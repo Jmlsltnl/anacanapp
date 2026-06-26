@@ -147,18 +147,6 @@ const AuthScreen = () => {
         return;
       }
 
-      // Verify the code owner has an ACTIVE PREMIUM subscription — partner mode is premium-only
-      const ownerIsPremium = partnerProfile.is_premium === true;
-
-      if (!ownerIsPremium) {
-        toast({
-          title: tr("authscreen_partner_premium_title", 'Partnyor modu Premium-dur'),
-          description: tr("authscreen_bu_kodun_sahibi_premium_abuneliye_malik__de7345", "Bu kodun sahibi Premium abunəliyə malik olmalıdır. Həyat yoldaşınızdan Premium aktivləşdirməsini xahiş edin."),
-          variant: 'destructive'
-        });
-        setIsLoading(false);
-        return;
-      }
 
       // Register new partner
       const partnerName = nameInputRef.current?.value || name || 'Partner';
