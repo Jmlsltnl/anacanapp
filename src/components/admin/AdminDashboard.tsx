@@ -177,10 +177,10 @@ const AdminDashboard = () => {
       });
 
       setLifeStageStats([
-      { name: 'Flow (Menstruasiya)', value: stageCounts.flow || 15, color: '#ec4899' },
-      { name: tr("admindashboard_bump_hamilelik_f698da", "Bump (Hamiləlik)"), value: stageCounts.bump || 45, color: '#f28155' },
-      { name: tr("admindashboard_mommy_analiq_bd48e3", "Mommy (Analıq)"), value: stageCounts.mommy || 30, color: '#8b5cf6' },
-      { name: 'Partner', value: stageCounts.partner || 10, color: '#3b82f6' }]
+      { name: 'Flow (Menstruasiya)', value: stageCounts.flow || 0, color: '#ec4899' },
+      { name: tr("admindashboard_bump_hamilelik_f698da", "Bump (Hamiləlik)"), value: stageCounts.bump || 0, color: '#f28155' },
+      { name: tr("admindashboard_mommy_analiq_bd48e3", "Mommy (Analıq)"), value: stageCounts.mommy || 0, color: '#8b5cf6' },
+      { name: 'Partner', value: stageCounts.partner || 0, color: '#3b82f6' }]
       );
     } catch (error) {
       console.error('Error fetching life stage stats:', error);
