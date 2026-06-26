@@ -120,7 +120,8 @@ const AuthScreen = () => {
       }
 
       // ── Registration flow: validate partner code ──
-      if (!partnerCode.startsWith('ANACAN-') || partnerCode.length < 10) {
+      const normalizedPartnerCode = partnerCode.trim().toUpperCase();
+      if (!normalizedPartnerCode.startsWith('ANACAN-') || normalizedPartnerCode.length < 10) {
         toast({
           title: tr("authscreen_kod_yanlisdir_64b48f", 'Kod yanlışdır'),
           description: tr("authscreen_zehmet_olmasa_duzgun_partnyor_kodu_daxil_cface0", 'Zəhmət olmasa düzgün partnyor kodu daxil edin.'),
@@ -132,7 +133,7 @@ const AuthScreen = () => {
 
       // Verify the partner code exists BEFORE registering
       const { data: partnerProfiles, error: findError } = await supabase.
-      rpc('find_partner_by_code', { p_partner_code: partnerCode });
+      rpc('find_partner_by_code', { p_partner_code: normalizedPartnerCode });
 
       const partnerProfile = partnerProfiles?.[0];
 
@@ -147,17 +148,7 @@ const AuthScreen = () => {
       }
 
       // Verify the code owner has an ACTIVE PREMIUM subscription — partner mode is premium-only
-      const { data: ownerSub } = await supabase.
-      from('subscriptions').
-      select('plan_type, status, expires_at').
-      eq('user_id', partnerProfile.user_id).
-      maybeSingle();
-
-      const ownerIsPremium =
-      ownerSub && (
-      ownerSub.plan_type === 'premium' || ownerSub.plan_type === 'premium_plus') && (
-      ownerSub.status === 'active' ||
-      ownerSub.status === 'cancelled' && ownerSub.expires_at && new Date(ownerSub.expires_at) > new Date());
+      const ownerIsPremium = partnerProfile.is_premium === true;
 
       if (!ownerIsPremium) {
         toast({
