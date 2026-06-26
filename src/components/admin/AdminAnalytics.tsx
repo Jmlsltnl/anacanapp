@@ -3,7 +3,7 @@ import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import {
   BarChart3, TrendingUp, Users, Crown, MousePointerClick,
-  Eye, Smartphone, Activity, RefreshCw, Calendar, Filter } from
+  Eye, Smartphone, Activity, RefreshCw, Calendar, Filter, DollarSign, Zap, Rocket, LineChart as LineChartIcon } from
 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -107,11 +107,22 @@ const AdminAnalytics = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [events, setEvents] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [premiumPlans, setPremiumPlans] = useState<any[]>([]);
 
   const fetchEvents = async () => {
     setLoading(true);
     try {
       const sinceDate = subDays(new Date(), parseInt(dateRange)).toISOString();
+      
+      // Fetch startup data concurrently
+      const [subsRes, plansRes] = await Promise.all([
+        supabase.from('subscriptions').select('*'),
+        supabase.from('premium_plans').select('*')
+      ]);
+      setSubscriptions(subsRes.data || []);
+      setPremiumPlans(plansRes.data || []);
+
       const { data, error } = await supabase.
       from('analytics_events').
       select('*').
@@ -137,6 +148,57 @@ const AdminAnalytics = () => {
     await fetchEvents();
     setRefreshing(false);
   };
+
+  // Startup / SaaS Metrics
+  const startupStats = useMemo(() => {
+    // DAU / MAU Stickiness
+    // We estimate DAU from events in the last 24h, and MAU from events in the last 30d (assuming dateRange >= 30, otherwise we use what we have)
+    const now = new Date();
+    const oneDayAgo = subDays(now, 1).toISOString();
+    const thirtyDaysAgo = subDays(now, 30).toISOString();
+    
+    const dauEvents = events.filter(e => e.created_at >= oneDayAgo);
+    const mauEvents = events.filter(e => e.created_at >= thirtyDaysAgo);
+    
+    const dau = new Set(dauEvents.map(e => e.user_id)).size;
+    const mau = new Set(mauEvents.map(e => e.user_id)).size || 1; // avoid div by 0
+    const stickiness = ((dau / mau) * 100).toFixed(1);
+
+    // MRR (Monthly Recurring Revenue) & ARR
+    // Active subscriptions multiplied by their plan's monthly price
+    const activeSubs = subscriptions.filter(s => s.status === 'active' || (s.status === 'cancelled' && new Date(s.expires_at) > now));
+    const cancelledSubs = subscriptions.filter(s => s.status === 'cancelled');
+    const totalSubs = subscriptions.length || 1;
+    const churnRate = ((cancelledSubs.length / totalSubs) * 100).toFixed(1);
+
+    // Estimate MRR based on plans
+    let mrr = 0;
+    activeSubs.forEach(sub => {
+      const plan = premiumPlans.find(p => p.id === sub.plan_id || p.name === sub.plan_type);
+      // Fallback estimate if plan not found (e.g. 4.99 AZN)
+      mrr += plan ? (plan.price_monthly || 4.99) : 4.99; 
+    });
+
+    // ARPU (Average Revenue Per User)
+    const activeUsers = new Set(events.map(e => e.user_id)).size || 1;
+    const arpu = (mrr / activeUsers).toFixed(2);
+    
+    // LTV (Life Time Value) = ARPU / Churn Rate (decimal)
+    const churnDecimal = (parseFloat(churnRate) / 100) || 0.05; // avoid div by 0, assume 5% if 0
+    const ltv = (parseFloat(arpu) / churnDecimal).toFixed(2);
+
+    return {
+      dau,
+      mau,
+      stickiness,
+      mrr: Math.round(mrr),
+      arr: Math.round(mrr * 12),
+      activeSubs: activeSubs.length,
+      churnRate,
+      arpu,
+      ltv
+    };
+  }, [events, subscriptions, premiumPlans]);
 
   // Computed stats
   const filteredEvents = useMemo(() => {
@@ -347,6 +409,7 @@ const AdminAnalytics = () => {
           <TabsTrigger value="tools">{tr("adminanalytics_alet_istifadesi_b15cf9", "Alət İstifadəsi")}</TabsTrigger>
           <TabsTrigger value="premium">Premium Analiz</TabsTrigger>
           <TabsTrigger value="users">{tr("adminanalytics_istifadeci_segmentleri_f5dd13", "İstifadəçi Segmentləri")}</TabsTrigger>
+          <TabsTrigger value="startup" className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"><Rocket className="w-4 h-4 mr-1.5" /> Startup / SaaS</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -609,6 +672,66 @@ const AdminAnalytics = () => {
               </div>
             </div>
           </Card>
+        </TabsContent>
+        {/* Startup / SaaS Tab */}
+        <TabsContent value="startup" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="p-5 border-indigo-100 dark:border-indigo-900 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <DollarSign className="w-16 h-16" />
+              </div>
+              <p className="text-sm text-muted-foreground font-medium">MRR (Aylıq Gəlir)</p>
+              <h3 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mt-2">₼{startupStats.mrr.toLocaleString()}</h3>
+              <p className="text-xs text-muted-foreground mt-2">ARR: ₼{startupStats.arr.toLocaleString()}</p>
+            </Card>
+            
+            <Card className="p-5 border-emerald-100 dark:border-emerald-900 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Zap className="w-16 h-16" />
+              </div>
+              <p className="text-sm text-muted-foreground font-medium">Məhsul Stickiness (DAU/MAU)</p>
+              <h3 className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-2">{startupStats.stickiness}%</h3>
+              <p className="text-xs text-muted-foreground mt-2">DAU: {startupStats.dau} / MAU: {startupStats.mau}</p>
+            </Card>
+
+            <Card className="p-5 border-rose-100 dark:border-rose-900 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Activity className="w-16 h-16" />
+              </div>
+              <p className="text-sm text-muted-foreground font-medium">Churn Rate (İtgi)</p>
+              <h3 className="text-3xl font-bold text-rose-600 dark:text-rose-400 mt-2">{startupStats.churnRate}%</h3>
+              <p className="text-xs text-muted-foreground mt-2">Aktiv Abunələr: {startupStats.activeSubs}</p>
+            </Card>
+
+            <Card className="p-5 border-amber-100 dark:border-amber-900 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <LineChartIcon className="w-16 h-16" />
+              </div>
+              <p className="text-sm text-muted-foreground font-medium">LTV (Həyat Dəyəri)</p>
+              <h3 className="text-3xl font-bold text-amber-600 dark:text-amber-400 mt-2">₼{startupStats.ltv}</h3>
+              <p className="text-xs text-muted-foreground mt-2">ARPU: ₼{startupStats.arpu}</p>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="p-6">
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Rocket className="w-5 h-5 text-indigo-500" /> SaaS Metrikaları İzahı</h3>
+              <div className="space-y-4">
+                <div className="bg-muted/30 p-4 rounded-xl">
+                  <h4 className="font-semibold text-sm">MRR (Monthly Recurring Revenue)</h4>
+                  <p className="text-xs text-muted-foreground mt-1">Aylıq təkrarlanan stabil gəlir. Hər ay avtomatik yenilənən abunəliklərdən gələn təxmini gəliri göstərir. İnvestorlar üçün ən vacib rəqəmdir.</p>
+                </div>
+                <div className="bg-muted/30 p-4 rounded-xl">
+                  <h4 className="font-semibold text-sm">Stickiness (DAU/MAU nisbəti)</h4>
+                  <p className="text-xs text-muted-foreground mt-1">İstifadəçilərin məhsula bağlılıq dərəcəsi. 20% yaxşı, 30% çox yaxşı hesab olunur. Bu rəqəm aktiv istifadəçilərinizin nə qədərinin tətbiqi HƏR GÜN açdığını göstərir.</p>
+                </div>
+                <div className="bg-muted/30 p-4 rounded-xl">
+                  <h4 className="font-semibold text-sm">LTV (Life Time Value)</h4>
+                  <p className="text-xs text-muted-foreground mt-1">Bir müştərinin tətbiqdə qaldığı müddət ərzində qazandırdığı ortalama məbləğ. Gələcəkdə reklam verərkən CAC (Müştəri Əldəetmə Xərci) bu rəqəmdən az olmalıdır (LTV:CAC nisbəti 3:1 idealıdır).</p>
+                </div>
+              </div>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>);
