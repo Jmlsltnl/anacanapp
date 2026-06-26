@@ -395,7 +395,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
           useUserStore.getState().setHasSelectedLanguage(true);
         } else {
           const localLang = useUserStore.getState().language;
-          supabase.from('user_preferences').upsert({ user_id: u.id, language: localLang }, { onConflict: 'user_id' }).catch(console.error);
+          Promise.resolve(supabase.from('user_preferences').upsert({ user_id: u.id, language: localLang }, { onConflict: 'user_id' })).catch(console.error);
         }
 
         setProfile(profileData);

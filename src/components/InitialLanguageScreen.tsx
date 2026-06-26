@@ -1,90 +1,186 @@
 import { motion } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
-import { Globe } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Check, Sparkles } from 'lucide-react';
 import { clearTranslationCache, loadTranslations } from '@/lib/i18n';
 import logoImage from '@/assets/logo.png';
 import { useState } from 'react';
 
 const LANGS = [
-  { code: 'az', label: 'Azərbaycan', flag: '🇦🇿', desc: 'Azərbaycan dilində davam edin' },
-  { code: 'en', label: 'English', flag: '🇬🇧', desc: 'Continue in English' }
+  {
+    code: 'az',
+    label: 'Azərbaycan',
+    nativeLabel: 'Azərbaycan dili',
+    flag: '🇦🇿',
+    desc: 'Azərbaycan dilində davam edin',
+  },
+  {
+    code: 'en',
+    label: 'English',
+    nativeLabel: 'English',
+    flag: '🇬🇧',
+    desc: 'Continue in English',
+  },
 ];
 
 export default function InitialLanguageScreen() {
   const { setLanguage, setHasSelectedLanguage } = useUserStore();
+  const [selected, setSelected] = useState<string | null>(null);
   const [isSwitching, setIsSwitching] = useState(false);
 
   const handleSelect = async (code: string) => {
+    if (isSwitching) return;
+    setSelected(code);
     setIsSwitching(true);
-    
-    // Switch translations
+
     clearTranslationCache();
     if (code !== 'az') {
       await loadTranslations(code);
     }
-    
-    // Save to store
+
     setLanguage(code);
-    
-    // Brief delay to allow UI to show loading state if needed
+
     setTimeout(() => {
       setHasSelectedLanguage(true);
-    }, 300);
+    }, 350);
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-background relative overflow-hidden">
-      {/* Decorative background blur */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-pink-500/20 rounded-full blur-[100px] pointer-events-none" />
+    <div
+      className="min-h-[100dvh] flex flex-col bg-background relative overflow-hidden"
+      style={{
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
+    >
+      {/* Warm decorative background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-32 -right-24 w-[420px] h-[420px] rounded-full bg-primary/20 blur-[120px]" />
+        <div className="absolute -bottom-40 -left-24 w-[460px] h-[460px] rounded-full bg-accent/15 blur-[120px]" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[300px] h-[300px] rounded-full bg-[hsl(var(--beige))]/40 blur-[100px]" />
+      </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 relative z-10 w-full max-w-md mx-auto">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 relative z-10 w-full max-w-md mx-auto">
+        {/* Logo + heading */}
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, type: 'spring' }}
-          className="mb-10 text-center"
+          initial={{ scale: 0.85, opacity: 0, y: 12 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="text-center mb-10"
         >
-          <div className="bg-white/80 dark:bg-black/50 p-6 rounded-3xl shadow-xl backdrop-blur-md inline-block border border-white/20">
-            <img src={logoImage} alt="Anacan" className="w-24 h-24 object-contain mx-auto" />
+          <div className="relative inline-flex items-center justify-center mb-6">
+            <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-primary/30 to-accent/20 blur-2xl" />
+            <div className="relative bg-card/90 backdrop-blur-xl p-5 rounded-[1.75rem] shadow-[var(--shadow-elevated)] border border-white/60">
+              <img
+                src={logoImage}
+                alt="Anacan"
+                className="w-20 h-20 object-contain"
+              />
+            </div>
           </div>
-          <h1 className="mt-8 text-3xl font-black text-foreground">Xoş gəlmisiniz!</h1>
-          <p className="mt-2 text-muted-foreground text-lg">Welcome to Anacan</p>
+
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/15 mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-primary" strokeWidth={2.5} />
+            <span className="text-xs font-semibold text-primary tracking-wide">
+              Anacan
+            </span>
+          </div>
+
+          <h1 className="text-[2rem] leading-tight font-black text-foreground tracking-tight">
+            Xoş gəlmisiniz
+          </h1>
+          <p className="mt-1.5 text-base text-muted-foreground font-medium">
+            Welcome to Anacan
+          </p>
         </motion.div>
 
+        {/* Language section */}
         <motion.div
-          initial={{ y: 30, opacity: 0 }}
+          initial={{ y: 24, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="w-full space-y-4"
+          transition={{ duration: 0.5, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full"
         >
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <Globe className="w-5 h-5 text-primary" />
-            <span className="font-semibold text-lg">Dil seçin / Select language</span>
+          <div className="text-center mb-5">
+            <p className="text-sm font-semibold text-foreground/80">
+              Dil seçin
+              <span className="mx-2 text-muted-foreground/50">·</span>
+              <span className="text-muted-foreground">Select language</span>
+            </p>
           </div>
 
-          <div className="grid gap-4">
-            {LANGS.map((lang, idx) => (
-              <motion.button
-                key={lang.code}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => handleSelect(lang.code)}
-                disabled={isSwitching}
-                className="w-full relative group overflow-hidden bg-card/60 backdrop-blur-xl border border-border/50 hover:border-primary/50 p-5 rounded-2xl flex items-center gap-4 transition-all hover:shadow-lg text-left disabled:opacity-50"
-              >
-                <div className="text-4xl">{lang.flag}</div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-foreground">{lang.label}</h3>
-                  <p className="text-sm text-muted-foreground mt-0.5">{lang.desc}</p>
-                </div>
-                
-                {/* Hover gradient effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </motion.button>
-            ))}
+          <div className="space-y-3">
+            {LANGS.map((lang, idx) => {
+              const isSelected = selected === lang.code;
+              return (
+                <motion.button
+                  key={lang.code}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 + idx * 0.07, duration: 0.4 }}
+                  whileTap={{ scale: 0.985 }}
+                  onClick={() => handleSelect(lang.code)}
+                  disabled={isSwitching}
+                  className={`group relative w-full overflow-hidden text-left rounded-2xl p-4 flex items-center gap-4 transition-all duration-300 border ${
+                    isSelected
+                      ? 'bg-card border-primary shadow-[var(--shadow-button)] scale-[1.01]'
+                      : 'bg-card/80 backdrop-blur-md border-border/60 hover:border-primary/40 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-soft)]'
+                  } disabled:cursor-not-allowed`}
+                >
+                  {/* Flag tile */}
+                  <div
+                    className={`flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center text-3xl transition-all ${
+                      isSelected
+                        ? 'bg-gradient-to-br from-primary to-accent shadow-md'
+                        : 'bg-[hsl(var(--beige-light))] group-hover:bg-primary/10'
+                    }`}
+                  >
+                    <span className="drop-shadow-sm">{lang.flag}</span>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-bold text-foreground leading-tight">
+                      {lang.nativeLabel}
+                    </h3>
+                    <p className="text-[13px] text-muted-foreground mt-0.5 truncate">
+                      {lang.desc}
+                    </p>
+                  </div>
+
+                  {/* Selection indicator */}
+                  <div
+                    className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isSelected
+                        ? 'bg-primary text-primary-foreground scale-100'
+                        : 'border-2 border-border bg-transparent scale-90 group-hover:border-primary/50'
+                    }`}
+                  >
+                    {isSelected && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+                      >
+                        <Check className="w-4 h-4" strokeWidth={3} />
+                      </motion.div>
+                    )}
+                  </div>
+                </motion.button>
+              );
+            })}
           </div>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.55, duration: 0.4 }}
+            className="text-center text-xs text-muted-foreground/80 mt-6 leading-relaxed"
+          >
+            Dili sonradan tənzimləmələrdən dəyişə bilərsiniz
+            <br />
+            <span className="text-muted-foreground/60">
+              You can change the language later in settings
+            </span>
+          </motion.p>
         </motion.div>
       </div>
     </div>
