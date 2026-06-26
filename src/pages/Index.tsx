@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import SplashScreen from '@/components/SplashScreen';
 import logoImage from '@/assets/logo.png';
 import AppIntroduction from '@/components/AppIntroduction';
+import InitialLanguageScreen from '@/components/InitialLanguageScreen';
 import AuthScreen from '@/components/AuthScreen';
 import OnboardingScreen from '@/components/OnboardingScreen';
 import BottomNav from '@/components/BottomNav';
@@ -83,7 +84,7 @@ const Index = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
-  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, lifeStage, hasCompletedFunnel, setFunnelCompleted } = useUserStore();
+  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, hasSelectedLanguage, setHasSelectedLanguage, lifeStage, hasCompletedFunnel, setFunnelCompleted } = useUserStore();
   const { isAdmin, loading, profile, user } = useAuth();
   const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
 
@@ -268,6 +269,13 @@ const Index = () => {
     enabled: isAuthenticated && !showSplash && !showIntro && !showAdmin
   });
 
+  // Bypass language screen for existing users (who have seen intro or are logged in)
+  useEffect(() => {
+    if (!hasSelectedLanguage && (hasSeenIntro || isOnboarded || isAuthenticated)) {
+      setHasSelectedLanguage(true);
+    }
+  }, [hasSelectedLanguage, hasSeenIntro, isOnboarded, isAuthenticated, setHasSelectedLanguage]);
+
   useEffect(() => {
     if (activeScreen === 'admin' && isAdmin) {
       setShowAdmin(true);
@@ -357,6 +365,15 @@ const Index = () => {
   // Splash screen
   if (showSplash) {
     return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
+
+  // Initial Language Selection (First-time users)
+  if (!hasSelectedLanguage) {
+    return (
+      <motion.div key="initial-language" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="min-h-screen bg-background relative overflow-hidden">
+        <InitialLanguageScreen />
+      </motion.div>
+    );
   }
 
   // App introduction (first time users)

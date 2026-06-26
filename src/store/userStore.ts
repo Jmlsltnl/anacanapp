@@ -8,6 +8,7 @@ interface UserState {
   isAuthenticated: boolean;
   isOnboarded: boolean;
   hasSeenIntro: boolean;
+  hasSelectedLanguage: boolean;
   hasCompletedFunnel: boolean;
   userId: string | null;
   email: string | null;
@@ -41,6 +42,7 @@ interface UserState {
   setAuth: (isAuth: boolean, userId?: string, email?: string, name?: string) => void;
   setOnboarded: (isOnboarded: boolean) => void;
   setHasSeenIntro: (hasSeen: boolean) => void;
+  setHasSelectedLanguage: (val: boolean) => void;
   setFunnelCompleted: (v: boolean) => void;
   setLifeStage: (stage: LifeStage) => void;
   setRole: (role: UserRole) => void;
@@ -77,6 +79,7 @@ export const useUserStore = create<UserState>()(
       isAuthenticated: false,
       isOnboarded: false,
       hasSeenIntro: false,
+      hasSelectedLanguage: false,
       hasCompletedFunnel: true, // Default true so existing users skip; set to false during onboarding
       userId: null,
       email: null,
@@ -110,9 +113,9 @@ export const useUserStore = create<UserState>()(
       },
 
       setOnboarded: (isOnboarded) => set({ isOnboarded }),
-
-      setHasSeenIntro: (hasSeen) => set({ hasSeenIntro: hasSeen }),
-      setFunnelCompleted: (v) => set({ hasCompletedFunnel: v }),
+      setHasSeenIntro: (hasSeenIntro) => set({ hasSeenIntro }),
+      setHasSelectedLanguage: (hasSelectedLanguage) => set({ hasSelectedLanguage }),
+      setFunnelCompleted: (hasCompletedFunnel) => set({ hasCompletedFunnel }),
 
       setLifeStage: (stage) => set({ lifeStage: stage }),
 

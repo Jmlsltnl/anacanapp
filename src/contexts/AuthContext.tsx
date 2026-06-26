@@ -378,15 +378,25 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
 
     const hydrateUser = async (u: User) => {
       try {
-        const [profileRes, roleRes] = await Promise.allSettled([
-        fetchProfile(u.id),
-        fetchUserRole(u.id)]
-        );
+        const [profileRes, roleRes, prefsRes] = await Promise.allSettled([
+          fetchProfile(u.id),
+          fetchUserRole(u.id),
+          supabase.from('user_preferences').select('language').eq('user_id', u.id).maybeSingle()
+        ]);
 
         if (!mounted) return;
 
         const profileData = profileRes.status === 'fulfilled' ? profileRes.value : null;
         const roleData = roleRes.status === 'fulfilled' ? roleRes.value : null;
+        const prefsData = prefsRes.status === 'fulfilled' ? prefsRes.value?.data : null;
+
+        if (prefsData?.language) {
+          useUserStore.getState().setLanguage(prefsData.language);
+          useUserStore.getState().setHasSelectedLanguage(true);
+        } else {
+          const localLang = useUserStore.getState().language;
+          supabase.from('user_preferences').upsert({ user_id: u.id, language: localLang }, { onConflict: 'user_id' }).catch(console.error);
+        }
 
         setProfile(profileData);
         setUserRole(roleData);
