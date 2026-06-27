@@ -61,7 +61,7 @@ export default function InitialLanguageScreen() {
 
   return (
     <div
-      className="min-h-[100dvh] flex flex-col bg-background relative overflow-hidden"
+      className="h-[100dvh] flex flex-col bg-background relative overflow-hidden"
       style={{
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)',
