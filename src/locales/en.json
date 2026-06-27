@@ -7427,5 +7427,15 @@
   "commentreply_orijinali_goster": "Show original",
   "commentreply_tercume_et_ai": "Translate *",
   "commentreply_tercume_xetasi": "Translation failed.",
-  "weighttracker_indi_eef": "Now:"
+  "weighttracker_indi_eef": "Now:",
+  "vitamintracker_d_vitamini": "Vitamin D",
+  "vitamintracker_kalsium": "Calcium",
+  "vitamintracker_omega_3": "Omega-3",
+  "vitamintracker_b12_vitamini": "Vitamin B12",
+  "vitamintracker_c_vitamini": "Vitamin C",
+  "vitamintracker_maqnezium": "Magnesium",
+  "vitamintracker_sink": "Zinc",
+  "vitamintracker_yod": "Iodine",
+  "vitamintracker_prenatal_vitamin": "Prenatal vitamin",
+  "vitamintracker_probiotik": "Probiotic"
 }

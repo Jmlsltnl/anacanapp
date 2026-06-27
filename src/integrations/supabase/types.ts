@@ -7044,6 +7044,7 @@ export type Database = {
           bio: string | null
           birth_height_cm: number | null
           birth_weight_kg: number | null
+          country_code: string | null
           created_at: string
           cycle_length: number | null
           delivery_type: string | null
@@ -7077,6 +7078,7 @@ export type Database = {
           bio?: string | null
           birth_height_cm?: number | null
           birth_weight_kg?: number | null
+          country_code?: string | null
           created_at?: string
           cycle_length?: number | null
           delivery_type?: string | null
@@ -7110,6 +7112,7 @@ export type Database = {
           bio?: string | null
           birth_height_cm?: number | null
           birth_weight_kg?: number | null
+          country_code?: string | null
           created_at?: string
           cycle_length?: number | null
           delivery_type?: string | null

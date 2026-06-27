@@ -14,17 +14,37 @@ interface VitaminTrackerProps {
 
 const VITAMIN_PRESETS = [
 { name: tr("vitamintracker_folat_fol_tursusu_941d76", "Folat (Fol turşusu)"), emoji: '🟢' },
-{ name: 'D vitamini', emoji: '☀️' },
+{ name: tr("vitamintracker_d_vitamini", "D vitamini"), emoji: '☀️' },
 { name: tr("vitamintracker_demir_30bf6c", "Dəmir"), emoji: '🔴' },
-{ name: 'Kalsium', emoji: '🦴' },
-{ name: 'Omega-3', emoji: '🐟' },
-{ name: 'B12 vitamini', emoji: '💜' },
-{ name: 'C vitamini', emoji: '🍊' },
-{ name: 'Maqnezium', emoji: '💎' },
-{ name: 'Sink', emoji: '⚡' },
-{ name: 'Yod', emoji: '🌊' },
-{ name: 'Prenatal vitamin', emoji: '💊' },
-{ name: 'Probiotik', emoji: '🦠' }];
+{ name: tr("vitamintracker_kalsium", "Kalsium"), emoji: '🦴' },
+{ name: tr("vitamintracker_omega_3", "Omega-3"), emoji: '🐟' },
+{ name: tr("vitamintracker_b12_vitamini", "B12 vitamini"), emoji: '💜' },
+{ name: tr("vitamintracker_c_vitamini", "C vitamini"), emoji: '🍊' },
+{ name: tr("vitamintracker_maqnezium", "Maqnezium"), emoji: '💎' },
+{ name: tr("vitamintracker_sink", "Sink"), emoji: '⚡' },
+{ name: tr("vitamintracker_yod", "Yod"), emoji: '🌊' },
+{ name: tr("vitamintracker_prenatal_vitamin", "Prenatal vitamin"), emoji: '💊' },
+{ name: tr("vitamintracker_probiotik", "Probiotik"), emoji: '🦠' }];
+
+export const getTranslatedVitaminName = (name: string) => {
+  if (!name) return name;
+  const normalized = name.trim().toLowerCase();
+  
+  if (normalized === 'folat (fol turşusu)' || normalized === 'folate (folic acid)') return tr("vitamintracker_folat_fol_tursusu_941d76", "Folat (Fol turşusu)");
+  if (normalized === 'd vitamini' || normalized === 'vitamin d') return tr("vitamintracker_d_vitamini", "D vitamini");
+  if (normalized === 'dəmir' || normalized === 'iron') return tr("vitamintracker_demir_30bf6c", "Dəmir");
+  if (normalized === 'kalsium' || normalized === 'calcium') return tr("vitamintracker_kalsium", "Kalsium");
+  if (normalized === 'omega-3') return tr("vitamintracker_omega_3", "Omega-3");
+  if (normalized === 'b12 vitamini' || normalized === 'vitamin b12') return tr("vitamintracker_b12_vitamini", "B12 vitamini");
+  if (normalized === 'c vitamini' || normalized === 'vitamin c') return tr("vitamintracker_c_vitamini", "C vitamini");
+  if (normalized === 'maqnezium' || normalized === 'magnesium') return tr("vitamintracker_maqnezium", "Maqnezium");
+  if (normalized === 'sink' || normalized === 'zinc') return tr("vitamintracker_sink", "Sink");
+  if (normalized === 'yod' || normalized === 'iodine') return tr("vitamintracker_yod", "Yod");
+  if (normalized === 'prenatal vitamin') return tr("vitamintracker_prenatal_vitamin", "Prenatal vitamin");
+  if (normalized === 'probiotik' || normalized === 'probiotic') return tr("vitamintracker_probiotik", "Probiotik");
+  
+  return name;
+};
 
 
 const DAY_LABELS = ['B', 'B.e', tr("vitamintracker_c_a_28099e", "\xC7.a"), tr("vitamintracker_c_b70344", "\xC7"), 'C.a', 'C', tr("vitamintracker_s_b97106", "\u015E")];
@@ -69,7 +89,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
       if (log) await undoIntake.mutateAsync(log.id);
     } else {
       await logIntake.mutateAsync(schedule);
-      toast.success(`${schedule.vitamin_name} ${tr("vitamintracker_taken_status", "qəbul edildi ✓")}`);
+      toast.success(`${getTranslatedVitaminName(schedule.vitamin_name)} ${tr("vitamintracker_taken_status", "qəbul edildi ✓")}`);
     }
   };
 
@@ -212,7 +232,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <p className={`font-semibold text-sm ${taken ? 'text-emerald-600 dark:text-emerald-400 line-through' : 'text-foreground'}`}>
-                        {schedule.vitamin_name}
+                        {getTranslatedVitaminName(schedule.vitamin_name)}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <Clock className="w-3 h-3 text-muted-foreground" />
@@ -238,9 +258,6 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                       <button
                       onClick={() => handleDelete(schedule.id)}
                       className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
-                      
-                        <Trash2 className="w-4 h-4" />
-                      </button>
                     </div>
                   </div>
                 </motion.div>);

@@ -21,6 +21,8 @@ import BannerSlot from '@/components/banners/BannerSlot';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Award } from '@/components/tools/Gamification';
+import countriesData from '../../countries.json';
 import { tr } from "@/lib/tr";
 
 interface ProfileScreenProps {
@@ -149,6 +151,8 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   };
 
   const stageInfo = getStageInfo();
+  
+  const userCountry = countriesData.find(c => c.isoAlpha2 === profile?.country_code);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -210,11 +214,13 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               <span className="inline-flex items-center px-3 py-1 bg-white/20 rounded-full text-white text-xs font-bold">
                 {stageInfo.name}
               </span>
-              {isAdmin &&
-              <span className="inline-flex items-center px-3 py-1 bg-amber-500/80 rounded-full text-white text-xs font-bold">
-                  👑 Admin
+              {userCountry && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 rounded-full text-white text-xs font-bold">
+                  <img src={userCountry.flag} alt="" className="w-4 h-3 object-cover rounded-sm" />
+                  {userCountry.name}
                 </span>
-              }
+              )}
+              {isAdmin &&
             </div>
           </div>
           <motion.button

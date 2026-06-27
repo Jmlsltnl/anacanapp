@@ -54,7 +54,7 @@ interface AuthContextValue {
   loading: boolean;
   isAdmin: boolean;
   isModerator: boolean;
-  signUp: (email: string, password: string, name: string) => Promise<{data: any;error: any;}>;
+  signUp: (email: string, password: string, name: string, countryCode?: string | null) => Promise<{data: any;error: any;}>;
   signIn: (email: string, password: string) => Promise<{data: any;error: any;}>;
   signInWithGoogle: () => Promise<{data: any;error: any;}>;
   signInWithApple: () => Promise<{data: any;error: any;}>;
@@ -200,14 +200,14 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
   // ─────────────────────────────────────────
   // Auth actions
   // ─────────────────────────────────────────
-  const signUp = async (email: string, password: string, name: string) => {
+  const signUp = async (email: string, password: string, name: string, countryCode?: string | null) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { name }
+          data: { name, country_code: countryCode }
         }
       });
       if (error) throw error;

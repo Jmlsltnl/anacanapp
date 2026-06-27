@@ -10,6 +10,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAppBranding, getBrandingUrl } from '@/hooks/useAppBranding';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { tr } from "@/lib/tr";
+import { useUserStore } from '@/store/userStore';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Globe } from 'lucide-react';
+import countriesData from '../../countries.json';
 
 type AuthMode = 'login' | 'register' | 'forgot-password';
 type PartnerAuthMode = 'login' | 'register';
@@ -73,6 +77,7 @@ const AuthScreen = () => {
   const { data: branding = [] } = useAppBranding();
   const socialLoginEnabled = useAppSetting('social_login_enabled');
   const isSocialLoginEnabled = socialLoginEnabled === true || socialLoginEnabled === 'true';
+  const { countryCode, setCountryCode } = useUserStore();
 
   // Get custom login logo from database
   const customLoginLogo = getBrandingUrl(branding, 'login_logo');
@@ -150,7 +155,7 @@ const AuthScreen = () => {
 
       // Register new partner
       const partnerName = nameInputRef.current?.value || name || 'Partner';
-      const { error: registerError } = await signUp(email, password, partnerName.trim());
+      const { error: registerError } = await signUp(email, password, partnerName.trim(), countryCode);
       if (registerError) {
         toast({
           title: tr("authscreen_qeydiyyat_alinmadi_982f04", "Qeydiyyat alınmadı"),
@@ -312,7 +317,7 @@ const AuthScreen = () => {
         }
 
         const finalName = nameInputRef.current?.value || name || email.split('@')[0];
-        const { error } = await signUp(email, password, finalName.trim());
+        const { error } = await signUp(email, password, finalName.trim(), countryCode);
         if (error) {
           toast({
             title: tr("authscreen_qeydiyyat_alinmadi_982f04", "Qeydiyyat alınmadı"),
@@ -515,20 +520,15 @@ const AuthScreen = () => {
                     </motion.div>
                   }
 
-                  <motion.div variants={itemVariants}>
-                    <div className="relative group">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
-                      <Input
+                    <motion.div variants={itemVariants}>
+                      <div className="relative group">
+                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
+                        <Input
                         type="email"
                         placeholder="E-mail"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
-                      
-                    </div>
-                  </motion.div>
-
-                  <motion.div variants={itemVariants}>
                     <div className="relative group">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
                       <Input
@@ -769,6 +769,31 @@ const AuthScreen = () => {
                       
                       </div>
                     </motion.div>
+
+                    {mode === 'register' && (
+                      <motion.div variants={itemVariants}>
+                        <div className="relative group">
+                          <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                            <Globe className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                          </div>
+                          <Select value={countryCode || ''} onValueChange={setCountryCode}>
+                            <SelectTrigger className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all">
+                              <SelectValue placeholder={tr("authscreen_olke_secin", "Ölkə seçin")} />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-[300px]">
+                              {countriesData.map((country) => (
+                                <SelectItem key={country.isoAlpha2} value={country.isoAlpha2}>
+                                  <span className="flex items-center gap-2">
+                                    <img src={country.flag} alt="" className="w-6 h-4 object-cover rounded-sm" />
+                                    {country.name}
+                                  </span>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </motion.div>
+                    )}
 
                     <motion.div variants={itemVariants}>
                       <div className="relative group">

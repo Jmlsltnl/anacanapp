@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Camera, Save, User, Calendar, Loader2, CalendarDays, Baby, Sparkles } from 'lucide-react';
+import { ArrowLeft, Camera, Save, User, Calendar, Loader2, CalendarDays, Baby, Sparkles, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
+import countriesData from '../../countries.json';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -26,7 +27,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
   useScrollToTop();
 
   const { user, profile, updateProfile } = useAuth();
-  const { lifeStage, babyName, dueDate, lastPeriodDate, cycleLength, setLifeStage, setDueDate, setLastPeriodDate, setCycleLength, setBabyData, babyGender, babyBirthDate } = useUserStore();
+  const { countryCode, setCountryCode, lifeStage, babyName, dueDate, lastPeriodDate, cycleLength, setLifeStage, setDueDate, setLastPeriodDate, setCycleLength, setBabyData, babyGender, babyBirthDate } = useUserStore();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -48,7 +49,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     last_period_date: lastPeriodDate ? new Date(lastPeriodDate).toISOString().split('T')[0] : '',
     cycle_length: cycleLength || 28,
     baby_birth_date: babyBirthDate ? new Date(babyBirthDate).toISOString().split('T')[0] : '',
-    baby_gender: babyGender || '' as 'boy' | 'girl' | ''
+    baby_gender: babyGender || '' as 'boy' | 'girl' | '',
+    country_code: profile?.country_code || countryCode || ''
   });
 
   // Compute the calculated date based on mode
@@ -157,7 +159,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
         bio: formData.bio,
         life_stage: formData.life_stage,
         baby_name: formData.baby_name || null,
-        cycle_length: formData.cycle_length
+        cycle_length: formData.cycle_length,
+        country_code: formData.country_code || null
       };
 
       // Set dates based on life stage
@@ -211,6 +214,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
       // Refresh auth profile
       await updateProfile({ name: formData.name });
+      setCountryCode(formData.country_code || null);
 
       toast({ title: tr("profileeditscreen_profil_yenilendi_ad61ca", 'Profil yeniləndi!') });
       onBack();
@@ -298,6 +302,25 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder={tr("profileeditscreen_adiniz_b3e84a", "Adınız")} />
               
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-muted-foreground">{tr("authscreen_olke_secin", "Ölkə")}</label>
+            <Select value={formData.country_code} onValueChange={(val) => setFormData(prev => ({ ...prev, country_code: val }))}>
+              <SelectTrigger className="w-full h-11 rounded-xl bg-background border border-input">
+                <SelectValue placeholder={tr("authscreen_olke_secin", "Ölkə seçin")} />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                {countriesData.map((country) => (
+                  <SelectItem key={country.isoAlpha2} value={country.isoAlpha2}>
+                    <span className="flex items-center gap-2">
+                      <img src={country.flag} alt="" className="w-6 h-4 object-cover rounded-sm border border-border/50" />
+                      {country.name}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

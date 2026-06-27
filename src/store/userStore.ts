@@ -29,6 +29,7 @@ interface UserState {
   babyCount: number;
   multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets' | null;
   language: string;
+  countryCode: string | null;
   
   // Partner's woman data (for partner mode)
   partnerWomanData: {
@@ -56,6 +57,7 @@ interface UserState {
   setPartnerWomanData: (data: UserState['partnerWomanData']) => void;
   setMultiplesData: (babyCount: number, multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets') => void;
   setLanguage: (lang: string) => void;
+  setCountryCode: (code: string | null) => void;
   logout: () => void;
   
   // Computed
@@ -98,6 +100,7 @@ export const useUserStore = create<UserState>()(
       babyCount: 1,
       multiplesType: null,
       language: 'az',
+      countryCode: null,
       partnerWomanData: null,
 
       setAuth: (isAuth, userId, email, name) => {
@@ -116,6 +119,7 @@ export const useUserStore = create<UserState>()(
       setHasSeenIntro: (hasSeenIntro) => set({ hasSeenIntro }),
       setHasSelectedLanguage: (hasSelectedLanguage) => set({ hasSelectedLanguage }),
       setFunnelCompleted: (hasCompletedFunnel) => set({ hasCompletedFunnel }),
+      setCountryCode: (countryCode) => set({ countryCode }),
 
       setLifeStage: (stage) => set({ lifeStage: stage }),
 
