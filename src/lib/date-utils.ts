@@ -9,12 +9,35 @@ export const getCurrentDateLocale = () => {
 /**
  * Format date to Azerbaijani format: "18 Fevral" or "18 Fevral 2025"
  */
+export const getTranslatedMonth = (monthIndex: number): string => {
+  const months = [
+    tr('month_january', 'Yanvar'),
+    tr('month_february', 'Fevral'),
+    tr('month_march', 'Mart'),
+    tr('month_april', 'Aprel'),
+    tr('month_may', 'May'),
+    tr('month_june', 'İyun'),
+    tr('month_july', 'İyul'),
+    tr('month_august', 'Avqust'),
+    tr('month_september', 'Sentyabr'),
+    tr('month_october', 'Oktyabr'),
+    tr('month_november', 'Noyabr'),
+    tr('month_december', 'Dekabr')
+  ];
+  return months[monthIndex] || '';
+};
+
+/**
+ * Format date to Azerbaijani format: "18 Fevral" or "18 Fevral 2025"
+ */
 export const formatDateAz = (date: Date | string, includeYear = false): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return '';
 
-  const formatStr = includeYear ? 'd MMMM yyyy' : 'd MMMM';
-  return format(d, formatStr, { locale: getCurrentDateLocale() });
+  const day = d.getDate();
+  const month = getTranslatedMonth(d.getMonth());
+  const year = d.getFullYear();
+  return includeYear ? `${day} ${month} ${year}` : `${day} ${month}`;
 };
 
 /**
@@ -24,8 +47,11 @@ export const formatDateTimeAz = (date: Date | string, includeYear = false): stri
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return '';
 
-  const formatStr = includeYear ? 'd MMMM yyyy, HH:mm' : 'd MMMM, HH:mm';
-  return format(d, formatStr, { locale: getCurrentDateLocale() });
+  const day = d.getDate();
+  const month = getTranslatedMonth(d.getMonth());
+  const year = d.getFullYear();
+  const time = format(d, 'HH:mm');
+  return includeYear ? `${day} ${month} ${year}, ${time}` : `${day} ${month}, ${time}`;
 };
 
 /**

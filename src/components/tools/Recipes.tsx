@@ -520,7 +520,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
             transition={{ delay: 0.1 + idx * 0.03 }}>
             
               <span className="text-lg">{category.emoji}</span>
-              <span className="text-sm font-medium">{category.name}</span>
+              <span className="text-sm font-medium">{getTranslatedCategoryName(category.id) || category.name}</span>
             </motion.button>
           )}
         </motion.div>

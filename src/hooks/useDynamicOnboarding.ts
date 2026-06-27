@@ -6,10 +6,16 @@ interface OnboardingStage {
   stage_id: string;
   title: string;
   title_az: string | null;
+  title_en: string | null;
+  title_ru: string | null;
   subtitle: string | null;
   subtitle_az: string | null;
+  subtitle_en: string | null;
+  subtitle_ru: string | null;
   description: string | null;
   description_az: string | null;
+  description_en: string | null;
+  description_ru: string | null;
   emoji: string;
   icon_name: string;
   bg_gradient: string;
@@ -21,6 +27,8 @@ interface MultiplesOption {
   option_id: string;
   label: string;
   label_az: string | null;
+  label_en: string | null;
+  label_ru: string | null;
   emoji: string;
   baby_count: number;
   sort_order: number;

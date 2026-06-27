@@ -6,6 +6,7 @@ import { useContractions } from '@/hooks/useContractions';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { hapticFeedback } from '@/lib/native';
+import { formatDateAz, formatTimeAz } from '@/lib/date-utils';
 
 interface ContractionTimerProps {
   onBack: () => void;
@@ -203,7 +204,7 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
             {tr("contractiontimer_5_1_1_qaydasi_a3c5d3", "5-1-1 Qaydas\u0131")}
           </h3>
           <p className="text-xs text-muted-foreground">
-            {tr("contractiontimer_sancilar_9b16c7", "Sanc\u0131lar")} <strong className="text-foreground">{tr("contractiontimer_5_deqiqe_ad05bb", "5 dəqiqə")}</strong>{tr("contractiontimer_araliginda_24710a", "aralığında,")}<strong className="text-foreground">{tr("contractiontimer_1_deqiqe_a187ac", "1 dəqiqə")}</strong>{tr("contractiontimer_davam_ederse_ve_bu_7029f5", "davam edərsə və bu")}<strong className="text-foreground">{tr("contractiontimer_1_saat_hardcoded", "1 saat")}</strong> {tr("contractiontimer_boyunca_davam_ederse_xestexana_2b067a", "boyunca davam ed\u0259rs\u0259, x\u0259st\u0259xanaya getm\u0259 vaxt\u0131d\u0131r.")}
+            {tr("contractiontimer_sancilar_9b16c7", "Sancılar")} <strong className="text-foreground">{tr("contractiontimer_5_deqiqe_ad05bb", "5 dəqiqə")}</strong> {tr("contractiontimer_araliginda_24710a", "aralığında,")} <strong className="text-foreground">{tr("contractiontimer_1_deqiqe_a187ac", "1 dəqiqə")}</strong> {tr("contractiontimer_davam_ederse_ve_bu_7029f5", "davam edərsə və bu")} <strong className="text-foreground">{tr("contractiontimer_1_saat_hardcoded", "1 saat")}</strong> {tr("contractiontimer_boyunca_davam_ederse_xestexana_2b067a", "boyunca davam edərsə, xəstəxanaya getmə vaxtıdır.")}
           </p>
         </motion.div>
 
@@ -228,16 +229,16 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
                       <div>
                         <p className="font-bold text-foreground text-sm">{formatTime(contraction.duration_seconds)} {tr("contractiontimer_muddet_a5b45d", "m\xFCdd\u0259t")}</p>
                         <p className="text-[10px] text-muted-foreground">
-                          {new Date(contraction.start_time).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}, {new Date(contraction.start_time).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                          {formatDateAz(contraction.start_time)}, {formatTimeAz(contraction.start_time)}
                         </p>
                       </div>
                     </div>
                     {contraction.interval_seconds &&
-                <div className="text-right">
+                      <div className="text-right">
                         <p className="text-xs font-bold text-muted-foreground">{formatTime(contraction.interval_seconds)}</p>
                         <p className="text-[10px] text-muted-foreground">{tr("contractiontimer_araliq_05bea1", "aralıq")}</p>
                       </div>
-                }
+                    }
                   </div>
                 </motion.div>
             )}

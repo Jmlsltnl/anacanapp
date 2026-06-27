@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAutoJoinGroups } from '@/hooks/useCommunity';
 import { useOnboardingStages, useMultiplesOptions, FALLBACK_STAGES, FALLBACK_MULTIPLES } from '@/hooks/useDynamicOnboarding';
 import { useAppSettings } from '@/hooks/useAppSettings';
+import { useLanguage } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
 import type { LifeStage } from '@/types/anacan';
 import { tr } from "@/lib/tr";
@@ -36,6 +37,7 @@ const OnboardingScreen = () => {
   const { updateProfile } = useAuth();
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();
+  const { language } = useLanguage();
 
   // Fetch dynamic data from backend
   const { data: dbStages, isLoading: stagesLoading } = useOnboardingStages();
@@ -54,6 +56,12 @@ const OnboardingScreen = () => {
 
   // Use database data or fallback, then filter by enabled settings
   const stages = useMemo(() => {
+    const getStageText = (s: any, field: string) => {
+      if (language === 'en' && s[field + '_en']) return s[field + '_en'];
+      if (language === 'ru' && s[field + '_ru']) return s[field + '_ru'];
+      return s[field + '_az'] || s[field];
+    };
+
     const allStages = !dbStages || dbStages.length === 0 ?
     FALLBACK_STAGES.map((s) => ({
       id: s.stage_id as LifeStage,
@@ -67,9 +75,9 @@ const OnboardingScreen = () => {
     })) :
     dbStages.map((s) => ({
       id: s.stage_id as LifeStage,
-      title: s.title_az || s.title,
-      subtitle: s.subtitle_az || s.subtitle,
-      description: s.description_az || s.description,
+      title: getStageText(s, 'title'),
+      subtitle: getStageText(s, 'subtitle'),
+      description: getStageText(s, 'description'),
       icon: iconMap[s.icon_name] || Heart,
       emoji: s.emoji,
       color: s.stage_id,
@@ -78,9 +86,15 @@ const OnboardingScreen = () => {
 
     // Filter by enabled settings
     return allStages.filter((stage) => isStageEnabled(stage.id));
-  }, [dbStages, appSettings]);
+  }, [dbStages, appSettings, language]);
 
   const multiplesOptions = useMemo(() => {
+    const getOptionLabel = (m: any) => {
+      if (language === 'en' && m.label_en) return m.label_en;
+      if (language === 'ru' && m.label_ru) return m.label_ru;
+      return m.label_az || m.label;
+    };
+
     if (!dbMultiples || dbMultiples.length === 0) {
       return FALLBACK_MULTIPLES.map((m) => ({
         id: m.option_id,
@@ -91,11 +105,11 @@ const OnboardingScreen = () => {
     }
     return dbMultiples.map((m) => ({
       id: m.option_id,
-      label: m.label_az || m.label,
+      label: getOptionLabel(m),
       emoji: m.emoji,
       count: m.baby_count
     }));
-  }, [dbMultiples]);
+  }, [dbMultiples, language]);
 
   const handleStageSelect = (stage: LifeStage) => {
     setSelectedStage(stage);

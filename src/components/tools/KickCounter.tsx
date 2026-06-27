@@ -6,6 +6,7 @@ import { useKickSessions } from '@/hooks/useKickSessions';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { hapticFeedback } from '@/lib/native';
+import { formatDateAz } from '@/lib/date-utils';
 
 interface KickCounterProps {
   onBack: () => void;
@@ -211,9 +212,9 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
               const today = new Date().toISOString().split('T')[0];
               const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
-              if (dateStr === today) return tr("kickcounter_bu_gun_786fd4", "Bu g\xFCn");
-              if (dateStr === yesterday) return tr("kickcounter_dunen_52b701", "D\xFCn\u0259n");
-              return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' });
+              if (dateStr === today) return tr("kickcounter_bu_gun_786fd4", "Bu gün");
+              if (dateStr === yesterday) return tr("kickcounter_dunen_52b701", "Dünən");
+              return formatDateAz(date);
             };
 
             return Object.entries(grouped).slice(0, 5).map(([date, daySessions]) =>
