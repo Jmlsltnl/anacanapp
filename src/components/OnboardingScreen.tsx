@@ -7,7 +7,7 @@ import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useAutoJoinGroups } from '@/hooks/useCommunity';
-import { useOnboardingStages, useMultiplesOptions, FALLBACK_STAGES, FALLBACK_MULTIPLES } from '@/hooks/useDynamicOnboarding';
+import { useOnboardingStages, useMultiplesOptions, getFallbackStages, getFallbackMultiples } from '@/hooks/useDynamicOnboarding';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useLanguage } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
@@ -59,11 +59,17 @@ const OnboardingScreen = () => {
     const getStageText = (s: any, field: string) => {
       if (language === 'en' && s[field + '_en']) return s[field + '_en'];
       if (language === 'ru' && s[field + '_ru']) return s[field + '_ru'];
+      
+      const fallback = getFallbackStages().find(fb => fb.stage_id === s.stage_id);
+      if (fallback) {
+        return fallback[`${field}_az` as keyof typeof fallback] || s[field + '_az'] || s[field];
+      }
+      
       return s[field + '_az'] || s[field];
     };
 
     const allStages = !dbStages || dbStages.length === 0 ?
-    FALLBACK_STAGES.map((s) => ({
+    getFallbackStages().map((s) => ({
       id: s.stage_id as LifeStage,
       title: s.title_az,
       subtitle: s.subtitle_az,
@@ -92,22 +98,28 @@ const OnboardingScreen = () => {
     const getOptionLabel = (m: any) => {
       if (language === 'en' && m.label_en) return m.label_en;
       if (language === 'ru' && m.label_ru) return m.label_ru;
+      
+      const fallback = getFallbackMultiples().find(fb => fb.option_id === m.option_id);
+      if (fallback) {
+        return fallback.label_az || m.label_az || m.label;
+      }
+      
       return m.label_az || m.label;
     };
 
     if (!dbMultiples || dbMultiples.length === 0) {
-      return FALLBACK_MULTIPLES.map((m) => ({
+      return getFallbackMultiples().map((m) => ({
         id: m.option_id,
         label: m.label_az,
         emoji: m.emoji,
-        count: m.baby_count
+        babyCount: m.baby_count
       }));
     }
     return dbMultiples.map((m) => ({
       id: m.option_id,
       label: getOptionLabel(m),
       emoji: m.emoji,
-      count: m.baby_count
+      babyCount: m.baby_count
     }));
   }, [dbMultiples, language]);
 

@@ -79,38 +79,37 @@ export const useMultiplesOptions = () => {
 };
 
 // Static fallbacks for when database is empty
-export const FALLBACK_STAGES = [
+export const getFallbackStages = () => [
 {
   stage_id: 'flow',
-  title_az: tr("usedynamiconboarding_dovrumu_izlemek_742fa2", "D\xF6vr\xFCm\xFC izl\u0259m\u0259k"),
-  subtitle_az: tr("usedynamiconboarding_menstruasiya_teqvimi_0e3b14", "Menstruasiya t\u0259qvimi"),
-  description_az: tr("usedynamiconboarding_dovrunuzu_izleyin_ovulyasiyani_370b05", "D\xF6vr\xFCn\xFCz\xFC izl\u0259yin, ovulyasiyan\u0131 proqnozla\u015Fd\u0131r\u0131n"),
+  title_az: tr("usedynamiconboarding_dovrumu_izlemek_742fa2", "Dövrümü izləmək"),
+  subtitle_az: tr("usedynamiconboarding_menstruasiya_teqvimi_0e3b14", "Menstruasiya təqvimi"),
+  description_az: tr("usedynamiconboarding_dovrunuzu_izleyin_ovulyasiyani_370b05", "Dövrünüzü izləyin, ovulyasiyanı proqnozlaşdırın"),
   emoji: '🌸',
   icon_name: 'Calendar',
   bg_gradient: 'from-rose-500 to-pink-600'
 },
 {
   stage_id: 'bump',
-  title_az: tr("usedynamiconboarding_hamileliyim_c88922", "Hamil\u0259liyim"),
-  subtitle_az: tr("usedynamiconboarding_hamilelik_izleyicisi_2a251f", "Hamil\u0259lik izl\u0259yicisi"),
-  description_az: tr("usedynamiconboarding_korpenizin_inkisafini_hefte_he_c2597f", "K\xF6rp\u0259nizin inki\u015Faf\u0131n\u0131 h\u0259ft\u0259-h\u0259ft\u0259 izl\u0259yin"),
+  title_az: tr("usedynamiconboarding_hamileliyim_c88922", "Hamiləliyim"),
+  subtitle_az: tr("usedynamiconboarding_hamilelik_izleyicisi_2a251f", "Hamiləlik izləyicisi"),
+  description_az: tr("usedynamiconboarding_korpenizin_inkisafini_hefte_he_c2597f", "Körpənizin inkişafını həftə-həftə izləyin"),
   emoji: '🤰',
   icon_name: 'Heart',
   bg_gradient: 'from-violet-500 to-purple-600'
 },
 {
   stage_id: 'mommy',
-  title_az: tr("usedynamiconboarding_korpem_var_58e0cd", "K\xF6rp\u0259m var"),
-  subtitle_az: tr("usedynamiconboarding_analiq_yardimcisi_acf2af", "Anal\u0131q yard\u0131m\xE7\u0131s\u0131"),
-  description_az: tr("usedynamiconboarding_korpenizin_qidalanma_yuxu_ve_i_06b9ec", "K\xF6rp\u0259nizin qidalanma, yuxu v\u0259 inki\u015Faf\u0131n\u0131 izl\u0259yin"),
+  title_az: tr("usedynamiconboarding_korpem_var_58e0cd", "Körpəm var"),
+  subtitle_az: tr("usedynamiconboarding_analiq_yardimcisi_acf2af", "Analıq yardımçısı"),
+  description_az: tr("usedynamiconboarding_korpenizin_qidalanma_yuxu_ve_i_06b9ec", "Körpənizin qidalanma, yuxu və inkişafını izləyin"),
   emoji: '👶',
   icon_name: 'Baby',
   bg_gradient: 'from-emerald-500 to-teal-600'
 }];
 
-
-export const FALLBACK_MULTIPLES = [
-{ option_id: 'single', label_az: tr("usedynamiconboarding_tek_usaq_9b99b4", "T\u0259k u\u015Faq"), emoji: '👶', baby_count: 1 },
-{ option_id: 'twins', label_az: tr("usedynamiconboarding_ekiz_680a49", "\u018Fkiz"), emoji: '👶👶', baby_count: 2 },
-{ option_id: 'triplets', label_az: tr("usedynamiconboarding_ucuz_45679e", "\xDC\xE7\xFCz"), emoji: '👶👶👶', baby_count: 3 },
-{ option_id: 'quadruplets', label_az: tr("usedynamiconboarding_dorduz_88f390", "D\xF6rd\xFCz"), emoji: '👶👶👶👶', baby_count: 4 }];
+export const getFallbackMultiples = () => [
+{ option_id: 'single', label_az: tr("usedynamiconboarding_tek_usaq_9b99b4", "Tək uşaq"), emoji: '👶', baby_count: 1 },
+{ option_id: 'twins', label_az: tr("usedynamiconboarding_ekiz_680a49", "Əkiz"), emoji: '👶👶', baby_count: 2 },
+{ option_id: 'triplets', label_az: tr("usedynamiconboarding_ucuz_45679e", "Üçüz"), emoji: '👶👶👶', baby_count: 3 },
+{ option_id: 'quadruplets', label_az: tr("usedynamiconboarding_dorduz_88f390", "Dördüz"), emoji: '👶👶👶👶', baby_count: 4 }];
