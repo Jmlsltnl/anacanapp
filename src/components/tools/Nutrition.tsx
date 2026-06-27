@@ -300,7 +300,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                     <Input
                     value={customFood.name}
                     onChange={(e) => setCustomFood({ ...customFood, name: e.target.value })}
-                    placeholder={tr("nutrition_mes_plov_afdcf0", "məs. Plov")}
+                    placeholder={tr("nutrition_mes_plov_afdcf0", "məs. Pasta")}
                     className="h-9 text-sm" />
                   
                   </div>

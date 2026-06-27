@@ -529,24 +529,53 @@ const AuthScreen = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
-                    <div className="relative group">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
-                      <Input
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder={tr("authscreen_sifre_6771ac", "Şifrə")}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="pl-12 pr-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
-                      
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                      </div>
+                    </motion.div>
+
+                    {partnerMode === 'register' && (
+                      <motion.div variants={itemVariants}>
+                        <div className="relative group">
+                          <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                            <Globe className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
+                          </div>
+                          <Select value={countryCode || ''} onValueChange={setCountryCode}>
+                            <SelectTrigger className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all">
+                              <SelectValue placeholder={tr("authscreen_olke_secin", "Ölkə seçin")} />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-[300px]">
+                              {countriesData.map((country) => (
+                                <SelectItem key={country.isoAlpha2} value={country.isoAlpha2}>
+                                  <span className="flex items-center gap-2">
+                                    <img src={country.flag} alt="" className="w-6 h-4 object-cover rounded-sm border border-border/50" />
+                                    {country.name}
+                                  </span>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    <motion.div variants={itemVariants}>
+                      <div className="relative group">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          placeholder={tr("authscreen_sifre_6771ac", "Şifrə")}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="pl-12 pr-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
                         
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                    </div>
-                  </motion.div>
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                          
+                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
+                    </motion.div>
 
                   {partnerMode === 'register' &&
                   <motion.div variants={itemVariants}>

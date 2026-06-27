@@ -180,7 +180,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
               <p className="text-sm text-muted-foreground">{tr("weighttracker_ceki_statusu_d932ab", "Çəki statusu")}</p>
               <h3 className="text-2xl font-black text-foreground">{status.text}</h3>
               <p className="text-xs text-muted-foreground mt-1">
-                {tr("weighttracker_baslangic_ef1964", "Başlanğıc:")} {startWeight} kg → {tr("weighttracker_indi_eef", "İndi:")} {currentWeight} kg
+                {tr("weighttracker_baslangic_ef1964", "Başlanğıc:")} {startWeight} kg → {tr("weighttracker_indi_eef", "Cari:")} {currentWeight} kg
               </p>
             </div>
           </div>

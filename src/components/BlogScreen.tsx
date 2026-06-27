@@ -145,7 +145,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
             <div className="flex-1">
               <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-violet-500" />
-                {tr("blogscreen_ana_bloqu_28124b", "Ana Bloqu")}
+                {tr("blogscreen_ana_bloqu_28124b", "Qadın Bloqları")}
               </h1>
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">

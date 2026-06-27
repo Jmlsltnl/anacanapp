@@ -220,7 +220,11 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                   {userCountry.name}
                 </span>
               )}
-              {isAdmin &&
+              {isAdmin && (
+                <span className="inline-flex items-center px-3 py-1 bg-amber-500/80 rounded-full text-white text-xs font-bold">
+                  👑 Admin
+                </span>
+              )}
             </div>
           </div>
           <motion.button
