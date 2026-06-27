@@ -242,7 +242,7 @@ export default function InitialLanguageScreen() {
                       >
                         <div className="w-10 h-8 rounded-lg overflow-hidden flex-shrink-0 shadow-sm border border-border/50">
                           <img 
-                            src={country.flag} 
+                            src={country.flag.startsWith('data:') ? country.flag : `data:image/png;base64,${country.flag}`} 
                             alt={country.name} 
                             className="w-full h-full object-cover"
                           />

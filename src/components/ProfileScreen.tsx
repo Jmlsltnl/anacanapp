@@ -216,7 +216,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               </span>
               {userCountry && (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 rounded-full text-white text-xs font-bold">
-                  <img src={userCountry.flag} alt="" className="w-4 h-3 object-cover rounded-sm" />
+                  <img src={userCountry.flag.startsWith('data:') ? userCountry.flag : `data:image/png;base64,${userCountry.flag}`} alt="" className="w-4 h-3 object-cover rounded-sm" />
                   {userCountry.name}
                 </span>
               )}

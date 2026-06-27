@@ -262,7 +262,13 @@ export default function VaccineCalendar({ onBack }: Props) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 px-2.5 gap-1.5 rounded-full">
-                  <span className="text-base leading-none">{country?.flag_emoji || '🌍'}</span>
+                  <span className="text-base leading-none">
+                    {country?.flag_emoji && !country.flag_emoji.startsWith('data:') && country.flag_emoji.length > 10 ? (
+                      <img src={`data:image/png;base64,${country.flag_emoji}`} alt="" className="w-4 h-3 object-cover rounded-sm" />
+                    ) : (
+                      <span>{country?.flag_emoji || '🌍'}</span>
+                    )}
+                  </span>
                   <span className="text-[11px] font-semibold">{country?.name || effectiveCountry}</span>
                   <ChevronDown className="w-3 h-3" />
                 </Button>
@@ -270,8 +276,15 @@ export default function VaccineCalendar({ onBack }: Props) {
               <DropdownMenuContent align="end" className="w-56">
                 {countries.map((c) =>
                 <DropdownMenuItem key={c.code} onClick={() => handleChangeCountry(c.code)}>
-                    <span className="mr-2">{c.flag_emoji}</span>{c.name}
-                  </DropdownMenuItem>
+                  <span className="flex items-center gap-2">
+                    {c.flag_emoji && !c.flag_emoji.startsWith('data:') && c.flag_emoji.length > 10 ? (
+                      <img src={`data:image/png;base64,${c.flag_emoji}`} alt="" className="w-4 h-3 object-cover rounded-sm" />
+                    ) : (
+                      <span>{c.flag_emoji || '🌍'}</span>
+                    )}
+                    <span>{c.name}</span>
+                  </span>
+                </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>

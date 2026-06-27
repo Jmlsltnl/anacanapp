@@ -546,7 +546,7 @@ const AuthScreen = () => {
                               {countriesData.map((country) => (
                                 <SelectItem key={country.isoAlpha2} value={country.isoAlpha2}>
                                   <span className="flex items-center gap-2">
-                                    <img src={country.flag} alt="" className="w-6 h-4 object-cover rounded-sm border border-border/50" />
+                                    <img src={country.flag.startsWith('data:') ? country.flag : `data:image/png;base64,${country.flag}`} alt="" className="w-6 h-4 object-cover rounded-sm border border-border/50" />
                                     {country.name}
                                   </span>
                                 </SelectItem>

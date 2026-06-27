@@ -11,6 +11,7 @@ import { isNative } from '@/lib/native';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { tr } from "@/lib/tr";
+import { useUserStore } from '@/store/userStore';
 
 interface AppIntroductionProps {
   onComplete: () => void;
@@ -22,7 +23,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Flower2, Music, Camera, Gift
 };
 
-const FALLBACK_SLIDES = [
+const getFallbackSlides = () => [
 { id: '1', title: tr("appintroduction_anacan_a_xos_geldiniz_297592", 'Anacan-a Xoş Gəldiniz'), subtitle: tr("appintroduction_saglamliginiz_ucun_en_yaxsi_yoldas_14de09", "Sağlamlığınız üçün ən yaxşı yoldaş"), description: tr("appintroduction_menstruasiya_hamilelik_ve_analiq_dovrler_d2bc72", 'Menstruasiya, hamiləlik və analıq dövrlərində sizinlə birlikdə olacaq şəxsi köməkçiniz.'), icon_name: 'Heart', gradient: 'from-pink-500 to-rose-600', bg_decor: 'bg-pink-100 dark:bg-pink-900/20' },
 { id: '2', title: tr("appintroduction_dovrunuzu_i_zleyin_4ad8b9", 'Dövrünüzü İzləyin'), subtitle: tr("appintroduction_agilli_tsikl_izleme_06d779", "Ağıllı tsikl izləmə"), description: tr("appintroduction_menstruasiya_tsiklinizi_ovulyasiyani_ve__5d8ab1", 'Menstruasiya tsiklinizi, ovulyasiyanı və bərəkətli günlərinizi dəqiq izləyin.'), icon_name: 'Calendar', gradient: 'from-purple-500 to-violet-600', bg_decor: 'bg-purple-100 dark:bg-purple-900/20' },
 { id: '3', title: tr("appintroduction_hamilelik_yolculugu_21d366", 'Hamiləlik Yolçuluğu'), subtitle: tr("appintroduction_hefte_hefte_beledci_01e461", "Həftə-həftə bələdçi"), description: tr("appintroduction_korpenizin_boyumesini_izleyin_heftelik_m_b5524b", 'Körpənizin böyüməsini izləyin, həftəlik məsləhətlər alın və doğuma hazırlaşın.'), icon_name: 'Baby', gradient: 'from-blue-500 to-cyan-600', bg_decor: 'bg-blue-100 dark:bg-blue-900/20' },
@@ -32,6 +33,7 @@ const FALLBACK_SLIDES = [
 
 const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const language = useUserStore((state) => state.language);
 
   const { data: dbSlides } = useQuery({
     queryKey: ['intro-slides'],
@@ -47,7 +49,27 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
     staleTime: 1000 * 60 * 60
   });
 
-  const slides = dbSlides && dbSlides.length > 0 ? dbSlides : FALLBACK_SLIDES;
+  const slides = dbSlides && dbSlides.length > 0 ? dbSlides.map(s => {
+    const getSlideText = (field: string) => {
+      if (language === 'en' && s[field + '_en']) return s[field + '_en'];
+      if (language === 'ru' && s[field + '_ru']) return s[field + '_ru'];
+      
+      const fallback = getFallbackSlides().find(fb => fb.id === s.id);
+      if (fallback) {
+        return fallback[field as keyof typeof fallback] || s[field + '_az'] || s[field];
+      }
+      return s[field + '_az'] || s[field];
+    };
+    return {
+      id: s.id,
+      title: getSlideText('title'),
+      subtitle: getSlideText('subtitle'),
+      description: getSlideText('description'),
+      icon_name: s.icon_name,
+      gradient: s.bg_gradient || 'from-pink-500 to-rose-600',
+      bg_decor: s.bg_decor || 'bg-pink-100 dark:bg-pink-900/20'
+    };
+  }) : getFallbackSlides();
 
   const handleHaptic = async () => {
     if (isNative) {
