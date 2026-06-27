@@ -385,7 +385,6 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
           {[
           { id: 'log', label: tr("nutrition_yemek_b1fd56", 'Yemək') },
           { id: 'vitamins', label: tr("nutrition_vitaminler_e49129", 'Vitaminlər') },
-          { id: 'tips', label: tr("nutrition_tovsiyeler_17a8f7", 'Tövsiyələr') },
           { id: 'water', label: tr("common_su_water", 'Su') }].
           map((tab) =>
           <button

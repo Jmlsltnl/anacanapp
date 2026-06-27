@@ -254,14 +254,14 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
       <AnimatePresence>
         {showAddModal &&
         <motion.div
-          className="fixed inset-0 z-50 flex items-end justify-center"
+          className="fixed inset-0 z-[100] flex items-end justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}>
           
             <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddModal(false)} />
             <motion.div
-            className="relative w-full max-w-lg bg-card rounded-t-3xl p-5 pb-safe space-y-4 max-h-[85vh] overflow-y-auto"
+            className="relative w-full max-w-lg bg-card rounded-t-3xl p-5 pb-[calc(env(safe-area-inset-bottom,20px)+80px)] space-y-4 max-h-[85vh] overflow-y-auto"
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}

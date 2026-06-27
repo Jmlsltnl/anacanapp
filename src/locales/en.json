@@ -2490,7 +2490,7 @@
   "blogpostdetail_serhinizi_yazin_9d6066": "Write your comment...",
   "blogpostdetail_serhler_8b3fc3": "Comments (",
   "blogscreen_all_filter": "All",
-  "blogscreen_ana_bloqu_28124b": "Mother's Blog",
+  "blogscreen_ana_bloqu_28124b": "Women Blogs",
   "blogscreen_beyendiyiniz_meqaleleri_saxlay_a35db1": "Save articles you like",
   "blogscreen_butun_meqaleler_df9384": "All Articles",
   "blogscreen_deq_780a5c": "min",
@@ -3088,7 +3088,7 @@
   "datepickerwheel_cum_a58b1a": "Fri.",
   "datepickerwheel_i_l_secin_5fe2b5": "Select a year",
   "datepickerwheel_mon": "Mon.",
-  "datepickerwheel_sen_60edd8": "Hilarious.",
+  "datepickerwheel_sen_60edd8": "Sat",
   "datepickerwheel_sun": "Sun.",
   "datepickerwheel_tarix_secin_3377b4": "Select a date",
   "datepickerwheel_temizle_1c3651": "Clean up",
@@ -4142,7 +4142,7 @@
   "nutrition_hamilelik_zamani_gunde_en_azi__d70ce9": "It is recommended to drink at least 10 glasses of water a day during pregnancy. Drinking enough water helps the baby's development.",
   "nutrition_i_stenilen_vaxt_ec15be": "Anytime",
   "nutrition_mes_350_eee901": "e.g. 350",
-  "nutrition_mes_plov_afdcf0": "e.g. Pilaf",
+  "nutrition_mes_plov_afdcf0": "e.g. Pasta",
   "nutrition_meslehet_f594cf": "💡 Type",
   "nutrition_nahar_lunch": "Lunch",
   "nutrition_pendir_cheese": "Cheese",
@@ -7426,5 +7426,6 @@
   "commentreply_tercume_edilir": "Translating...",
   "commentreply_orijinali_goster": "Show original",
   "commentreply_tercume_et_ai": "Translate *",
-  "commentreply_tercume_xetasi": "Translation failed."
+  "commentreply_tercume_xetasi": "Translation failed.",
+  "weighttracker_indi_eef": "Now:"
 }
