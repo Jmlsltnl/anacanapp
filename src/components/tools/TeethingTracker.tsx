@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { DatePickerWheel } from '@/components/ui/date-picker-wheel';
 import { useTeething, BabyTooth } from '@/hooks/useTeething';
 import { useChildren } from '@/hooks/useChildren';
 import ChildSelector from '@/components/mommy/ChildSelector';
@@ -427,13 +428,13 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               <div className="space-y-2">
                 <label className="text-sm font-medium flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  {tr("teethingtracker_cixma_tarixi_3c7ae9", "\xC7\u0131xma tarixi")}
+                  {tr("teethingtracker_cixma_tarixi_3c7ae9", "Çıxma tarixi")}
                 </label>
-                <Input
-                type="date"
-                value={emergedDate}
-                onChange={(e) => setEmergedDate(e.target.value)}
-                max={new Date().toISOString().split('T')[0]} />
+                <DatePickerWheel
+                value={emergedDate ? new Date(emergedDate) : undefined}
+                onChange={(date) => setEmergedDate(date ? date.toISOString().split('T')[0] : '')}
+                minYear={new Date().getFullYear() - 5}
+                maxYear={new Date().getFullYear()} />
               
               </div>
 
