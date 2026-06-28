@@ -16,6 +16,7 @@ interface FlowPhaseTip {
   phase: string;
   tip_text: string;
   tip_text_az: string | null;
+  tip_text_en?: string | null;
   emoji: string;
   category: string;
   sort_order: number;
@@ -25,8 +26,10 @@ interface FlowInsight {
   id: string;
   title: string;
   title_az: string | null;
+  title_en?: string | null;
   content: string;
   content_az: string | null;
+  content_en?: string | null;
   phase: string | null;
   emoji: string;
   category: string;

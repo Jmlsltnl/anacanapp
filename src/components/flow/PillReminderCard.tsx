@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useFlowReminders, useSaveFlowReminder, useToggleReminder } from '@/hooks/useFlowReminders';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
+import { useUserStore } from '@/store/userStore';
 
 const PILL_NOTIFICATION_ID = 91201;
 
@@ -17,16 +18,25 @@ const PillReminderCard = () => {
   const toggle = useToggleReminder();
   const pill = reminders.find((r) => r.reminder_type === 'pill');
 
+  const { language } = useUserStore();
+  const defaultTitleAz = "Həbinizi qəbul edin";
+  
+  const getPillTitle = () => {
+    if (!pill?.title) return tr("pillremindercard_hebinizi_qebul_edin_03c5be", defaultTitleAz);
+    if (language === 'en' && pill.title === defaultTitleAz) return "Take your pill";
+    return pill.title;
+  };
+
   const [time, setTime] = useState(pill?.time_of_day?.slice(0, 5) || '09:00');
-  const [title, setTitle] = useState(pill?.title || tr("pillremindercard_hebinizi_qebul_edin_03c5be", "H\u0259binizi q\u0259bul edin"));
+  const [title, setTitle] = useState(getPillTitle());
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     if (pill) {
       setTime(pill.time_of_day?.slice(0, 5) || '09:00');
-      setTitle(pill.title || tr("pillremindercard_hebinizi_qebul_edin_03c5be", "H\u0259binizi q\u0259bul edin"));
+      setTitle(getPillTitle());
     }
-  }, [pill?.id]);
+  }, [pill?.id, language]);
 
   const scheduleNative = async (enabled: boolean, t: string, ttl: string) => {
     if (!Capacitor.isNativePlatform()) return;

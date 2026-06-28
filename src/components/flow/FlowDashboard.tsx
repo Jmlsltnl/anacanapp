@@ -195,9 +195,16 @@ const FlowDashboard = () => {
     staleTime: 5 * 60 * 1000
   });
 
-  const labelNextPeriod = upcomingLabels?.flow_label_next_period || tr("flowdashboard_novbeti_period_b29c4a", "N\xF6vb\u0259ti Period");
-  const labelFertileWindow = upcomingLabels?.flow_label_fertile_window || tr("flowdashboard_reproduktiv_dovr_80642c", "Reproduktiv D\xF6vr");
-  const labelOvulationDay = upcomingLabels?.flow_label_ovulation_day || tr("flowdashboard_ovulyasiya_gunu_811e84", "Ovulyasiya G\xFCn\xFC");
+  const getDynamicLabel = (dbValue: string | undefined, defaultAz: string, trKey: string, defaultEn: string) => {
+    if (language === 'en') {
+      return defaultEn;
+    }
+    return dbValue || tr(trKey, defaultAz);
+  };
+
+  const labelNextPeriod = getDynamicLabel(upcomingLabels?.flow_label_next_period, "Növbəti Period", "flowdashboard_novbeti_period_b29c4a", "Upcoming Period");
+  const labelFertileWindow = getDynamicLabel(upcomingLabels?.flow_label_fertile_window, "Reproduktiv Dövr", "flowdashboard_reproduktiv_dovr_80642c", "Fertile Window");
+  const labelOvulationDay = getDynamicLabel(upcomingLabels?.flow_label_ovulation_day, "Ovulyasiya Günü", "flowdashboard_ovulyasiya_gunu_811e84", "Ovulation Day");
 
   // Get last period date
   const lastPeriodDate = cycleData?.lastPeriodDate ?
@@ -417,7 +424,7 @@ const FlowDashboard = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-foreground text-sm">
-                          {language === 'en' && tip.title_en ? tip.title_en : getTranslatedTip(tip.title_az || tip.title, language)}
+                          {language === 'en' ? (tip.title_en || tip.title) : getTranslatedTip(tip.title_az || tip.title, language)}
                         </h4>
                         <span
                       className="text-[10px] px-1.5 py-0.5 rounded-full"
@@ -430,7 +437,7 @@ const FlowDashboard = () => {
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        {language === 'en' && tip.content_en ? tip.content_en : getTranslatedTip(tip.content_az || tip.content, language)}
+                        {language === 'en' ? (tip.content_en || tip.content) : getTranslatedTip(tip.content_az || tip.content, language)}
                       </p>
                     </div>
                   </div>

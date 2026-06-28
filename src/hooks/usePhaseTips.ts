@@ -9,8 +9,10 @@ export interface PhaseTip {
   phase: MenstrualPhase;
   title: string;
   title_az: string | null;
+  title_en?: string | null;
   content: string;
   content_az: string | null;
+  content_en?: string | null;
   emoji: string;
   category: TipCategory;
   sort_order: number;
