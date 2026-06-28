@@ -48,8 +48,23 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Get user language
+    const { data: pref } = await supabase
+      .from('user_preferences')
+      .select('language')
+      .eq('user_id', parent.user_id)
+      .maybeSingle();
+    const userLang = pref?.language || 'az';
+    const isEn = userLang === 'en';
+    const isRu = userLang === 'ru';
+    const isTr = userLang === 'tr';
+
     // Author name (respect anonymity)
     let authorName = 'Bir istifadəçi';
+    if (isEn) authorName = 'A user';
+    if (isRu) authorName = 'Пользователь';
+    if (isTr) authorName = 'Bir kullanıcı';
+    
     if (!reply.is_anonymous) {
       const { data: prof } = await supabase
         .from('profiles')
@@ -59,7 +74,10 @@ Deno.serve(async (req) => {
       if (prof?.name) authorName = prof.name;
     }
 
-    const title = `${authorName} rəyinizə cavab yazdı`;
+    const title = isEn ? `${authorName} replied to your comment` 
+                : isRu ? `${authorName} ответил(а) на ваш комментарий`
+                : isTr ? `${authorName} yorumunuza yanıt verdi`
+                : `${authorName} rəyinizə cavab yazdı`;
     const body = (reply.content || '').slice(0, 120);
 
     // Idempotency: avoid duplicate notifications for the same reply

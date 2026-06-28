@@ -159,17 +159,23 @@ Deno.serve(async (req) => {
 
       const userLang = langByUser.get(userId) || 'az';
       const isEn = userLang === 'en';
+      const isRu = userLang === 'ru';
+      const isTr = userLang === 'tr';
       const vitaminNames = userVitamins.map((v: any) => `${v.icon_emoji} ${v.vitamin_name}`).join(', ');
+      
       const title = body.manual
-        ? (isEn ? '[TEST] 💊 Vitamin reminder' : '[TEST] 💊 Vitamin bildirişi')
-        : (isEn ? '💊 Time to take your vitamins!' : '💊 Vitamin qəbulu vaxtıdır!');
+        ? (isEn ? '[TEST] 💊 Vitamin reminder' : isRu ? '[TEST] 💊 Напоминание о витаминах' : isTr ? '[TEST] 💊 Vitamin hatırlatıcısı' : '[TEST] 💊 Vitamin bildirişi')
+        : (isEn ? '💊 Time to take your vitamins!' : isRu ? '💊 Время принимать витамины!' : isTr ? '💊 Vitaminlerinizi alma zamanı!' : '💊 Vitamin qəbulu vaxtıdır!');
+      
       const bodyText = userVitamins.length === 1
-        ? (isEn
-            ? `Time to take ${userVitamins[0].vitamin_name}`
-            : `${userVitamins[0].vitamin_name} qəbul etmə vaxtıdır`)
-        : (isEn
-            ? `Time to take ${userVitamins.length} vitamins: ${vitaminNames}`
-            : `${userVitamins.length} vitamin qəbul etmə vaxtıdır: ${vitaminNames}`);
+        ? (isEn ? `Time to take ${userVitamins[0].vitamin_name}`
+         : isRu ? `Время принимать ${userVitamins[0].vitamin_name}`
+         : isTr ? `${userVitamins[0].vitamin_name} alma zamanı`
+         : `${userVitamins[0].vitamin_name} qəbul etmə vaxtıdır`)
+        : (isEn ? `Time to take ${userVitamins.length} vitamins: ${vitaminNames}`
+         : isRu ? `Время принимать ${userVitamins.length} витаминов: ${vitaminNames}`
+         : isTr ? `${userVitamins.length} vitamin alma zamanı: ${vitaminNames}`
+         : `${userVitamins.length} vitamin qəbul etmə vaxtıdır: ${vitaminNames}`);
 
       // Store notification in DB (skip for test to avoid pollution)
       if (!body.manual) {

@@ -5,6 +5,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import { useUserStore } from '@/store/userStore';
 
 interface NotificationsScreenProps {
   onBack: () => void;
@@ -54,7 +55,8 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
     if (diffMins < 60) return `${diffMins} ${tr("notificationsscreen_mins", "dəq")}`;
     if (diffHours < 24) return `${diffHours} ${tr("notificationsscreen_hours", "saat")}`;
     if (diffDays === 1) return tr("notificationsscreen_dunen_52b701", "D\xFCn\u0259n");
-    return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'short' });
+    const { language } = useUserStore.getState();
+    return date.toLocaleDateString(language === 'en' ? 'en-US' : language === 'ru' ? 'ru-RU' : language === 'tr' ? 'tr-TR' : 'az-AZ', { day: 'numeric', month: 'short' });
   };
 
   const handleNotificationClick = (notification: any) => {
