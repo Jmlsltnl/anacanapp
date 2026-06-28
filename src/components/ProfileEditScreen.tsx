@@ -50,7 +50,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     cycle_length: cycleLength || 28,
     baby_birth_date: babyBirthDate ? new Date(babyBirthDate).toISOString().split('T')[0] : '',
     baby_gender: babyGender || '' as 'boy' | 'girl' | '',
-    country_code: profile?.country_code || countryCode || ''
+    country_code: (profile as any)?.country_code || countryCode || ''
   });
 
   // Compute the calculated date based on mode

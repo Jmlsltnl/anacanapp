@@ -176,7 +176,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
             <span className="absolute top-2 left-2 px-2 py-0.5 bg-amber-500/90 rounded-full text-[10px] font-bold text-white">{cake.milestone_label}</span>
             }
                 {cake.category === 'month' && cake.month_number &&
-            <span className="absolute top-2 left-2 px-2 py-0.5 bg-primary/90 rounded-full text-[10px] font-bold text-white">{tr(`common_month_label_${cake.month_number}`, `${cake.month_number}-${getOrdinalSuffix(cake.month_number!)} ay`)}</span>
+            <span className="absolute top-2 left-2 px-2 py-0.5 bg-primary/90 rounded-full text-[10px] font-bold text-white">{tr(`common_month_label_${cake.month_number}`, `${getOrdinal(cake.month_number!, language)} ay`)}</span>
             }
               </div> :
 

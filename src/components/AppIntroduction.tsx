@@ -66,7 +66,7 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
       subtitle: getSlideText('subtitle'),
       description: getSlideText('description'),
       icon_name: s.icon_name,
-      gradient: s.bg_gradient || 'from-pink-500 to-rose-600',
+      gradient: s.gradient || 'from-pink-500 to-rose-600',
       bg_decor: s.bg_decor || 'bg-pink-100 dark:bg-pink-900/20'
     };
   }) : getFallbackSlides();
