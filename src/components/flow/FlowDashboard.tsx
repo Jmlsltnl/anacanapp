@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Droplets, Heart, Sparkles, AlertCircle, Plus, Calendar as CalendarIcon, Beaker, Pill, Droplet, Moon, Activity, Baby, Sparkle, Wind, CheckCircle2, XCircle, ArrowRight, TrendingUp, Flame, Apple, Dumbbell } from 'lucide-react';
+import { Droplets, Heart, Sparkles, AlertCircle, Plus, Calendar as CalendarIcon, Beaker, Pill, Droplet, Moon, Activity, Baby, Sparkle, Wind, CheckCircle2, XCircle, ArrowRight, TrendingUp, Flame, Apple, Dumbbell, Brain, CircleDot } from 'lucide-react';
 import { getTranslatedTip } from '@/lib/tip-translations';
 import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
