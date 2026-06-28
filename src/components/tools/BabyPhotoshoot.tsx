@@ -113,12 +113,12 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     if (dbBackgrounds.length > 0) {
       // Group backgrounds by category
       const grouped: Record<string, any[]> = {};
-      dbBackgrounds.forEach((bg) => {
-        const cat = bg[`category_name_${language}` as keyof typeof bg] || bg.category_name_az || bg.category_name;
+      dbBackgrounds.forEach((bg: any) => {
+        const cat = bg[`category_name_${language}`] || bg.category_name_az || bg.category_name;
         if (!grouped[cat]) grouped[cat] = [];
         grouped[cat].push({
           id: bg.theme_id,
-          name: bg[`theme_name_${language}` as keyof typeof bg] || bg.theme_name_az || bg.theme_name,
+          name: bg[`theme_name_${language}`] || bg.theme_name_az || bg.theme_name,
           category: cat,
           premium: false, // Can add is_premium to DB if needed
           emoji: bg.theme_emoji || '🎨',

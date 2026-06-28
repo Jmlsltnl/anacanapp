@@ -50,7 +50,7 @@ export const useOnboardingStages = () => {
         return [];
       }
 
-      return data as OnboardingStage[];
+      return data as unknown as OnboardingStage[];
     },
     staleTime: 1000 * 60 * 60 // 1 hour
   });
@@ -72,7 +72,7 @@ export const useMultiplesOptions = () => {
         return [];
       }
 
-      return data as MultiplesOption[];
+      return data as unknown as MultiplesOption[];
     },
     staleTime: 1000 * 60 * 60 // 1 hour
   });

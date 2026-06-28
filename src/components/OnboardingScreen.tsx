@@ -488,7 +488,7 @@ const OnboardingScreen = () => {
                       {multiplesOptions.map((option) =>
                   <motion.button
                     key={option.id}
-                    onClick={() => handleMultiplesSelect(option.id as any, option.count)}
+                    onClick={() => handleMultiplesSelect(option.id as any, option.babyCount)}
                     className={`p-4 rounded-2xl font-bold transition-all flex flex-col items-center gap-2 ${
                     multiplesType === option.id ?
                     'bg-primary text-primary-foreground shadow-elevated' :

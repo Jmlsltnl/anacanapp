@@ -21,7 +21,7 @@ import BannerSlot from '@/components/banners/BannerSlot';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Award } from '@/components/tools/Gamification';
+
 import countriesData from '../../countries.json';
 import { tr } from "@/lib/tr";
 
@@ -152,7 +152,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
 
   const stageInfo = getStageInfo();
   
-  const userCountry = countriesData.find(c => c.isoAlpha2 === profile?.country_code);
+  const userCountry = countriesData.find(c => c.isoAlpha2 === (profile as any)?.country_code);
 
   const containerVariants = {
     hidden: { opacity: 0 },
