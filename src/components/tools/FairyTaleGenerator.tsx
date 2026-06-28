@@ -75,10 +75,10 @@ const STORY_STYLES = [
 
 
 const LANGUAGES = [
-{ code: 'az', label: tr("fairytalegenerator_azerbaycan_733e93", 'Azərbaycan'), flag: '🇦🇿' },
-{ code: 'en', label: 'English', flag: '🇬🇧' },
-{ code: 'ru', label: 'Русский', flag: '🇷🇺' },
-{ code: 'tr', label: tr("fairytalegenerator_turkce_299adc", 'Türkçe'), flag: '🇹🇷' }];
+{ code: 'az', label: tr("fairytalegenerator_azerbaycan_733e93", 'Azərbaycan'), flag: 'az' },
+{ code: 'en', label: 'English', flag: 'gb' },
+{ code: 'ru', label: 'Русский', flag: 'ru' },
+{ code: 'tr', label: tr("fairytalegenerator_turkce_299adc", 'Türkçe'), flag: 'tr' }];
 
 
 const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
@@ -447,7 +447,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     'bg-muted hover:bg-muted/80'}`
                     }>
                     
-                        <span>{lang.flag}</span>
+                        <img src={`https://flagcdn.com/w40/${lang.flag}.png`} alt={lang.code} className="w-5 h-auto rounded-sm shadow-sm" />
                         {lang.label}
                       </button>
                   )}
@@ -562,7 +562,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                       'bg-muted hover:bg-muted/80'}`
                       }>
                       
-                        <span className="text-lg">{lang.flag}</span>
+                        <img src={`https://flagcdn.com/w40/${lang.flag}.png`} alt={lang.code} className="w-6 h-auto rounded-sm shadow-sm" />
                         {lang.label}
                       </button>
                     )}
@@ -740,7 +740,10 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     </div>
                     <div>
                       <span className="text-muted-foreground">{tr("untranslated_dil_rfnolb", "Dil:")}</span>
-                      <p className="font-medium">{LANGUAGES.find((l) => l.code === formData.language)?.flag} {LANGUAGES.find((l) => l.code === formData.language)?.label}</p>
+                      <p className="font-medium flex items-center gap-2">
+                        <img src={`https://flagcdn.com/w40/${LANGUAGES.find((l) => l.code === formData.language)?.flag}.png`} alt="" className="w-5 h-auto rounded-sm shadow-sm" />
+                        {LANGUAGES.find((l) => l.code === formData.language)?.label}
+                      </p>
                     </div>
                     {formData.hero &&
                     <div>

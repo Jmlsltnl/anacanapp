@@ -3307,8 +3307,8 @@
   "fairytalegenerator_macera_bc3bdc": "Adventure",
   "fairytalegenerator_mehribanliq_7e25e6": "Kindness",
   "fairytalegenerator_meselen_1_yasina_hazirlasan_balaca_aslan_e692b9": "For example: Write a story about a little lion turning 1, celebrating with friends in the forest...",
-  "fairytalegenerator_meselen_aysel_murad_bdd8a0": "For example: Aysel, Murad...",
-  "fairytalegenerator_meselen_aysel_murad_leman_2ed3da": "For example: Aysel, Murad, Leman...",
+  "fairytalegenerator_meselen_aysel_murad_bdd8a0": "For example: Sophia, John...",
+  "fairytalegenerator_meselen_aysel_murad_leman_2ed3da": "For example: Sophia, John, Emma...",
   "fairytalegenerator_mesuliyyet_6e6cbe": "Responsibility",
   "fairytalegenerator_minnetdarliq_31b225": "Gratitude",
   "fairytalegenerator_movzu_5a3526": "Theme:",
@@ -7439,5 +7439,6 @@
   "vitamintracker_prenatal_vitamin": "Prenatal vitamin",
   "vitamintracker_probiotik": "Probiotic",
   "untranslated_sonra_1f3m9s": "Later",
-  "common_qeyd": "notes"
+  "common_qeyd": "notes",
+  "postsearchfilter_populyar": "Popular"
 }

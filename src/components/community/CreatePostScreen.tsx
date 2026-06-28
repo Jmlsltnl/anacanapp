@@ -193,18 +193,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
 
       {/* Content */}
       <div className="flex-1 px-4 py-4 space-y-4 pb-32">
-        {/* Group Selector */}
-        <Select value={selectedGroupId || 'public'} onValueChange={(value) => setSelectedGroupId(value === 'public' ? null : value)}>
-          <SelectTrigger className="w-full h-10 rounded-2xl bg-muted/15 border-border/10 text-[12px] font-medium">
-            <SelectValue placeholder={tr("createpostscreen_qrup_secin_8e26b9", "Qrup seçin")} />
-          </SelectTrigger>
-          <SelectContent className="bg-popover border-border z-[100] rounded-xl">
-            <SelectItem value="public">{tr("createpostscreen_umumi_794727", "🌍 Ümumi")}</SelectItem>
-            {groups.map((group) =>
-            <SelectItem key={group.id} value={group.id}>{group.icon_emoji || '👥'} {group.name}</SelectItem>
-            )}
-          </SelectContent>
-        </Select>
+        {/* Group Selector removed as per request */}
 
         {/* Content textarea */}
         <div className="relative">

@@ -213,18 +213,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
             </div>
 
             <div className="px-5 space-y-4">
-              {/* Group Selector */}
-              <Select value={selectedGroupId || 'public'} onValueChange={(value) => setSelectedGroupId(value === 'public' ? null : value)}>
-                <SelectTrigger className="w-full h-10 rounded-2xl bg-muted/40 border-border/30 text-[12px] font-medium">
-                  <SelectValue placeholder={tr("createpostmodal_qrup_secin_8e26b9", "Qrup seçin")} />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border-border z-[100] rounded-xl">
-                  <SelectItem value="public">{tr("createpostmodal_umumi_794727", "🌍 Ümumi")}</SelectItem>
-                  {groups.map((group) =>
-                <SelectItem key={group.id} value={group.id}>{group.icon_emoji || '👥'} {group.name}</SelectItem>
-                )}
-                </SelectContent>
-              </Select>
+              {/* Group Selector removed as per request */}
 
               {/* Content */}
               <div className="relative">

@@ -11,14 +11,14 @@ const LANGS = [
     code: 'az',
     label: 'Azərbaycan',
     nativeLabel: 'Azərbaycan dili',
-    flag: '🇦🇿',
+    flag: 'az',
     desc: 'Azərbaycan dilində davam edin',
   },
   {
     code: 'en',
     label: 'English',
     nativeLabel: 'English',
-    flag: '🇬🇧',
+    flag: 'gb',
     desc: 'Continue in English',
   },
 ];
@@ -146,7 +146,7 @@ export default function InitialLanguageScreen() {
                               : 'bg-[hsl(var(--beige-light))] group-hover:bg-primary/10'
                           }`}
                         >
-                          <span className="drop-shadow-sm">{lang.flag}</span>
+                          <img src={`https://flagcdn.com/w40/${lang.flag}.png`} alt={lang.code} className="w-8 h-auto rounded-sm shadow-sm" />
                         </div>
 
                         <div className="flex-1 min-w-0">
