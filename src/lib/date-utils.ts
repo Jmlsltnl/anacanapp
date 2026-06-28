@@ -1,10 +1,13 @@
 import { tr } from "@/lib/tr";import { format } from 'date-fns';
-import { az, enUS } from 'date-fns/locale';
+import { az, enUS, ru, tr as trLocale } from 'date-fns/locale';
 import { getPersistedLanguage } from './tr';
 
 export const getCurrentDateLocale = () => {
   const lang = getPersistedLanguage();
-  return lang === 'en' ? enUS : az;
+  if (lang === 'en') return enUS;
+  if (lang === 'ru') return ru;
+  if (lang === 'tr') return trLocale;
+  return az;
 };
 /**
  * Format date to Azerbaijani format: "18 Fevral" or "18 Fevral 2025"

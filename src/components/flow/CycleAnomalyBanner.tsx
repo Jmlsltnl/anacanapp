@@ -13,24 +13,24 @@ const CycleAnomalyBanner = () => {
   if (stats.shortestCycle > 0 && stats.shortestCycle < 21) {
     anomalies.push({
       severity: 'warn',
-      title: tr("cycleanomalybanner_qisa_tsikl_askar_edildi_b0e734", "Q\u0131sa tsikl a\u015Fkar edildi"),
-      message: `${tr("flow_shortest_cycle", "Ən qısa tsikliniz")} ${stats.shortestCycle} ${tr("flow_days", "gündür.")} ${tr("flow_short_cycle_warn", "21 gündən az tsikllər həkim müraciəti tələb edə bilər.")}`
+      title: tr("cycleanomalybanner_qisa_tsikl_askar_edildi_b0e734", "Qısa tsikl aşkar edildi"),
+      message: tr("flow_shortest_cycle_msg", "Ən qısa tsikliniz {days} gündür. 21 gündən az tsikllər həkim müraciəti tələb edə bilər.").replace("{days}", String(stats.shortestCycle))
     });
   }
 
   if (stats.longestCycle > 35) {
     anomalies.push({
       severity: 'warn',
-      title: tr("cycleanomalybanner_uzun_tsikl_askar_edildi_14479e", "Uzun tsikl a\u015Fkar edildi"),
-      message: `${tr("flow_longest_cycle", "Ən uzun tsikliniz")} ${stats.longestCycle} ${tr("flow_days", "gündür.")} ${tr("flow_long_cycle_warn", "35 gündən uzun tsikllər PCOS və ya hormonal disbalans əlaməti ola bilər.")}`
+      title: tr("cycleanomalybanner_uzun_tsikl_askar_edildi_14479e", "Uzun tsikl aşkar edildi"),
+      message: tr("flow_longest_cycle_msg", "Ən uzun tsikliniz {days} gündür. 35 gündən uzun tsikllər PCOS və ya hormonal disbalans əlaməti ola bilər.").replace("{days}", String(stats.longestCycle))
     });
   }
 
   if (stats.cycleVariation > 7) {
     anomalies.push({
       severity: 'info',
-      title: tr("cycleanomalybanner_duzensiz_tsikl_7b2693", "D\xFCz\u0259nsiz tsikl"),
-      message: `${tr("flow_cycle_diff", "Tsikllər arasında")} ${stats.cycleVariation} ${tr("flow_cycle_diff_2", "gün fərq var. Bu stress, çəki dəyişikliyi və ya tireoid problemlərlə bağlı ola bilər.")}`
+      title: tr("cycleanomalybanner_duzensiz_tsikl_7b2693", "Düzənsiz tsikl"),
+      message: tr("flow_cycle_diff_msg", "Tsikllər arasında {days} gün fərq var. Bu stress, çəki dəyişikliyi və ya tireoid problemlərlə bağlı ola bilər.").replace("{days}", String(stats.cycleVariation))
     });
   }
 

@@ -61,13 +61,15 @@ const FlowRemindersCard = () => {
                   <span className="text-xl">{info?.emoji || '🔔'}</span>
                   <div>
                     <p className={`text-sm font-medium ${reminder.is_enabled ? 'text-foreground' : 'text-muted-foreground'}`}>
-                      {reminder.title || info?.labelAz || info?.label}
+                      {reminder.reminder_type !== 'custom' 
+                        ? tr(`useflowreminders_title_${reminder.reminder_type}`, reminder.title || info?.labelAz || info?.label || '') 
+                        : reminder.title}
                     </p>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Clock className="w-3 h-3" />
                       <span>{reminder.time_of_day?.slice(0, 5) || '09:00'}</span>
                       {reminder.days_before > 0 &&
-                    <span>• {reminder.days_before} {tr("flowreminderscard_gun_evvel_c5f8ed", "g\xFCn \u0259vv\u0259l")}</span>
+                    <span>• {tr("flow_days_before", "{days} gün əvvəl").replace("{days}", String(reminder.days_before))}</span>
                     }
                     </div>
                   </div>

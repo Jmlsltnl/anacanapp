@@ -66,9 +66,9 @@ const PeriodDelayBanner = () => {
           <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
         </div>
         <div className="flex-1">
-          <h4 className="font-bold text-foreground text-sm mb-0.5">{tr("perioddelaybanner_periodunuz_1", "Periodunuz")} {delayDays} {tr("perioddelaybanner_gun_gecikir_a09c9d", "gün gecikir")}</h4>
+          <h4 className="font-bold text-foreground text-sm mb-0.5">{tr("perioddelaybanner_period_late", "Periodunuz {days} gün gecikir").replace("{days}", String(delayDays))}</h4>
           <p className="text-xs text-muted-foreground leading-snug mb-3">
-            {tr("perioddelaybanner_orta_tsikliniz_1", "Orta tsikliniz")} {avgCycle} {tr("perioddelaybanner_gundur_stress_ceki_deyisikliyi_96ebc4", "gündür. Stress, çəki dəyişikliyi, hormonal dalğalanma və ya hamiləlik səbəb ola bilər. Hamiləlik testi etməyi düşünün.")}
+            {tr("perioddelaybanner_avg_cycle_desc", "Orta tsikliniz {days} gündür. Stress, çəki dəyişikliyi, hormonal dalğalanma və ya hamiləlik səbəb ola bilər. Hamiləlik testi etməyi düşünün.").replace("{days}", String(avgCycle))}
           </p>
           <button
             onClick={() => navigate(`/ai-chat?prompt=${encodeURIComponent(`${tr("flow_period_delay_prompt_1", "Periodum")} ${delayDays} ${tr("flow_period_delay_prompt_2", "gün gecikib, nə edə bilərəm?")}`)}`)}

@@ -5949,5 +5949,13 @@
   "untranslated_orta_period_tvx5me": "Orta period",
   "untranslated_diapazon_dgfplg": "Diapazon",
   "untranslated_variasiya_nbjh0m": "Variasiya",
-  "untranslated_simptom_pattern_analizi_btozmi": "Simptom Analizi"
+  "untranslated_simptom_pattern_analizi_btozmi": "Simptom Analizi",
+  "perioddelaybanner_period_late": "Periodunuz {days} gün gecikir",
+  "perioddelaybanner_avg_cycle_desc": "Orta tsikliniz {days} gündür. Stress, çəki dəyişikliyi, hormonal dalğalanma və ya hamiləlik səbəb ola bilər. Hamiləlik testi etməyi düşünün.",
+  "flow_shortest_cycle_msg": "Ən qısa tsikliniz {days} gündür. 21 gündən az tsikllər həkim müraciəti tələb edə bilər.",
+  "flow_longest_cycle_msg": "Ən uzun tsikliniz {days} gündür. 35 gündən uzun tsikllər PCOS və ya hormonal disbalans əlaməti ola bilər.",
+  "flow_cycle_diff_msg": "Tsikllər arasında {days} gün fərq var. Bu stress, çəki dəyişikliyi və ya tireoid problemlərlə bağlı ola bilər.",
+  "flowdashboard_novbeti_period_42eab0": "Növbəti Period",
+  "flowdashboard_reproduktiv_dovr_0a3598": "Reproduktiv Dövr",
+  "flowdashboard_ovulyasiya_gunu_62b53e": "Ovulyasiya Günü"
 }

@@ -417,7 +417,7 @@ const FlowDashboard = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-foreground text-sm">
-                          {getTranslatedTip(tip.title_az || tip.title, language)}
+                          {language === 'en' && tip.title_en ? tip.title_en : getTranslatedTip(tip.title_az || tip.title, language)}
                         </h4>
                         <span
                       className="text-[10px] px-1.5 py-0.5 rounded-full"
@@ -430,7 +430,7 @@ const FlowDashboard = () => {
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        {getTranslatedTip(tip.content_az || tip.content, language)}
+                        {language === 'en' && tip.content_en ? tip.content_en : getTranslatedTip(tip.content_az || tip.content, language)}
                       </p>
                     </div>
                   </div>
@@ -611,12 +611,12 @@ const FlowDashboard = () => {
               selected={periodStartDate}
               onSelect={(date) => date && setPeriodStartDate(date)}
               disabled={(date) => date > new Date()}
-              locale={az}
+              locale={getCurrentDateLocale()}
               className="rounded-xl border pointer-events-auto" />
             
           </div>
           <p className="text-sm text-center text-muted-foreground">
-            {tr("flowdashboard_secilen_tarix_104372", "Se\xE7il\u0259n tarix:")} <strong>{format(periodStartDate, 'd MMMM yyyy', { locale: getCurrentDateLocale() })}</strong>
+            {tr("flowdashboard_secilen_tarix_104372", "Seçilən tarix:")} <strong>{format(periodStartDate, 'd MMMM yyyy', { locale: getCurrentDateLocale() })}</strong>
           </p>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={markingPeriod}>{tr("flowdashboard_legv_et_b5e49c", "Ləğv et")}</AlertDialogCancel>
@@ -640,7 +640,7 @@ const FlowDashboard = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>{tr("flowdashboard_period_bitisi_d0fdcc", "✅ Period bitişi")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {tr("flowdashboard_periodunuzun_bitdiyi_tarixi_se_aa37b7", "Periodunuzun bitdiyi tarixi se\xE7in:")}
+              {tr("flowdashboard_periodunuzun_bitdiyi_tarixi_se_aa37b7", "Periodunuzun bitdiyi tarixi seçin:")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex justify-center py-2">
@@ -649,14 +649,14 @@ const FlowDashboard = () => {
               selected={periodEndDate}
               onSelect={(date) => date && setPeriodEndDate(date)}
               disabled={(date) => date > new Date() || (cycleData?.lastPeriodDate ? date < new Date(cycleData.lastPeriodDate) : false)}
-              locale={az}
+              locale={getCurrentDateLocale()}
               className="rounded-xl border pointer-events-auto" />
             
           </div>
           <p className="text-sm text-center text-muted-foreground">
-            {tr("flowdashboard_secilen_tarix_104372", "Se\xE7il\u0259n tarix:")} <strong>{format(periodEndDate, 'd MMMM yyyy', { locale: getCurrentDateLocale() })}</strong>
+            {tr("flowdashboard_secilen_tarix_104372", "Seçilən tarix:")} <strong>{format(periodEndDate, 'd MMMM yyyy', { locale: getCurrentDateLocale() })}</strong>
             {cycleData?.lastPeriodDate &&
-            <> • Period: <strong>{differenceInDays(periodEndDate, new Date(cycleData.lastPeriodDate)) + 1} {tr("flowdashboard_gun_54e78d", "g\xFCn")}</strong></>
+            <> • Period: <strong>{differenceInDays(periodEndDate, new Date(cycleData.lastPeriodDate)) + 1} {tr("flowdashboard_gun_54e78d", "gün")}</strong></>
             }
           </p>
           <AlertDialogFooter>
