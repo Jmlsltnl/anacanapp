@@ -7474,5 +7474,11 @@
   "useflowreminders_title_pill": "Pill reminder",
   "cycletrendchart_uzunluq_f427cd": "Length",
   "authscreen_olke": "Country",
-  "authscreen_olke_secin": "Select Country"
+  "authscreen_olke_secin": "Select Country",
+  "dashboard_1_trimester": "1st Trimester",
+  "dashboard_2_trimester": "2nd Trimester",
+  "dashboard_3_trimester": "3rd Trimester",
+  "dashboard_sm": "cm",
+  "dashboard_qr": "gr",
+  "dashboard_glasses": "glass(es)"
 }

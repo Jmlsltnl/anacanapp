@@ -385,17 +385,21 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
               {tr("dashboard_anacan_hazirda_cfaa50", "Anacan, hazırda")} <span className={trimesterColors.text}>{weekData.fruit}</span> {tr("dashboard_boydayam_22a1", "boydayam")}
             </p>
             <p className="text-xs text-muted-foreground font-medium">
-              {selectedWeek}{tr("dashboard_hefte_5af01f", ". h\u0259ft\u0259,")} {selectedDayInWeek}{tr("dashboard_gun_a4ba4e", ". g\xFCn \u2022")} <span className={`font-semibold ${trimesterColors.text}`}>{selectedTrimester}-{selectedTrimester === 1 ? 'ci' : selectedTrimester === 2 ? 'ci' : tr("dashboard_cu_a8237f", "c\xFC")} Trimester</span>
+              {selectedWeek}{tr("dashboard_hefte_5af01f", ". h\u0259ft\u0259,")} {selectedDayInWeek}{tr("dashboard_gun_a4ba4e", ". g\xFCn \u2022")} <span className={`font-semibold ${trimesterColors.text}`}>
+                {selectedTrimester === 1 ? tr("dashboard_1_trimester", "1-ci Trimester") : 
+                 selectedTrimester === 2 ? tr("dashboard_2_trimester", "2-ci Trimester") :
+                 tr("dashboard_3_trimester", "3-cü Trimester")}
+              </span>
             </p>
             <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
               <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
                 {pregnancyDay}{tr("dashboard_gun_d96b5d", ". g\xFCn")}
               </span>
               <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
-                {weekData.lengthCm} sm
+                {weekData.lengthCm} {tr("dashboard_sm", "sm")}
               </span>
               <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
-                {weekData.weightG} qr
+                {weekData.weightG} {tr("dashboard_qr", "qr")}
               </span>
               <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
                 {daysLeft} {tr("dashboard_gun_qaldi_993281", "g\xFCn qald\u0131")}

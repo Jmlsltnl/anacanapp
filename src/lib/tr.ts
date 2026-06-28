@@ -27,7 +27,8 @@ export function getPersistedLanguage(): string {
  */
 export function tr(key: string, defaultValue: string): string {
   const lang = getPersistedLanguage();
-  return getCachedTranslation(key, lang) || defaultValue;
+  const val = getCachedTranslation(key, lang);
+  return val !== undefined ? val : defaultValue;
 }
 
 /**
