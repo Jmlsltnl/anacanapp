@@ -509,7 +509,6 @@ export const useHospitalBagTemplates = () => {
       const { data, error } = await supabase
         .from('hospital_bag_templates')
         .select('*')
-        .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
       return mapRowsTranslation(data, language, ['item_name', 'notes']) as HospitalBagTemplate[];

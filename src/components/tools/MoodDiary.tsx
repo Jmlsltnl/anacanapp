@@ -27,9 +27,11 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   const [notes, setNotes] = useState('');
 
   const { logs, todayLog, loading: logsLoading, addLog } = useDailyLogs();
-  const { lifeStage } = useUserStore();
+  const { lifeStage, language } = useUserStore();
   const { data: dbMoods, isLoading: moodsLoading } = useMoodOptions();
   const { data: dbSymptoms, isLoading: symptomsLoading } = useSymptoms(lifeStage);
+
+  const locale = language === 'en' ? 'en-US' : language === 'ru' ? 'ru-RU' : 'az-AZ';
 
   // Map DB data to component format
   const moodEmojis = useMemo(() => {
@@ -155,7 +157,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
             </div>
             <div className="text-right">
               <p className="text-fuchsia-600/70 dark:text-fuchsia-400/70 text-xs font-medium">{tr("mooddiary_bu_hefte_a5f60b", "Bu həftə")}</p>
-              <p className="text-2xl font-black text-fuchsia-600 dark:text-fuchsia-400">{logs.length} qeyd</p>
+              <p className="text-2xl font-black text-fuchsia-600 dark:text-fuchsia-400">{logs.length} {tr("common_qeyd", "qeyd")}</p>
             </div>
           </div>
         </motion.div>
@@ -300,7 +302,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <p className="font-semibold text-foreground">
-                            {new Date(entry.log_date).toLocaleDateString('az-AZ', { weekday: 'long', day: 'numeric', month: 'short' })}
+                            {new Date(entry.log_date).toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'short' })}
                           </p>
                           <div className="flex">
                             {Array.from({ length: 5 }).map((_, i) =>
@@ -359,11 +361,12 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
                 <h3 className="font-bold mb-4 text-foreground">{tr("mooddiary_heftelik_ehval_trendi_5796d9", "Həftəlik əhval trendi")}</h3>
                 <div className="flex items-end justify-between h-32 px-2">
-                  {['B.e.', tr("mooddiary_c_a_5c29b2", "\xC7.a."), tr("mooddiary_c_399abb", "\xC7."), 'C.a.', 'C.', tr("mooddiary_s_f3ddc2", "\u015E."), 'B.'].map((day, i) => {
+                  {Array.from({ length: 7 }).map((_, i) => {
+                  const day = new Date(2024, 0, 1 + i).toLocaleDateString(locale, { weekday: 'short' });
                   const dayLog = logs.find((l) => new Date(l.log_date).getDay() === (i + 1) % 7);
                   const height = dayLog?.mood ? dayLog.mood / 5 * 100 : 50;
                   return (
-                    <div key={day} className="flex flex-col items-center gap-2">
+                    <div key={i} className="flex flex-col items-center gap-2">
                         <motion.div
                         initial={{ height: 0 }}
                         animate={{ height: `${height}%` }}

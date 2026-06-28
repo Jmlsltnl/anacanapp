@@ -323,7 +323,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold">{tr("crytranslator_aglama_analizi_edek_ebce29", "Ağlama analizi edək")}</h1>
+            <h1 className="text-lg font-bold">{tr("adminanalytics_aglama_analizi_0713b3", "Ağlama Analizi")}</h1>
             <p className="text-xs text-muted-foreground">{tr("crytranslator_ai_ile_korpe_aglamasini_analiz_edin_e2e23c", "AI ilə körpə ağlamasını analiz edin")}</p>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setShowHistory(!showHistory)} className="relative z-30">

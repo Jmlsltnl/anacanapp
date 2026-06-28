@@ -325,7 +325,7 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
                       variant="outline"
                       onClick={() => setShowWhiteNoisePrompt(false)}>
                       
-                        Sonra
+                        {tr("untranslated_sonra_1f3m9s", "Sonra")}
                       </Button>
                     </div>
                   </div>

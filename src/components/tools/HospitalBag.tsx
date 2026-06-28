@@ -45,7 +45,7 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
     ? items 
     : items.filter(item => item.category === activeCategory);
 
-  const translatedFilteredItems = mapRowsTranslation(filteredItems, language, ['item_name', 'notes']);
+  const translatedFilteredItems = filteredItems;
 
   const sortedItems = [...translatedFilteredItems].sort((a, b) => (a.priority || 2) - (b.priority || 2));
 

@@ -10,6 +10,8 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import AlbumOrderScreen from '@/components/shop/AlbumOrderScreen';
 import { tr } from "@/lib/tr";
+import { getOrdinal } from "@/lib/utils";
+import { useUserStore } from "@/store/userStore";
 
 interface BabyMonthlyAlbumProps {
   onBack: () => void;
@@ -21,14 +23,15 @@ interface AlbumPhoto {
   url: string;
 }
 
-const getMonthLabels = () => Array.from({ length: 12 }, (_, i) => ({
+const getMonthLabels = (language: string) => Array.from({ length: 12 }, (_, i) => ({
   month: i + 1,
-  label: `${i + 1} ${tr('babymonthlyalbum_month_suffix', '-ci ay')}`,
+  label: `${getOrdinal(i + 1, language)} ${tr('babymonthlyalbum_month_suffix', 'ay')}`,
   emoji: ['🌱', '🌿', '🌳', '🌻', '🌺', '🌸', '🍀', '🌈', '⭐', '🎈', '🎉', '🎂'][i]
 }));
 
 const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
-  const monthLabels = getMonthLabels();
+  const language = useUserStore((s) => s.language);
+  const monthLabels = getMonthLabels(language);
   useScrollToTop();
   const { user } = useAuth();
   const { selectedChild, getChildAge } = useChildren();

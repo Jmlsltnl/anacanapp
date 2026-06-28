@@ -109,8 +109,20 @@ export const useHospitalBag = () => {
     }
   }, [user, templatesLoading, templates]);
 
+  const enrichedItems = items.map(item => {
+    const template = templates.find(t => t.id === item.item_id);
+    if (template) {
+      return {
+        ...item,
+        item_name: template.item_name,
+        notes: template.notes
+      };
+    }
+    return item;
+  });
+
   return {
-    items,
+    items: enrichedItems,
     loading: loading || templatesLoading,
     toggleItem,
     getProgress,

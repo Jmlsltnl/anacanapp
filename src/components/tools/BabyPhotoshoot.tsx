@@ -16,6 +16,7 @@ import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { PremiumModal } from '@/components/PremiumModal';
 import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
 import { tr } from "@/lib/tr";
+import { useUserStore } from '@/store/userStore';
 import {
   usePhotoshootBackgrounds,
   usePhotoshootEyeColors,
@@ -105,17 +106,19 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   const { data: dbOutfits = [] } = usePhotoshootOutfits(customization.gender);
   const { data: dbImageStyles = [] } = usePhotoshootImageStyles();
 
+  const language = useUserStore((s) => s.language);
+
   // Map DB data or use fallbacks
   const currentBackgrounds = useMemo(() => {
     if (dbBackgrounds.length > 0) {
       // Group backgrounds by category
       const grouped: Record<string, any[]> = {};
       dbBackgrounds.forEach((bg) => {
-        const cat = bg.category_name_az || bg.category_name;
+        const cat = bg[`category_name_${language}` as keyof typeof bg] || bg.category_name_az || bg.category_name;
         if (!grouped[cat]) grouped[cat] = [];
         grouped[cat].push({
           id: bg.theme_id,
-          name: bg.theme_name_az || bg.theme_name,
+          name: bg[`theme_name_${language}` as keyof typeof bg] || bg.theme_name_az || bg.theme_name,
           category: cat,
           premium: false, // Can add is_premium to DB if needed
           emoji: bg.theme_emoji || '🎨',
@@ -126,7 +129,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       return Object.values(grouped).flat();
     }
     return []; // Will use fallback in render
-  }, [dbBackgrounds]);
+  }, [dbBackgrounds, language]);
 
   // Map Tailwind gradient classes to actual CSS hex colors for inline styles
   const gradientToHex: Record<string, [string, string]> = {
@@ -159,54 +162,54 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
   const eyeColorOptions = useMemo(() => {
     const source = dbEyeColors.length > 0 ? dbEyeColors : fallbackEyeColors;
-    return source.map((c) => ({
+    return source.map((c: any) => ({
       id: c.color_id,
-      name: c.color_name_az || c.color_name,
+      name: c[`color_name_${language}`] || c.color_name_az || c.color_name,
       hexValue: c.hex_value || 'from-gray-300 to-gray-400'
     }));
-  }, [dbEyeColors]);
+  }, [dbEyeColors, language]);
 
   const hairColorOptions = useMemo(() => {
     const source = dbHairColors.length > 0 ? dbHairColors : fallbackHairColors;
-    return source.map((c) => ({
+    return source.map((c: any) => ({
       id: c.color_id,
-      name: c.color_name_az || c.color_name,
+      name: c[`color_name_${language}`] || c.color_name_az || c.color_name,
       hexValue: c.hex_value || 'from-gray-300 to-gray-400'
     }));
-  }, [dbHairColors]);
+  }, [dbHairColors, language]);
 
   const hairStyleOptions = useMemo(() => {
     if (dbHairStyles.length > 0) {
       return dbHairStyles.map((s) => ({
         id: s.style_id,
-        name: s.style_name_az || s.style_name,
+        name: s[`style_name_${language}` as keyof typeof s] || s.style_name_az || s.style_name,
         emoji: s.emoji || '✨'
       }));
     }
-    return fallbackHairStyles.map((s) => ({
+    return fallbackHairStyles.map((s: any) => ({
       id: s.style_id,
-      name: s.style_name_az || s.style_name,
+      name: s[`style_name_${language}`] || s.style_name_az || s.style_name,
       emoji: s.emoji
     }));
-  }, [dbHairStyles]);
+  }, [dbHairStyles, language]);
 
   const currentOutfits = useMemo(() => {
     if (dbOutfits.length > 0) {
       return dbOutfits.map((o) => ({
         id: o.outfit_id,
-        name: o.outfit_name_az || o.outfit_name,
+        name: o[`outfit_name_${language}` as keyof typeof o] || o.outfit_name_az || o.outfit_name,
         emoji: o.emoji || '👕',
         premium: false // Can add is_premium to DB if needed
       }));
     }
     return []; // Will use fallback
-  }, [dbOutfits]);
+  }, [dbOutfits, language]);
 
   const imageStyleOptions = useMemo(() => {
     if (dbImageStyles.length > 0) {
       return dbImageStyles.map((s) => ({
         id: s.style_id,
-        name: s.style_name_az || s.style_name,
+        name: s[`style_name_${language}` as keyof typeof s] || s.style_name_az || s.style_name,
         emoji: s.emoji || '🎨',
         promptModifier: s.prompt_modifier || ''
       }));
@@ -216,7 +219,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     { id: 'realistic', name: 'Realistik', emoji: '📷', promptModifier: 'ultra realistic, photorealistic' },
     { id: '3d_disney', name: '3D Disney', emoji: '🏰', promptModifier: '3D Disney Pixar style' }];
 
-  }, [dbImageStyles]);
+  }, [dbImageStyles, language]);
 
 
   useEffect(() => {

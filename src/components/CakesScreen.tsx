@@ -15,21 +15,19 @@ interface CakesScreenProps {
   initialMonth?: number;
 }
 
-const getOrdinalSuffix = (n: number): string => {
-  const suffixes: Record<number, string> = {
-    1: 'ci', 2: 'ci', 3: tr("cakesscreen_cu_a8237f", "c\xFC"), 4: tr("cakesscreen_cu_a8237f", "c\xFC"), 5: 'ci', 6: tr("cakesscreen_ci_581209", "c\u0131"),
-    7: 'ci', 8: 'ci', 9: 'cu', 10: 'cu', 11: 'ci', 12: 'ci'
-  };
-  return suffixes[n] || 'ci';
-};
+import { getOrdinal } from '@/lib/utils';
+import { useUserStore } from '@/store/userStore';
 
-const MONTHS = Array.from({ length: 12 }, (_, i) => ({
+const getMonthLabels = (language: string) => Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
-  label: tr(`common_month_label_${i + 1}`, `${i + 1}-${getOrdinalSuffix(i + 1)} ay`),
+  label: `${getOrdinal(i + 1, language)} ay`,
   emoji: ['🎂', '🧁', '🎀', '🌸', '⭐', '🎈', '🌈', '🎪', '🎠', '🎡', '🎆', '🎊'][i]
 }));
 
 const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
+  const language = useUserStore((s) => s.language);
+  const MONTHS = useMemo(() => getMonthLabels(language), [language]);
+
   useScrollToTop();
   useScreenAnalytics('Cakes', 'Shop');
   const { cakes, loading } = useCakes();

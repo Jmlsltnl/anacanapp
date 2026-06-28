@@ -2280,7 +2280,7 @@
   "babymonthlyalbum_korpeniz_da99de": "Your baby",
   "babymonthlyalbum_legv_et": "Cancel",
   "babymonthlyalbum_legv_et_b5e49c": "Cancel it",
-  "babymonthlyalbum_month_suffix": "-th month",
+  "babymonthlyalbum_month_suffix": "month",
   "babymonthlyalbum_sehife_fd1fa9": "Page",
   "babymonthlyalbum_sekil_silindi_efe8e8": "Photo deleted",
   "babymonthlyalbum_sekil_siline_bilmedi_e563ea": "Photo could not be deleted",
@@ -3271,7 +3271,7 @@
   "fairytalegenerator_3_5_yas_023631": "3-5 years",
   "fairytalegenerator_6_9_yas_345fa4": "6-9 years",
   "fairytalegenerator_addim_9346cd": "Step",
-  "fairytalegenerator_agilli_nagillar_3f1901": "Clever Tales",
+  "fairytalegenerator_agilli_nagillar_3f1901": "Magic Tales",
   "fairytalegenerator_ari_b3e5dd": "Bee",
   "fairytalegenerator_ayi_balasi_f0fdaa": "Bear Cub",
   "fairytalegenerator_azerbaycan_733e93": "Azerbaijan",
@@ -3306,9 +3306,9 @@
   "fairytalegenerator_laylay_3c7a2d": "Lullaby",
   "fairytalegenerator_macera_bc3bdc": "Adventure",
   "fairytalegenerator_mehribanliq_7e25e6": "Kindness",
-  "fairytalegenerator_meselen_1_yasina_hazirlasan_balaca_aslan_e692b9": "Example: Write a story about a little lion preparing for his 1st birthday, having a party in the forest with his friends...",
-  "fairytalegenerator_meselen_aysel_murad_bdd8a0": "Example: Aysel, Murad...",
-  "fairytalegenerator_meselen_aysel_murad_leman_2ed3da": "Example: Aysel, Murad, Leman...",
+  "fairytalegenerator_meselen_1_yasina_hazirlasan_balaca_aslan_e692b9": "For example: Write a story about a little lion turning 1, celebrating with friends in the forest...",
+  "fairytalegenerator_meselen_aysel_murad_bdd8a0": "For example: Aysel, Murad...",
+  "fairytalegenerator_meselen_aysel_murad_leman_2ed3da": "For example: Aysel, Murad, Leman...",
   "fairytalegenerator_mesuliyyet_6e6cbe": "Responsibility",
   "fairytalegenerator_minnetdarliq_31b225": "Gratitude",
   "fairytalegenerator_movzu_5a3526": "Theme:",
@@ -7437,5 +7437,6 @@
   "vitamintracker_sink": "Zinc",
   "vitamintracker_yod": "Iodine",
   "vitamintracker_prenatal_vitamin": "Prenatal vitamin",
-  "vitamintracker_probiotik": "Probiotic"
+  "vitamintracker_probiotik": "Probiotic",
+  "untranslated_sonra_1f3m9s": "Later"
 }

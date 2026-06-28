@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useChildren } from '@/hooks/useChildren';
 import { format } from 'date-fns';
-import { getCurrentDateLocale } from '@/lib/date-utils';
+import { getCurrentDateLocale, formatDateAz } from '@/lib/date-utils';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
 
@@ -296,7 +296,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
               </div>
               <h2 className="font-bold text-foreground">{tr("babygrowthtracker_olcu_tarixcesi_249279", "Ölçü Tarixçəsi")}</h2>
             </div>
-            <span className="text-xs text-muted-foreground">{entries.length} qeyd</span>
+            <span className="text-xs text-muted-foreground">{entries.length} {tr("common_qeyd", "qeyd")}</span>
           </div>
 
           {isLoading ?
@@ -346,7 +346,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
                           </div>
                           <div>
                             <p className="font-bold text-foreground">
-                              {format(new Date(entry.entry_date), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
+                              {formatDateAz(new Date(entry.entry_date), true)}
                             </p>
                             <div className="flex items-center gap-3 mt-1 text-sm">
                               {entry.weight_kg &&
