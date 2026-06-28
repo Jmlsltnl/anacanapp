@@ -9527,6 +9527,7 @@ export type Database = {
         Args: { p_partner_code: string }
         Returns: {
           id: string
+          is_premium: boolean
           name: string
           user_id: string
         }[]
