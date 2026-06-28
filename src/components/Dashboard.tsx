@@ -382,7 +382,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
           {/* Main Text - "Anacan hazırda meyvə boydayam" */}
           <div className="text-center">
             <p className="text-lg font-bold text-foreground mb-1">
-              {tr("dashboard_anacan_hazirda_cfaa50", "Anacan, haz\u0131rda")} <span className={trimesterColors.text}>{weekData.fruit}</span> boydayam
+              {tr("dashboard_anacan_hazirda_cfaa50", "Anacan, hazırda")} <span className={trimesterColors.text}>{weekData.fruit}</span> {tr("dashboard_boydayam_22a1", "boydayam")}
             </p>
             <p className="text-xs text-muted-foreground font-medium">
               {selectedWeek}{tr("dashboard_hefte_5af01f", ". h\u0259ft\u0259,")} {selectedDayInWeek}{tr("dashboard_gun_a4ba4e", ". g\xFCn \u2022")} <span className={`font-semibold ${trimesterColors.text}`}>{selectedTrimester}-{selectedTrimester === 1 ? 'ci' : selectedTrimester === 2 ? 'ci' : tr("dashboard_cu_a8237f", "c\xFC")} Trimester</span>
@@ -508,8 +508,8 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
         <div className="flex justify-around">
           {[
           { icon: '👀', label: tr("dashboard_goz_fbc05e", 'Göz'), active: weeklyDevelopment.eyes },
-          { icon: '👂', label: 'Qulaq', active: weeklyDevelopment.ears },
-          { icon: '✋', label: 'Barmaq', active: weeklyDevelopment.fingers },
+          { icon: '👂', label: tr("dashboard_qulaq_93ab", 'Qulaq'), active: weeklyDevelopment.ears },
+          { icon: '✋', label: tr("dashboard_barmaq_18bc", 'Barmaq'), active: weeklyDevelopment.fingers },
           { icon: '🦶', label: tr("dashboard_tepik_9a873a", 'Təpik'), active: weeklyDevelopment.kicks },
           { icon: '💇', label: tr("dashboard_sac_a09eaa", 'Saç'), active: weeklyDevelopment.hair }].
           map((item, index) =>
