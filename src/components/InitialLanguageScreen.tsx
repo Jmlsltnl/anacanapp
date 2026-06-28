@@ -212,7 +212,7 @@ export default function InitialLanguageScreen() {
                 </button>
                 <div className="flex-1 text-center pr-10">
                   <h2 className="text-xl font-bold text-foreground">
-                    {selectedLang === 'en' ? 'Select Country' : 'Ölkə seçin'}
+                    {selectedLang === 'en' ? 'Select Country' : selectedLang === 'ru' ? 'Выберите страну' : selectedLang === 'tr' ? 'Ülke seçin' : 'Ölkə seçin'}
                   </h2>
                 </div>
               </div>
@@ -221,7 +221,7 @@ export default function InitialLanguageScreen() {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder={selectedLang === 'en' ? 'Search country...' : 'Ölkə axtarın...'}
+                  placeholder={selectedLang === 'en' ? 'Search country...' : selectedLang === 'ru' ? 'Поиск страны...' : selectedLang === 'tr' ? 'Ülke ara...' : 'Ölkə axtarın...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full h-14 pl-12 pr-4 rounded-2xl bg-card border border-border focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all outline-none text-base"
@@ -259,7 +259,7 @@ export default function InitialLanguageScreen() {
                     <div className="text-center py-12">
                       <Globe className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
                       <p className="text-muted-foreground">
-                        {selectedLang === 'en' ? 'No countries found' : 'Ölkə tapılmadı'}
+                        {selectedLang === 'en' ? 'No countries found' : selectedLang === 'ru' ? 'Страны не найдены' : selectedLang === 'tr' ? 'Ülke bulunamadı' : 'Ölkə tapılmadı'}
                       </p>
                     </div>
                   )}

@@ -305,7 +305,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">{tr("authscreen_olke_secin", "Ölkə")}</label>
+            <label className="text-sm font-medium text-muted-foreground">{tr("authscreen_olke", "Ölkə")}</label>
             <Select value={formData.country_code} onValueChange={(val) => setFormData(prev => ({ ...prev, country_code: val }))}>
               <SelectTrigger className="w-full h-11 rounded-xl bg-background border border-input">
                 <SelectValue placeholder={tr("authscreen_olke_secin", "Ölkə seçin")} />

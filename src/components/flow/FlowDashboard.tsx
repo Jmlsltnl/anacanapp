@@ -1,11 +1,8 @@
 import { useState } from 'react';
 import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Calendar as CalendarIcon, Droplets, Heart, Moon, Sparkles,
-  TrendingUp,
-  Apple, Dumbbell, Brain, Flame, CircleDot } from
-'lucide-react';
+import { Droplets, Heart, Sparkles, AlertCircle, Plus, Calendar as CalendarIcon, Beaker, Pill, Droplet, Moon, Activity, Baby, Sparkle, Wind, CheckCircle2, XCircle, ArrowRight, TrendingUp, Flame, Apple, Dumbbell } from 'lucide-react';
+import { getTranslatedTip } from '@/lib/tip-translations';
 import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
 import { format, addDays, differenceInDays } from 'date-fns';
@@ -41,7 +38,7 @@ import DailyStoryCards from './DailyStoryCards';
 import PartnerFlowStatusCard from './PartnerFlowStatusCard';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
 const FlowDashboard = () => {
-  const { getCycleData, cycleLength, periodLength, setLastPeriodDate } = useUserStore();
+  const { getCycleData, cycleLength, periodLength, setLastPeriodDate, language } = useUserStore();
   const cycleData = getCycleData();
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -420,7 +417,7 @@ const FlowDashboard = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold text-foreground text-sm">
-                          {tip.title_az || tip.title}
+                          {getTranslatedTip(tip.title_az || tip.title, language)}
                         </h4>
                         <span
                       className="text-[10px] px-1.5 py-0.5 rounded-full"
@@ -433,7 +430,7 @@ const FlowDashboard = () => {
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        {tip.content_az || tip.content}
+                        {getTranslatedTip(tip.content_az || tip.content, language)}
                       </p>
                     </div>
                   </div>

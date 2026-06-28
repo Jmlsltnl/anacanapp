@@ -147,7 +147,7 @@ const FlowPeriodCalendar = () => {
 
       {/* Day Labels */}
       <div className="grid grid-cols-7 gap-1 mb-2">
-        {['B', 'BE', tr("flowperiodcalendar_c_b70344", "\xC7"), tr("flowperiodcalendar_ca_f55b0c", "\xC7A"), 'C', 'C', tr("flowperiodcalendar_s_b97106", "\u015E")].map((day, i) =>
+        {[tr('day_sun_short', 'B'), tr('day_mon_short', 'BE'), tr('day_tue_short', 'ÇA'), tr('day_wed_short', 'Ç'), tr('day_thu_short', 'CA'), tr('day_fri_short', 'C'), tr('day_sat_short', 'Ş')].map((day, i) =>
         <div key={i} className="text-center text-xs text-muted-foreground font-medium py-1">
             {day}
           </div>
