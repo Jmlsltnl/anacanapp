@@ -38,13 +38,30 @@ const ChatMediaUpload = ({ onUpload, disabled }: ChatMediaUploadProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const ext = type === 'image' ? 'jpg' : 'webm';
+      let ext = 'jpg';
+      let contentType = 'image/jpeg';
+      
+      if (type === 'audio') {
+        const fileType = file.type || '';
+        if (fileType.includes('mp4')) ext = 'mp4';
+        else if (fileType.includes('ogg')) ext = 'ogg';
+        else if (fileType.includes('webm')) ext = 'webm';
+        else ext = 'm4a';
+        
+        contentType = fileType || 'audio/mp4';
+      } else {
+        const fileType = file.type || '';
+        if (fileType.includes('png')) ext = 'png';
+        else if (fileType.includes('gif')) ext = 'gif';
+        contentType = fileType || 'image/jpeg';
+      }
+
       const fileName = `${user.id}/${Date.now()}.${ext}`;
 
       const { data, error } = await supabase.storage
         .from('chat-media')
         .upload(fileName, file, {
-          contentType: type === 'image' ? 'image/jpeg' : 'audio/webm',
+          contentType,
           upsert: false
         });
 
@@ -68,7 +85,19 @@ const ChatMediaUpload = ({ onUpload, disabled }: ChatMediaUploadProps) => {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      
+      let mimeType = 'audio/webm';
+      if (MediaRecorder.isTypeSupported('audio/webm')) {
+        mimeType = 'audio/webm';
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        mimeType = 'audio/mp4';
+      } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
+        mimeType = 'audio/ogg';
+      } else {
+        mimeType = '';
+      }
+
+      const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -79,7 +108,8 @@ const ChatMediaUpload = ({ onUpload, disabled }: ChatMediaUploadProps) => {
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const actualMimeType = mediaRecorder.mimeType || mimeType || 'audio/mp4';
+        const audioBlob = new Blob(audioChunksRef.current, { type: actualMimeType });
         stream.getTracks().forEach(track => track.stop());
         await uploadFile(audioBlob, 'audio');
       };
