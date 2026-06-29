@@ -70,21 +70,22 @@ const GroupsList = ({ groups, memberGroupIds, onSelectGroup, searchQuery, isLoad
                 isMember ? 'cursor-pointer active:scale-[0.99]' : ''}`
                 }>
                 
+                
                   <div className="p-3.5 flex items-center gap-3.5">
                     <div className="w-12 h-12 min-w-12 rounded-2xl bg-gradient-to-br from-primary/8 to-accent/5 flex items-center justify-center">
                       <span className="text-xl leading-none">{group.icon_emoji || '👥'}</span>
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-foreground text-[14px] leading-tight line-clamp-1">{group.name}</h4>
+                      <h4 className="font-bold text-foreground text-[14px] leading-tight line-clamp-1">{tr(`group_name_${group.name.replace(/\s+/g, '_').toLowerCase()}`, group.name)}</h4>
                       {group.description &&
-                    <p className="text-[11px] text-muted-foreground/45 mt-0.5 line-clamp-1 font-medium">{group.description}</p>
+                    <p className="text-[11px] text-muted-foreground/45 mt-0.5 line-clamp-1 font-medium">{tr(`group_desc_${group.name.replace(/\s+/g, '_').toLowerCase()}`, group.description)}</p>
                     }
                       <div className="flex items-center gap-1.5 mt-1.5">
                         <div className="flex -space-x-1.5">
                           {[0, 1, 2].map((i) =>
                         <div key={i} className="w-4 h-4 rounded-full bg-gradient-to-br from-primary/20 to-accent/15 border border-card" />
-                        )}
+                          )}
                         </div>
                         <span className="text-[10px] text-muted-foreground/35 font-semibold">{group.member_count} {tr("groupslist_uzv_3f0dbc", "\xFCzv")}</span>
                       </div>
