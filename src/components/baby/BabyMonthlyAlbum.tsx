@@ -54,12 +54,23 @@ const BabyMonthlyAlbum = ({ onBack }: BabyMonthlyAlbumProps) => {
       if (!user) return [];
       const { data } = await supabase.storage.from('baby-album').list(user.id, { sortBy: { column: 'name', order: 'asc' } });
       if (!data) return [];
-      return data.map((f) => {
+      const files = data.filter((f) => f.name !== '.emptyFolderPlaceholder');
+      const paths = files.map((f) => `${user.id}/${f.name}`);
+      
+      let signedUrls: any[] = [];
+      if (paths.length > 0) {
+        const { data: urls, error: signedError } = await supabase.storage.from('baby-album').createSignedUrls(paths, 3600);
+        if (!signedError && urls) {
+          signedUrls = urls;
+        }
+      }
+
+      return files.map((f, i) => {
         const monthMatch = f.name.match(/^month-(\d+)/);
         return {
           name: f.name,
           month: monthMatch ? parseInt(monthMatch[1]) : 0,
-          url: supabase.storage.from('baby-album').getPublicUrl(`${user.id}/${f.name}`).data.publicUrl
+          url: signedUrls[i]?.signedUrl || ''
         };
       }).filter((p) => p.month > 0);
     },

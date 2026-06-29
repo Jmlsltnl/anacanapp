@@ -91,6 +91,23 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
       eq('user_id', user.id).
       order('month_number', { ascending: true });
       if (error) throw error;
+      
+      const paths = data.map(p => {
+        const urlParts = p.photo_url.split('/pregnancy-album/');
+        return urlParts.length > 1 ? decodeURIComponent(urlParts[1]) : p.photo_url;
+      });
+      
+      if (paths.length > 0) {
+        const { data: signedUrls } = await supabase.storage.from('pregnancy-album').createSignedUrls(paths, 3600);
+        if (signedUrls) {
+          data.forEach((p, i) => {
+            if (signedUrls[i]?.signedUrl) {
+              p.photo_url = signedUrls[i].signedUrl;
+            }
+          });
+        }
+      }
+      
       return data as AlbumPhoto[];
     },
     enabled: !!user?.id
