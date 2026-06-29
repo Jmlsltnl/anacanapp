@@ -327,9 +327,9 @@ export default function AdminVaccines() {
       <Dialog open={!!countryDlg} onOpenChange={(o) => !o && setCountryDlg(null)}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{countryDlg?.id ? tr("adminvaccines_olkeni_redakte_et_3057d4", "\xD6lk\u0259ni redakt\u0259 et") : tr("adminvaccines_yeni_olke_561985", "Yeni \xF6lk\u0259")}</DialogTitle></DialogHeader>
-          {countryDlg &&
-          <div className="space-y-3">
-              <Field label={tr("adminvaccines_kod_mes_az_tr_aa7b00", "Kod (m\u0259s. AZ, TR)")}><Input value={countryDlg.code || ''} onChange={(e) => setCountryDlg({ ...countryDlg, code: e.target.value.toUpperCase() })} /></Field>
+          {countryDlg && (
+            <div className="space-y-3">
+              <Field label={tr("adminvaccines_kod_mes_az_tr_aa7b00", "Kod (məs. AZ, TR)")}><Input value={countryDlg.code || ''} onChange={(e) => setCountryDlg({ ...countryDlg, code: e.target.value.toUpperCase() })} /></Field>
               <Field label="Ad (AZ)"><Input value={countryDlg.name_az || ''} onChange={(e) => setCountryDlg({ ...countryDlg, name_az: e.target.value })} /></Field>
               <Field label="Ad (EN)"><Input value={countryDlg.name_en || ''} onChange={(e) => setCountryDlg({ ...countryDlg, name_en: e.target.value })} /></Field>
               <Field label="Bayraq emoji"><Input value={countryDlg.flag_emoji || ''} onChange={(e) => setCountryDlg({ ...countryDlg, flag_emoji: e.target.value })} /></Field>
@@ -339,7 +339,7 @@ export default function AdminVaccines() {
               <ToggleRow label="Aktiv" value={!!countryDlg.is_active} onChange={(v) => setCountryDlg({ ...countryDlg, is_active: v })} />
               <ToggleRow label="Default" value={!!countryDlg.is_default} onChange={(v) => setCountryDlg({ ...countryDlg, is_default: v })} />
             </div>
-          }
+          )}
           <DialogFooter>
             <Button variant="ghost" onClick={() => setCountryDlg(null)}>{tr("adminvaccines_legv_f7100a", "L\u0259\u011Fv")}</Button>
             <Button onClick={() => countryDlg && saveCountry.mutate(countryDlg)}>Yadda saxla</Button>
@@ -351,9 +351,8 @@ export default function AdminVaccines() {
       <Dialog open={!!vaccineDlg} onOpenChange={(o) => !o && setVaccineDlg(null)}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{vaccineDlg?.id ? tr("adminvaccines_peyvendi_redakte_et_667d25", "Peyv\u0259ndi redakt\u0259 et") : tr("adminvaccines_yeni_peyvend_c3cef1", "Yeni peyv\u0259nd")}</DialogTitle></DialogHeader>
-          {vaccineDlg &&
-          <div className="space-y-3">
-          <div className="space-y-3">
+          {vaccineDlg && (
+            <div className="space-y-3">
               <div className="grid grid-cols-2 gap-2">
                 <Field label="Kod"><Input value={vaccineDlg.code || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, code: e.target.value })} /></Field>
                 <Field label={tr("adminvaccines_reng_hex_3c8123", "R\u0259ng (hex)")}><Input value={vaccineDlg.color_hex || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, color_hex: e.target.value })} /></Field>
@@ -381,7 +380,7 @@ export default function AdminVaccines() {
               <ToggleRow label={tr("adminvaccines_mecburi_ffc711", "M\u0259cburi")} value={!!vaccineDlg.is_mandatory} onChange={(v) => setVaccineDlg({ ...vaccineDlg, is_mandatory: v })} />
               <ToggleRow label="Aktiv" value={!!vaccineDlg.is_active} onChange={(v) => setVaccineDlg({ ...vaccineDlg, is_active: v })} />
             </div>
-          }
+          )}
           <DialogFooter>
             <Button variant="ghost" onClick={() => setVaccineDlg(null)}>{tr("adminvaccines_legv_f7100a", "L\u0259\u011Fv")}</Button>
             <Button onClick={() => vaccineDlg && saveVaccine.mutate(vaccineDlg)}>Yadda saxla</Button>
@@ -393,7 +392,34 @@ export default function AdminVaccines() {
       <Dialog open={!!scheduleDlg} onOpenChange={(o) => !o && setScheduleDlg(null)}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{scheduleDlg?.id ? tr("adminvaccines_dozani_redakte_et_c51553", "Dozan\u0131 redakt\u0259 et") : 'Yeni doza'}</DialogTitle></DialogHeader>
-          {scheduleDlg &&
+          {scheduleDlg && (
+            <div className="space-y-3">
+              <Field label="Peyvənd">
+                <Select value={scheduleDlg.vaccine_id || ''} onValueChange={v => setScheduleDlg({ ...scheduleDlg, vaccine_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Seç..." /></SelectTrigger>
+                  <SelectContent>
+                    {vaccines.map(v => <SelectItem key={v.id} value={v.id}>{v.name_az}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="Doza №"><Input type="number" value={scheduleDlg.dose_number ?? 1} onChange={e => setScheduleDlg({ ...scheduleDlg, dose_number: +e.target.value })} /></Field>
+                <Field label="Sıra"><Input type="number" value={scheduleDlg.sort_order ?? 0} onChange={e => setScheduleDlg({ ...scheduleDlg, sort_order: +e.target.value })} /></Field>
+              </div>
+              <Field label="Doza adı (məs. 1-ci doza)"><Input value={scheduleDlg.dose_label_az || ''} onChange={e => setScheduleDlg({ ...scheduleDlg, dose_label_az: e.target.value })} /></Field>
+              <Field label="Yaş etiketi (məs. 2 aylıq)"><Input value={scheduleDlg.age_label_az || ''} onChange={e => setScheduleDlg({ ...scheduleDlg, age_label_az: e.target.value })} /></Field>
+              <Field label="Tövsiyə olunan yaş (günlə)"><Input type="number" value={scheduleDlg.recommended_age_days ?? 0} onChange={e => setScheduleDlg({ ...scheduleDlg, recommended_age_days: +e.target.value })} /></Field>
+              <div className="grid grid-cols-2 gap-2">
+                <Field label="Min yaş (günlə)"><Input type="number" value={scheduleDlg.min_age_days ?? ''} onChange={e => setScheduleDlg({ ...scheduleDlg, min_age_days: e.target.value === '' ? null : +e.target.value })} /></Field>
+                <Field label="Max yaş (günlə)"><Input type="number" value={scheduleDlg.max_age_days ?? ''} onChange={e => setScheduleDlg({ ...scheduleDlg, max_age_days: e.target.value === '' ? null : +e.target.value })} /></Field>
+              </div>
+              <Field label="Qeyd"><Textarea rows={2} value={scheduleDlg.notes_az || ''} onChange={e => setScheduleDlg({ ...scheduleDlg, notes_az: e.target.value })} /></Field>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setScheduleDlg(null)}>{tr("adminvaccines_legv_f7100a", "Ləğv")}</Button>
+            <Button onClick={() => scheduleDlg && saveSchedule.mutate(scheduleDlg)}>Yadda saxla</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
