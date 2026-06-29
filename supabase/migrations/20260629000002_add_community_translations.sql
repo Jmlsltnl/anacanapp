@@ -1,8 +1,8 @@
 INSERT INTO translations (key, lang, value)
 VALUES 
-    ('community_header_pregnancy', 'en', 'Connect with other expectant mothers'),
+    ('community_header_bump', 'en', 'Connect with other expectant mothers'),
     ('community_header_mommy', 'en', 'Connect with other mothers'),
-    ('community_header_trying', 'en', 'Connect with others trying to conceive'),
+    ('community_header_flow', 'en', 'Connect with others trying to conceive'),
     ('communityscreen_cemiyyet_2dc44d', 'en', 'Community'),
     ('group_name_hamiləlik', 'en', 'Pregnancy'),
     ('group_desc_hamiləlik', 'en', 'Connect with other expectant mothers'),
