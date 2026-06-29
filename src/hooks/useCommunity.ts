@@ -531,4 +531,5 @@ export const useAutoJoinGroups = () => {
   }, [queryClient]);
 
   return { autoJoin };
-};
+};   
+ 
