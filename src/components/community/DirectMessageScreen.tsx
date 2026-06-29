@@ -88,6 +88,13 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
         const actualMimeType = recorder.mimeType || mimeType || 'audio/mp4';
         const blob = new Blob(audioChunksRef.current, { type: actualMimeType });
         stream.getTracks().forEach((t) => t.stop());
+        
+        if (blob.size === 0) {
+          console.error("Audio blob is empty, ignoring upload");
+          setIsRecording(false);
+          return;
+        }
+
         setUploading(true);
         try {
           const url = await uploadMedia(blob, 'audio');
@@ -99,7 +106,7 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
         }
       };
 
-      recorder.start();
+      recorder.start(1000);
       setIsRecording(true);
       setRecordingTime(0);
       await hapticFeedback.medium();

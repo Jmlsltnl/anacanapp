@@ -159,6 +159,13 @@ export const useDirectMessages = (otherUserId?: string) => {
         console.warn('Push notification failed:', pushErr);
       }
 
+      if (data) {
+        setMessages((prev) => {
+          if (prev.find((m) => m.id === data.id)) return prev;
+          return [...prev, data as DirectMessage];
+        });
+      }
+
       return data;
     } catch (err: any) {
       console.error('Error sending DM:', err);
