@@ -269,7 +269,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               animate={{ opacity: 1, y: 0 }}
               className="bg-card rounded-2xl p-4 border border-border">
               <Label className="text-base font-semibold mb-3 flex items-center gap-2">
-                {tr("role_selection", "Rolunuz")}
+                {tr("maternitycalculator_rolunuz", "Rolunuz")}
               </Label>
               <div className="grid grid-cols-2 gap-3">
                 <button
@@ -278,7 +278,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                     role === 'mother' ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'
                   }`}
                 >
-                  🤰 {tr("role_mother", "Ana")}
+                  🤰 {tr("maternitycalculator_ana", "Ana")}
                 </button>
                 <button
                   onClick={() => setRole('father')}
@@ -286,7 +286,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                     role === 'father' ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'
                   }`}
                 >
-                  👨‍🍼 {tr("role_father", "Ata")}
+                  👨‍🍼 {tr("maternitycalculator_ata", "Ata")}
                 </button>
               </div>
             </motion.div>
@@ -299,7 +299,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               className="bg-card rounded-2xl p-4 border border-border">
               <Label className="text-base font-semibold mb-3 flex items-center gap-2">
                 <CalendarDays className="w-5 h-5 text-primary" />
-                {tr("edd_date_label", "Təxmini Doğuş Tarixi (EDD)")}
+                {tr("maternitycalculator_edd_date", "Təxmini Doğuş Tarixi (EDD)")}
               </Label>
               <Input
                 type="date"
@@ -317,7 +317,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                 transition={{ delay: 0.15 }}
                 className="bg-card rounded-2xl p-4 border border-border">
                 <Label className="text-base font-semibold mb-3 block">
-                  {tr("maternitycalculator_ayliq_emek_haqqiniz_azn_8e5f51", "Aylıq əmək haqqınız")} ({selectedRule.compensation.currency})
+                  {tr("maternitycalculator_ayliq_emek_haqqiniz", "Aylıq əmək haqqınız")} ({selectedRule.compensation.currency})
                 </Label>
                 <div className="relative">
                   <Input
@@ -427,7 +427,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                         <div className="relative">
                           <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-primary/20 border-2 border-primary" />
                           <p className="font-bold text-foreground text-sm">{formatDate(result.leaveStartDate)}</p>
-                          <p className="text-muted-foreground text-sm">{result.role === 'father' ? tr("paternity_start", "Atalıq məzuniyyətinin başlanğıcı") : tr("leave_start_date", "Məzuniyyətin Başlanğıcı")}</p>
+                          <p className="text-muted-foreground text-sm">{result.role === 'father' ? tr("maternitycalculator_paternity_start", "Atalıq məzuniyyətinin başlanğıcı") : tr("maternitycalculator_leave_start_date", "Məzuniyyətin Başlanğıcı")}</p>
                         </div>
                         
                         {/* EDD */}
@@ -435,7 +435,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                           <div className="relative">
                             <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-amber-500/20 border-2 border-amber-500" />
                             <p className="font-bold text-foreground text-sm">{formatDate(new Date(eddDate))}</p>
-                            <p className="text-muted-foreground text-sm">{tr("edd_date_label", "Təxmini Doğuş Tarixi (EDD)")}</p>
+                            <p className="text-muted-foreground text-sm">{tr("maternitycalculator_edd_date", "Təxmini Doğuş Tarixi (EDD)")}</p>
                           </div>
                         )}
                         
@@ -443,14 +443,14 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                         <div className="relative">
                           <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-orange-500/20 border-2 border-orange-500" />
                           <p className="font-bold text-foreground text-sm">{formatDate(result.leaveEndDate)}</p>
-                          <p className="text-muted-foreground text-sm">{tr("leave_end_date", "Məzuniyyətin Sonu")}</p>
+                          <p className="text-muted-foreground text-sm">{tr("maternitycalculator_leave_end_date", "Məzuniyyətin Sonu")}</p>
                         </div>
                         
                         {/* Return to Work */}
                         <div className="relative">
                           <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-emerald-500/20 border-2 border-emerald-500" />
                           <p className="font-bold text-foreground text-sm">{formatDate(result.returnToWorkDate)}</p>
-                          <p className="text-muted-foreground text-sm">{tr("return_to_work", "İşə Qayıdış Tarixi")}</p>
+                          <p className="text-muted-foreground text-sm">{tr("maternitycalculator_return_to_work", "İşə Qayıdış Tarixi")}</p>
                         </div>
                       </div>
                     </div>
