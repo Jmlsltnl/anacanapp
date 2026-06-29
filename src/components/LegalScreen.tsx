@@ -3,6 +3,7 @@ import { tr } from '@/lib/tr';
 import { ArrowLeft, FileText, Shield, Scale, AlertTriangle, CreditCard, Database, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useUserStore } from '@/store/userStore';
 import { useLegalDocuments, LegalDocument } from '@/hooks/useLegalDocuments';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import MarkdownContent from '@/components/MarkdownContent';
@@ -36,6 +37,8 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
 
   const { data: documents = [], isLoading } = useLegalDocuments();
   const [selectedDoc, setSelectedDoc] = useState<LegalDocument | null>(null);
+  const language = useUserStore((state) => state.language);
+  const isEn = language === 'en';
 
   useEffect(() => {
     if (initialDocument && documents.length > 0 && !selectedDoc) {
@@ -57,7 +60,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
           <Button variant="ghost" size="icon" onClick={() => setSelectedDoc(null)}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-lg font-semibold">{selectedDoc.title_az || selectedDoc.title}</h1>
+          <h1 className="text-lg font-semibold">{isEn ? (selectedDoc.title || selectedDoc.title_az) : (selectedDoc.title_az || selectedDoc.title)}</h1>
         </div>
 
         <ScrollArea className="flex-1 p-4">
@@ -67,7 +70,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
             </div>
             <div className="prose prose-xs dark:prose-invert max-w-none text-sm [&_h1]:text-lg [&_h2]:text-base [&_h3]:text-sm [&_p]:text-sm [&_li]:text-sm">
               {(() => {
-                const c = selectedDoc.content_az || selectedDoc.content;
+                const c = isEn ? (selectedDoc.content || selectedDoc.content_az) : (selectedDoc.content_az || selectedDoc.content);
                 const isHtml = c.trim().startsWith('<') || /<[a-z][\s\S]*>/i.test(c);
                 return isHtml ? <HtmlContent content={c} /> : <MarkdownContent content={c} />;
               })()}
@@ -106,7 +109,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-medium">{doc.title_az || doc.title}</h3>
+                    <h3 className="font-medium">{isEn ? (doc.title || doc.title_az) : (doc.title_az || doc.title)}</h3>
                     <p className="text-sm text-muted-foreground">
                       Versiya {doc.version}
                     </p>
