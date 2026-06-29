@@ -79,11 +79,23 @@ const VACCINES = {
     name_az: 'İnsan papilloma virusu', name_en: 'Human papillomavirus',
     disease_az: 'Uşaqlıq boynu xərçəngi', disease_en: 'Cervical cancer',
     route_az: 'Əzələdaxili', route_en: 'Intramuscular',
+  },
+  JE: {
+    code: 'JE', color_hex: '#14B8A6',
+    name_az: 'Yapon ensefaliti', name_en: 'Japanese Encephalitis',
+    disease_az: 'Yapon ensefaliti', disease_en: 'Japanese Encephalitis',
+    route_az: 'Dərialtı', route_en: 'Subcutaneous',
+  },
+  YF: {
+    code: 'YF', color_hex: '#EAB308',
+    name_az: 'Sarı qızdırma', name_en: 'Yellow Fever',
+    disease_az: 'Sarı qızdırma', disease_en: 'Yellow Fever',
+    route_az: 'Dərialtı', route_en: 'Subcutaneous',
   }
 };
 
 const COUNTRIES = [
-  // ... TR, US, GB, DE, RU ...
+  // Previous 16
   {
     code: 'TR', name_az: 'Türkiyə', name_en: 'Turkey', flag: '🇹🇷',
     source_url: 'https://saglik.gov.tr', source_label: 'T.C. Sağlık Bakanlığı',
@@ -153,7 +165,6 @@ const COUNTRIES = [
       { v: 'MMR', schedules: [{ d: 1, age: 365, a_az: '12 aylıq', a_en: '12 months' }, { d: 2, age: 2190, a_az: '6 yaş', a_en: '6 years' }]}
     ]
   },
-  // NEW COUNTRIES
   {
     code: 'FR', name_az: 'Fransa', name_en: 'France', flag: '🇫🇷',
     source_url: 'https://solidarites-sante.gouv.fr', source_label: 'Ministère de la Santé',
@@ -301,6 +312,156 @@ const COUNTRIES = [
       { v: 'PCV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
       { v: 'MMR', schedules: [{ d: 1, age: 365, a_az: '12 aylıq', a_en: '12 months' }, { d: 2, age: 2190, a_az: '6 yaş', a_en: '6 years' }]}
     ]
+  },
+  // --- ADDITIONAL COUNTRIES ---
+  {
+    code: 'IN', name_az: 'Hindistan', name_en: 'India', flag: '🇮🇳',
+    source_url: 'https://mohfw.gov.in/', source_label: 'Ministry of Health and Family Welfare',
+    schedules: [
+      { v: 'BCG', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }]},
+      { v: 'HEP_B', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }, { d: 2, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 3, age: 70, a_az: '10 həftə', a_en: '10 weeks' }, { d: 4, age: 98, a_az: '14 həftə', a_en: '14 weeks' }]},
+      { v: 'OPV', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }, { d: 2, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 3, age: 70, a_az: '10 həftə', a_en: '10 weeks' }, { d: 4, age: 98, a_az: '14 həftə', a_en: '14 weeks' }]},
+      { v: 'IPV', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 98, a_az: '14 həftə', a_en: '14 weeks' }]},
+      { v: 'DTAP', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 70, a_az: '10 həftə', a_en: '10 weeks' }, { d: 3, age: 98, a_az: '14 həftə', a_en: '14 weeks' }, { d: 4, age: 480, a_az: '16-24 aylıq', a_en: '16-24 months' }]},
+      { v: 'HIB', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 70, a_az: '10 həftə', a_en: '10 weeks' }, { d: 3, age: 98, a_az: '14 həftə', a_en: '14 weeks' }]},
+      { v: 'RV', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 70, a_az: '10 həftə', a_en: '10 weeks' }, { d: 3, age: 98, a_az: '14 həftə', a_en: '14 weeks' }]},
+      { v: 'PCV', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 98, a_az: '14 həftə', a_en: '14 weeks' }, { d: 3, age: 270, a_az: '9 aylıq', a_en: '9 months' }]},
+      { v: 'MMR', schedules: [{ d: 1, age: 270, a_az: '9-12 aylıq', a_en: '9-12 months' }, { d: 2, age: 480, a_az: '16-24 aylıq', a_en: '16-24 months' }]},
+      { v: 'JE', schedules: [{ d: 1, age: 270, a_az: '9-12 aylıq', a_en: '9-12 months' }, { d: 2, age: 480, a_az: '16-24 aylıq', a_en: '16-24 months' }]}
+    ]
+  },
+  {
+    code: 'CN', name_az: 'Çin', name_en: 'China', flag: '🇨🇳',
+    source_url: 'http://www.nhc.gov.cn/', source_label: 'National Health Commission',
+    schedules: [
+      { v: 'BCG', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }]},
+      { v: 'HEP_B', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }, { d: 2, age: 30, a_az: '1 aylıq', a_en: '1 month' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }]},
+      { v: 'IPV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 90, a_az: '3 aylıq', a_en: '3 months' }]},
+      { v: 'OPV', schedules: [{ d: 1, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 2, age: 1460, a_az: '4 yaş', a_en: '4 years' }]},
+      { v: 'DTAP', schedules: [{ d: 1, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 150, a_az: '5 aylıq', a_en: '5 months' }, { d: 4, age: 540, a_az: '18 aylıq', a_en: '18 months' }]},
+      { v: 'MMR', schedules: [{ d: 1, age: 240, a_az: '8 aylıq', a_en: '8 months' }, { d: 2, age: 540, a_az: '18 aylıq', a_en: '18 months' }]},
+      { v: 'JE', schedules: [{ d: 1, age: 240, a_az: '8 aylıq', a_en: '8 months' }, { d: 2, age: 730, a_az: '2 yaş', a_en: '2 years' }]},
+      { v: 'MEN', schedules: [{ d: 1, age: 180, a_az: '6 aylıq', a_en: '6 months' }, { d: 2, age: 270, a_az: '9 aylıq', a_en: '9 months' }, { d: 3, age: 1095, a_az: '3 yaş', a_en: '3 years' }, { d: 4, age: 2190, a_az: '6 yaş', a_en: '6 years' }]},
+      { v: 'HEPA', schedules: [{ d: 1, age: 540, a_az: '18 aylıq', a_en: '18 months' }, { d: 2, age: 730, a_az: '24 aylıq', a_en: '24 months' }]}
+    ]
+  },
+  {
+    code: 'JP', name_az: 'Yaponiya', name_en: 'Japan', flag: '🇯🇵',
+    source_url: 'https://www.mhlw.go.jp/', source_label: 'Ministry of Health, Labour and Welfare',
+    schedules: [
+      { v: 'BCG', schedules: [{ d: 1, age: 150, a_az: '5 aylıq', a_en: '5 months' }]},
+      { v: 'HEP_B', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 3, age: 210, a_az: '7-8 aylıq', a_en: '7-8 months' }]},
+      { v: 'RV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 90, a_az: '3 aylıq', a_en: '3 months' }]},
+      { v: 'HIB', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 3, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 4, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'PCV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 3, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 4, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'DTAP', schedules: [{ d: 1, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 150, a_az: '5 aylıq', a_en: '5 months' }, { d: 4, age: 540, a_az: '18 aylıq', a_en: '18 months' }]},
+      { v: 'IPV', schedules: [{ d: 1, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 150, a_az: '5 aylıq', a_en: '5 months' }, { d: 4, age: 540, a_az: '18 aylıq', a_en: '18 months' }]},
+      { v: 'MMR', schedules: [{ d: 1, age: 365, a_az: '1 yaş', a_en: '1 year' }, { d: 2, age: 1825, a_az: '5-6 yaş', a_en: '5-6 years' }]},
+      { v: 'VARICELLA', schedules: [{ d: 1, age: 365, a_az: '1 yaş', a_en: '1 year' }, { d: 2, age: 730, a_az: '2 yaş', a_en: '2 years' }]},
+      { v: 'JE', schedules: [{ d: 1, age: 1095, a_az: '3 yaş', a_en: '3 years' }, { d: 2, age: 1125, a_az: '3 yaş', a_en: '3 years' }, { d: 3, age: 1460, a_az: '4 yaş', a_en: '4 years' }, { d: 4, age: 3285, a_az: '9 yaş', a_en: '9 years' }]}
+    ]
+  },
+  {
+    code: 'KR', name_az: 'Cənubi Koreya', name_en: 'South Korea', flag: '🇰🇷',
+    source_url: 'https://nip.kdca.go.kr/', source_label: 'KDCA',
+    schedules: [
+      { v: 'BCG', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda (0-4 həftə)', a_en: '0-4 weeks' }]},
+      { v: 'HEP_B', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }, { d: 2, age: 30, a_az: '1 aylıq', a_en: '1 month' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }]},
+      { v: 'DTAP', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }, { d: 4, age: 450, a_az: '15-18 aylıq', a_en: '15-18 months' }]},
+      { v: 'IPV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }, { d: 4, age: 1460, a_az: '4-6 yaş', a_en: '4-6 years' }]},
+      { v: 'HIB', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }, { d: 4, age: 365, a_az: '12-15 aylıq', a_en: '12-15 months' }]},
+      { v: 'PCV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }, { d: 4, age: 365, a_az: '12-15 aylıq', a_en: '12-15 months' }]},
+      { v: 'MMR', schedules: [{ d: 1, age: 365, a_az: '12-15 aylıq', a_en: '12-15 months' }, { d: 2, age: 1460, a_az: '4-6 yaş', a_en: '4-6 years' }]},
+      { v: 'VARICELLA', schedules: [{ d: 1, age: 365, a_az: '12-15 aylıq', a_en: '12-15 months' }]},
+      { v: 'JE', schedules: [{ d: 1, age: 365, a_az: '12-23 aylıq', a_en: '12-23 months' }, { d: 2, age: 395, a_az: '13-24 aylıq', a_en: '13-24 months' }, { d: 3, age: 730, a_az: '2 yaş', a_en: '2 years' }]}
+    ]
+  },
+  {
+    code: 'BR', name_az: 'Braziliya', name_en: 'Brazil', flag: '🇧🇷',
+    source_url: 'https://www.gov.br/saude/', source_label: 'Ministério da Saúde',
+    schedules: [
+      { v: 'BCG', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }]},
+      { v: 'HEP_B', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }]},
+      { v: 'DTAP', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }, { d: 4, age: 450, a_az: '15 aylıq', a_en: '15 months' }]},
+      { v: 'HIB', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }]},
+      { v: 'IPV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }]},
+      { v: 'OPV', schedules: [{ d: 1, age: 450, a_az: '15 aylıq', a_en: '15 months' }, { d: 2, age: 1460, a_az: '4 yaş', a_en: '4 years' }]},
+      { v: 'RV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }]},
+      { v: 'PCV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'MEN', schedules: [{ d: 1, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 2, age: 150, a_az: '5 aylıq', a_en: '5 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'YF', schedules: [{ d: 1, age: 270, a_az: '9 aylıq', a_en: '9 months' }, { d: 2, age: 1460, a_az: '4 yaş', a_en: '4 years' }]},
+      { v: 'MMR', schedules: [{ d: 1, age: 365, a_az: '12 aylıq', a_en: '12 months' }, { d: 2, age: 450, a_az: '15 aylıq', a_en: '15 months' }]},
+      { v: 'VARICELLA', schedules: [{ d: 1, age: 450, a_az: '15 aylıq', a_en: '15 months' }, { d: 2, age: 1460, a_az: '4 yaş', a_en: '4 years' }]}
+    ]
+  },
+  {
+    code: 'PL', name_az: 'Polşa', name_en: 'Poland', flag: '🇵🇱',
+    source_url: 'https://szczepienia.pzh.gov.pl/', source_label: 'NIZP PZH',
+    schedules: [
+      { v: 'BCG', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }]},
+      { v: 'HEP_B', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }, { d: 2, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 3, age: 210, a_az: '7 aylıq', a_en: '7 months' }]},
+      { v: 'DTAP', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 90, a_az: '3-4 aylıq', a_en: '3-4 months' }, { d: 3, age: 150, a_az: '5-6 aylıq', a_en: '5-6 months' }, { d: 4, age: 480, a_az: '16-18 aylıq', a_en: '16-18 months' }]},
+      { v: 'IPV', schedules: [{ d: 1, age: 90, a_az: '3-4 aylıq', a_en: '3-4 months' }, { d: 2, age: 150, a_az: '5-6 aylıq', a_en: '5-6 months' }, { d: 3, age: 480, a_az: '16-18 aylıq', a_en: '16-18 months' }]},
+      { v: 'HIB', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 90, a_az: '3-4 aylıq', a_en: '3-4 months' }, { d: 3, age: 150, a_az: '5-6 aylıq', a_en: '5-6 months' }, { d: 4, age: 480, a_az: '16-18 aylıq', a_en: '16-18 months' }]},
+      { v: 'PCV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 395, a_az: '13 aylıq', a_en: '13 months' }]},
+      { v: 'RV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 90, a_az: '3-4 aylıq', a_en: '3-4 months' }, { d: 3, age: 150, a_az: '5-6 aylıq', a_en: '5-6 months' }]},
+      { v: 'MMR', schedules: [{ d: 1, age: 395, a_az: '13-15 aylıq', a_en: '13-15 months' }, { d: 2, age: 2190, a_az: '6 yaş', a_en: '6 years' }]}
+    ]
+  },
+  {
+    code: 'IL', name_az: 'İsrail', name_en: 'Israel', flag: '🇮🇱',
+    source_url: 'https://www.health.gov.il/', source_label: 'Ministry of Health',
+    schedules: [
+      { v: 'HEP_B', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }, { d: 2, age: 30, a_az: '1 aylıq', a_en: '1 month' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }]},
+      { v: 'DTAP', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }, { d: 4, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'IPV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }, { d: 4, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'HIB', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }, { d: 4, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'PCV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'RV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 180, a_az: '6 aylıq', a_en: '6 months' }]},
+      { v: 'MMR', schedules: [{ d: 1, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'VARICELLA', schedules: [{ d: 1, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'HEPA', schedules: [{ d: 1, age: 540, a_az: '18 aylıq', a_en: '18 months' }, { d: 2, age: 730, a_az: '24 aylıq', a_en: '24 months' }]}
+    ]
+  },
+  {
+    code: 'SE', name_az: 'İsveç', name_en: 'Sweden', flag: '🇸🇪',
+    source_url: 'https://www.folkhalsomyndigheten.se/', source_label: 'Public Health Agency of Sweden',
+    schedules: [
+      { v: 'DTAP', schedules: [{ d: 1, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 2, age: 150, a_az: '5 aylıq', a_en: '5 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }, { d: 4, age: 1825, a_az: '5 yaş', a_en: '5 years' }]},
+      { v: 'IPV', schedules: [{ d: 1, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 2, age: 150, a_az: '5 aylıq', a_en: '5 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }, { d: 4, age: 1825, a_az: '5 yaş', a_en: '5 years' }]},
+      { v: 'HIB', schedules: [{ d: 1, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 2, age: 150, a_az: '5 aylıq', a_en: '5 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'HEP_B', schedules: [{ d: 1, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 2, age: 150, a_az: '5 aylıq', a_en: '5 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'PCV', schedules: [{ d: 1, age: 90, a_az: '3 aylıq', a_en: '3 months' }, { d: 2, age: 150, a_az: '5 aylıq', a_en: '5 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'RV', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 90, a_az: '3 aylıq', a_en: '3 months' }]},
+      { v: 'MMR', schedules: [{ d: 1, age: 540, a_az: '18 aylıq', a_en: '18 months' }, { d: 2, age: 2190, a_az: '6-8 yaş', a_en: '6-8 years' }]}
+    ]
+  },
+  {
+    code: 'CH', name_az: 'İsveçrə', name_en: 'Switzerland', flag: '🇨🇭',
+    source_url: 'https://www.bag.admin.ch/', source_label: 'FOPH',
+    schedules: [
+      { v: 'DTAP', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'IPV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'HIB', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'HEP_B', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'PCV', schedules: [{ d: 1, age: 60, a_az: '2 aylıq', a_en: '2 months' }, { d: 2, age: 120, a_az: '4 aylıq', a_en: '4 months' }, { d: 3, age: 365, a_az: '12 aylıq', a_en: '12 months' }]},
+      { v: 'MMR', schedules: [{ d: 1, age: 270, a_az: '9 aylıq', a_en: '9 months' }, { d: 2, age: 365, a_az: '12 aylıq', a_en: '12 months' }]}
+    ]
+  },
+  {
+    code: 'ZA', name_az: 'Cənubi Afrika', name_en: 'South Africa', flag: '🇿🇦',
+    source_url: 'https://www.health.gov.za/', source_label: 'Department of Health',
+    schedules: [
+      { v: 'BCG', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }]},
+      { v: 'OPV', schedules: [{ d: 1, age: 0, a_az: 'Doğulanda', a_en: 'At birth' }, { d: 2, age: 42, a_az: '6 həftə', a_en: '6 weeks' }]},
+      { v: 'RV', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 98, a_az: '14 həftə', a_en: '14 weeks' }]},
+      { v: 'DTAP', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 70, a_az: '10 həftə', a_en: '10 weeks' }, { d: 3, age: 98, a_az: '14 həftə', a_en: '14 weeks' }]},
+      { v: 'IPV', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 70, a_az: '10 həftə', a_en: '10 weeks' }, { d: 3, age: 98, a_az: '14 həftə', a_en: '14 weeks' }]},
+      { v: 'HIB', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 70, a_az: '10 həftə', a_en: '10 weeks' }, { d: 3, age: 98, a_az: '14 həftə', a_en: '14 weeks' }]},
+      { v: 'HEP_B', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 70, a_az: '10 həftə', a_en: '10 weeks' }, { d: 3, age: 98, a_az: '14 həftə', a_en: '14 weeks' }]},
+      { v: 'PCV', schedules: [{ d: 1, age: 42, a_az: '6 həftə', a_en: '6 weeks' }, { d: 2, age: 98, a_az: '14 həftə', a_en: '14 weeks' }, { d: 3, age: 270, a_az: '9 aylıq', a_en: '9 months' }]},
+      { v: 'MMR', schedules: [{ d: 1, age: 180, a_az: '6 aylıq', a_en: '6 months' }, { d: 2, age: 365, a_az: '12 aylıq', a_en: '12 months' }]}
+    ]
   }
 ];
 
@@ -311,7 +472,7 @@ function escapeSql(str) {
 
 const sqlStmts = [];
 sqlStmts.push(`-- 20260629000000_seed_major_vaccine_countries.sql
--- Seed script for major countries vaccine schedules (TR, US, GB, DE, RU, FR, IT, ES, CA, AU, AE, SA, KZ, GE, UA, UZ)
+-- Seed script for 26 countries vaccine schedules
 
 BEGIN;
 `);
