@@ -69,7 +69,14 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+      
+      let mimeType = 'audio/webm';
+      if (MediaRecorder.isTypeSupported('audio/webm')) mimeType = 'audio/webm';
+      else if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
+      else if (MediaRecorder.isTypeSupported('audio/ogg')) mimeType = 'audio/ogg';
+      else mimeType = '';
+
+      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
       mediaRecorderRef.current = recorder;
       audioChunksRef.current = [];
 
@@ -78,7 +85,8 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
       };
 
       recorder.onstop = async () => {
-        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const actualMimeType = recorder.mimeType || mimeType || 'audio/mp4';
+        const blob = new Blob(audioChunksRef.current, { type: actualMimeType });
         stream.getTracks().forEach((t) => t.stop());
         setUploading(true);
         try {

@@ -169,9 +169,28 @@ export const useDirectMessages = (otherUserId?: string) => {
 
   const uploadMedia = async (file: Blob, type: 'image' | 'video' | 'audio') => {
     if (!user) return null;
-    const ext = type === 'image' ? 'jpg' : type === 'video' ? 'mp4' : 'webm';
+    
+    let ext = 'jpg';
+    let contentType = 'image/jpeg';
+    
+    if (type === 'audio') {
+      const fileType = file.type || '';
+      if (fileType.includes('mp4')) ext = 'mp4';
+      else if (fileType.includes('ogg')) ext = 'ogg';
+      else if (fileType.includes('webm')) ext = 'webm';
+      else ext = 'm4a';
+      contentType = fileType || 'audio/mp4';
+    } else if (type === 'video') {
+      ext = 'mp4';
+      contentType = 'video/mp4';
+    } else {
+      const fileType = file.type || '';
+      if (fileType.includes('png')) ext = 'png';
+      else if (fileType.includes('gif')) ext = 'gif';
+      contentType = fileType || 'image/jpeg';
+    }
+
     const fileName = `dm/${user.id}/${Date.now()}.${ext}`;
-    const contentType = type === 'image' ? 'image/jpeg' : type === 'video' ? 'video/mp4' : 'audio/webm';
 
     const { data, error } = await supabase.storage.
     from('chat-media').
