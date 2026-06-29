@@ -187,7 +187,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
             >
               <ArrowLeft className="w-5 h-5" />
             </motion.button>
-            <h1 className={`text-xl font-bold flex-1 ${isPremium ? 'text-white' : 'text-foreground'}`}>{tr("billingscreen_title", "My Subscription")}</h1>
+            <h1 className={`text-xl font-bold flex-1 ${isPremium ? 'text-white' : 'text-foreground'}`}>{tr("billingscreen_title", "Abunəliyim")}</h1>
           </div>
 
           {/* Master Status Card (Bento Layout) */}
@@ -228,7 +228,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                           <span className="text-[10px] font-bold text-amber-100 uppercase tracking-wider">{config.cancelled_badge}</span>
                         </div>
                       ) : (
-                        <span className="text-xs font-medium text-muted-foreground">{tr("billingscreen_pulsuz_status", "Current Status: Free")}</span>
+                        <span className="text-xs font-medium text-muted-foreground">{tr("billingscreen_pulsuz_status", "Hazırkı Status: Pulsuz")}</span>
                       )}
                     </div>
                   </div>
@@ -254,7 +254,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                     className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"
                   />
                   <Crown className="w-5 h-5 mr-2" />
-                  {tr("billingscreen_go_premium", "Upgrade to Premium")}
+                  {tr("billingscreen_go_premium", "Premium-a Yüksəlt")}
                 </Button>
               </div>
             )}
@@ -314,7 +314,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                     className="h-14 rounded-2xl bg-primary/10 text-primary hover:bg-primary/20 font-bold text-sm"
                   >
                     <Crown className="w-4 h-4 mr-2" />
-                    {tr("billingscreen_upgrade_plan", "Upgrade")}
+                    {tr("billingscreen_upgrade_plan", "Planı Yüksəlt")}
                   </Button>
                   <Button
                     onClick={handleCancelSubscription}
