@@ -526,7 +526,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 <p className="text-muted-foreground text-sm mb-4">{tr("nutrition_stekan_su_icdiniz_a26973", "stəkan su içdiniz")}</p>
                 
                 <div className="flex flex-wrap justify-center gap-1.5 mb-4">
-                  {Array.from({ length: targets.water }).map((_, i) =>
+                  {Array.from({ length: Math.max(targets.water, waterGlasses) }).map((_, i) =>
                 <motion.div
                   key={i}
                   initial={{ scale: 0 }}
@@ -534,7 +534,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                   transition={{ delay: i * 0.03 }}
                   className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${
                   i < waterGlasses ?
-                  'bg-blue-500 text-white' :
+                  'bg-blue-500 text-white shadow-md' :
                   'bg-blue-100 dark:bg-blue-900/30 text-blue-300 dark:text-blue-600'}`
                   }>
                   

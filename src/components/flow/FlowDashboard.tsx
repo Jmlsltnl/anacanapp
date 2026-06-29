@@ -36,6 +36,7 @@ import PillReminderCard from './PillReminderCard';
 import SymptomPatternReport from './SymptomPatternReport';
 import DailyStoryCards from './DailyStoryCards';
 import PartnerFlowStatusCard from './PartnerFlowStatusCard';
+import WaterWidget from '@/components/dashboard/WaterWidget';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
 const FlowDashboard = () => {
   const { getCycleData, cycleLength, periodLength, setLastPeriodDate, language } = useUserStore();
@@ -354,6 +355,11 @@ const FlowDashboard = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Water Tracking Widget */}
+      <div className="mb-4 mt-2">
+        <WaterWidget />
+      </div>
 
       {/* Interactive Period Calendar (Apple Health style) */}
       <FlowPeriodCalendar />

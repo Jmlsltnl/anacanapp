@@ -55,6 +55,7 @@ import FlowDashboard from '@/components/flow/FlowDashboard';
 import BirthOnboardingModal from '@/components/BirthOnboardingModal';
 import DashboardPremiumBanner from '@/components/DashboardPremiumBanner';
 import PregnancyDayNavigator from '@/components/bump/PregnancyDayNavigator';
+import WaterWidget from '@/components/dashboard/WaterWidget';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -500,6 +501,16 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
           <p className="text-[9px] text-muted-foreground">{tr("dashboard_kq_ceki_b42b8d", "kq çəki")}</p>
         </motion.div>
       </div>
+
+      {/* Water Tracking Widget */}
+      <motion.div
+        className="mt-1.5"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <WaterWidget />
+      </motion.div>
 
       {/* Baby Development - Static Icons */}
       <motion.div
@@ -1147,6 +1158,16 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
           </div>
         </motion.div>
       }
+
+      {/* Water Tracking Widget */}
+      <motion.div
+        className="mb-4"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+      >
+        <WaterWidget />
+      </motion.div>
 
       {/* Teething Widget */}
 

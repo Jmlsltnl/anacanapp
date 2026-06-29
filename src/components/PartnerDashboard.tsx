@@ -28,6 +28,7 @@ import PartnerHeroCard from './partner/PartnerHeroCard';
 import LiveActivityCard from './partner/LiveActivityCard';
 import PartnerQuickStats from './partner/PartnerQuickStats';
 import SyncedFeaturesGrid from './partner/SyncedFeaturesGrid';
+import WaterWidget from '@/components/dashboard/WaterWidget';
 import { tr } from "@/lib/tr";
 
 interface PartnerDashboardProps {
@@ -400,13 +401,12 @@ const PartnerDashboard = ({ onNavigate }: PartnerDashboardProps = {}) => {
             }
 
               {/* Quick Stats */}
+              <div className="mt-4 mb-4">
+                <WaterWidget />
+              </div>
               <PartnerQuickStats />
             </motion.div>
           }
-
-          {activeTab === 'stats' && <WeeklyStatsTab />}
-
-          {activeTab === 'surprise' && <SurpriseTab />}
 
           {activeTab === 'notifications' && <NotificationsTab />}
 
