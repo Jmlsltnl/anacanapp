@@ -190,7 +190,7 @@ export const useDirectMessages = (otherUserId?: string) => {
       contentType = fileType || 'image/jpeg';
     }
 
-    const fileName = `dm/${user.id}/${Date.now()}.${ext}`;
+    const fileName = `${user.id}/${Date.now()}.${ext}`;
 
     const { data, error } = await supabase.storage.
     from('chat-media').
