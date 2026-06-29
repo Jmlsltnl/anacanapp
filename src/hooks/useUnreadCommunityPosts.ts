@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
@@ -78,7 +79,7 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
     const seenPostIds = { ...localSeenPostIds, ...serverSeenPostIds } satisfies SeenPostMap;
     writeSeenPostIds(userId, seenPostIds);
 
-    const currentLanguage = localStorage.getItem('language') || 'az';
+    const currentLanguage = useUserStore.getState().language || 'az';
     const { data: posts, error } = await supabase
       .from('community_posts')
       .select('id, created_at, user_id')
@@ -134,7 +135,7 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
   },
 
   markCommunitySeen: async (userId: string) => {
-    const currentLanguage = localStorage.getItem('language') || 'az';
+    const currentLanguage = useUserStore.getState().language || 'az';
     const { data: posts } = await supabase
       .from('community_posts')
       .select('id, created_at, user_id')

@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getPublicProfileCards } from '@/lib/public-profile-cards';
+import { useUserStore } from '@/store/userStore';
 
 export interface CommunityGroup {
   id: string;
@@ -147,7 +148,7 @@ export const useGroupPosts = (groupId: string | null) => {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
 
-      const currentLanguage = localStorage.getItem('language') || 'az';
+      const currentLanguage = useUserStore.getState().language || 'az';
       
       let query = supabase.
       from('community_posts').
@@ -214,7 +215,7 @@ export const useCreatePost = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const currentLanguage = localStorage.getItem('language') || 'az';
+      const currentLanguage = useUserStore.getState().language || 'az';
       const { error } = await supabase.
       from('community_posts').
       insert([
@@ -531,5 +532,4 @@ export const useAutoJoinGroups = () => {
   }, [queryClient]);
 
   return { autoJoin };
-};   
- 
+}; 
