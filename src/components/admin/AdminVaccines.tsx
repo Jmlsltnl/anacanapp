@@ -353,18 +353,29 @@ export default function AdminVaccines() {
           <DialogHeader><DialogTitle>{vaccineDlg?.id ? tr("adminvaccines_peyvendi_redakte_et_667d25", "Peyv\u0259ndi redakt\u0259 et") : tr("adminvaccines_yeni_peyvend_c3cef1", "Yeni peyv\u0259nd")}</DialogTitle></DialogHeader>
           {vaccineDlg &&
           <div className="space-y-3">
+          <div className="space-y-3">
               <div className="grid grid-cols-2 gap-2">
                 <Field label="Kod"><Input value={vaccineDlg.code || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, code: e.target.value })} /></Field>
                 <Field label={tr("adminvaccines_reng_hex_3c8123", "R\u0259ng (hex)")}><Input value={vaccineDlg.color_hex || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, color_hex: e.target.value })} /></Field>
               </div>
               <Field label="Ad (AZ)"><Input value={vaccineDlg.name_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, name_az: e.target.value })} /></Field>
               <Field label="Ad (EN)"><Input value={vaccineDlg.name_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, name_en: e.target.value })} /></Field>
-              <Field label={tr("adminvaccines_qisa_tesvir_az_693f19", "Q\u0131sa t\u0259svir (AZ)")}><Textarea rows={2} value={vaccineDlg.short_description_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, short_description_az: e.target.value })} /></Field>
-              <Field label={tr("adminvaccines_tam_tesvir_az_d57f71", "Tam t\u0259svir (AZ)")}><Textarea rows={4} value={vaccineDlg.full_description_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, full_description_az: e.target.value })} /></Field>
-              <Field label={tr("adminvaccines_qarsisi_alinan_xestelik_862a71", "Qar\u015F\u0131s\u0131 al\u0131nan x\u0259st\u0259lik")}><Input value={vaccineDlg.disease_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, disease_az: e.target.value })} /></Field>
-              <Field label={tr("adminvaccines_vurma_usulu_689cd3", "Vurma \xFCsulu")}><Input value={vaccineDlg.route_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, route_az: e.target.value })} /></Field>
-              <Field label={tr("adminvaccines_yan_tesirler_426f38", "Yan t\u0259sirl\u0259r")}><Textarea rows={2} value={vaccineDlg.side_effects_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, side_effects_az: e.target.value })} /></Field>
-              <Field label={tr("adminvaccines_eks_gosterisler_f34875", "\u018Fks-g\xF6st\u0259ri\u015Fl\u0259r")}><Textarea rows={2} value={vaccineDlg.contraindications_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, contraindications_az: e.target.value })} /></Field>
+              <Field label={tr("adminvaccines_qisa_tesvir_az_693f19", "Qısa təsvir (AZ)")}><Textarea rows={2} value={vaccineDlg.short_description_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, short_description_az: e.target.value })} /></Field>
+              <Field label="Qısa təsvir (EN)"><Textarea rows={2} value={vaccineDlg.short_description_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, short_description_en: e.target.value })} /></Field>
+              <Field label={tr("adminvaccines_tam_tesvir_az_d57f71", "Tam təsvir (AZ)")}><Textarea rows={4} value={vaccineDlg.full_description_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, full_description_az: e.target.value })} /></Field>
+              <Field label="Tam təsvir (EN)"><Textarea rows={4} value={vaccineDlg.full_description_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, full_description_en: e.target.value })} /></Field>
+              <div className="grid grid-cols-2 gap-2">
+                <Field label={tr("adminvaccines_qarsisi_alinan_xestelik_862a71", "Qarşısı alınan xəstəlik")}><Input value={vaccineDlg.disease_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, disease_az: e.target.value })} /></Field>
+                <Field label="Disease (EN)"><Input value={vaccineDlg.disease_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, disease_en: e.target.value })} /></Field>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Field label={tr("adminvaccines_vurma_usulu_689cd3", "Vurma üsulu")}><Input value={vaccineDlg.route_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, route_az: e.target.value })} /></Field>
+                <Field label="Route (EN)"><Input value={vaccineDlg.route_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, route_en: e.target.value })} /></Field>
+              </div>
+              <Field label={tr("adminvaccines_yan_tesirler_426f38", "Yan təsirlər")}><Textarea rows={2} value={vaccineDlg.side_effects_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, side_effects_az: e.target.value })} /></Field>
+              <Field label="Side effects (EN)"><Textarea rows={2} value={vaccineDlg.side_effects_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, side_effects_en: e.target.value })} /></Field>
+              <Field label={tr("adminvaccines_eks_gosterisler_f34875", "Əks-göstərişlər")}><Textarea rows={2} value={vaccineDlg.contraindications_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, contraindications_az: e.target.value })} /></Field>
+              <Field label="Contraindications (EN)"><Textarea rows={2} value={vaccineDlg.contraindications_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, contraindications_en: e.target.value })} /></Field>
               <Field label={tr("adminvaccines_menbe_url_f7f4f2", "M\u0259nb\u0259 URL")}><Input value={vaccineDlg.source_url || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, source_url: e.target.value })} /></Field>
               <Field label={tr("adminvaccines_sira_421c5f", "S\u0131ra")}><Input type="number" value={vaccineDlg.sort_order ?? 0} onChange={(e) => setVaccineDlg({ ...vaccineDlg, sort_order: +e.target.value })} /></Field>
               <ToggleRow label={tr("adminvaccines_mecburi_ffc711", "M\u0259cburi")} value={!!vaccineDlg.is_mandatory} onChange={(v) => setVaccineDlg({ ...vaccineDlg, is_mandatory: v })} />
@@ -383,33 +394,6 @@ export default function AdminVaccines() {
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{scheduleDlg?.id ? tr("adminvaccines_dozani_redakte_et_c51553", "Dozan\u0131 redakt\u0259 et") : 'Yeni doza'}</DialogTitle></DialogHeader>
           {scheduleDlg &&
-          <div className="space-y-3">
-              <Field label={tr("adminvaccines_peyvend_17d309", "Peyv\u0259nd")}>
-                <Select value={scheduleDlg.vaccine_id || ''} onValueChange={(v) => setScheduleDlg({ ...scheduleDlg, vaccine_id: v })}>
-                  <SelectTrigger><SelectValue placeholder={tr("adminvaccines_sec_ac5416", "Se\xE7...")} /></SelectTrigger>
-                  <SelectContent>
-                    {vaccines.map((v) => <SelectItem key={v.id} value={v.id}>{v.name_az}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </Field>
-              <div className="grid grid-cols-2 gap-2">
-                <Field label="Doza №"><Input type="number" value={scheduleDlg.dose_number ?? 1} onChange={(e) => setScheduleDlg({ ...scheduleDlg, dose_number: +e.target.value })} /></Field>
-                <Field label={tr("adminvaccines_sira_421c5f", "S\u0131ra")}><Input type="number" value={scheduleDlg.sort_order ?? 0} onChange={(e) => setScheduleDlg({ ...scheduleDlg, sort_order: +e.target.value })} /></Field>
-              </div>
-              <Field label={tr("adminvaccines_doza_adi_mes_1_ci_doza_d2d62d", "Doza ad\u0131 (m\u0259s. 1-ci doza)")}><Input value={scheduleDlg.dose_label_az || ''} onChange={(e) => setScheduleDlg({ ...scheduleDlg, dose_label_az: e.target.value })} /></Field>
-              <Field label={tr("adminvaccines_yas_etiketi_mes_2_ayliq_56db60", "Ya\u015F etiketi (m\u0259s. 2 ayl\u0131q)")}><Input value={scheduleDlg.age_label_az || ''} onChange={(e) => setScheduleDlg({ ...scheduleDlg, age_label_az: e.target.value })} /></Field>
-              <Field label={tr("adminvaccines_tovsiye_olunan_yas_gunle_0dadf3", "T\xF6vsiy\u0259 olunan ya\u015F (g\xFCnl\u0259)")}><Input type="number" value={scheduleDlg.recommended_age_days ?? 0} onChange={(e) => setScheduleDlg({ ...scheduleDlg, recommended_age_days: +e.target.value })} /></Field>
-              <div className="grid grid-cols-2 gap-2">
-                <Field label={tr("adminvaccines_min_yas_gunle_28c892", "Min ya\u015F (g\xFCnl\u0259)")}><Input type="number" value={scheduleDlg.min_age_days ?? ''} onChange={(e) => setScheduleDlg({ ...scheduleDlg, min_age_days: e.target.value === '' ? null : +e.target.value })} /></Field>
-                <Field label={tr("adminvaccines_max_yas_gunle_bec1ce", "Max ya\u015F (g\xFCnl\u0259)")}><Input type="number" value={scheduleDlg.max_age_days ?? ''} onChange={(e) => setScheduleDlg({ ...scheduleDlg, max_age_days: e.target.value === '' ? null : +e.target.value })} /></Field>
-              </div>
-              <Field label="Qeyd"><Textarea rows={2} value={scheduleDlg.notes_az || ''} onChange={(e) => setScheduleDlg({ ...scheduleDlg, notes_az: e.target.value })} /></Field>
-            </div>
-          }
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setScheduleDlg(null)}>{tr("adminvaccines_legv_f7100a", "L\u0259\u011Fv")}</Button>
-            <Button onClick={() => scheduleDlg && saveSchedule.mutate(scheduleDlg)}>Yadda saxla</Button>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
 
