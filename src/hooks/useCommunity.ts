@@ -147,9 +147,12 @@ export const useGroupPosts = (groupId: string | null) => {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
 
+      const currentLanguage = localStorage.getItem('language') || 'az';
+      
       let query = supabase.
       from('community_posts').
       select('*').
+      eq('language', currentLanguage).
       eq('is_active', true).
       order('is_pinned', { ascending: false }).
       order('created_at', { ascending: false });
@@ -211,15 +214,19 @@ export const useCreatePost = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      const currentLanguage = localStorage.getItem('language') || 'az';
       const { error } = await supabase.
       from('community_posts').
-      insert({
-        group_id: groupId,
-        user_id: user.id,
-        content,
-        media_urls: mediaUrls || [],
-        is_anonymous: isAnonymous || false
-      } as any);
+      insert([
+        {
+          group_id: groupId,
+          user_id: user.id,
+          content,
+          media_urls: mediaUrls || [],
+          is_anonymous: isAnonymous || false,
+          language: currentLanguage
+        }
+      ]);
 
       if (error) throw error;
     },

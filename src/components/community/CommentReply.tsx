@@ -45,9 +45,6 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   const [showReplies, setShowReplies] = useState(level === 0);
   const [replyText, setReplyText] = useState('');
   const [isLiking, setIsLiking] = useState(false);
-  const [translatedText, setTranslatedText] = useState<string | null>(null);
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [showTranslated, setShowTranslated] = useState(false);
   const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
   const createComment = useCreateComment();
@@ -84,47 +81,6 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
     }
   };
 
-  const handleTranslate = async () => {
-    if (translatedText) {
-      setShowTranslated(!showTranslated);
-      return;
-    }
-    
-    setIsTranslating(true);
-    hapticFeedback.light();
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate-text`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token || ''}`,
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-        },
-        body: JSON.stringify({
-          text: comment.content
-        })
-      });
-
-      if (!response.ok) throw new Error('Translation failed');
-      const data = await response.json();
-      if (data.success && data.translatedText) {
-        setTranslatedText(data.translatedText);
-        setShowTranslated(true);
-      } else {
-        throw new Error('Translation error');
-      }
-    } catch (err) {
-      console.error(err);
-      toast({
-        title: tr("commentreply_xeta_3cdbb6", 'Xəta'),
-        description: tr("commentreply_tercume_xetasi", 'Tərcümə edilə bilmədi.'),
-        variant: 'destructive'
-      });
-    } finally {
-      setIsTranslating(false);
-    }
-  };
 
   const handleDelete = async () => {
     if (!confirm(tr("commentreply_bu_serhi_silmek_isteyirsiniz_fc50c9", "Bu \u015F\u0259rhi silm\u0259k ist\u0259yirsiniz?"))) return;
@@ -167,24 +123,8 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
               }
             </div>
             <p className="text-[12px] text-foreground/80 mt-1 leading-relaxed">
-              {showTranslated ? translatedText || comment.content : comment.content}
+              {comment.content}
             </p>
-            <button 
-              onClick={(e) => {
-                e.stopPropagation();
-                handleTranslate();
-              }}
-              disabled={isTranslating}
-              className="mt-1 flex items-center gap-1 text-[9px] font-semibold text-primary hover:text-primary/80 transition-colors"
-            >
-              <Sparkles className={`w-2.5 h-2.5 ${isTranslating ? 'animate-spin' : ''}`} />
-              {isTranslating 
-                ? tr("commentreply_tercume_edilir", "Tərcümə edilir...") 
-                : showTranslated 
-                  ? tr("commentreply_orijinali_goster", "Orijinalı göstər") 
-                  : tr("commentreply_tercume_et_ai", "Tərcümə et *")
-              }
-            </button>
           </div>
 
           {/* Actions */}

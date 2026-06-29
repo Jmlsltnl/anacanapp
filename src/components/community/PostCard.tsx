@@ -60,9 +60,6 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const [showHeartBurst, setShowHeartBurst] = useState(false);
-  const [translatedText, setTranslatedText] = useState<string | null>(null);
-  const [isTranslating, setIsTranslating] = useState(false);
-  const [showTranslated, setShowTranslated] = useState(false);
   const lastTapRef = useRef(0);
   const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
@@ -130,47 +127,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
     await nativeShare({ title: tr("postcard_anacan_paylasim_9618d9", 'Anacan - Paylaşım'), text: post.content.substring(0, 100) + (post.content.length > 100 ? '...' : '') });
   };
 
-  const handleTranslate = async () => {
-    if (translatedText) {
-      setShowTranslated(!showTranslated);
-      return;
-    }
-    
-    setIsTranslating(true);
-    hapticFeedback.light();
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate-text`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token || ''}`,
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-        },
-        body: JSON.stringify({
-          text: post.content
-        })
-      });
 
-      if (!response.ok) throw new Error('Translation failed');
-      const data = await response.json();
-      if (data.success && data.translatedText) {
-        setTranslatedText(data.translatedText);
-        setShowTranslated(true);
-      } else {
-        throw new Error('Translation error');
-      }
-    } catch (err) {
-      console.error(err);
-      toast({
-        title: tr("postcard_xeta_3cdbb6", 'Xəta'),
-        description: tr("postcard_tercume_xetasi", 'Tərcümə edilə bilmədi.'),
-        variant: 'destructive'
-      });
-    } finally {
-      setIsTranslating(false);
-    }
-  };
 
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: getCurrentDateLocale() });
   const mediaItems = (post.media_urls || []).map((url) => ({ url, type: getMediaType(url) }));
@@ -272,29 +229,13 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
         <div onClick={handleDoubleTap} className="relative">
             <div className="px-4 pb-2.5">
               <p className="text-foreground whitespace-pre-wrap text-[16px] leading-[1.6]">
-                {(showTranslated ? translatedText || post.content : post.content).split(/(\s+)/).map((word, index) => {
+                {post.content.split(/(\s+)/).map((word, index) => {
                 if (word.startsWith('#')) return <span key={index} className="text-primary font-semibold">{word}</span>;
                 if (word.startsWith('@')) return <span key={index} className="text-blue-500 font-semibold">{word}</span>;
                 if (/^https?:\/\/\S+/.test(word)) return <a key={index} href={word} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline break-all" onClick={(e) => e.stopPropagation()}>{word}</a>;
                 return word;
               })}
               </p>
-              <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleTranslate();
-                }}
-                disabled={isTranslating}
-                className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors"
-              >
-                <Sparkles className={`w-3 h-3 ${isTranslating ? 'animate-spin' : ''}`} />
-                {isTranslating 
-                  ? tr("postcard_tercume_edilir", "Tərcümə edilir...") 
-                  : showTranslated 
-                    ? tr("postcard_orijinali_goster", "Orijinalı göstər") 
-                    : tr("postcard_tercume_et_ai", "Tərcümə et *")
-                }
-              </button>
             </div>
             {mediaItems.length > 0 &&
           <div className="mt-1">

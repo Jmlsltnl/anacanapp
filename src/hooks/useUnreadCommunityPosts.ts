@@ -78,9 +78,11 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
     const seenPostIds = { ...localSeenPostIds, ...serverSeenPostIds } satisfies SeenPostMap;
     writeSeenPostIds(userId, seenPostIds);
 
+    const currentLanguage = localStorage.getItem('language') || 'az';
     const { data: posts, error } = await supabase
       .from('community_posts')
       .select('id, created_at, user_id')
+      .eq('language', currentLanguage)
       .eq('is_active', true)
       .is('group_id', null)
       .neq('user_id', userId)
@@ -132,9 +134,11 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
   },
 
   markCommunitySeen: async (userId: string) => {
+    const currentLanguage = localStorage.getItem('language') || 'az';
     const { data: posts } = await supabase
       .from('community_posts')
       .select('id, created_at, user_id')
+      .eq('language', currentLanguage)
       .eq('is_active', true)
       .is('group_id', null)
       .neq('user_id', userId)
