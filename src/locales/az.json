@@ -5957,5 +5957,17 @@
   "flow_cycle_diff_msg": "Tsikllər arasında {days} gün fərq var. Bu stress, çəki dəyişikliyi və ya tireoid problemlərlə bağlı ola bilər.",
   "flowdashboard_novbeti_period_42eab0": "Növbəti Period",
   "flowdashboard_reproduktiv_dovr_0a3598": "Reproduktiv Dövr",
-  "flowdashboard_ovulyasiya_gunu_62b53e": "Ovulyasiya Günü"
+  "flowdashboard_ovulyasiya_gunu_62b53e": "Ovulyasiya Günü",
+  "country": "Ölkə",
+  "select_country": "Ölkə seçin",
+  "edd_date_label": "Təxmini Doğuş Tarixi (EDD)",
+  "days_before": "gün əvvəl",
+  "days_after": "gün sonra",
+  "date_details": "Tarix Məlumatları",
+  "leave_start_date": "Məzuniyyətin Başlanğıcı",
+  "leave_end_date": "Məzuniyyətin Sonu",
+  "return_to_work": "İşə Qayıdış Tarixi",
+  "financial_details": "Maliyyə Hesablaması",
+  "total_payment": "Yekun Ödəniş",
+  "payment_rules": "Ödəniş Qaydaları"
 }

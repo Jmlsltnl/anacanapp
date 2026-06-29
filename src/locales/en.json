@@ -7480,5 +7480,17 @@
   "dashboard_3_trimester": "3rd Trimester",
   "dashboard_sm": "cm",
   "dashboard_qr": "gr",
-  "dashboard_glasses": "glass(es)"
+  "dashboard_glasses": "glass(es)",
+  "country": "Country",
+  "select_country": "Select Country",
+  "edd_date_label": "Estimated Due Date (EDD)",
+  "days_before": "days before",
+  "days_after": "days after",
+  "date_details": "Date Details",
+  "leave_start_date": "Leave Start Date",
+  "leave_end_date": "Leave End Date",
+  "return_to_work": "Return to Work Date",
+  "financial_details": "Financial Calculation",
+  "total_payment": "Total Payment",
+  "payment_rules": "Payment Rules"
 }
