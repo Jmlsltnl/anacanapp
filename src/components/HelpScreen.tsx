@@ -370,7 +370,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                 </motion.a>
 
                 <motion.a
-                href="tel:+994120000000"
+                href="tel:+994103216507"
                 className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors"
                 whileTap={{ scale: 0.98 }}>
                 
@@ -379,7 +379,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-foreground">{tr("untranslated_telefon_vwjgg5", "Telefon")}</p>
-                    <p className="text-sm text-primary">+994 12 000 00 00</p>
+                    <p className="text-sm text-primary">+994 10 321 65 07</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </motion.a>
