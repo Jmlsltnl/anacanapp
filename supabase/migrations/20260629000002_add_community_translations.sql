@@ -1,4 +1,4 @@
-INSERT INTO app_translations (key, language, value)
+INSERT INTO translations (key, lang, value)
 VALUES 
     ('community_header_pregnancy', 'en', 'Connect with other expectant mothers'),
     ('community_header_mommy', 'en', 'Connect with other mothers'),
@@ -12,5 +12,5 @@ VALUES
     ('group_desc_təcrübəli_analar', 'en', 'Share advice and experiences'),
     ('group_name_məsləhət', 'en', 'Advice'),
     ('group_desc_məsləhət', 'en', 'Ask questions and get advice from mothers')
-ON CONFLICT (key, language) DO UPDATE 
+ON CONFLICT (key, lang) DO UPDATE 
 SET value = EXCLUDED.value;
