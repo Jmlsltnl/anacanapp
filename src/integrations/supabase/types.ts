@@ -1438,6 +1438,7 @@ export type Database = {
           author_avatar_url: string | null
           author_name: string | null
           category: string
+          category_en: string | null
           comments_count: number | null
           content: string
           content_en: string | null
@@ -1454,6 +1455,7 @@ export type Database = {
           saves_count: number | null
           slug: string
           tags: string[] | null
+          tags_en: string[] | null
           title: string
           title_en: string | null
           updated_at: string
@@ -1479,6 +1481,7 @@ export type Database = {
           saves_count?: number | null
           slug: string
           tags?: string[] | null
+          tags_en?: string[] | null
           title: string
           title_en?: string | null
           updated_at?: string
@@ -1488,6 +1491,7 @@ export type Database = {
           author_avatar_url?: string | null
           author_name?: string | null
           category?: string
+          category_en?: string | null
           comments_count?: number | null
           content?: string
           content_en?: string | null
@@ -1504,6 +1508,7 @@ export type Database = {
           saves_count?: number | null
           slug?: string
           tags?: string[] | null
+          tags_en?: string[] | null
           title?: string
           title_en?: string | null
           updated_at?: string
