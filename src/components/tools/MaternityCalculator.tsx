@@ -40,6 +40,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
   const [pregnancyType, setPregnancyType] = useState<'normal' | 'complicated' | 'multiple'>('normal');
   const [selectedCountryCode, setSelectedCountryCode] = useState<string>('AZ');
   const [eddDate, setEddDate] = useState<string>('');
+  const [role, setRole] = useState<'mother' | 'father'>('mother');
   
   const [result, setResult] = useState<any>(null);
   const [expandedGuideline, setExpandedGuideline] = useState<string | null>(null);
@@ -54,27 +55,92 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
     const edd = new Date(eddDate);
     if (isNaN(edd.getTime())) return;
 
-    let daysBefore = selectedRule.normalDaysBefore;
-    let daysAfter = selectedRule.normalDaysAfter;
+    let daysBefore = 0;
+    let daysAfter = 0;
+    let leaveStartDate: Date;
+    
+    if (role === 'father') {
+      // Paternity leave usually starts on or just after birth
+      daysAfter = selectedRule.paternity?.days || 0;
+      leaveStartDate = edd; // Father's leave starts on birth date
+    } else {
+      daysBefore = selectedRule.normalDaysBefore;
+      daysAfter = selectedRule.normalDaysAfter;
 
-    if (pregnancyType === 'complicated') {
-      daysAfter = selectedRule.complicatedDaysAfter;
-    } else if (pregnancyType === 'multiple') {
-      daysBefore = selectedRule.multipleDaysBefore;
-      daysAfter = selectedRule.multipleDaysAfter;
+      if (pregnancyType === 'complicated') {
+        daysAfter = selectedRule.complicatedDaysAfter;
+      } else if (pregnancyType === 'multiple') {
+        daysBefore = selectedRule.multipleDaysBefore;
+        daysAfter = selectedRule.multipleDaysAfter;
+      }
+      leaveStartDate = subDays(edd, daysBefore);
     }
 
     const totalDays = daysBefore + daysAfter;
-    const leaveStartDate = subDays(edd, daysBefore);
-    const leaveEndDate = addDays(edd, daysAfter);
+    const leaveEndDate = addDays(leaveStartDate, totalDays > 0 ? totalDays - 1 : 0);
     const returnToWorkDate = addDays(leaveEndDate, 1);
 
-    let aznBenefitResult = null;
+    let benefitResult = null;
     
-    // Only calculate monetary benefit exactly for AZ using the backend config
-    if (selectedCountryCode === 'AZ' && config) {
+    // Calculate for AZ using backend config if possible (Mother only)
+    if (selectedCountryCode === 'AZ' && config && role === 'mother') {
       const salaryNum = parseFloat(salary) || 0;
-      aznBenefitResult = calculateBenefit(salaryNum, pregnancyType);
+      benefitResult = {
+        ...calculateBenefit(salaryNum, pregnancyType),
+        currency: 'AZN',
+        isNativeAz: true,
+        formula: isAZ ? selectedRule.compensation?.formulaDescription_az : selectedRule.compensation?.formulaDescription_en
+      };
+    } else if (selectedRule.compensation && selectedRule.compensation.type !== 'UNPAID') {
+      const salaryNum = parseFloat(salary) || 0;
+      const comp = selectedRule.compensation;
+      const dailyWage = salaryNum / 30.416; // Average days in month
+      
+      let dailyBenefit = 0;
+      let totalBenefit = 0;
+      
+      if (comp.type === 'PERCENTAGE_UNCAPPED' || comp.type === 'PERCENTAGE_CAPPED') {
+        dailyBenefit = dailyWage * ((comp.percentage || 100) / 100);
+        
+        if (comp.maxCapDaily && dailyBenefit > comp.maxCapDaily) dailyBenefit = comp.maxCapDaily;
+        if (comp.minCapDaily && dailyBenefit < comp.minCapDaily) dailyBenefit = comp.minCapDaily;
+        
+        totalBenefit = dailyBenefit * totalDays;
+        
+        if (comp.maxCapTotal && totalBenefit > comp.maxCapTotal) totalBenefit = comp.maxCapTotal;
+      } else if (comp.type === 'FLAT_RATE') {
+        dailyBenefit = comp.flatRateDaily || 0;
+        totalBenefit = dailyBenefit * totalDays;
+      } else if (comp.type === 'COMPLEX') {
+        if (selectedCountryCode === 'GB') {
+          const firstPhaseDays = Math.min(totalDays, 42); // 6 weeks
+          const secondPhaseDays = Math.max(0, Math.min(totalDays - 42, 231)); // 33 weeks
+          const firstPhaseBenefit = (dailyWage * 0.9) * firstPhaseDays;
+          const secondPhaseDaily = Math.min(26.29, dailyWage * 0.9);
+          const secondPhaseBenefit = secondPhaseDaily * secondPhaseDays;
+          totalBenefit = firstPhaseBenefit + secondPhaseBenefit;
+        } else if (selectedCountryCode === 'AE') {
+           const firstPhaseDays = Math.min(totalDays, 45);
+           const secondPhaseDays = Math.max(0, Math.min(totalDays - 45, 15));
+           totalBenefit = (dailyWage * firstPhaseDays) + (dailyWage * 0.5 * secondPhaseDays);
+        }
+      }
+      
+      benefitResult = {
+        maternityBenefit: totalBenefit,
+        dailySalary: dailyWage,
+        totalBenefit: totalBenefit,
+        isCustom: true,
+        currency: comp.currency,
+        formula: isAZ ? comp.formulaDescription_az : comp.formulaDescription_en
+      };
+    }
+    
+    if (role === 'father' && selectedRule.paternity) {
+       benefitResult = {
+         isPaternity: true,
+         formula: isAZ ? selectedRule.paternity.payDescription_az : selectedRule.paternity.payDescription_en
+       };
     }
 
     setResult({
@@ -84,8 +150,9 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
       leaveStartDate,
       leaveEndDate,
       returnToWorkDate,
-      aznBenefitResult,
-      rule: selectedRule
+      benefitResult,
+      rule: selectedRule,
+      role
     });
   };
 
@@ -196,6 +263,34 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               </Select>
             </motion.div>
 
+            {/* Role Selection */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-card rounded-2xl p-4 border border-border">
+              <Label className="text-base font-semibold mb-3 flex items-center gap-2">
+                {tr("role_selection", "Rolunuz")}
+              </Label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setRole('mother')}
+                  className={`p-3 rounded-xl border-2 font-semibold transition-all ${
+                    role === 'mother' ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'
+                  }`}
+                >
+                  🤰 {tr("role_mother", "Ana")}
+                </button>
+                <button
+                  onClick={() => setRole('father')}
+                  className={`p-3 rounded-xl border-2 font-semibold transition-all ${
+                    role === 'father' ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'
+                  }`}
+                >
+                  👨‍🍼 {tr("role_father", "Ata")}
+                </button>
+              </div>
+            </motion.div>
+
             {/* Expected Due Date Input */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -214,15 +309,15 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               />
             </motion.div>
 
-            {/* Salary Input (Only for AZ mostly, but can show for others if needed, let's show always but only calculate for AZ or display it generally) */}
-            {selectedCountryCode === 'AZ' && (
+            {/* Salary Input */}
+            {role === 'mother' && selectedRule.compensation && selectedRule.compensation.type !== 'UNPAID' && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
                 className="bg-card rounded-2xl p-4 border border-border">
                 <Label className="text-base font-semibold mb-3 block">
-                  {tr("maternitycalculator_ayliq_emek_haqqiniz_azn_8e5f51", "Aylıq əmək haqqınız (AZN)")}
+                  {tr("maternitycalculator_ayliq_emek_haqqiniz_azn_8e5f51", "Aylıq əmək haqqınız")} ({selectedRule.compensation.currency})
                 </Label>
                 <div className="relative">
                   <Input
@@ -233,19 +328,20 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                     className="h-14 text-lg pr-16" 
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
-                    AZN
+                    {selectedRule.compensation.currency}
                   </span>
                 </div>
-                {config && parseFloat(salary) > 0 && parseFloat(salary) < config.minSalary &&
+                {selectedCountryCode === 'AZ' && config && parseFloat(salary) > 0 && parseFloat(salary) < config.minSalary &&
                 <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
-                    {tr("maternitycalculator_minimum_emek_haqqi_f94050", "Minimum əmək haqqı (")}{config.minSalary} {tr("maternitycalculator_azn_esas_goturulecek_5cb1de", "AZN) əsas götürüləcək")}
+                    {tr("maternitycalculator_minimum_emek_haqqi_f94050", "Minimum əmək haqqı (")}{config.minSalary} AZN) {tr("maternitycalculator_azn_esas_goturulecek_5cb1de", "əsas götürüləcək")}
                   </p>
                 }
               </motion.div>
             )}
 
-            {/* Pregnancy Type Selection */}
+            {/* Pregnancy Type Selection (Only for mother) */}
+            {role === 'mother' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -276,6 +372,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                 )}
               </RadioGroup>
             </motion.div>
+            )}
 
             {/* Calculate Button */}
             <motion.div
@@ -284,7 +381,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               transition={{ delay: 0.3 }}>
               <Button
                 onClick={handleCalculate}
-                disabled={!eddDate || (selectedCountryCode === 'AZ' && (!salary || parseFloat(salary) <= 0))}
+                disabled={!eddDate || (role === 'mother' && selectedRule.compensation?.type !== 'UNPAID' && (!salary || parseFloat(salary) <= 0))}
                 className="w-full h-14 text-lg font-semibold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500">
                 <Calculator className="w-5 h-5 mr-2" />
                 {tr("maternitycalculator_calculate_3c7a2d", "Hesabla")}
@@ -316,37 +413,51 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                     </p>
                   </div>
 
-                  {/* Dates Breakdown */}
+                  {/* Visual Timeline */}
                   <div className="bg-card rounded-2xl border border-border overflow-hidden">
                     <div className="p-4 border-b border-border">
                       <p className="font-semibold flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-primary" />
-                        {tr("date_details", "Tarix Məlumatları")}
+                        <CalendarDays className="w-4 h-4 text-primary" />
+                        {tr("maternitycalculator_zaman_xetti_visual", "Zaman Xətti")}
                       </p>
                     </div>
-                    
-                    <div className="divide-y divide-border">
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 gap-1">
-                        <span className="text-muted-foreground">{tr("leave_start_date", "Məzuniyyətin Başlanğıcı")}</span>
-                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">{formatDate(result.leaveStartDate)}</span>
-                      </div>
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 gap-1">
-                        <span className="text-muted-foreground">{tr("edd_date_label", "Təxmini Doğuş Tarixi (EDD)")}</span>
-                        <span className="font-semibold text-primary">{formatDate(new Date(eddDate))}</span>
-                      </div>
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 gap-1">
-                        <span className="text-muted-foreground">{tr("leave_end_date", "Məzuniyyətin Sonu")}</span>
-                        <span className="font-semibold text-orange-600 dark:text-orange-400">{formatDate(result.leaveEndDate)}</span>
-                      </div>
-                      <div className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-muted/30 gap-1">
-                        <span className="text-muted-foreground font-medium">{tr("return_to_work", "İşə Qayıdış Tarixi")}</span>
-                        <span className="font-bold">{formatDate(result.returnToWorkDate)}</span>
+                    <div className="p-5">
+                      <div className="relative pl-6 space-y-6 border-l-2 border-primary/20 ml-2">
+                        {/* Start Date */}
+                        <div className="relative">
+                          <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-primary/20 border-2 border-primary" />
+                          <p className="font-bold text-foreground text-sm">{formatDate(result.leaveStartDate)}</p>
+                          <p className="text-muted-foreground text-sm">{result.role === 'father' ? tr("paternity_start", "Atalıq məzuniyyətinin başlanğıcı") : tr("leave_start_date", "Məzuniyyətin Başlanğıcı")}</p>
+                        </div>
+                        
+                        {/* EDD */}
+                        {result.role === 'mother' && (
+                          <div className="relative">
+                            <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-amber-500/20 border-2 border-amber-500" />
+                            <p className="font-bold text-foreground text-sm">{formatDate(new Date(eddDate))}</p>
+                            <p className="text-muted-foreground text-sm">{tr("edd_date_label", "Təxmini Doğuş Tarixi (EDD)")}</p>
+                          </div>
+                        )}
+                        
+                        {/* End Date */}
+                        <div className="relative">
+                          <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-orange-500/20 border-2 border-orange-500" />
+                          <p className="font-bold text-foreground text-sm">{formatDate(result.leaveEndDate)}</p>
+                          <p className="text-muted-foreground text-sm">{tr("leave_end_date", "Məzuniyyətin Sonu")}</p>
+                        </div>
+                        
+                        {/* Return to Work */}
+                        <div className="relative">
+                          <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-emerald-500/20 border-2 border-emerald-500" />
+                          <p className="font-bold text-foreground text-sm">{formatDate(result.returnToWorkDate)}</p>
+                          <p className="text-muted-foreground text-sm">{tr("return_to_work", "İşə Qayıdış Tarixi")}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Financial Breakdown (Only AZ has precise calculation currently) */}
-                  {result.aznBenefitResult ? (
+                  {/* Financial Breakdown */}
+                  {result.benefitResult ? (
                     <div className="bg-card rounded-2xl border border-border overflow-hidden">
                       <div className="p-4 border-b border-border">
                         <p className="font-semibold flex items-center gap-2">
@@ -357,25 +468,35 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                       <div className="divide-y divide-border">
                         <div className="flex justify-between items-center p-4">
                           <span className="text-muted-foreground">{tr("maternitycalculator_orta_gunluk_emek_haqqi_39d8be", "Orta günlük əmək haqqı")}</span>
-                          <span className="font-semibold">{result.aznBenefitResult.dailySalary.toFixed(2)} ₼</span>
+                          <span className="font-semibold">{result.benefitResult.dailySalary.toFixed(2)} {result.benefitResult.currency}</span>
                         </div>
                         <div className="flex justify-between items-center p-4">
                           <span className="text-muted-foreground">{tr("maternitycalculator_dekret_odenisi_af1939", "Dekret ödənişi")}</span>
-                          <span className="font-semibold text-emerald-600">{result.aznBenefitResult.maternityBenefit.toLocaleString('az-AZ')} ₼</span>
+                          <span className="font-semibold text-emerald-600">{result.benefitResult.maternityBenefit.toLocaleString(isAZ ? 'az-AZ' : 'en-US', {maximumFractionDigits: 2})} {result.benefitResult.currency}</span>
                         </div>
-                        <div className="flex justify-between items-center p-4">
-                          <span className="text-muted-foreground">{tr("maternitycalculator_dogum_muavineti_22766f", "Doğum müavinəti")}</span>
-                          <span className="font-semibold text-emerald-600">+{result.aznBenefitResult.birthBenefit} ₼</span>
-                        </div>
+                        {result.benefitResult.isNativeAz && result.benefitResult.birthBenefit && (
+                          <div className="flex justify-between items-center p-4">
+                            <span className="text-muted-foreground">{tr("maternitycalculator_dogum_muavineti_22766f", "Doğum müavinəti")}</span>
+                            <span className="font-semibold text-emerald-600">+{result.benefitResult.birthBenefit} {result.benefitResult.currency}</span>
+                          </div>
+                        )}
                         <div className="flex justify-between items-center p-4 bg-emerald-50 dark:bg-emerald-900/20">
                           <span className="font-semibold text-emerald-900 dark:text-emerald-100">{tr("total_payment", "Yekun Ödəniş")}</span>
                           <span className="font-bold text-xl text-emerald-700 dark:text-emerald-400">
-                            {result.aznBenefitResult.totalBenefit.toLocaleString('az-AZ')} ₼
+                            {result.benefitResult.totalBenefit.toLocaleString(isAZ ? 'az-AZ' : 'en-US', {maximumFractionDigits: 2})} {result.benefitResult.currency}
                           </span>
                         </div>
                       </div>
                       <div className="bg-muted/50 p-4 text-xs text-muted-foreground">
-                        <strong>Formula:</strong> {tr("maternitycalculator_ayliq_maas_12_365_mezuniyyet_g_4df91a", "(Aylıq maaş × 12 ÷ 365) × Məzuniyyət günləri + 600 AZN")}
+                        {result.benefitResult.formula && (
+                          <div className="mb-2">
+                            <strong>Formula:</strong> {result.benefitResult.formula}
+                          </div>
+                        )}
+                        <div className="text-amber-600 flex items-start gap-1">
+                          <AlertCircle className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                          <span>{tr("maternitycalculator_approximate_note", "Qeyd: Hesablama qanunvericiliyin ümumi şərtlərinə əsaslanır və təxminidir. Real məbləğ stajdan və vergilərdən asılı olaraq dəyişə bilər.")}</span>
+                        </div>
                       </div>
                     </div>
                   ) : (
@@ -385,8 +506,39 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                           {tr("payment_rules", "Ödəniş Qaydaları")}
                         </p>
                         <p className="text-sm text-amber-700 dark:text-amber-300">
-                          {isAZ ? result.rule.payDescription_az : result.rule.payDescription_en}
+                          {result.role === 'father' && result.rule.paternity ? (isAZ ? result.rule.paternity.payDescription_az : result.rule.paternity.payDescription_en) : (isAZ ? result.rule.payDescription_az : result.rule.payDescription_en)}
                         </p>
+                    </div>
+                  )}
+
+                  {/* Tenure Requirements */}
+                  {result.rule.tenureRequirementMonths !== undefined && result.rule.tenureRequirementMonths > 0 && (
+                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800 p-4">
+                      <p className="font-semibold text-blue-800 dark:text-blue-200 flex items-center gap-2 mb-2">
+                        <CheckCircle2 className="w-4 h-4" />
+                        {tr("tenure_requirement", "İş Stajı Tələbi")}
+                      </p>
+                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                        {isAZ ? `Məzuniyyət ödənişi almaq üçün son iş yerində minimum ${result.rule.tenureRequirementMonths} ay iş stajınız olmalıdır.` : `You must have at least ${result.rule.tenureRequirementMonths} months of tenure at your current job to receive paid leave.`}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Parental Leave */}
+                  {result.rule.parental && result.rule.parental.months > 0 && (
+                    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-2xl border border-purple-200 dark:border-purple-800 p-4">
+                      <p className="font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 mb-2">
+                        <Baby className="w-4 h-4" />
+                        {tr("parental_leave", "Uşağa Qulluq Məzuniyyəti (Parental Leave)")}
+                      </p>
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                          {tr("duration", "Müddət")}: {result.rule.parental.months} {tr("months", "ay")}
+                        </p>
+                        <p className="text-sm text-purple-700/80 dark:text-purple-300/80">
+                          {isAZ ? result.rule.parental.payDescription_az : result.rule.parental.payDescription_en}
+                        </p>
+                      </div>
                     </div>
                   )}
                 </motion.div>

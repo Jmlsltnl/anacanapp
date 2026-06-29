@@ -1,4 +1,34 @@
+export interface PaternityRule {
+  days: number;
+  payDescription_az: string;
+  payDescription_en: string;
+}
+
+export interface ParentalRule {
+  months: number;
+  payDescription_az: string;
+  payDescription_en: string;
+}
+
+export type CompensationType = 'PERCENTAGE_UNCAPPED' | 'PERCENTAGE_CAPPED' | 'FLAT_RATE' | 'COMPLEX' | 'UNPAID';
+
+export interface CompensationRule {
+  type: CompensationType;
+  currency: string;
+  percentage?: number;
+  maxCapDaily?: number;
+  maxCapTotal?: number;
+  minCapDaily?: number;
+  flatRateDaily?: number;
+  formulaDescription_az: string;
+  formulaDescription_en: string;
+}
+
 export interface MaternityRule {
+  tenureRequirementMonths?: number;
+  paternity?: PaternityRule;
+  parental?: ParentalRule;
+  compensation?: CompensationRule;
   code: string;
   name_az: string;
   name_en: string;
@@ -28,6 +58,25 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 110,
     payPercentage: 100,
     payDescription_az: '100% əmək haqqı ödənilir',
+
+    tenureRequirementMonths: 6,
+    paternity: {
+      days: 14,
+      payDescription_az: 'Ödənişsiz',
+      payDescription_en: 'Unpaid'
+    },
+    parental: {
+      months: 36,
+      payDescription_az: 'Qismən ödənişli (1.5 yaşa qədər sabit məbləğ)',
+      payDescription_en: 'Partially paid (fixed amount until 1.5 years)'
+    },
+    compensation: {
+      "type": "PERCENTAGE_UNCAPPED",
+      "currency": "AZN",
+      "percentage": 100,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i",
+      "formulaDescription_en": "100% of daily salary"
+    },
     payDescription_en: '100% of salary is paid',
     guidelines_az: [
       {
@@ -56,6 +105,25 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 56,
     payPercentage: 66.6,
     payDescription_az: 'Gündəlik qazancın 2/3 hissəsi',
+
+    tenureRequirementMonths: 3,
+    paternity: {
+      days: 5,
+      payDescription_az: 'Ödənişli (100%)',
+      payDescription_en: 'Paid (100%)'
+    },
+    parental: {
+      months: 6,
+      payDescription_az: 'Ödənişsiz (istəyə görə 6 aya qədər)',
+      payDescription_en: 'Unpaid (optional up to 6 months)'
+    },
+    compensation: {
+      "type": "PERCENTAGE_UNCAPPED",
+      "currency": "TRY",
+      "percentage": 66.66,
+      "formulaDescription_az": "Gündəlik maaşın 2/3 hissəsi",
+      "formulaDescription_en": "2/3 of daily salary"
+    },
     payDescription_en: '2/3 of daily earnings',
     guidelines_az: [
       {
@@ -84,6 +152,24 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 70,
     payPercentage: 0,
     payDescription_az: 'FMLA çərçivəsində ödənişsizdir (bəzi ştatlar istisna olmaqla)',
+
+    tenureRequirementMonths: 12,
+    paternity: {
+      days: 84,
+      payDescription_az: 'Ödənişsiz (FMLA çərçivəsində)',
+      payDescription_en: 'Unpaid (under FMLA)'
+    },
+    parental: {
+      months: 0,
+      payDescription_az: 'Yoxdur',
+      payDescription_en: 'None'
+    },
+    compensation: {
+      "type": "UNPAID",
+      "currency": "USD",
+      "formulaDescription_az": "Ödənişsiz",
+      "formulaDescription_en": "Unpaid"
+    },
     payDescription_en: 'Unpaid under FMLA (with some state exceptions)',
     guidelines_az: [
       {
@@ -112,6 +198,24 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 287,
     payPercentage: null,
     payDescription_az: 'İlk 6 həftə 90%, sonrakı 33 həftə sabit SMP məbləği',
+
+    tenureRequirementMonths: 6,
+    paternity: {
+      days: 14,
+      payDescription_az: 'Həftəlik sabit məbləğ və ya 90%',
+      payDescription_en: 'Weekly flat rate or 90%'
+    },
+    parental: {
+      months: 12,
+      payDescription_az: 'Bölüşdürülə bilən məzuniyyət (Shared Parental Leave)',
+      payDescription_en: 'Shared Parental Leave'
+    },
+    compensation: {
+      "type": "COMPLEX",
+      "currency": "GBP",
+      "formulaDescription_az": "İlk 6 həftə maaşın 90%-i, qalan həftələr sabit 184.03 GBP (həftəlik) və ya 90% (hansı azdırsa)",
+      "formulaDescription_en": "First 6 weeks 90% of salary, remaining weeks flat 184.03 GBP (weekly) or 90% (whichever is lower)"
+    },
     payDescription_en: '90% for first 6 weeks, then flat SMP rate for 33 weeks',
     guidelines_az: [
       {
@@ -140,6 +244,25 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 84,
     payPercentage: 100,
     payDescription_az: '100% əmək haqqı (Mutterschaftsgeld + işəgötürən əlavəsi)',
+
+    tenureRequirementMonths: 0,
+    paternity: {
+      days: 0,
+      payDescription_az: 'Xüsusi atalıq yoxdur (Valideyn məzuniyyəti istifadə edilir)',
+      payDescription_en: 'No specific paternity (Uses Shared Parental Leave)'
+    },
+    parental: {
+      months: 36,
+      payDescription_az: 'İlk 14 ay 67% (Elterngeld)',
+      payDescription_en: 'First 14 months 67% (Elterngeld)'
+    },
+    compensation: {
+      "type": "PERCENTAGE_UNCAPPED",
+      "currency": "EUR",
+      "percentage": 100,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i",
+      "formulaDescription_en": "100% of daily salary"
+    },
     payDescription_en: '100% of salary (Mutterschaftsgeld + employer supplement)',
     guidelines_az: [
       {
@@ -168,6 +291,27 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 110,
     payPercentage: 100,
     payDescription_az: '100% əmək haqqı (maksimum limitlə)',
+
+    tenureRequirementMonths: 6,
+    paternity: {
+      days: 5,
+      payDescription_az: 'Ödənişsiz (işəgötürənin razılığı ilə)',
+      payDescription_en: 'Unpaid (with employer consent)'
+    },
+    parental: {
+      months: 36,
+      payDescription_az: '1.5 yaşa qədər 40%',
+      payDescription_en: '40% until 1.5 years'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "RUB",
+      "percentage": 100,
+      "maxCapDaily": 4039.7,
+      "minCapDaily": 632.6,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i (Gündəlik maksimum 4039 RUB limitlə)",
+      "formulaDescription_en": "100% of daily salary (capped at 4,039 RUB daily)"
+    },
     payDescription_en: '100% of salary (capped at maximum limit)',
     guidelines_az: [
       {
@@ -196,6 +340,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 154, // 22 weeks
     payPercentage: 100,
     payDescription_az: 'Sosial sığorta tərəfindən ödənilən günlük müavinət',
+
+    tenureRequirementMonths: 10,
+    paternity: {
+      days: 25,
+      payDescription_az: 'Ödənişli (Gündəlik limitlə)',
+      payDescription_en: 'Paid (with daily cap)'
+    },
+    parental: {
+      months: 36,
+      payDescription_az: 'Sabit müavinət',
+      payDescription_en: 'Fixed allowance'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "EUR",
+      "percentage": 100,
+      "maxCapDaily": 100.36,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i (Gündəlik maksimum 100.36 EUR limitlə)",
+      "formulaDescription_en": "100% of daily salary (capped at 100.36 EUR daily)"
+    },
     payDescription_en: 'Daily allowance paid by social security',
     guidelines_az: [
       {
@@ -224,6 +388,25 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 90,
     payPercentage: 80,
     payDescription_az: 'INPS tərəfindən 80% ödənilir (bəzi hallarda işəgötürən 100%-ə tamamlayır)',
+
+    tenureRequirementMonths: 0,
+    paternity: {
+      days: 10,
+      payDescription_az: 'Ödənişli (100%)',
+      payDescription_en: 'Paid (100%)'
+    },
+    parental: {
+      months: 10,
+      payDescription_az: '30% ödənişli',
+      payDescription_en: '30% paid'
+    },
+    compensation: {
+      "type": "PERCENTAGE_UNCAPPED",
+      "currency": "EUR",
+      "percentage": 80,
+      "formulaDescription_az": "Gündəlik maaşın 80%-i",
+      "formulaDescription_en": "80% of daily salary"
+    },
     payDescription_en: '80% paid by INPS (often topped up to 100% by employer)',
     guidelines_az: [
       {
@@ -252,6 +435,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 98, // +1 week per extra child for each parent
     payPercentage: 100,
     payDescription_az: '100% Sosial Təminat tərəfindən ödənilir',
+
+    tenureRequirementMonths: 6,
+    paternity: {
+      days: 112,
+      payDescription_az: 'Ödənişli (100% - analıq ilə eyni)',
+      payDescription_en: 'Paid (100% - same as maternity)'
+    },
+    parental: {
+      months: 36,
+      payDescription_az: 'Ödənişsiz',
+      payDescription_en: 'Unpaid'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "EUR",
+      "percentage": 100,
+      "maxCapDaily": 155,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i (Gündəlik maksimum ~155 EUR limitlə)",
+      "formulaDescription_en": "100% of daily salary (capped at ~155 EUR daily)"
+    },
     payDescription_en: '100% paid by Social Security',
     guidelines_az: [
       {
@@ -280,6 +483,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 105,
     payPercentage: 55,
     payDescription_az: 'EI tərəfindən 55% (maksimum limitlə)',
+
+    tenureRequirementMonths: 14,
+    paternity: {
+      days: 35,
+      payDescription_az: 'Maksimum 5 həftə (55% ödənişli)',
+      payDescription_en: 'Max 5 weeks (55% paid)'
+    },
+    parental: {
+      months: 18,
+      payDescription_az: '35 həftə (55%) və ya 61 həftə (33%)',
+      payDescription_en: '35 weeks (55%) or 61 weeks (33%)'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "CAD",
+      "percentage": 55,
+      "maxCapDaily": 95.42,
+      "formulaDescription_az": "Gündəlik maaşın 55%-i (Gündəlik maksimum 95.42 CAD limitlə)",
+      "formulaDescription_en": "55% of daily salary (capped at 95.42 CAD daily)"
+    },
     payDescription_en: '55% paid by EI (up to a maximum amount)',
     guidelines_az: [
       {
@@ -308,6 +531,25 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 140,
     payPercentage: null,
     payDescription_az: 'Milli minimum əmək haqqı səviyyəsində',
+
+    tenureRequirementMonths: 10,
+    paternity: {
+      days: 14,
+      payDescription_az: 'Milli minimum əmək haqqı',
+      payDescription_en: 'National Minimum Wage'
+    },
+    parental: {
+      months: 24,
+      payDescription_az: 'Ödənişsiz qorunan məzuniyyət',
+      payDescription_en: 'Unpaid protected leave'
+    },
+    compensation: {
+      "type": "FLAT_RATE",
+      "currency": "AUD",
+      "flatRateDaily": 130.84,
+      "formulaDescription_az": "Milli minimum əmək haqqı səviyyəsində (Gündəlik ~130.84 AUD)",
+      "formulaDescription_en": "National minimum wage rate (~130.84 AUD daily)"
+    },
     payDescription_en: 'Paid at the National Minimum Wage',
     guidelines_az: [
       {
@@ -336,6 +578,24 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 30,
     payPercentage: null,
     payDescription_az: 'İlk 45 gün 100%, sonrakı 15 gün 50%',
+
+    tenureRequirementMonths: 0,
+    paternity: {
+      days: 5,
+      payDescription_az: 'Ödənişli (100%)',
+      payDescription_en: 'Paid (100%)'
+    },
+    parental: {
+      months: 0,
+      payDescription_az: 'Yoxdur',
+      payDescription_en: 'None'
+    },
+    compensation: {
+      "type": "COMPLEX",
+      "currency": "AED",
+      "formulaDescription_az": "İlk 45 gün maaşın 100%-i, sonrakı 15 gün 50%-i",
+      "formulaDescription_en": "First 45 days 100% of salary, next 15 days 50%"
+    },
     payDescription_en: 'First 45 days at 100%, next 15 days at 50%',
     guidelines_az: [
       {
@@ -364,6 +624,25 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 42,
     payPercentage: 100,
     payDescription_az: '100% işəgötürən tərəfindən (stajdan asılıdır)',
+
+    tenureRequirementMonths: 0,
+    paternity: {
+      days: 3,
+      payDescription_az: 'Ödənişli (100%)',
+      payDescription_en: 'Paid (100%)'
+    },
+    parental: {
+      months: 0,
+      payDescription_az: 'Yoxdur',
+      payDescription_en: 'None'
+    },
+    compensation: {
+      "type": "PERCENTAGE_UNCAPPED",
+      "currency": "SAR",
+      "percentage": 100,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i",
+      "formulaDescription_en": "100% of daily salary"
+    },
     payDescription_en: '100% by employer (depends on tenure)',
     guidelines_az: [
       {
@@ -392,6 +671,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 70,
     payPercentage: 100,
     payDescription_az: 'Dövlət Sosial Sığorta Fondu tərəfindən ödənilir',
+
+    tenureRequirementMonths: 0,
+    paternity: {
+      days: 5,
+      payDescription_az: 'Ödənişsiz',
+      payDescription_en: 'Unpaid'
+    },
+    parental: {
+      months: 12,
+      payDescription_az: '1.5 yaşa qədər 40%',
+      payDescription_en: '40% until 1.5 years'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "KZT",
+      "percentage": 100,
+      "maxCapDaily": 19561,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i (Gündəlik maksimum ~19,561 KZT limitlə)",
+      "formulaDescription_en": "100% of daily salary (capped at ~19,561 KZT daily)"
+    },
     payDescription_en: 'Paid by the State Social Insurance Fund',
     guidelines_az: [
       {
@@ -420,6 +719,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 70,
     payPercentage: null,
     payDescription_az: 'Dövlət tərəfindən maksimum 1000 GEL (birdəfəlik)',
+
+    tenureRequirementMonths: 0,
+    paternity: {
+      days: 0,
+      payDescription_az: 'Xüsusi yoxdur',
+      payDescription_en: 'None specific'
+    },
+    parental: {
+      months: 0,
+      payDescription_az: 'Yoxdur',
+      payDescription_en: 'None'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "GEL",
+      "percentage": 100,
+      "maxCapTotal": 1000,
+      "formulaDescription_az": "Maaşın 100%-i (Lakin ümumi dövlət tərəfindən maksimum 1000 GEL ödənilir)",
+      "formulaDescription_en": "100% of salary (capped at a total of 1000 GEL)"
+    },
     payDescription_en: 'State pays a maximum of 1000 GEL (one-time)',
     guidelines_az: [
       {
@@ -448,6 +767,27 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 70,
     payPercentage: 100,
     payDescription_az: '100% Sosial Sığorta tərəfindən',
+
+    tenureRequirementMonths: 6,
+    paternity: {
+      days: 14,
+      payDescription_az: 'Ödənişli (100%)',
+      payDescription_en: 'Paid (100%)'
+    },
+    parental: {
+      months: 36,
+      payDescription_az: 'Ödənişsiz (iş yeri qorunur)',
+      payDescription_en: 'Unpaid (job protected)'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "UAH",
+      "percentage": 100,
+      "maxCapDaily": 3501,
+      "minCapDaily": 233,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i (Gündəlik maksimum 3501 UAH limitlə)",
+      "formulaDescription_en": "100% of daily salary (capped at 3501 UAH daily)"
+    },
     payDescription_en: '100% by Social Insurance Fund',
     guidelines_az: [
       {
@@ -476,6 +816,25 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 70,
     payPercentage: 100,
     payDescription_az: '100% dövlət tərəfindən',
+
+    tenureRequirementMonths: 6,
+    paternity: {
+      days: 0,
+      payDescription_az: 'Xüsusi yoxdur',
+      payDescription_en: 'None specific'
+    },
+    parental: {
+      months: 36,
+      payDescription_az: '2 yaşa qədər qismən ödənişli',
+      payDescription_en: 'Partially paid up to 2 years'
+    },
+    compensation: {
+      "type": "PERCENTAGE_UNCAPPED",
+      "currency": "UZS",
+      "percentage": 100,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i",
+      "formulaDescription_en": "100% of daily salary"
+    },
     payDescription_en: '100% paid by the state',
     guidelines_az: [
       {
@@ -504,6 +863,25 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 126,
     payPercentage: 100,
     payDescription_az: '100% işəgötürən tərəfindən',
+
+    tenureRequirementMonths: 3,
+    paternity: {
+      days: 15,
+      payDescription_az: 'Yalnız dövlət işçiləri üçün (100%)',
+      payDescription_en: 'For government employees only (100%)'
+    },
+    parental: {
+      months: 0,
+      payDescription_az: 'Yoxdur',
+      payDescription_en: 'None'
+    },
+    compensation: {
+      "type": "PERCENTAGE_UNCAPPED",
+      "currency": "INR",
+      "percentage": 100,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i",
+      "formulaDescription_en": "100% of daily salary"
+    },
     payDescription_en: '100% paid by employer',
     guidelines_az: [
       {
@@ -532,6 +910,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 98, // +15 days per extra child
     payPercentage: 100,
     payDescription_az: '100% Sığorta və ya İşəgötürən tərəfindən',
+
+    tenureRequirementMonths: 0,
+    paternity: {
+      days: 15,
+      payDescription_az: 'Ödənişli (Regionlara görə)',
+      payDescription_en: 'Paid (Varies by region)'
+    },
+    parental: {
+      months: 0,
+      payDescription_az: 'Yoxdur',
+      payDescription_en: 'None'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "CNY",
+      "percentage": 100,
+      "maxCapDaily": 1000,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i (Regionlara görə fərqli maksimum limitlərlə)",
+      "formulaDescription_en": "100% of daily salary (capped based on regional average wage)"
+    },
     payDescription_en: '100% paid by Insurance or Employer',
     guidelines_az: [
       {
@@ -560,6 +958,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 56,
     payPercentage: 67,
     payDescription_az: 'Gündəlik qazancın təxminən 67%-i',
+
+    tenureRequirementMonths: 12,
+    paternity: {
+      days: 28,
+      payDescription_az: '67% ödənişli',
+      payDescription_en: '67% paid'
+    },
+    parental: {
+      months: 12,
+      payDescription_az: '67%-dən 50%-ə qədər ödənişli',
+      payDescription_en: '67% to 50% paid'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "JPY",
+      "percentage": 67,
+      "maxCapDaily": 15190,
+      "formulaDescription_az": "Gündəlik maaşın 67%-i (Gündəlik maksimum 15,190 JPY limitlə)",
+      "formulaDescription_en": "67% of daily salary (capped at 15,190 JPY daily)"
+    },
     payDescription_en: 'Approximately 67% of daily wage',
     guidelines_az: [
       {
@@ -588,6 +1006,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 60, // Total 120 days
     payPercentage: 100,
     payDescription_az: '100% (şirkət və dövlət arasında bölünür)',
+
+    tenureRequirementMonths: 6,
+    paternity: {
+      days: 10,
+      payDescription_az: 'Ödənişli (100%)',
+      payDescription_en: 'Paid (100%)'
+    },
+    parental: {
+      months: 12,
+      payDescription_az: '80% ödənişli (limitlə)',
+      payDescription_en: '80% paid (capped)'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "KRW",
+      "percentage": 100,
+      "maxCapDaily": 70000,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i (Dövlət tərəfindən aylıq maksimum limitlərlə)",
+      "formulaDescription_en": "100% of daily salary (with state monthly caps)"
+    },
     payDescription_en: '100% (shared by employer and state)',
     guidelines_az: [
       {
@@ -616,6 +1054,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 92,
     payPercentage: 100,
     payDescription_az: '100% INSS tərəfindən',
+
+    tenureRequirementMonths: 0,
+    paternity: {
+      days: 5,
+      payDescription_az: 'Ödənişli (100%)',
+      payDescription_en: 'Paid (100%)'
+    },
+    parental: {
+      months: 0,
+      payDescription_az: 'Yoxdur',
+      payDescription_en: 'None'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "BRL",
+      "percentage": 100,
+      "maxCapDaily": 259,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i (Maksimum INSS limiti ilə)",
+      "formulaDescription_en": "100% of daily salary (capped at INSS limit)"
+    },
     payDescription_en: '100% paid by INSS',
     guidelines_az: [
       {
@@ -644,6 +1102,25 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 175, // Up to 31-37 weeks depending on number of children
     payPercentage: 100,
     payDescription_az: '100% ZUS tərəfindən (və ya 1 il üçün 81,5%)',
+
+    tenureRequirementMonths: 0,
+    paternity: {
+      days: 14,
+      payDescription_az: '100% ödənişli',
+      payDescription_en: '100% paid'
+    },
+    parental: {
+      months: 41,
+      payDescription_az: '70% ödənişli',
+      payDescription_en: '70% paid'
+    },
+    compensation: {
+      "type": "PERCENTAGE_UNCAPPED",
+      "currency": "PLN",
+      "percentage": 100,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i",
+      "formulaDescription_en": "100% of daily salary"
+    },
     payDescription_en: '100% by ZUS (or 81.5% if spread over a year)',
     guidelines_az: [
       {
@@ -672,6 +1149,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 77, // Extra 3 weeks per extra child
     payPercentage: 100,
     payDescription_az: '100% Milli Sığorta tərəfindən',
+
+    tenureRequirementMonths: 10,
+    paternity: {
+      days: 6,
+      payDescription_az: 'Məzuniyyət/Xəstəlik günləri hesabına',
+      payDescription_en: 'Deducted from sick/vacation days'
+    },
+    parental: {
+      months: 0,
+      payDescription_az: 'Yoxdur',
+      payDescription_en: 'None'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "ILS",
+      "percentage": 100,
+      "maxCapDaily": 1655,
+      "formulaDescription_az": "Gündəlik maaşın 100%-i (Gündəlik maksimum 1655 ILS limitlə)",
+      "formulaDescription_en": "100% of daily salary (capped at 1655 ILS daily)"
+    },
     payDescription_en: '100% by National Insurance',
     guidelines_az: [
       {
@@ -700,6 +1197,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 270,
     payPercentage: 80,
     payDescription_az: 'Gündəlik qazancın 80%-i (tavansız limitsiz deyil)',
+
+    tenureRequirementMonths: 8,
+    paternity: {
+      days: 10,
+      payDescription_az: '80% ödənişli',
+      payDescription_en: '80% paid'
+    },
+    parental: {
+      months: 16,
+      payDescription_az: '80% ödənişli (480 gün ümumi)',
+      payDescription_en: '80% paid (480 days total)'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "SEK",
+      "percentage": 80,
+      "maxCapDaily": 1218,
+      "formulaDescription_az": "Gündəlik maaşın 80%-i (Gündəlik maksimum 1218 SEK limitlə)",
+      "formulaDescription_en": "80% of daily salary (capped at 1218 SEK daily)"
+    },
     payDescription_en: '80% of daily wage (up to a ceiling)',
     guidelines_az: [
       {
@@ -728,6 +1245,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 98,
     payPercentage: 80,
     payDescription_az: '80% (maksimum limitlə)',
+
+    tenureRequirementMonths: 5,
+    paternity: {
+      days: 14,
+      payDescription_az: '80% ödənişli',
+      payDescription_en: '80% paid'
+    },
+    parental: {
+      months: 0,
+      payDescription_az: 'Yoxdur',
+      payDescription_en: 'None'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "CHF",
+      "percentage": 80,
+      "maxCapDaily": 220,
+      "formulaDescription_az": "Gündəlik maaşın 80%-i (Gündəlik maksimum 220 CHF limitlə)",
+      "formulaDescription_en": "80% of daily salary (capped at 220 CHF daily)"
+    },
     payDescription_en: '80% (up to a maximum limit)',
     guidelines_az: [
       {
@@ -756,6 +1293,26 @@ export const maternityRules: MaternityRule[] = [
     multipleDaysAfter: 84,
     payPercentage: null,
     payDescription_az: 'UIF vasitəsilə maaşın 38-60%-i',
+
+    tenureRequirementMonths: 3,
+    paternity: {
+      days: 10,
+      payDescription_az: '66% ödənişli (UIF)',
+      payDescription_en: '66% paid (UIF)'
+    },
+    parental: {
+      months: 0,
+      payDescription_az: 'Yoxdur',
+      payDescription_en: 'None'
+    },
+    compensation: {
+      "type": "PERCENTAGE_CAPPED",
+      "currency": "ZAR",
+      "percentage": 60,
+      "maxCapDaily": 590,
+      "formulaDescription_az": "Gündəlik maaşın 60%-i (Maksimum UIF limiti ilə)",
+      "formulaDescription_en": "60% of daily salary (capped at UIF limit)"
+    },
     payDescription_en: '38-60% of salary via UIF',
     guidelines_az: [
       {

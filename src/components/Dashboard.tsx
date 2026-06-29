@@ -502,16 +502,6 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
         </motion.div>
       </div>
 
-      {/* Water Tracking Widget */}
-      <motion.div
-        className="mt-1.5"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        <WaterWidget />
-      </motion.div>
-
       {/* Baby Development - Static Icons */}
       <motion.div
         className="bg-primary/5 dark:bg-primary/10 rounded-xl p-3 shadow-card border border-primary/20"
@@ -660,6 +650,16 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
           <p className="text-xs text-foreground/80 leading-relaxed">{currentWeekTip.content}</p>
         </motion.div>
       }
+
+      {/* Water Tracking Widget (Moved below messages) */}
+      <motion.div
+        className="mb-4"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.55 }}
+      >
+        <WaterWidget />
+      </motion.div>
 
       {/* Quick Actions Grid */}
       <div className="grid grid-cols-4 gap-1.5">
