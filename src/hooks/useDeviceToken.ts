@@ -98,10 +98,24 @@ export const useDeviceToken = () => {
       let permStatus = await FirebaseMessaging.checkPermissions();
       console.log('[DeviceToken] Current permission:', permStatus.receive);
 
-      if (permStatus.receive === 'prompt') {
-        console.log('[DeviceToken] Requesting permissions...');
-        permStatus = await FirebaseMessaging.requestPermissions();
-        console.log('[DeviceToken] Permission result:', permStatus.receive);
+      const today = new Date().toDateString();
+      const lastPrompt = localStorage.getItem('last_push_prompt_date');
+
+      if (permStatus.receive !== 'granted') {
+        if (lastPrompt !== today) {
+          localStorage.setItem('last_push_prompt_date', today);
+          
+          if (permStatus.receive === 'prompt') {
+            console.log('[DeviceToken] Requesting permissions...');
+            permStatus = await FirebaseMessaging.requestPermissions();
+            console.log('[DeviceToken] Permission result:', permStatus.receive);
+          } else if (permStatus.receive === 'denied') {
+            toast(tr("usedevicetoken_bildirislere_icaze_verin", "Bildirişlərə icazə verin"), {
+              description: tr("usedevicetoken_bildiris_izah", "Vacib məlumatları və xatırlatmaları almaq üçün cihaz ayarlarından tətbiqə bildiriş göndərməyə icazə verin."),
+              duration: 8000,
+            });
+          }
+        }
       }
 
       if (permStatus.receive !== 'granted') {
@@ -175,8 +189,19 @@ export const useDeviceToken = () => {
         const { PushNotifications } = await import('@capacitor/push-notifications');
 
         let permStatus = await PushNotifications.checkPermissions();
-        if (permStatus.receive === 'prompt') {
-          permStatus = await PushNotifications.requestPermissions();
+        const today = new Date().toDateString();
+        const lastPrompt = localStorage.getItem('last_push_prompt_date');
+
+        if (permStatus.receive !== 'granted' && lastPrompt !== today) {
+          localStorage.setItem('last_push_prompt_date', today);
+          if (permStatus.receive === 'prompt') {
+            permStatus = await PushNotifications.requestPermissions();
+          } else if (permStatus.receive === 'denied') {
+            toast(tr("usedevicetoken_bildirislere_icaze_verin", "Bildirişlərə icazə verin"), {
+              description: tr("usedevicetoken_bildiris_izah", "Vacib məlumatları və xatırlatmaları almaq üçün cihaz ayarlarından tətbiqə bildiriş göndərməyə icazə verin."),
+              duration: 8000,
+            });
+          }
         }
 
         if (permStatus.receive !== 'granted') {
