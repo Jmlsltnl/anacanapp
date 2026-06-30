@@ -79,8 +79,9 @@ export async function sendFCMv1(
           alert: { title, body },
           sound: 'default',
           badge: 1,
-          'content-available': 1,
-          'mutable-content': 1,
+          // NOTE: 'content-available' və 'mutable-content' qəsdən çıxarılıb.
+          // Onlar olanda iOS push-u silent/background kimi qəbul edir və
+          // Notification Service Extension olmadan ekranda görünmür.
         },
       },
     },
