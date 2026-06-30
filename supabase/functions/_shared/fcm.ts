@@ -70,7 +70,10 @@ export async function sendFCMv1(
     data: data || {},
     android: {
       priority: 'HIGH',
-      notification: { sound: 'default', channel_id: 'high_importance_channel' },
+      // Do not force a custom channel here. Older Android installs may not have
+      // created `high_importance_channel`, and Android drops notifications sent
+      // to a missing channel. Let FCM/app defaults choose a valid channel.
+      notification: { sound: 'default' },
     },
     apns: {
       headers: { 'apns-priority': '10', 'apns-push-type': 'alert' },

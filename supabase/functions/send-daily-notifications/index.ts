@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
     const currentMinute = bakuNow.getUTCMinutes();
     const currentTimeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
 
-    let body: { manual?: boolean; userId?: string; skipDedup?: boolean } = {};
+    let body: { manual?: boolean; userId?: string; skipDedup?: boolean; slot?: string } = {};
     try { body = await req.json(); } catch { /* No body */ }
 
     const triggeredBy = body.manual ? (body.userId ? 'admin-test' : 'admin') : 'cron';
@@ -143,17 +143,30 @@ Deno.serve(async (req) => {
       );
     }
 
+    const requestedSlot = body.manual ? normalizeTimeLabel(body.slot) : null;
+
     // Match the current cron run to the nearest expected Baku delivery slot.
     // Each run can cover both exact-hour and legacy half-hour content times.
     const currentMinutes = currentHour * 60 + currentMinute;
-    const matchingSlot = DAILY_RUN_SLOTS
-      .map((slot) => ({ slot, diff: Math.abs(currentMinutes - toMinutes(slot.runAt)) }))
-      .filter(({ diff }) => diff <= 40)
-      .sort((a, b) => a.diff - b.diff)[0]?.slot ?? null;
+    const matchingSlot = requestedSlot
+      ? DAILY_RUN_SLOTS.find((slot) => slot.runAt === requestedSlot) ?? null
+      : DAILY_RUN_SLOTS
+        .map((slot) => ({ slot, diff: Math.abs(currentMinutes - toMinutes(slot.runAt)) }))
+        .filter(({ diff }) => diff <= 40)
+        .sort((a, b) => a.diff - b.diff)[0]?.slot ?? null;
 
-    // For manual triggers, send all pending; for cron, only matching slot
-    const activeSendTime = body.manual ? null : matchingSlot?.runAt ?? null;
-    const activeContentTimes = body.manual
+    if (body.manual && requestedSlot && !matchingSlot) {
+      runId = await startRunLog(supabase, 'send-daily-notifications', triggeredBy, currentTimeStr, requestedSlot);
+      await finishRunLog(supabase, runId, { status: 'success', sent_count: 0, skipped_count: 1, reasons: { invalid_slot: 1 } });
+      return new Response(
+        JSON.stringify({ message: `Invalid notification slot: ${requestedSlot}`, skipped: true }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Manual slot triggers resend only that slot; manual without slot keeps the existing all-pending admin behavior.
+    const activeSendTime = body.manual && !requestedSlot ? null : matchingSlot?.runAt ?? null;
+    const activeContentTimes = body.manual && !requestedSlot
       ? null
       : new Set((matchingSlot?.contentTimes ?? []).map((value) => normalizeTimeLabel(value)).filter(Boolean) as string[]);
 
