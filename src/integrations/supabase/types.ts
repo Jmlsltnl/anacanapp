@@ -1465,6 +1465,7 @@ export type Database = {
           author_avatar_url?: string | null
           author_name?: string | null
           category?: string
+          category_en?: string | null
           comments_count?: number | null
           content: string
           content_en?: string | null
@@ -2060,11 +2061,11 @@ export type Database = {
           is_active: boolean | null
           is_anonymous: boolean
           is_pinned: boolean | null
+          language: string | null
           likes_count: number | null
           media_urls: string[] | null
           updated_at: string
           user_id: string
-          language?: string | null
         }
         Insert: {
           comments_count?: number | null
@@ -2075,11 +2076,11 @@ export type Database = {
           is_active?: boolean | null
           is_anonymous?: boolean
           is_pinned?: boolean | null
+          language?: string | null
           likes_count?: number | null
           media_urls?: string[] | null
           updated_at?: string
           user_id: string
-          language?: string | null
         }
         Update: {
           comments_count?: number | null
@@ -2090,11 +2091,11 @@ export type Database = {
           is_active?: boolean | null
           is_anonymous?: boolean
           is_pinned?: boolean | null
+          language?: string | null
           likes_count?: number | null
           media_urls?: string[] | null
           updated_at?: string
           user_id?: string
-          language?: string | null
         }
         Relationships: [
           {
