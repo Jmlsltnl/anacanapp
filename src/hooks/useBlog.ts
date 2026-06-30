@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { tr } from '@/lib/tr';
+import { tr, mapRowsTranslation, mapRowTranslation } from '@/lib/tr';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 export type BlogLifeStage = 'flow' | 'bump' | 'mommy' | 'all';
 
@@ -45,6 +46,7 @@ export interface BlogPostCategory {
 }
 
 export const useBlog = () => {
+  const { language } = useAppSettings();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
@@ -60,13 +62,14 @@ export const useBlog = () => {
 
       if (error) throw error;
       
-      const typedPosts = (data || []) as BlogPost[];
+      let typedPosts = (data || []) as BlogPost[];
+      typedPosts = mapRowsTranslation(typedPosts, language, ['title', 'content', 'excerpt', 'category', 'tags']);
       setPosts(typedPosts);
       setFeaturedPosts(typedPosts.filter(p => p.is_featured));
     } catch (error) {
       console.error('Error fetching blog posts:', error);
     }
-  }, []);
+  }, [language]);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -77,11 +80,13 @@ export const useBlog = () => {
         .order('sort_order', { ascending: true });
 
       if (error) throw error;
-      setCategories((data || []) as BlogCategory[]);
+      let typedCategories = (data || []) as BlogCategory[];
+      typedCategories = mapRowsTranslation(typedCategories, language, ['name', 'description']);
+      setCategories(typedCategories);
     } catch (error) {
       console.error('Error fetching blog categories:', error);
     }
-  }, []);
+  }, [language]);
 
   const getPostBySlug = async (slug: string): Promise<BlogPost | null> => {
     try {
@@ -99,7 +104,7 @@ export const useBlog = () => {
         await supabase.rpc('increment_blog_view_count', { post_id: data.id });
       }
       
-      return data as BlogPost;
+      return data ? mapRowTranslation(data as BlogPost, language, ['title', 'content', 'excerpt', 'category', 'tags']) : null;
     } catch (error) {
       console.error('Error fetching post:', error);
       return null;
@@ -142,6 +147,7 @@ export const useBlog = () => {
 
 // Admin hook for managing blog
 export const useBlogAdmin = () => {
+  const { language } = useAppSettings();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [postCategories, setPostCategories] = useState<BlogPostCategory[]>([]);
@@ -155,11 +161,15 @@ export const useBlogAdmin = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPosts((data || []) as BlogPost[]);
+      let typedPosts = (data || []) as BlogPost[];
+      typedPosts = mapRowsTranslation(typedPosts, language, ['title', 'content', 'excerpt', 'category', 'tags']);
+      setPosts(typedPosts);
+      return typedPosts;
     } catch (error) {
-      console.error('Error fetching all posts:', error);
+      console.error('Error fetching posts by category:', error);
+      return [];
     }
-  }, []);
+  }, [language]);
 
   const fetchAllCategories = useCallback(async () => {
     try {
@@ -169,7 +179,9 @@ export const useBlogAdmin = () => {
         .order('sort_order', { ascending: true });
 
       if (error) throw error;
-      setCategories((data || []) as BlogCategory[]);
+      let typedCategories = (data || []) as BlogCategory[];
+      typedCategories = mapRowsTranslation(typedCategories, language, ['name', 'description']);
+      setCategories(typedCategories);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
