@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { tr, mapRowsTranslation, mapRowTranslation } from '@/lib/tr';
-import { useAppSettings } from '@/hooks/useAppSettings';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export type BlogLifeStage = 'flow' | 'bump' | 'mommy' | 'all';
 
@@ -46,7 +46,7 @@ export interface BlogPostCategory {
 }
 
 export const useBlog = () => {
-  const { language } = useAppSettings();
+  const { language } = useLanguage();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
@@ -147,7 +147,7 @@ export const useBlog = () => {
 
 // Admin hook for managing blog
 export const useBlogAdmin = () => {
-  const { language } = useAppSettings();
+  const { language } = useLanguage();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [postCategories, setPostCategories] = useState<BlogPostCategory[]>([]);
