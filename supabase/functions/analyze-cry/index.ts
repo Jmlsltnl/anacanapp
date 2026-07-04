@@ -40,19 +40,21 @@ async function detectIfCrying(
             {
               text: `CRITICAL AUDIO CLASSIFICATION TASK
 
-You are an expert audio analyst AI. You must be extremely strict, objective, and skeptical.
+You are an expert pediatric audio analyst AI. You must be extremely strict, objective, and skeptical.
 Your task is to classify this audio recording.
 
 IMPORTANT RULE 1: If the audio is mostly SILENT, or just background hiss/static, or general room noise, you MUST return "silence" or "noise".
 IMPORTANT RULE 2: If there is no clear human baby (0-12 months) crying, you must NOT classify it as crying.
 IMPORTANT RULE 3: Do NOT hallucinate sounds. If you don't hear a baby crying clearly, it is NOT crying.
+IMPORTANT RULE 4: Explicitly ignore false positives such as: White noise machines, toys playing music, adult singing (lullabies), pets, and street noise.
 
 STEP 1: Identify the main sound.
 - Is it completely silent or just static? -> "silence"
-- Is it general background noise (traffic, wind, rustling, fan)? -> "noise"
-- Is there an adult speaking or breathing? -> "adult_voice"
+- Is it general background noise (traffic, wind, rustling, fan, white noise machine)? -> "noise"
+- Is there an adult speaking, singing, or breathing? -> "adult_voice"
 - Is there a baby making happy/neutral sounds? -> "baby_cooing"
 - Is there a baby CRYING (sustained, rhythmic wailing)? -> "baby_crying"
+- Is it a musical toy or TV? -> "music_tv"
 
 STEP 2: For baby crying, verify it is rhythmic and sustained. A single short shout, cough, or sneeze is NOT crying.
 
@@ -155,42 +157,45 @@ async function classifyCryType(audioBase64: string, _apiKey?: string, userContex
           }
         },
         {
-          text: `Sən peşəkar və çox dəqiq AI-sən. Birinci mərhələ bu səsdə körpə ağlaması olduğunu təxmin edib, lakin sən YENİDƏN və ÇOX DİQQƏTLƏ yoxlamalısan.
+          text: `Sən peşəkar pediatr və çox dəqiq AI-sən. Birinci mərhələ bu səsdə körpə ağlaması olduğunu təxmin edib, lakin sən YENİDƏN və ÇOX DİQQƏTLƏ yoxlamalısan.
 
-Əgər səs sadəcə səssizlik, səs-küy, külək, böyük adam səsi və ya heyvan səsidirsə, DƏRHAL "no_cry_detected" və ya "false_positive" qaytar. Xəyalpərəstlik etmə, olmayan səsi uydurma.
+Əgər səs sadəcə səssizlik, ağ küy (white noise), oyuncaq musiqisi, böyük adam səsi (hətta laylay çalsa belə) və ya heyvan səsidirsə, DƏRHAL "no_cry_detected" və ya "false_positive" qaytar. Xəyalpərəstlik etmə, olmayan səsi uydurma.
 
 ${ageContext ? `KÖRPƏ KONTEKST: ${ageContext}` : ''}
 
-${userContext?.babyAgeMonths !== undefined && userContext.babyAgeMonths < 3 ? `
-XÜSUSI QEYD: Bu yenidoğulmuş körpədir. Yenidoğulmuşlarda ən çox görülən ağlama səbəbləri:
-- Ac qalma (hər 2-3 saatda qidalanma lazımdır)
-- Bez dəyişdirmə (tez-tez yaş bez narahatlıq yaradır)
-- Kolik (axşam saatlarında şiddətli ağlama)
-- Həddən artıq yorğunluq
-` : ''}
+${userContext?.babyAgeMonths !== undefined && userContext.babyAgeMonths < 4 ? `
+XÜSUSI QEYD: Bu 4 aydan kiçik körpədir. "Dunstan Baby Language" metodundan istifadə edərək səsləri analiz et:
+- "Neh" səsi (dil damağa dəyir) -> "hungry" (Acıqma)
+- "Owh" səsi (əsnəməyə bənzər) -> "tired" (Yorğunluq, yuxu)
+- "Heh" səsi (qısa, qırıq-qırıq) -> "discomfort" (Narahatlıq - bez, isti/soyuq)
+- "Eairh" səsi (sıxılmış, gərgin) -> "colic" (Qaz sancısı, alt qaz)
+- "Eh" səsi (döş qəfəsindən qısa) -> "discomfort" (Gəyirmə ehtiyacı)
+` : `
+XÜSUSI QEYD: Bu 4 aydan böyük körpədir. Ağlamanın emosional və fiziki səbəblərinə diqqət yetir (diş çıxarma, ayrılıq qorxusu, həddən artıq stimulyasiya, aclıq).
+`}
 
 Ağlama növləri (ƏGƏR HƏQİQƏTƏN AĞLAYIRSA):
-- "hungry": Ritmik "neh-neh" səsi, tədricən güclənir
-- "tired": Monoton, zəif, gözlərini ovuşdurma ilə
+- "hungry": Ritmik ağlama, ağız hərəkətləri ilə
+- "tired": Monoton, zəif, əsnəməyə bənzər
 - "pain": Ani, kəskin, çox yüksək tonlu qışqırıq
-- "discomfort": Narahat, qıcıqlanma (bez, soyuq/isti)
-- "colic": Şiddətli, axşam saatlarında, uzun sürən
-- "attention": Aralıqlı, valideyn görəndə azalır
+- "discomfort": Narahat, qıcıqlanma (bez, gəyirmə)
+- "colic": Şiddətli, sıxılmış, qaz sancısına bənzər
+- "attention": Aralıqlı, sızlanma
 - "overstimulated": Yorğun, həddən artıq stimulyasiya
-- "sick": Zəif, normadan fərqli
+- "sick": Zəif, iniltili
 
 Əgər ağlama deyilsə:
 - "no_cry_detected": Səssizlik və ya sadəcə səs-küy
-- "false_positive": Böyük adam, TV, heyvan və s. (səhv aşkarlanma)
+- "false_positive": Böyük adam, TV, heyvan, ağ küy (white noise)
 
 JSON CAVAB:
 {
   "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick|no_cry_detected|false_positive",
   "confidence": 70-100,
-  "explanation": "Nə eşitdiyin barədə və analiz haqqında Azərbaycan dilində izahat${userContext?.babyName ? ` (${userContext.babyName} adını istifadə et)` : ''}",
-  "recommendations": ["tövsiyə 1", "tövsiyə 2", "tövsiyə 3"],
+  "explanation": "Nə eşitdiyin barədə və analiz haqqında valideynə çox professional, empatiyalı və sakitləşdirici tərzdə Azərbaycan dilində izahat${userContext?.babyName ? ` (${userContext.babyName} adını istifadə et)` : ''}. Əgər səbəb qazdırsa 'Eairh' səsini eşitdiyini vurğula.",
+  "recommendations": ["Ayaqları qarına doğru hərəkət etdirərək qazı çıxarmağa kömək et (Bicycle legs)", "Dəri-dəriyə təmas qur (Skin-to-skin)", "Tövsiyə 3"],
   "urgency": "low|medium|high"
-}${language === 'en' ? '\n\nIMPORTANT: Write the "explanation" and all "recommendations" entries in ENGLISH. Keep JSON keys and enum values exactly as shown.' : ''}`
+}${language === 'en' ? '\n\nIMPORTANT: Write the "explanation" and all "recommendations" entries in ENGLISH in a highly professional, empathetic, pediatric tone. Keep JSON keys and enum values exactly as shown.' : ''}`
         }
       ]
     }],
