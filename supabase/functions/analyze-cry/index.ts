@@ -26,7 +26,8 @@ async function detectIfCrying(
   audioBase64: string,
   _apiKey?: string
 ): Promise<{ isCrying: boolean; confidence: number; soundType: string }> {
-  const response = await callGeminiSmart("gemini-2.5-flash-lite", {
+  // Using the more capable gemini-2.5-flash model instead of lite for better audio precision and less hallucination
+  const response = await callGeminiSmart("gemini-2.5-flash", {
     contents: [{
       role: 'user',
       parts: [
@@ -39,37 +40,21 @@ async function detectIfCrying(
             {
               text: `CRITICAL AUDIO CLASSIFICATION TASK
 
-Listen to this audio carefully and classify EXACTLY what type of sound this is.
+You are an expert audio analyst AI. You must be extremely strict, objective, and skeptical.
+Your task is to classify this audio recording.
 
-This gate is STRICT: Only return baby_crying if you are VERY confident it is an INFANT (0-12 months) AND the cry is RHYTHMIC + SUSTAINED (multiple "cry cycles" like wah-wah/neh-neh over several seconds).
-If the audio is a SINGLE loud scream, a bang, a shout, a cough, laughter, TV/music, or general noise — it is NOT baby crying.
+IMPORTANT RULE 1: If the audio is mostly SILENT, or just background hiss/static, or general room noise, you MUST return "silence" or "noise".
+IMPORTANT RULE 2: If there is no clear human baby (0-12 months) crying, you must NOT classify it as crying.
+IMPORTANT RULE 3: Do NOT hallucinate sounds. If you don't hear a baby crying clearly, it is NOT crying.
 
-STEP 1: What sounds do you hear in this audio?
-- Is there human vocalization?
-- Is there crying sounds?
-- Is there coughing, sneezing, or other respiratory sounds?
-- Is there silence or background noise only?
+STEP 1: Identify the main sound.
+- Is it completely silent or just static? -> "silence"
+- Is it general background noise (traffic, wind, rustling, fan)? -> "noise"
+- Is there an adult speaking or breathing? -> "adult_voice"
+- Is there a baby making happy/neutral sounds? -> "baby_cooing"
+- Is there a baby CRYING (sustained, rhythmic wailing)? -> "baby_crying"
 
-STEP 2: If there IS human vocalization, determine:
-- Is this an INFANT/BABY making the sound? (0-12 months old)
-- Is this a child or adult?
-
-STEP 3: If it's a baby, is it CRYING?
-Baby crying characteristics:
-- Sustained vocalization (not brief coughs)
-- Rhythmic pattern (wah-wah, neh-neh sounds)
-- High-pitched wailing
-- Duration of several seconds of continuous crying
-
-NOT CRYING (common false positives):
-- COUGHING: Short, abrupt, expulsive sounds
-- SNEEZING: Single burst sounds
-- COOING/BABBLING: Happy, playful sounds
-- HICCUPS: Rhythmic but short sounds
-- ADULT SOUNDS: Any adult speech or sounds
-- SINGLE SCREAM / BIG SOUND: One sharp shout/yelp, impact sounds, claps, banging
-- TV/MUSIC: Any media audio, background speech/music
-- ENVIRONMENTAL NOISE: Wind, traffic, fan, white noise, kitchen sounds, etc.
+STEP 2: For baby crying, verify it is rhythmic and sustained. A single short shout, cough, or sneeze is NOT crying.
 
 Return ONLY this JSON (no markdown, no extra keys):
 {
@@ -78,13 +63,13 @@ Return ONLY this JSON (no markdown, no extra keys):
   "isBabyCrying": true or false,
   "cryPattern": "rhythmic_cry|single_scream|intermittent|none|unknown",
   "confidence": 0-100,
-  "reasoning": "Brief explanation of what you actually heard"
+  "reasoning": "What you actually heard in detail. Explain why it is or isn't a baby crying."
 }`
             }
           ]
         }],
         generationConfig: {
-          temperature: 0.05,
+          temperature: 0.1,
           topK: 1,
           topP: 0.1,
           maxOutputTokens: 512,
@@ -125,8 +110,8 @@ Return ONLY this JSON (no markdown, no extra keys):
         isBabyVocalization &&
         isBabyCrying &&
         soundType === 'baby_crying' &&
-        cryPattern === 'rhythmic_cry' &&
-        confidence >= 92;
+        (cryPattern === 'rhythmic_cry' || cryPattern === 'intermittent') &&
+        confidence >= 85;
 
       return { isCrying, confidence, soundType };
     }
@@ -170,7 +155,9 @@ async function classifyCryType(audioBase64: string, _apiKey?: string, userContex
           }
         },
         {
-          text: `Bu səsdə TƏSDIQ OLUNMUŞ körpə ağlaması var. İndi ağlamanın SƏBƏBİNİ müəyyən et.
+          text: `Sən peşəkar və çox dəqiq AI-sən. Birinci mərhələ bu səsdə körpə ağlaması olduğunu təxmin edib, lakin sən YENİDƏN və ÇOX DİQQƏTLƏ yoxlamalısan.
+
+Əgər səs sadəcə səssizlik, səs-küy, külək, böyük adam səsi və ya heyvan səsidirsə, DƏRHAL "no_cry_detected" və ya "false_positive" qaytar. Xəyalpərəstlik etmə, olmayan səsi uydurma.
 
 ${ageContext ? `KÖRPƏ KONTEKST: ${ageContext}` : ''}
 
@@ -182,7 +169,7 @@ XÜSUSI QEYD: Bu yenidoğulmuş körpədir. Yenidoğulmuşlarda ən çox görül
 - Həddən artıq yorğunluq
 ` : ''}
 
-Ağlama növləri:
+Ağlama növləri (ƏGƏR HƏQİQƏTƏN AĞLAYIRSA):
 - "hungry": Ritmik "neh-neh" səsi, tədricən güclənir
 - "tired": Monoton, zəif, gözlərini ovuşdurma ilə
 - "pain": Ani, kəskin, çox yüksək tonlu qışqırıq
@@ -192,11 +179,15 @@ Ağlama növləri:
 - "overstimulated": Yorğun, həddən artıq stimulyasiya
 - "sick": Zəif, normadan fərqli
 
+Əgər ağlama deyilsə:
+- "no_cry_detected": Səssizlik və ya sadəcə səs-küy
+- "false_positive": Böyük adam, TV, heyvan və s. (səhv aşkarlanma)
+
 JSON CAVAB:
 {
-  "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick",
+  "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick|no_cry_detected|false_positive",
   "confidence": 70-100,
-  "explanation": "Azərbaycan dilində izahat${userContext?.babyName ? ` (${userContext.babyName} adını istifadə et)` : ''}",
+  "explanation": "Nə eşitdiyin barədə və analiz haqqında Azərbaycan dilində izahat${userContext?.babyName ? ` (${userContext.babyName} adını istifadə et)` : ''}",
   "recommendations": ["tövsiyə 1", "tövsiyə 2", "tövsiyə 3"],
   "urgency": "low|medium|high"
 }${language === 'en' ? '\n\nIMPORTANT: Write the "explanation" and all "recommendations" entries in ENGLISH. Keep JSON keys and enum values exactly as shown.' : ''}`
@@ -204,7 +195,7 @@ JSON CAVAB:
       ]
     }],
     generationConfig: {
-      temperature: 0.2,
+      temperature: 0.1,
       topK: 10,
       topP: 0.5,
       maxOutputTokens: 1024,

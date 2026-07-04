@@ -52,7 +52,7 @@ const VitaminsTab = ({ className }: VitaminsTabProps) => {
             <h3 className="font-semibold text-sm">{vitamin.name}</h3>
             {isEssential &&
           <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/20 text-primary font-medium">
-                Vacib
+                {tr("vitamins_vacib", "Vacib")}
               </span>
           }
           </div>

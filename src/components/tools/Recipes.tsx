@@ -144,6 +144,15 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
         'şam yeməyi': { en: 'Dinner', az: 'Şam Yeməyi' },
         'sam yemeyi': { en: 'Dinner', az: 'Şam Yeməyi' },
         
+        'şorbalar': { en: 'Soups', az: 'Şorbalar' },
+        'sorbalar': { en: 'Soups', az: 'Şorbalar' },
+        
+        'pürelər': { en: 'Purees', az: 'Pürelər' },
+        'pureler': { en: 'Purees', az: 'Pürelər' },
+        
+        'əsas yeməklər': { en: 'Main dishes', az: 'Əsas yeməklər' },
+        'esas yemekler': { en: 'Main dishes', az: 'Əsas yeməklər' },
+        
         'desertler': { en: 'Desserts', az: 'Desertlər' },
         'desertlər': { en: 'Desserts', az: 'Desertlər' },
         'desert': { en: 'Dessert', az: 'Desert' },

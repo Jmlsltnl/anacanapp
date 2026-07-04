@@ -27,7 +27,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
   useScrollToTop();
 
   const { user, profile, updateProfile } = useAuth();
-  const { countryCode, setCountryCode, lifeStage, babyName, dueDate, lastPeriodDate, cycleLength, setLifeStage, setDueDate, setLastPeriodDate, setCycleLength, setBabyData, babyGender, babyBirthDate } = useUserStore();
+  const { countryCode, setCountryCode, lifeStage, babyName, dueDate, lastPeriodDate, cycleLength, setLifeStage, setDueDate, setLastPeriodDate, setCycleLength, setBabyData, babyGender, babyBirthDate, language } = useUserStore();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -83,7 +83,8 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
   const formatDate = (date: Date | null): string => {
     if (!date) return '';
-    return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long', year: 'numeric' });
+    const locale = language === 'en' ? 'en-US' : 'az-AZ';
+    return date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
   useEffect(() => {

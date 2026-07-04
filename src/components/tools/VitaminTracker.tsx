@@ -30,7 +30,15 @@ const VITAMIN_PRESETS = [
 { name: tr("vitamintracker_probiotik", "Probiotik"), emoji: '🦠' }];
 
 
-const DAY_LABELS = ['B', 'B.e', tr("vitamintracker_c_a_28099e", "Ç.a"), tr("vitamintracker_c_b70344", "Ç"), 'C.a', 'C', tr("vitamintracker_s_b97106", "Ş")];
+const DAY_LABELS = [
+  tr("vitamintracker_sun", "B"),
+  tr("vitamintracker_mon", "B.e"),
+  tr("vitamintracker_tue", "Ç.a"),
+  tr("vitamintracker_wed", "Ç"),
+  tr("vitamintracker_thu", "C.a"),
+  tr("vitamintracker_fri", "C"),
+  tr("vitamintracker_sat", "Ş")
+];
 
 const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
   const language = useUserStore((state) => state.language);

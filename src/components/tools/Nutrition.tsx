@@ -1,7 +1,7 @@
 import { useState, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, Utensils, Apple, Coffee, Droplets,
+  ArrowLeft, Utensils, Apple, Coffee, Droplets, Droplet,
   Plus, Star, X, Check, Trash2, Leaf, Heart } from
 'lucide-react';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
@@ -300,7 +300,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                     <Input
                     value={customFood.name}
                     onChange={(e) => setCustomFood({ ...customFood, name: e.target.value })}
-                    placeholder={tr("nutrition_mes_plov_afdcf0", "məs. Pasta")}
+                    placeholder={tr("nutrition_mes_plov_afdcf0", "məs. Plov")}
                     className="h-9 text-sm" />
                   
                   </div>
@@ -532,13 +532,13 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: i * 0.03 }}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all ${
                   i < waterGlasses ?
-                  'bg-blue-500 text-white shadow-md' :
-                  'bg-blue-100 dark:bg-blue-900/30 text-blue-300 dark:text-blue-600'}`
+                  'bg-blue-500 text-white shadow-md shadow-blue-500/30' :
+                  'bg-blue-50 dark:bg-blue-900/20 text-blue-200 dark:text-blue-800 border border-blue-100 dark:border-blue-800/50'}`
                   }>
                   
-                      💧
+                      <Droplet className={`w-5 h-5 ${i < waterGlasses ? 'fill-current' : 'fill-none stroke-current stroke-2'}`} />
                     </motion.div>
                 )}
                 </div>
