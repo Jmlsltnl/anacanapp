@@ -146,7 +146,6 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   };
 
   // Build tools from DB configs
-  const language = useUserStore((state) => state.language);
   const isNonAz = language !== 'az';
   const { disabledTools, isToolDisabled } = useDisabledTools();
   const tools: Tool[] = useMemo(() => {
