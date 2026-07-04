@@ -21,7 +21,7 @@ interface CryAnalysisRequest {
 }
 
 // Two-stage analysis for accurate cry detection
-// NOTE: This is intentionally conservative to minimize false positives.
+// NOTE: This approach is intentionally conservative to minimize false positives and provide professional pediatric recommendations.
 async function detectIfCrying(
   audioBase64: string,
   _apiKey?: string
