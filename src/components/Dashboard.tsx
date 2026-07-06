@@ -383,7 +383,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
           {/* Main Text - "Anacan hazırda meyvə boydayam" */}
           <div className="text-center">
             <p className="text-lg font-bold text-foreground mb-1">
-              {tr("dashboard_anacan_hazirda_cfaa50", "Anacan, hazırda")} <span className={trimesterColors.text}>{weekData.fruit}</span> {tr("dashboard_boydayam_22a1", "boydayam")}
+              {tr("dashboard_anacan_hazirda_cfaa50", "Anacan, hazırda")} <span className={trimesterColors.text}>{weekData.fruit}</span>{language === 'az' ? ' boydayam' : ''}
             </p>
             <p className="text-xs text-muted-foreground font-medium">
               {selectedWeek}{tr("dashboard_hefte_5af01f", ". h\u0259ft\u0259,")} {selectedDayInWeek}{tr("dashboard_gun_a4ba4e", ". g\xFCn \u2022")} <span className={`font-semibold ${trimesterColors.text}`}>
