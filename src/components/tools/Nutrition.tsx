@@ -66,7 +66,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   const { loading: mealLoading, addMealLog, deleteMealLog, getTodayStats, getMealsByType } = useMealLogs();
   const { data: nutritionTips = [], isLoading: tipsLoading } = useNutritionTips();
   const { data: dbFoods = [], isLoading: foodsLoading } = useCommonFoods();
-  const { lifeStage } = useUserStore();
+  const { lifeStage, language } = useUserStore();
 
   // Dynamic data from database
   const { data: dbMealTypes = [] } = useMealTypes(lifeStage || 'flow');
@@ -90,13 +90,27 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   // Map meal types from DB or use fallback
   const mealTypes = useMemo(() => {
     if (dbMealTypes.length > 0) {
-      return dbMealTypes.map((m) => ({
-        id: m.meal_id,
-        name: m.name,
-        icon: mealIcons[m.meal_id] || Utensils,
-        time: m.time_range || '',
-        emoji: m.emoji || '🍽️'
-      }));
+      return dbMealTypes.map((m) => {
+        let mealName = m.name;
+        let mealTime = m.time_range || '';
+
+        if (language === 'en') {
+          if (mealName === 'Əlavə qida' || mealName === 'Qəlyanaltı') mealName = 'Snack';
+          if (mealName === 'Səhər yeməyi') mealName = 'Breakfast';
+          if (mealName === 'Nahar') mealName = 'Lunch';
+          if (mealName === 'Şam yeməyi') mealName = 'Dinner';
+          
+          if (mealTime === 'İstənilən vaxt') mealTime = 'Anytime';
+        }
+
+        return {
+          id: m.meal_id,
+          name: mealName,
+          icon: mealIcons[m.meal_id] || Utensils,
+          time: mealTime,
+          emoji: m.emoji || '🍽️'
+        };
+      });
     }
     return fallbackMealTypes.map((m) => ({
       id: m.meal_id,
