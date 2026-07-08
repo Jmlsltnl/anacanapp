@@ -132,7 +132,8 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   };
 
 
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll to bottom only when a new message is added.
+  // This allows the user to read long AI responses from the top down while they stream.
   useEffect(() => {
     requestAnimationFrame(() => {
       if (scrollRef.current) {
@@ -143,7 +144,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         }
       }
     });
-  }, [messages]);
+  }, [messages.length]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
