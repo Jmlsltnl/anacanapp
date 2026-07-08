@@ -20,6 +20,9 @@ import { getPhaseInfoForDate } from '@/lib/cycle-utils';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useChildren } from '@/hooks/useChildren';
+import { useMealLogs } from '@/hooks/useMealLogs';
+import { useWeightEntries } from '@/hooks/useWeightEntries';
+import { useKickSessions } from '@/hooks/useKickSessions';
 import MarkdownContent from './MarkdownContent';
 import { tr } from "@/lib/tr";
 
@@ -48,6 +51,9 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const { todayLogs: babyTodayLogs } = useBabyLogs();
   const { todayLog: motherTodayLog } = useDailyLogs();
   const { selectedChild, getChildAge } = useChildren();
+  const { todayLogs: motherMeals } = useMealLogs();
+  const { entries: weightEntries } = useWeightEntries();
+  const { todaySessions: kickSessions } = useKickSessions();
 
   const pregnancyData = getPregnancyData();
 
@@ -246,6 +252,16 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
               diaperType: l.diaper_type,
               notes: l.notes,
               startTime: l.start_time
+            })) || [],
+            recentMotherMeals: motherMeals?.map(m => ({
+              type: m.meal_type,
+              food: m.food_name,
+              calories: m.calories
+            })) || [],
+            latestWeight: weightEntries?.length > 0 ? weightEntries[0].weight : null,
+            todayKickSessions: kickSessions?.map(k => ({
+              kicks: k.kick_count,
+              duration: k.duration_seconds
             })) || []
           }
         })
