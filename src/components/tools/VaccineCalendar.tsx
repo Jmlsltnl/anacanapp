@@ -563,6 +563,7 @@ function DetailRow({ label, value }: {label: string;value: string;}) {
 function ActionDialog({
   open, mode, row, onClose, onSubmit
 }: {open: boolean;mode: 'done' | 'skip' | null;row: VaccineScheduleRow | null;onClose: () => void;onSubmit: (payload: any) => Promise<void>;}) {
+  const lang = getPersistedLanguage();
   const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState(today);
   const [location, setLocation] = useState('');
