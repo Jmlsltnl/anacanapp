@@ -6,6 +6,12 @@ interface UserProfile {
   lastPeriodDate?: string;
   cycleLength?: number;
   partnerName?: string;
+  selectedChildDetails?: any;
+  recentMotherLog?: any;
+  recentBabyLogs?: any[];
+  recentMotherMeals?: any[];
+  latestWeight?: number | null;
+  todayKickSessions?: any[];
 }
 
 export const getSystemPrompt = (
@@ -43,6 +49,12 @@ ${userProfile.babyBirthDate ? `- Baby birth date: ${userProfile.babyBirthDate}` 
 ${userProfile.lastPeriodDate ? `- Last period date: ${userProfile.lastPeriodDate}` : ""}
 ${userProfile.cycleLength ? `- Cycle length: ${userProfile.cycleLength} days` : ""}
 ${userProfile.partnerName ? `- Partner's name: ${userProfile.partnerName}` : ""}
+${userProfile.selectedChildDetails ? `- Selected Child Details (age/gender): ${JSON.stringify(userProfile.selectedChildDetails)}` : ""}
+${userProfile.recentMotherLog ? `- Mother's today logs (mood/symptoms): ${JSON.stringify(userProfile.recentMotherLog)}` : ""}
+${userProfile.recentBabyLogs?.length ? `- Baby's today logs (feeding/sleep/diaper): ${JSON.stringify(userProfile.recentBabyLogs)}` : ""}
+${userProfile.recentMotherMeals?.length ? `- Mother's today meals: ${JSON.stringify(userProfile.recentMotherMeals)}` : ""}
+${userProfile.latestWeight ? `- Latest logged weight: ${userProfile.latestWeight} kg` : ""}
+${userProfile.todayKickSessions?.length ? `- Today's baby kick sessions: ${JSON.stringify(userProfile.todayKickSessions)}` : ""}
 `
       : `
 İstifadəçi məlumatları:
@@ -53,6 +65,12 @@ ${userProfile.babyBirthDate ? `- Körpənin doğum tarixi: ${userProfile.babyBir
 ${userProfile.lastPeriodDate ? `- Son menstruasiya tarixi: ${userProfile.lastPeriodDate}` : ""}
 ${userProfile.cycleLength ? `- Tsikl uzunluğu: ${userProfile.cycleLength} gün` : ""}
 ${userProfile.partnerName ? `- Həyat yoldaşının adı: ${userProfile.partnerName}` : ""}
+${userProfile.selectedChildDetails ? `- Körpənin detalları (yaşı/cinsi): ${JSON.stringify(userProfile.selectedChildDetails)}` : ""}
+${userProfile.recentMotherLog ? `- Ananın bugünkü qeydləri: ${JSON.stringify(userProfile.recentMotherLog)}` : ""}
+${userProfile.recentBabyLogs?.length ? `- Körpənin bugünkü fəaliyyət qeydləri: ${JSON.stringify(userProfile.recentBabyLogs)}` : ""}
+${userProfile.recentMotherMeals?.length ? `- Ananın bugünkü qidalanması: ${JSON.stringify(userProfile.recentMotherMeals)}` : ""}
+${userProfile.latestWeight ? `- Son qeyd edilən çəki: ${userProfile.latestWeight} kq` : ""}
+${userProfile.todayKickSessions?.length ? `- Bugünkü təpik sayımları: ${JSON.stringify(userProfile.todayKickSessions)}` : ""}
 `
     : "";
 
