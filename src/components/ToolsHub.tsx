@@ -429,7 +429,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                     <p className="text-white/70 text-xs">
                       {(() => {
                         const desc = hero.hero_subtitle || hero.description || '';
-                        if (language === 'en' && hero.tool_id === 'photoshoot' && (desc === 'Anacan tətbiqində yaradılmış körpə fotosu' || desc.includes('fotolar'))) return 'Create magical photoshoots for your baby';
+                        if (language === 'en' && hero.tool_id === 'photoshoot') return 'Create magical photoshoots for your baby';
                         if (language === 'en' && hero.tool_id === 'recipes' && desc.includes('resept')) return 'Healthy and delicious recipes';
                         return desc;
                       })()}
@@ -497,7 +497,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                   <h3 className="font-semibold text-foreground text-[12px] leading-tight mb-0.5 pr-4 line-clamp-2">{tool.name}</h3>
                   <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">
                     {(() => {
-                      if (language === 'en' && tool.id === 'photoshoot' && (tool.description === 'Anacan tətbiqində yaradılmış körpə fotosu' || tool.description?.includes('fotolar'))) return 'Create magical photoshoots for your baby';
+                      if (language === 'en' && tool.id === 'photoshoot') return 'Create magical photoshoots for your baby';
                       if (language === 'en' && tool.id === 'recipes' && tool.description?.includes('resept')) return 'Healthy and delicious recipes';
                       return tool.description;
                     })()}
