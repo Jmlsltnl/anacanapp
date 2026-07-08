@@ -1378,7 +1378,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                 type="number"
                 value={formulaML}
                 onChange={(e) => setFormulaML(e.target.value)}
-                placeholder={tr("dashboard_diger_ml_da1e7f", "Digər (ml)")}
+                placeholder={language === 'en' ? "Other (ml)" : "Digər (ml)"}
                 className="flex-1 px-3 py-1.5 rounded-lg border border-blue-200 text-sm bg-white"
                 min="1"
                 max="500" />
@@ -1420,7 +1420,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                 type="text"
                 value={solidFoodName}
                 onChange={(e) => setSolidFoodName(e.target.value)}
-                placeholder={tr("dashboard_mes_balkabaqli_pure_27f08d", "Məs: balkabaqlı püre")}
+                placeholder={language === 'en' ? "e.g. pumpkin puree" : "Məs: balkabaqlı püre"}
                 className="flex-1 px-3 py-1.5 rounded-lg border border-orange-200 text-sm bg-white" />
               
                 <motion.button

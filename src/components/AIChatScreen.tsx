@@ -37,7 +37,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { lifeStage, getPregnancyData, name, dueDate, babyName, babyBirthDate, lastPeriodDate, cycleLength, periodLength } = useUserStore();
+  const { lifeStage, getPregnancyData, name, dueDate, babyName, babyBirthDate, lastPeriodDate, cycleLength, periodLength, language } = useUserStore();
   const { user } = useAuth();
   const { messages: savedMessages, addMessage, clearHistory, loading: historyLoading } = useAIChatHistory('woman');
   const { toast } = useToast();
@@ -482,7 +482,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder={tr("aichatscreen_anacan_ai_ye_sualinizi_yazin_927a37", "Anacan.AI-yə sualınızı yazın...")}
+              placeholder={language === 'en' ? "Type your question for Anacan.AI..." : "Anacan.AI-yə sualınızı yazın..."}
               className="min-h-[40px] max-h-[100px] pr-4 resize-none rounded-xl border-2 focus:border-primary/50 text-sm py-2"
               disabled={isLoading} />
             

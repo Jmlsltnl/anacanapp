@@ -16,7 +16,7 @@ interface DoctorReportScreenProps {
 }
 
 const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
-  const { name, lifeStage, getCycleData, getPregnancyData } = useUserStore();
+  const { name, lifeStage, getCycleData, getPregnancyData, language } = useUserStore();
   const { selectedChild, getChildAge } = useChildren();
   const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState('1month');
@@ -240,7 +240,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
           
           <h3 className="font-bold mb-4">{tr("doctorreportscreen_hekim_ucun_qeydler_052b91", "Həkim üçün Qeydlər")}</h3>
           <textarea
-            placeholder={tr("doctorreportscreen_hekiminiz_ucun_elave_qeydler_yazin_2bd3dc", "Həkiminiz üçün əlavə qeydlər yazın...")}
+            placeholder={language === 'en' ? "Write additional notes for your doctor..." : "Həkiminiz üçün əlavə qeydlər yazın..."}
             className="w-full h-24 p-4 rounded-2xl bg-muted/50 resize-none outline-none focus:ring-2 focus:ring-primary/20" />
           
         </motion.div>

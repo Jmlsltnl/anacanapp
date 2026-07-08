@@ -15,7 +15,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
-import { tr } from "@/lib/tr";
+import { tr, getPersistedLanguage } from "@/lib/tr";
 
 interface FairyTaleGeneratorProps {
   onBack: () => void;
@@ -415,7 +415,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 <Input
                 value={directChildName}
                 onChange={(e) => setDirectChildName(e.target.value)}
-                placeholder={tr("fairytalegenerator_meselen_aysel_murad_bdd8a0", "Məsələn: Aysel, Murad...")} />
+                placeholder={getPersistedLanguage() === 'en' ? "For example: Aysel, Murad..." : "Məsələn: Aysel, Murad..."} />
               
               </div>
 
@@ -514,7 +514,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   <Input
                     value={formData.child_name}
                     onChange={(e) => setFormData({ ...formData, child_name: e.target.value })}
-                    placeholder={tr("fairytalegenerator_meselen_aysel_murad_leman_2ed3da", "Məsələn: Aysel, Murad, Ləman...")}
+                    placeholder={getPersistedLanguage() === 'en' ? "For example: Aysel, Murad..." : "Məsələn: Aysel, Murad, Ləman..."}
                     className="text-lg"
                     autoFocus />
                   
