@@ -78,9 +78,41 @@ const translateVaccineLabel = (text: string | undefined | null, lang: string): s
     "Bustər (revaksinasiya)": "Booster (revaccination)",
     "İkinci bustər": "Second booster",
     "1-ci doza (doğulanda)": "1st dose (at birth)",
+
+    // Vaccine Names & Diseases (AZ)
+    "Hepatit B": "Hepatitis B",
+    "Vərəm (BCG)": "Tuberculosis (BCG)",
+    "Poliomielit (OPV)": "Poliomyelitis (OPV)",
+    "Poliomielit (İPV)": "Poliomyelitis (IPV)",
+    "GDT (Göyöskürək, difteriya, tetanoz)": "DTP (Pertussis, Diphtheria, Tetanus)",
+    "Hib (B tipli hemofil infeksiya)": "Hib (Haemophilus influenzae type B)",
+    "Pnevmokokk (Poliovalent)": "Pneumococcal (Polyvalent)",
+    "QPM (Qızılca, parotit, məxmərək)": "MMR (Measles, Mumps, Rubella)",
+    "Difteriya və tetanoz (DT)": "Diphtheria and Tetanus (DT)",
+    "Vərəm": "Tuberculosis",
+    "Poliomielit": "Poliomyelitis",
+    "Göyöskürək, difteriya, tetanoz": "Pertussis, Diphtheria, Tetanus",
+    "B tipli hemofil infeksiya": "Haemophilus influenzae type B",
+    "Pnevmokokk infeksiyaları": "Pneumococcal infections",
+    "Qızılca, parotit, məxmərək": "Measles, Mumps, Rubella",
+    "Əzələdaxili": "Intramuscular",
+    "Ağızdan (oral)": "Oral",
+    "Dərialtı": "Subcutaneous",
+    "Dəridaxili": "Intradermal"
   };
 
-  return dict[text] || text;
+  // If there's an exact match
+  if (dict[text]) return dict[text];
+
+  // Try to replace parts of the string
+  let translated = text;
+  for (const [az, en] of Object.entries(dict)) {
+    if (translated.includes(az)) {
+      translated = translated.split(az).join(en);
+    }
+  }
+
+  return translated;
 };
 
 const computeStatus = (row: VaccineScheduleRow, ageDays: number, log?: ChildVaccination | null): StatusKey => {
@@ -193,7 +225,7 @@ export default function VaccineCalendar({ onBack }: Props) {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <h4 className="text-[13px] font-bold text-foreground truncate">{row.vaccine.name}</h4>
+              <h4 className="text-[13px] font-bold text-foreground truncate">{translateVaccineLabel(row.vaccine.name, lang)}</h4>
               {!row.vaccine.is_mandatory &&
               <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">{tr("vaccinecalendar_konullu_6b1c0e", "k\xF6n\xFCll\xFC")}</span>
               }
@@ -398,7 +430,7 @@ export default function VaccineCalendar({ onBack }: Props) {
                     <Syringe className="w-6 h-6" />
                   </div>
                   <div className="flex-1 text-left">
-                    <SheetTitle className="text-base">{detailRow.vaccine.name}</SheetTitle>
+                    <SheetTitle className="text-base">{translateVaccineLabel(detailRow.vaccine.name, lang)}</SheetTitle>
                     <p className="text-[11px] text-muted-foreground">{translateVaccineLabel(detailRow.age_label, lang)} • {translateVaccineLabel(detailRow.dose_label, lang)}</p>
                   </div>
                 </div>
@@ -406,28 +438,28 @@ export default function VaccineCalendar({ onBack }: Props) {
 
               <div className="mt-4 space-y-3 text-sm">
                 {detailRow.vaccine.short_description &&
-              <p className="text-[13px] text-foreground leading-relaxed">{detailRow.vaccine.short_description}</p>
+              <p className="text-[13px] text-foreground leading-relaxed">{translateVaccineLabel(detailRow.vaccine.short_description, lang)}</p>
               }
                 {detailRow.vaccine.full_description &&
               <div className="bg-primary/5 rounded-xl p-3">
                     <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-line">
-                      {detailRow.vaccine.full_description}
+                      {translateVaccineLabel(detailRow.vaccine.full_description, lang)}
                     </p>
                   </div>
               }
                 {detailRow.vaccine.disease &&
-              <DetailRow label={tr("vaccinecalendar_qarsisi_alinan_xestelik_862a71", "Qar\u015F\u0131s\u0131 al\u0131nan x\u0259st\u0259lik")} value={detailRow.vaccine.disease} />
+              <DetailRow label={tr("vaccinecalendar_qarsisi_alinan_xestelik_862a71", "Qarşısı alınan xəstəlik")} value={translateVaccineLabel(detailRow.vaccine.disease, lang)} />
               }
                 {detailRow.vaccine.route &&
-              <DetailRow label={tr("vaccinecalendar_vurma_usulu_689cd3", "Vurma \xFCsulu")} value={detailRow.vaccine.route} />
+              <DetailRow label={tr("vaccinecalendar_vurma_usulu_689cd3", "Vurma üsulu")} value={translateVaccineLabel(detailRow.vaccine.route, lang)} />
               }
                 {detailRow.vaccine.side_effects &&
-              <DetailRow label={tr("vaccinecalendar_mumkun_yan_tesirler_fc6796", "M\xFCmk\xFCn yan t\u0259sirl\u0259r")} value={detailRow.vaccine.side_effects} />
+              <DetailRow label={tr("vaccinecalendar_mumkun_yan_tesirler_fc6796", "Mümkün yan təsirlər")} value={translateVaccineLabel(detailRow.vaccine.side_effects, lang)} />
               }
                 {detailRow.vaccine.contraindications &&
-              <DetailRow label={tr("vaccinecalendar_eks_gosterisler_f34875", "\u018Fks-g\xF6st\u0259ri\u015Fl\u0259r")} value={detailRow.vaccine.contraindications} />
+              <DetailRow label={tr("vaccinecalendar_eks_gosterisler_f34875", "Əks-göstərişlər")} value={translateVaccineLabel(detailRow.vaccine.contraindications, lang)} />
               }
-                {detailRow.notes && <DetailRow label={tr("untranslated_qeyd_z0999u", "Qeyd")} value={detailRow.notes} />}
+                {detailRow.notes && <DetailRow label={tr("untranslated_qeyd_z0999u", "Qeyd")} value={translateVaccineLabel(detailRow.notes, lang)} />}
 
                 {/* Actions */}
                 <div className="grid grid-cols-2 gap-2 pt-2">
@@ -546,7 +578,7 @@ function ActionDialog({
             {mode === 'done' ? tr("vaccinecalendar_peyvend_vuruldu_22c2e5", "Peyv\u0259nd vuruldu") : tr("vaccinecalendar_peyvendi_buraxildi_kimi_qeyd_e_64265a", "Peyv\u0259ndi burax\u0131ld\u0131 kimi qeyd et")}
           </DialogTitle>
         </DialogHeader>
-        {row && <p className="text-xs text-muted-foreground -mt-2">{row.vaccine.name} • {translateVaccineLabel(row.dose_label, getPersistedLanguage())}</p>}
+        {row && <p className="text-xs text-muted-foreground -mt-2">{translateVaccineLabel(row.vaccine.name, lang)} • {translateVaccineLabel(row.dose_label, getPersistedLanguage())}</p>}
         {mode === 'done' ?
           <div className="space-y-3 mt-2">
             <div>
@@ -554,8 +586,8 @@ function ActionDialog({
               <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} max={today} />
             </div>
             <div>
-              <Label className="text-xs">{tr("vaccinecalendar_yer_xestexana_klinika_d8c111", "Yer (x\u0259st\u0259xana/klinika)")}</Label>
-              <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder={tr("vaccinecalendar_mes_baki_usaq_klinik_xestexana_8a2157", "m\u0259s. Bak\u0131 U\u015Faq Klinik X\u0259st\u0259xanas\u0131")} />
+              <Label className="text-xs">{tr("vaccinecalendar_yer_xestexana_klinika_d8c111", "Yer (xəstəxana/klinika)")}</Label>
+              <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder={lang === 'en' ? "e.g. Baku Children's Clinic" : "məs. Bakı Uşaq Klinik Xəstəxanası"} />
             </div>
             <div>
               <Label className="text-xs">{tr("vaccinecalendar_partiya_nomresi_isteye_bagli_4b290a", "Partiya n\xF6mr\u0259si (ist\u0259y\u0259 ba\u011Fl\u0131)")}</Label>
@@ -575,8 +607,8 @@ function ActionDialog({
 
         <div className="space-y-3 mt-2">
             <div>
-              <Label className="text-xs">{tr("vaccinecalendar_sebeb_7b51f1", "S\u0259b\u0259b")}</Label>
-              <Textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} placeholder={tr("vaccinecalendar_mes_tibbi_eks_gosteris_d1b954", "m\u0259s. Tibbi \u0259ks-g\xF6st\u0259ri\u015F")} />
+              <Label className="text-xs">{tr("vaccinecalendar_sebeb_7b51f1", "Səbəb")}</Label>
+              <Textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} placeholder={lang === 'en' ? "e.g. Medical contraindication" : "məs. Tibbi əks-göstəriş"} />
             </div>
             <Button
             variant="outline"

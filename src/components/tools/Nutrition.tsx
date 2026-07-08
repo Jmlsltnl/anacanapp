@@ -94,7 +94,11 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
         let mealName = m.name;
         let mealTime = m.time_range || '';
 
-        if (language === 'en') {
+        // Fix for Nursing (it incorrectly comes as Nursing / Əlavə qida from db in some cases)
+        if (m.meal_id === 'nursing') {
+          mealName = language === 'en' ? 'Nursing' : 'Əmizdirmə';
+          mealTime = language === 'en' ? 'Anytime' : 'İstənilən vaxt';
+        } else if (language === 'en') {
           if (mealName === 'Əlavə qida' || mealName === 'Qəlyanaltı') mealName = 'Snack';
           if (mealName === 'Səhər yeməyi') mealName = 'Breakfast';
           if (mealName === 'Nahar') mealName = 'Lunch';
@@ -314,7 +318,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                     <Input
                     value={customFood.name}
                     onChange={(e) => setCustomFood({ ...customFood, name: e.target.value })}
-                    placeholder={tr("nutrition_mes_plov_afdcf0", "məs. Plov")}
+                    placeholder={language === 'en' ? "e.g. Salad" : "məs. Plov"}
                     className="h-9 text-sm" />
                   
                   </div>
@@ -324,7 +328,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                     type="number"
                     value={customFood.calories}
                     onChange={(e) => setCustomFood({ ...customFood, calories: e.target.value })}
-                    placeholder={tr("nutrition_mes_350_eee901", "məs. 350")}
+                    placeholder={language === 'en' ? "e.g. 350" : "məs. 350"}
                     className="h-9 text-sm" />
                   
                   </div>

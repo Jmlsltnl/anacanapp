@@ -324,7 +324,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                     type="number"
                     value={salary}
                     onChange={(e) => setSalary(e.target.value)}
-                    placeholder={tr("maternitycalculator_meselen_800_4effcf", "Məsələn: 800")}
+                    placeholder={language === 'en' ? "e.g. 800" : "Məsələn: 800"}
                     className="h-14 text-lg pr-16" 
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
@@ -516,7 +516,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                     <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800 p-4">
                       <p className="font-semibold text-blue-800 dark:text-blue-200 flex items-center gap-2 mb-2">
                         <CheckCircle2 className="w-4 h-4" />
-                        {tr("tenure_requirement", "İş Stajı Tələbi")}
+                        {language === 'en' ? "Tenure Requirement" : "İş Stajı Tələbi"}
                       </p>
                       <p className="text-sm text-blue-700 dark:text-blue-300">
                         {isAZ ? `Məzuniyyət ödənişi almaq üçün son iş yerində minimum ${result.rule.tenureRequirementMonths} ay iş stajınız olmalıdır.` : `You must have at least ${result.rule.tenureRequirementMonths} months of tenure at your current job to receive paid leave.`}
@@ -529,11 +529,11 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                     <div className="bg-purple-50 dark:bg-purple-900/20 rounded-2xl border border-purple-200 dark:border-purple-800 p-4">
                       <p className="font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 mb-2">
                         <Baby className="w-4 h-4" />
-                        {tr("parental_leave", "Uşağa Qulluq Məzuniyyəti (Parental Leave)")}
+                        {language === 'en' ? "Parental Leave" : "Uşağa Qulluq Məzuniyyəti"}
                       </p>
                       <div className="space-y-2">
                         <p className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                          {tr("duration", "Müddət")}: {result.rule.parental.months} {tr("months", "ay")}
+                          {language === 'en' ? "Duration" : "Müddət"}: {result.rule.parental.months} {language === 'en' ? "months" : "ay"}
                         </p>
                         <p className="text-sm text-purple-700/80 dark:text-purple-300/80">
                           {isAZ ? result.rule.parental.payDescription_az : result.rule.parental.payDescription_en}
