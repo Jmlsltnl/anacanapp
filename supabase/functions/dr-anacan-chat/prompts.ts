@@ -38,9 +38,14 @@ export const getSystemPrompt = (
 - Ümumi məsləhətlər, qidalanma tövsiyələri, emosional dəstək, körpə baxımı və gündəlik məsləhətlər üçün bu xəbərdarlığı ƏLAVƏ ETMƏ.
 - Yəni hər cavabda deyil, YALNIZ tibbi/dərman mövsuzunda yazanda göstər.`;
 
+  // Add current date dynamically
+  const currentDateEn = new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+  const currentDateAz = new Date().toLocaleDateString("az-AZ", { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+  const dateContext = isEn ? `\nToday's Date: ${currentDateEn}\n` : `\nBugünkü tarix: ${currentDateAz}\n`;
+
   const userContext = userProfile
     ? isEn
-      ? `
+      ? `${dateContext}
 User details:
 ${userProfile.name ? `- Name: ${userProfile.name}` : ""}
 ${userProfile.dueDate ? `- Estimated due date: ${userProfile.dueDate}` : ""}
@@ -56,7 +61,7 @@ ${userProfile.recentMotherMeals?.length ? `- Mother's today meals: ${JSON.string
 ${userProfile.latestWeight ? `- Latest logged weight: ${userProfile.latestWeight} kg` : ""}
 ${userProfile.todayKickSessions?.length ? `- Today's baby kick sessions: ${JSON.stringify(userProfile.todayKickSessions)}` : ""}
 `
-      : `
+      : `${dateContext}
 İstifadəçi məlumatları:
 ${userProfile.name ? `- Adı: ${userProfile.name}` : ""}
 ${userProfile.dueDate ? `- Təxmini doğuş tarixi: ${userProfile.dueDate}` : ""}
