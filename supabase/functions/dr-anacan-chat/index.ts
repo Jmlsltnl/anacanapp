@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
       },
     };
 
-    const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
+    const models = ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite"];
     const endpoint = stream ? "streamGenerateContent" : "generateContent";
     
     let response: Response | null = null;
