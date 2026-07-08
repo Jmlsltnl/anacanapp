@@ -17,6 +17,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
 import { getPregnancyDay } from '@/lib/pregnancy-utils';
 import { getPhaseInfoForDate } from '@/lib/cycle-utils';
+import { useBabyLogs } from '@/hooks/useBabyLogs';
+import { useDailyLogs } from '@/hooks/useDailyLogs';
+import { useChildren } from '@/hooks/useChildren';
 import MarkdownContent from './MarkdownContent';
 import { tr } from "@/lib/tr";
 
@@ -41,6 +44,10 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const { user } = useAuth();
   const { messages: savedMessages, addMessage, clearHistory, loading: historyLoading } = useAIChatHistory('woman');
   const { toast } = useToast();
+  
+  const { todayLogs: babyTodayLogs } = useBabyLogs();
+  const { todayLog: motherTodayLog } = useDailyLogs();
+  const { selectedChild, getChildAge } = useChildren();
 
   const pregnancyData = getPregnancyData();
 
@@ -216,7 +223,30 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
             babyName: userProfile.baby_name,
             babyBirthDate: userProfile.baby_birth_date,
             lastPeriodDate: userProfile.last_period_date,
-            cycleLength: userProfile.cycle_length
+            cycleLength: userProfile.cycle_length,
+            selectedChildDetails: selectedChild ? {
+              name: selectedChild.name,
+              gender: selectedChild.gender,
+              birthDate: selectedChild.birth_date,
+              exactAge: getChildAge(selectedChild)
+            } : null,
+            recentMotherLog: motherTodayLog ? {
+              mood: motherTodayLog.mood,
+              waterIntake: motherTodayLog.water_intake,
+              symptoms: motherTodayLog.symptoms
+            } : null,
+            recentBabyLogs: babyTodayLogs?.map(l => ({
+              type: l.log_type,
+              amount: (l as any).amount_ml,
+              food: (l as any).food_name,
+              duration: (l as any).duration_mins,
+              quality: (l as any).sleep_quality,
+              poop: (l as any).poop_type,
+              feedType: l.feed_type,
+              diaperType: l.diaper_type,
+              notes: l.notes,
+              startTime: l.start_time
+            })) || []
           }
         })
       });
