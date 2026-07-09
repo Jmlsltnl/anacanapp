@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { localNotifications, isNative } from '@/lib/native';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { useUserStore } from '@/store/userStore';
 
 interface NotificationSettings {
   notifications_enabled: boolean;
@@ -31,6 +32,7 @@ export const useNotificationSettings = () => {
   const { user } = useAuth();
   const [settings, setSettings] = useState<NotificationSettings>(defaultSettings);
   const [loading, setLoading] = useState(true);
+  const language = useUserStore(s => s.language);
 
   // Load settings from database
   useEffect(() => {
@@ -102,7 +104,7 @@ export const useNotificationSettings = () => {
       await localNotifications.schedule(reminders);
       console.log(`Scheduled ${reminders.length} water reminders`);
     }
-  }, [settings.notifications_enabled, settings.water_reminder]);
+  }, [settings.notifications_enabled, settings.water_reminder, language]);
 
   // Schedule vitamin reminder
   const scheduleVitaminReminder = useCallback(async () => {
@@ -124,12 +126,11 @@ export const useNotificationSettings = () => {
     await localNotifications.schedule([{
       id: 200,
       title: tr("usenotificationsettings_vitamin_vaxti_9bfc40", "Vitamin vaxtı! 💊"),
-      body: tr("usenotificationsettings_gundelik_prenatal_vitaminlerin_645dfe", "G\xFCnd\u0259lik prenatal vitaminl\u0259rinizi q\u0259bul etm\u0259yi unutmay\u0131n."),
+      body: tr("usenotificationsettings_gundelik_vitaminlerinizi_qebul_6a3811", "Gündəlik vitaminlərinizi qəbul etməyi unutmayın."),
       schedule: { at: reminderTime }
     }]);
-
-    console.log('Scheduled vitamin reminder for:', reminderTime);
-  }, [settings.notifications_enabled, settings.vitamin_reminder, settings.vitamin_time]);
+    console.log('Scheduled vitamin reminder');
+  }, [settings.notifications_enabled, settings.vitamin_reminder, settings.vitamin_time, language]);
 
   // Schedule exercise reminders
   const scheduleExerciseReminders = useCallback(async () => {
@@ -166,7 +167,7 @@ export const useNotificationSettings = () => {
       await localNotifications.schedule(reminders);
       console.log(`Scheduled ${reminders.length} exercise reminders`);
     }
-  }, [settings.notifications_enabled, settings.exercise_reminder, settings.exercise_days]);
+  }, [settings.notifications_enabled, settings.exercise_reminder, settings.exercise_days, language]);
 
   // Schedule appointment reminder
   const scheduleAppointmentReminder = useCallback(async (appointmentDate: Date, title: string) => {

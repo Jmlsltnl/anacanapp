@@ -2,12 +2,12 @@ import { tr } from "@/lib/tr";import { LocalNotifications } from '@capacitor/loc
 import { isNative } from '@/lib/native';
 import type { TimerType } from '@/store/timerStore';
 
-const timerLabels: Record<TimerType, string> = {
+const getTimerLabels = (): Record<TimerType, string> => ({
   sleep: tr("timernotifications_yuxu_eb2b53", "😴 Yuxu"),
   feeding: tr("timernotifications_emizdirme_af3cc9", "🍼 Əmizdirmə"),
   diaper: tr("timernotifications_bez_deyisdirme_cfec83", "🧷 Bez dəyişdirmə"),
   'white-noise': tr("timernotifications_kuy_sesi_1de6fc", "🔊 Küy Səsi")
-};
+});
 
 // Generate a stable numeric ID from timer string ID
 function hashTimerId(timerId: string): number {
@@ -33,7 +33,7 @@ feedType?: 'left' | 'right')
       if (req.display !== 'granted') return;
     }
 
-    const title = label || timerLabels[type] || 'Timer';
+    const title = label || getTimerLabels()[type] || 'Timer';
     const feedSuffix = feedType ? ` (${feedType === 'left' ? tr("timernotifications_sol", "Sol") : tr("timernotifications_sag_edbe12", "Sağ")})` : '';
 
     await LocalNotifications.schedule({
