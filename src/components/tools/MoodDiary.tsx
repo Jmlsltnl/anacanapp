@@ -294,8 +294,6 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
-              
               className="bg-card rounded-2xl p-3 shadow-sm border border-border/50">
               
                     <div className="flex items-start gap-3">
