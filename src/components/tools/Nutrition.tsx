@@ -212,13 +212,24 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
           </div>
 
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
+              
+              <ArrowLeft className="w-4 h-4 text-white" />
+            </motion.button>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-white">{mealInfo?.name}</h1>
+              <p className="text-white/80 text-xs">{mealInfo?.time}</p>
+            </div>
+            <div className="text-3xl">{mealInfo?.emoji}</div>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-white/70 text-xs">{tr("nutrition_bu_yemek_be47dc", "Bu yemək")}</p>
                 <p className="text-xl font-black text-white">{mealCalories} kcal</p>
               </div>
               <div className="text-white/70 text-xs">
-                {mealLogs.length} {tr("nutrition_qida_item", "qida")}
+                {mealLogs.length} {language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : 'qida'}
               </div>
             </div>
           </div>
@@ -451,7 +462,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                       <h3 className="font-semibold text-sm">{meal.name}</h3>
                       <p className="text-xs text-muted-foreground">
                         {mealLogs.length > 0 ?
-                      `${mealLogs.length} ${tr("nutrition_qida_item", "qida")} • ${mealCalories} kcal` :
+                      `${mealLogs.length} ${language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : 'qida'} • ${mealCalories} kcal` :
                       meal.time
                       }
                       </p>
