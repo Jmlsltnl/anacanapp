@@ -472,7 +472,7 @@ const OnboardingScreen = () => {
               </motion.div>
 
               <motion.div
-              className="space-y-5 flex-1"
+              className="space-y-3 flex-1"
               variants={staggerChildren}
               initial="initial"
               animate="animate">
@@ -480,25 +480,25 @@ const OnboardingScreen = () => {
                 {/* Multiples selection for bump and mommy stages */}
                 {(selectedStage === 'bump' || selectedStage === 'mommy') &&
               <motion.div variants={childVariants}>
-                    <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-                      <Users className="w-4 h-4" />
-                      {tr("onboardingscreen_usaq_sayi_04c015", "U\u015Faq say\u0131")}
+                    <label className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5" />
+                      {tr("onboardingscreen_usaq_sayi_04c015", "Uşaq sayı")}
                     </label>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2">
                       {multiplesOptions.map((option) =>
                   <motion.button
                     key={option.id}
                     onClick={() => handleMultiplesSelect(option.id as any, option.babyCount)}
-                    className={`p-4 rounded-2xl font-bold transition-all flex flex-col items-center gap-2 ${
+                    className={`p-2.5 rounded-xl font-bold transition-all flex flex-col items-center gap-1 ${
                     multiplesType === option.id ?
-                    'bg-primary text-primary-foreground shadow-elevated' :
+                    'bg-primary text-primary-foreground shadow-sm' :
                     'bg-muted text-muted-foreground hover:bg-muted/80'}`
                     }
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}>
                     
-                          <span className="text-2xl">{option.emoji}</span>
-                          <span className="text-sm">{option.label}</span>
+                          <span className="text-xl">{option.emoji}</span>
+                          <span className="text-xs">{option.label}</span>
                         </motion.button>
                   )}
                     </div>
@@ -508,21 +508,21 @@ const OnboardingScreen = () => {
                 {selectedStage === 'mommy' &&
               <>
                     <motion.div variants={childVariants}>
-                      <label className="text-sm font-bold text-foreground mb-3 block">
-                        {babyCount > 1 ? tr("onboardingscreen_korpelerinizin_adlari_vergulle_96665e", "K\xF6rp\u0259l\u0259rinizin adlar\u0131 (verg\xFCll\u0259 ay\u0131r\u0131n)") : tr("onboardingscreen_korpenizin_adi_10b2c3", "K\xF6rp\u0259nizin ad\u0131")}
+                      <label className="text-xs font-bold text-foreground mb-2 block">
+                        {babyCount > 1 ? tr("onboardingscreen_korpelerinizin_adlari_vergulle_96665e", "Körpələrinizin adları (vergüllə ayırın)") : tr("onboardingscreen_korpenizin_adi_10b2c3", "Körpənizin adı")}
                       </label>
                       <Input
                     type="text"
-                    placeholder={babyCount > 1 ? tr("onboardingscreen_eli_veli_e76548", "\u018Fli, V\u0259li") : tr("common_ad_placeholder", "Ad")}
+                    placeholder={babyCount > 1 ? tr("onboardingscreen_eli_veli_e76548", "Əli, Vəli") : tr("common_ad_placeholder", "Ad")}
                     value={babyName}
                     onChange={(e) => setBabyName(e.target.value)}
-                    className="h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5" />
+                    className="h-11 rounded-xl bg-muted/50 border border-transparent focus:border-primary/30 text-sm px-4" />
                   
                     </motion.div>
 
                     <motion.div variants={childVariants}>
-                      <label className="text-sm font-bold text-foreground mb-3 block">{tr("untranslated_cinsi_az7fty", "Cinsi")}</label>
-                      <div className="flex gap-4">
+                      <label className="text-xs font-bold text-foreground mb-2 block">{tr("untranslated_cinsi_az7fty", "Cinsi")}</label>
+                      <div className="flex gap-2">
                         {[
                     { id: 'boy', label: tr("onboardingscreen_oglan_e9715e", 'Oğlan'), emoji: '👦', gradient: 'from-blue-500 to-indigo-600' },
                     { id: 'girl', label: tr("onboardingscreen_qiz_79bf6b", 'Qız'), emoji: '👧', gradient: 'from-pink-500 to-rose-600' }].
@@ -530,16 +530,16 @@ const OnboardingScreen = () => {
                     <motion.button
                       key={g.id}
                       onClick={() => setBabyGender(g.id as 'boy' | 'girl')}
-                      className={`flex-1 p-4 rounded-2xl font-bold transition-all flex flex-col items-center gap-2 ${
+                      className={`flex-1 p-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
                       babyGender === g.id ?
-                      `bg-gradient-to-r ${g.gradient} text-white shadow-elevated` :
+                      `bg-gradient-to-r ${g.gradient} text-white shadow-sm` :
                       'bg-muted text-muted-foreground hover:bg-muted/80'}`
                       }
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}>
                       
-                            <span className="text-3xl">{g.emoji}</span>
-                            <span>{g.label}</span>
+                            <span className="text-xl">{g.emoji}</span>
+                            <span className="text-sm">{g.label}</span>
                           </motion.button>
                     )}
                       </div>
