@@ -800,7 +800,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
           {tr("babyphotoshoot_foto_qalereyasi_0ec00d", "Foto Qalereyas\u0131")}
         </h2>
         {photos.length > 0 &&
-      <span className="text-sm text-muted-foreground">{photos.length} foto</span>
+      <span className="text-sm text-muted-foreground">{photos.length} {tr("babyphotoshoot_foto_suffix_3c7a2d", "foto")}</span>
       }
       </div>
 

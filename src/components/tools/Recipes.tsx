@@ -141,6 +141,12 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
         'desertlər': { en: 'Desserts', az: 'Desertlər' },
         'desert': { en: 'Dessert', az: 'Desert' },
         
+        'saglam ickiler': { en: 'Healthy Drinks', az: 'Sağlam içkilər' },
+        'sağlam içkilər': { en: 'Healthy Drinks', az: 'Sağlam içkilər' },
+        
+        'elave qida': { en: 'Supplementary Food', az: 'Əlavə qida' },
+        'əlavə qida': { en: 'Supplementary Food', az: 'Əlavə qida' },
+        
         'qelyanaltilar': { en: 'Snacks', az: 'Qəlyanaltılar' },
         'qəlyanaltılar': { en: 'Snacks', az: 'Qəlyanaltılar' },
         'qelyanalti': { en: 'Snack', az: 'Qəlyanaltı' },
@@ -153,6 +159,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
         'korpe_qidasi': { en: 'Baby Food', az: 'Körpə Qidası' },
         'körpə qidası': { en: 'Baby Food', az: 'Körpə Qidası' },
         'korpe qidasi': { en: 'Baby Food', az: 'Körpə Qidası' },
+        
+        'populyar': { en: 'Popular', az: 'Populyar' },
         
         'all': { en: 'All', az: 'Hamısı' },
         'hamısı': { en: 'All', az: 'Hamısı' },

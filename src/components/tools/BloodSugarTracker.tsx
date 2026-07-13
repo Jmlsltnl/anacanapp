@@ -328,12 +328,12 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
 
       {/* Add Modal */}
       {showAddModal &&
-      <div className="fixed inset-0 z-[60] bg-black/50 flex items-end">
+      <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
           <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
-          className="w-full bg-card rounded-t-3xl p-5 max-h-[85vh] overflow-y-auto"
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="w-full max-w-md bg-card rounded-3xl p-5 max-h-[85vh] overflow-y-auto shadow-xl"
           style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 24px)' }}>
           
             <div className="flex items-center justify-between mb-4">
