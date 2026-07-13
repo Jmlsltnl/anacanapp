@@ -215,10 +215,10 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-white/70 text-xs">{tr("nutrition_bu_yemek_be47dc", "Bu yemək")}</p>
-                <p className="text-xl font-black text-white">{mealCalories} kal</p>
+                <p className="text-xl font-black text-white">{mealCalories} kcal</p>
               </div>
               <div className="text-white/70 text-xs">
-                {mealLogs.length} qida
+                {mealLogs.length} {tr("nutrition_qida_item", "qida")}
               </div>
             </div>
           </div>
@@ -239,7 +239,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 
                     <div>
                       <p className="font-medium text-sm">{log.food_name}</p>
-                      <p className="text-xs text-muted-foreground">{log.calories} kal</p>
+                      <p className="text-xs text-muted-foreground">{log.calories} kcal</p>
                     </div>
                     <motion.button
                   onClick={() => handleDeleteMeal(log.id)}
@@ -451,7 +451,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                       <h3 className="font-semibold text-sm">{meal.name}</h3>
                       <p className="text-xs text-muted-foreground">
                         {mealLogs.length > 0 ?
-                      `${mealLogs.length} qida • ${mealCalories} kal` :
+                      `${mealLogs.length} ${tr("nutrition_qida_item", "qida")} • ${mealCalories} kcal` :
                       meal.time
                       }
                       </p>
@@ -506,7 +506,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 
                       <div className="text-2xl mb-2">{tip.emoji || '🍎'}</div>
                       <h3 className="font-bold mb-0.5 text-sm">{tip.title}</h3>
-                      <p className="text-[10px] text-muted-foreground mb-1">{tip.calories || 0} kal</p>
+                      <p className="text-[10px] text-muted-foreground mb-1">{tip.calories || 0} kcal</p>
                       <div className="flex flex-wrap gap-0.5">
                         {(tip.benefits || []).slice(0, 2).map((benefit) =>
                   <span

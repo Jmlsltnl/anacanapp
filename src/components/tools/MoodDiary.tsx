@@ -176,7 +176,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
                 activeTab === tab.id ?
                 'bg-primary text-white shadow-md' :
                 'text-muted-foreground'}`
@@ -190,7 +190,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
         </div>
       </div>
 
-      <div className="px-5 mt-6">
+      <div className="px-4 mt-5">
         <AnimatePresence mode="wait">
           {activeTab === 'log' &&
           <motion.div
@@ -201,8 +201,8 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
             className="space-y-6">
             
               {/* Mood Selection */}
-              <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
-                <h2 className="font-bold text-lg mb-4 text-center">{tr("mooddiary_bu_gun_ozunuzu_nece_hiss_edirsiniz_b2d818", "Bu gün özünüzü necə hiss edirsiniz?")}</h2>
+              <div className="bg-card rounded-3xl p-5 shadow-card border border-border/50">
+                <h2 className="font-bold text-base mb-3 text-center">{tr("mooddiary_bu_gun_ozunuzu_nece_hiss_edirsiniz_b2d818", "Bu gün özünüzü necə hiss edirsiniz?")}</h2>
                 <div className="flex justify-between">
                   {moodEmojis.map((mood, index) =>
                 <motion.button
@@ -211,7 +211,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
                   animate={{ scale: 1 }}
                   transition={{ delay: index * 0.1 }}
                   onClick={() => setSelectedMood(mood.value)}
-                  className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl border-2 transition-all ${
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl border-2 transition-all ${
                   selectedMood === mood.value ?
                   `${mood.color} scale-110 shadow-lg` :
                   'bg-muted/30 border-transparent'}`
@@ -256,13 +256,14 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               </div>
 
               {/* Notes */}
-              <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
-                <h2 className="font-bold text-lg mb-4">{tr("mooddiary_qeydler_a7a98b", "Qeydlər")}</h2>
+              <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
+                <h2 className="font-bold text-sm mb-3">{tr("mooddiary_qeydler_a7a98b", "Qeydlər")}</h2>
                 <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={tr("mooddiary_bu_gun_haqqinda_yazmaq_istedikleriniz_1e2d2d", "Bu gün haqqında yazmaq istədikləriniz...")}
-                className="w-full h-24 p-4 rounded-2xl bg-muted/30 resize-none outline-none focus:ring-2 focus:ring-primary/20" />
+                  className="w-full bg-muted/30 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+                  rows={2} />
               
               </div>
 
@@ -295,13 +296,15 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               transition={{ delay: index * 0.1 }}
               className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
               
-                    <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 rounded-xl bg-fuchsia-100 dark:bg-fuchsia-900/30 flex items-center justify-center text-2xl">
+              className="bg-card rounded-2xl p-3 shadow-sm border border-border/50">
+              
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-fuchsia-100 dark:bg-fuchsia-900/30 flex items-center justify-center text-xl">
                         {entry.mood ? moodEmojis.find((m) => m.value === entry.mood)?.emoji : '😐'}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          <p className="font-semibold text-foreground">
+                          <p className="font-semibold text-xs text-foreground">
                             {new Date(entry.log_date).toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'short' })}
                           </p>
                           <div className="flex">

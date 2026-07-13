@@ -209,7 +209,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                               <Clock className="w-3.5 h-3.5" /> {exercise.duration} {tr("exercises_deq_780a5c", "d\u0259q")}
                             </span>
                             <span className="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1 font-medium">
-                              <Flame className="w-3.5 h-3.5" /> {exercise.calories} kal
+                              <Flame className="w-3.5 h-3.5" /> {exercise.calories} kcal
                             </span>
                             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                         exercise.level === 'easy' ?
@@ -272,7 +272,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                       <Flame className="w-5 h-5 text-orange-600" />
                     </div>
                     <p className="font-bold text-foreground">{selectedExercise.calories}</p>
-                    <p className="text-[10px] text-muted-foreground">kalori</p>
+                    <p className="text-[10px] text-muted-foreground">kcal</p>
                   </div>
                   <div className="text-center">
                     <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mx-auto mb-1">

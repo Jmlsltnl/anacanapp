@@ -30,7 +30,7 @@ const VITAMIN_PRESETS = [
 { name: tr("vitamintracker_probiotik", "Probiotik"), emoji: '🦠' }];
 
 
-const DAY_LABELS = [
+const getDayLabels = () => [
   tr("vitamintracker_sun", "B"),
   tr("vitamintracker_mon", "B.e"),
   tr("vitamintracker_tue", "Ç.a"),
@@ -402,7 +402,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-2 block">{tr("vitamintracker_qebul_gunleri_5262ae", "Qəbul günləri")}</label>
                   <div className="flex gap-1.5">
-                    {DAY_LABELS.map((label, idx) =>
+                    {getDayLabels().map((label, idx) =>
                   <button
                     key={idx}
                     onClick={() => toggleDay(idx)}
