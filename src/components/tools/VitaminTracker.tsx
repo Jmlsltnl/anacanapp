@@ -307,17 +307,17 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
       <AnimatePresence>
         {showAddModal &&
         <motion.div
-          className="fixed inset-0 z-[100] flex items-end justify-center"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}>
           
             <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddModal(false)} />
             <motion.div
-            className="relative w-full max-w-lg bg-card rounded-t-3xl flex flex-col max-h-[85vh]"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
+            className="relative w-full max-w-lg bg-card rounded-3xl overflow-hidden flex flex-col max-h-[85vh] shadow-xl"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}>
             
               <div className="p-5 pb-0 flex items-center justify-between border-b border-border/50 pb-4">
@@ -437,13 +437,13 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
               </div>
 
               {/* Submit */}
-              <div className="p-5 pt-2 border-t border-border/50 pb-[calc(env(safe-area-inset-bottom,20px)+20px)] bg-card">
+              <div className="p-5 pt-4 border-t border-border/50 bg-card rounded-b-3xl">
                 <button
                 onClick={handleAdd}
                 disabled={addSchedule.isPending}
                 className="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50">
                 
-                  {addSchedule.isPending ? tr("vitamintracker_elave_edilir_3c28b4", "\u018Flav\u0259 edilir...") : tr("vitamintracker_vitamin_elave_et_ba4a9c", "Vitamin \u018Flav\u0259 Et")}
+                  {addSchedule.isPending ? tr("vitamintracker_elave_edilir_3c28b4", "Əlavə edilir...") : tr("vitamintracker_vitamin_elave_et_ba4a9c", "Vitamin Əlavə Et")}
                 </button>
               </div>
             </motion.div>
