@@ -119,7 +119,7 @@ export default function PremiumFunnelModal({ isOpen, onClose, feature }: Premium
               initial={{ scale: 0.5, rotate: -10 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', damping: 12 }}
-              className="w-28 h-28 mx-auto mb-6 rounded-[2rem] bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex items-center justify-center shadow-2xl shadow-amber-500/40"
+              className="w-28 h-28 mx-auto mb-6 rounded-[2rem] bg-gradient-to-br from-[#FFB088] via-[#F28155] to-[#C9522A] flex items-center justify-center shadow-2xl shadow-amber-500/40"
             >
               <Crown className="w-14 h-14 text-white drop-shadow-lg" />
             </motion.div>
@@ -207,7 +207,7 @@ export default function PremiumFunnelModal({ isOpen, onClose, feature }: Premium
                     transition={{ delay: 0.05 + i * 0.05 }}
                     className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400/40 to-orange-500/40 flex items-center justify-center mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#F28155]/40 to-[#C9522A]/40 flex items-center justify-center mb-2">
                       <Icon className="w-4 h-4 text-amber-200" />
                     </div>
                     <p className="text-white text-xs font-bold leading-tight mb-0.5">{s.title}</p>
@@ -243,7 +243,7 @@ export default function PremiumFunnelModal({ isOpen, onClose, feature }: Premium
                   className="bg-white/95 rounded-2xl p-4 shadow-lg"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-rose-400 flex items-center justify-center text-lg">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F28155] to-[#E85D3A] flex items-center justify-center text-lg">
                       {r.stage}
                     </div>
                     <div>
@@ -274,7 +274,7 @@ export default function PremiumFunnelModal({ isOpen, onClose, feature }: Premium
               </p>
             </div>
             <div className="bg-white/95 rounded-3xl overflow-hidden shadow-2xl">
-              <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500">
+              <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-4 py-3 bg-gradient-to-r from-[#F28155] to-[#C9522A]">
                 <span className="text-white text-xs font-bold" />
                 <span className="text-white text-xs font-bold text-center w-14">
                   {tr('premiumfunnel_cmp_free', 'Pulsuz')}
@@ -287,7 +287,7 @@ export default function PremiumFunnelModal({ isOpen, onClose, feature }: Premium
                 <div
                   key={row.label}
                   className={`grid grid-cols-[1fr_auto_auto] gap-2 px-4 py-3 items-center ${
-                    i % 2 === 0 ? 'bg-white' : 'bg-amber-50/50'
+                    i % 2 === 0 ? 'bg-white' : 'bg-[#FAF7F4]'
                   }`}
                 >
                   <span className="text-foreground text-xs font-medium">{row.label}</span>
@@ -299,7 +299,7 @@ export default function PremiumFunnelModal({ isOpen, onClose, feature }: Premium
                     )}
                   </span>
                   <span className="w-14 flex justify-center">
-                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-[#F28155] to-[#C9522A] flex items-center justify-center">
                       <Check className="w-3 h-3 text-white" strokeWidth={3} />
                     </div>
                   </span>
