@@ -371,7 +371,7 @@ export default function PremiumFunnelModal({ isOpen, onClose, feature }: Premium
 
   if (!isOpen) return null;
 
-  return (
+  const modalNode = (
     <>
       <AnimatePresence>
         {!showPaywall && (
@@ -379,23 +379,23 @@ export default function PremiumFunnelModal({ isOpen, onClose, feature }: Premium
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex flex-col"
+            className="fixed inset-0 z-[9999] flex flex-col"
             role="dialog"
             aria-modal="true"
           >
-            {/* Background */}
+            {/* Background — brand Coral Orange */}
             <div
               className="absolute inset-0"
               style={{
                 background:
-                  'linear-gradient(160deg, #7c2d12 0%, #9a3412 25%, #c2410c 55%, #f97316 100%)',
+                  'linear-gradient(160deg, #8A3A1F 0%, #C9522A 30%, #F28155 65%, #FFB088 100%)',
               }}
             />
             <div
-              className="absolute inset-0 opacity-[0.08]"
+              className="absolute inset-0 opacity-[0.10]"
               style={{
                 backgroundImage:
-                  'radial-gradient(circle at 25% 25%, white 1px, transparent 1px)',
+                  'radial-gradient(circle at 25% 25%, #FAF7F4 1px, transparent 1px)',
                 backgroundSize: '28px 28px',
               }}
             />
@@ -450,12 +450,12 @@ export default function PremiumFunnelModal({ isOpen, onClose, feature }: Premium
 
               {/* CTA */}
               <div
-                className="shrink-0 px-5 pt-3 pb-5"
-                style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)' }}
+                className="shrink-0 px-5 pt-3 bg-gradient-to-t from-black/20 to-transparent"
+                style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
               >
                 <Button
                   onClick={next}
-                  className="w-full h-14 rounded-2xl bg-white hover:bg-white/95 text-orange-600 font-black text-base shadow-2xl shadow-black/30"
+                  className="w-full h-14 rounded-2xl bg-[#FAF7F4] hover:bg-white text-[#C9522A] font-black text-base shadow-2xl shadow-black/40"
                 >
                   {isLast
                     ? tr('premiumfunnel_cta_last', '3 Gün Pulsuz Başla')
@@ -463,7 +463,7 @@ export default function PremiumFunnelModal({ isOpen, onClose, feature }: Premium
                   <ChevronRight className="w-5 h-5 ml-1" />
                 </Button>
                 {isLast && (
-                  <p className="text-center text-white/70 text-[11px] mt-3">
+                  <p className="text-center text-white/80 text-[11px] mt-3">
                     {tr(
                       'premiumfunnel_cta_disclaimer',
                       'Sonra: yalnız 3.92 ₼/ay (illik) · İstənilən vaxt ləğv edin'
@@ -487,6 +487,10 @@ export default function PremiumFunnelModal({ isOpen, onClose, feature }: Premium
       />
     </>
   );
+
+  return typeof document !== 'undefined'
+    ? createPortal(modalNode, document.body)
+    : modalNode;
 }
 
 // ---------- Helper ----------
