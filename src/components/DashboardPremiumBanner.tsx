@@ -5,7 +5,7 @@ import { Crown, Sparkles, Check, ChevronRight, Shield, Star } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useUserStore } from '@/store/userStore';
-import { PremiumModal } from '@/components/PremiumModal';
+import PremiumFunnelModal from '@/components/premium/PremiumFunnelModal';
 
 interface DashboardPremiumBannerProps {
   onOpenPremium?: () => void;
@@ -157,7 +157,7 @@ export default function DashboardPremiumBanner({ onOpenPremium }: DashboardPremi
           </div>
         </div>
       </div>
-      <PremiumModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <PremiumFunnelModal isOpen={modalOpen} onClose={() => setModalOpen(false)} feature="dashboard_banner" />
     </motion.div>);
 
 }
