@@ -779,6 +779,7 @@ const getBabyDailyFunFact = (ageInDays: number): string => {
 
 const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) => void;}) => {
   const { toast } = useToast();
+  const { language } = useUserStore();
   const { isMilestoneAchieved, toggleMilestone, getMilestoneDate, MILESTONES } = useBabyMilestones();
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
