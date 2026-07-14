@@ -212,17 +212,6 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
           </div>
 
           <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
-              
-              <ArrowLeft className="w-4 h-4 text-white" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-white">{mealInfo?.name}</h1>
-              <p className="text-white/80 text-xs">{mealInfo?.time}</p>
-            </div>
-            <div className="text-3xl">{mealInfo?.emoji}</div>
-          </div>
-
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-white/70 text-xs">{tr("nutrition_bu_yemek_be47dc", "Bu yemək")}</p>
@@ -237,33 +226,33 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
 
         <div className="px-3 -mt-3 space-y-3">
           {/* Added foods */}
-          {mealLogs.length > 0 &&
-          <div className="bg-card rounded-xl p-3 shadow-card border border-border/50">
+          {mealLogs.length > 0 && (
+            <div className="bg-card rounded-xl p-3 shadow-card border border-border/50">
               <h3 className="font-semibold mb-2 text-sm">{tr("nutrition_elave_edilen_qidalar_c604e8", "Əlavə edilən qidalar")}</h3>
               <div className="space-y-1.5">
-                {mealLogs.map((log) =>
-              <motion.div
-                key={log.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
-                
+                {mealLogs.map((log) => (
+                  <motion.div
+                    key={log.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
+                    
                     <div>
                       <p className="font-medium text-sm">{log.food_name}</p>
                       <p className="text-xs text-muted-foreground">{log.calories} kcal</p>
                     </div>
                     <motion.button
-                  onClick={() => handleDeleteMeal(log.id)}
-                  className="w-7 h-7 rounded-full bg-destructive/10 flex items-center justify-center"
-                  whileTap={{ scale: 0.9 }}>
-                  
+                      onClick={() => handleDeleteMeal(log.id)}
+                      className="w-7 h-7 rounded-full bg-destructive/10 flex items-center justify-center"
+                      whileTap={{ scale: 0.9 }}>
+                      
                       <Trash2 className="w-3.5 h-3.5 text-destructive" />
                     </motion.button>
                   </motion.div>
-              )}
+                ))}
               </div>
             </div>
-          }
+          )}
 
           {/* Quick add foods */}
           <div className="bg-card rounded-xl p-3 shadow-card border border-border/50">
