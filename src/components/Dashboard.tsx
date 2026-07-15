@@ -204,8 +204,8 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
   const firstWeight = weightEntries[weightEntries.length - 1]?.weight;
   const weightGain = latestWeight && firstWeight ? (latestWeight - firstWeight).toFixed(1) : '0';
 
-  // Show "I gave birth" button from week 38
-  const showBirthButton = pregData?.currentWeek ? pregData.currentWeek >= 38 : false;
+  // Show "I gave birth" button from 3rd trimester (last 3 months, week 27+)
+  const showBirthButton = pregData?.currentWeek ? pregData.currentWeek >= 27 : false;
 
   if (!pregData) return null;
 
