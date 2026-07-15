@@ -2187,6 +2187,8 @@
   "authscreen_giris_zamani_xeta_bas_verdi_ye_1c654e": "An error occurred during login. Please try again.",
   "authscreen_gizlilik_siyaseti_dc3f28": "Privacy Policy",
   "authscreen_google_ile_giris_alinmadi_2d7d46": "Sign in with Google failed",
+  "authscreen_google_ile_davam_et": "Continue with Google",
+  "authscreen_apple_ile_davam_et": "Continue with Apple",
   "authscreen_ile_razilasirsiniz_547dd9": "you agree with",
   "authscreen_kod_yanlisdir_64b48f": "The code is incorrect",
   "authscreen_link_gonder_d6b028": "Send a link",
