@@ -405,56 +405,36 @@ const AuthScreen = () => {
           paddingBottom: 'env(safe-area-inset-bottom)'
         }}>
         
-        {/* Partner Header - Blue/Partner theme */}
-        <div className="relative bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 pt-14 pb-24 px-6 rounded-b-[3.5rem] shadow-elevated flex-shrink-0">
-          {/* Background decoration */}
-          <div className="absolute inset-0 overflow-hidden rounded-b-[3.5rem]">
-            <motion.div
-              className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.15, 0.1] }}
-              transition={{ duration: 4, repeat: Infinity }} />
-            
-            <motion.div
-              className="absolute bottom-10 -left-5 w-24 h-24 rounded-full bg-white/5"
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 3, repeat: Infinity }} />
-            
+        {/* Compact Partner Header */}
+        <div className="relative px-5 pt-4 pb-2 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setMainView('main');
+                resetForm();
+              }}
+              className="w-10 h-10 flex items-center justify-center bg-card rounded-xl border border-border/60 text-muted-foreground hover:text-foreground transition-colors shadow-sm">
+              <ArrowLeft className="w-5 h-5" strokeWidth={2.5} />
+            </button>
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-base font-bold text-foreground leading-tight">
+                  {tr("authscreen_partnyor_bolmesi_ed393a", "Partnyor Bölməsi")}
+                </h1>
+                <p className="text-[11px] text-muted-foreground">
+                  {tr("authscreen_xaniminizla_birlikde_bu_seyahete_qosulun_fa14d9", "Xanımınızla birlikdə bu səyahətə qoşulun")}
+                </p>
+              </div>
+            </div>
           </div>
-
-          {/* Back Button */}
-          <button
-            onClick={() => {
-              setMainView('main');
-              resetForm();
-            }}
-            className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors"
-            style={{ marginTop: 'env(safe-area-inset-top)' }}>
-            
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-
-          <motion.div
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative flex flex-col items-center">
-            
-            {/* Partner Icon */}
-            <motion.div
-              className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-5 shadow-lg border border-white/20"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}>
-              
-              <Users className="w-10 h-10 text-white" />
-            </motion.div>
-            <h1 className="text-3xl font-black text-white tracking-tight">{tr("authscreen_partnyor_bolmesi_ed393a", "Partnyor Bölməsi")}</h1>
-            <p className="text-white/80 mt-2 font-medium text-center">{tr("authscreen_xaniminizla_birlikde_bu_seyahete_qosulun_fa14d9", "Xanımınızla birlikdə bu səyahətə qoşulun")}</p>
-          </motion.div>
         </div>
 
         {/* Partner Auth Form - Scrollable */}
-        <ScrollArea className="flex-1 -mt-12 relative z-10">
-          <div className="px-5 pb-8">
+        <ScrollArea className="flex-1 relative z-10">
+          <div className="px-5 pt-4 pb-8">
             <motion.div
               className="bg-card rounded-3xl shadow-elevated p-5 border border-border/50"
               initial={{ opacity: 0, y: 40 }}
