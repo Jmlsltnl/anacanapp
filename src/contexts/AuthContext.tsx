@@ -234,6 +234,12 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
 
   const signInWithGoogle = async () => {
     try {
+      if (isCapacitorNative) {
+        const { signInWithGoogleNative } = await import('@/lib/native-auth');
+        const data = await signInWithGoogleNative();
+        import('@/lib/analytics').then((m) => m.analytics.logLogin('google')).catch(() => {});
+        return { data, error: null };
+      }
       await loadLovableAuth;
       if (!lovableAuth) throw new Error('Social login not available');
       const result = await lovableAuth.auth.signInWithOAuth('google', {
@@ -249,6 +255,12 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
 
   const signInWithApple = async () => {
     try {
+      if (isCapacitorNative) {
+        const { signInWithAppleNative } = await import('@/lib/native-auth');
+        const data = await signInWithAppleNative();
+        import('@/lib/analytics').then((m) => m.analytics.logLogin('apple')).catch(() => {});
+        return { data, error: null };
+      }
       await loadLovableAuth;
       if (!lovableAuth) throw new Error('Social login not available');
       const result = await lovableAuth.auth.signInWithOAuth('apple', {
