@@ -456,13 +456,13 @@ const AuthScreen = () => {
         <ScrollArea className="flex-1 -mt-12 relative z-10">
           <div className="px-5 pb-8">
             <motion.div
-              className="bg-card rounded-3xl shadow-elevated p-6 border border-border/50"
+              className="bg-card rounded-3xl shadow-elevated p-5 border border-border/50"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}>
               
               {/* Partner Mode Tabs */}
-              <div className="flex gap-2 mb-7 p-1.5 bg-muted rounded-2xl">
+              <div className="flex gap-1 mb-5 p-1 bg-muted rounded-xl">
                 {[
                 { id: 'register', label: tr("authscreen_qeydiyyat", 'Qeydiyyat') },
                 { id: 'login', label: tr("authscreen_giris_1ffbd7", 'Giriş') }].
@@ -470,7 +470,7 @@ const AuthScreen = () => {
                 <button
                   key={tab.id}
                   onClick={() => setPartnerMode(tab.id as PartnerAuthMode)}
-                  className={`flex-1 py-3.5 px-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                  className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
                   partnerMode === tab.id ?
                   'bg-card text-foreground shadow-md' :
                   'text-muted-foreground hover:text-foreground/70'}`
@@ -676,13 +676,13 @@ const AuthScreen = () => {
             </p>
           </motion.div>
           <motion.div
-            className="bg-card rounded-3xl shadow-elevated p-6 border border-border/50"
+            className="bg-card rounded-3xl shadow-elevated p-5 border border-border/50"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}>
             
             {/* Mode Tabs */}
-            <div className="flex gap-2 mb-7 p-1.5 bg-muted rounded-2xl">
+            <div className="flex gap-1 mb-5 p-1 bg-muted rounded-xl">
               {[
               { id: 'login', label: tr("authscreen_giris_1ffbd7", 'Giriş') },
               { id: 'register', label: tr("authscreen_qeydiyyat", 'Qeydiyyat') }].
@@ -690,7 +690,7 @@ const AuthScreen = () => {
               <button
                 key={tab.id}
                 onClick={() => setMode(tab.id as AuthMode)}
-                className={`flex-1 py-3.5 px-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
                 mode === tab.id ?
                 'bg-card text-foreground shadow-md' :
                 'text-muted-foreground hover:text-foreground/70'}`
