@@ -647,59 +647,34 @@ const AuthScreen = () => {
       
       {/* Decorative Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute top-1/3 -left-20 w-60 h-60 rounded-full bg-accent/5 blur-3xl" />
-        <div className="absolute -bottom-20 right-10 w-72 h-72 rounded-full bg-primary/5 blur-3xl" />
-      </div>
-
-      {/* Header */}
-      <div className="relative gradient-primary pt-14 pb-24 px-6 rounded-b-[3.5rem] shadow-elevated flex-shrink-0">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden rounded-b-[3.5rem]">
-          <motion.div
-            className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10"
-            animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.15, 0.1] }}
-            transition={{ duration: 4, repeat: Infinity }} />
-          
-          <motion.div
-            className="absolute bottom-10 -left-5 w-24 h-24 rounded-full bg-white/5"
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 3, repeat: Infinity }} />
-          
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative flex flex-col items-center">
-          
-          {/* Logo */}
-          <motion.div
-            className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-5 shadow-lg border border-white/20 overflow-hidden"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}>
-            
-            {customLoginLogo ?
-            <img src={customLoginLogo} alt="Anacan Logo" className="w-12 h-12 object-contain" /> :
-
-            <svg viewBox="0 0 60 60" className="w-10 h-10">
-                <path
-                d="M30 8 L48 52 L42 52 L38 42 L22 42 L18 52 L12 52 L30 8Z M30 20 L24 36 L36 36 L30 20Z"
-                fill="white" />
-              
-                <circle cx="30" cy="18" r="4" fill="white" />
-              </svg>
-            }
-          </motion.div>
-          <h1 className="text-4xl font-black text-white tracking-tight">Anacan</h1>
-          <p className="text-white/80 mt-2 font-medium">{tr("authscreen_bedeninle_harmoniyada_ol_ac87bc", "Bədəninlə harmoniyada ol")}</p>
-        </motion.div>
+        <div className="absolute -top-32 -right-24 w-72 h-72 rounded-full bg-primary/10 blur-[100px]" />
+        <div className="absolute -bottom-24 -left-16 w-72 h-72 rounded-full bg-accent/10 blur-[100px]" />
       </div>
 
       {/* Auth Form - Scrollable */}
-      <ScrollArea className="flex-1 -mt-12 relative z-10">
-        <div className="px-5 pb-8">
+      <ScrollArea className="flex-1 relative z-10">
+        <div className="px-5 pt-10 pb-8">
+          {/* Compact brand */}
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col items-center mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-md shadow-primary/20 mb-3 overflow-hidden">
+              {customLoginLogo ? (
+                <img src={customLoginLogo} alt="Anacan" className="w-8 h-8 object-contain" />
+              ) : (
+                <svg viewBox="0 0 60 60" className="w-7 h-7">
+                  <path d="M30 8 L48 52 L42 52 L38 42 L22 42 L18 52 L12 52 L30 8Z M30 20 L24 36 L36 36 L30 20Z" fill="hsl(var(--primary-foreground))" />
+                  <circle cx="30" cy="18" r="4" fill="hsl(var(--primary-foreground))" />
+                </svg>
+              )}
+            </div>
+            <h1 className="text-2xl font-black text-foreground tracking-tight">Anacan</h1>
+            <p className="text-xs text-muted-foreground mt-1 font-medium">
+              {tr("authscreen_bedeninle_harmoniyada_ol_ac87bc", "Bədəninlə harmoniyada ol")}
+            </p>
+          </motion.div>
           <motion.div
             className="bg-card rounded-3xl shadow-elevated p-6 border border-border/50"
             initial={{ opacity: 0, y: 40 }}
