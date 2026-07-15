@@ -405,64 +405,44 @@ const AuthScreen = () => {
           paddingBottom: 'env(safe-area-inset-bottom)'
         }}>
         
-        {/* Partner Header - Blue/Partner theme */}
-        <div className="relative bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 pt-14 pb-24 px-6 rounded-b-[3.5rem] shadow-elevated flex-shrink-0">
-          {/* Background decoration */}
-          <div className="absolute inset-0 overflow-hidden rounded-b-[3.5rem]">
-            <motion.div
-              className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.15, 0.1] }}
-              transition={{ duration: 4, repeat: Infinity }} />
-            
-            <motion.div
-              className="absolute bottom-10 -left-5 w-24 h-24 rounded-full bg-white/5"
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 3, repeat: Infinity }} />
-            
+        {/* Compact Partner Header */}
+        <div className="relative px-5 pt-4 pb-2 flex-shrink-0">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setMainView('main');
+                resetForm();
+              }}
+              className="w-10 h-10 flex items-center justify-center bg-card rounded-xl border border-border/60 text-muted-foreground hover:text-foreground transition-colors shadow-sm">
+              <ArrowLeft className="w-5 h-5" strokeWidth={2.5} />
+            </button>
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/20">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-base font-bold text-foreground leading-tight">
+                  {tr("authscreen_partnyor_bolmesi_ed393a", "Partnyor Bölməsi")}
+                </h1>
+                <p className="text-[11px] text-muted-foreground">
+                  {tr("authscreen_xaniminizla_birlikde_bu_seyahete_qosulun_fa14d9", "Xanımınızla birlikdə bu səyahətə qoşulun")}
+                </p>
+              </div>
+            </div>
           </div>
-
-          {/* Back Button */}
-          <button
-            onClick={() => {
-              setMainView('main');
-              resetForm();
-            }}
-            className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors"
-            style={{ marginTop: 'env(safe-area-inset-top)' }}>
-            
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-
-          <motion.div
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="relative flex flex-col items-center">
-            
-            {/* Partner Icon */}
-            <motion.div
-              className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-5 shadow-lg border border-white/20"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}>
-              
-              <Users className="w-10 h-10 text-white" />
-            </motion.div>
-            <h1 className="text-3xl font-black text-white tracking-tight">{tr("authscreen_partnyor_bolmesi_ed393a", "Partnyor Bölməsi")}</h1>
-            <p className="text-white/80 mt-2 font-medium text-center">{tr("authscreen_xaniminizla_birlikde_bu_seyahete_qosulun_fa14d9", "Xanımınızla birlikdə bu səyahətə qoşulun")}</p>
-          </motion.div>
         </div>
 
         {/* Partner Auth Form - Scrollable */}
-        <ScrollArea className="flex-1 -mt-12 relative z-10">
-          <div className="px-5 pb-8">
+        <ScrollArea className="flex-1 relative z-10">
+          <div className="px-5 pt-4 pb-8">
             <motion.div
-              className="bg-card rounded-3xl shadow-elevated p-6 border border-border/50"
+              className="bg-card rounded-3xl shadow-elevated p-5 border border-border/50"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}>
               
               {/* Partner Mode Tabs */}
-              <div className="flex gap-2 mb-7 p-1.5 bg-muted rounded-2xl">
+              <div className="flex gap-1 mb-5 p-1 bg-muted rounded-xl">
                 {[
                 { id: 'register', label: tr("authscreen_qeydiyyat", 'Qeydiyyat') },
                 { id: 'login', label: tr("authscreen_giris_1ffbd7", 'Giriş') }].
@@ -470,7 +450,7 @@ const AuthScreen = () => {
                 <button
                   key={tab.id}
                   onClick={() => setPartnerMode(tab.id as PartnerAuthMode)}
-                  className={`flex-1 py-3.5 px-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                  className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
                   partnerMode === tab.id ?
                   'bg-card text-foreground shadow-md' :
                   'text-muted-foreground hover:text-foreground/70'}`
@@ -514,7 +494,7 @@ const AuthScreen = () => {
                         placeholder={tr("authscreen_adiniz_b3e84a", "Adınız")}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
                       
                       </div>
                     </motion.div>
@@ -528,7 +508,7 @@ const AuthScreen = () => {
                         placeholder="E-mail"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
                       </div>
                     </motion.div>
 
@@ -539,7 +519,7 @@ const AuthScreen = () => {
                             <Globe className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
                           </div>
                           <Select value={countryCode || ''} onValueChange={setCountryCode}>
-                            <SelectTrigger className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all">
+                            <SelectTrigger className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all">
                               <SelectValue placeholder={tr("authscreen_olke_secin", "Ölkə seçin")} />
                             </SelectTrigger>
                             <SelectContent className="max-h-[300px]">
@@ -565,7 +545,7 @@ const AuthScreen = () => {
                           placeholder={tr("authscreen_sifre_6771ac", "Şifrə")}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="pl-12 pr-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
+                          className="pl-11 pr-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
                         
                         <button
                           type="button"
@@ -586,7 +566,7 @@ const AuthScreen = () => {
                         placeholder="ANACAN-XXXX"
                         value={partnerCode}
                         onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base uppercase tracking-widest font-mono transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base uppercase tracking-widest font-mono transition-all" />
                       
                       </div>
                       <p className="text-xs text-muted-foreground mt-2 text-center">
@@ -599,7 +579,7 @@ const AuthScreen = () => {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-14 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-70">
+                      className="w-full h-[52px] rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-70">
                       
                       {isLoading ?
                       <motion.div
@@ -647,67 +627,42 @@ const AuthScreen = () => {
       
       {/* Decorative Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute top-1/3 -left-20 w-60 h-60 rounded-full bg-accent/5 blur-3xl" />
-        <div className="absolute -bottom-20 right-10 w-72 h-72 rounded-full bg-primary/5 blur-3xl" />
-      </div>
-
-      {/* Header */}
-      <div className="relative gradient-primary pt-14 pb-24 px-6 rounded-b-[3.5rem] shadow-elevated flex-shrink-0">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden rounded-b-[3.5rem]">
-          <motion.div
-            className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-white/10"
-            animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.15, 0.1] }}
-            transition={{ duration: 4, repeat: Infinity }} />
-          
-          <motion.div
-            className="absolute bottom-10 -left-5 w-24 h-24 rounded-full bg-white/5"
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 3, repeat: Infinity }} />
-          
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative flex flex-col items-center">
-          
-          {/* Logo */}
-          <motion.div
-            className="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-5 shadow-lg border border-white/20 overflow-hidden"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}>
-            
-            {customLoginLogo ?
-            <img src={customLoginLogo} alt="Anacan Logo" className="w-12 h-12 object-contain" /> :
-
-            <svg viewBox="0 0 60 60" className="w-10 h-10">
-                <path
-                d="M30 8 L48 52 L42 52 L38 42 L22 42 L18 52 L12 52 L30 8Z M30 20 L24 36 L36 36 L30 20Z"
-                fill="white" />
-              
-                <circle cx="30" cy="18" r="4" fill="white" />
-              </svg>
-            }
-          </motion.div>
-          <h1 className="text-4xl font-black text-white tracking-tight">Anacan</h1>
-          <p className="text-white/80 mt-2 font-medium">{tr("authscreen_bedeninle_harmoniyada_ol_ac87bc", "Bədəninlə harmoniyada ol")}</p>
-        </motion.div>
+        <div className="absolute -top-32 -right-24 w-72 h-72 rounded-full bg-primary/10 blur-[100px]" />
+        <div className="absolute -bottom-24 -left-16 w-72 h-72 rounded-full bg-accent/10 blur-[100px]" />
       </div>
 
       {/* Auth Form - Scrollable */}
-      <ScrollArea className="flex-1 -mt-12 relative z-10">
-        <div className="px-5 pb-8">
+      <ScrollArea className="flex-1 relative z-10">
+        <div className="px-5 pt-10 pb-8">
+          {/* Compact brand */}
           <motion.div
-            className="bg-card rounded-3xl shadow-elevated p-6 border border-border/50"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col items-center mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-md shadow-primary/20 mb-3 overflow-hidden">
+              {customLoginLogo ? (
+                <img src={customLoginLogo} alt="Anacan" className="w-8 h-8 object-contain" />
+              ) : (
+                <svg viewBox="0 0 60 60" className="w-7 h-7">
+                  <path d="M30 8 L48 52 L42 52 L38 42 L22 42 L18 52 L12 52 L30 8Z M30 20 L24 36 L36 36 L30 20Z" fill="hsl(var(--primary-foreground))" />
+                  <circle cx="30" cy="18" r="4" fill="hsl(var(--primary-foreground))" />
+                </svg>
+              )}
+            </div>
+            <h1 className="text-2xl font-black text-foreground tracking-tight">Anacan</h1>
+            <p className="text-xs text-muted-foreground mt-1 font-medium">
+              {tr("authscreen_bedeninle_harmoniyada_ol_ac87bc", "Bədəninlə harmoniyada ol")}
+            </p>
+          </motion.div>
+          <motion.div
+            className="bg-card rounded-3xl shadow-elevated p-5 border border-border/50"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}>
             
             {/* Mode Tabs */}
-            <div className="flex gap-2 mb-7 p-1.5 bg-muted rounded-2xl">
+            <div className="flex gap-1 mb-5 p-1 bg-muted rounded-xl">
               {[
               { id: 'login', label: tr("authscreen_giris_1ffbd7", 'Giriş') },
               { id: 'register', label: tr("authscreen_qeydiyyat", 'Qeydiyyat') }].
@@ -715,7 +670,7 @@ const AuthScreen = () => {
               <button
                 key={tab.id}
                 onClick={() => setMode(tab.id as AuthMode)}
-                className={`flex-1 py-3.5 px-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
                 mode === tab.id ?
                 'bg-card text-foreground shadow-md' :
                 'text-muted-foreground hover:text-foreground/70'}`
@@ -763,7 +718,7 @@ const AuthScreen = () => {
                         placeholder="E-mail"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
                       
                       </div>
                     </motion.div>
@@ -780,7 +735,7 @@ const AuthScreen = () => {
                         placeholder={tr("authscreen_adiniz_b3e84a", "Adınız")}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
                       
                         </div>
                       </motion.div>
@@ -794,7 +749,7 @@ const AuthScreen = () => {
                         placeholder="E-mail"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
                       
                       </div>
                     </motion.div>
@@ -806,7 +761,7 @@ const AuthScreen = () => {
                             <Globe className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                           </div>
                           <Select value={countryCode || ''} onValueChange={setCountryCode}>
-                            <SelectTrigger className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all">
+                            <SelectTrigger className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all">
                               <SelectValue placeholder={tr("authscreen_olke_secin", "Ölkə seçin")} />
                             </SelectTrigger>
                             <SelectContent className="max-h-[300px]">
@@ -832,7 +787,7 @@ const AuthScreen = () => {
                         placeholder={tr("authscreen_sifre_6771ac", "Şifrə")}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-12 pr-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
+                        className="pl-11 pr-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
                       
                         <button
                         type="button"
@@ -862,7 +817,7 @@ const AuthScreen = () => {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full h-14 rounded-2xl gradient-primary text-white font-bold text-base shadow-button hover:shadow-glow transition-all duration-300 disabled:opacity-70">
+                    className="w-full h-[52px] rounded-2xl gradient-primary text-white font-bold text-base shadow-button hover:shadow-glow transition-all duration-300 disabled:opacity-70">
                     
                     {isLoading ?
                     <motion.div
@@ -899,7 +854,7 @@ const AuthScreen = () => {
                   type="button"
                   variant="outline"
                   disabled={isLoading}
-                  className="w-full h-14 rounded-2xl border-2 hover:bg-muted/50 transition-all gap-3"
+                  className="w-full h-12 rounded-xl border hover:bg-muted/50 transition-all gap-3"
                   onClick={handleGoogleLogin}>
 
                   <svg className="w-6 h-6" viewBox="0 0 24 24">
@@ -914,7 +869,7 @@ const AuthScreen = () => {
                   type="button"
                   variant="outline"
                   disabled={isLoading}
-                  className="w-full h-14 rounded-2xl border-2 hover:bg-muted/50 transition-all gap-3"
+                  className="w-full h-12 rounded-xl border hover:bg-muted/50 transition-all gap-3"
                   onClick={handleAppleLogin}>
 
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
