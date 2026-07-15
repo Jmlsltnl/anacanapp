@@ -662,14 +662,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
       </motion.div>
 
       {/* Quick Actions Grid */}
-      <div className="grid grid-cols-4 gap-1.5">
-        <QuickActionButton
-          icon={Droplets}
-          label={tr("untranslated_su_yvcozn", "Su")}
-          color="bg-primary/10 dark:bg-primary/20 text-primary"
-          value={`${waterCount}/8`}
-          onClick={addWater} />
-        
+      <div className="grid grid-cols-3 gap-1.5">
         <QuickActionButton
           icon={Pill}
           label="Vitamin"
@@ -696,6 +689,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
           }} />
         
       </div>
+
 
       {/* "I Gave Birth" Button - Shown from week 38 */}
       {showBirthButton &&
