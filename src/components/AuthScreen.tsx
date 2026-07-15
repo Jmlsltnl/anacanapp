@@ -514,7 +514,7 @@ const AuthScreen = () => {
                         placeholder={tr("authscreen_adiniz_b3e84a", "Adınız")}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
                       
                       </div>
                     </motion.div>
@@ -528,7 +528,7 @@ const AuthScreen = () => {
                         placeholder="E-mail"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
                       </div>
                     </motion.div>
 
@@ -539,7 +539,7 @@ const AuthScreen = () => {
                             <Globe className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
                           </div>
                           <Select value={countryCode || ''} onValueChange={setCountryCode}>
-                            <SelectTrigger className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all">
+                            <SelectTrigger className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all">
                               <SelectValue placeholder={tr("authscreen_olke_secin", "Ölkə seçin")} />
                             </SelectTrigger>
                             <SelectContent className="max-h-[300px]">
@@ -565,7 +565,7 @@ const AuthScreen = () => {
                           placeholder={tr("authscreen_sifre_6771ac", "Şifrə")}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className="pl-12 pr-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
+                          className="pl-11 pr-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base transition-all" />
                         
                         <button
                           type="button"
@@ -586,7 +586,7 @@ const AuthScreen = () => {
                         placeholder="ANACAN-XXXX"
                         value={partnerCode}
                         onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base uppercase tracking-widest font-mono transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-blue-500/30 text-base uppercase tracking-widest font-mono transition-all" />
                       
                       </div>
                       <p className="text-xs text-muted-foreground mt-2 text-center">
@@ -599,7 +599,7 @@ const AuthScreen = () => {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-14 rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-70">
+                      className="w-full h-[52px] rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold text-base shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-70">
                       
                       {isLoading ?
                       <motion.div
@@ -738,7 +738,7 @@ const AuthScreen = () => {
                         placeholder="E-mail"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
                       
                       </div>
                     </motion.div>
@@ -755,7 +755,7 @@ const AuthScreen = () => {
                         placeholder={tr("authscreen_adiniz_b3e84a", "Adınız")}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
                       
                         </div>
                       </motion.div>
@@ -769,7 +769,7 @@ const AuthScreen = () => {
                         placeholder="E-mail"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
+                        className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
                       
                       </div>
                     </motion.div>
@@ -781,7 +781,7 @@ const AuthScreen = () => {
                             <Globe className="w-5 h-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
                           </div>
                           <Select value={countryCode || ''} onValueChange={setCountryCode}>
-                            <SelectTrigger className="pl-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all">
+                            <SelectTrigger className="pl-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all">
                               <SelectValue placeholder={tr("authscreen_olke_secin", "Ölkə seçin")} />
                             </SelectTrigger>
                             <SelectContent className="max-h-[300px]">
@@ -807,7 +807,7 @@ const AuthScreen = () => {
                         placeholder={tr("authscreen_sifre_6771ac", "Şifrə")}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-12 pr-12 h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
+                        className="pl-11 pr-11 h-12 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-base transition-all" />
                       
                         <button
                         type="button"
@@ -837,7 +837,7 @@ const AuthScreen = () => {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full h-14 rounded-2xl gradient-primary text-white font-bold text-base shadow-button hover:shadow-glow transition-all duration-300 disabled:opacity-70">
+                    className="w-full h-[52px] rounded-2xl gradient-primary text-white font-bold text-base shadow-button hover:shadow-glow transition-all duration-300 disabled:opacity-70">
                     
                     {isLoading ?
                     <motion.div
@@ -874,7 +874,7 @@ const AuthScreen = () => {
                   type="button"
                   variant="outline"
                   disabled={isLoading}
-                  className="w-full h-14 rounded-2xl border-2 hover:bg-muted/50 transition-all gap-3"
+                  className="w-full h-12 rounded-xl border hover:bg-muted/50 transition-all gap-3"
                   onClick={handleGoogleLogin}>
 
                   <svg className="w-6 h-6" viewBox="0 0 24 24">
@@ -889,7 +889,7 @@ const AuthScreen = () => {
                   type="button"
                   variant="outline"
                   disabled={isLoading}
-                  className="w-full h-14 rounded-2xl border-2 hover:bg-muted/50 transition-all gap-3"
+                  className="w-full h-12 rounded-xl border hover:bg-muted/50 transition-all gap-3"
                   onClick={handleAppleLogin}>
 
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
