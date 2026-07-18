@@ -198,11 +198,11 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            className="space-y-6">
+            className="space-y-3">
             
               {/* Mood Selection */}
-              <div className="bg-card rounded-3xl p-5 shadow-card border border-border/50">
-                <h2 className="font-bold text-base mb-3 text-center">{tr("mooddiary_bu_gun_ozunuzu_nece_hiss_edirsiniz_b2d818", "Bu gün özünüzü necə hiss edirsiniz?")}</h2>
+              <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
+                <h2 className="font-bold text-sm mb-2 text-center">{tr("mooddiary_bu_gun_ozunuzu_nece_hiss_edirsiniz_b2d818", "Bu gün özünüzü necə hiss edirsiniz?")}</h2>
                 <div className="flex justify-between">
                   {moodEmojis.map((mood, index) =>
                 <motion.button
@@ -211,7 +211,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
                   animate={{ scale: 1 }}
                   transition={{ delay: index * 0.1 }}
                   onClick={() => setSelectedMood(mood.value)}
-                  className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl border-2 transition-all ${
+                  className={`w-10 h-10 rounded-2xl flex items-center justify-center text-lg border-2 transition-all ${
                   selectedMood === mood.value ?
                   `${mood.color} scale-110 shadow-lg` :
                   'bg-muted/30 border-transparent'}`
@@ -226,7 +226,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               <motion.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center mt-3 text-primary font-medium">
+                className="text-center mt-2 text-primary text-sm font-medium">
                 
                     {moodEmojis.find((m) => m.value === selectedMood)?.label}
                   </motion.p>
@@ -234,14 +234,14 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               </div>
 
               {/* Symptoms */}
-              <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
-                <h2 className="font-bold text-sm mb-2.5">{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</h2>
+              <div className="bg-card rounded-2xl p-3 shadow-card border border-border/50">
+                <h2 className="font-bold text-sm mb-2">{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</h2>
                 <div className="flex flex-wrap gap-1.5">
                   {symptomOptions.map((symptom) =>
                 <motion.button
                   key={symptom.id}
                   onClick={() => toggleSymptom(symptom.id)}
-                  className={`px-2.5 py-1 rounded-full flex items-center gap-1 text-[11px] font-medium transition-all ${
+                  className={`px-2 py-0.5 rounded-full flex items-center gap-1 text-[11px] font-medium transition-all ${
                   selectedSymptoms.includes(symptom.id) ?
                   'bg-primary text-white' :
                   'bg-muted/50 text-muted-foreground'}`
@@ -256,8 +256,8 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               </div>
 
               {/* Notes */}
-              <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
-                <h2 className="font-bold text-sm mb-3">{tr("mooddiary_qeydler_a7a98b", "Qeydlər")}</h2>
+              <div className="bg-card rounded-2xl p-3 shadow-card border border-border/50">
+                <h2 className="font-bold text-sm mb-2">{tr("mooddiary_qeydler_a7a98b", "Qeydlər")}</h2>
                 <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -271,7 +271,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               <motion.button
               onClick={handleSave}
               disabled={selectedMood === null}
-              className="w-full gradient-primary text-white font-bold py-4 rounded-2xl shadow-elevated disabled:opacity-50"
+              className="w-full gradient-primary text-white font-bold py-3 rounded-2xl shadow-elevated disabled:opacity-50"
               whileTap={{ scale: 0.98 }}>{tr("untranslated_yadda_saxla_bpdu9v", "Yadda saxla")}</motion.button>
             </motion.div>
           }
@@ -282,7 +282,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            className="space-y-4">
+            className="space-y-3">
             
               <h2 className="font-bold text-lg">{tr("mooddiary_son_qeydler_181e41", "Son qeydlər")}</h2>
                 {logs.length === 0 ?
@@ -341,7 +341,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            className="space-y-4">
+            className="space-y-3">
             
               <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
                 <div className="flex items-center gap-3 mb-4">

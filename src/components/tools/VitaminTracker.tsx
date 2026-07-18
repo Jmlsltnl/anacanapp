@@ -30,15 +30,12 @@ const VITAMIN_PRESETS = [
 { name: tr("vitamintracker_probiotik", "Probiotik"), emoji: '🦠' }];
 
 
-const getDayLabels = () => [
-  tr("vitamintracker_sun", "B"),
-  tr("vitamintracker_mon", "B.e"),
-  tr("vitamintracker_tue", "Ç.a"),
-  tr("vitamintracker_wed", "Ç"),
-  tr("vitamintracker_thu", "C.a"),
-  tr("vitamintracker_fri", "C"),
-  tr("vitamintracker_sat", "Ş")
-];
+const getDayLabels = (language: string) => {
+  if (language === 'en') return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  if (language === 'ru') return ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  if (language === 'tr') return ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+  return ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'];
+};
 
 const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
   const language = useUserStore((state) => state.language);
@@ -402,7 +399,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-2 block">{tr("vitamintracker_qebul_gunleri_5262ae", "Qəbul günləri")}</label>
                   <div className="flex gap-1.5">
-                    {getDayLabels().map((label, idx) =>
+                    {getDayLabels(language).map((label, idx) =>
                   <button
                     key={idx}
                     onClick={() => toggleDay(idx)}
