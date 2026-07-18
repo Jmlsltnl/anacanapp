@@ -418,7 +418,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
                     <div className="flex items-center gap-2 mb-1">
                       {hero.hero_badge &&
                       <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] text-white font-semibold">
-                        {hero.hero_badge === 'Populyar' ? (language === 'en' ? 'Popular' : language === 'ru' ? 'Популярный' : language === 'tr' ? 'Popüler' : 'Populyar') : hero.hero_badge}
+                        {hero.hero_badge.includes('Populyar') ? hero.hero_badge.replace('Populyar', language === 'en' ? 'Popular' : language === 'ru' ? 'Популярный' : language === 'tr' ? 'Popüler' : 'Populyar') : hero.hero_badge}
                       </span>
                       }
                       {hero.is_premium &&
