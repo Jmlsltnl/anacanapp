@@ -333,26 +333,26 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="w-full max-w-md bg-card rounded-3xl p-5 max-h-[85vh] overflow-y-auto shadow-xl"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 24px)' }}>
+          className="w-full max-w-md bg-card rounded-3xl p-4 max-h-[85vh] overflow-y-auto shadow-xl"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 16px)' }}>
           
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3">
               <h2 className="font-bold text-lg">{tr("bloodsugartracker_yeni_olcme_cc2042", "Yeni ölçmə")}</h2>
-              <Button variant="ghost" size="icon" onClick={() => setShowAddModal(false)}>
+              <Button variant="ghost" size="icon" onClick={() => setShowAddModal(false)} className="h-8 w-8">
                 <X className="w-5 h-5" />
               </Button>
             </div>
 
             {/* Reading Value */}
-            <div className="mb-4">
-              <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_qan_sekeri_seviyyesi_mg_dl_cb75a9", "Qan şəkəri səviyyəsi (mg/dL)")}</label>
+            <div className="mb-3">
+              <label className="text-xs font-medium mb-1.5 block">{tr("bloodsugartracker_qan_sekeri_seviyyesi_mg_dl_cb75a9", "Qan şəkəri səviyyəsi (mg/dL)")}</label>
               <input
               type="number"
               inputMode="decimal"
               value={newReading}
               onChange={(e) => setNewReading(e.target.value)}
               placeholder={tr("bloodsugartracker_meselen_95_23137b", "Məsələn: 95")}
-              className="w-full h-14 px-4 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-2xl font-bold text-center transition-all outline-none" />
+              className="w-full h-12 px-3 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-xl font-bold text-center transition-all outline-none" />
             
               {newReading &&
             <div className="mt-2 text-center">
@@ -364,21 +364,21 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
             </div>
 
             {/* Reading Type */}
-            <div className="mb-4">
-              <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_olcme_novu_0d8219", "Ölçmə növü")}</label>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="mb-3">
+              <label className="text-xs font-medium mb-1.5 block">{tr("bloodsugartracker_olcme_novu_0d8219", "Ölçmə növü")}</label>
+              <div className="grid grid-cols-2 gap-1.5">
                 {readingTypes.map((type) =>
               <button
                 key={type.id}
                 onClick={() => setSelectedType(type.id)}
-                className={`p-3 rounded-xl border-2 text-left transition-all ${
+                className={`p-2 rounded-xl border-2 text-left transition-all flex items-center ${
                 selectedType === type.id ?
                 'border-primary bg-primary/5' :
                 'border-border/50 bg-card'}`
                 }>
                 
-                    <span className="text-lg mr-2">{type.emoji}</span>
-                    <span className="text-sm font-medium">{type.label}</span>
+                    <span className="text-base mr-2">{type.emoji}</span>
+                    <span className="text-xs font-medium">{type.label}</span>
                   </button>
               )}
               </div>
@@ -386,21 +386,21 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
 
             {/* Meal Context (optional) */}
             {(selectedType === 'before_meal' || selectedType === 'after_meal') &&
-          <div className="mb-4">
-                <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_yemek_b1fd56", "Yemək")}</label>
-                <div className="grid grid-cols-4 gap-2">
+          <div className="mb-3">
+                <label className="text-xs font-medium mb-1.5 block">{tr("bloodsugartracker_yemek_b1fd56", "Yemək")}</label>
+                <div className="grid grid-cols-4 gap-1.5">
                   {mealContexts.map((meal) =>
               <button
                 key={meal.id}
                 onClick={() => setSelectedMeal(selectedMeal === meal.id ? null : meal.id)}
-                className={`p-2 rounded-xl border-2 text-center transition-all ${
+                className={`p-1.5 rounded-xl border-2 text-center transition-all ${
                 selectedMeal === meal.id ?
                 'border-primary bg-primary/5' :
                 'border-border/50 bg-card'}`
                 }>
                 
-                      <span className="text-xl block">{meal.emoji}</span>
-                      <span className="text-[10px]">{meal.label}</span>
+                      <span className="text-lg block mb-0.5">{meal.emoji}</span>
+                      <span className="text-[9px] leading-tight block">{meal.label}</span>
                     </button>
               )}
                 </div>
@@ -408,18 +408,18 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
           }
 
             {/* Notes */}
-            <div className="mb-6">
-              <label className="text-sm font-medium mb-2 block">{tr("bloodsugartracker_qeyd_isteye_bagli_96c689", "Qeyd (istəyə bağlı)")}</label>
+            <div className="mb-4">
+              <label className="text-xs font-medium mb-1.5 block">{tr("bloodsugartracker_qeyd_isteye_bagli_96c689", "Qeyd (istəyə bağlı)")}</label>
               <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder={tr("bloodsugartracker_elave_qeydler_c55f23", "Əlavə qeydlər...")}
-              className="w-full h-20 px-3 py-2 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm resize-none transition-all outline-none" />
+              className="w-full h-16 px-3 py-2 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-xs resize-none transition-all outline-none" />
             
             </div>
 
             <Button
-            className="w-full h-12 rounded-xl font-semibold"
+            className="w-full h-10 rounded-xl font-semibold text-sm"
             disabled={!newReading || addLogMutation.isPending}
             onClick={() => addLogMutation.mutate()}>
             

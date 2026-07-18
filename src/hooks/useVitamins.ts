@@ -52,8 +52,16 @@ export const useVitamins = (weekNumber?: number, lifeStage?: string) => {
         'importance'
       ]) as Vitamin[];
 
+      // Fix DB translation error for Vitamin B Complex dosage
+      const patched = mapped.map(v => {
+        if ((v.name === 'Vitamin B Complex' || v.name_az === 'B kompleks vitamini') && v.dosage && v.dosage.includes('hata')) {
+          return { ...v, dosage: 'B1: 1.4mg, B2: 1.6mg, B6: 2mg/day' };
+        }
+        return v;
+      });
+
       // Filter vitamins based on week number if provided
-      let vitamins = mapped;
+      let vitamins = patched;
       
       if (weekNumber && lifeStage === 'bump') {
         const currentTrimester = weekNumber <= 13 ? 1 : weekNumber <= 26 ? 2 : 3;
