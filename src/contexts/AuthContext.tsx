@@ -1,14 +1,7 @@
 import { tr } from "@/lib/tr";import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-// Lovable Cloud auth - only available in web builds, not in native Capacitor
-let lovableAuth: any = null;
 const isCapacitorNative = typeof (window as any)?.Capacitor?.isNativePlatform === 'function' &&
-(window as any).Capacitor.isNativePlatform();
-const loadLovableAuth: Promise<void> = isCapacitorNative ?
-Promise.resolve() :
-import('@/integrations/lovable/index').
-then((mod) => {lovableAuth = mod.lovable;}).
-catch(() => {console.warn('Lovable Cloud auth not available');});
+  (window as any).Capacitor.isNativePlatform();
 import { useUserStore } from '@/store/userStore';
 import type { User, Session } from '@supabase/supabase-js';
 
@@ -240,13 +233,14 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
         import('@/lib/analytics').then((m) => m.analytics.logLogin('google')).catch(() => {});
         return { data, error: null };
       }
-      await loadLovableAuth;
-      if (!lovableAuth) throw new Error('Social login not available');
-      const result = await lovableAuth.auth.signInWithOAuth('google', {
-        redirect_uri: window.location.origin
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin
+        }
       });
-      if (result.error) throw result.error;
-      return { data: result, error: null };
+      if (error) throw error;
+      return { data, error: null };
     } catch (error) {
       console.error('Google sign in error:', error);
       return { data: null, error };
@@ -255,19 +249,21 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
 
   const signInWithApple = async () => {
     try {
-      if (isCapacitorNative) {
+      const platform = (window as any)?.Capacitor?.getPlatform?.();
+      if (isCapacitorNative && platform === 'ios') {
         const { signInWithAppleNative } = await import('@/lib/native-auth');
         const data = await signInWithAppleNative();
         import('@/lib/analytics').then((m) => m.analytics.logLogin('apple')).catch(() => {});
         return { data, error: null };
       }
-      await loadLovableAuth;
-      if (!lovableAuth) throw new Error('Social login not available');
-      const result = await lovableAuth.auth.signInWithOAuth('apple', {
-        redirect_uri: window.location.origin
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: window.location.origin
+        }
       });
-      if (result.error) throw result.error;
-      return { data: result, error: null };
+      if (error) throw error;
+      return { data, error: null };
     } catch (error) {
       console.error('Apple sign in error:', error);
       return { data: null, error };
