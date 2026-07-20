@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Search, Star, MapPin, Phone, Globe, Clock,
   Stethoscope, Building2, User, ChevronRight, Filter, Heart,
-  Mail, DollarSign, Calendar, X } from
+  Mail, DollarSign, Calendar, X, GraduationCap, Award, Briefcase, Languages } from
 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -77,6 +77,52 @@ const dayLabels: Record<string, string> = {
   friday: tr("doctorshospitals_cume_faba24", "C\xFCm\u0259"),
   saturday: tr("doctorshospitals_senbe_02045c", "\u015E\u0259nb\u0259"),
   sunday: tr("common_bazar", 'Bazar')
+};
+
+const parseDescription = (text: string) => {
+  if (!text) return { basicDescription: '' };
+  
+  const result: any = {
+    experience: '',
+    languages: '',
+    education: '',
+    master: '',
+    interests: '',
+    servicesList: '',
+    basicDescription: ''
+  };
+
+  const lines = text.split('\n');
+  const remainingLines: string[] = [];
+  
+  let parsingHeaders = true;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (parsingHeaders) {
+      if (line.startsWith('Təcrübə:')) result.experience = line.replace('Təcrübə:', '').trim();
+      else if (line.startsWith('Dillər:')) result.languages = line.replace('Dillər:', '').trim();
+      else if (line.startsWith('Təhsil:')) result.education = line.replace('Təhsil:', '').trim();
+      else if (line.startsWith('Magistr:')) result.master = line.replace('Magistr:', '').trim();
+      else if (line.startsWith('Maraq sahələri:')) result.interests = line.replace('Maraq sahələri:', '').trim();
+      else if (line.startsWith('Xidmətlər:')) result.servicesList = line.replace('Xidmətlər:', '').trim();
+      else if (line === '') {
+         // skip empty lines
+      } else {
+         parsingHeaders = false;
+         remainingLines.push(line);
+      }
+    } else {
+       remainingLines.push(line);
+    }
+  }
+  
+  result.basicDescription = remainingLines.join('\n').trim();
+  
+  if (!result.experience && !result.languages && !result.education && !result.interests && !result.servicesList) {
+    return { basicDescription: text };
+  }
+  
+  return result;
 };
 
 const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
@@ -366,6 +412,8 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
   const currentRating = latestProvider?.rating ?? provider.rating;
   const currentReviewCount = latestProvider?.review_count ?? provider.review_count;
 
+  const parsedDesc = parseDescription(provider.description || '');
+
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Hero */}
@@ -424,10 +472,66 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
             <span className="text-muted-foreground text-sm">({currentReviewCount} {tr("doctorshospitals_rey_f2285f", "rəy)")}</span>
           </div>
 
-          {provider.description &&
-          <p className="text-sm text-muted-foreground">{provider.description}</p>
+          {/* Detailed Badges */}
+          <div className="flex flex-wrap gap-2 mb-3 mt-3">
+            {parsedDesc.experience &&
+              <Badge variant="secondary" className="flex items-center gap-1 bg-primary/10 text-primary hover:bg-primary/20">
+                <Briefcase className="w-3 h-3" />
+                {parsedDesc.experience}
+              </Badge>
+            }
+            {parsedDesc.languages &&
+              <Badge variant="secondary" className="flex items-center gap-1 bg-blue-500/10 text-blue-600 hover:bg-blue-500/20">
+                <Languages className="w-3 h-3" />
+                {parsedDesc.languages}
+              </Badge>
+            }
+            {parsedDesc.education &&
+              <Badge variant="secondary" className="flex items-center gap-1 bg-green-500/10 text-green-600 hover:bg-green-500/20">
+                <GraduationCap className="w-3 h-3" />
+                {parsedDesc.education}
+              </Badge>
+            }
+          </div>
+
+          {parsedDesc.basicDescription &&
+            <div className="text-sm text-muted-foreground whitespace-pre-wrap">{parsedDesc.basicDescription}</div>
           }
         </div>
+
+        {/* Interests and Services */}
+        {parsedDesc.interests && (
+          <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4 shadow-sm">
+            <h2 className="font-semibold text-sm flex items-center gap-2 mb-3">
+              <Heart className="w-4 h-4 text-primary" />
+              {tr("doctorshospitals_maraq_saheleri", "Maraq sahələri")}
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {parsedDesc.interests.split(',').map((interest: string, i: number) => (
+                <Badge key={i} variant="outline" className="text-xs font-normal border-primary/20 bg-card">
+                  {interest.trim()}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {parsedDesc.servicesList && (
+          <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4 shadow-sm">
+            <h2 className="font-semibold text-sm flex items-center gap-2 mb-3">
+              <Stethoscope className="w-4 h-4 text-primary" />
+              {tr("doctorshospitals_xidmetler", "Xidmətlər")}
+            </h2>
+            <ul className="space-y-2">
+              {parsedDesc.servicesList.split(',').map((service: string, i: number) => (
+                <li key={i} className="flex gap-2 text-sm text-muted-foreground">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary/50 mt-1.5 shrink-0" />
+                  <span>{service.trim()}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Contact Info */}
         <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4 space-y-3">
