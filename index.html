@@ -37,6 +37,19 @@
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Hide Lovable badge on every page -->
+    <style>
+      #lovable-badge,
+      aside#lovable-badge,
+      .lovable-badge,
+      [data-lovable-badge] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    </style>
   </head>
 
   <body style="margin: 0; padding: 0; background-color: #faf7f4;">
