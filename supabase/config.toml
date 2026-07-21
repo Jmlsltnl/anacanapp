@@ -41,3 +41,15 @@ verify_jwt = false
 
 [functions.bulk-import-csv]
 verify_jwt = false
+
+[functions.partner-create-redemption]
+verify_jwt = false
+
+[functions.partner-redemption-status]
+verify_jwt = false
+
+[functions.partner-verify-redemption]
+verify_jwt = false
+
+[functions.expire-partner-links]
+verify_jwt = false
