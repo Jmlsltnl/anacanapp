@@ -458,20 +458,35 @@ const AdminTranslations = () => {
     const errors: string[] = [];
 
     try {
-      // 1. Fetch existing rows (selecting ID and update columns to optimize)
-      let query: any = (supabase as any).from(targetTable).select([dbIdColumn, ...selectedUpdateColumns].join(', '));
+      // 1. Fetch existing rows (selecting ID and update columns to optimize) - Paginated to bypass 1000 limit
+      const allDbData: any[] = [];
+      let from = 0;
+      const pageSize = 1000;
       
-      // If translations table, filter by language to prevent getting too many rows
-      if (targetTable === 'translations') {
-        query = query.eq('lang', uploadLang);
+      while (true) {
+        let pageQuery: any = (supabase as any)
+          .from(targetTable)
+          .select([dbIdColumn, ...selectedUpdateColumns].join(', '))
+          .range(from, from + pageSize - 1);
+          
+        if (targetTable === 'translations') {
+          pageQuery = pageQuery.eq('lang', uploadLang);
+        }
+
+        const { data: page, error: pageErr } = await pageQuery;
+        
+        if (pageErr) {
+          throw new Error(`Məlumat bazasından oxuma xətası: ${pageErr.message}`);
+        }
+        
+        if (!page || page.length === 0) break;
+        allDbData.push(...page);
+        
+        if (page.length < pageSize) break;
+        from += pageSize;
       }
 
-
-      const { data: dbData, error: dbErr } = await query;
-      
-      if (dbErr) {
-        throw new Error(`Məlumat bazasından oxuma xətası: ${dbErr.message}`);
-      }
+      const dbData = allDbData;
 
       const dbMap = new Map(dbData?.map(r => [String(r[dbIdColumn]), r]) || []);
 
