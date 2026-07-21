@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { tr } from '@/lib/tr';
+import { useAdminLanguage } from '@/contexts/AdminLanguageContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Package, Settings, BarChart3, Shield,
@@ -196,6 +198,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
   });
   const [searchQuery, setSearchQuery] = useState('');
   const { profile, signOut } = useAuth();
+  const { adminLanguage, setAdminLanguage } = useAdminLanguage();
 
   const { data: pendingCounts } = useQuery({
     queryKey: ['admin-pending-counts'],
@@ -464,7 +467,22 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground hidden sm:inline-block">Edit Dili:</span>
+              <Select value={adminLanguage} onValueChange={(val: any) => setAdminLanguage(val)}>
+                <SelectTrigger className="w-[85px] h-8 text-xs bg-muted/50 border-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="az">🇦🇿 AZ</SelectItem>
+                  <SelectItem value="en">🇬🇧 EN</SelectItem>
+                  <SelectItem value="ru">🇷🇺 RU</SelectItem>
+                  <SelectItem value="tr">🇹🇷 TR</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
             <Button variant="ghost" size="icon" className="relative h-8 w-8">
               <Bell className="w-4 h-4" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AdminLanguageProvider } from '@/contexts/AdminLanguageContext';
 import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
 import AdminUsers from './admin/AdminUsers';
@@ -222,13 +223,15 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
   };
 
   return (
-    <AdminLayout
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-      onExit={onExit}
-    >
-      {renderContent()}
-    </AdminLayout>
+    <AdminLanguageProvider>
+      <AdminLayout
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onExit={onExit}
+      >
+        {renderContent()}
+      </AdminLayout>
+    </AdminLanguageProvider>
   );
 };
 

@@ -17,6 +17,8 @@ import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { LocalizedInput } from './ui/LocalizedInput';
+import { LocalizedTextarea } from './ui/LocalizedTextarea';
 
 type ContentType = 'symptoms' | 'tips' | 'insights' | 'labels';
 
@@ -159,7 +161,7 @@ const AdminFlowContent = () => {
   const getDefaultFormData = () => {
     switch (activeTab) {
       case 'symptoms':
-        return { symptom_key: '', label: '', label_az: '', emoji: '🤕', category: 'physical', color: '#F97316', is_active: true, sort_order: 0 };
+        return { symptom_key: '', label: '', label_az: '', label_en: '', emoji: '🤕', category: 'physical', color: '#F97316', is_active: true, sort_order: 0 };
       case 'tips':
         return { phase: 'menstrual', category: 'nutrition', title: '', title_az: '', title_en: '', content: '', content_az: '', content_en: '', emoji: '💡', is_active: true, sort_order: 0 };
       case 'insights':
@@ -415,20 +417,12 @@ const AdminFlowContent = () => {
                     
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Ad (EN)</label>
-                  <Input
-                    value={formData.label || ''}
-                    onChange={(e) => setFormData({ ...formData, label: e.target.value })} />
-                  
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Ad (AZ)</label>
-                  <Input
-                    value={formData.label_az || ''}
-                    onChange={(e) => setFormData({ ...formData, label_az: e.target.value })} />
-                  
-                </div>
+                <LocalizedInput
+                  formData={formData}
+                  setFormData={setFormData}
+                  field="label"
+                  label="Simptom Adı"
+                />
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_reng_8c6bc5", "Rəng")}</label>
                   <Input
@@ -469,54 +463,19 @@ const AdminFlowContent = () => {
                     
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{tr("adminflowcontent_basliq_en_4ac905", "Başlıq (EN)")}</label>
-                  <Input
-                    value={formData.title_en || ''}
-                    onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
-                    placeholder="Tip title (EN)" />
-                  
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{tr("adminflowcontent_basliq_az_3e294a", "Başlıq (AZ)")}</label>
-                  <Input
-                    value={formData.title_az || ''}
-                    onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                    placeholder={tr("adminflowcontent_azerbaycan_dilinde_basliq_a39299", "Azərbaycan dilində başlıq")} />
-                  
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Başlıq (Default)</label>
-                  <Input
-                    value={formData.title || ''}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Tip title" />
-                  
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_en_7541aa", "Məzmun (EN)")}</label>
-                  <Textarea
-                    value={formData.content_en || ''}
-                    onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
-                    rows={2} />
-                  
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_az_d18d5f", "Məzmun (AZ)")}</label>
-                  <Textarea
-                    value={formData.content_az || ''}
-                    onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
-                    rows={2} />
-                  
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Məzmun (Default)</label>
-                  <Textarea
-                    value={formData.content || ''}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows={2} />
-                  
-                </div>
+                <LocalizedInput
+                  formData={formData}
+                  setFormData={setFormData}
+                  field="title"
+                  label="Başlıq"
+                />
+                <LocalizedTextarea
+                  formData={formData}
+                  setFormData={setFormData}
+                  field="content"
+                  label="Məzmun"
+                  rows={3}
+                />
               </>
               }
 
@@ -550,51 +509,19 @@ const AdminFlowContent = () => {
                     
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{tr("adminflowcontent_basliq_en_4ac905", "Başlıq (EN)")}</label>
-                  <Input
-                    value={formData.title_en || ''}
-                    onChange={(e) => setFormData({ ...formData, title_en: e.target.value })} />
-                  
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{tr("adminflowcontent_basliq_az_3e294a", "Başlıq (AZ)")}</label>
-                  <Input
-                    value={formData.title_az || ''}
-                    onChange={(e) => setFormData({ ...formData, title_az: e.target.value })} />
-                  
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Başlıq (Default)</label>
-                  <Input
-                    value={formData.title || ''}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
-                  
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_en_7541aa", "Məzmun (EN)")}</label>
-                  <Textarea
-                    value={formData.content_en || ''}
-                    onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
-                    rows={3} />
-                  
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_az_d18d5f", "Məzmun (AZ)")}</label>
-                  <Textarea
-                    value={formData.content_az || ''}
-                    onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
-                    rows={3} />
-                  
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Məzmun (Default)</label>
-                  <Textarea
-                    value={formData.content || ''}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                    rows={3} />
-                  
-                </div>
+                <LocalizedInput
+                  formData={formData}
+                  setFormData={setFormData}
+                  field="title"
+                  label="Başlıq"
+                />
+                <LocalizedTextarea
+                  formData={formData}
+                  setFormData={setFormData}
+                  field="content"
+                  label="Məzmun"
+                  rows={3}
+                />
               </>
               }
 
