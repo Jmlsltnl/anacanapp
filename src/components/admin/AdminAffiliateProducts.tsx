@@ -495,43 +495,6 @@ const AdminAffiliateProducts = () => {
                 </div>
               </div>
             </TabsContent>
-
-            <TabsContent value="details" className="space-y-4 mt-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_ustunlukleri_her_setirde_bir_54cbce", "Üstünlükləri (hər sətirdə bir)")}</label>
-                  <Textarea placeholder={tr("adminaffiliateproducts_keyfiyyetli_material_10_uzunomurlu_215f76", "Keyfiyyətli material&#10;Uzunömürlü")} value={formData.pros} onChange={(e) => setFormData((p) => ({ ...p, pros: e.target.value }))} rows={4} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_catismazliqlari_her_setirde_bir_1f2f46", "Çatışmazlıqları (hər sətirdə bir)")}</label>
-                  <Textarea placeholder={tr("adminaffiliateproducts_bahalidir_10_catdirilma_uzun_cekir_66741d", "Bahalıdır&#10;Çatdırılma uzun çəkir")} value={formData.cons} onChange={(e) => setFormData((p) => ({ ...p, cons: e.target.value }))} rows={4} />
-                </div>
-              </div>
-              <div>
-                )}
-                </div>
-              </div>
-              
-              <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Təsvir" rows={3} />
-            </TabsContent>
-
-            <TabsContent value="media" className="space-y-4 mt-4">
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_esas_sekil_url_3fdd67", "Əsas şəkil URL")}</label>
-                  <Input placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData((p) => ({ ...p, image_url: e.target.value }))} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_elave_sekiller_her_setirde_bir_url_d60242", "Əlavə şəkillər (hər sətirdə bir URL)")}</label>
-                  <Textarea placeholder="https://image1.jpg&#10;https://image2.jpg" value={formData.images} onChange={(e) => setFormData((p) => ({ ...p, images: e.target.value }))} rows={4} />
-                </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">Video URL</label>
-                  <Input placeholder="https://video.mp4" value={formData.video_url} onChange={(e) => setFormData((p) => ({ ...p, video_url: e.target.value }))} />
-                </div>
-              </div>
-            </TabsContent>
-
             <TabsContent value="details" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>

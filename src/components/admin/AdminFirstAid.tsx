@@ -202,7 +202,6 @@ const AdminFirstAid = () => {
 
 
               <>
-              <>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-lg ${getEmergencyLevelColor(scenario.emergency_level)} flex items-center justify-center text-xl text-white`}>
