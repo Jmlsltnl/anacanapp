@@ -161,9 +161,9 @@ const AdminFlowContent = () => {
       case 'symptoms':
         return { symptom_key: '', label: '', label_az: '', emoji: '🤕', category: 'physical', color: '#F97316', is_active: true, sort_order: 0 };
       case 'tips':
-        return { phase: 'menstrual', category: 'nutrition', title: '', title_az: '', content: '', content_az: '', emoji: '💡', is_active: true, sort_order: 0 };
+        return { phase: 'menstrual', category: 'nutrition', title: '', title_az: '', title_en: '', content: '', content_az: '', content_en: '', emoji: '💡', is_active: true, sort_order: 0 };
       case 'insights':
-        return { title: '', title_az: '', content: '', content_az: '', phase: null, emoji: '💡', category: 'general', is_active: true, sort_order: 0 };
+        return { title: '', title_az: '', title_en: '', content: '', content_az: '', content_en: '', phase: null, emoji: '💡', category: 'general', is_active: true, sort_order: 0 };
       default:
         return {};
     }
@@ -472,9 +472,9 @@ const AdminFlowContent = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_basliq_en_4ac905", "Başlıq (EN)")}</label>
                   <Input
-                    value={formData.title || ''}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Tip title" />
+                    value={formData.title_en || ''}
+                    onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
+                    placeholder="Tip title (EN)" />
                   
                 </div>
                 <div className="space-y-2">
@@ -486,10 +486,18 @@ const AdminFlowContent = () => {
                   
                 </div>
                 <div className="space-y-2">
+                  <label className="text-sm font-medium">Başlıq (Default)</label>
+                  <Input
+                    value={formData.title || ''}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Tip title" />
+                  
+                </div>
+                <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_en_7541aa", "Məzmun (EN)")}</label>
                   <Textarea
-                    value={formData.content || ''}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    value={formData.content_en || ''}
+                    onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
                     rows={2} />
                   
                 </div>
@@ -498,6 +506,14 @@ const AdminFlowContent = () => {
                   <Textarea
                     value={formData.content_az || ''}
                     onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
+                    rows={2} />
+                  
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Məzmun (Default)</label>
+                  <Textarea
+                    value={formData.content || ''}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                     rows={2} />
                   
                 </div>
@@ -537,8 +553,8 @@ const AdminFlowContent = () => {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_basliq_en_4ac905", "Başlıq (EN)")}</label>
                   <Input
-                    value={formData.title || ''}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
+                    value={formData.title_en || ''}
+                    onChange={(e) => setFormData({ ...formData, title_en: e.target.value })} />
                   
                 </div>
                 <div className="space-y-2">
@@ -549,10 +565,17 @@ const AdminFlowContent = () => {
                   
                 </div>
                 <div className="space-y-2">
+                  <label className="text-sm font-medium">Başlıq (Default)</label>
+                  <Input
+                    value={formData.title || ''}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
+                  
+                </div>
+                <div className="space-y-2">
                   <label className="text-sm font-medium">{tr("adminflowcontent_mezmun_en_7541aa", "Məzmun (EN)")}</label>
                   <Textarea
-                    value={formData.content || ''}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                    value={formData.content_en || ''}
+                    onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
                     rows={3} />
                   
                 </div>
@@ -561,6 +584,14 @@ const AdminFlowContent = () => {
                   <Textarea
                     value={formData.content_az || ''}
                     onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
+                    rows={3} />
+                  
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Məzmun (Default)</label>
+                  <Textarea
+                    value={formData.content || ''}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                     rows={3} />
                   
                 </div>
