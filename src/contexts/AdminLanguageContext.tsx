@@ -44,3 +44,15 @@ export function useAdminLanguage() {
   }
   return context;
 }
+
+export function useAdminLocalize() {
+  const { adminLanguage } = useAdminLanguage();
+  
+  return (row: any, field: string): string => {
+    if (!row) return '';
+    if (adminLanguage === 'az') {
+      return row[`${field}_az`] || row[field] || '';
+    }
+    return row[`${field}_${adminLanguage}`] || row[field] || row[`${field}_az`] || '';
+  };
+}

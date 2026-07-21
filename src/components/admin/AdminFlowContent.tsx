@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { LocalizedInput } from './ui/LocalizedInput';
 import { LocalizedTextarea } from './ui/LocalizedTextarea';
+import { useAdminLocalize } from '@/contexts/AdminLanguageContext';
 
 type ContentType = 'symptoms' | 'tips' | 'insights' | 'labels';
 
@@ -37,6 +38,7 @@ const AdminFlowContent = () => {
   const [formData, setFormData] = useState<any>({});
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const localize = useAdminLocalize();
 
   // Fetch symptoms
   const symptomsQuery = useQuery({
@@ -353,9 +355,9 @@ const AdminFlowContent = () => {
               <span className="text-2xl">{item.emoji}</span>
               <div>
                 <p className="font-medium text-foreground">
-                  {activeTab === 'symptoms' && (item.label_az || item.label)}
-                  {activeTab === 'tips' && (item.title_az || item.title)}
-                  {activeTab === 'insights' && (item.title_az || item.title)}
+                  {activeTab === 'symptoms' && localize(item, 'label')}
+                  {activeTab === 'tips' && localize(item, 'title')}
+                  {activeTab === 'insights' && localize(item, 'title')}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   {item.phase &&

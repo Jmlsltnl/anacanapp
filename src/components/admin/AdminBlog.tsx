@@ -19,6 +19,9 @@ import BlogAnalytics from './BlogAnalytics';
 import { supabase } from '@/integrations/supabase/client';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 import AdminUsageStats from './AdminUsageStats';
+import { LocalizedInput } from './ui/LocalizedInput';
+import { LocalizedTextarea } from './ui/LocalizedTextarea';
+import { useAdminLocalize } from '@/contexts/AdminLanguageContext';
 
 const AdminBlog = () => {
   const { posts, categories, postCategories, loading, createPost, updatePost, deletePost, createCategory, deleteCategory, getPostCategoryIds, setPostCategoriesForPost } = useBlogAdmin();
@@ -34,12 +37,16 @@ const AdminBlog = () => {
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const initialFormDataRef = useRef<string>('');
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const localize = useAdminLocalize();
 
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
     excerpt: '',
     content: '',
+    title_az: '', title_en: '', title_ru: '', title_tr: '',
+    excerpt_az: '', excerpt_en: '', excerpt_ru: '', excerpt_tr: '',
+    content_az: '', content_en: '', content_ru: '', content_tr: '',
     cover_image_url: '',
     category: tr("adminblog_hamilelik_64e7fe", "hamil\u0259lik"),
     tags: [] as string[],
@@ -217,6 +224,9 @@ const AdminBlog = () => {
       slug: post.slug,
       excerpt: post.excerpt || '',
       content: post.content,
+      title_az: post.title_az || '', title_en: post.title_en || '', title_ru: post.title_ru || '', title_tr: post.title_tr || '',
+      excerpt_az: post.excerpt_az || '', excerpt_en: post.excerpt_en || '', excerpt_ru: post.excerpt_ru || '', excerpt_tr: post.excerpt_tr || '',
+      content_az: post.content_az || '', content_en: post.content_en || '', content_ru: post.content_ru || '', content_tr: post.content_tr || '',
       cover_image_url: post.cover_image_url || '',
       category: post.category,
       tags: post.tags || [],
@@ -367,6 +377,9 @@ const AdminBlog = () => {
       slug: '',
       excerpt: '',
       content: '',
+      title_az: '', title_en: '', title_ru: '', title_tr: '',
+      excerpt_az: '', excerpt_en: '', excerpt_ru: '', excerpt_tr: '',
+      content_az: '', content_en: '', content_ru: '', content_tr: '',
       cover_image_url: '',
       category: tr("adminblog_hamilelik_64e7fe", "hamil\u0259lik"),
       tags: [],
@@ -398,7 +411,7 @@ const AdminBlog = () => {
   }, [showEditor]);
 
   const filteredPosts = posts.filter((p) =>
-  p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  localize(p, 'title').toLowerCase().includes(searchQuery.toLowerCase()) ||
   p.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -521,7 +534,7 @@ const AdminBlog = () => {
                 }
                   </div>
 
-                  <h3 className="font-bold text-foreground line-clamp-2 mb-2">{post.title}</h3>
+                  <h3 className="font-bold text-foreground line-clamp-2 mb-2">{localize(post, 'title')}</h3>
                   
                   {/* Categories badges */}
                   <div className="flex flex-wrap gap-1 mb-2">
@@ -668,14 +681,12 @@ const AdminBlog = () => {
 
               <div className="p-6 space-y-6">
                 {/* Title */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">{tr("adminblog_basliq_3dfed8", "Başlıq *")}</label>
-                  <Input
-                  value={formData.title}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  placeholder={tr("adminblog_meqalenin_basligi_b374b6", "Məqalənin başlığı")} />
-                
-                </div>
+                <LocalizedInput
+                  formData={formData}
+                  setFormData={setFormData}
+                  field="title"
+                  label={tr("adminblog_basliq_3dfed8", "Başlıq *")}
+                />
 
                 {/* Slug */}
                 <div>
@@ -809,18 +820,6 @@ const AdminBlog = () => {
                   onChange={(e) => setFormData({ ...formData, reading_time: parseInt(e.target.value) || 5 })}
                   min={1}
                   className="max-w-[150px]" />
-                
-                </div>
-
-                {/* Excerpt */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">{tr("adminblog_qisa_tesvir_15ed14", "Qısa Təsvir")}</label>
-                  <Textarea
-                  value={formData.excerpt}
-                  onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                  placeholder={tr("adminblog_meqalenin_qisa_tesviri_deb19e", "Məqalənin qısa təsviri...")}
-                  rows={2} />
-                
                 </div>
 
                 {/* Content */}

@@ -11,6 +11,18 @@ export interface BlogPost {
   slug: string;
   excerpt: string | null;
   content: string;
+  title_az?: string;
+  title_en?: string;
+  title_ru?: string;
+  title_tr?: string;
+  excerpt_az?: string;
+  excerpt_en?: string;
+  excerpt_ru?: string;
+  excerpt_tr?: string;
+  content_az?: string;
+  content_en?: string;
+  content_ru?: string;
+  content_tr?: string;
   cover_image_url: string | null;
   category: string;
   tags: string[];

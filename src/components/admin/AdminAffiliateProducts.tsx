@@ -9,9 +9,11 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, Edit, Save, X, ExternalLink, Package, Image, Video, Star, Upload, Download, FileSpreadsheet, FileDown } from 'lucide-react';
-import { exportToCSV } from '@/utils/csvExport';
 import { useAppSetting, useUpdateAppSetting } from '@/hooks/useAppSettings';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { LocalizedInput } from './ui/LocalizedInput';
+import { LocalizedTextarea } from './ui/LocalizedTextarea';
+import { useAdminLocalize } from '@/contexts/AdminLanguageContext';
 
 // CSV Template headers
 const CSV_HEADERS = [
@@ -73,15 +75,18 @@ const AdminAffiliateProducts = () => {
   const updateSetting = useUpdateAppSetting();
 
   const [formData, setFormData] = useState({
-    name: '', name_az: '', description: '', description_az: '',
+    name: '', name_az: '', name_en: '', name_ru: '', name_tr: '',
+    description: '', description_az: '', description_en: '', description_ru: '', description_tr: '',
     category: 'general', category_az: '', price: '', original_price: '',
     currency: 'AZN', affiliate_url: '', platform: 'other',
     image_url: '', images: '', video_url: '',
     store_name: '', store_logo_url: '',
-    rating: '', review_count: '', review_summary_az: '',
+    rating: '', review_count: '', review_summary: '', review_summary_az: '', review_summary_en: '', review_summary_ru: '', review_summary_tr: '',
     life_stages: ['bump'], is_featured: false, is_active: true,
     pros: '', cons: '', tags: '', specifications: ''
   });
+
+  const localize = useAdminLocalize();
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['admin-affiliate-products'],
