@@ -12,6 +12,7 @@ import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useFlowDailyLog, useSaveFlowDailyLog, useFlowSymptoms, FlowDailyLog } from '@/hooks/useFlowDailyLogs';
+import { useUserStore } from '@/store/userStore';
 import { toast } from 'sonner';
 import { tr } from "@/lib/tr";
 
@@ -58,6 +59,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
   const { data: existingLog, isLoading } = useFlowDailyLog(dateStr);
   const { data: symptoms = [] } = useFlowSymptoms();
   const saveLog = useSaveFlowDailyLog();
+  const { language } = useUserStore();
 
   const [expanded, setExpanded] = useState(!compact);
   const [formData, setFormData] = useState<Partial<FlowDailyLog>>({
@@ -278,7 +280,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
                   'bg-muted hover:bg-muted/80 text-muted-foreground'}`
                   }>
                   
-                      {symptom.emoji} {symptom.label_az || symptom.label}
+                      {symptom.emoji} {language === 'en' ? symptom.label : (symptom.label_az || symptom.label)}
                     </button>
                 )}
                 </div>

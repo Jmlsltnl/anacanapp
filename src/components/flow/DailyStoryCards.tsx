@@ -45,6 +45,26 @@ const DailyStoryCards = () => {
 
   if (cards.length === 0) return null;
 
+  const getCardTitle = (card: any, lang: string) => {
+    if (lang === 'az') return card.title_az || card.title;
+    if (lang === 'en') return card.title_en || card.title;
+    const localized = card[`title_${lang}`];
+    if (localized) return localized;
+    const translated = getTranslatedTip(card.title, lang);
+    if (translated !== card.title) return translated;
+    return getTranslatedTip(card.title_az || card.title, lang);
+  };
+
+  const getCardContent = (card: any, lang: string) => {
+    if (lang === 'az') return card.content_az || card.content;
+    if (lang === 'en') return card.content_en || card.content;
+    const localized = card[`content_${lang}`];
+    if (localized) return localized;
+    const translated = getTranslatedTip(card.content, lang);
+    if (translated !== card.content) return translated;
+    return getTranslatedTip(card.content_az || card.content, lang);
+  };
+
   return (
     <>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
@@ -66,8 +86,8 @@ const DailyStoryCards = () => {
                 className={`flex-shrink-0 w-36 h-48 rounded-2xl p-3 text-left snap-center bg-gradient-to-br ${gradient} text-white shadow-md`}>
                 
                 <div className="text-3xl mb-2">{card.emoji || '✨'}</div>
-                <p className="font-bold text-sm leading-tight mb-1 line-clamp-2">{language === 'en' && card.title_en ? card.title_en : getTranslatedTip(card.title_az || card.title, language)}</p>
-                <p className="text-[10px] text-white/80 line-clamp-3">{language === 'en' && card.content_en ? card.content_en : getTranslatedTip(card.content_az || card.content, language)}</p>
+                <p className="font-bold text-sm leading-tight mb-1 line-clamp-2">{getCardTitle(card, language)}</p>
+                <p className="text-[10px] text-white/80 line-clamp-3">{getCardContent(card, language)}</p>
               </motion.button>);
 
           })}
@@ -96,8 +116,8 @@ const DailyStoryCards = () => {
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <h2 className="text-xl font-bold text-foreground mb-2">{language === 'en' && selected.title_en ? selected.title_en : getTranslatedTip(selected.title_az || selected.title, language)}</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{language === 'en' && selected.content_en ? selected.content_en : getTranslatedTip(selected.content_az || selected.content, language)}</p>
+              <h2 className="text-xl font-bold text-foreground mb-2">{getCardTitle(selected, language)}</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{getCardContent(selected, language)}</p>
             </motion.div>
           </motion.div>
         }
