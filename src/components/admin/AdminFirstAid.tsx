@@ -11,13 +11,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { LocalizedInput } from './ui/LocalizedInput';
+import { LocalizedTextarea } from './ui/LocalizedTextarea';
+import { useAdminLocalize } from '@/contexts/AdminLanguageContext';
 
 interface FirstAidScenario {
   id: string;
   title: string;
   title_az: string;
+  title_en?: string;
+  title_ru?: string;
+  title_tr?: string;
   description: string | null;
   description_az: string | null;
+  description_en?: string | null;
+  description_ru?: string | null;
+  description_tr?: string | null;
   icon: string | null;
   color: string | null;
   emergency_level: string | null;
@@ -31,8 +40,14 @@ interface FirstAidStep {
   step_number: number;
   title: string;
   title_az: string;
+  title_en?: string;
+  title_ru?: string;
+  title_tr?: string;
   instruction: string;
   instruction_az: string;
+  instruction_en?: string;
+  instruction_ru?: string;
+  instruction_tr?: string;
   image_url: string | null;
   audio_url: string | null;
   animation_url: string | null;
@@ -46,6 +61,7 @@ const AdminFirstAid = () => {
   const [newScenario, setNewScenario] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const localize = useAdminLocalize();
 
   // Fetch scenarios
   const { data: scenarios = [], isLoading } = useQuery({
@@ -186,14 +202,15 @@ const AdminFirstAid = () => {
 
 
               <>
+              <>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-lg ${getEmergencyLevelColor(scenario.emergency_level)} flex items-center justify-center text-xl text-white`}>
                             {scenario.icon || '🏥'}
                           </div>
                           <div>
-                            <h3 className="font-bold">{scenario.title_az}</h3>
-                            <p className="text-sm text-muted-foreground">{scenario.description_az}</p>
+                            <h3 className="font-bold">{localize(scenario, 'title')}</h3>
+                            <p className="text-sm text-muted-foreground">{localize(scenario, 'description')}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -228,8 +245,8 @@ const AdminFirstAid = () => {
                                   {step.step_number}
                                 </div>
                                 <div className="flex-1">
-                                  <p className="font-medium">{step.title_az}</p>
-                                  <p className="text-sm text-muted-foreground">{step.instruction_az}</p>
+                                  <p className="font-medium">{localize(step, 'title')}</p>
+                                  <p className="text-sm text-muted-foreground">{localize(step, 'instruction')}</p>
                                 </div>
                               </div>
                     )}
@@ -259,8 +276,14 @@ const ScenarioForm = ({ scenario, onSave, onCancel, isLoading }: ScenarioFormPro
   const [form, setForm] = useState({
     title: scenario?.title || '',
     title_az: scenario?.title_az || '',
+    title_en: scenario?.title_en || '',
+    title_ru: scenario?.title_ru || '',
+    title_tr: scenario?.title_tr || '',
     description: scenario?.description || '',
     description_az: scenario?.description_az || '',
+    description_en: scenario?.description_en || '',
+    description_ru: scenario?.description_ru || '',
+    description_tr: scenario?.description_tr || '',
     icon: scenario?.icon || '🏥',
     emergency_level: scenario?.emergency_level || 'medium',
     is_active: scenario?.is_active ?? true,
@@ -269,41 +292,9 @@ const ScenarioForm = ({ scenario, onSave, onCancel, isLoading }: ScenarioFormPro
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium">{tr("adminfirstaid_basliq_en_4ac905", "Başlıq (EN)")}</label>
-          <Input
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            placeholder="Choking" />
-          
-        </div>
-        <div>
-          <label className="text-sm font-medium">{tr("adminfirstaid_basliq_az_3e294a", "Başlıq (AZ)")}</label>
-          <Input
-            value={form.title_az}
-            onChange={(e) => setForm({ ...form, title_az: e.target.value })}
-            placeholder={tr("adminfirstaid_bogulma_cad7f4", "Boğulma")} />
-          
-        </div>
-      </div>
+      <LocalizedInput formData={form} setFormData={setForm} field="title" label="Başlıq *" />
       
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium">{tr("adminfirstaid_tesvir_en_c64521", "Təsvir (EN)")}</label>
-          <Textarea
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })} />
-          
-        </div>
-        <div>
-          <label className="text-sm font-medium">{tr("adminfirstaid_tesvir_az_2c237a", "Təsvir (AZ)")}</label>
-          <Textarea
-            value={form.description_az}
-            onChange={(e) => setForm({ ...form, description_az: e.target.value })} />
-          
-        </div>
-      </div>
+      <LocalizedTextarea formData={form} setFormData={setForm} field="description" label="Təsvir *" rows={3} />
       
       <div className="grid grid-cols-3 gap-4">
         <div>
