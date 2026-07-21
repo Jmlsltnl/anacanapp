@@ -563,6 +563,9 @@ const AdminTranslations = () => {
               if (insertFields[csvCol] !== undefined) return; // already set
               if (dbColNames.length > 0 && !dbColNames.includes(csvCol)) return; // not in DB
 
+              // Prevent inserting 'id' if it's not the matching column (avoids unique constraint errors when users copy-paste rows in CSV)
+              if (csvCol === 'id' && dbIdColumn !== 'id') return;
+
               const val = item[csvCol];
               const dbCol = dbColumns.find(c => c.column_name === csvCol);
               insertFields[csvCol] = castFieldValue(val, dbCol);
