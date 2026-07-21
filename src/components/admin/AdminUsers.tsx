@@ -28,6 +28,9 @@ import {
 '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 interface UserProfile {
   id: string;
@@ -45,6 +48,7 @@ interface UserRole {
 }
 
 const AdminUsers = () => {
+    const localize = useAdminLocalize();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);

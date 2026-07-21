@@ -429,7 +429,7 @@ const AdminAffiliateProducts = () => {
             <TabsContent value="basic" className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
                 <Input placeholder="Ad (EN)" value={formData.name} onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))} />
-                <Input placeholder="Ad (AZ) *" value={formData.name_az} onChange={(e) => setFormData((p) => ({ ...p, name_az: e.target.value }))} />
+                <LocalizedInput formData={formData} setFormData={setFormData} field="name" label="Ad *" />
                 <Input placeholder="Affiliate URL *" value={formData.affiliate_url} onChange={(e) => setFormData((p) => ({ ...p, affiliate_url: e.target.value }))} className="col-span-2" />
                 
                 <select value={formData.platform} onChange={(e) => setFormData((p) => ({ ...p, platform: e.target.value }))} className="h-10 rounded-md border bg-background px-3">
@@ -476,7 +476,7 @@ const AdminAffiliateProducts = () => {
                 </div>
               </div>
               
-              <Textarea placeholder={tr("adminaffiliateproducts_tesvir_az_2c237a", "Təsvir (AZ)")} value={formData.description_az} onChange={(e) => setFormData((p) => ({ ...p, description_az: e.target.value }))} rows={3} />
+              <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Təsvir" rows={3} />
             </TabsContent>
 
             <TabsContent value="media" className="space-y-4 mt-4">
@@ -512,7 +512,7 @@ const AdminAffiliateProducts = () => {
                 </div>
               </div>
               
-              <Textarea placeholder={tr("adminaffiliateproducts_tesvir_az_2c237a", "Təsvir (AZ)")} value={formData.description_az} onChange={(e) => setFormData((p) => ({ ...p, description_az: e.target.value }))} rows={3} />
+              <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Təsvir" rows={3} />
             </TabsContent>
 
             <TabsContent value="media" className="space-y-4 mt-4">
@@ -605,7 +605,7 @@ const AdminAffiliateProducts = () => {
             }
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-medium">{product.name_az || product.name}</span>
+                    <span className="font-medium">{localize(product, 'name')}</span>
                     {product.is_featured && <Badge className="text-[10px] bg-amber-500/10 text-amber-600">⭐</Badge>}
                     {!product.is_active && <Badge variant="secondary" className="text-[10px]">Deaktiv</Badge>}
                     {(product.images?.length > 0 || product.video_url) &&

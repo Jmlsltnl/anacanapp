@@ -12,6 +12,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { Plus, Pencil, Trash2, Image, Layout, Eye, EyeOff, ExternalLink, MousePointer, BarChart3 } from 'lucide-react';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const PLACEMENTS: {value: BannerPlacement;label: string;}[] = [
 { value: 'home_top', label: tr("adminbanners_ana_sehife_ust_67d37b", "Ana Səhifə - Üst") },
@@ -40,6 +43,7 @@ const DEFAULT_COLORS = [
 
 
 const AdminBanners = () => {
+    const localize = useAdminLocalize();
   const { data: banners, isLoading } = useAllBanners();
   const createBanner = useCreateBanner();
   const updateBanner = useUpdateBanner();
@@ -255,7 +259,7 @@ const AdminBanners = () => {
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold truncate">{banner.title_az || banner.title}</h3>
+                          <h3 className="font-semibold truncate">{localize(banner, 'title')}</h3>
                           {!banner.is_active &&
                       <span className="text-xs bg-muted px-2 py-0.5 rounded">Deaktiv</span>
                       }
@@ -264,7 +268,7 @@ const AdminBanners = () => {
                       }
                         </div>
                         <p className="text-sm text-muted-foreground truncate">
-                          {banner.description_az || banner.description || tr("adminbanners_tesvir_yoxdur_12f487", "T\u0259svir yoxdur")}
+                          {localize(banner, 'description') || tr("adminbanners_tesvir_yoxdur_12f487", "T\u0259svir yoxdur")}
                         </p>
                         <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                           <span className="bg-muted px-2 py-0.5 rounded">{getPlacementLabel(banner.placement)}</span>
@@ -321,10 +325,7 @@ const AdminBanners = () => {
               </div>
               <div>
                 <Label>{tr("adminbanners_basliq_az_3e294a", "Başlıq (AZ)")}</Label>
-                <Input
-                  value={formData.title_az || ''}
-                  onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                  placeholder={tr("adminbanners_banner_basligi_0722c5", "Banner Başlığı")} />
+                <LocalizedInput formData={formData} setFormData={setFormData} field="title" label="Banner Başlığı" />
                 
               </div>
             </div>
@@ -341,11 +342,7 @@ const AdminBanners = () => {
               </div>
               <div>
                 <Label>{tr("adminbanners_tesvir_az_2c237a", "Təsvir (AZ)")}</Label>
-                <Textarea
-                  value={formData.description_az || ''}
-                  onChange={(e) => setFormData({ ...formData, description_az: e.target.value })}
-                  placeholder={tr("adminbanners_tesvir_f85651", "Təsvir")}
-                  rows={2} />
+                <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Təsvir" rows={2} />
                 
               </div>
             </div>
@@ -440,10 +437,7 @@ const AdminBanners = () => {
                   </div>
                   <div>
                     <Label>{tr("adminbanners_duyme_metni_az_75db00", "Düymə Mətni (AZ)")}</Label>
-                    <Input
-                    value={formData.button_text_az || ''}
-                    onChange={(e) => setFormData({ ...formData, button_text_az: e.target.value })}
-                    placeholder={tr("adminbanners_daha_cox_7d8a93", "Daha Çox")} />
+                    <LocalizedInput formData={formData} setFormData={setFormData} field="button_text" label="Daha Çox" />
                   
                   </div>
                 </div>
@@ -535,10 +529,10 @@ const AdminBanners = () => {
                     <Layout className="w-6 h-6" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold">{formData.title_az || formData.title || tr("adminbanners_banner_basligi_0722c5", "Banner Ba\u015Fl\u0131\u011F\u0131")}</h3>
-                    <p className="text-sm opacity-90">{formData.description_az || formData.description || tr("adminbanners_tesvir_f85651", "T\u0259svir")}</p>
+                    <h3 className="font-semibold">{localize(formData, 'title') || tr("adminbanners_banner_basligi_0722c5", "Banner Ba\u015Fl\u0131\u011F\u0131")}</h3>
+                    <p className="text-sm opacity-90">{localize(formData, 'description') || tr("adminbanners_tesvir_f85651", "T\u0259svir")}</p>
                   </div>
-                  <span className="text-sm font-medium">{formData.button_text_az || formData.button_text || tr("adminbanners_daha_cox_7d8a93", "Daha \xC7ox")}</span>
+                  <span className="text-sm font-medium">{localize(formData, 'button_text') || tr("adminbanners_daha_cox_7d8a93", "Daha \xC7ox")}</span>
                 </div>
               </div>
             }

@@ -12,6 +12,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Save, Loader2 } from 'lucide-react';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 interface ColumnConfig {
   key: string;
@@ -205,6 +208,7 @@ function ConfigTable({ tableName, title, columns, defaultValues }: ConfigTablePr
 }
 
 const AdminToolsConfig = () => {
+    const localize = useAdminLocalize();
   return (
     <div className="space-y-6">
       <div>

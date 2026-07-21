@@ -21,8 +21,12 @@ import UnsavedChangesDialog from './UnsavedChangesDialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminRecipes = () => {
+    const localize = useAdminLocalize();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { data: recipes = [], isLoading, create, update, remove, refetch } = useAdminRecipesAdmin();
@@ -41,7 +45,7 @@ const AdminRecipes = () => {
   const [editingCat, setEditingCat] = useState<any>(null);
   const [catForm, setCatForm] = useState({ category_id: '', name: '', name_az: '', emoji: '', sort_order: 0, is_active: true });
 
-  const categories = dbCategories.map((c) => ({ id: c.category_id, label: c.name_az || c.name, emoji: c.emoji }));
+  const categories = dbCategories.map((c) => ({ id: c.category_id, label: localize(c, 'name'), emoji: c.emoji }));
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState<AdminRecipe | null>(null);
@@ -494,7 +498,7 @@ const AdminRecipes = () => {
             {dbCategories.map((cat) =>
             <div key={cat.id} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/50 border border-border/50">
                 <span>{cat.emoji}</span>
-                <span className="text-sm font-medium">{cat.name_az || cat.name}</span>
+                <span className="text-sm font-medium">{localize(cat, 'name')}</span>
                 <Badge variant={cat.is_active ? 'default' : 'secondary'} className="text-[10px] px-1.5">
                   {cat.is_active ? 'Aktiv' : 'Deaktiv'}
                 </Badge>
@@ -527,7 +531,7 @@ const AdminRecipes = () => {
             </div>
             <div>
               <Label>Ad (AZ)</Label>
-              <Input value={catForm.name_az} onChange={(e) => setCatForm({ ...catForm, name_az: e.target.value })} placeholder={tr("adminrecipes_seher_yemeyi_b82929", "Səhər yeməyi")} />
+              <LocalizedInput formData={catForm} setFormData={setCatForm} field="name" label="Səhər yeməyi" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -617,7 +621,7 @@ const AdminRecipes = () => {
                       const tagInfo = recipeTags.find((rt) => rt.tag_id === t);
                       return (
                         <Badge key={t} variant="outline" className="text-[10px]">
-                              {tagInfo ? `${tagInfo.emoji} ${tagInfo.name_az || tagInfo.name}` : t}
+                              {tagInfo ? `${tagInfo.emoji} ${localize(tagInfo, 'name')}` : t}
                             </Badge>);
 
                     })}
@@ -696,7 +700,7 @@ const AdminRecipes = () => {
                         'bg-muted/50 text-muted-foreground border-border hover:bg-muted'}`
                         }>
                         
-                        {tag.emoji} {tag.name_az || tag.name}
+                        {tag.emoji} {localize(tag, 'name')}
                       </button>);
 
                   })}

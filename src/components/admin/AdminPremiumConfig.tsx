@@ -18,6 +18,9 @@ import { supabase } from '@/integrations/supabase/client';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 import PaywallDesignerTab from './PaywallDesignerTab';
 import BillingDesignerTab from './BillingDesignerTab';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 // =========== FREE LIMITS TAB ===========
 const FreeLimitsTab = () => {
@@ -382,6 +385,7 @@ const UserSubscriptionsTab = () => {
 
 // =========== MAIN COMPONENT ===========
 const AdminPremiumConfig = () => {
+    const localize = useAdminLocalize();
   const { features, plans, loading, createFeature, updateFeature, deleteFeature, updatePlan } = useAdminPremiumConfig();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('designer');
@@ -530,7 +534,7 @@ const AdminPremiumConfig = () => {
                 <div className="flex items-center gap-4">
                   <span className="text-2xl">{feature.icon}</span>
                   <div>
-                    <p className="font-medium">{feature.title_az || feature.title}</p>
+                    <p className="font-medium">{localize(feature, 'title')}</p>
                     <div className="flex items-center gap-2 mt-1">
                       {feature.is_included_free && <Badge variant="outline" className="text-xs">Free</Badge>}
                       {feature.is_included_premium && <Badge className="text-xs bg-primary">Premium</Badge>}
@@ -554,7 +558,7 @@ const AdminPremiumConfig = () => {
             <motion.div key={plan.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`relative p-6 bg-card rounded-xl border-2 ${plan.is_popular ? 'border-primary' : 'border-border'}`}>
                 {plan.is_popular && <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">Populyar</Badge>}
                 <div className="text-center">
-                  <h3 className="text-xl font-bold">{plan.name_az || plan.name}</h3>
+                  <h3 className="text-xl font-bold">{localize(plan, 'name')}</h3>
                   <div className="mt-4">
                     <span className="text-3xl font-bold">{plan.price_monthly}</span>
                     <span className="text-muted-foreground"> {plan.currency}/ay</span>
@@ -591,7 +595,7 @@ const AdminPremiumConfig = () => {
                     <th className="text-left p-3">Funksiya</th>
                     {plans.map((plan) =>
                     <th key={plan.id} className="text-center p-3">
-                        {plan.name_az || plan.name}
+                        {localize(plan, 'name')}
                         <div className="text-sm font-normal text-muted-foreground">{plan.price_monthly} {plan.currency}/ay</div>
                       </th>
                     )}
@@ -600,7 +604,7 @@ const AdminPremiumConfig = () => {
                 <tbody>
                   {features.map((feature) =>
                   <tr key={feature.id} className="border-t">
-                      <td className="p-3"><span className="mr-2">{feature.icon}</span>{feature.title_az || feature.title}</td>
+                      <td className="p-3"><span className="mr-2">{feature.icon}</span>{localize(feature, 'title')}</td>
                       <td className="text-center p-3">{feature.is_included_free ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : <Minus className="w-5 h-5 text-muted-foreground mx-auto" />}</td>
                       <td className="text-center p-3">{feature.is_included_premium ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : <Minus className="w-5 h-5 text-muted-foreground mx-auto" />}</td>
                       <td className="text-center p-3">{feature.is_included_premium_plus ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : <Minus className="w-5 h-5 text-muted-foreground mx-auto" />}</td>
@@ -628,8 +632,8 @@ const AdminPremiumConfig = () => {
                 <Input value={featureForm.title} onChange={(e) => setFeatureForm({ ...featureForm, title: e.target.value })} />
               </div>
             </div>
-            <div><Label>{tr("adminpremiumconfig_basliq_az_3e294a", "Başlıq (AZ)")}</Label><Input value={featureForm.title_az} onChange={(e) => setFeatureForm({ ...featureForm, title_az: e.target.value })} /></div>
-            <div><Label>{tr("adminpremiumconfig_aciqlama_az_86f364", "Açıqlama (AZ)")}</Label><Textarea value={featureForm.description_az} onChange={(e) => setFeatureForm({ ...featureForm, description_az: e.target.value })} rows={2} /></div>
+            <div><Label>{tr("adminpremiumconfig_basliq_az_3e294a", "Başlıq (AZ)")}</Label><LocalizedInput formData={featureForm} setFormData={setFeatureForm} field="title" label="Title" /></div>
+            <div><Label>{tr("adminpremiumconfig_aciqlama_az_86f364", "Açıqlama (AZ)")}</Label><LocalizedTextarea formData={featureForm} setFormData={setFeatureForm} field="description" label="Description" rows={2} /></div>
             <div className="space-y-3 pt-2">
               <Label>Planlara daxildir:</Label>
               <div className="flex items-center justify-between"><span>Free</span><Switch checked={featureForm.is_included_free} onCheckedChange={(v) => setFeatureForm({ ...featureForm, is_included_free: v })} /></div>
@@ -650,13 +654,13 @@ const AdminPremiumConfig = () => {
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>{tr("adminpremiumconfig_plani_redakte_et_caa626", "Planı Redaktə Et")}</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <div><Label>Ad (AZ)</Label><Input value={planForm.name_az} onChange={(e) => setPlanForm({ ...planForm, name_az: e.target.value })} /></div>
+            <div><Label>Ad (AZ)</Label><LocalizedInput formData={planForm} setFormData={setPlanForm} field="name" label="Name" /></div>
             <div className="grid grid-cols-2 gap-4">
               <div><Label>{tr("adminpremiumconfig_ayliq_qiymet_8bb31c", "Aylıq Qiymət")}</Label><Input type="number" step="0.01" value={planForm.price_monthly} onChange={(e) => setPlanForm({ ...planForm, price_monthly: parseFloat(e.target.value) || 0 })} /></div>
               <div><Label>{tr("adminpremiumconfig_illik_qiymet_56917a", "İllik Qiymət")}</Label><Input type="number" step="0.01" value={planForm.price_yearly} onChange={(e) => setPlanForm({ ...planForm, price_yearly: parseFloat(e.target.value) || 0 })} /></div>
             </div>
             <div><Label>Valyuta</Label><Input value={planForm.currency} onChange={(e) => setPlanForm({ ...planForm, currency: e.target.value })} /></div>
-            <div><Label>{tr("adminpremiumconfig_badge_metni_az_e09581", "Badge Mətni (AZ)")}</Label><Input value={planForm.badge_text_az} onChange={(e) => setPlanForm({ ...planForm, badge_text_az: e.target.value })} placeholder={tr("adminpremiumconfig_mes_en_serfeli_ce533c", "Məs: Ən sərfəli")} /></div>
+            <div><Label>{tr("adminpremiumconfig_badge_metni_az_e09581", "Badge Mətni (AZ)")}</Label><LocalizedInput formData={planForm} setFormData={setPlanForm} field="badge_text" label="Məs: Ən sərfəli" /></div>
             <div className="flex items-center justify-between"><Label>Populyar</Label><Switch checked={planForm.is_popular} onCheckedChange={(v) => setPlanForm({ ...planForm, is_popular: v })} /></div>
             <div className="flex items-center justify-between"><Label>Aktiv</Label><Switch checked={planForm.is_active} onCheckedChange={(v) => setPlanForm({ ...planForm, is_active: v })} /></div>
             <div className="flex gap-2 pt-4">

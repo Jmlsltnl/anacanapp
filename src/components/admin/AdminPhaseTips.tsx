@@ -16,8 +16,12 @@ import {
   PHASE_INFO,
   CATEGORY_INFO } from
 '@/hooks/usePhaseTips';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminPhaseTips = () => {
+    const localize = useAdminLocalize();
   const { tips, tipsByPhase, isLoading, createTip, updateTip, deleteTip } = usePhaseTipsAdmin();
   const { toast } = useToast();
   const [activePhase, setActivePhase] = useState<MenstrualPhase>('menstrual');
@@ -185,9 +189,9 @@ const AdminPhaseTips = () => {
               <span className="text-xs text-muted-foreground">#{tip.sort_order}</span>
             </div>
 
-            <h3 className="font-bold text-foreground mb-1">{tip.title_az || tip.title}</h3>
+            <h3 className="font-bold text-foreground mb-1">{localize(tip, 'title')}</h3>
             <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-              {tip.content_az || tip.content}
+              {localize(tip, 'content')}
             </p>
 
             <div className="flex gap-2">
@@ -323,10 +327,7 @@ const AdminPhaseTips = () => {
                 {/* Title AZ */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_basliq_az_2bba90", "Başlıq (AZ) *")}</label>
-                  <Input
-                  value={formData.title_az}
-                  onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                  placeholder={tr("adminphasetips_azerbaycan_dilinde_basliq_a39299", "Azərbaycan dilində başlıq")} />
+                  <LocalizedInput formData={formData} setFormData={setFormData} field="title" label="Azərbaycan dilində başlıq" />
                 
                 </div>
 
@@ -344,11 +345,7 @@ const AdminPhaseTips = () => {
                 {/* Content AZ */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">{tr("adminphasetips_mezmun_az_c325f6", "Məzmun (AZ) *")}</label>
-                  <Textarea
-                  value={formData.content_az}
-                  onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
-                  placeholder={tr("adminphasetips_azerbaycan_dilinde_mezmun_bd2290", "Azərbaycan dilində məzmun")}
-                  rows={3} />
+                  <LocalizedTextarea formData={formData} setFormData={setFormData} field="content" label="Azərbaycan dilində məzmun" rows={3} />
                 
                 </div>
 

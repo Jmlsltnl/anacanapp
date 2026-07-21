@@ -7,8 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Copy, Link, ExternalLink, Search, Smartphone, Globe } from 'lucide-react';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminDeeplinks = () => {
+    const localize = useAdminLocalize();
   const [search, setSearch] = useState('');
   const [format, setFormat] = useState<'universal' | 'scheme'>('universal');
   const [paramValues, setParamValues] = useState<Record<string, Record<string, string>>>({});
@@ -28,8 +32,7 @@ const AdminDeeplinks = () => {
     const result: Record<string, DeeplinkRoute[]> = {};
     Object.entries(categories).forEach(([cat, routes]) => {
       const filtered = routes.filter((r) =>
-      r.label_az.toLowerCase().includes(q) ||
-      r.label.toLowerCase().includes(q) ||
+      localize(r, 'label') ||
       r.pattern.toLowerCase().includes(q) ||
       r.key.toLowerCase().includes(q)
       );

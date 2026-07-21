@@ -12,6 +12,9 @@ import { toast } from 'sonner';
 import { BookOpen, Download, Upload, Save, Search, Filter, Plus, Database, AlertCircle, Loader2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 interface TranslationRow {
   id: string;
@@ -77,6 +80,7 @@ const TABLE_PRIMARY_KEYS: Record<string, string> = {
 
 
 const AdminTranslations = () => {
+    const localize = useAdminLocalize();
   const queryClient = useQueryClient();
   const [selectedLang, setSelectedLang] = useState('en');
   const [selectedNamespace, setSelectedNamespace] = useState('all');

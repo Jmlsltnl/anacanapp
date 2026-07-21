@@ -15,6 +15,9 @@ import {
 import { Plus, Pencil, Trash2, Copy, Syringe, Globe, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { VaccineCountry, Vaccine, VaccineSchedule } from '@/hooks/useVaccines';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const useAdminCountries = () =>
 useQuery({
@@ -52,6 +55,7 @@ useQuery({
 });
 
 export default function AdminVaccines() {
+    const localize = useAdminLocalize();
   const { toast } = useToast();
   const qc = useQueryClient();
   const { data: countries = [] } = useAdminCountries();
@@ -330,7 +334,7 @@ export default function AdminVaccines() {
           {countryDlg && (
             <div className="space-y-3">
               <Field label={tr("adminvaccines_kod_mes_az_tr_aa7b00", "Kod (məs. AZ, TR)")}><Input value={countryDlg.code || ''} onChange={(e) => setCountryDlg({ ...countryDlg, code: e.target.value.toUpperCase() })} /></Field>
-              <Field label="Ad (AZ)"><Input value={countryDlg.name_az || ''} onChange={(e) => setCountryDlg({ ...countryDlg, name_az: e.target.value })} /></Field>
+              <Field label="Ad (AZ)"><LocalizedInput formData={countryDlg} setFormData={setCountryDlg} field="name" label="Name" /></Field>
               <Field label="Ad (EN)"><Input value={countryDlg.name_en || ''} onChange={(e) => setCountryDlg({ ...countryDlg, name_en: e.target.value })} /></Field>
               <Field label="Bayraq emoji"><Input value={countryDlg.flag_emoji || ''} onChange={(e) => setCountryDlg({ ...countryDlg, flag_emoji: e.target.value })} /></Field>
               <Field label={tr("adminvaccines_menbe_url_f7f4f2", "M\u0259nb\u0259 URL")}><Input value={countryDlg.source_url || ''} onChange={(e) => setCountryDlg({ ...countryDlg, source_url: e.target.value })} /></Field>
@@ -357,23 +361,23 @@ export default function AdminVaccines() {
                 <Field label="Kod"><Input value={vaccineDlg.code || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, code: e.target.value })} /></Field>
                 <Field label={tr("adminvaccines_reng_hex_3c8123", "R\u0259ng (hex)")}><Input value={vaccineDlg.color_hex || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, color_hex: e.target.value })} /></Field>
               </div>
-              <Field label="Ad (AZ)"><Input value={vaccineDlg.name_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, name_az: e.target.value })} /></Field>
+              <Field label="Ad (AZ)"><LocalizedInput formData={vaccineDlg} setFormData={setVaccineDlg} field="name" label="Name" /></Field>
               <Field label="Ad (EN)"><Input value={vaccineDlg.name_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, name_en: e.target.value })} /></Field>
-              <Field label={tr("adminvaccines_qisa_tesvir_az_693f19", "Qısa təsvir (AZ)")}><Textarea rows={2} value={vaccineDlg.short_description_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, short_description_az: e.target.value })} /></Field>
+              <Field label={tr("adminvaccines_qisa_tesvir_az_693f19", "Qısa təsvir (AZ)")}><LocalizedTextarea formData={vaccineDlg} setFormData={setVaccineDlg} field="short_description" label="Short_description" rows={2} /></Field>
               <Field label="Qısa təsvir (EN)"><Textarea rows={2} value={vaccineDlg.short_description_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, short_description_en: e.target.value })} /></Field>
-              <Field label={tr("adminvaccines_tam_tesvir_az_d57f71", "Tam təsvir (AZ)")}><Textarea rows={4} value={vaccineDlg.full_description_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, full_description_az: e.target.value })} /></Field>
+              <Field label={tr("adminvaccines_tam_tesvir_az_d57f71", "Tam təsvir (AZ)")}><LocalizedTextarea formData={vaccineDlg} setFormData={setVaccineDlg} field="full_description" label="Full_description" rows={4} /></Field>
               <Field label="Tam təsvir (EN)"><Textarea rows={4} value={vaccineDlg.full_description_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, full_description_en: e.target.value })} /></Field>
               <div className="grid grid-cols-2 gap-2">
-                <Field label={tr("adminvaccines_qarsisi_alinan_xestelik_862a71", "Qarşısı alınan xəstəlik")}><Input value={vaccineDlg.disease_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, disease_az: e.target.value })} /></Field>
+                <Field label={tr("adminvaccines_qarsisi_alinan_xestelik_862a71", "Qarşısı alınan xəstəlik")}><LocalizedInput formData={vaccineDlg} setFormData={setVaccineDlg} field="disease" label="Disease" /></Field>
                 <Field label="Disease (EN)"><Input value={vaccineDlg.disease_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, disease_en: e.target.value })} /></Field>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <Field label={tr("adminvaccines_vurma_usulu_689cd3", "Vurma üsulu")}><Input value={vaccineDlg.route_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, route_az: e.target.value })} /></Field>
+                <Field label={tr("adminvaccines_vurma_usulu_689cd3", "Vurma üsulu")}><LocalizedInput formData={vaccineDlg} setFormData={setVaccineDlg} field="route" label="Route" /></Field>
                 <Field label="Route (EN)"><Input value={vaccineDlg.route_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, route_en: e.target.value })} /></Field>
               </div>
-              <Field label={tr("adminvaccines_yan_tesirler_426f38", "Yan təsirlər")}><Textarea rows={2} value={vaccineDlg.side_effects_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, side_effects_az: e.target.value })} /></Field>
+              <Field label={tr("adminvaccines_yan_tesirler_426f38", "Yan təsirlər")}><LocalizedTextarea formData={vaccineDlg} setFormData={setVaccineDlg} field="side_effects" label="Side_effects" rows={2} /></Field>
               <Field label="Side effects (EN)"><Textarea rows={2} value={vaccineDlg.side_effects_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, side_effects_en: e.target.value })} /></Field>
-              <Field label={tr("adminvaccines_eks_gosterisler_f34875", "Əks-göstərişlər")}><Textarea rows={2} value={vaccineDlg.contraindications_az || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, contraindications_az: e.target.value })} /></Field>
+              <Field label={tr("adminvaccines_eks_gosterisler_f34875", "Əks-göstərişlər")}><LocalizedTextarea formData={vaccineDlg} setFormData={setVaccineDlg} field="contraindications" label="Contraindications" rows={2} /></Field>
               <Field label="Contraindications (EN)"><Textarea rows={2} value={vaccineDlg.contraindications_en || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, contraindications_en: e.target.value })} /></Field>
               <Field label={tr("adminvaccines_menbe_url_f7f4f2", "M\u0259nb\u0259 URL")}><Input value={vaccineDlg.source_url || ''} onChange={(e) => setVaccineDlg({ ...vaccineDlg, source_url: e.target.value })} /></Field>
               <Field label={tr("adminvaccines_sira_421c5f", "S\u0131ra")}><Input type="number" value={vaccineDlg.sort_order ?? 0} onChange={(e) => setVaccineDlg({ ...vaccineDlg, sort_order: +e.target.value })} /></Field>
@@ -406,14 +410,14 @@ export default function AdminVaccines() {
                 <Field label="Doza №"><Input type="number" value={scheduleDlg.dose_number ?? 1} onChange={e => setScheduleDlg({ ...scheduleDlg, dose_number: +e.target.value })} /></Field>
                 <Field label="Sıra"><Input type="number" value={scheduleDlg.sort_order ?? 0} onChange={e => setScheduleDlg({ ...scheduleDlg, sort_order: +e.target.value })} /></Field>
               </div>
-              <Field label="Doza adı (məs. 1-ci doza)"><Input value={scheduleDlg.dose_label_az || ''} onChange={e => setScheduleDlg({ ...scheduleDlg, dose_label_az: e.target.value })} /></Field>
-              <Field label="Yaş etiketi (məs. 2 aylıq)"><Input value={scheduleDlg.age_label_az || ''} onChange={e => setScheduleDlg({ ...scheduleDlg, age_label_az: e.target.value })} /></Field>
+              <Field label="Doza adı (məs. 1-ci doza)"><LocalizedInput formData={scheduleDlg} setFormData={setScheduleDlg} field="dose_label" label="Dose_label" /></Field>
+              <Field label="Yaş etiketi (məs. 2 aylıq)"><LocalizedInput formData={scheduleDlg} setFormData={setScheduleDlg} field="age_label" label="Age_label" /></Field>
               <Field label="Tövsiyə olunan yaş (günlə)"><Input type="number" value={scheduleDlg.recommended_age_days ?? 0} onChange={e => setScheduleDlg({ ...scheduleDlg, recommended_age_days: +e.target.value })} /></Field>
               <div className="grid grid-cols-2 gap-2">
                 <Field label="Min yaş (günlə)"><Input type="number" value={scheduleDlg.min_age_days ?? ''} onChange={e => setScheduleDlg({ ...scheduleDlg, min_age_days: e.target.value === '' ? null : +e.target.value })} /></Field>
                 <Field label="Max yaş (günlə)"><Input type="number" value={scheduleDlg.max_age_days ?? ''} onChange={e => setScheduleDlg({ ...scheduleDlg, max_age_days: e.target.value === '' ? null : +e.target.value })} /></Field>
               </div>
-              <Field label="Qeyd"><Textarea rows={2} value={scheduleDlg.notes_az || ''} onChange={e => setScheduleDlg({ ...scheduleDlg, notes_az: e.target.value })} /></Field>
+              <Field label="Qeyd"><LocalizedTextarea formData={scheduleDlg} setFormData={setScheduleDlg} field="notes" label="Notes" rows={2} /></Field>
             </div>
           )}
           <DialogFooter>

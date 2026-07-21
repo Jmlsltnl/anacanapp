@@ -14,6 +14,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useAllLegalDocuments, useUpdateLegalDocument, useCreateLegalDocument, LegalDocument } from '@/hooks/useLegalDocuments';
 import { toast } from 'sonner';
 import MarkdownContent from '@/components/MarkdownContent';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const documentTypeLabels: Record<string, string> = {
   terms_of_service: tr("adminlegal_i_stifade_sertleri_fbbe3d", "\u0130stifad\u0259 \u015E\u0259rtl\u0259ri"),
@@ -25,6 +28,7 @@ const documentTypeLabels: Record<string, string> = {
 };
 
 const AdminLegal = () => {
+    const localize = useAdminLocalize();
   const { data: documents = [], isLoading } = useAllLegalDocuments();
   const updateDocument = useUpdateLegalDocument();
   const createDocument = useCreateLegalDocument();
@@ -110,7 +114,7 @@ const AdminLegal = () => {
                   <FileText className={`h-5 w-5 ${doc.is_active ? 'text-green-500' : 'text-gray-500'}`} />
                 </div>
                 <div>
-                  <h3 className="font-medium">{doc.title_az || doc.title}</h3>
+                  <h3 className="font-medium">{localize(doc, 'title')}</h3>
                   <p className="text-sm text-muted-foreground">
                     {documentTypeLabels[doc.document_type] || doc.document_type} • v{doc.version}
                   </p>
@@ -181,9 +185,7 @@ const AdminLegal = () => {
                   </div>
                   <div className="space-y-2">
                     <Label>{tr("adminlegal_basliq_az_3e294a", "Başlıq (AZ)")}</Label>
-                    <Input
-                      value={editForm.title_az || ''}
-                      onChange={(e) => setEditForm({ ...editForm, title_az: e.target.value })} />
+                    <LocalizedInput formData={editForm} setFormData={setEditForm} field="title" label="Title" />
                     
                   </div>
                 </div>

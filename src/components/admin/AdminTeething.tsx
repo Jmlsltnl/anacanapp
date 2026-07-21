@@ -14,6 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Edit, Trash2, Save, Sparkles, Heart, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 interface BabyTooth {
   id: string;
@@ -56,6 +59,7 @@ interface Symptom {
 }
 
 const AdminTeething = () => {
+    const localize = useAdminLocalize();
   const [activeTab, setActiveTab] = useState('teeth');
   const [teeth, setTeeth] = useState<BabyTooth[]>([]);
   const [tips, setTips] = useState<CareTip[]>([]);
@@ -261,7 +265,7 @@ const AdminTeething = () => {
                   <TableRow key={tooth.id}>
                       <TableCell>
                         <div>
-                          <p className="font-medium">{tooth.name_az || tooth.name}</p>
+                          <p className="font-medium">{localize(tooth, 'name')}</p>
                           <p className="text-xs text-muted-foreground">{tooth.tooth_code}</p>
                         </div>
                       </TableCell>
@@ -321,9 +325,9 @@ const AdminTeething = () => {
                         <div className="flex items-start gap-2">
                           <span className="text-xl">{tip.emoji}</span>
                           <div>
-                            <p className="font-medium">{tip.title_az || tip.title}</p>
+                            <p className="font-medium">{localize(tip, 'title')}</p>
                             <p className="text-xs text-muted-foreground line-clamp-1">
-                              {tip.content_az || tip.content}
+                              {localize(tip, 'content')}
                             </p>
                           </div>
                         </div>
@@ -375,9 +379,9 @@ const AdminTeething = () => {
                         <div className="flex items-start gap-2">
                           <span className="text-xl">{symptom.emoji}</span>
                           <div>
-                            <p className="font-medium">{symptom.name_az || symptom.name}</p>
+                            <p className="font-medium">{localize(symptom, 'name')}</p>
                             <p className="text-xs text-muted-foreground line-clamp-1">
-                              {symptom.description_az || symptom.description}
+                              {localize(symptom, 'description')}
                             </p>
                           </div>
                         </div>
@@ -463,9 +467,7 @@ const AdminTeething = () => {
                   </div>
                   <div>
                     <label className="text-sm font-medium">Ad (AZ)</label>
-                    <Input
-                  value={editingItem.name_az || ''}
-                  onChange={(e) => updateEditingItem('name_az', e.target.value)} />
+                    <LocalizedInput formData={editingItem} setFormData={setEditingItem} field="name" label="Name" />
                 
                   </div>
                   <div className="grid grid-cols-3 gap-4">
@@ -556,9 +558,7 @@ const AdminTeething = () => {
                   </div>
                   <div>
                     <label className="text-sm font-medium">{tr("adminteething_basliq_az_3e294a", "Başlıq (AZ)")}</label>
-                    <Input
-                  value={editingItem.title_az || ''}
-                  onChange={(e) => updateEditingItem('title_az', e.target.value)} />
+                    <LocalizedInput formData={editingItem} setFormData={setEditingItem} field="title" label="Title" />
                 
                   </div>
                   <div>
@@ -571,10 +571,7 @@ const AdminTeething = () => {
                   </div>
                   <div>
                     <label className="text-sm font-medium">{tr("adminteething_mezmun_az_d18d5f", "Məzmun (AZ)")}</label>
-                    <Textarea
-                  value={editingItem.content_az || ''}
-                  onChange={(e) => updateEditingItem('content_az', e.target.value)}
-                  rows={3} />
+                    <LocalizedTextarea formData={editingItem} setFormData={setEditingItem} field="content" label="Content" rows={3} />
                 
                   </div>
                 </>
@@ -611,9 +608,7 @@ const AdminTeething = () => {
                   </div>
                   <div>
                     <label className="text-sm font-medium">Ad (AZ)</label>
-                    <Input
-                  value={editingItem.name_az || ''}
-                  onChange={(e) => updateEditingItem('name_az', e.target.value)} />
+                    <LocalizedInput formData={editingItem} setFormData={setEditingItem} field="name" label="Name" />
                 
                   </div>
                   <div>
@@ -626,10 +621,7 @@ const AdminTeething = () => {
                   </div>
                   <div>
                     <label className="text-sm font-medium">{tr("adminteething_aciqlama_az_86f364", "Açıqlama (AZ)")}</label>
-                    <Textarea
-                  value={editingItem.description_az || ''}
-                  onChange={(e) => updateEditingItem('description_az', e.target.value)}
-                  rows={2} />
+                    <LocalizedTextarea formData={editingItem} setFormData={setEditingItem} field="description" label="Description" rows={2} />
                 
                   </div>
                 </>

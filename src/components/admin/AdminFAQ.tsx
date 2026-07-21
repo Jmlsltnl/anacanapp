@@ -13,6 +13,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { useAdminFAQ, FAQ } from '@/hooks/useAdminFAQ';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const categories = [
 { id: 'general', label: tr("adminfaq_umumi_1b5521", "Ümumi") },
@@ -24,6 +27,7 @@ const categories = [
 
 
 const AdminFAQ = () => {
+    const localize = useAdminLocalize();
   const { data: faqs = [], isLoading, create, update, remove } = useAdminFAQ();
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -87,7 +91,7 @@ const AdminFAQ = () => {
   };
 
   const filteredFaqs = faqs.filter((f) =>
-  (f.question_az || f.question).toLowerCase().includes(search.toLowerCase())
+  (localize(f, 'question')).toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -187,7 +191,7 @@ const AdminFAQ = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <p className="font-medium text-foreground">{faq.question_az || faq.question}</p>
+                        <p className="font-medium text-foreground">{localize(faq, 'question')}</p>
                         <Badge variant={faq.is_active ? 'default' : 'secondary'}>
                           {faq.is_active ? 'Aktiv' : 'Gizli'}
                         </Badge>
@@ -196,7 +200,7 @@ const AdminFAQ = () => {
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-2">
-                        {faq.answer_az || faq.answer}
+                        {localize(faq, 'answer')}
                       </p>
                     </div>
                     <div className="flex items-center gap-2 ml-4">
@@ -228,10 +232,7 @@ const AdminFAQ = () => {
                 value={formData.question || ''}
                 onChange={(e) => setFormData({ ...formData, question: e.target.value })} />
               
-              <Input
-                placeholder="Sual (AZ)"
-                value={formData.question_az || ''}
-                onChange={(e) => setFormData({ ...formData, question_az: e.target.value })} />
+              <LocalizedInput formData={formData} setFormData={setFormData} field="question" label="Sual" />
               
               <Textarea
                 placeholder="Cavab (EN)"
@@ -239,11 +240,7 @@ const AdminFAQ = () => {
                 onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
                 rows={4} />
               
-              <Textarea
-                placeholder="Cavab (AZ)"
-                value={formData.answer_az || ''}
-                onChange={(e) => setFormData({ ...formData, answer_az: e.target.value })}
-                rows={4} />
+              <LocalizedTextarea formData={formData} setFormData={setFormData} field="answer" label="Cavab" rows={4} />
               
               <div className="grid grid-cols-2 gap-3">
                 <Select

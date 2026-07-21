@@ -9,6 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash2, Save, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AGE_GROUPS = [
 { value: 'newborn', label: tr("admindevelopmenttips_yenidogan_0_3_ay_267ade", "Yenidoğan (0-3 ay)") },
@@ -19,6 +22,7 @@ const AGE_GROUPS = [
 const EMOJIS = ['👁️', '🎵', '🤲', '🧸', '📖', '🎶', '🥣', '🚶', '🗣️', '💪', '🌟', '❤️'];
 
 const AdminDevelopmentTips = () => {
+    const localize = useAdminLocalize();
   const { data: tips = [], isLoading } = useAllDevelopmentTips();
   const { createTip, updateTip, deleteTip } = useDevelopmentTipsMutations();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -113,11 +117,7 @@ const AdminDevelopmentTips = () => {
                     )}
                         </SelectContent>
                       </Select>
-                      <Input
-                  value={formData.title_az ?? tip.title_az ?? ''}
-                  onChange={(e) => setFormData({ ...formData, title_az: e.target.value })}
-                  placeholder={tr("admindevelopmenttips_basliq_az_3e294a", "Başlıq (AZ)")}
-                  className="flex-1" />
+                      <LocalizedInput formData={formData} setFormData={setFormData} field="title" label="Başlıq" />
                 
                       <Select
                   value={formData.age_group || tip.age_group}
@@ -133,11 +133,7 @@ const AdminDevelopmentTips = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <Textarea
-                value={formData.content_az ?? tip.content_az ?? ''}
-                onChange={(e) => setFormData({ ...formData, content_az: e.target.value })}
-                placeholder={tr("admindevelopmenttips_metn_az_0aaa4b", "Mətn (AZ)")}
-                rows={2} />
+                    <LocalizedTextarea formData={formData} setFormData={setFormData} field="content" label="Mətn" rows={2} />
               
                     <div className="flex gap-2">
                       <Input
@@ -160,9 +156,9 @@ const AdminDevelopmentTips = () => {
             <div className="flex items-start gap-3">
                     <span className="text-2xl">{tip.emoji}</span>
                     <div className="flex-1">
-                      <p className="font-medium">{tip.title_az || tip.title}</p>
+                      <p className="font-medium">{localize(tip, 'title')}</p>
                       <p className="text-sm text-muted-foreground line-clamp-2">
-                        {tip.content_az || tip.content}
+                        {localize(tip, 'content')}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">

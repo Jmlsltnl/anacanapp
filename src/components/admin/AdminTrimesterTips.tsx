@@ -12,11 +12,15 @@ import { Label } from '@/components/ui/label';
 import { Plus, Trash2, Edit2, Save, X, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminTrimesterTips = () => {
+    const localize = useAdminLocalize();
   const { data: dbTrimesterInfo = [] } = useTrimesterInfo();
   const TRIMESTER_INFO = dbTrimesterInfo.length > 0 ?
-  dbTrimesterInfo.map((t) => ({ value: t.trimester_number, label: t.label_az || t.label, emoji: t.emoji, color: t.color_class })) :
+  dbTrimesterInfo.map((t) => ({ value: t.trimester_number, label: localize(t, 'label'), emoji: t.emoji, color: t.color_class })) :
   FALLBACK_TRIMESTER_INFO.map((t) => ({ value: t.trimester_number, label: t.label_az, emoji: t.emoji, color: t.color_class }));
 
   const { tips, isLoading, createTip, updateTip, deleteTip } = useTrimesterTipsAdmin();

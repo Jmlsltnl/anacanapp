@@ -10,8 +10,12 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminVitamins = () => {
+    const localize = useAdminLocalize();
   const { vitamins, isLoading, createVitamin, updateVitamin, deleteVitamin } = useVitaminsAdmin();
   const [search, setSearch] = useState('');
   const [filterStage, setFilterStage] = useState<string>('all');
@@ -195,7 +199,7 @@ const AdminVitamins = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-sm">{vitamin.name_az || vitamin.name}</h3>
+                  <h3 className="font-semibold text-sm">{localize(vitamin, 'name')}</h3>
                   <span className={`text-[10px] px-1.5 py-0.5 rounded ${
                 vitamin.importance === 'essential' ?
                 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
@@ -205,7 +209,7 @@ const AdminVitamins = () => {
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
-                  {vitamin.description_az || vitamin.description}
+                  {localize(vitamin, 'description')}
                 </p>
                 <div className="flex items-center gap-2 mt-1.5 text-[10px] text-muted-foreground">
                   <span className="px-1.5 py-0.5 bg-muted rounded">
@@ -267,22 +271,14 @@ const AdminVitamins = () => {
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Ad (AZ)</label>
-                <Input
-                  value={formData.name_az}
-                  onChange={(e) => setFormData({ ...formData, name_az: e.target.value })}
-                  placeholder="D vitamini"
-                  className="h-9" />
+                <LocalizedInput formData={formData} setFormData={setFormData} field="name" label="D vitamini" />
                 
               </div>
             </div>
 
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">{tr("adminvitamins_tesvir_az_2c237a", "Təsvir (AZ)")}</label>
-              <Textarea
-                value={formData.description_az}
-                onChange={(e) => setFormData({ ...formData, description_az: e.target.value })}
-                placeholder={tr("adminvitamins_vitaminin_faydalari_haqqinda_a3e855", "Vitaminin faydaları haqqında...")}
-                rows={2} />
+              <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Vitaminin faydaları haqqında..." rows={2} />
               
             </div>
 

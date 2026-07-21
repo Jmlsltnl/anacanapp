@@ -7,6 +7,9 @@ import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Plus, Edit, Trash2, Sparkles, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 interface Venue {
   id?: string;
@@ -39,6 +42,7 @@ const emptyVenue = (): Venue => ({
 });
 
 export default function AdminPartnerVenues() {
+    const localize = useAdminLocalize();
   const [venues, setVenues] = useState<Venue[]>([]);
   const [categories, setCategories] = useState<{key: string;label_az: string;}[]>([]);
   const [open, setOpen] = useState(false);

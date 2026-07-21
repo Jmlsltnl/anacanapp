@@ -12,8 +12,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminMaternityBenefits, MaternityConfigItem, MaternityGuideline } from '@/hooks/useMaternityBenefits';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminMaternityBenefits = () => {
+    const localize = useAdminLocalize();
   const { configItems, guidelines, loading, updateConfigValue, createGuideline, updateGuideline, deleteGuideline } = useAdminMaternityBenefits();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('config');
@@ -180,8 +184,8 @@ const AdminMaternityBenefits = () => {
               className="flex items-center justify-between p-4 bg-card rounded-xl border">
               
                 <div className="flex-1">
-                  <p className="font-medium">{item.label_az || item.label}</p>
-                  <p className="text-sm text-muted-foreground">{item.description_az || item.description}</p>
+                  <p className="font-medium">{localize(item, 'label')}</p>
+                  <p className="text-sm text-muted-foreground">{localize(item, 'description')}</p>
                 </div>
                 
                 {editingConfig?.id === item.id ?
@@ -238,7 +242,7 @@ const AdminMaternityBenefits = () => {
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{guide.icon}</span>
                   <div>
-                    <p className="font-medium">{guide.title_az || guide.title}</p>
+                    <p className="font-medium">{localize(guide, 'title')}</p>
                     <p className="text-sm text-muted-foreground">
                       Kateqoriya: {guide.category} {tr("adminmaternitybenefits_sira_b8830f", "| S\u0131ra:")} {guide.sort_order}
                     </p>
@@ -288,9 +292,7 @@ const AdminMaternityBenefits = () => {
 
             <div>
               <Label>{tr("adminmaternitybenefits_basliq_az_3e294a", "Başlıq (AZ)")}</Label>
-              <Input
-                value={guideForm.title_az}
-                onChange={(e) => setGuideForm({ ...guideForm, title_az: e.target.value })} />
+              <LocalizedInput formData={guideForm} setFormData={setGuideForm} field="title" label="Title" />
               
             </div>
 
@@ -305,10 +307,7 @@ const AdminMaternityBenefits = () => {
 
             <div>
               <Label>{tr("adminmaternitybenefits_mezmun_az_markdown_desteklenir_769038", "Məzmun (AZ) - Markdown dəstəklənir")}</Label>
-              <Textarea
-                value={guideForm.content_az}
-                onChange={(e) => setGuideForm({ ...guideForm, content_az: e.target.value })}
-                rows={6} />
+              <LocalizedTextarea formData={guideForm} setFormData={setGuideForm} field="content" label="Content" rows={6} />
               
             </div>
 

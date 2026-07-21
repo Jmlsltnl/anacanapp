@@ -13,11 +13,15 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSkillCategories, FALLBACK_SKILL_CATEGORIES } from '@/hooks/useSkillCategories';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminPlayActivities = () => {
+    const localize = useAdminLocalize();
   const { data: dbSkillCategories = [] } = useSkillCategories();
   const skillCategories = dbSkillCategories.length > 0 ?
-  dbSkillCategories.map((s) => ({ value: s.skill_key, label: s.label_az || s.label, color: s.color })) :
+  dbSkillCategories.map((s) => ({ value: s.skill_key, label: localize(s, 'label'), color: s.color })) :
   FALLBACK_SKILL_CATEGORIES.map((s) => ({ value: s.skill_key, label: s.label_az, color: s.color }));
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -172,7 +176,7 @@ const AdminPlayActivities = () => {
                         <div className="flex items-center gap-3">
                           <span className="text-3xl">🎮</span>
                           <div>
-                            <h3 className="font-bold">{activity.title_az || activity.title}</h3>
+                            <h3 className="font-bold">{localize(activity, 'title')}</h3>
                             <div className="flex items-center gap-2 mt-1">
                               <Badge className={`${getSkillCategoryColor(activity.skill_tags)} text-white text-xs`}>
                                 {activity.skill_tags?.[0] ? skillCategories.find((c) => c.value === activity.skill_tags![0])?.label || tr("adminplayactivities_diger_293b3a", "Dig\u0259r") : tr("adminplayactivities_diger_293b3a", "Dig\u0259r")}
@@ -190,7 +194,7 @@ const AdminPlayActivities = () => {
                       </div>
                       
                       <p className="text-sm text-muted-foreground line-clamp-2">
-                        {activity.description_az || activity.description}
+                        {localize(activity, 'description')}
                       </p>
                       
                       {activity.required_items && activity.required_items.length > 0 &&
@@ -284,9 +288,7 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
         </div>
         <div>
           <label className="text-sm font-medium">{tr("adminplayactivities_basliq_az_3e294a", "Başlıq (AZ)")}</label>
-          <Input
-            value={form.title_az}
-            onChange={(e) => setForm({ ...form, title_az: e.target.value })} />
+          <LocalizedInput formData={form} setFormData={setForm} field="title" label="Title" />
           
         </div>
       </div>
@@ -301,9 +303,7 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
         </div>
         <div>
           <label className="text-sm font-medium">{tr("adminplayactivities_tesvir_az_2c237a", "Təsvir (AZ)")}</label>
-          <Textarea
-            value={form.description_az}
-            onChange={(e) => setForm({ ...form, description_az: e.target.value })} />
+          <LocalizedTextarea formData={form} setFormData={setForm} field="description" label="Description" />
           
         </div>
       </div>

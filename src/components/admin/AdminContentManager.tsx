@@ -14,6 +14,9 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BulkTipsImport from './BulkTipsImport';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 type ContentType = 'recipes' | 'tips' | 'safety' | 'names' | 'hospital' | 'nutrition';
 
@@ -30,6 +33,7 @@ interface ContentItem {
 }
 
 const AdminContentManager = () => {
+    const localize = useAdminLocalize();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<ContentType>('recipes');
   const [items, setItems] = useState<ContentItem[]>([]);
@@ -962,7 +966,7 @@ const AdminContentManager = () => {
                   <p className="font-semibold">{item.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {item.origin && `${item.origin} • `}
-                    {item.meaning_az || item.meaning}
+                    {localize(item, 'meaning')}
                   </p>
                 </div>
                 <div className="text-right">

@@ -12,6 +12,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Badge } from '@/components/ui/badge';
 import { useAdminPartnerTips, PartnerDailyTip } from '@/hooks/useAdminPartnerTips';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const lifeStages = [
 { id: 'flow', label: tr("adminpartnertips_dovr_izleme_9d1cf4", "Dövr İzləmə"), emoji: '🌸' },
@@ -20,6 +23,7 @@ const lifeStages = [
 
 
 const AdminPartnerTips = () => {
+    const localize = useAdminLocalize();
   const { data: tips = [], isLoading, create, update, remove } = useAdminPartnerTips();
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -83,7 +87,7 @@ const AdminPartnerTips = () => {
   };
 
   const filteredTips = tips.filter((t) =>
-  (t.tip_text_az || t.tip_text).toLowerCase().includes(search.toLowerCase())
+  (localize(t, 'tip_text')).toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -166,7 +170,7 @@ const AdminPartnerTips = () => {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-foreground">{tip.tip_text_az || tip.tip_text}</p>
+                        <p className="font-medium text-foreground">{localize(tip, 'tip_text')}</p>
                         <Badge variant={tip.is_active ? 'default' : 'secondary'}>
                           {tip.is_active ? 'Aktiv' : 'Deaktiv'}
                         </Badge>
@@ -209,10 +213,7 @@ const AdminPartnerTips = () => {
               value={formData.tip_text || ''}
               onChange={(e) => setFormData({ ...formData, tip_text: e.target.value })} />
             
-            <Textarea
-              placeholder={tr("adminpartnertips_metn_az_0aaa4b", "Mətn (AZ)")}
-              value={formData.tip_text_az || ''}
-              onChange={(e) => setFormData({ ...formData, tip_text_az: e.target.value })} />
+            <LocalizedTextarea formData={formData} setFormData={setFormData} field="tip_text" label="Mətn" />
             
             <div className="grid grid-cols-2 gap-3">
               <Input

@@ -12,6 +12,9 @@ import { useCakeOrders } from '@/hooks/useCakes';
 import { usePaymentMethods } from '@/hooks/usePaymentMethods';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const MILESTONE_OPTIONS = [
 { value: 'first_tooth', label: tr("admincakes_ilk_dis_03153e", "İlk Diş") },
@@ -41,6 +44,7 @@ const PAYMENT_STATUSES = [
 
 
 const AdminCakes = () => {
+    const localize = useAdminLocalize();
   const { toast } = useToast();
   const { cakes, loading, addCake, updateCake, deleteCake } = useAdminCakes();
   const { orders, updateOrderStatus } = useCakeOrders();
@@ -563,8 +567,8 @@ const AdminCakes = () => {
             animate={{ opacity: 1 }}>
             
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-sm">{method.label_az || method.label}</h3>
-                    <p className="text-xs text-muted-foreground">{method.description_az || method.description}</p>
+                    <h3 className="font-bold text-sm">{localize(method, 'label')}</h3>
+                    <p className="text-xs text-muted-foreground">{localize(method, 'description')}</p>
                     {method.method_key === 'c2c_transfer' &&
               <button
                 onClick={() => setEditingConfig({ id: method.id, config: method.config || {} })}

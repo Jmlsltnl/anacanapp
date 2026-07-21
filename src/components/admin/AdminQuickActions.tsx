@@ -8,12 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Trash2, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const ICONS = ['Baby', 'Thermometer', 'Music', 'AlertCircle', 'Sparkles', 'BookOpen', 'Camera', 'Stethoscope', 'Heart', 'Star'];
 const AGE_GROUPS = ['newborn', 'infant', 'older', 'all'];
 const LIFE_STAGES = ['mommy', 'bump', 'flow'];
 
 const AdminQuickActions = () => {
+    const localize = useAdminLocalize();
   const { data: actions = [], isLoading } = useAllQuickActions();
   const { createAction, updateAction, deleteAction } = useQuickActionsMutations();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -107,11 +111,7 @@ const AdminQuickActions = () => {
                   )}
                       </SelectContent>
                     </Select>
-                    <Input
-                value={formData.label_az ?? action.label_az ?? ''}
-                onChange={(e) => setFormData({ ...formData, label_az: e.target.value })}
-                placeholder={tr("adminquickactions_azerbaycanca_bdc8df", "Azərbaycanca")}
-                className="flex-1" />
+                    <LocalizedInput formData={formData} setFormData={setFormData} field="label" label="Azərbaycanca" />
               
                     <Input
                 value={formData.tool_key ?? action.tool_key}
@@ -148,7 +148,7 @@ const AdminQuickActions = () => {
                       {action.icon.slice(0, 2)}
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium">{action.label_az || action.label}</p>
+                      <p className="font-medium">{localize(action, 'label')}</p>
                       <p className="text-xs text-muted-foreground">{action.tool_key}</p>
                     </div>
                     <span className="text-xs bg-primary/10 px-2 py-1 rounded">{action.age_group}</span>

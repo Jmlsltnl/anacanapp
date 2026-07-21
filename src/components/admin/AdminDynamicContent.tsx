@@ -27,10 +27,14 @@ import {
   usePhotoshootThemesAdmin,
   useMoodOptionsAdmin } from
 '@/hooks/useDynamicConfig';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 type ContentType = 'exercises' | 'sounds' | 'surprises' | 'milestones' | 'symptoms' | 'foods' | 'categories' | 'themes' | 'moods';
 
 const AdminDynamicContent = () => {
+    const localize = useAdminLocalize();
   const [activeTab, setActiveTab] = useState<ContentType>('exercises');
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -163,7 +167,7 @@ const AdminDynamicContent = () => {
           <>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Ad (EN)" value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-              <Input placeholder="Ad (AZ)" value={formData.name_az || ''} onChange={(e) => setFormData({ ...formData, name_az: e.target.value })} />
+              <LocalizedInput formData={formData} setFormData={setFormData} field="name" label="Ad" />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <Input type="number" placeholder={tr("admindynamiccontent_deqiqe_582f34", "Dəqiqə")} value={formData.duration_minutes || ''} onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) })} />
@@ -195,7 +199,7 @@ const AdminDynamicContent = () => {
           <>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Ad (EN)" value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-              <Input placeholder="Ad (AZ)" value={formData.name_az || ''} onChange={(e) => setFormData({ ...formData, name_az: e.target.value })} />
+              <LocalizedInput formData={formData} setFormData={setFormData} field="name" label="Ad" />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={(e) => setFormData({ ...formData, emoji: e.target.value })} />
@@ -210,7 +214,7 @@ const AdminDynamicContent = () => {
               <Input placeholder="Gradient" value={formData.color_gradient || ''} onChange={(e) => setFormData({ ...formData, color_gradient: e.target.value })} />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <Input placeholder={tr("admindynamiccontent_tesvir_az_2c237a", "Təsvir (AZ)")} value={formData.description_az || ''} onChange={(e) => setFormData({ ...formData, description_az: e.target.value })} />
+              <LocalizedInput formData={formData} setFormData={setFormData} field="description" label="Təsvir" />
               <Input placeholder={tr("admindynamiccontent_tesvir_en_c64521", "Təsvir (EN)")} value={formData.description || ''} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
             </div>
             <Input placeholder="Audio URL" value={formData.audio_url || ''} onChange={(e) => setFormData({ ...formData, audio_url: e.target.value })} />
@@ -269,14 +273,14 @@ const AdminDynamicContent = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder={tr("admindynamiccontent_basliq_en_4ac905", "Başlıq (EN)")} value={formData.label || ''} onChange={(e) => setFormData({ ...formData, label: e.target.value })} />
-              <Input placeholder={tr("admindynamiccontent_basliq_az_3e294a", "Başlıq (AZ)")} value={formData.label_az || ''} onChange={(e) => setFormData({ ...formData, label_az: e.target.value })} />
+              <LocalizedInput formData={formData} setFormData={setFormData} field="label" label="Başlıq" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={(e) => setFormData({ ...formData, emoji: e.target.value })} />
               <Input type="number" placeholder={tr("admindynamiccontent_sira_421c5f", "Sıra")} value={formData.sort_order || 0} onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })} />
             </div>
             <Textarea placeholder={tr("admindynamiccontent_tesvir_en_c64521", "Təsvir (EN)")} value={formData.description || ''} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
-            <Textarea placeholder={tr("admindynamiccontent_tesvir_az_2c237a", "Təsvir (AZ)")} value={formData.description_az || ''} onChange={(e) => setFormData({ ...formData, description_az: e.target.value })} />
+            <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Təsvir" />
             <div className="flex items-center gap-2">
               <Switch checked={formData.is_active} onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} />
               <span className="text-sm">Aktiv</span>
@@ -293,7 +297,7 @@ const AdminDynamicContent = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder={tr("admindynamiccontent_basliq_en_4ac905", "Başlıq (EN)")} value={formData.label || ''} onChange={(e) => setFormData({ ...formData, label: e.target.value })} />
-              <Input placeholder={tr("admindynamiccontent_basliq_az_3e294a", "Başlıq (AZ)")} value={formData.label_az || ''} onChange={(e) => setFormData({ ...formData, label_az: e.target.value })} />
+              <LocalizedInput formData={formData} setFormData={setFormData} field="label" label="Başlıq" />
             </div>
             <Input type="number" placeholder={tr("admindynamiccontent_sira_421c5f", "Sıra")} value={formData.sort_order || 0} onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })} />
             <div className="flex items-center gap-2">
@@ -308,7 +312,7 @@ const AdminDynamicContent = () => {
           <>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Ad (EN)" value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-              <Input placeholder="Ad (AZ)" value={formData.name_az || ''} onChange={(e) => setFormData({ ...formData, name_az: e.target.value })} />
+              <LocalizedInput formData={formData} setFormData={setFormData} field="name" label="Ad" />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <Input type="number" placeholder="Kalori" value={formData.calories || 100} onChange={(e) => setFormData({ ...formData, calories: parseInt(e.target.value) })} />
@@ -363,7 +367,7 @@ const AdminDynamicContent = () => {
             <Input placeholder={tr("admindynamiccontent_acar_e_g_vitamins_9b17ec", "Açar (e.g. vitamins)")} value={formData.category_key || ''} onChange={(e) => setFormData({ ...formData, category_key: e.target.value })} />
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Ad (EN)" value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-              <Input placeholder="Ad (AZ)" value={formData.name_az || ''} onChange={(e) => setFormData({ ...formData, name_az: e.target.value })} />
+              <LocalizedInput formData={formData} setFormData={setFormData} field="name" label="Ad" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={(e) => setFormData({ ...formData, emoji: e.target.value })} />
@@ -389,7 +393,7 @@ const AdminDynamicContent = () => {
             </Select>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Ad (EN)" value={formData.name || ''} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
-              <Input placeholder="Ad (AZ)" value={formData.name_az || ''} onChange={(e) => setFormData({ ...formData, name_az: e.target.value })} />
+              <LocalizedInput formData={formData} setFormData={setFormData} field="name" label="Ad" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Emoji" value={formData.emoji || ''} onChange={(e) => setFormData({ ...formData, emoji: e.target.value })} />
@@ -419,7 +423,7 @@ const AdminDynamicContent = () => {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder={tr("admindynamiccontent_basliq_en_4ac905", "Başlıq (EN)")} value={formData.label || ''} onChange={(e) => setFormData({ ...formData, label: e.target.value })} />
-              <Input placeholder={tr("admindynamiccontent_basliq_az_3e294a", "Başlıq (AZ)")} value={formData.label_az || ''} onChange={(e) => setFormData({ ...formData, label_az: e.target.value })} />
+              <LocalizedInput formData={formData} setFormData={setFormData} field="label" label="Başlıq" />
             </div>
             <Input placeholder={tr("admindynamiccontent_reng_sinifi_e_g_bg_red_100_border_red_30_9f81d4", "Rəng sinifi (e.g. bg-red-100 border-red-300)")} value={formData.color_class || ''} onChange={(e) => setFormData({ ...formData, color_class: e.target.value })} />
             <div className="flex items-center gap-2">
@@ -435,7 +439,7 @@ const AdminDynamicContent = () => {
   };
 
   const renderItemCard = (item: any) => {
-    const displayName = item.name_az || item.name || item.title || item.label_az || item.label || tr("admindynamiccontent_adsiz_40b703", "Ads\u0131z");
+    const displayName = localize(item, 'name') || item.title || item.label_az || item.label || tr("admindynamiccontent_adsiz_40b703", "Ads\u0131z");
     const emoji = item.emoji || item.icon || '📦';
 
     return (

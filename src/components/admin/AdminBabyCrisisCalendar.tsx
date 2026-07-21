@@ -36,8 +36,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger } from
 "@/components/ui/collapsible";
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminBabyCrisisCalendar = () => {
+    const localize = useAdminLocalize();
   const { toast } = useToast();
   const { data: crisisPeriods = [], isLoading } = useAllBabyCrisisPeriods();
   const createMutation = useCreateBabyCrisisPeriod();
@@ -250,7 +254,7 @@ const AdminBabyCrisisCalendar = () => {
                   <div className="text-3xl">{period.emoji}</div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-foreground">{period.title_az || period.title}</h3>
+                      <h3 className="font-bold text-foreground">{localize(period, 'title')}</h3>
                       {period.leap_number &&
                     <Badge variant="secondary" className="text-xs">
                           Leap #{period.leap_number}
@@ -312,7 +316,7 @@ const AdminBabyCrisisCalendar = () => {
                       Simptomlar
                     </h4>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      {(period.symptoms_az || period.symptoms || []).map((s, i) =>
+                      {(localize(period, 'symptoms') || []).map((s, i) =>
                     <li key={i}>• {s}</li>
                     )}
                     </ul>
@@ -323,16 +327,16 @@ const AdminBabyCrisisCalendar = () => {
                       {tr("adminbabycrisiscalendar_tovsiyeler_17a8f7", "T\xF6vsiy\u0259l\u0259r")}
                     </h4>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      {(period.tips_az || period.tips || []).map((t, i) =>
+                      {(localize(period, 'tips') || []).map((t, i) =>
                     <li key={i}>• {t}</li>
                     )}
                     </ul>
                   </div>
-                  {(period.description_az || period.description) &&
+                  {(localize(period, 'description')) &&
                 <div className="md:col-span-2">
                       <h4 className="font-semibold text-sm text-foreground mb-2">{tr("adminbabycrisiscalendar_aciqlama_c33d69", "Açıqlama")}</h4>
                       <p className="text-sm text-muted-foreground">
-                        {period.description_az || period.description}
+                        {localize(period, 'description')}
                       </p>
                     </div>
                 }
@@ -400,10 +404,7 @@ const AdminBabyCrisisCalendar = () => {
               </div>
               <div>
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_basliq_az_3e294a", "Başlıq (AZ)")}</label>
-                <Input
-                  value={formData.title_az}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, title_az: e.target.value }))}
-                  placeholder={tr("adminbabycrisiscalendar_dunyasi_77862f", "...Dünyası")} />
+                <LocalizedInput formData={formData} setFormData={setFormData} field="title" label="...Dünyası" />
                 
               </div>
             </div>
@@ -420,10 +421,7 @@ const AdminBabyCrisisCalendar = () => {
               </div>
               <div>
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_aciqlama_az_86f364", "Açıqlama (AZ)")}</label>
-                <Textarea
-                  value={formData.description_az}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, description_az: e.target.value }))}
-                  rows={2} />
+                <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Description" rows={2} />
                 
               </div>
             </div>
@@ -441,11 +439,7 @@ const AdminBabyCrisisCalendar = () => {
               </div>
               <div>
                 <label className="text-sm font-medium">Simptomlar (AZ)</label>
-                <Textarea
-                  value={formData.symptoms_az}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, symptoms_az: e.target.value }))}
-                  placeholder={tr("adminbabycrisiscalendar_daha_cox_aglama_10_yuxu_problemleri_c4317e", "Daha çox ağlama&#10;Yuxu problemləri")}
-                  rows={3} />
+                <LocalizedTextarea formData={formData} setFormData={setFormData} field="symptoms" label="Daha çox ağlama&#10;Yuxu problemləri" rows={3} />
                 
               </div>
             </div>
@@ -463,11 +457,7 @@ const AdminBabyCrisisCalendar = () => {
               </div>
               <div>
                 <label className="text-sm font-medium">{tr("adminbabycrisiscalendar_tovsiyeler_az_12e64c", "Tövsiyələr (AZ)")}</label>
-                <Textarea
-                  value={formData.tips_az}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, tips_az: e.target.value }))}
-                  placeholder={tr("adminbabycrisiscalendar_elave_qucaqlasma_10_sebir_8f500e", "Əlavə qucaqlaşma&#10;Səbir")}
-                  rows={3} />
+                <LocalizedTextarea formData={formData} setFormData={setFormData} field="tips" label="Əlavə qucaqlaşma&#10;Səbir" rows={3} />
                 
               </div>
             </div>

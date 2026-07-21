@@ -21,8 +21,12 @@ import {
   DialogTitle,
   DialogTrigger } from
 "@/components/ui/dialog";
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminBabyIllustrations = () => {
+    const localize = useAdminLocalize();
   const { toast } = useToast();
   const { data: illustrations = [], isLoading } = useAllBabyMonthIllustrations();
   const upsertMutation = useUpsertBabyMonthIllustration();
@@ -255,19 +259,12 @@ const AdminBabyIllustrations = () => {
             <div className="space-y-3">
               <div>
                 <label className="text-sm font-medium text-foreground">{tr("adminbabyillustrations_basliq_az_3e294a", "Başlıq (AZ)")}</label>
-                <Input
-                  value={formData.title_az}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, title_az: e.target.value }))}
-                  placeholder={`${selectedMonth} aylıq körpə`} />
+                <LocalizedInput formData={formData} setFormData={setFormData} field="title" label={`${selectedMonth} aylıq körpə`} />
                 
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground">{tr("adminbabyillustrations_aciqlama_az_86f364", "Açıqlama (AZ)")}</label>
-                <Textarea
-                  value={formData.description_az}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, description_az: e.target.value }))}
-                  placeholder={tr("adminbabyillustrations_bu_yasda_korpenin_xususiyyetleri_d15028", "Bu yaşda körpənin xüsusiyyətləri...")}
-                  rows={3} />
+                <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Bu yaşda körpənin xüsusiyyətləri..." rows={3} />
                 
               </div>
             </div>

@@ -27,6 +27,9 @@ import {
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 interface Review {
   id: string;
@@ -41,6 +44,7 @@ interface Review {
 }
 
 const AdminHealthcareReviews = () => {
+    const localize = useAdminLocalize();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -67,7 +71,7 @@ const AdminHealthcareReviews = () => {
       select('id, name, name_az').
       in('id', providerIds);
 
-      const providerMap = new Map(providers?.map((p) => [p.id, p.name_az || p.name]) || []);
+      const providerMap = new Map(providers?.map((p) => [p.id, localize(p, 'name')]) || []);
 
       // Fetch user profiles
       const userIds = [...new Set((reviewsData || []).map((r) => r.user_id))];

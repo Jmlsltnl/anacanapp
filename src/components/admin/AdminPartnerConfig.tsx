@@ -9,8 +9,12 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Save, X, Loader2, Trophy, Menu, Gift } from 'lucide-react';
 import { toast } from 'sonner';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminPartnerConfig = () => {
+    const localize = useAdminLocalize();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('achievements');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -136,7 +140,7 @@ const AdminPartnerConfig = () => {
                         <div className="flex items-center gap-3">
                           <span className="text-3xl">{item.emoji}</span>
                           <div>
-                            <p className="font-semibold">{item.name_az || item.name}</p>
+                            <p className="font-semibold">{localize(item, 'name')}</p>
                             <p className="text-xs text-muted-foreground">
                               {tr("adminpartnerconfig_sert_302b8b", "\u015E\u0259rt:")} {item.unlock_condition} {tr("adminpartnerconfig_hedd_831a6e", "| H\u0259dd:")} {item.unlock_threshold}
                             </p>
@@ -196,7 +200,7 @@ const AdminPartnerConfig = () => {
                         <div className="flex items-center gap-3">
                           <Menu className="w-5 h-5 text-muted-foreground" />
                           <div>
-                            <p className="font-semibold">{item.label_az || item.label}</p>
+                            <p className="font-semibold">{localize(item, 'label')}</p>
                             <p className="text-xs text-muted-foreground">Route: {item.route} | Icon: {item.icon_name}</p>
                           </div>
                         </div>
@@ -254,7 +258,7 @@ const AdminPartnerConfig = () => {
                         <div className="flex items-center gap-3">
                           <span className="text-2xl">{item.emoji}</span>
                           <div>
-                            <p className="font-semibold">{item.label_az || item.label}</p>
+                            <p className="font-semibold">{localize(item, 'label')}</p>
                             <p className="text-xs text-muted-foreground">Key: {item.category_key}</p>
                           </div>
                         </div>
@@ -300,7 +304,7 @@ const AchievementForm = ({ item, onSave, onCancel, isLoading }: any) => {
         <Input placeholder="Key" value={form.achievement_key} onChange={(e) => setForm({ ...form, achievement_key: e.target.value })} />
         <Input placeholder="Emoji" value={form.emoji} onChange={(e) => setForm({ ...form, emoji: e.target.value })} />
         <Input placeholder="Name (EN)" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-        <Input placeholder="Name (AZ)" value={form.name_az} onChange={(e) => setForm({ ...form, name_az: e.target.value })} />
+        <LocalizedInput formData={form} setFormData={setForm} field="name" label="Name" />
         <Input placeholder="Unlock Condition" value={form.unlock_condition} onChange={(e) => setForm({ ...form, unlock_condition: e.target.value })} />
         <Input type="number" placeholder="Threshold" value={form.unlock_threshold} onChange={(e) => setForm({ ...form, unlock_threshold: parseInt(e.target.value) || 0 })} />
       </div>
@@ -328,7 +332,7 @@ const MenuItemForm = ({ item, onSave, onCancel, isLoading }: any) => {
       <div className="grid grid-cols-2 gap-3">
         <Input placeholder="Key" value={form.menu_key} onChange={(e) => setForm({ ...form, menu_key: e.target.value })} />
         <Input placeholder="Label (EN)" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} />
-        <Input placeholder="Label (AZ)" value={form.label_az} onChange={(e) => setForm({ ...form, label_az: e.target.value })} />
+        <LocalizedInput formData={form} setFormData={setForm} field="label" label="Label" />
         <Input placeholder="Icon Name" value={form.icon_name} onChange={(e) => setForm({ ...form, icon_name: e.target.value })} />
         <Input placeholder="Route" value={form.route} onChange={(e) => setForm({ ...form, route: e.target.value })} />
         <Input type="number" placeholder="Sort Order" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
@@ -358,7 +362,7 @@ const SurpriseCategoryForm = ({ item, onSave, onCancel, isLoading }: any) => {
         <Input placeholder="Key" value={form.category_key} onChange={(e) => setForm({ ...form, category_key: e.target.value })} />
         <Input placeholder="Emoji" value={form.emoji} onChange={(e) => setForm({ ...form, emoji: e.target.value })} />
         <Input placeholder="Label (EN)" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} />
-        <Input placeholder="Label (AZ)" value={form.label_az} onChange={(e) => setForm({ ...form, label_az: e.target.value })} />
+        <LocalizedInput formData={form} setFormData={setForm} field="label" label="Label" />
         <Input placeholder="Color Gradient" value={form.color_gradient} onChange={(e) => setForm({ ...form, color_gradient: e.target.value })} />
         <Input type="number" placeholder="Sort Order" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
       </div>

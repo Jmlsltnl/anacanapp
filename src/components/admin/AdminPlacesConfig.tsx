@@ -9,8 +9,12 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Save, X, Loader2, MapPin, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminPlacesConfig = () => {
+    const localize = useAdminLocalize();
   const queryClient = useQueryClient();
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [editingAmenity, setEditingAmenity] = useState<string | null>(null);
@@ -161,7 +165,7 @@ const AdminPlacesConfig = () => {
                             {cat.category_key[0].toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-semibold">{cat.label_az || cat.label}</p>
+                            <p className="font-semibold">{localize(cat, 'label')}</p>
                             <p className="text-xs text-muted-foreground">Key: {cat.category_key} | Icon: {cat.icon_name}</p>
                           </div>
                         </div>
@@ -222,7 +226,7 @@ const AdminPlacesConfig = () => {
                         <div className="flex items-center gap-3">
                           <span className="text-2xl">{amenity.emoji}</span>
                           <div>
-                            <p className="font-semibold">{amenity.label_az || amenity.label}</p>
+                            <p className="font-semibold">{localize(amenity, 'label')}</p>
                             <p className="text-xs text-muted-foreground">Key: {amenity.amenity_key}</p>
                           </div>
                         </div>
@@ -268,7 +272,7 @@ const CategoryForm = ({ category, onSave, onCancel, isLoading }: any) => {
       <div className="grid grid-cols-2 gap-3">
         <Input placeholder="Key" value={form.category_key} onChange={(e) => setForm({ ...form, category_key: e.target.value })} />
         <Input placeholder="Label (EN)" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} />
-        <Input placeholder="Label (AZ)" value={form.label_az} onChange={(e) => setForm({ ...form, label_az: e.target.value })} />
+        <LocalizedInput formData={form} setFormData={setForm} field="label" label="Label" />
         <Input placeholder="Icon Name" value={form.icon_name} onChange={(e) => setForm({ ...form, icon_name: e.target.value })} />
         <Input placeholder="Color Gradient" value={form.color_gradient} onChange={(e) => setForm({ ...form, color_gradient: e.target.value })} />
         <Input type="number" placeholder="Sort Order" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
@@ -301,7 +305,7 @@ const AmenityForm = ({ amenity, onSave, onCancel, isLoading }: any) => {
       <div className="grid grid-cols-2 gap-3">
         <Input placeholder="Key (has_...)" value={form.amenity_key} onChange={(e) => setForm({ ...form, amenity_key: e.target.value })} />
         <Input placeholder="Label (EN)" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} />
-        <Input placeholder="Label (AZ)" value={form.label_az} onChange={(e) => setForm({ ...form, label_az: e.target.value })} />
+        <LocalizedInput formData={form} setFormData={setForm} field="label" label="Label" />
         <Input placeholder="Emoji" value={form.emoji} onChange={(e) => setForm({ ...form, emoji: e.target.value })} />
         <Input type="number" placeholder="Sort Order" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
       </div>

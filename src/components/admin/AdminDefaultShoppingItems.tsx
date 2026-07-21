@@ -12,6 +12,9 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminDefaultShoppingItems, DefaultShoppingItem } from '@/hooks/useDefaultShoppingItems';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const categories = [
 { value: 'baby_care', label: tr("admindefaultshoppingitems_korpe_baximi_1ba070", "Körpə Baxımı") },
@@ -38,6 +41,7 @@ const priorities = [
 
 
 const AdminDefaultShoppingItems = () => {
+    const localize = useAdminLocalize();
   const { items, loading, createItem, updateItem, deleteItem } = useAdminDefaultShoppingItems();
   const { toast } = useToast();
   const [showModal, setShowModal] = useState(false);
@@ -179,7 +183,7 @@ const AdminDefaultShoppingItems = () => {
             <div className="flex items-center gap-4">
               <div className={`w-3 h-3 rounded-full ${priorities.find((p) => p.value === item.priority)?.color}`} />
               <div>
-                <p className="font-medium">{item.name_az || item.name}</p>
+                <p className="font-medium">{localize(item, 'name')}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="outline" className="text-xs">
                     {categories.find((c) => c.value === item.category)?.label}
@@ -231,10 +235,7 @@ const AdminDefaultShoppingItems = () => {
 
             <div>
               <Label>Ad (AZ)</Label>
-              <Input
-                value={formData.name_az}
-                onChange={(e) => setFormData({ ...formData, name_az: e.target.value })}
-                placeholder={tr("admindefaultshoppingitems_korpe_bezleri_0bc848", "Körpə bezləri")} />
+              <LocalizedInput formData={formData} setFormData={setFormData} field="name" label="Körpə bezləri" />
               
             </div>
 

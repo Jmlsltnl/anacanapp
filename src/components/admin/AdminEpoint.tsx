@@ -11,6 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAllPaymentTransactions } from '@/hooks/useEpointPayment';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const statusConfig: Record<string, {label: string;color: string;icon: any;}> = {
   pending: { label: tr("adminepoint_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-500/10 text-yellow-600', icon: Clock },
@@ -30,6 +33,7 @@ const orderTypeLabels: Record<string, string> = {
 };
 
 const AdminEpoint = () => {
+    const localize = useAdminLocalize();
   const [publicKey, setPublicKey] = useState('');
   const [privateKey, setPrivateKey] = useState('');
   const [mode, setMode] = useState('live');

@@ -20,6 +20,9 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import AdminUsageStats from './AdminUsageStats';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 interface ToolConfig {
   id: string;
@@ -68,6 +71,7 @@ const premiumTypeLabels: Record<string, string> = {
 };
 
 const AdminTools = () => {
+    const localize = useAdminLocalize();
   const [activeCategory, setActiveCategory] = useState<'flow' | 'bump' | 'mommy'>('bump');
   const [search, setSearch] = useState('');
   const [localTools, setLocalTools] = useState<ToolConfig[]>([]);
@@ -130,7 +134,7 @@ const AdminTools = () => {
   // Filter and sort tools for current category - show ALL tools in admin (not filtered by life_stages)
   const categoryTools = localTools.
   filter((t) => !search ||
-  (t.name_az || t.name).toLowerCase().includes(search.toLowerCase()) ||
+  (localize(t, 'name')).toLowerCase().includes(search.toLowerCase()) ||
   t.tool_id.toLowerCase().includes(search.toLowerCase())
   ).
   sort((a, b) => {

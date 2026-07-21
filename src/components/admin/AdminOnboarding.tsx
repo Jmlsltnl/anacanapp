@@ -16,8 +16,12 @@ import {
   OnboardingStage,
   MultiplesOption } from
 '@/hooks/useAdminOnboarding';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminOnboarding = () => {
+    const localize = useAdminLocalize();
   const stages = useAdminOnboardingStages();
   const multiples = useAdminMultiplesOptions();
 
@@ -201,12 +205,12 @@ const AdminOnboarding = () => {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="font-medium text-foreground">{stage.title_az || stage.title}</p>
+                            <p className="font-medium text-foreground">{localize(stage, 'title')}</p>
                             <Badge variant={stage.is_active ? 'default' : 'secondary'}>
                               {stage.is_active ? 'Aktiv' : 'Gizli'}
                             </Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground">{stage.subtitle_az || stage.subtitle}</p>
+                          <p className="text-sm text-muted-foreground">{localize(stage, 'subtitle')}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge variant="outline">{stage.stage_id}</Badge>
                             <span className="text-xs text-muted-foreground">{tr("adminonboarding_sira_d654d0", "S\u0131ra:")} {stage.sort_order}</span>
@@ -262,7 +266,7 @@ const AdminOnboarding = () => {
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <p className="font-medium text-foreground">{option.label_az || option.label}</p>
+                            <p className="font-medium text-foreground">{localize(option, 'label')}</p>
                             <Badge variant={option.is_active ? 'default' : 'secondary'}>
                               {option.is_active ? 'Aktiv' : 'Gizli'}
                             </Badge>
@@ -315,10 +319,7 @@ const AdminOnboarding = () => {
                 value={stageFormData.title || ''}
                 onChange={(e) => setStageFormData({ ...stageFormData, title: e.target.value })} />
               
-              <Input
-                placeholder={tr("adminonboarding_basliq_az_3e294a", "Başlıq (AZ)")}
-                value={stageFormData.title_az || ''}
-                onChange={(e) => setStageFormData({ ...stageFormData, title_az: e.target.value })} />
+              <LocalizedInput formData={stageFormData} setFormData={setStageFormData} field="title" label="Başlıq" />
               
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -327,16 +328,10 @@ const AdminOnboarding = () => {
                 value={stageFormData.subtitle || ''}
                 onChange={(e) => setStageFormData({ ...stageFormData, subtitle: e.target.value })} />
               
-              <Input
-                placeholder={tr("adminonboarding_alt_basliq_az_fe8faa", "Alt başlıq (AZ)")}
-                value={stageFormData.subtitle_az || ''}
-                onChange={(e) => setStageFormData({ ...stageFormData, subtitle_az: e.target.value })} />
+              <LocalizedInput formData={stageFormData} setFormData={setStageFormData} field="subtitle" label="Alt başlıq" />
               
             </div>
-            <Textarea
-              placeholder={tr("adminonboarding_tesvir_az_2c237a", "Təsvir (AZ)")}
-              value={stageFormData.description_az || ''}
-              onChange={(e) => setStageFormData({ ...stageFormData, description_az: e.target.value })} />
+            <LocalizedTextarea formData={stageFormData} setFormData={setStageFormData} field="description" label="Təsvir" />
             
             <div className="grid grid-cols-2 gap-3">
               <Input
@@ -400,10 +395,7 @@ const AdminOnboarding = () => {
                 value={multipleFormData.label || ''}
                 onChange={(e) => setMultipleFormData({ ...multipleFormData, label: e.target.value })} />
               
-              <Input
-                placeholder="Label (AZ)"
-                value={multipleFormData.label_az || ''}
-                onChange={(e) => setMultipleFormData({ ...multipleFormData, label_az: e.target.value })} />
+              <LocalizedInput formData={multipleFormData} setFormData={setMultipleFormData} field="label" label="Label" />
               
             </div>
             <div className="grid grid-cols-2 gap-3">

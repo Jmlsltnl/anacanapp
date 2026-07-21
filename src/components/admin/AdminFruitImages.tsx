@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePregnancyContentAdmin } from '@/hooks/usePregnancyContent';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 interface FruitImage {
   id: string;
@@ -27,6 +30,7 @@ interface WeekFruitData {
 }
 
 const AdminFruitImages = () => {
+    const localize = useAdminLocalize();
   const [fruitImages, setFruitImages] = useState<FruitImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState<number | null>(null);

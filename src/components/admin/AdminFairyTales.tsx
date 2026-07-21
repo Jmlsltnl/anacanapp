@@ -12,6 +12,9 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import AdminUsageStats from './AdminUsageStats';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 interface FairyTaleTheme {
   id: string;
@@ -26,6 +29,7 @@ interface FairyTaleTheme {
 }
 
 const AdminFairyTales = () => {
+    const localize = useAdminLocalize();
   const [editingTheme, setEditingTheme] = useState<FairyTaleTheme | null>(null);
   const [newTheme, setNewTheme] = useState(false);
   const { toast } = useToast();
@@ -261,10 +265,7 @@ const ThemeForm = ({ theme, onSave, onCancel, isLoading }: ThemeFormProps) => {
         </div>
         <div>
           <label className="text-sm font-medium">Ad (AZ)</label>
-          <Input
-            value={form.name_az}
-            onChange={(e) => setForm({ ...form, name_az: e.target.value })}
-            placeholder={tr("adminfairytales_mese_macerasi_6112a8", "Meşə Macərası")} />
+          <LocalizedInput formData={form} setFormData={setForm} field="name" label="Meşə Macərası" />
           
         </div>
       </div>
@@ -279,9 +280,7 @@ const ThemeForm = ({ theme, onSave, onCancel, isLoading }: ThemeFormProps) => {
         </div>
         <div>
           <label className="text-sm font-medium">{tr("adminfairytales_tesvir_az_2c237a", "Təsvir (AZ)")}</label>
-          <Textarea
-            value={form.description_az}
-            onChange={(e) => setForm({ ...form, description_az: e.target.value })} />
+          <LocalizedTextarea formData={form} setFormData={setForm} field="description" label="Description" />
           
         </div>
       </div>

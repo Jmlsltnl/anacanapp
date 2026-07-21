@@ -31,6 +31,9 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import AdminUsageStats from './AdminUsageStats';
 import AdminPhotoGallery from './AdminPhotoGallery';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 interface EditingItem {
   id: string;
@@ -39,6 +42,7 @@ interface EditingItem {
 }
 
 const AdminPhotoshoot = () => {
+    const localize = useAdminLocalize();
   const [activeTab, setActiveTab] = useState('image-styles');
   const [editingItem, setEditingItem] = useState<EditingItem | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -460,10 +464,7 @@ const AdminPhotoshoot = () => {
                   value={newItem.style_name || ''}
                   onChange={(e) => setNewItem({ ...newItem, style_name: e.target.value })} />
                 
-                  <Input
-                  placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
-                  value={newItem.style_name_az || ''}
-                  onChange={(e) => setNewItem({ ...newItem, style_name_az: e.target.value })} />
+                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="style_name" label="Azərbaycan adı" />
                 
                 </div>
                 <Textarea
@@ -498,7 +499,7 @@ const AdminPhotoshoot = () => {
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">{style.emoji}</span>
                         <div>
-                          <p className="font-medium">{style.style_name_az || style.style_name}</p>
+                          <p className="font-medium">{localize(style, 'style_name')}</p>
                           <p className="text-xs text-muted-foreground">{style.style_id}</p>
                         </div>
                       </div>
@@ -559,20 +560,14 @@ const AdminPhotoshoot = () => {
                   value={newItem.theme_name || ''}
                   onChange={(e) => setNewItem({ ...newItem, theme_name: e.target.value })} />
                 
-                  <Input
-                  placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
-                  value={newItem.theme_name_az || ''}
-                  onChange={(e) => setNewItem({ ...newItem, theme_name_az: e.target.value })} />
+                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="theme_name" label="Azərbaycan adı" />
                 
                   <Input
                   placeholder={tr("adminphotoshoot_kateqoriya_ingilis_a39e44", "Kateqoriya (İngilis)")}
                   value={newItem.category_name || ''}
                   onChange={(e) => setNewItem({ ...newItem, category_name: e.target.value })} />
                 
-                  <Input
-                  placeholder="Kateqoriya (AZ)"
-                  value={newItem.category_name_az || ''}
-                  onChange={(e) => setNewItem({ ...newItem, category_name_az: e.target.value })} />
+                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="category_name" label="Kateqoriya" />
                 
                 </div>
                 <Textarea
@@ -619,9 +614,9 @@ const AdminPhotoshoot = () => {
                     <div className="flex items-center gap-4">
                       <span className="text-2xl">{bg.theme_emoji}</span>
                       <div>
-                        <p className="font-medium">{bg.theme_name_az || bg.theme_name}</p>
+                        <p className="font-medium">{localize(bg, 'theme_name')}</p>
                         <p className="text-sm text-muted-foreground">
-                          {bg.category_name_az || bg.category_name} • {bg.gender === 'boy' ? tr("adminphotoshoot_oglan_c41cd8", "\uD83D\uDC66 O\u011Flan") : bg.gender === 'girl' ? tr("adminphotoshoot_qiz_cc9008", "\uD83D\uDC67 Q\u0131z") : tr("adminphotoshoot_hami_77353a", "\uD83D\uDC76 Ham\u0131")}
+                          {localize(bg, 'category_name')} • {bg.gender === 'boy' ? tr("adminphotoshoot_oglan_c41cd8", "\uD83D\uDC66 O\u011Flan") : bg.gender === 'girl' ? tr("adminphotoshoot_qiz_cc9008", "\uD83D\uDC67 Q\u0131z") : tr("adminphotoshoot_hami_77353a", "\uD83D\uDC76 Ham\u0131")}
                         </p>
                       </div>
                     </div>
@@ -676,10 +671,7 @@ const AdminPhotoshoot = () => {
                   value={newItem.outfit_name || ''}
                   onChange={(e) => setNewItem({ ...newItem, outfit_name: e.target.value })} />
                 
-                  <Input
-                  placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
-                  value={newItem.outfit_name_az || ''}
-                  onChange={(e) => setNewItem({ ...newItem, outfit_name_az: e.target.value })} />
+                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="outfit_name" label="Azərbaycan adı" />
                 
                 </div>
                 <Select
@@ -720,7 +712,7 @@ const AdminPhotoshoot = () => {
                     <div className="flex items-center gap-4">
                       <span className="text-2xl">{outfit.emoji}</span>
                       <div>
-                        <p className="font-medium">{outfit.outfit_name_az || outfit.outfit_name}</p>
+                        <p className="font-medium">{localize(outfit, 'outfit_name')}</p>
                         <p className="text-sm text-muted-foreground">
                           {outfit.gender === 'boy' ? tr("adminphotoshoot_oglan_c41cd8", "\uD83D\uDC66 O\u011Flan") : outfit.gender === 'girl' ? tr("adminphotoshoot_qiz_cc9008", "\uD83D\uDC67 Q\u0131z") : tr("adminphotoshoot_hami_ucun_c75ad9", "\uD83D\uDC76 Ham\u0131 \xFC\xE7\xFCn")}
                         </p>
@@ -777,10 +769,7 @@ const AdminPhotoshoot = () => {
                   value={newItem.color_name || ''}
                   onChange={(e) => setNewItem({ ...newItem, color_name: e.target.value })} />
                 
-                  <Input
-                  placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
-                  value={newItem.color_name_az || ''}
-                  onChange={(e) => setNewItem({ ...newItem, color_name_az: e.target.value })} />
+                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="color_name" label="Azərbaycan adı" />
                 
                 </div>
                 <div className="flex gap-2">
@@ -808,7 +797,7 @@ const AdminPhotoshoot = () => {
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${color.hex_value}`} />
                       <div>
-                        <p className="font-medium">{color.color_name_az || color.color_name}</p>
+                        <p className="font-medium">{localize(color, 'color_name')}</p>
                         <p className="text-xs text-muted-foreground">{color.color_id}</p>
                       </div>
                     </div>
@@ -863,10 +852,7 @@ const AdminPhotoshoot = () => {
                   value={newItem.color_name || ''}
                   onChange={(e) => setNewItem({ ...newItem, color_name: e.target.value })} />
                 
-                  <Input
-                  placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
-                  value={newItem.color_name_az || ''}
-                  onChange={(e) => setNewItem({ ...newItem, color_name_az: e.target.value })} />
+                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="color_name" label="Azərbaycan adı" />
                 
                 </div>
                 <div className="flex gap-2">
@@ -894,7 +880,7 @@ const AdminPhotoshoot = () => {
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${color.hex_value}`} />
                       <div>
-                        <p className="font-medium">{color.color_name_az || color.color_name}</p>
+                        <p className="font-medium">{localize(color, 'color_name')}</p>
                         <p className="text-xs text-muted-foreground">{color.color_id}</p>
                       </div>
                     </div>
@@ -949,10 +935,7 @@ const AdminPhotoshoot = () => {
                   value={newItem.style_name || ''}
                   onChange={(e) => setNewItem({ ...newItem, style_name: e.target.value })} />
                 
-                  <Input
-                  placeholder={tr("adminphotoshoot_azerbaycan_adi_439c58", "Azərbaycan adı")}
-                  value={newItem.style_name_az || ''}
-                  onChange={(e) => setNewItem({ ...newItem, style_name_az: e.target.value })} />
+                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="style_name" label="Azərbaycan adı" />
                 
                 </div>
                 <div className="flex gap-2">
@@ -980,7 +963,7 @@ const AdminPhotoshoot = () => {
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{style.emoji}</span>
                       <div>
-                        <p className="font-medium">{style.style_name_az || style.style_name}</p>
+                        <p className="font-medium">{localize(style, 'style_name')}</p>
                         <p className="text-xs text-muted-foreground">{style.style_id}</p>
                       </div>
                     </div>

@@ -23,8 +23,12 @@ import {
   NoiseThreshold,
   MentalHealthResourceAdmin } from
 '@/hooks/useAdminMentalHealth';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminMentalHealth = () => {
+    const localize = useAdminLocalize();
   return (
     <div className="space-y-6">
       <div>
@@ -114,7 +118,7 @@ const EPDSTab = () => {
             {questions.map((q) =>
             <TableRow key={q.id}>
                 <TableCell>{q.question_number}</TableCell>
-                <TableCell className="max-w-md truncate">{q.question_text_az || q.question_text}</TableCell>
+                <TableCell className="max-w-md truncate">{localize(q, 'question_text')}</TableCell>
                 <TableCell>
                   <Badge variant={q.is_active ? 'default' : 'secondary'}>
                     {q.is_active ? 'Aktiv' : 'Deaktiv'}
@@ -168,7 +172,7 @@ const EPDSForm = ({ item, onSave }: {item: EPDSQuestion | null;onSave: (data: Pa
       </div>
       <div>
         <Label>Sual (AZ)</Label>
-        <Textarea value={formData.question_text_az} onChange={(e) => setFormData({ ...formData, question_text_az: e.target.value })} />
+        <LocalizedTextarea formData={formData} setFormData={setFormData} field="question_text" label="Question_text" />
       </div>
       <div className="flex items-center gap-4">
         <Switch checked={formData.is_reverse_scored} onCheckedChange={(v) => setFormData({ ...formData, is_reverse_scored: v })} />
@@ -220,7 +224,7 @@ const MoodTab = () => {
           {moods.map((m) =>
           <Card key={m.id} className="text-center p-4">
               <div className="text-4xl mb-2">{m.emoji}</div>
-              <div className="font-medium">{m.label_az || m.label}</div>
+              <div className="font-medium">{localize(m, 'label')}</div>
               <div className="text-sm text-muted-foreground">{tr("adminmentalhealth_deyer_a656ba", "D\u0259y\u0259r:")} {m.mood_value}</div>
               <div className="flex gap-1 mt-2 justify-center">
                 <Button variant="ghost" size="icon" onClick={() => {setEditItem(m);setIsOpen(true);}}>
@@ -268,7 +272,7 @@ const MoodForm = ({ item, onSave }: {item: MoodLevel | null;onSave: (data: Parti
         </div>
         <div>
           <Label>Etiket (AZ)</Label>
-          <Input value={formData.label_az} onChange={(e) => setFormData({ ...formData, label_az: e.target.value })} />
+          <LocalizedInput formData={formData} setFormData={setFormData} field="label" label="Label" />
         </div>
       </div>
       <div>
@@ -329,7 +333,7 @@ const BreathingTab = () => {
           <TableBody>
             {exercises.map((e) =>
             <TableRow key={e.id}>
-                <TableCell>{e.name_az || e.name}</TableCell>
+                <TableCell>{localize(e, 'name')}</TableCell>
                 <TableCell>{e.inhale_seconds}s</TableCell>
                 <TableCell>{e.hold_seconds}s</TableCell>
                 <TableCell>{e.exhale_seconds}s</TableCell>
@@ -379,7 +383,7 @@ const BreathingForm = ({ item, onSave }: {item: BreathingExercise | null;onSave:
         </div>
         <div>
           <Label>Ad (AZ)</Label>
-          <Input value={formData.name_az} onChange={(e) => setFormData({ ...formData, name_az: e.target.value })} />
+          <LocalizedInput formData={formData} setFormData={setFormData} field="name" label="Name" />
         </div>
       </div>
       <div className="grid grid-cols-4 gap-2">
@@ -402,7 +406,7 @@ const BreathingForm = ({ item, onSave }: {item: BreathingExercise | null;onSave:
       </div>
       <div>
         <Label>{tr("adminmentalhealth_tesvir_az_2c237a", "Təsvir (AZ)")}</Label>
-        <Textarea value={formData.description_az} onChange={(e) => setFormData({ ...formData, description_az: e.target.value })} />
+        <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Description" />
       </div>
       <Button onClick={() => onSave(formData)} className="w-full">Yadda saxla</Button>
     </div>);
@@ -459,7 +463,7 @@ const NoiseTab = () => {
             <TableRow key={t.id}>
                 <TableCell>{t.threshold_key}</TableCell>
                 <TableCell>{t.min_db} - {t.max_db || '∞'} dB</TableCell>
-                <TableCell>{t.label_az || t.label}</TableCell>
+                <TableCell>{localize(t, 'label')}</TableCell>
                 <TableCell>{t.emoji}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">
@@ -517,7 +521,7 @@ const NoiseForm = ({ item, onSave }: {item: NoiseThreshold | null;onSave: (data:
         </div>
         <div>
           <Label>Etiket (AZ)</Label>
-          <Input value={formData.label_az} onChange={(e) => setFormData({ ...formData, label_az: e.target.value })} />
+          <LocalizedInput formData={formData} setFormData={setFormData} field="label" label="Label" />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
@@ -532,7 +536,7 @@ const NoiseForm = ({ item, onSave }: {item: NoiseThreshold | null;onSave: (data:
       </div>
       <div>
         <Label>{tr("adminmentalhealth_tesvir_az_2c237a", "Təsvir (AZ)")}</Label>
-        <Textarea value={formData.description_az} onChange={(e) => setFormData({ ...formData, description_az: e.target.value })} />
+        <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Description" />
       </div>
       <Button onClick={() => onSave(formData)} className="w-full">Yadda saxla</Button>
     </div>);
@@ -608,11 +612,11 @@ const ResourcesTab = () => {
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Ad (EN)</Label><Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} /></div>
-                <div><Label>Ad (AZ)</Label><Input value={formData.name_az} onChange={(e) => setFormData({ ...formData, name_az: e.target.value })} /></div>
+                <div><Label>Ad (AZ)</Label><LocalizedInput formData={formData} setFormData={setFormData} field="name" label="Name" /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>{tr("adminmentalhealth_tesvir_en_c64521", "Təsvir (EN)")}</Label><Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} /></div>
-                <div><Label>{tr("adminmentalhealth_tesvir_az_2c237a", "Təsvir (AZ)")}</Label><Textarea value={formData.description_az} onChange={(e) => setFormData({ ...formData, description_az: e.target.value })} /></div>
+                <div><Label>{tr("adminmentalhealth_tesvir_az_2c237a", "Təsvir (AZ)")}</Label><LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Description" /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Telefon</Label><Input value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} /></div>
@@ -620,7 +624,7 @@ const ResourcesTab = () => {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>{tr("adminmentalhealth_unvan_en_18f4d9", "Ünvan (EN)")}</Label><Input value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} /></div>
-                <div><Label>{tr("adminmentalhealth_unvan_az_9434ac", "Ünvan (AZ)")}</Label><Input value={formData.address_az} onChange={(e) => setFormData({ ...formData, address_az: e.target.value })} /></div>
+                <div><Label>{tr("adminmentalhealth_unvan_az_9434ac", "Ünvan (AZ)")}</Label><LocalizedInput formData={formData} setFormData={setFormData} field="address" label="Address" /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Tip</Label><Input value={formData.resource_type} onChange={(e) => setFormData({ ...formData, resource_type: e.target.value })} placeholder="hotline, clinic, support" /></div>

@@ -21,8 +21,12 @@ import {
   SelectTrigger,
   SelectValue } from
 '@/components/ui/select';
+import { LocalizedInput } from "./ui/LocalizedInput";
+import { LocalizedTextarea } from "./ui/LocalizedTextarea";
+import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 
 const AdminSupport = () => {
+    const localize = useAdminLocalize();
   const { tickets, loading, respondToTicket, updateStatus, updatePriority, refetch } = useSupportTicketsAdmin();
   const { data: supportCategories = [] } = useSupportCategories();
   const { toast } = useToast();
@@ -45,7 +49,7 @@ const AdminSupport = () => {
   const categoryLabels = useMemo(() => {
     const labels: Record<string, string> = {};
     supportCategories.forEach((cat) => {
-      labels[cat.category_key] = cat.name_az || cat.name;
+      labels[cat.category_key] = localize(cat, 'name');
     });
     // Add fallback for common categories
     if (!labels['general']) labels['general'] = tr("adminsupport_umumi_1b5521", "\xDCmumi");
