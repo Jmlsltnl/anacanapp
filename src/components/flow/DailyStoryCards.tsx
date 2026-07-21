@@ -96,35 +96,37 @@ const DailyStoryCards = () => {
         </div>
       </motion.div>
 
-      <AnimatePresence>
-        {selected && createPortal(
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center"
-          onClick={() => setSelected(null)}>
-          
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {selected && (
             <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
-            className="bg-card w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[80vh] overflow-y-auto">
-            
-              <div className="flex items-start justify-between mb-3">
-                <div className="text-4xl">{selected.emoji || '✨'}</div>
-                <button onClick={() => setSelected(null)} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <h2 className="text-xl font-bold text-foreground mb-2">{getCardTitle(selected, language)}</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{getCardContent(selected, language)}</p>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center"
+              onClick={() => setSelected(null)}>
+              
+                <motion.div
+                initial={{ y: 100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 100, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-card w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[80vh] overflow-y-auto">
+                
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="text-4xl">{selected.emoji || '✨'}</div>
+                    <button onClick={() => setSelected(null)} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <h2 className="text-xl font-bold text-foreground mb-2">{getCardTitle(selected, language)}</h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">{getCardContent(selected, language)}</p>
+                </motion.div>
             </motion.div>
-          </motion.div>,
-          document.body
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>);
 
 };
