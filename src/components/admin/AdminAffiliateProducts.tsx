@@ -508,6 +508,42 @@ const AdminAffiliateProducts = () => {
                 </div>
               </div>
               <div>
+                )}
+                </div>
+              </div>
+              
+              <Textarea placeholder={tr("adminaffiliateproducts_tesvir_az_2c237a", "Təsvir (AZ)")} value={formData.description_az} onChange={(e) => setFormData((p) => ({ ...p, description_az: e.target.value }))} rows={3} />
+            </TabsContent>
+
+            <TabsContent value="media" className="space-y-4 mt-4">
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_esas_sekil_url_3fdd67", "Əsas şəkil URL")}</label>
+                  <Input placeholder="https://..." value={formData.image_url} onChange={(e) => setFormData((p) => ({ ...p, image_url: e.target.value }))} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_elave_sekiller_her_setirde_bir_url_d60242", "Əlavə şəkillər (hər sətirdə bir URL)")}</label>
+                  <Textarea placeholder="https://image1.jpg&#10;https://image2.jpg" value={formData.images} onChange={(e) => setFormData((p) => ({ ...p, images: e.target.value }))} rows={4} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Video URL</label>
+                  <Input placeholder="https://video.mp4" value={formData.video_url} onChange={(e) => setFormData((p) => ({ ...p, video_url: e.target.value }))} />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="details" className="space-y-4 mt-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_ustunlukleri_her_setirde_bir_54cbce", "Üstünlükləri (hər sətirdə bir)")}</label>
+                  <Textarea placeholder={tr("adminaffiliateproducts_keyfiyyetli_material_10_uzunomurlu_215f76", "Keyfiyyətli material&#10;Uzunömürlü")} value={formData.pros} onChange={(e) => setFormData((p) => ({ ...p, pros: e.target.value }))} rows={4} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_catismazliqlari_her_setirde_bir_1f2f46", "Çatışmazlıqları (hər sətirdə bir)")}</label>
+                  <Textarea placeholder={tr("adminaffiliateproducts_bahalidir_10_catdirilma_uzun_cekir_66741d", "Bahalıdır&#10;Çatdırılma uzun çəkir")} value={formData.cons} onChange={(e) => setFormData((p) => ({ ...p, cons: e.target.value }))} rows={4} />
+                </div>
+              </div>
+              <div>
                 <label className="text-sm font-medium mb-1 block">{tr("adminaffiliateproducts_teqler_vergulle_ayirin_cbcd30", "Teqlər (vergüllə ayırın)")}</label>
                 <Input placeholder={tr("adminaffiliateproducts_hamilelik_korpe_yeni_edb521", "hamiləlik, körpə, yeni")} value={formData.tags} onChange={(e) => setFormData((p) => ({ ...p, tags: e.target.value }))} />
               </div>
@@ -522,7 +558,7 @@ const AdminAffiliateProducts = () => {
                 <Input type="number" placeholder="Reytinq (0-5)" value={formData.rating} onChange={(e) => setFormData((p) => ({ ...p, rating: e.target.value }))} step="0.1" max="5" min="0" />
                 <Input type="number" placeholder={tr("adminaffiliateproducts_rey_sayi_8a7896", "Rəy sayı")} value={formData.review_count} onChange={(e) => setFormData((p) => ({ ...p, review_count: e.target.value }))} />
               </div>
-              <Textarea placeholder={tr("adminaffiliateproducts_rey_xulasesi_az_3a0257", "Rəy xülasəsi (AZ)")} value={formData.review_summary_az} onChange={(e) => setFormData((p) => ({ ...p, review_summary_az: e.target.value }))} rows={3} />
+              <LocalizedTextarea formData={formData} setFormData={setFormData} field="review_summary" label="Rəy xülasəsi" rows={3} />
             </TabsContent>
           </Tabs>
           
