@@ -289,6 +289,7 @@ export const useUserStore = create<UserState>()(
         babyCount: state.babyCount,
         multiplesType: state.multiplesType,
         language: state.language,
+        hasSelectedLanguage: state.hasSelectedLanguage,
       }),
     }
   )

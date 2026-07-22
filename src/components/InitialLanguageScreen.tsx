@@ -26,7 +26,7 @@ const LANGS = [
 export default function InitialLanguageScreen() {
   const { setLanguage, setHasSelectedLanguage, setCountryCode } = useUserStore();
   const [step, setStep] = useState<1 | 2>(1);
-  const [selectedLang, setSelectedLang] = useState<string>('az');
+  const [selectedLang, setSelectedLang] = useState<string>(useUserStore.getState().language || 'az');
   const [isSwitching, setIsSwitching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
