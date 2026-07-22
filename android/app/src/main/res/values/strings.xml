@@ -9,4 +9,7 @@
     <string name="facebook_app_id">927014948766655</string>
     <string name="facebook_client_token">67f7fdf1147431285d5ff230fa259f3a</string>
     <string name="fb_login_protocol_scheme">fb927014948766655</string>
+
+    <!-- Google Auth Web Client ID -->
+    <string name="default_web_client_id">296566533432-gpmp4takbhknosmejaic4aopdakgd0o3.apps.googleusercontent.com</string>
 </resources>
