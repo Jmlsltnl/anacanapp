@@ -367,8 +367,10 @@ const Index = () => {
     return <SplashScreen onComplete={() => setShowSplash(false)} />;
   }
 
+  const shouldBypassLanguage = hasSeenIntro || isOnboarded || isAuthenticated;
+
   // Initial Language Selection (First-time users)
-  if (!hasSelectedLanguage) {
+  if (!hasSelectedLanguage && !shouldBypassLanguage) {
     return (
       <motion.div key="initial-language" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="min-h-screen bg-background relative overflow-hidden">
         <InitialLanguageScreen />
