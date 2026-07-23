@@ -350,12 +350,17 @@ const AuthScreen = () => {
       if (error) {
         toast({
           title: tr("authscreen_google_ile_giris_alinmadi_2d7d46", 'Google ilə giriş alınmadı'),
-          description: tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
+          description: error.message || tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
           variant: 'destructive'
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Google auth error:', error);
+      toast({
+        title: tr("authscreen_google_ile_giris_alinmadi_2d7d46", 'Google ilə giriş alınmadı'),
+        description: error?.message || String(error),
+        variant: 'destructive'
+      });
     }
     setIsLoading(false);
   };
@@ -367,12 +372,17 @@ const AuthScreen = () => {
       if (error) {
         toast({
           title: tr("authscreen_apple_ile_giris_alinmadi_6f9b3a", 'Apple ilə giriş alınmadı'),
-          description: tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
+          description: error.message || tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
           variant: 'destructive'
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Apple auth error:', error);
+      toast({
+        title: tr("authscreen_apple_ile_giris_alinmadi_6f9b3a", 'Apple ilə giriş alınmadı'),
+        description: error?.message || String(error),
+        variant: 'destructive'
+      });
     }
     setIsLoading(false);
   };
