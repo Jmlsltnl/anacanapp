@@ -3,6 +3,10 @@ import { persist } from 'zustand/middleware';
 import type { LifeStage, UserRole, DailyLog, CycleData, PregnancyData, BabyData } from '@/types/anacan';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { getPregnancyWeek, getDayInWeek, getTrimester, calculateDueDate, getRealCalendarAge } from '@/lib/pregnancy-utils';
+import { Preferences } from '@capacitor/preferences';
+import { Capacitor } from '@capacitor/core';
+
+const isNative = () => Capacitor.isNativePlatform();
 
 interface UserState {
   isAuthenticated: boolean;
@@ -116,8 +120,18 @@ export const useUserStore = create<UserState>()(
       },
 
       setOnboarded: (isOnboarded) => set({ isOnboarded }),
-      setHasSeenIntro: (hasSeenIntro) => set({ hasSeenIntro }),
-      setHasSelectedLanguage: (hasSelectedLanguage) => set({ hasSelectedLanguage }),
+      setHasSeenIntro: (hasSeenIntro) => {
+        set({ hasSeenIntro });
+        if (isNative()) {
+          void Preferences.set({ key: 'anacan_has_seen_intro', value: String(hasSeenIntro) });
+        }
+      },
+      setHasSelectedLanguage: (hasSelectedLanguage) => {
+        set({ hasSelectedLanguage });
+        if (isNative()) {
+          void Preferences.set({ key: 'anacan_has_selected_language', value: String(hasSelectedLanguage) });
+        }
+      },
       setFunnelCompleted: (hasCompletedFunnel) => set({ hasCompletedFunnel }),
       setCountryCode: (countryCode) => set({ countryCode }),
 
@@ -143,7 +157,12 @@ export const useUserStore = create<UserState>()(
 
       setMultiplesData: (babyCount, multiplesType) => set({ babyCount, multiplesType }),
 
-      setLanguage: (lang) => set({ language: lang }),
+      setLanguage: (lang) => {
+        set({ language: lang });
+        if (isNative()) {
+          void Preferences.set({ key: 'anacan_app_language', value: lang });
+        }
+      },
 
       setPartnerCode: (code) => set({ partnerCode: code }),
 

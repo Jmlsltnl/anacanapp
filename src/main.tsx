@@ -25,6 +25,8 @@ import { initMixpanel } from "./lib/mixpanel";
 import { initCrashReporter } from "./lib/crashReporter";
 import { initFacebookEvents } from "./lib/facebook-events";
 import { restoreNativeSession, startNativeSessionSync } from "./lib/session-persistence";
+import { Preferences } from '@capacitor/preferences';
+import { useUserStore } from '@/store/userStore';
 
 // Initialize crash reporter first (catches all errors from this point)
 initCrashReporter();
@@ -38,14 +40,34 @@ initFacebookEvents();
 // Initialize native features when app starts
 initializeNativeFeatures().catch(console.error);
 
+async function restorePreferences() {
+  try {
+    const { value: storedLang } = await Preferences.get({ key: 'anacan_app_language' });
+    if (storedLang) {
+      useUserStore.getState().setLanguage(storedLang);
+    }
+    const { value: storedSelected } = await Preferences.get({ key: 'anacan_has_selected_language' });
+    if (storedSelected === 'true') {
+      useUserStore.getState().setHasSelectedLanguage(true);
+    }
+    const { value: storedIntro } = await Preferences.get({ key: 'anacan_has_seen_intro' });
+    if (storedIntro === 'true') {
+      useUserStore.getState().setHasSeenIntro(true);
+    }
+  } catch (e) {
+    console.warn("[bootstrap] restorePreferences failed", e);
+  }
+}
+
 // Restore Supabase session from native storage (survives app updates that
 // wipe WebView localStorage). Must happen BEFORE the React tree renders so
 // users don't see a flash of the login screen. Then keep it in sync.
 async function bootstrap() {
   try {
     await restoreNativeSession();
+    await restorePreferences();
   } catch (e) {
-    console.warn("[bootstrap] restoreNativeSession failed", e);
+    console.warn("[bootstrap] restore failed", e);
   }
   startNativeSessionSync();
   createRoot(document.getElementById("root")!).render(<App />);
