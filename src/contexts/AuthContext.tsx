@@ -397,15 +397,21 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
         const profileData = profileRes.status === 'fulfilled' ? profileRes.value : null;
         const roleData = roleRes.status === 'fulfilled' ? roleRes.value : null;
         const prefsData = prefsRes.status === 'fulfilled' ? prefsRes.value?.data : null;
+        const createdTime = new Date(u.created_at).getTime();
+        const lastSignInTime = u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : createdTime;
+        const isFirstLogin = Math.abs(lastSignInTime - createdTime) < 60000;
+        const localLang = useUserStore.getState().language;
 
-        if (prefsData?.language) {
+        if (isFirstLogin) {
+          // For newly registered users, their local language choice should be pushed to the DB
+          // overriding the default 'az' that the database trigger might have inserted.
+          Promise.resolve(supabase.from('user_preferences').upsert({ user_id: u.id, language: localLang }, { onConflict: 'user_id' })).catch(console.error);
+        } else if (prefsData?.language) {
           useUserStore.getState().setLanguage(prefsData.language);
           useUserStore.getState().setHasSelectedLanguage(true);
         } else {
-          const localLang = useUserStore.getState().language;
           Promise.resolve(supabase.from('user_preferences').upsert({ user_id: u.id, language: localLang }, { onConflict: 'user_id' })).catch(console.error);
         }
-
         setProfile(profileData);
         setUserRole(roleData);
 
