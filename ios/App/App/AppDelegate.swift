@@ -108,18 +108,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func applicationWillTerminate(_ application: UIApplication) {}
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-#if canImport(FBSDKCoreKit)
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
-#else
-        return false
-#endif
     }
 
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-#if canImport(FBSDKCoreKit)
         return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)
-#else
-        return false
-#endif
     }
 }
