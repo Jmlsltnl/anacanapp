@@ -17,21 +17,9 @@ export default function LanguageSelector() {
   const [enabled, setEnabled] = useState(true);
   const [switching, setSwitching] = useState(false);
 
-  // Feature flag check
+  // Removed feature flag check so the language selector is always enabled for all users.
   useEffect(() => {
-    (async () => {
-      const { data } = await supabase.
-      from('app_settings').
-      select('value').
-      eq('key', 'language_switcher_enabled').
-      maybeSingle();
-      const isOn = data?.value === true || data?.value === 'true';
-      setEnabled(isOn);
-      if (!isOn && language !== 'az') {
-        setLanguage('az');
-        clearTranslationCache();
-      }
-    })();
+    setEnabled(true);
   }, []);
 
   const change = async (code: string) => {

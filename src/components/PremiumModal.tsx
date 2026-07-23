@@ -179,6 +179,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
             background: `linear-gradient(to bottom, ${paywallConfig.gradient_from}, ${paywallConfig.gradient_via}, ${paywallConfig.gradient_to})`
           }} />
         
+          <div className="absolute inset-0 bg-background/0 dark:bg-slate-900/90 mix-blend-multiply" />
           <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
           <motion.div
@@ -198,12 +199,12 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
             <button
             ref={closeButtonRef}
             onClick={onClose}
-            className="absolute top-3 right-4 w-8 h-8 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center hover:bg-white/25 transition-colors z-10"
+            className="absolute top-3 right-4 w-8 h-8 rounded-full bg-black/10 dark:bg-white/15 backdrop-blur-sm flex items-center justify-center hover:bg-white/25 transition-colors z-10"
             style={{ marginTop: 'env(safe-area-inset-top, 0px)' }}
             disabled={isPurchasing}
             aria-label={tr("premiummodal_bagla_84bdc9", "Bağla")}>
             
-              <X className="w-4 h-4 text-white" />
+              <X className="w-4 h-4 text-gray-900 dark:text-white" />
             </button>
 
             {/* Top: Branding */}
@@ -228,7 +229,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                       
                           <Sparkles className="w-5 h-5 text-emerald-300" />
                         </motion.div>
-                        <span className="text-sm font-black text-white tracking-wider">{paywallConfig.free_trial_badge}</span>
+                        <span className="text-sm font-black text-gray-900 dark:text-white tracking-wider">{paywallConfig.free_trial_badge}</span>
                         <motion.div
                       animate={{ rotate: [0, -15, 15, 0] }}
                       transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}>
@@ -250,17 +251,17 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.1 }}
-              className="w-14 h-14 mx-auto mb-2.5 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              className="w-14 h-14 mx-auto mb-2.5 rounded-2xl bg-black/10 dark:bg-white/20 backdrop-blur-sm flex items-center justify-center">
               
-                <Crown className="w-7 h-7 text-white" />
+                <Crown className="w-7 h-7 text-gray-900 dark:text-white" />
               </motion.div>
-              <h2 className="text-xl font-extrabold text-white tracking-tight">{paywallConfig.title}</h2>
-              <p className="text-white/70 text-xs mt-0.5">{paywallConfig.subtitle}</p>
+              <h2 className="text-xl font-extrabold text-gray-900 dark:text-white tracking-tight">{paywallConfig.title}</h2>
+              <p className="text-gray-700 dark:text-white/70 text-xs mt-0.5">{paywallConfig.subtitle}</p>
 
               {feature &&
-            <div className="mt-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 inline-flex items-center gap-1.5">
-                  <Lock className="w-3 h-3 text-white" />
-                  <span className="text-white text-[10px] font-medium">{featureLockText}</span>
+            <div className="mt-2 bg-black/10 dark:bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 inline-flex items-center gap-1.5">
+                  <Lock className="w-3 h-3 text-gray-900 dark:text-white" />
+                  <span className="text-gray-900 dark:text-white text-[10px] font-medium">{featureLockText}</span>
                 </div>
             }
             </div>
@@ -268,13 +269,13 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
             {/* Middle: Features */}
             <div className="flex-1 overflow-y-auto overscroll-contain px-5 min-h-0">
               {error &&
-            <div className="mb-2 p-2 bg-white/10 text-white rounded-xl text-xs text-center" role="alert">{error}</div>
+            <div className="mb-2 p-2 bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white rounded-xl text-xs text-center" role="alert">{error}</div>
             }
 
               {/* Benefit pills */}
               <div className="flex items-center justify-center gap-1.5 mb-3">
                 {paywallConfig.pills.map((b, i) =>
-              <div key={i} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 text-white text-[10px] font-semibold">
+              <div key={i} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white text-[10px] font-semibold">
                     {renderPillIcon(b.icon)}
                     {b.text}
                   </div>
@@ -285,9 +286,9 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
               {allFeatures.length > 0 &&
             <div className="grid grid-cols-2 gap-1.5 mb-4">
                   {allFeatures.slice(0, 8).map((item) =>
-              <div key={item.id} className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-xl px-2.5 py-2">
+              <div key={item.id} className="flex items-center gap-2 bg-black/5 dark:bg-white/10 backdrop-blur-sm rounded-xl px-2.5 py-2">
                       <span className="text-sm shrink-0">{item.icon}</span>
-                      <span className="text-[10px] font-medium text-white/90 leading-tight line-clamp-2">{item.title}</span>
+                      <span className="text-[10px] font-medium text-gray-800 dark:text-white/90 leading-tight line-clamp-2">{item.title}</span>
                     </div>
               )}
                 </div>
@@ -300,16 +301,16 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                 whileTap={{ scale: 0.97 }}
                 className={`relative p-3 rounded-2xl text-left transition-all duration-200 ${
                 selectedPlan === 'yearly' ?
-                'bg-white text-foreground shadow-xl shadow-black/20' :
-                'bg-white/10 text-white border border-white/20'}`
+                'bg-white dark:bg-slate-800 text-gray-900 dark:text-white shadow-xl shadow-black/20' :
+                'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white border border-black/10 dark:border-white/20'}`
                 }
                 onClick={() => setSelectedPlan('yearly')}
                 aria-pressed={selectedPlan === 'yearly'}>
                 
                   <span className={`absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap ${
                 selectedPlan === 'yearly' ?
-                'bg-gradient-to-r from-amber-500 to-orange-500 text-white' :
-                'bg-white/20 text-white'}`
+                'bg-gradient-to-r from-amber-500 to-orange-500 text-gray-900 dark:text-white' :
+                'bg-black/10 dark:bg-white/20 text-gray-900 dark:text-white'}`
                 }>
                     {savingsBadgeText}
                   </span>
@@ -317,12 +318,12 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                     <p className="font-bold text-xs">{paywallConfig.yearly_label}</p>
                     {selectedPlan === 'yearly' &&
                   <div className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-                        <Check className="w-2.5 h-2.5 text-white" />
+                        <Check className="w-2.5 h-2.5 text-gray-900 dark:text-white" />
                       </div>
                   }
                   </div>
                   <p className="text-lg font-black">{currencySymbol}{yearlyMonthly}<span className="text-[10px] font-normal opacity-60">{paywallConfig.yearly_suffix}</span></p>
-                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'yearly' ? 'text-muted-foreground' : 'text-white/50'}`}>
+                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'yearly' ? 'text-muted-foreground' : 'text-gray-600 dark:text-white/50'}`}>
                     {yearlyProduct?.product?.defaultOptionHasFreeTrial ?
                   tr("premiummodal_trial_then_price", "{days} gün pulsuz, sonra {price}").replace("{days}", String(parseIsoTrialDays(yearlyProduct.product.defaultOptionTrialPeriod) ?? paywallConfig.free_trial_days)).replace("{price}", `${currencySymbol}${yearlyPrice}${paywallConfig.yearly_total_suffix}`) :
                   `${currencySymbol}${yearlyPrice}${paywallConfig.yearly_total_suffix}`}
@@ -335,7 +336,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                 className={`relative p-3 rounded-2xl text-left transition-all duration-200 ${
                 selectedPlan === 'monthly' ?
                 'bg-white text-foreground shadow-xl shadow-black/20' :
-                'bg-white/10 text-white border border-white/20'}`
+                'bg-black/5 dark:bg-white/10 text-gray-900 dark:text-white border border-black/10 dark:border-white/20'}`
                 }
                 onClick={() => setSelectedPlan('monthly')}
                 aria-pressed={selectedPlan === 'monthly'}>
@@ -344,12 +345,12 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                     <p className="font-bold text-xs">{paywallConfig.monthly_label}</p>
                     {selectedPlan === 'monthly' &&
                   <div className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-                        <Check className="w-2.5 h-2.5 text-white" />
+                        <Check className="w-2.5 h-2.5 text-gray-900 dark:text-white" />
                       </div>
                   }
                   </div>
                   <p className="text-lg font-black">{currencySymbol}{monthlyPrice}<span className="text-[10px] font-normal opacity-60">{paywallConfig.monthly_suffix}</span></p>
-                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'monthly' ? 'text-muted-foreground' : 'text-white/50'}`}>
+                  <p className={`text-[10px] mt-0.5 ${selectedPlan === 'monthly' ? 'text-muted-foreground' : 'text-gray-600 dark:text-white/50'}`}>
                     {monthlyProduct?.product?.defaultOptionHasFreeTrial ?
                   tr("premiummodal_trial_then_price", "{days} gün pulsuz, sonra {price}").replace("{days}", String(parseIsoTrialDays(monthlyProduct.product.defaultOptionTrialPeriod) ?? paywallConfig.free_trial_days)).replace("{price}", `${currencySymbol}${monthlyPrice}${paywallConfig.monthly_suffix}`) :
                   '\u00A0'}
@@ -361,12 +362,12 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
             {/* Bottom: CTA + Legal */}
             <div className="shrink-0 px-5 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)' }}>
               {showFreeTrial &&
-            <p className="text-center text-[11px] text-white/80 mb-2 font-medium">
+            <p className="text-center text-[11px] text-gray-800 dark:text-white/80 mb-2 font-medium">
                   {selectedHasStoreTrial || !isNative ? freeTrialNote : tr("premiummodal_bu_plan_ucun_pulsuz_sinaq_yoxd_0d6727", "Bu plan \xFC\xE7\xFCn pulsuz s\u0131naq yoxdur")}
                 </p>
             }
               <Button
-              className="w-full h-12 rounded-2xl bg-white hover:bg-white/95 text-orange-600 font-bold text-sm shadow-xl shadow-black/15 border-0 disabled:opacity-50 transition-all"
+              className="w-full h-12 rounded-2xl bg-white dark:bg-orange-600 hover:bg-gray-50 dark:hover:bg-orange-700 text-orange-600 dark:text-white font-bold text-sm shadow-xl shadow-black/15 border-0 disabled:opacity-50 transition-all"
               onClick={handlePurchase}
               disabled={isPurchasing || isLoading}
               aria-label={isPurchasing ? paywallConfig.purchasing_text : ctaText}>
@@ -381,21 +382,21 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
               <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
                 {isNative && isSupported &&
               <>
-                    <button onClick={handleRestore} disabled={isPurchasing || isLoading} className="text-[10px] text-white/50 hover:text-white/80 transition-colors disabled:opacity-50 flex items-center gap-1">
+                    <button onClick={handleRestore} disabled={isPurchasing || isLoading} className="text-[10px] text-gray-600 dark:text-white/50 hover:text-gray-800 dark:text-white/80 transition-colors disabled:opacity-50 flex items-center gap-1">
                       <RefreshCw className="w-3 h-3" />{paywallConfig.restore_text}
                     </button>
-                    <span className="text-[10px] text-white/30">•</span>
+                    <span className="text-[10px] text-gray-400 dark:text-white/30">•</span>
                   </>
               }
-                <a href="https://anacanapp.lovable.app/legal/terms_of_service" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/50 underline hover:text-white/80">{paywallConfig.terms_label}</a>
-                <span className="text-[10px] text-white/30">•</span>
-                <a href="https://anacanapp.lovable.app/legal/privacy_policy" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/50 underline hover:text-white/80">{paywallConfig.privacy_label}</a>
+                <a href="https://anacanapp.lovable.app/legal/terms_of_service" target="_blank" rel="noopener noreferrer" className="text-[10px] text-gray-600 dark:text-white/50 underline hover:text-gray-800 dark:text-white/80">{paywallConfig.terms_label}</a>
+                <span className="text-[10px] text-gray-400 dark:text-white/30">•</span>
+                <a href="https://anacanapp.lovable.app/legal/privacy_policy" target="_blank" rel="noopener noreferrer" className="text-[10px] text-gray-600 dark:text-white/50 underline hover:text-gray-800 dark:text-white/80">{paywallConfig.privacy_label}</a>
               </div>
-              <p className="text-center text-[9px] text-white/40 mt-1">
+              <p className="text-center text-[9px] text-gray-500 dark:text-white/40 mt-1">
                 {paywallConfig.cancel_notice}
               </p>
               {!isNative && paywallConfig.non_native_notice &&
-            <p className="text-center text-[10px] text-white/40 mt-1 flex items-center justify-center gap-1">
+            <p className="text-center text-[10px] text-gray-500 dark:text-white/40 mt-1 flex items-center justify-center gap-1">
                   <Star className="w-3 h-3" />{paywallConfig.non_native_notice}
                 </p>
             }
