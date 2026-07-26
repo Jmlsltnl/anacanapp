@@ -22,6 +22,8 @@ interface ScheduledNotification {
   id: string;
   title: string;
   body: string;
+  title_en: string | null;
+  body_en: string | null;
   target_audience: string;
   priority: number;
 }
