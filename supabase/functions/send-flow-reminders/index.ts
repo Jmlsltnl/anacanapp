@@ -33,6 +33,7 @@ const EN_DEFAULTS: Record<string, { title: (d: number) => string; body: (d: numb
 
 function pickLang(value: string | null | undefined, valueEn: string | null | undefined, lang: string): string {
   if (lang === 'en' && valueEn && valueEn.trim()) return valueEn;
+  if (lang === 'en') return ''; // force fallback path for EN when _en missing
   return value || '';
 }
 
