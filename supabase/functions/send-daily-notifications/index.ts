@@ -22,6 +22,8 @@ interface ScheduledNotification {
   id: string;
   title: string;
   body: string;
+  title_en: string | null;
+  body_en: string | null;
   target_audience: string;
   priority: number;
 }
@@ -417,7 +419,9 @@ Deno.serve(async (req) => {
         if (match) {
           const dedupKey = `${user.user_id}:${scheduledSourceType}:${match.id}`;
           if (!alreadySent.has(dedupKey)) {
-            notificationsToSend.push({ id: match.id, title: match.title, body: match.body, type: 'scheduled', sourceType: scheduledSourceType });
+            const localizedTitle = pickLang(match.title, match.title_en, user.language);
+            const localizedBody = pickLang(match.body, match.body_en, user.language);
+            notificationsToSend.push({ id: match.id, title: localizedTitle, body: localizedBody, type: 'scheduled', sourceType: scheduledSourceType });
           }
         }
       }
