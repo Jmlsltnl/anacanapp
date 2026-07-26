@@ -8235,6 +8235,7 @@ export type Database = {
       scheduled_notifications: {
         Row: {
           body: string
+          body_en: string | null
           created_at: string | null
           id: string
           is_active: boolean | null
@@ -8242,10 +8243,12 @@ export type Database = {
           priority: number | null
           target_audience: string
           title: string
+          title_en: string | null
           updated_at: string | null
         }
         Insert: {
           body: string
+          body_en?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -8253,10 +8256,12 @@ export type Database = {
           priority?: number | null
           target_audience?: string
           title: string
+          title_en?: string | null
           updated_at?: string | null
         }
         Update: {
           body?: string
+          body_en?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -8264,6 +8269,7 @@ export type Database = {
           priority?: number | null
           target_audience?: string
           title?: string
+          title_en?: string | null
           updated_at?: string | null
         }
         Relationships: []
