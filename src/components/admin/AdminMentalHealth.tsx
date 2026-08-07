@@ -72,6 +72,7 @@ const AdminMentalHealth = () => {
 
 // EPDS Tab
 const EPDSTab = () => {
+  const localize = useAdminLocalize();
   const { data: questions = [], create, update, remove } = useAdminEPDSQuestions();
   const [editItem, setEditItem] = useState<EPDSQuestion | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -187,6 +188,7 @@ const EPDSForm = ({ item, onSave }: {item: EPDSQuestion | null;onSave: (data: Pa
 
 // Mood Tab
 const MoodTab = () => {
+  const localize = useAdminLocalize();
   const { data: moods = [], create, update, remove } = useAdminMoodLevels();
   const [editItem, setEditItem] = useState<MoodLevel | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -286,6 +288,7 @@ const MoodForm = ({ item, onSave }: {item: MoodLevel | null;onSave: (data: Parti
 
 // Breathing Tab
 const BreathingTab = () => {
+  const localize = useAdminLocalize();
   const { data: exercises = [], create, update, remove } = useAdminBreathingExercises();
   const [editItem, setEditItem] = useState<BreathingExercise | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -415,6 +418,7 @@ const BreathingForm = ({ item, onSave }: {item: BreathingExercise | null;onSave:
 
 // Noise Tab
 const NoiseTab = () => {
+  const localize = useAdminLocalize();
   const { data: thresholds = [], create, update, remove } = useAdminNoiseThresholds();
   const [editItem, setEditItem] = useState<NoiseThreshold | null>(null);
   const [isOpen, setIsOpen] = useState(false);

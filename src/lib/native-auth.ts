@@ -56,6 +56,8 @@ export async function signInWithAppleNative() {
   const hashedNonce = await sha256Hex(rawNonce);
 
   const res = await SignInWithApple.authorize({
+    clientId: "az.anacan.app",
+    redirectURI: `${window.location.origin}/`,
     scopes: "email name",
     state: "signin",
     nonce: hashedNonce,
