@@ -14,6 +14,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { LocalizedInput } from './ui/LocalizedInput';
 import { LocalizedTextarea } from './ui/LocalizedTextarea';
 import { useAdminLocalize } from '@/contexts/AdminLanguageContext';
+import { exportToCSV } from '@/utils/csvExport';
 
 // CSV Template headers
 const CSV_HEADERS = [
@@ -283,12 +284,13 @@ const AdminAffiliateProducts = () => {
 
   const resetForm = () => {
     setFormData({
-      name: '', name_az: '', description: '', description_az: '',
+      name: '', name_az: '', name_en: '', name_ru: '', name_tr: '',
+      description: '', description_az: '', description_en: '', description_ru: '', description_tr: '',
       category: 'general', category_az: '', price: '', original_price: '',
       currency: 'AZN', affiliate_url: '', platform: 'other',
       image_url: '', images: '', video_url: '',
       store_name: '', store_logo_url: '',
-      rating: '', review_count: '', review_summary_az: '',
+      rating: '', review_count: '', review_summary: '', review_summary_az: '', review_summary_en: '', review_summary_ru: '', review_summary_tr: '',
       life_stages: ['bump'], is_featured: false, is_active: true,
       pros: '', cons: '', tags: '', specifications: ''
     });
@@ -301,8 +303,14 @@ const AdminAffiliateProducts = () => {
     setFormData({
       name: product.name || '',
       name_az: product.name_az || '',
+      name_en: product.name_en || '',
+      name_ru: product.name_ru || '',
+      name_tr: product.name_tr || '',
       description: product.description || '',
       description_az: product.description_az || '',
+      description_en: product.description_en || '',
+      description_ru: product.description_ru || '',
+      description_tr: product.description_tr || '',
       category: product.category || 'general',
       category_az: product.category_az || '',
       price: product.price?.toString() || '',
@@ -317,7 +325,11 @@ const AdminAffiliateProducts = () => {
       store_logo_url: product.store_logo_url || '',
       rating: product.rating?.toString() || '',
       review_count: product.review_count?.toString() || '',
+      review_summary: product.review_summary || '',
       review_summary_az: product.review_summary_az || '',
+      review_summary_en: product.review_summary_en || '',
+      review_summary_ru: product.review_summary_ru || '',
+      review_summary_tr: product.review_summary_tr || '',
       life_stages: product.life_stages || ['bump'],
       is_featured: product.is_featured || false,
       is_active: product.is_active !== false,
