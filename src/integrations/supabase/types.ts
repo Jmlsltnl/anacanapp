@@ -19,69 +19,105 @@ export type Database = {
           calories: number | null
           category: string
           category_en: string | null
+          category_ru: string | null
+          category_tr: string | null
           cook_time: number | null
           created_at: string
           description: string | null
           description_en: string | null
+          description_ru: string | null
+          description_tr: string | null
           id: string
           image_url: string | null
           ingredients: Json
           ingredients_en: Json | null
+          ingredients_ru: Json | null
+          ingredients_tr: Json | null
           instructions: Json
           instructions_en: Json | null
+          instructions_ru: Json | null
+          instructions_tr: Json | null
           is_active: boolean | null
           prep_time: number | null
           servings: number | null
           tags: string[] | null
           tags_en: string[] | null
+          tags_ru: string[] | null
+          tags_tr: string[] | null
           title: string
           title_en: string | null
+          title_ru: string | null
+          title_tr: string | null
           updated_at: string
         }
         Insert: {
           calories?: number | null
           category?: string
           category_en?: string | null
+          category_ru?: string | null
+          category_tr?: string | null
           cook_time?: number | null
           created_at?: string
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           id?: string
           image_url?: string | null
           ingredients?: Json
           ingredients_en?: Json | null
+          ingredients_ru?: Json | null
+          ingredients_tr?: Json | null
           instructions?: Json
           instructions_en?: Json | null
+          instructions_ru?: Json | null
+          instructions_tr?: Json | null
           is_active?: boolean | null
           prep_time?: number | null
           servings?: number | null
           tags?: string[] | null
           tags_en?: string[] | null
+          tags_ru?: string[] | null
+          tags_tr?: string[] | null
           title: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string
         }
         Update: {
           calories?: number | null
           category?: string
           category_en?: string | null
+          category_ru?: string | null
+          category_tr?: string | null
           cook_time?: number | null
           created_at?: string
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           id?: string
           image_url?: string | null
           ingredients?: Json
           ingredients_en?: Json | null
+          ingredients_ru?: Json | null
+          ingredients_tr?: Json | null
           instructions?: Json
           instructions_en?: Json | null
+          instructions_ru?: Json | null
+          instructions_tr?: Json | null
           is_active?: boolean | null
           prep_time?: number | null
           servings?: number | null
           tags?: string[] | null
           tags_en?: string[] | null
+          tags_ru?: string[] | null
+          tags_tr?: string[] | null
           title?: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -804,6 +840,8 @@ export type Database = {
           id: string
           info: string
           info_en: string | null
+          info_ru: string | null
+          info_tr: string | null
           is_active: boolean
           updated_at: string
         }
@@ -813,6 +851,8 @@ export type Database = {
           id?: string
           info: string
           info_en?: string | null
+          info_ru?: string | null
+          info_tr?: string | null
           is_active?: boolean
           updated_at?: string
         }
@@ -822,6 +862,8 @@ export type Database = {
           id?: string
           info?: string
           info_en?: string | null
+          info_ru?: string | null
+          info_tr?: string | null
           is_active?: boolean
           updated_at?: string
         }
@@ -1085,6 +1127,7 @@ export type Database = {
           gender: string
           id: string
           is_active: boolean | null
+          lang: string
           meaning: string | null
           meaning_az: string | null
           meaning_en: string | null
@@ -1093,6 +1136,8 @@ export type Database = {
           name: string
           origin: string | null
           origin_en: string | null
+          origin_ru: string | null
+          origin_tr: string | null
           popularity: number | null
         }
         Insert: {
@@ -1100,6 +1145,7 @@ export type Database = {
           gender?: string
           id?: string
           is_active?: boolean | null
+          lang?: string
           meaning?: string | null
           meaning_az?: string | null
           meaning_en?: string | null
@@ -1108,6 +1154,8 @@ export type Database = {
           name: string
           origin?: string | null
           origin_en?: string | null
+          origin_ru?: string | null
+          origin_tr?: string | null
           popularity?: number | null
         }
         Update: {
@@ -1115,6 +1163,7 @@ export type Database = {
           gender?: string
           id?: string
           is_active?: boolean | null
+          lang?: string
           meaning?: string | null
           meaning_az?: string | null
           meaning_en?: string | null
@@ -1123,6 +1172,8 @@ export type Database = {
           name?: string
           origin?: string | null
           origin_en?: string | null
+          origin_ru?: string | null
+          origin_tr?: string | null
           popularity?: number | null
         }
         Relationships: []
@@ -1343,11 +1394,15 @@ export type Database = {
           created_at: string
           description: string | null
           description_en: string | null
+          description_ru: string | null
+          description_tr: string | null
           icon: string | null
           id: string
           is_active: boolean | null
           name: string
           name_en: string | null
+          name_ru: string | null
+          name_tr: string | null
           slug: string
           sort_order: number | null
         }
@@ -1356,11 +1411,15 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean | null
           name: string
           name_en?: string | null
+          name_ru?: string | null
+          name_tr?: string | null
           slug: string
           sort_order?: number | null
         }
@@ -1369,11 +1428,15 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean | null
           name?: string
           name_en?: string | null
+          name_ru?: string | null
+          name_tr?: string | null
           slug?: string
           sort_order?: number | null
         }
@@ -1664,6 +1727,39 @@ export type Database = {
         }
         Relationships: []
       }
+      blood_pressure_logs: {
+        Row: {
+          created_at: string
+          diastolic: number
+          id: string
+          measured_at: string
+          notes: string | null
+          pulse: number | null
+          systolic: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          diastolic: number
+          id?: string
+          measured_at?: string
+          notes?: string | null
+          pulse?: number | null
+          systolic: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          diastolic?: number
+          id?: string
+          measured_at?: string
+          notes?: string | null
+          pulse?: number | null
+          systolic?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       blood_sugar_logs: {
         Row: {
           created_at: string | null
@@ -1907,6 +2003,8 @@ export type Database = {
           custom_field_labels: Json | null
           description: string | null
           description_en: string | null
+          description_ru: string | null
+          description_tr: string | null
           has_custom_fields: boolean | null
           id: string
           image_url: string | null
@@ -1914,10 +2012,14 @@ export type Database = {
           is_active: boolean | null
           milestone_label: string | null
           milestone_label_en: string | null
+          milestone_label_ru: string | null
+          milestone_label_tr: string | null
           milestone_type: string | null
           month_number: number | null
           name: string
           name_en: string | null
+          name_ru: string | null
+          name_tr: string | null
           price: number
           sort_order: number | null
           updated_at: string
@@ -1928,6 +2030,8 @@ export type Database = {
           custom_field_labels?: Json | null
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           has_custom_fields?: boolean | null
           id?: string
           image_url?: string | null
@@ -1935,10 +2039,14 @@ export type Database = {
           is_active?: boolean | null
           milestone_label?: string | null
           milestone_label_en?: string | null
+          milestone_label_ru?: string | null
+          milestone_label_tr?: string | null
           milestone_type?: string | null
           month_number?: number | null
           name: string
           name_en?: string | null
+          name_ru?: string | null
+          name_tr?: string | null
           price?: number
           sort_order?: number | null
           updated_at?: string
@@ -1949,6 +2057,8 @@ export type Database = {
           custom_field_labels?: Json | null
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           has_custom_fields?: boolean | null
           id?: string
           image_url?: string | null
@@ -1956,10 +2066,14 @@ export type Database = {
           is_active?: boolean | null
           milestone_label?: string | null
           milestone_label_en?: string | null
+          milestone_label_ru?: string | null
+          milestone_label_tr?: string | null
           milestone_type?: string | null
           month_number?: number | null
           name?: string
           name_en?: string | null
+          name_ru?: string | null
+          name_tr?: string | null
           price?: number
           sort_order?: number | null
           updated_at?: string
@@ -3080,6 +3194,8 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_en: string | null
+          description_ru: string | null
+          description_tr: string | null
           duration_minutes: number
           icon: string | null
           id: string
@@ -3100,6 +3216,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           duration_minutes?: number
           icon?: string | null
           id?: string
@@ -3120,6 +3238,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           duration_minutes?: number
           icon?: string | null
           id?: string
@@ -3456,14 +3576,17 @@ export type Database = {
       }
       flow_daily_logs: {
         Row: {
+          cervical_mucus: string | null
           created_at: string
           energy_level: number | null
           flow_intensity: string | null
           id: string
+          libido: number | null
           log_date: string
           mood: number | null
           notes: string | null
           pain_level: number | null
+          sexual_activity: string | null
           sleep_hours: number | null
           sleep_quality: number | null
           symptoms: string[] | null
@@ -3473,14 +3596,17 @@ export type Database = {
           water_glasses: number | null
         }
         Insert: {
+          cervical_mucus?: string | null
           created_at?: string
           energy_level?: number | null
           flow_intensity?: string | null
           id?: string
+          libido?: number | null
           log_date?: string
           mood?: number | null
           notes?: string | null
           pain_level?: number | null
+          sexual_activity?: string | null
           sleep_hours?: number | null
           sleep_quality?: number | null
           symptoms?: string[] | null
@@ -3490,14 +3616,17 @@ export type Database = {
           water_glasses?: number | null
         }
         Update: {
+          cervical_mucus?: string | null
           created_at?: string
           energy_level?: number | null
           flow_intensity?: string | null
           id?: string
+          libido?: number | null
           log_date?: string
           mood?: number | null
           notes?: string | null
           pain_level?: number | null
+          sexual_activity?: string | null
           sleep_hours?: number | null
           sleep_quality?: number | null
           symptoms?: string[] | null
@@ -3793,6 +3922,39 @@ export type Database = {
           updated_at?: string
           week_number?: number
           weight_g?: number | null
+        }
+        Relationships: []
+      }
+      game_scores: {
+        Row: {
+          best_level: number
+          best_score: number
+          created_at: string
+          game_id: string
+          id: string
+          total_plays: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_level?: number
+          best_score?: number
+          created_at?: string
+          game_id?: string
+          id?: string
+          total_plays?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_level?: number
+          best_score?: number
+          created_at?: string
+          game_id?: string
+          id?: string
+          total_plays?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -4241,6 +4403,8 @@ export type Database = {
           created_at: string
           description: string | null
           description_en: string | null
+          description_ru: string | null
+          description_tr: string | null
           gradient: string
           icon_name: string
           id: string
@@ -4248,8 +4412,12 @@ export type Database = {
           sort_order: number
           subtitle: string | null
           subtitle_en: string | null
+          subtitle_ru: string | null
+          subtitle_tr: string | null
           title: string
           title_en: string | null
+          title_ru: string | null
+          title_tr: string | null
           updated_at: string
         }
         Insert: {
@@ -4257,6 +4425,8 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           gradient?: string
           icon_name?: string
           id?: string
@@ -4264,8 +4434,12 @@ export type Database = {
           sort_order?: number
           subtitle?: string | null
           subtitle_en?: string | null
+          subtitle_ru?: string | null
+          subtitle_tr?: string | null
           title: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string
         }
         Update: {
@@ -4273,6 +4447,8 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           gradient?: string
           icon_name?: string
           id?: string
@@ -4280,8 +4456,12 @@ export type Database = {
           sort_order?: number
           subtitle?: string | null
           subtitle_en?: string | null
+          subtitle_ru?: string | null
+          subtitle_tr?: string | null
           title?: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -4983,6 +5163,8 @@ export type Database = {
           is_active: boolean
           message: string
           message_en: string | null
+          message_ru: string | null
+          message_tr: string | null
           updated_at: string
         }
         Insert: {
@@ -4992,6 +5174,8 @@ export type Database = {
           is_active?: boolean
           message: string
           message_en?: string | null
+          message_ru?: string | null
+          message_tr?: string | null
           updated_at?: string
         }
         Update: {
@@ -5001,6 +5185,8 @@ export type Database = {
           is_active?: boolean
           message?: string
           message_en?: string | null
+          message_ru?: string | null
+          message_tr?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -5532,12 +5718,16 @@ export type Database = {
           category: string
           content: string
           content_en: string | null
+          content_ru: string | null
+          content_tr: string | null
           created_at: string
           id: string
           is_active: boolean | null
           nutrients: Json | null
           title: string
           title_en: string | null
+          title_ru: string | null
+          title_tr: string | null
           trimester: number | null
           updated_at: string
         }
@@ -5546,12 +5736,16 @@ export type Database = {
           category?: string
           content: string
           content_en?: string | null
+          content_ru?: string | null
+          content_tr?: string | null
           created_at?: string
           id?: string
           is_active?: boolean | null
           nutrients?: Json | null
           title: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           trimester?: number | null
           updated_at?: string
         }
@@ -5560,12 +5754,16 @@ export type Database = {
           category?: string
           content?: string
           content_en?: string | null
+          content_ru?: string | null
+          content_tr?: string | null
           created_at?: string
           id?: string
           is_active?: boolean | null
           nutrients?: Json | null
           title?: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           trimester?: number | null
           updated_at?: string
         }
@@ -6001,6 +6199,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      partner_sharing_settings: {
+        Row: {
+          share_appointments: boolean
+          share_baby_logs: boolean
+          share_contractions: boolean
+          share_cycle: boolean
+          share_kicks: boolean
+          share_mood: boolean
+          share_symptoms: boolean
+          share_water: boolean
+          share_weight: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          share_appointments?: boolean
+          share_baby_logs?: boolean
+          share_contractions?: boolean
+          share_cycle?: boolean
+          share_kicks?: boolean
+          share_mood?: boolean
+          share_symptoms?: boolean
+          share_water?: boolean
+          share_weight?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          share_appointments?: boolean
+          share_baby_logs?: boolean
+          share_contractions?: boolean
+          share_cycle?: boolean
+          share_kicks?: boolean
+          share_mood?: boolean
+          share_symptoms?: boolean
+          share_water?: boolean
+          share_weight?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       partner_surprises: {
         Row: {
@@ -7317,47 +7557,81 @@ export type Database = {
         Row: {
           baby_development: string | null
           baby_development_en: string | null
+          baby_development_ru: string | null
+          baby_development_tr: string | null
           baby_message: string | null
           baby_message_en: string | null
+          baby_message_ru: string | null
+          baby_message_tr: string | null
           baby_size_cm: number | null
           baby_size_fruit: string | null
           baby_size_fruit_en: string | null
+          baby_size_fruit_ru: string | null
+          baby_size_fruit_tr: string | null
           baby_weight_gram: number | null
           body_changes: string | null
           body_changes_en: string | null
+          body_changes_ru: string | null
+          body_changes_tr: string | null
           created_at: string
           daily_tip: string | null
           daily_tip_en: string | null
+          daily_tip_ru: string | null
+          daily_tip_tr: string | null
           day_number: number | null
           days_until_birth: number | null
           doctor_visit_tip: string | null
           doctor_visit_tip_en: string | null
+          doctor_visit_tip_ru: string | null
+          doctor_visit_tip_tr: string | null
           emotional_tip: string | null
           emotional_tip_en: string | null
+          emotional_tip_ru: string | null
+          emotional_tip_tr: string | null
           exercise_tip: string | null
           exercise_tip_en: string | null
+          exercise_tip_ru: string | null
+          exercise_tip_tr: string | null
           foods_to_avoid: string[] | null
           foods_to_avoid_en: string[] | null
+          foods_to_avoid_ru: string[] | null
+          foods_to_avoid_tr: string[] | null
           id: string
           image_url: string | null
           is_active: boolean | null
           mother_symptoms: string[] | null
           mother_symptoms_en: string[] | null
+          mother_symptoms_ru: string[] | null
+          mother_symptoms_tr: string[] | null
           mother_tips: string | null
           mother_tips_en: string | null
+          mother_tips_ru: string | null
+          mother_tips_tr: string | null
           mother_warnings: string | null
           mother_warnings_en: string | null
+          mother_warnings_ru: string | null
+          mother_warnings_tr: string | null
           nutrition_tip: string | null
           nutrition_tip_en: string | null
+          nutrition_tip_ru: string | null
+          nutrition_tip_tr: string | null
           partner_tip: string | null
           partner_tip_en: string | null
+          partner_tip_ru: string | null
+          partner_tip_tr: string | null
           pregnancy_day: number | null
           recommended_exercises: string[] | null
           recommended_exercises_en: string[] | null
+          recommended_exercises_ru: string[] | null
+          recommended_exercises_tr: string[] | null
           recommended_foods: string[] | null
           recommended_foods_en: string[] | null
+          recommended_foods_ru: string[] | null
+          recommended_foods_tr: string[] | null
           tests_to_do: string[] | null
           tests_to_do_en: string[] | null
+          tests_to_do_ru: string[] | null
+          tests_to_do_tr: string[] | null
           updated_at: string
           video_url: string | null
           week_number: number
@@ -7365,47 +7639,81 @@ export type Database = {
         Insert: {
           baby_development?: string | null
           baby_development_en?: string | null
+          baby_development_ru?: string | null
+          baby_development_tr?: string | null
           baby_message?: string | null
           baby_message_en?: string | null
+          baby_message_ru?: string | null
+          baby_message_tr?: string | null
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
           baby_size_fruit_en?: string | null
+          baby_size_fruit_ru?: string | null
+          baby_size_fruit_tr?: string | null
           baby_weight_gram?: number | null
           body_changes?: string | null
           body_changes_en?: string | null
+          body_changes_ru?: string | null
+          body_changes_tr?: string | null
           created_at?: string
           daily_tip?: string | null
           daily_tip_en?: string | null
+          daily_tip_ru?: string | null
+          daily_tip_tr?: string | null
           day_number?: number | null
           days_until_birth?: number | null
           doctor_visit_tip?: string | null
           doctor_visit_tip_en?: string | null
+          doctor_visit_tip_ru?: string | null
+          doctor_visit_tip_tr?: string | null
           emotional_tip?: string | null
           emotional_tip_en?: string | null
+          emotional_tip_ru?: string | null
+          emotional_tip_tr?: string | null
           exercise_tip?: string | null
           exercise_tip_en?: string | null
+          exercise_tip_ru?: string | null
+          exercise_tip_tr?: string | null
           foods_to_avoid?: string[] | null
           foods_to_avoid_en?: string[] | null
+          foods_to_avoid_ru?: string[] | null
+          foods_to_avoid_tr?: string[] | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           mother_symptoms?: string[] | null
           mother_symptoms_en?: string[] | null
+          mother_symptoms_ru?: string[] | null
+          mother_symptoms_tr?: string[] | null
           mother_tips?: string | null
           mother_tips_en?: string | null
+          mother_tips_ru?: string | null
+          mother_tips_tr?: string | null
           mother_warnings?: string | null
           mother_warnings_en?: string | null
+          mother_warnings_ru?: string | null
+          mother_warnings_tr?: string | null
           nutrition_tip?: string | null
           nutrition_tip_en?: string | null
+          nutrition_tip_ru?: string | null
+          nutrition_tip_tr?: string | null
           partner_tip?: string | null
           partner_tip_en?: string | null
+          partner_tip_ru?: string | null
+          partner_tip_tr?: string | null
           pregnancy_day?: number | null
           recommended_exercises?: string[] | null
           recommended_exercises_en?: string[] | null
+          recommended_exercises_ru?: string[] | null
+          recommended_exercises_tr?: string[] | null
           recommended_foods?: string[] | null
           recommended_foods_en?: string[] | null
+          recommended_foods_ru?: string[] | null
+          recommended_foods_tr?: string[] | null
           tests_to_do?: string[] | null
           tests_to_do_en?: string[] | null
+          tests_to_do_ru?: string[] | null
+          tests_to_do_tr?: string[] | null
           updated_at?: string
           video_url?: string | null
           week_number: number
@@ -7413,47 +7721,81 @@ export type Database = {
         Update: {
           baby_development?: string | null
           baby_development_en?: string | null
+          baby_development_ru?: string | null
+          baby_development_tr?: string | null
           baby_message?: string | null
           baby_message_en?: string | null
+          baby_message_ru?: string | null
+          baby_message_tr?: string | null
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
           baby_size_fruit_en?: string | null
+          baby_size_fruit_ru?: string | null
+          baby_size_fruit_tr?: string | null
           baby_weight_gram?: number | null
           body_changes?: string | null
           body_changes_en?: string | null
+          body_changes_ru?: string | null
+          body_changes_tr?: string | null
           created_at?: string
           daily_tip?: string | null
           daily_tip_en?: string | null
+          daily_tip_ru?: string | null
+          daily_tip_tr?: string | null
           day_number?: number | null
           days_until_birth?: number | null
           doctor_visit_tip?: string | null
           doctor_visit_tip_en?: string | null
+          doctor_visit_tip_ru?: string | null
+          doctor_visit_tip_tr?: string | null
           emotional_tip?: string | null
           emotional_tip_en?: string | null
+          emotional_tip_ru?: string | null
+          emotional_tip_tr?: string | null
           exercise_tip?: string | null
           exercise_tip_en?: string | null
+          exercise_tip_ru?: string | null
+          exercise_tip_tr?: string | null
           foods_to_avoid?: string[] | null
           foods_to_avoid_en?: string[] | null
+          foods_to_avoid_ru?: string[] | null
+          foods_to_avoid_tr?: string[] | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           mother_symptoms?: string[] | null
           mother_symptoms_en?: string[] | null
+          mother_symptoms_ru?: string[] | null
+          mother_symptoms_tr?: string[] | null
           mother_tips?: string | null
           mother_tips_en?: string | null
+          mother_tips_ru?: string | null
+          mother_tips_tr?: string | null
           mother_warnings?: string | null
           mother_warnings_en?: string | null
+          mother_warnings_ru?: string | null
+          mother_warnings_tr?: string | null
           nutrition_tip?: string | null
           nutrition_tip_en?: string | null
+          nutrition_tip_ru?: string | null
+          nutrition_tip_tr?: string | null
           partner_tip?: string | null
           partner_tip_en?: string | null
+          partner_tip_ru?: string | null
+          partner_tip_tr?: string | null
           pregnancy_day?: number | null
           recommended_exercises?: string[] | null
           recommended_exercises_en?: string[] | null
+          recommended_exercises_ru?: string[] | null
+          recommended_exercises_tr?: string[] | null
           recommended_foods?: string[] | null
           recommended_foods_en?: string[] | null
+          recommended_foods_ru?: string[] | null
+          recommended_foods_tr?: string[] | null
           tests_to_do?: string[] | null
           tests_to_do_en?: string[] | null
+          tests_to_do_ru?: string[] | null
+          tests_to_do_tr?: string[] | null
           updated_at?: string
           video_url?: string | null
           week_number?: number
@@ -7701,14 +8043,20 @@ export type Database = {
         Row: {
           category: string
           category_en: string | null
+          category_ru: string | null
+          category_tr: string | null
           created_at: string
           description: string | null
           description_en: string | null
+          description_ru: string | null
+          description_tr: string | null
           id: string
           image_url: string | null
           is_active: boolean | null
           name: string
           name_en: string | null
+          name_ru: string | null
+          name_tr: string | null
           original_price: number | null
           price: number
           rating: number | null
@@ -7718,14 +8066,20 @@ export type Database = {
         Insert: {
           category: string
           category_en?: string | null
+          category_ru?: string | null
+          category_tr?: string | null
           created_at?: string
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           name: string
           name_en?: string | null
+          name_ru?: string | null
+          name_tr?: string | null
           original_price?: number | null
           price?: number
           rating?: number | null
@@ -7735,14 +8089,20 @@ export type Database = {
         Update: {
           category?: string
           category_en?: string | null
+          category_ru?: string | null
+          category_tr?: string | null
           created_at?: string
           description?: string | null
           description_en?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           name?: string
           name_en?: string | null
+          name_ru?: string | null
+          name_tr?: string | null
           original_price?: number | null
           price?: number
           rating?: number | null
@@ -7777,6 +8137,7 @@ export type Database = {
           linked_partner_id: string | null
           multiples_type: string | null
           name: string
+          onboarding_answers: Json | null
           partner_code: string | null
           period_length: number | null
           pregnancy_day: number | null
@@ -7811,6 +8172,7 @@ export type Database = {
           linked_partner_id?: string | null
           multiples_type?: string | null
           name: string
+          onboarding_answers?: Json | null
           partner_code?: string | null
           period_length?: number | null
           pregnancy_day?: number | null
@@ -7845,6 +8207,7 @@ export type Database = {
           linked_partner_id?: string | null
           multiples_type?: string | null
           name?: string
+          onboarding_answers?: Json | null
           partner_code?: string | null
           period_length?: number | null
           pregnancy_day?: number | null
@@ -8083,6 +8446,63 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          code: string
+          converted_at: string | null
+          created_at: string
+          id: string
+          referred_user_id: string
+          referrer_rewarded_at: string | null
+          referrer_user_id: string
+          reward_days: number
+          status: string
+          trial_started_at: string | null
+        }
+        Insert: {
+          code: string
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referred_user_id: string
+          referrer_rewarded_at?: string | null
+          referrer_user_id: string
+          reward_days?: number
+          status?: string
+          trial_started_at?: string | null
+        }
+        Update: {
+          code?: string
+          converted_at?: string | null
+          created_at?: string
+          id?: string
+          referred_user_id?: string
+          referrer_rewarded_at?: string | null
+          referrer_user_id?: string
+          reward_days?: number
+          status?: string
+          trial_started_at?: string | null
+        }
+        Relationships: []
+      }
       safety_categories: {
         Row: {
           category_id: string
@@ -8236,6 +8656,8 @@ export type Database = {
         Row: {
           body: string
           body_en: string | null
+          body_ru: string | null
+          body_tr: string | null
           created_at: string | null
           id: string
           is_active: boolean | null
@@ -8244,11 +8666,15 @@ export type Database = {
           target_audience: string
           title: string
           title_en: string | null
+          title_ru: string | null
+          title_tr: string | null
           updated_at: string | null
         }
         Insert: {
           body: string
           body_en?: string | null
+          body_ru?: string | null
+          body_tr?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -8257,11 +8683,15 @@ export type Database = {
           target_audience?: string
           title: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string | null
         }
         Update: {
           body?: string
           body_en?: string | null
+          body_ru?: string | null
+          body_tr?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -8270,6 +8700,8 @@ export type Database = {
           target_audience?: string
           title?: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -9294,6 +9726,8 @@ export type Database = {
           sort_order: number | null
           tip_text: string
           tip_text_en: string | null
+          tip_text_ru: string | null
+          tip_text_tr: string | null
           trimester: number
           updated_at: string | null
         }
@@ -9305,6 +9739,8 @@ export type Database = {
           sort_order?: number | null
           tip_text: string
           tip_text_en?: string | null
+          tip_text_ru?: string | null
+          tip_text_tr?: string | null
           trimester: number
           updated_at?: string | null
         }
@@ -9316,6 +9752,8 @@ export type Database = {
           sort_order?: number | null
           tip_text?: string
           tip_text_en?: string | null
+          tip_text_ru?: string | null
+          tip_text_tr?: string | null
           trimester?: number
           updated_at?: string | null
         }
@@ -9529,6 +9967,12 @@ export type Database = {
           last_push_sent_at: string | null
           last_white_noise_sound: string | null
           notifications_enabled: boolean | null
+          privacy_allow_messages: boolean
+          privacy_location_sharing: boolean
+          privacy_notification_sounds: boolean
+          privacy_profile_visible: boolean
+          privacy_share_analytics: boolean
+          privacy_show_in_community: boolean
           push_comments: boolean | null
           push_community: boolean | null
           push_enabled: boolean | null
@@ -9559,6 +10003,12 @@ export type Database = {
           last_push_sent_at?: string | null
           last_white_noise_sound?: string | null
           notifications_enabled?: boolean | null
+          privacy_allow_messages?: boolean
+          privacy_location_sharing?: boolean
+          privacy_notification_sounds?: boolean
+          privacy_profile_visible?: boolean
+          privacy_share_analytics?: boolean
+          privacy_show_in_community?: boolean
           push_comments?: boolean | null
           push_community?: boolean | null
           push_enabled?: boolean | null
@@ -9589,6 +10039,12 @@ export type Database = {
           last_push_sent_at?: string | null
           last_white_noise_sound?: string | null
           notifications_enabled?: boolean | null
+          privacy_allow_messages?: boolean
+          privacy_location_sharing?: boolean
+          privacy_notification_sounds?: boolean
+          privacy_profile_visible?: boolean
+          privacy_share_analytics?: boolean
+          privacy_show_in_community?: boolean
           push_comments?: boolean | null
           push_community?: boolean | null
           push_enabled?: boolean | null
@@ -10021,6 +10477,8 @@ export type Database = {
         Row: {
           benefits: string[] | null
           benefits_en: string[] | null
+          benefits_ru: string[] | null
+          benefits_tr: string[] | null
           created_at: string
           description: string | null
           description_az: string | null
@@ -10029,12 +10487,18 @@ export type Database = {
           description_tr: string | null
           dosage: string | null
           dosage_en: string | null
+          dosage_ru: string | null
+          dosage_tr: string | null
           food_sources: string[] | null
           food_sources_en: string[] | null
+          food_sources_ru: string[] | null
+          food_sources_tr: string[] | null
           icon_emoji: string | null
           id: string
           importance: string | null
           importance_en: string | null
+          importance_ru: string | null
+          importance_tr: string | null
           is_active: boolean | null
           life_stage: string | null
           name: string
@@ -10051,6 +10515,8 @@ export type Database = {
         Insert: {
           benefits?: string[] | null
           benefits_en?: string[] | null
+          benefits_ru?: string[] | null
+          benefits_tr?: string[] | null
           created_at?: string
           description?: string | null
           description_az?: string | null
@@ -10059,12 +10525,18 @@ export type Database = {
           description_tr?: string | null
           dosage?: string | null
           dosage_en?: string | null
+          dosage_ru?: string | null
+          dosage_tr?: string | null
           food_sources?: string[] | null
           food_sources_en?: string[] | null
+          food_sources_ru?: string[] | null
+          food_sources_tr?: string[] | null
           icon_emoji?: string | null
           id?: string
           importance?: string | null
           importance_en?: string | null
+          importance_ru?: string | null
+          importance_tr?: string | null
           is_active?: boolean | null
           life_stage?: string | null
           name: string
@@ -10081,6 +10553,8 @@ export type Database = {
         Update: {
           benefits?: string[] | null
           benefits_en?: string[] | null
+          benefits_ru?: string[] | null
+          benefits_tr?: string[] | null
           created_at?: string
           description?: string | null
           description_az?: string | null
@@ -10089,12 +10563,18 @@ export type Database = {
           description_tr?: string | null
           dosage?: string | null
           dosage_en?: string | null
+          dosage_ru?: string | null
+          dosage_tr?: string | null
           food_sources?: string[] | null
           food_sources_en?: string[] | null
+          food_sources_ru?: string[] | null
+          food_sources_tr?: string[] | null
           icon_emoji?: string | null
           id?: string
           importance?: string | null
           importance_en?: string | null
+          importance_ru?: string | null
+          importance_tr?: string | null
           is_active?: boolean | null
           life_stage?: string | null
           name?: string
@@ -10150,6 +10630,8 @@ export type Database = {
         Row: {
           content: string
           content_en: string | null
+          content_ru: string | null
+          content_tr: string | null
           created_at: string
           id: string
           image_url: string | null
@@ -10157,14 +10639,20 @@ export type Database = {
           life_stage: string
           tips: Json | null
           tips_en: Json | null
+          tips_ru: Json | null
+          tips_tr: Json | null
           title: string
           title_en: string | null
+          title_ru: string | null
+          title_tr: string | null
           updated_at: string
           week_number: number
         }
         Insert: {
           content: string
           content_en?: string | null
+          content_ru?: string | null
+          content_tr?: string | null
           created_at?: string
           id?: string
           image_url?: string | null
@@ -10172,14 +10660,20 @@ export type Database = {
           life_stage?: string
           tips?: Json | null
           tips_en?: Json | null
+          tips_ru?: Json | null
+          tips_tr?: Json | null
           title: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string
           week_number: number
         }
         Update: {
           content?: string
           content_en?: string | null
+          content_ru?: string | null
+          content_tr?: string | null
           created_at?: string
           id?: string
           image_url?: string | null
@@ -10187,8 +10681,12 @@ export type Database = {
           life_stage?: string
           tips?: Json | null
           tips_en?: Json | null
+          tips_ru?: Json | null
+          tips_tr?: Json | null
           title?: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string
           week_number?: number
         }
@@ -10539,6 +11037,10 @@ export type Database = {
       }
     }
     Functions: {
+      _grant_premium_days: {
+        Args: { p_days: number; p_user: string }
+        Returns: undefined
+      }
       can_redeem_partner_venue: {
         Args: { _user_id: string; _venue_id: string }
         Returns: Json
@@ -10552,6 +11054,7 @@ export type Database = {
           user_id: string
         }[]
       }
+      generate_partner_code: { Args: never; Returns: string }
       get_active_payment_methods: {
         Args: never
         Returns: {
@@ -10611,7 +11114,13 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_linked_partner_premium: { Args: never; Returns: boolean }
+      get_linked_partner_user_id: {
+        Args: { _user_id: string }
+        Returns: string
+      }
       get_notification_admin_status: { Args: never; Returns: Json }
+      get_or_create_referral_code: { Args: never; Returns: string }
       get_user_linked_partner_id: {
         Args: { _user_id: string }
         Returns: string
@@ -10639,6 +11148,9 @@ export type Database = {
         }
         Returns: boolean
       }
+      redeem_referral_code: { Args: { p_code: string }; Returns: Json }
+      unlink_partners: { Args: never; Returns: undefined }
+      update_my_referral_status: { Args: { p_state: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user" | "moderator"
