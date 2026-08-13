@@ -119,6 +119,11 @@ Deno.serve(async (req) => {
       inApp: 'Premium aboneliğiniz sona erdi ve partner bağlantısı durduruldu. Yeniden etkinleştirmek için Premium\'u uzatın.',
       push: 'Partner bağlantınız durduruldu. Premium\'u uzatın ve yeniden bağlanın.',
     },
+    kk: {
+      title: 'Premium мерзімі аяқталды',
+      inApp: 'Premium жазылымыңыз аяқталды және серіктеспен байланыс тоқтатылды. Қайта белсендіру үшін Premium мерзімін ұзартыңыз.',
+      push: 'Серіктеспен байланысыңыз тоқтатылды. Premium мерзімін ұзартып, қайта қосылыңыз.',
+    },
   };
 
   if (detached.length > 0) {

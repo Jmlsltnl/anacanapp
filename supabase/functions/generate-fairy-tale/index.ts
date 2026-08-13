@@ -7,30 +7,34 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string }> = {
+const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string; kk: string }> = {
   '0-2': {
     az: 'Çox sadə cümlələr (3-5 söz). Təkrarlanan ifadələr. Heyvan səsləri. Rənglər və formalar. Nağıl 1-2 dəqiqəlik olsun.',
     en: 'Very simple sentences (3-5 words). Repetitive phrases. Animal sounds. Colors and shapes. Story should be 1-2 minutes.',
     ru: 'Очень простые предложения (3-5 слов). Повторяющиеся фразы. Звуки животных. Цвета и формы. Сказка на 1-2 минуты.',
     tr: 'Çok basit cümleler (3-5 kelime). Tekrarlanan ifadeler. Hayvan sesleri. Renkler ve şekiller. Masal 1-2 dakika olsun.',
+    kk: 'Өте қарапайым сөйлемдер (3-5 сөз). Қайталанатын тіркестер. Жануарлардың дыбыстары. Түстер мен пішіндер. Ертегі 1-2 минутқа созылсын.',
   },
   '3-5': {
     az: 'Sadə amma məzmunlu cümlələr. Dialoqlar olsun. Əyləncəli hadisələr. Tərbiyəvi mesaj aydın olsun. 3-4 dəqiqəlik nağıl.',
     en: 'Simple but meaningful sentences. Include dialogues. Fun events. Clear moral message. 3-4 minute story.',
     ru: 'Простые, но содержательные предложения. Диалоги. Весёлые события. Ясный воспитательный посыл. Сказка на 3-4 минуты.',
     tr: 'Basit ama anlamlı cümleler. Diyaloglar olsun. Eğlenceli olaylar. Net eğitici mesaj. 3-4 dakikalık masal.',
+    kk: 'Қарапайым, бірақ мағыналы сөйлемдер. Диалогтар болсын. Қызықты оқиғалар. Тәрбиелік ойы анық болсын. Ертегі 3-4 минутқа созылсын.',
   },
   '6-9': {
     az: 'Daha mürəkkəb süjet xətti. Problemin həlli prosesi göstərilsin. Uşağın düşünməsinə kömək edən suallar. 4-6 dəqiqəlik nağıl.',
     en: 'More complex plot. Show problem-solving process. Questions that help the child think. 4-6 minute story.',
     ru: 'Более сложный сюжет. Показать процесс решения проблем. Вопросы для размышления. Сказка на 4-6 минут.',
     tr: 'Daha karmaşık olay örgüsü. Problem çözme süreci gösterilsin. Çocuğun düşünmesine yardımcı sorular. 4-6 dakikalık masal.',
+    kk: 'Күрделірек оқиға желісі. Мәселені шешу үдерісі көрсетілсін. Баланың ойлануына көмектесетін сұрақтар. Ертегі 4-6 минутқа созылсын.',
   },
   '10-12': {
     az: 'Zəngin süjet. Əxlaqi dilemma və seçimlər. Emosional dərinlik. Daha uzun dialoqlar. 5-7 dəqiqəlik nağıl.',
     en: 'Rich plot. Moral dilemmas and choices. Emotional depth. Longer dialogues. 5-7 minute story.',
     ru: 'Богатый сюжет. Моральные дилеммы и выбор. Эмоциональная глубина. Длинные диалоги. Сказка на 5-7 минут.',
     tr: 'Zengin olay örgüsü. Ahlaki ikilemler ve seçimler. Duygusal derinlik. Daha uzun diyaloglar. 5-7 dakikalık masal.',
+    kk: 'Мазмұнды оқиға желісі. Моральдық дилеммалар мен таңдау. Эмоциялық тереңдік. Ұзағырақ диалогтар. Ертегі 5-7 минутқа созылсын.',
   },
 };
 
@@ -143,6 +147,40 @@ Yapı:
 
 Format: İlk satırda başlık, sonra masal metni.`;
 
+    case 'kk':
+      return `Сіз марапатқа ие болған балалар кітабының авторысыз. Оқиға желісі қисынды дамитын әрі кәсіби баяндау мәнерімен жазылған қызықты, сапалы балалар ертегісін жазыңыз.
+
+САПАҒА ҚОЙЫЛАТЫН МАҢЫЗДЫ ТАЛАПТАР:
+1. Баланың аты — "${childName}". Бас кейіпкер ретінде ӘРҚАШАН осы атты қолданыңыз.
+2. Ертегінің басы, ортасы және соңы анық БОЛУЫ КЕРЕК. ҚИСЫНДЫ себеп-салдар байланысы болуы тиіс.
+3. Әр оқиғаның СЕБЕБІ болуы керек — кездейсоқ сиқырлы шешімдер БОЛМАУЫ ТИІС.
+4. Кейіпкерлердің мінездері мен уәждері бірізді болуы керек.
+5. Тәрбиелік ой оқиғалардан ТАБИҒИ түрде туындауы керек — жасанды ақыл-өсиет БОЛМАСЫН.
+6. Жанды, бейнелі тілді қолданыңыз (түстер, дыбыстар, иістер).
+7. Кейіпкерлердің мінезін ашатын мағыналы диалогтар қосыңыз.
+8. Мәселе кейіпкердің ӨЗ күш-жігері, ақылы немесе тұлғалық өсуі арқылы шешілуі керек.
+9. "Олар бақытты өмір сүрді" сияқты таптаурын тіркестерге ТЫЙЫМ САЛЫНАДЫ — нақты әрі көңілден шығатын аяқталу жазыңыз.
+10. Әсіреленген, тым көтеріңкі сипаттамаларға ТЫЙЫМ САЛЫНАДЫ. Жылы, бірақ шынайы реңкті сақтаңыз.
+
+ТЫЙЫМ САЛЫНАДЫ:
+- Аты жоқ "кішкентай дос", "сиқырлы тіршілік иесі" сияқты тіркестер
+- Кездейсоқ сиқырлы шешімдер
+- Уағыз түріндегі моральдық сабақтар
+- Шектен тыс тәтті, жасанды тіл
+- Оқиға желісіндегі олқылықтар немесе қисынсыз реттілік
+
+Ертегінің құрылымы:
+1. Тақырып: "${childName} және [бір нәрсе]" түрінде
+2. Оқиға орнының сипаттамасы (ҚАЙДА және ҚАШАН, сезімге әсер ететін егжей-тегжейлермен)
+3. Кейіпкерлерді таныстыру (мінез ерекшеліктерімен)
+4. Мәселе/сынақ (қисынды әрі балаға түсінікті)
+5. 2-3 әрекет/кедергі (біртіндеп күрделене түсетін)
+6. Шарықтау шегі — кейіпкердің өсуі немесе бір нәрсені үйренуі
+7. Оқиғалардан қисынды түрде туындайтын шешім
+8. Көңілден шығатын аяқталу және табиғи тәрбиелік қорытынды${ageInstruction}
+
+Пішім: Бірінші жолға тақырыпты, одан кейін ертегі мәтінін жазыңыз. Тізім түрінде емес, абзацтарға бөліп жазыңыз. Ертегі ҚАЗАҚ тілінде болуы керек.`;
+
     default: // 'az'
       return `Sən mükafat almış uşaq kitabı müəllifiisən. Məntiqi süjet inkişafı və peşəkar anlatım tərzi ilə uşaqlar üçün maraqlı, keyfiyyətli nağıl yaz.
 
@@ -215,6 +253,19 @@ Eğitici mesaj: ${moralLesson || 'Dostluk ve iyilik'}
 ${styleText ? `Tarz: ${styleText}` : ''}
 
 "${childName}" hakkında PROFESYONEL, mantıklı bir masal yaz. Canlı betimlemeler ve tatmin edici bir son olsun.`;
+
+    case 'kk':
+      return `Баланың аты: ${childName}${ageText}
+Тақырып: ${theme || 'Ормандағы шытырман оқиға'}
+Көмекші кейіпкер: ${hero || 'Дана орман жануары'}
+Тәрбиелік ой: ${moralLesson || 'Достық пен жақсылық'}
+${styleText ? `Стиль: ${styleText}` : ''}
+
+МАҢЫЗДЫ:
+- "${childName}" туралы КӘСІБИ, ҚИСЫНДЫ ертегі жазыңыз
+- Жанды сипаттамалар, мағыналы диалогтар және көңілден шығатын аяқталу болсын
+- Тәрбиелік ой жасанды емес, оқиғалардан ТАБИҒИ түрде туындасын
+- Қазақ тілінің грамматикалық нормаларын мұқият сақтаңыз`;
 
     default: // 'az'
       return `Uşağın adı: ${childName}${ageText}
@@ -333,6 +384,7 @@ serve(async (req) => {
       en: `${actualChildName}'s Story`,
       ru: `Сказка ${actualChildName}`,
       tr: `${actualChildName}'in Masalı`,
+      kk: `${actualChildName} туралы ертегі`,
     };
     
     const title = rawTitle || defaultTitles[language] || defaultTitles['az'];

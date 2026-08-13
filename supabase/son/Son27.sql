@@ -13,7 +13,7 @@
 CREATE TABLE IF NOT EXISTS public.community_post_translations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL REFERENCES public.community_posts(id) ON DELETE CASCADE,
-  lang TEXT NOT NULL CHECK (lang IN ('az','en','ru','tr')),
+  lang TEXT NOT NULL CHECK (lang IN ('az','en','ru','tr','kk')),
   content TEXT NOT NULL,
   model TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),

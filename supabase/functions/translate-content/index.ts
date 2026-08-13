@@ -75,7 +75,7 @@ const REGISTRY: Record<string, TableCfg> = {
   mommy_day_notifications: { text: ['title', 'body'] },
 };
 
-const LANG_NAMES: Record<string, string> = { ru: 'Russian', tr: 'Turkish', en: 'English' };
+const LANG_NAMES: Record<string, string> = { ru: 'Russian', tr: 'Turkish', en: 'English', kk: 'Kazakh' };
 const MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
 
 function buildSystemPrompt(lang: string): string {
@@ -84,7 +84,9 @@ function buildSystemPrompt(lang: string): string {
     ? 'Use the formal «вы» form when addressing the user. Use «менструация» for period, «малыш» for baby. Emergency number is 103.'
     : lang === 'tr'
       ? 'Use the formal "siz" form when addressing the user. Use "regl" for period, "bebek" for baby. Emergency number is 112.'
-      : 'Use a warm, professional tone.';
+      : lang === 'kk'
+        ? 'Write natural modern Kazakh (Cyrillic script). Use the formal «Сіз» form when addressing the user. Use «етеккір» for period, «бөпе» for baby, «ДДСҰ» for WHO. Emergency number is 103.'
+        : 'Use a warm, professional tone.';
   return [
     `You are a professional medical/parenting content translator for a pregnancy & motherhood app (Anacan).`,
     `Translate the JSON values from Azerbaijani to ${target}.`,
@@ -215,7 +217,7 @@ Deno.serve(async (req) => {
 
     const cfg = REGISTRY[table];
     if (!cfg) return json({ error: `unknown table '${table}'`, tables: Object.keys(REGISTRY) }, 400);
-    if (!['ru', 'tr', 'en'].includes(lang)) return json({ error: "lang must be 'ru' | 'tr' | 'en'" }, 400);
+    if (!['ru', 'tr', 'en', 'kk'].includes(lang)) return json({ error: "lang must be 'ru' | 'tr' | 'en' | 'kk'" }, 400);
 
     const textF = cfg.text ?? [];
     const arrF = cfg.arr ?? [];

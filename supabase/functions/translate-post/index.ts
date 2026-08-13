@@ -19,12 +19,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const LANGS = ['az', 'en', 'ru', 'tr'];
+const LANGS = ['az', 'en', 'ru', 'tr', 'kk'];
 const LANG_NAMES: Record<string, string> = {
   az: 'Azerbaijani',
   en: 'English',
   ru: 'Russian',
   tr: 'Turkish',
+  kk: 'Kazakh',
 };
 const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
 const MAX_CONTENT_LEN = 6000;
@@ -38,9 +39,11 @@ function buildSystemPrompt(targetLang: string, sourceLang: string | null): strin
       ? 'Use the formal «вы» form. Use «малыш» for baby, «менструация» for period.'
       : targetLang === 'tr'
         ? 'Use the formal "siz" form. Use "bebek" for baby, "regl" for period.'
-        : targetLang === 'az'
-          ? 'Use the formal "siz" form.'
-          : 'Use a warm, natural tone.';
+        : targetLang === 'kk'
+          ? 'Write natural modern Kazakh (Cyrillic script). Use the formal «Сіз» form. Use «бөпе» for baby, «етеккір» for period.'
+          : targetLang === 'az'
+            ? 'Use the formal "siz" form.'
+            : 'Use a warm, natural tone.';
   return [
     `You translate community posts written by mothers in a pregnancy & motherhood app (Anacan).`,
     `Translate the user's message to ${target}.${source ? ` The source language is most likely ${source}, but detect it yourself if it differs.` : ''}`,

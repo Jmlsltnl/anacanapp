@@ -48,11 +48,15 @@ interface DayNotification {
   is_active: boolean;
 }
 
-/** İstifadəçi dilinə uyğun sütunu qaytarır: field_{en|ru|tr} → base (AZ). */
+/** İstifadəçi dilinə uyğun sütunu qaytarır: field_{en|ru|tr|kk} → (kk üçün ru körpüsü) → base (AZ). */
 function pickLang(row: Record<string, unknown>, field: string, lang: string): string {
   if (lang && lang !== 'az') {
     const localized = row[`${field}_${lang}`];
     if (typeof localized === 'string' && localized.trim()) return localized;
+    if (lang === 'kk') {
+      const ru = row[`${field}_ru`];
+      if (typeof ru === 'string' && ru.trim()) return ru;
+    }
   }
   const base = row[field];
   return typeof base === 'string' ? base : '';

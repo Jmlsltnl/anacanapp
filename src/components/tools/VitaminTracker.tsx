@@ -35,6 +35,7 @@ const getDayLabels = (language: string) => {
   if (language === 'en') return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   if (language === 'ru') return ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
   if (language === 'tr') return ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+  if (language === 'kk') return ['Жс', 'Дс', 'Сс', 'Ср', 'Бс', 'Жм', 'Сб'];
   return ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'];
 };
 
@@ -44,15 +45,18 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
   const { data: dbVitamins = [] } = useQuery({
     queryKey: ['all_raw_vitamins', language],
     queryFn: async () => {
-      const { data } = await supabase.from('vitamins').select('name, name_az, name_en, name_ru, name_tr, icon_emoji').eq('is_active', true);
+      // select('*') — yeni dil sütunları (name_kk və s.) əlavə olunanda kod dəyişmir;
+      // konkret siyahı olsaydı, sütun DB-yə çatmamış 400 verərdi
+      const { data } = await supabase.from('vitamins').select('*').eq('is_active', true);
       return (data || []) as any[];
     },
     staleTime: 1000 * 60 * 60,
   });
 
-  // Vitamin adını istifadəçi dilində qaytar (ru/tr sütunları oxunur — əvvəllər oxunmurdu)
+  // Vitamin adını istifadəçi dilində qaytar (kk üçün ru körpüsü)
   const locVitName = (v: any): string =>
-  language === 'az' ? (v.name_az || v.name) : (v[`name_${language}`] || v.name_en || v.name);
+  language === 'az' ? (v.name_az || v.name) :
+  (v[`name_${language}`] || (language === 'kk' ? v.name_ru : null) || v.name_en || v.name);
 
   const dynamicPresets = dbVitamins.length > 0 ? dbVitamins.map(v => ({
     name: locVitName(v),

@@ -98,7 +98,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               <ArrowLeft size={16} strokeWidth={2} />
             </motion.button>
             <div>
-              <p className="a-eyebrow">{names.length} {tr("babynames_ad_count_3c7a2d", "ad")} · {language === 'en' ? '🇬🇧 English' : language === 'tr' ? '🇹🇷 Türkçe' : language === 'ru' ? '🇷🇺 Русские' : `🇦🇿 ${tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan")}`}</p>
+              <p className="a-eyebrow">{names.length} {tr("babynames_ad_count_3c7a2d", "ad")} · {language === 'en' ? '🇬🇧 English' : language === 'tr' ? '🇹🇷 Türkçe' : language === 'ru' ? '🇷🇺 Русские' : language === 'kk' ? '🇰🇿 Қазақша' : `🇦🇿 ${tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan")}`}</p>
               <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("babynames_korpe_adlari_357880", "Körpə Adları")}</p>
             </div>
           </div>
@@ -327,7 +327,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                           {selectedName.gender === 'boy' ? tr("babynames_oglan_e9715e", "O\u011Flan") : selectedName.gender === 'girl' ? tr("babynames_qiz_79bf6b", "Q\u0131z") : 'Unisex'}
                         </span>
                         <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: ink, padding: '4px 10px', fontSize: 10 }}>
-                          {selectedName.origin || (language === 'en' ? 'Azerbaijan' : language === 'tr' ? 'Türkçe' : language === 'ru' ? 'Русское' : tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan"))}
+                          {selectedName.origin || (language === 'en' ? 'Azerbaijan' : language === 'tr' ? 'Türkçe' : language === 'ru' ? 'Русское' : language === 'kk' ? 'Әзербайжан' : tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan"))}
                         </span>
                       </div>
                     </>);

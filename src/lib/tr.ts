@@ -46,6 +46,9 @@ export function mapRowTranslation<T extends Record<string, any>>(
     let val: any;
     if (language === 'az') {
       val = row[`${field}_az`] ?? row[field];
+    } else if (language === 'kk') {
+      // kk üçün ru körpüsü: kk hələ tərcümə olunmayıbsa rus mətn az-dan daha faydalıdır
+      val = row[`${field}_kk`] ?? row[`${field}_ru`] ?? row[field] ?? row[`${field}_az`];
     } else {
       val = row[`${field}_${language}`] ?? row[field] ?? row[`${field}_az`];
     }

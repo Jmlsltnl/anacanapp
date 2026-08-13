@@ -23,13 +23,15 @@ export async function loadTranslations(lang: string): Promise<void> {
 
   dbPromise = (async () => {
     try {
-      // DEV-only: lokal sınaq üçün ru/tr seed fayllarını overlay et (DB push-dan əvvəl).
+      // DEV-only: lokal sınaq üçün ru/tr/kk seed fayllarını overlay et (DB push-dan əvvəl).
       // import.meta.env.DEV prod build-də false-a çevrilir və bu blok tamamilə silinir.
-      if (import.meta.env.DEV && (lang === 'ru' || lang === 'tr')) {
+      if (import.meta.env.DEV && (lang === 'ru' || lang === 'tr' || lang === 'kk')) {
         try {
           const seedModule = lang === 'ru'
             ? await import('../../scripts/i18n/ru.seed.json')
-            : await import('../../scripts/i18n/tr.seed.json');
+            : lang === 'kk'
+              ? await import('../../scripts/i18n/kk.seed.json')
+              : await import('../../scripts/i18n/tr.seed.json');
           const seed = (seedModule.default ?? seedModule) as Record<string, string>;
           translationCache[lang] = { ...seed, ...(translationCache[lang] || {}) };
           console.info(`[i18n][DEV] Lokal ${lang} seed yükləndi: ${Object.keys(seed).length} açar`);
@@ -85,13 +87,14 @@ const FALLBACK_LANGUAGES: AppLanguage[] = [
  * ru/tr istifadəçilərə açmaq üçün DB-də is_active=true etmək kifayətdir — app release lazım deyil.
  * Şəbəkə/RLS xətasında az+en fallback qaytarır.
  */
-/** ru/tr bu bundle-da HƏMİŞƏ seçilə bilir (DB app_languages.is_active-dən asılı olmayaraq).
+/** ru/tr/kk bu bundle-da HƏMİŞƏ seçilə bilir (DB app_languages.is_active-dən asılı olmayaraq).
     Köhnə buildlər köhnə bundle daşıdığı üçün onlarda görünmür — yalnız yeni web/build. */
 function withDevLanguages(list: AppLanguage[]): AppLanguage[] {
   const have = new Set(list.map((l) => l.code));
   const extras: AppLanguage[] = [
     { code: 'tr', name: 'Turkish', native_name: 'Türkçe' },
     { code: 'ru', name: 'Russian', native_name: 'Русский' },
+    { code: 'kk', name: 'Kazakh', native_name: 'Қазақша' },
   ];
   return [...list, ...extras.filter((e) => !have.has(e.code))];
 }
@@ -116,6 +119,7 @@ const LOCALE_TAGS: Record<string, string> = {
   en: 'en-US',
   ru: 'ru-RU',
   tr: 'tr-TR',
+  kk: 'kk-KZ',
 };
 
 /**

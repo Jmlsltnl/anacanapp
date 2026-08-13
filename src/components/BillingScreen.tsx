@@ -21,7 +21,7 @@ import { getDynamicIcon } from '@/lib/dynamicIcon';
 import WinBackCard from '@/components/WinBackCard';
 import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
-import { tr } from "@/lib/tr";
+import { tr, getPersistedLanguage } from "@/lib/tr";
 
 interface PaymentEntry {
   productId: string;
@@ -279,7 +279,13 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
           <div className="p-2 grid grid-cols-1 gap-1">
             {allFeaturesList.map((f, i) => {
               const feat = 'title_en' in f ? f : null;
-              const text = feat ? (getCurrentDateLocale().code === 'az' ? feat.title_az || feat.title : feat.title_en || feat.title) : (f as any).text;
+              // Bütün dillər üzrə seçim: <lang> → (kk üçün ru körpüsü) → en → base
+              const bLang = getPersistedLanguage();
+              const text = feat
+                ? (bLang === 'az'
+                    ? feat.title_az || feat.title
+                    : (feat as any)[`title_${bLang}`] || (bLang === 'kk' ? (feat as any).title_ru : null) || feat.title_en || feat.title)
+                : (f as any).text;
               return (
                 <div key={i} className="flex items-center gap-3 p-2 rounded-xl transition-colors">
                   <div className="w-8 h-8 flex items-center justify-center shrink-0" style={{ borderRadius: 10, background: 'var(--a-peach-1)' }}>

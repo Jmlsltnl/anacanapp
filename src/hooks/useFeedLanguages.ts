@@ -17,7 +17,7 @@ import { FeedLang, isFeedLang, sanitizeFeedLangs } from '@/lib/langDetect';
 export const FEED_LANGS_CHANGED_EVENT = 'anacan:feed-langs-changed';
 
 // Rus dilinin default linzaya daxil edildiyi ölkələr
-const RU_DEFAULT_COUNTRIES = new Set(['RU', 'BY', 'UA', 'KZ', 'KG', 'UZ', 'TJ', 'TM', 'AM', 'GE', 'MD']);
+const RU_DEFAULT_COUNTRIES = new Set(['RU', 'BY', 'UA', 'KG', 'UZ', 'TJ', 'TM', 'AM', 'GE', 'MD']);
 
 /** Ölkə + UI dilinə görə ağıllı default linza */
 export function defaultFeedLanguages(countryCode: string | null | undefined, uiLang: string): FeedLang[] {
@@ -26,6 +26,7 @@ export function defaultFeedLanguages(countryCode: string | null | undefined, uiL
   let langs: FeedLang[];
   if (cc === 'AZ' || !cc) langs = ['az', 'ru', 'tr']; // AZ bazarı — ölkə seçməyənlər də bura
   else if (cc === 'TR') langs = ['tr'];
+  else if (cc === 'KZ') langs = ['kk', 'ru']; // Qazaxıstan — qazax + rus
   else if (RU_DEFAULT_COUNTRIES.has(cc)) langs = ['ru'];
   else langs = ['en'];
   if (!langs.includes(ui)) langs = [ui, ...langs];

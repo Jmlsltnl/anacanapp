@@ -61,13 +61,22 @@ const DEFAULTS: Record<string, ReminderTexts> = {
     pms: { title: () => 'PMS dönemi ⚡', body: () => 'PMS dönemi yaklaşıyor, kendinize iyi bakın!' },
     pill: { title: () => 'Hap zamanı 💊', body: () => 'Günlük hapınızı almayı unutmayın!' },
   },
+  kk: {
+    period_start: { title: () => 'Етеккір жақындап қалды 🔴', body: (d) => `Етеккірге дейін ${d} күн қалды!` },
+    period_end: { title: () => 'Етеккір аяқталды ✅', body: () => 'Етеккіріңіз аяқталды!' },
+    ovulation: { title: () => 'Овуляция күні 🌸', body: (d) => `Овуляцияға дейін ${d} күн қалды!` },
+    fertile_start: { title: () => 'Фертильді күндер 💕', body: () => 'Фертильді күндер басталады!' },
+    fertile_end: { title: () => 'Фертильді күндер аяқталады 📅', body: () => 'Фертильді күндер аяқталып келеді.' },
+    pms: { title: () => 'ПМС кезеңі ⚡', body: () => 'ПМС кезеңі жақындап қалды, өзіңізге күтім жасаңыз!' },
+    pill: { title: () => 'Дәрі қабылдау уақыты 💊', body: () => 'Күнделікті дәріңізді қабылдауды ұмытпаңыз!' },
+  },
 };
 
 function pickLang(value: string | null | undefined, valueEn: string | null | undefined, lang: string): string {
   // İstifadəçinin ÖZ yazdığı xatırlatma mətni: EN üçün _en sütunu, digər dillər üçün
   // yalnız custom AZ mətni varsa o göstərilir; boşdursa DEFAULTS (aşağıda) işə düşür.
   if (lang === 'en') return (valueEn && valueEn.trim()) ? valueEn : '';
-  if (lang === 'ru' || lang === 'tr') return ''; // custom mətn tərcüməsizdir → localized default üstün tutulur
+  if (lang === 'ru' || lang === 'tr' || lang === 'kk') return ''; // custom mətn tərcüməsizdir → localized default üstün tutulur
   return value || '';
 }
 

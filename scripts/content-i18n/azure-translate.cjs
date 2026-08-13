@@ -68,12 +68,12 @@ const REGISTRY = {
   baby_crisis_periods: { text: ['title', 'description'], arrText: ['symptoms', 'tips'] },
   mental_health_resources: { text: ['name', 'description'] },
   breathing_exercises: { text: ['name', 'description'] },
-  vitamins: { text: ['dosage'], arr: ['benefits', 'food_sources'] }, // importance qəsdən yoxdur (badge məntiqi)
+  vitamins: { text: ['dosage', 'name', 'description'], arr: ['benefits', 'food_sources'] }, // importance qəsdən yoxdur (badge məntiqi)
   exercises: { text: ['description'] },
   intro_slides: { text: ['title', 'subtitle', 'description'] },
   products: { text: ['name', 'description', 'category'] },
   cakes: { text: ['name', 'description', 'milestone_label'] },
-  baby_names_db: { text: ['origin'] },
+  baby_names_db: { text: ['origin', 'meaning'] },
 };
 
 // Əlavə reyestr (scan-gaps nəticəsində yaradılan yeni cədvəllər)
@@ -83,7 +83,7 @@ if (fs.existsSync(extraPath)) {
   for (const [t, cfg] of Object.entries(extra)) REGISTRY[t] = REGISTRY[t] || cfg;
 }
 
-const LANG_NAMES = { ru: 'Russian', tr: 'Turkish', en: 'English' };
+const LANG_NAMES = { ru: 'Russian', tr: 'Turkish', en: 'English', kk: 'Kazakh' };
 
 function buildSystemPrompt(lang) {
   const target = LANG_NAMES[lang];
@@ -91,7 +91,9 @@ function buildSystemPrompt(lang) {
     ? 'Use the formal «вы» form when addressing the user. Use «менструация» for period, «малыш» for baby, «ВОЗ» for WHO. Emergency number is 103.'
     : lang === 'tr'
       ? 'Use the formal "siz" form when addressing the user. Use "regl" for period, "bebek" for baby, "DSÖ" for WHO. Emergency number is 112.'
-      : 'Use a warm, professional tone.';
+      : lang === 'kk'
+        ? 'Write natural modern Kazakh (Cyrillic script) as used in Kazakhstan. Use the formal «Сіз» form when addressing the user. Use «етеккір» for period/menstruation, «бөпе» for baby, «ДДСҰ» for WHO. Emergency number is 103.'
+        : 'Use a warm, professional tone.';
   return [
     `You are a professional medical/parenting content translator for a pregnancy & motherhood app (Anacan).`,
     `Translate the JSON values from Azerbaijani to ${target}.`,

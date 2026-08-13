@@ -7,7 +7,7 @@ import { useState, useMemo, useEffect } from 'react';
 import countriesData from '../../countries.json';
 
 // flagcdn ölkə kodu xəritəsi (dil kodu → bayraq kodu)
-const FLAG_BY_CODE: Record<string, string> = { az: 'az', en: 'gb', ru: 'ru', tr: 'tr' };
+const FLAG_BY_CODE: Record<string, string> = { az: 'az', en: 'gb', ru: 'ru', tr: 'tr', kk: 'kz' };
 
 // İlkin/fallback siyahı — app_languages sorğusu gələnə qədər və ya offline halda.
 const FALLBACK_LANGS = [
@@ -85,13 +85,13 @@ export default function InitialLanguageScreen() {
   // Bu ekran tərcümə yüklənməzdən ƏVVƏL göstərilir — mətnlər inline saxlanır.
   const L = (m: Record<string, string>) => m[selectedLang] ?? m.az;
   const t = {
-    selectCountry: L({ az: 'Ölkə seçin', en: 'Select Country', ru: 'Выберите страну', tr: 'Ülke seçin' }),
+    selectCountry: L({ az: 'Ölkə seçin', en: 'Select Country', ru: 'Выберите страну', tr: 'Ülke seçin', kk: 'Елді таңдаңыз' }),
     selectCountryCap: 'SELECT COUNTRY',
-    searchPlaceholder: L({ az: 'Axtar', en: 'Search', ru: 'Поиск', tr: 'Ara' }),
-    noneFound: L({ az: 'Ölkə tapılmadı', en: 'No countries found', ru: 'Страны не найдены', tr: 'Ülke bulunamadı' }),
-    selectLanguage: L({ az: 'Dil seçin', en: 'Select Language', ru: 'Выберите язык', tr: 'Dil seçin' }),
+    searchPlaceholder: L({ az: 'Axtar', en: 'Search', ru: 'Поиск', tr: 'Ara', kk: 'Іздеу' }),
+    noneFound: L({ az: 'Ölkə tapılmadı', en: 'No countries found', ru: 'Страны не найдены', tr: 'Ülke bulunamadı', kk: 'Ел табылмады' }),
+    selectLanguage: L({ az: 'Dil seçin', en: 'Select Language', ru: 'Выберите язык', tr: 'Dil seçin', kk: 'Тілді таңдаңыз' }),
     selectLanguageCap: 'SELECT LANGUAGE',
-    continue: L({ az: 'Davam et', en: 'Continue', ru: 'Продолжить', tr: 'Devam et' }),
+    continue: L({ az: 'Davam et', en: 'Continue', ru: 'Продолжить', tr: 'Devam et', kk: 'Жалғастыру' }),
     continueEn: 'Continue',
   };
 
@@ -205,9 +205,13 @@ export default function InitialLanguageScreen() {
               </motion.button>
 
               <p className="text-center mt-5 leading-relaxed" style={{ fontSize: 11, color: 'var(--a-on-bg-soft)' }}>
-                {selectedLang === 'en'
-                  ? 'You can change the language later in settings'
-                  : 'Dili sonradan tənzimləmələrdən dəyişə bilərsiniz'}
+                {L({
+                  az: 'Dili sonradan tənzimləmələrdən dəyişə bilərsiniz',
+                  en: 'You can change the language later in settings',
+                  ru: 'Язык можно изменить позже в настройках',
+                  tr: 'Dili daha sonra ayarlardan değiştirebilirsiniz',
+                  kk: 'Тілді кейін баптаулардан өзгерте аласыз',
+                })}
               </p>
             </motion.div>
           ) : (

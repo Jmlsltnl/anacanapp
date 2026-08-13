@@ -1,19 +1,20 @@
 // ============================================================
-// langDetect — cəmiyyət postları üçün yüngül dil aşkarlama (az/en/ru/tr).
+// langDetect — cəmiyyət postları üçün yüngül dil aşkarlama (az/en/ru/tr/kk).
 // Prinsip:
-//   1. Kiril hərfləri üstünlük təşkil edirsə → ru
-//   2. "ə" hərfi varsa → az ("ə" az dilinin ən çox işlənən hərfidir; tr/en/ru-da yoxdur)
-//   3. "ə"-siz, amma türk-spesifik hərflər (ğ/ş/ı/ö/ü/ç) varsa:
+//   1. Kiril mətnində qazax-spesifik hərflər (ә/ғ/қ/ң/ө/ұ/ү/һ/і) varsa → kk
+//   2. Qalan kiril üstünlüyü → ru
+//   3. "ə" hərfi varsa → az ("ə" az dilinin ən çox işlənən hərfidir; tr/en/ru-da yoxdur)
+//   4. "ə"-siz, amma türk-spesifik hərflər (ğ/ş/ı/ö/ü/ç) varsa:
 //        q/x da varsa → az (türk əlifbasında q/x yoxdur), yoxsa → tr
-//   4. Stop-söz sayğacı (tr vs en) → qalan latın mətnlər üçün
-//   5. Qısa/qeyri-müəyyən mətn → fallback (UI dili)
+//   5. Stop-söz sayğacı (tr vs en) → qalan latın mətnlər üçün
+//   6. Qısa/qeyri-müəyyən mətn → fallback (UI dili)
 // Qeyd: bu YALNIZ ilkin təxmindir — istifadəçi compose-da dil çipi ilə düzəldə bilər.
 // ============================================================
 
-export type FeedLang = 'az' | 'en' | 'ru' | 'tr';
+export type FeedLang = 'az' | 'en' | 'ru' | 'tr' | 'kk';
 
 /** Feed linzasında göstərilən sıra ilə bütün dəstəklənən dillər */
-export const FEED_LANGS: FeedLang[] = ['az', 'ru', 'tr', 'en'];
+export const FEED_LANGS: FeedLang[] = ['az', 'ru', 'tr', 'kk', 'en'];
 
 export function isFeedLang(v: unknown): v is FeedLang {
   return typeof v === 'string' && (FEED_LANGS as string[]).includes(v);
@@ -44,15 +45,18 @@ export function detectLang(text: string, fallback: FeedLang = 'az'): FeedLang {
     .replace(/https?:\/\/\S+/gi, ' ')
     .replace(/[@#]\S+/g, ' ');
 
-  const cyr = (t.match(/[А-Яа-яЁё]/g) || []).length;
+  const cyr = (t.match(/[А-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі]/g) || []).length;
   const lat = (t.match(/[A-Za-zƏəĞğIıİÖöŞşÜüÇç]/g) || []).length;
   const totalLetters = cyr + lat;
 
   // Çox qısa mətn (emoji, "ok" və s.) — təxmin etmə, UI dilini götür
   if (totalLetters < 6) return fallback;
 
-  // 1) Kiril üstünlüyü → ru
-  if (cyr > totalLetters * 0.4) return 'ru';
+  // 1) Kiril üstünlüyü → kk (qazax-spesifik hərf varsa) və ya ru
+  if (cyr > totalLetters * 0.4) {
+    // ә ғ қ ң ө ұ ү һ і — rus əlifbasında yoxdur, qazax mətninin etibarlı göstəricisidir
+    return /[ӘәҒғҚқҢңӨөҰұҮүҺһІі]/.test(t) ? 'kk' : 'ru';
+  }
 
   // 2) "ə" → az (praktikada hər az cümləsində var: və, mən, gələcək...)
   if (/[Əə]/.test(t)) return 'az';

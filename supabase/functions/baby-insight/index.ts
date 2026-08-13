@@ -59,6 +59,11 @@ const FALLBACK: Record<string, Insight> = {
     feeding: { status: 'normal', note: 'Beslenme kayıtları toplanıyor — her beslenmeyi kaydetmeye çalışın.' },
     diaper: { status: 'normal', note: 'Bez kayıtları toplanıyor — ıslak bezler beslenmenin iyi bir göstergesidir.' },
   },
+  kk: {
+    sleep: { status: 'normal', note: 'Ұйқы туралы жазбалар жиналып жатыр — күні бойы бақылауды жалғастырыңыз.' },
+    feeding: { status: 'normal', note: 'Тамақтану туралы жазбалар жиналып жатыр — әр тамақтануды белгілеп отыруға тырысыңыз.' },
+    diaper: { status: 'normal', note: 'Жөргек туралы жазбалар жиналып жатыр — суланған жөргектер жеткілікті тамақтанудың жақсы көрсеткіші болып саналады.' },
+  },
 };
 
 const LANG_CONF: Record<string, { outLang: string }> = {
@@ -66,6 +71,7 @@ const LANG_CONF: Record<string, { outLang: string }> = {
   en: { outLang: 'ENGLISH' },
   ru: { outLang: 'RUSSIAN' },
   tr: { outLang: 'TURKISH' },
+  kk: { outLang: 'KAZAKH' },
 };
 
 Deno.serve(async (req) => {

@@ -51,8 +51,9 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
 
   const slides = dbSlides && dbSlides.length > 0 ? dbSlides.map(s => {
     const getSlideText = (field: string) => {
-      if (language === 'en' && s[field + '_en']) return s[field + '_en'];
-      if (language === 'ru' && s[field + '_ru']) return s[field + '_ru'];
+      if (language !== 'az' && s[field + '_' + language]) return s[field + '_' + language];
+      if (language === 'kk' && s[field + '_ru']) return s[field + '_ru'];
+      if (language !== 'az' && language !== 'ru' && s[field + '_en']) return s[field + '_en'];
 
       const fallback = getFallbackSlides().find(fb => fb.id === s.id);
       if (fallback) {

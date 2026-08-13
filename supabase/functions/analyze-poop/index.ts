@@ -88,6 +88,20 @@ async function validateImage(imageBase64: string, _apiKey?: string, language: st
       'valid': 'Görsel uygun',
       'failed': 'Görsel kontrol edilemedi. Lütfen tekrar deneyin.',
     },
+    kk: {
+      'diaper_empty': 'Бұл жөргек бос, нәжіс көрінбейді. Нәжіс бар жөргекті суретке түсіріңіз.',
+      'baby_photo': 'Бұл бөпенің суреті. Бөпенің жөргегін суретке түсіріңіз.',
+      'adult_content': 'Бұл суретте бөпенің жөргегі көрсетілмеген. Дұрыс суретті таңдаңыз.',
+      'food': 'Бұл тағамның суреті. Бөпенің жөргегін суретке түсіріңіз.',
+      'animal': 'Бұл жануардың суреті. Бөпенің жөргегін суретке түсіріңіз.',
+      'screenshot': 'Бұл экран скриншоты. Бөпенің жөргегін шынайы суретке түсіріңіз.',
+      'landscape': 'Бұл табиғат көрінісінің суреті. Бөпенің жөргегін суретке түсіріңіз.',
+      'object': 'Бұл заттың суреті. Бөпенің жөргегін суретке түсіріңіз.',
+      'other': 'Бұл сурет талдауға жарамсыз. Бөпенің жөргегіндегі нәжісті суретке түсіріңіз.',
+      'unknown': 'Сурет танылмады. Анығырақ сурет түсіріңіз.',
+      'valid': 'Сурет жарамды',
+      'failed': 'Суретті тексеру мүмкін болмады. Қайталап көріңіз.',
+    },
   };
   const vmsg = VALIDATION_MESSAGES[language] ?? VALIDATION_MESSAGES.az;
   
@@ -185,8 +199,8 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
 // Stage 2: Analyze the poop
 async function analyzePoop(imageBase64: string, _apiKey?: string, userContext?: PoopAnalysisRequest['userContext'], language: string = 'az'): Promise<Response | null> {
   const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
-  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH' };
-  const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish' };
+  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH' };
+  const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish', kk: 'Kazakh' };
   const outLang = OUT_LANG[language];
   
   // Build age context for prompt
@@ -386,6 +400,11 @@ Deno.serve(async (req) => {
           colorNameAz: 'Bilinmiyor',
           explanation: 'Görsel analiz edildi. Daha net bir fotoğraf çekmeyi deneyin.',
           recommendations: ['Bebeğin genel durumunu takip edin', 'Herhangi bir endişeniz olursa doktora başvurun'],
+        },
+        kk: {
+          colorNameAz: 'Белгісіз',
+          explanation: 'Сурет талданды. Анығырақ сурет түсіріп көріңіз.',
+          recommendations: ['Бөпенің жалпы жағдайын бақылаңыз', 'Қандай да бір алаңдататын белгі болса, дәрігерге жүгініңіз'],
         },
       };
       const fb = FALLBACK[language] ?? FALLBACK.az;

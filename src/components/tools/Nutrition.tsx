@@ -115,8 +115,8 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
 
         // Fix for Nursing (it incorrectly comes as Nursing / Əlavə qida from db in some cases)
         if (m.meal_id === 'nursing') {
-          mealName = language === 'en' ? 'Nursing' : 'Əmizdirmə';
-          mealTime = language === 'en' ? 'Anytime' : 'İstənilən vaxt';
+          mealName = language === 'en' ? 'Nursing' : language === 'ru' ? 'Грудное вскармливание' : language === 'tr' ? 'Emzirme' : language === 'kk' ? 'Емізу' : 'Əmizdirmə';
+          mealTime = language === 'en' ? 'Anytime' : language === 'ru' ? 'В любое время' : language === 'tr' ? 'Her zaman' : language === 'kk' ? 'Кез келген уақытта' : 'İstənilən vaxt';
         } else if (language === 'en') {
           if (mealName === 'Əlavə qida' || mealName === 'Qəlyanaltı') mealName = 'Snack';
           if (mealName === 'Səhər yeməyi') mealName = 'Breakfast';
@@ -226,7 +226,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                   <p className="a-heading" style={{ margin: 0, fontSize: 24 }}>{mealCalories} <span style={{ fontSize: 13, fontWeight: 700 }}>kcal</span></p>
                 </div>
                 <span className="a-tag" style={{ cursor: 'default' }}>
-                  {mealLogs.length} {language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : 'qida'}
+                  {mealLogs.length} {language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : language === 'kk' ? 'өнім' : 'qida'}
                 </span>
               </div>
             </div>
@@ -455,7 +455,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                           <p className="a-list-title">{meal.name}</p>
                           <p className="a-list-sub">
                             {mealLogs.length > 0 ?
-                          `${mealLogs.length} ${language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : 'qida'} • ${mealCalories} kcal` :
+                          `${mealLogs.length} ${language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : language === 'kk' ? 'өнім' : 'qida'} • ${mealCalories} kcal` :
                           meal.time
                           }
                           </p>

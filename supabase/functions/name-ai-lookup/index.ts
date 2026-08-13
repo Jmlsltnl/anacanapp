@@ -23,6 +23,7 @@ const LANG_FIELD: Record<string, { meaning: string; origin: string }> = {
   en: { meaning: 'meaning_en', origin: 'origin_en' },
   ru: { meaning: 'meaning_ru', origin: 'origin_ru' },
   tr: { meaning: 'meaning_tr', origin: 'origin_tr' },
+  kk: { meaning: 'meaning_kk', origin: 'origin_kk' },
 };
 
 /** Adı bazadakı standart formaya salır: "aylin" → "Aylin" */
@@ -48,6 +49,9 @@ Deno.serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const { name: rawName, language = 'az' } = await req.json() as NameRequest;
+    const displayLang = ['az', 'en', 'ru', 'tr', 'kk'].includes(language) ? language : 'az';
+    // Siyahı seqmenti (baby_names_db.lang) yalnız az/en/ru/tr-dir — kk istifadəçisinin
+    // əlavə etdiyi ad az seqmentinə düşür (siyahıda görünsün), display isə kk sahələrindən oxunur
     const lang = ['az', 'en', 'ru', 'tr'].includes(language) ? language : 'az';
 
     const name = properCase(String(rawName || ''));
@@ -67,7 +71,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (existing) {
-      const f = LANG_FIELD[lang];
+      const f = LANG_FIELD[displayLang];
       return new Response(JSON.stringify({
         success: true,
         found: true,
@@ -76,24 +80,24 @@ Deno.serve(async (req) => {
         display: {
           name: existing.name,
           gender: existing.gender,
-          meaning: existing[f.meaning] || existing.meaning_az || existing.meaning,
-          origin: existing[f.origin] || existing.origin,
+          meaning: existing[f.meaning] || (displayLang === 'kk' ? existing.meaning_ru : null) || existing.meaning_az || existing.meaning,
+          origin: existing[f.origin] || (displayLang === 'kk' ? existing.origin_ru : null) || existing.origin,
           popularity: existing.popularity || 0,
         },
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // 2) AI axtarışı — 4 dildə məna + mənşə
+    // 2) AI axtarışı — 5 dildə məna + mənşə
     const prompt = `Sən körpə adları üzrə etimoloji məlumat bazasısan.
 Ad: "${name}"
 
-Bu adın həqiqi şəxs adı olub-olmadığını müəyyən et (Azərbaycan, türk, ərəb, fars, rus, Avropa və s. mənşəli qadın/kişi adları).
+Bu adın həqiqi şəxs adı olub-olmadığını müəyyən et (Azərbaycan, türk, ərəb, fars, rus, qazax, Avropa və s. mənşəli qadın/kişi adları).
 
 QAYDALAR:
 1. YALNIZ aşağıdakı JSON formatında cavab ver (başqa heç nə yazma, markdown yox):
-{"found":true,"gender":"girl","origin_az":"Ərəb mənşəli","origin_en":"Arabic","origin_ru":"Арабское","origin_tr":"Arapça kökenli","meaning_az":"...","meaning_en":"...","meaning_ru":"...","meaning_tr":"..."}
+{"found":true,"gender":"girl","origin_az":"Ərəb mənşəli","origin_en":"Arabic","origin_ru":"Арабское","origin_tr":"Arapça kökenli","origin_kk":"Араб тілінен","meaning_az":"...","meaning_en":"...","meaning_ru":"...","meaning_tr":"...","meaning_kk":"..."}
 2. gender: "boy" | "girl" | "unisex"
-3. Hər meaning_* qısa və dəqiq olsun (maksimum 120 simvol), həmin dildə yazılsın.
+3. Hər meaning_* qısa və dəqiq olsun (maksimum 120 simvol), həmin dildə yazılsın (meaning_kk qazax dilində, kiril).
 4. Ad real şəxs adı deyilsə (təsadüfi söz, əşya, təhqir və s.): {"found":false}
 5. Uydurma etimologiya vermə — əmin deyilsənsə found:false qaytar.`;
 
@@ -134,11 +138,13 @@ QAYDALAR:
       origin_en: clip(parsed.origin_en, 80),
       origin_ru: clip(parsed.origin_ru, 80),
       origin_tr: clip(parsed.origin_tr, 80),
+      origin_kk: clip(parsed.origin_kk, 80),
       meaning: clip(parsed.meaning_az, 200),
       meaning_az: clip(parsed.meaning_az, 200),
       meaning_en: clip(parsed.meaning_en, 200),
       meaning_ru: clip(parsed.meaning_ru, 200),
       meaning_tr: clip(parsed.meaning_tr, 200),
+      meaning_kk: clip(parsed.meaning_kk, 200),
       popularity: 25,
       is_active: true,
     };
@@ -151,7 +157,7 @@ QAYDALAR:
 
     if (insErr) console.error('name insert failed:', insErr.message);
 
-    const f = LANG_FIELD[lang];
+    const f = LANG_FIELD[displayLang];
     return new Response(JSON.stringify({
       success: true,
       found: true,

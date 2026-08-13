@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
       resolvedLifeStage = "bump";
     }
 
-    const LANG_NAME: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish" };
+    const LANG_NAME: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh" };
     const replyLangName = LANG_NAME[language];
 
     const langInstruction = replyLangName
@@ -104,6 +104,10 @@ Deno.serve(async (req) => {
       tr: {
         unavailable: "Üzgünüz, hizmet geçici olarak kullanılamıyor. Lütfen biraz sonra tekrar deneyin.",
         noAnswer: "Üzgünüm, yanıt alamadım. Lütfen tekrar deneyin.",
+      },
+      kk: {
+        unavailable: "Кешіріңіз, қызмет уақытша қолжетімсіз. Сәл кейінірек қайталап көріңіз.",
+        noAnswer: "Кешіріңіз, жауап ала алмадым. Қайталап көріңіз.",
       },
     };
     const errTexts = ERR_TEXTS[language] ?? ERR_TEXTS.az;

@@ -75,7 +75,8 @@ const LANGUAGES = [
   { code: 'az', label: tr("fairytalegenerator_azerbaycan_733e93", 'Azərbaycan'), flag: 'az' },
   { code: 'en', label: 'English', flag: 'gb' },
   { code: 'ru', label: 'Русский', flag: 'ru' },
-  { code: 'tr', label: tr("fairytalegenerator_turkce_299adc", 'Türkçe'), flag: 'tr' }];
+  { code: 'tr', label: tr("fairytalegenerator_turkce_299adc", 'Türkçe'), flag: 'tr' },
+  { code: 'kk', label: 'Қазақша', flag: 'kz' }];
 
 
 // Shared select-pill styles (lav accent)

@@ -51,17 +51,19 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
   const language = useUserStore((state) => state.language);
   const isEn = language === 'en';
 
-  // 4 dil: az→az, en→en/base, ru→ru||en, tr→tr||en (fallback az)
+  // 5 dil: az→az, en→en/base, ru→ru||en, tr→tr||en, kk→kk||ru||en (fallback az)
   const pickTitle = (d: any): string => {
     if (language === 'az') return d.title_az || d.title;
     if (language === 'ru') return d.title_ru || d.title_en || d.title || d.title_az;
     if (language === 'tr') return d.title_tr || d.title_en || d.title || d.title_az;
+    if (language === 'kk') return d.title_kk || d.title_ru || d.title_en || d.title || d.title_az;
     return d.title_en || d.title || d.title_az;
   };
   const pickContent = (d: any): string => {
     if (language === 'az') return d.content_az || d.content;
     if (language === 'ru') return d.content_ru || d.content_en || d.content || d.content_az;
     if (language === 'tr') return d.content_tr || d.content_en || d.content || d.content_az;
+    if (language === 'kk') return d.content_kk || d.content_ru || d.content_en || d.content || d.content_az;
     return d.content_en || d.content || d.content_az;
   };
 

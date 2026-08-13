@@ -39,9 +39,9 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
   const [activeTab, setActiveTab] = useState('calculator');
   const [salary, setSalary] = useState('');
   const [pregnancyType, setPregnancyType] = useState<'normal' | 'complicated' | 'multiple'>('normal');
-  // Default ölkə tətbiq dilinə görə (tr→TR, ru→RU, əks halda AZ); istifadəçi istənilən vaxt dəyişə bilər
+  // Default ölkə tətbiq dilinə görə (tr→TR, ru/kk→RU, əks halda AZ); istifadəçi istənilən vaxt dəyişə bilər
   const [selectedCountryCode, setSelectedCountryCode] = useState<string>(
-    language === 'tr' ? 'TR' : language === 'ru' ? 'RU' : 'AZ'
+    language === 'tr' ? 'TR' : language === 'ru' || language === 'kk' ? 'RU' : 'AZ'
   );
   const [eddDate, setEddDate] = useState<string>('');
   const [role, setRole] = useState<'mother' | 'father'>('mother');
@@ -189,9 +189,9 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
         icon: g.icon || '⚖️'
       }))
     : (
-      // Dil üzrə seçim: az→az, ru→ru||en, tr→tr||en, digər→en
+      // Dil üzrə seçim: az→az, ru→ru||en, tr→tr||en, kk→ru||en (statik datada kk yoxdur), digər→en
       language === 'az' ? selectedRule.guidelines_az :
-      language === 'ru' ? (selectedRule.guidelines_ru || selectedRule.guidelines_en) :
+      language === 'ru' || language === 'kk' ? (selectedRule.guidelines_ru || selectedRule.guidelines_en) :
       language === 'tr' ? (selectedRule.guidelines_tr || selectedRule.guidelines_en) :
       selectedRule.guidelines_en
       ).map((g, i) => ({

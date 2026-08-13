@@ -32,7 +32,7 @@ const PartnerWeekInfoCard = ({ currentWeek, weekData, dayContent, language }: Pr
   const development: string | null = (() => {
     if (!dayContent) return null;
     const d = dayContent as any;
-    const localized = language === 'en' ? d.baby_development_en : language === 'ru' ? d.baby_development_ru : language === 'tr' ? d.baby_development_tr : null;
+    const localized = language !== 'az' ? d[`baby_development_${language}`] || (language === 'kk' ? d.baby_development_ru : null) : null;
     return localized || d.baby_development || null;
   })();
 
