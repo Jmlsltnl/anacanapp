@@ -10,6 +10,74 @@ const translationCache: Record<string, Record<string, string>> = {};
 translationCache['en'] = { ...(enStatic as Record<string, string>) };
 translationCache['az'] = { ...(azStatic as Record<string, string>) };
 
+// ── Zero-flash dil yüklənməsi ──
+// Problem: ru/tr/kk əvvəllər YALNIZ DB-dən (şəbəkə) gəlirdi → ilk render AZ görünürdü,
+// sonra seçilmiş dilə "sıçrayırdı" (zəif internetdə saniyələrlə). Həll — 3 qat:
+//   1) localStorage keşi: son uğurlu dəst sinxron hidratasiya olunur (aşağıda, modul yüklənən an)
+//   2) Lokal seed chunk-ları: ru/tr/kk seed-ləri bundle-ın hissəsidir (dynamic import, şəbəkəsiz)
+//   3) DB overlay: admin düzəlişləri arxa planda gəlir və keşə yazılır
+const SEED_LANGS = new Set(['ru', 'tr', 'kk']);
+const LS_CACHE_PREFIX = 'anacan_i18n_cache:';
+
+function hydrateFromLocalStorage(lang: string): boolean {
+  try {
+    const raw = localStorage.getItem(LS_CACHE_PREFIX + lang);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw) as Record<string, string>;
+    if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+      translationCache[lang] = { ...(translationCache[lang] || {}), ...parsed };
+      return true;
+    }
+  } catch { /* korlanmış keş — seed/DB yolu işləyəcək */ }
+  return false;
+}
+
+function persistToLocalStorage(lang: string): void {
+  try {
+    const data = translationCache[lang];
+    if (data && Object.keys(data).length > 0) {
+      localStorage.setItem(LS_CACHE_PREFIX + lang, JSON.stringify(data));
+    }
+  } catch { /* kvota dolub — keşsiz davam (seed onsuz da lokaldır) */ }
+}
+
+// Modul yüklənən AN (React-dan əvvəl) persist dil üçün sinxron hidratasiya —
+// ikinci açılışdan etibarən heç bir await olmadan düzgün dildə render olunur.
+try {
+  const bootLang = localStorage.getItem('language') || 'az';
+  if (SEED_LANGS.has(bootLang)) hydrateFromLocalStorage(bootLang);
+} catch { /* SSR-safe */ }
+
+/** Lokal seed chunk-ını yüklə (şəbəkəsiz — bundle assets). Mövcud dəyərlər üstün qalır. */
+async function loadLocalSeed(lang: string): Promise<void> {
+  if (!SEED_LANGS.has(lang)) return;
+  try {
+    const seedModule = lang === 'ru'
+      ? await import('../../scripts/i18n/ru.seed.json')
+      : lang === 'kk'
+        ? await import('../../scripts/i18n/kk.seed.json')
+        : await import('../../scripts/i18n/tr.seed.json');
+    const seed = (seedModule.default ?? seedModule) as Record<string, string>;
+    // seed ALTDA — localStorage keşi / DB overlay dəyərləri üstün qalsın
+    translationCache[lang] = { ...seed, ...(translationCache[lang] || {}) };
+  } catch (e) {
+    console.warn('[i18n] Lokal seed yüklənmədi:', e);
+  }
+}
+
+/**
+ * İlk render-dən ƏVVƏL dilin hazır olmasını təmin edir (main.tsx boot gate).
+ * az/en → dərhal (bundle); ru/tr/kk → localStorage keşi varsa dərhal,
+ * yoxdursa lokal seed chunk-ı gözlənilir (şəbəkəsiz, millisaniyələr).
+ */
+export async function ensureLanguageReady(lang: string): Promise<void> {
+  if (!SEED_LANGS.has(lang)) return;
+  const cached = translationCache[lang];
+  if (cached && Object.keys(cached).length > 100) return; // artıq hidratasiya olunub
+  await loadLocalSeed(lang);
+  persistToLocalStorage(lang); // növbəti açılış sinxron olsun
+}
+
 let dbLoadedFor: string | null = null;
 let dbPromise: Promise<void> | null = null;
 
@@ -23,22 +91,8 @@ export async function loadTranslations(lang: string): Promise<void> {
 
   dbPromise = (async () => {
     try {
-      // DEV-only: lokal sınaq üçün ru/tr/kk seed fayllarını overlay et (DB push-dan əvvəl).
-      // import.meta.env.DEV prod build-də false-a çevrilir və bu blok tamamilə silinir.
-      if (import.meta.env.DEV && (lang === 'ru' || lang === 'tr' || lang === 'kk')) {
-        try {
-          const seedModule = lang === 'ru'
-            ? await import('../../scripts/i18n/ru.seed.json')
-            : lang === 'kk'
-              ? await import('../../scripts/i18n/kk.seed.json')
-              : await import('../../scripts/i18n/tr.seed.json');
-          const seed = (seedModule.default ?? seedModule) as Record<string, string>;
-          translationCache[lang] = { ...seed, ...(translationCache[lang] || {}) };
-          console.info(`[i18n][DEV] Lokal ${lang} seed yükləndi: ${Object.keys(seed).length} açar`);
-        } catch (e) {
-          console.warn('[i18n][DEV] Lokal seed yüklənmədi:', e);
-        }
-      }
+      // Lokal seed HƏMİŞƏ birinci (prod daxil) — DB yalnız admin düzəlişləri üçün overlay-dır.
+      await loadLocalSeed(lang);
 
       const overlay: Record<string, string> = {};
       let from = 0;
@@ -57,8 +111,12 @@ export async function loadTranslations(lang: string): Promise<void> {
       }
       translationCache[lang] = { ...(translationCache[lang] || {}), ...overlay };
       dbLoadedFor = lang;
+      // Birləşmiş dəsti keşlə — növbəti soyuq açılış sinxron və şəbəkəsiz olsun
+      persistToLocalStorage(lang);
     } catch (err) {
       console.error('Translation load error:', err);
+      // DB alınmasa belə seed-i keşlə (offline-first)
+      persistToLocalStorage(lang);
     } finally {
       dbPromise = null;
     }

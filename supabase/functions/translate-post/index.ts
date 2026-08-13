@@ -52,7 +52,7 @@ function buildSystemPrompt(targetLang: string, sourceLang: string | null): strin
     `2) Preserve emojis, line breaks, punctuation style and formatting exactly.`,
     `3) Keep #hashtags, @mentions and URLs completely unchanged (do not translate them).`,
     `4) Do not add or omit anything; keep the author's tone (casual, warm, mother-to-mother).`,
-    `5) Medical terms must stay accurate. Keep brand words unchanged: Anacan, Premium, Dr.Anacan.`,
+    `5) Medical terms must stay accurate. Keep brand names unchanged: Anacan (app name), Premium, Dr.Anacan. EXCEPTION: "Anacan" as an affectionate address to the mother → ru «мамочка», tr "anneciğim", kk «анашым», en "Mommy".`,
     `6) ${style}`,
     `7) If the text is already fully in ${target}, return it unchanged.`,
   ].join('\n');

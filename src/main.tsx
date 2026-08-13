@@ -27,6 +27,7 @@ import { initFacebookEvents } from "./lib/facebook-events";
 import { restoreNativeSession, startNativeSessionSync } from "./lib/session-persistence";
 import { Preferences } from '@capacitor/preferences';
 import { useUserStore } from '@/store/userStore';
+import { ensureLanguageReady } from '@/lib/i18n';
 
 // Initialize crash reporter first (catches all errors from this point)
 initCrashReporter();
@@ -80,6 +81,18 @@ async function bootstrap() {
     await restorePreferences();
   } catch (e) {
     console.warn("[bootstrap] restore failed", e);
+  }
+  // Zero-flash i18n: seçilmiş dil (ru/tr/kk) İLK render-dən əvvəl hazır olur —
+  // lokal seed chunk-ı / localStorage keşi (şəbəkəsiz, ms səviyyəsində).
+  // Guard: hər ehtimala qarşı 4s-dən çox bloklamasın (splash arxasında keçir).
+  try {
+    const lang = useUserStore.getState().language || 'az';
+    await Promise.race([
+      ensureLanguageReady(lang),
+      new Promise((r) => setTimeout(r, 4000)),
+    ]);
+  } catch (e) {
+    console.warn("[bootstrap] i18n hazırlığı alınmadı (AZ fallback):", e);
   }
   startNativeSessionSync();
   createRoot(document.getElementById("root")!).render(<App />);

@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { tr } from '@/lib/tr';
 import { Globe, Check } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
-import { clearTranslationCache, loadTranslations, fetchActiveLanguages } from '@/lib/i18n';
+import { clearTranslationCache, ensureLanguageReady, fetchActiveLanguages } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 
 // İlkin/fallback siyahı — app_languages sorğusu gələnə qədər və ya xəta halında.
@@ -34,7 +34,9 @@ export default function LanguageSelector() {
     if (code === language) {setOpen(false);return;}
     setSwitching(true);
     clearTranslationCache();
-    if (code !== 'az') await loadTranslations(code);
+    // Lokal seed dərhal hazırdır (şəbəkəsiz); DB overlay-i reload-dan sonra
+    // App boot onsuz da arxa planda edir — zəif internetdə istifadəçini gözlətmirik.
+    if (code !== 'az') await ensureLanguageReady(code);
     setLanguage(code);
     // Persist to user_preferences so server-side (cron, edge fns) honors the choice
     try {

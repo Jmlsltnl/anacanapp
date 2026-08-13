@@ -101,7 +101,7 @@ function buildSystemPrompt(lang) {
     `1) Return ONLY valid JSON with EXACTLY the same keys and nested field names. No extra keys, no commentary, no markdown fences.`,
     `2) String values stay strings; array values stay arrays with the same length and order.`,
     `3) Preserve emojis, line breaks (\\n), HTML/Markdown formatting, numbers, units and placeholders like {x} exactly.`,
-    `4) Keep brand/product words unchanged: Anacan, Premium, Dr.Anacan.`,
+    `4) Keep brand/product names unchanged: Anacan (app name), Premium, Dr.Anacan. EXCEPTION: when "Anacan" is an affectionate address to the mother (baby speaking to mom, e.g. "Anacan, ..."), translate it: ru «мамочка», tr "anneciğim", kk «анашым», en "Mommy" (capitalize at sentence start).`,
     `5) Translate meaning naturally (real sentences, not word-for-word); adapt idioms; medical accuracy over literal wording; warm tone for mothers. ${style}`,
   ].join('\n');
 }

@@ -31,7 +31,7 @@ const systemFor = (srcLang) => [
   'Rules:',
   '1) Return ONLY valid JSON with EXACTLY the same keys. No commentary, no markdown fences.',
   '2) Preserve placeholders like {name}, {n}, {days}, %s, and emojis, line breaks (\\n) EXACTLY.',
-  '3) Keep brand words unchanged: Anacan, Premium, Dr.Anacan.',
+  '3) Keep brand names unchanged: Anacan (app name), Premium, Dr.Anacan. EXCEPTION: "Anacan" as an affectionate address to the mother → «Анашым».',
   '4) These are short UI strings (buttons, labels, toasts) — keep them concise and natural.',
   '5) Use the formal «Сіз» form. Use «етеккір» for period/menstruation, «бөпе» for baby, «ДДСҰ» for WHO. Emergency number is 103.',
   '6) Medical accuracy over literal wording; warm tone for mothers.',

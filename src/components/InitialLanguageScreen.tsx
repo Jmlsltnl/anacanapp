@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { Check, Search, ChevronLeft, Globe } from 'lucide-react';
-import { clearTranslationCache, loadTranslations, fetchActiveLanguages } from '@/lib/i18n';
+import { clearTranslationCache, ensureLanguageReady, loadTranslations, fetchActiveLanguages } from '@/lib/i18n';
 import logoImage from '@/assets/logo.png';
 import { useState, useMemo, useEffect } from 'react';
 import countriesData from '../../countries.json';
@@ -62,7 +62,10 @@ export default function InitialLanguageScreen() {
     setIsSwitching(true);
     clearTranslationCache();
     if (selectedLang !== 'az') {
-      await loadTranslations(selectedLang);
+      // Lokal seed dərhal (şəbəkəsiz); DB overlay arxa planda gəlir —
+      // zəif internetdə "Davam et" düyməsi saniyələrlə asılı qalmır.
+      await ensureLanguageReady(selectedLang);
+      void loadTranslations(selectedLang);
     }
     setLanguage(selectedLang);
     setTimeout(() => {
