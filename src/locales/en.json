@@ -8305,5 +8305,6 @@
   "nutrition_ai_kalori_axtarir": "AI is estimating...",
   "countryselect_olke_secin": "Select country",
   "countryselect_axtar": "Search...",
-  "countryselect_tapilmadi": "No countries found"
+  "countryselect_tapilmadi": "No countries found",
+  "dashboard_hero_fruit_tpl": "Mommy, right now I'm the size of {fruit}"
 }

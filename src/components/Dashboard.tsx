@@ -359,7 +359,12 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
         </div>
 
         <h1 className="a-hero-headline a-heading">
-          {tr("dashboard_anacan_hazirda_cfaa50", "Anacan, hazırda")} <em>{weekData.fruit}</em>{language === 'az' ? ' boydayam' : ''}
+          {(() => {
+            // Şablon: {fruit} yerinə meyvə adı — hər dildə təbii söz sırası
+            const tpl = tr("dashboard_hero_fruit_tpl", "Anacan, hazırda {fruit} boydayam");
+            const [before, after] = tpl.split('{fruit}');
+            return <>{before}<em>{weekData.fruit}</em>{after ?? ''}</>;
+          })()}
         </h1>
 
         <div className="a-tag-row" style={{ justifyContent: 'center', marginTop: 18, marginBottom: 0 }}>

@@ -10,6 +10,7 @@ import { useSavedPosts } from '@/hooks/useBlogInteractions';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { saveScroll, restoreScroll } from '@/lib/scrollMemory';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -60,6 +61,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
 
   // Increment view count when selecting a post from list
   const handleSelectPost = async (post: BlogPost) => {
+    saveScroll('blog'); // geri qayıdanda siyahı pozisiyası bərpa olunsun
     setSelectedPost(post);
     try {
       await supabase.rpc('increment_blog_view_count', { post_id: post.id });
@@ -95,6 +97,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
     } else {
       // Otherwise, just close the post and show blog list
       setSelectedPost(null);
+      restoreScroll('blog');
     }
   };
 

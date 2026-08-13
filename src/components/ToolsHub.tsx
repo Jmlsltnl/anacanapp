@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { saveScroll, restoreScroll } from '@/lib/scrollMemory';
 import { pushBackHandler } from '@/lib/backButton';
 import { isToolFree } from '@/lib/freemium';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -126,10 +127,14 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const [activeTool, setActiveTool] = useState<string | null>(initialTool);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
-  // Alət açılanda VƏ siyahıya qayıdanda həmişə yuxarıdan başla.
-  // (Əvvəllər window.scrollY saxlanılırdı — real scroller [data-scroll-container]
-  // olduğu üçün həmişə 0 idi və heç nə işləmirdi → alət səhifəsi ortadan açılırdı.)
+  // Alət açılanda yuxarıdan başla; siyahıya QAYIDANDA isə əvvəlki
+  // pozisiya bərpa olunur (restoreScroll useScrollToTop resetindən sonra qalib gəlir).
   useScrollToTop([activeTool]);
+  const prevToolRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (prevToolRef.current && !activeTool) restoreScroll('toolshub');
+    prevToolRef.current = activeTool;
+  }, [activeTool]);
 
   // Android geri: açıq alət → alətlər siyahısına qayıt (Index-dən ƏVVƏL işləyir)
   useEffect(() => {
@@ -145,6 +150,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   }, [activeTool, onBack, initialTool]);
 
   const openTool = (toolId: string) => {
+    saveScroll('toolshub'); // geri qayıdanda siyahı pozisiyası bərpa olunsun
     setActiveTool(toolId);
   };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { saveScroll, restoreScroll } from '@/lib/scrollMemory';
 import SplashScreen from '@/components/SplashScreen';
 import logoImage from '@/assets/logo.png';
 import AppIntroduction from '@/components/AppIntroduction';
@@ -99,7 +100,16 @@ const Index = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
-  const [activeScreen, setActiveScreen] = useState<string | null>(null);
+  const [activeScreen, _setActiveScreen] = useState<string | null>(null);
+
+  // Scroll yaddaşı: alt-ekrana keçəndə cari tabın pozisiyası saxlanır,
+  // GERİ qayıdanda (activeScreen → null) bərpa olunur.
+  const activeTabRef = useRef('home');
+  const setActiveScreen = useCallback((s: string | null) => {
+    if (s) saveScroll(`tab:${activeTabRef.current}`);
+    _setActiveScreen(s);
+    if (s === null) restoreScroll(`tab:${activeTabRef.current}`);
+  }, []);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showMotherChat, setShowMotherChat] = useState(false);
   const [viewingUserId, setViewingUserId] = useState<string | null>(null);
@@ -275,8 +285,16 @@ const Index = () => {
       // Increment key to force ToolsHub to reset
       setToolsResetKey(prev => prev + 1);
     }
+    // Tab dəyişəndə: cari tabın scroll-u yadda qalır, hədəf tabınki bərpa olunur
+    if (tab !== activeTab) {
+      saveScroll(`tab:${activeTab}`);
+      restoreScroll(`tab:${tab}`);
+    }
     setActiveTab(tab);
   };
+
+  // setActiveScreen üçün cari tab referansı
+  useEffect(() => { activeTabRef.current = activeTab; }, [activeTab]);
 
   // iOS-style swipe navigation — only navigates back/forward in the current stack, never switches tabs
   const handleSwipeBack = useCallback(() => {

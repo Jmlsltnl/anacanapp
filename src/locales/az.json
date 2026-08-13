@@ -6783,5 +6783,6 @@
   "nutrition_ai_kalori_axtarir": "AI təyin edir...",
   "countryselect_olke_secin": "Ölkə seçin",
   "countryselect_axtar": "Axtar...",
-  "countryselect_tapilmadi": "Ölkə tapılmadı"
+  "countryselect_tapilmadi": "Ölkə tapılmadı",
+  "dashboard_hero_fruit_tpl": "Anacan, hazırda {fruit} boydayam"
 }
