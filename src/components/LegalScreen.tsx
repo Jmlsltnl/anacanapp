@@ -51,6 +51,20 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
   const language = useUserStore((state) => state.language);
   const isEn = language === 'en';
 
+  // 4 dil: az→az, en→en/base, ru→ru||en, tr→tr||en (fallback az)
+  const pickTitle = (d: any): string => {
+    if (language === 'az') return d.title_az || d.title;
+    if (language === 'ru') return d.title_ru || d.title_en || d.title || d.title_az;
+    if (language === 'tr') return d.title_tr || d.title_en || d.title || d.title_az;
+    return d.title_en || d.title || d.title_az;
+  };
+  const pickContent = (d: any): string => {
+    if (language === 'az') return d.content_az || d.content;
+    if (language === 'ru') return d.content_ru || d.content_en || d.content || d.content_az;
+    if (language === 'tr') return d.content_tr || d.content_en || d.content || d.content_az;
+    return d.content_en || d.content || d.content_az;
+  };
+
   useEffect(() => {
     if (initialDocument && documents.length > 0 && !selectedDoc) {
       const doc = documents.find((d) => d.document_type === initialDocument);
@@ -72,7 +86,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
           <motion.button onClick={() => setSelectedDoc(null)} className="a-icon-btn shrink-0" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
             <ArrowLeft size={16} strokeWidth={2} />
           </motion.button>
-          <h1 className="truncate" style={{ fontSize: 15, fontWeight: 800, color: 'var(--a-ink)' }}>{isEn ? (selectedDoc.title || selectedDoc.title_az) : (selectedDoc.title_az || selectedDoc.title)}</h1>
+          <h1 className="truncate" style={{ fontSize: 15, fontWeight: 800, color: 'var(--a-ink)' }}>{pickTitle(selectedDoc)}</h1>
         </div>
 
         <ScrollArea className="flex-1 p-4">
@@ -82,7 +96,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
             </div>
             <div className="a-card prose prose-xs dark:prose-invert max-w-none text-sm [&_h1]:text-lg [&_h2]:text-base [&_h3]:text-sm [&_p]:text-sm [&_li]:text-sm" style={{ color: 'var(--a-body-text)' }}>
               {(() => {
-                const c = isEn ? (selectedDoc.content || selectedDoc.content_az) : (selectedDoc.content_az || selectedDoc.content);
+                const c = pickContent(selectedDoc);
                 const isHtml = c.trim().startsWith('<') || /<[a-z][\s\S]*>/i.test(c);
                 return isHtml ? <HtmlContent content={c} /> : <MarkdownContent content={c} />;
               })()}
@@ -125,7 +139,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
                     <Icon size={18} style={{ color: tint.ink }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{isEn ? (doc.title || doc.title_az) : (doc.title_az || doc.title)}</h3>
+                    <h3 style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{pickTitle(doc)}</h3>
                     <p style={{ fontSize: 11.5, color: 'var(--a-ink-soft)', marginTop: 1 }}>
                       Versiya {doc.version}
                     </p>

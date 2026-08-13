@@ -15,11 +15,12 @@ interface Props {
   babyName: string;
 }
 
-const SEVERITY_META: Record<string, {bg: string;ink: string;label: string;}> = {
+// FUNKSIYA: tr() render anında (modul-load AZ bake tələsinə qarşı)
+const SEVERITY_META = (): Record<string, {bg: string;ink: string;label: string;}> => ({
   mild: { bg: 'var(--a-yellow-1)', ink: 'var(--a-yellow-ink)', label: tr('babycrisiswidget_yungul_2a8010', 'Yüngül') },
   medium: { bg: 'var(--a-peach-1)', ink: 'var(--a-accent-ink)', label: tr('babycrisiswidget_medium', 'Orta') },
   intense: { bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)', label: tr('babycrisiswidget_i_ntensiv_45a63b', 'İntensiv') }
-};
+});
 
 const PartnerBabyCrisisCard = ({ babyAgeWeeks, babyName }: Props) => {
   const currentCrises = useCurrentBabyCrisis(babyAgeWeeks);
@@ -33,7 +34,8 @@ const PartnerBabyCrisisCard = ({ babyAgeWeeks, babyName }: Props) => {
 
   // ── Aktiv kriz ──
   if (current) {
-    const sev = SEVERITY_META[current.severity] || SEVERITY_META.mild;
+    const sevMap = SEVERITY_META();
+  const sev = sevMap[current.severity] || sevMap.mild;
     const tips = (current.tips || []).slice(0, expanded ? 4 : 1);
     return (
       <motion.div

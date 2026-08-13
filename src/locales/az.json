@@ -6791,5 +6791,14 @@
   "ft_child_names_ph": "Məsələn: Aysel, Murad, Ləman...",
   "mc_example_prefix": "Məsələn",
   "rf_urgent_guidance_n": "⚠️ Gözləməyin: dərhal həkiminizə zəng edin və ya təcili yardıma ({n}) müraciət edin.",
-  "pdf_notes_ph": "Həkiminiz üçün əlavə qeydlər yazın..."
+  "pdf_notes_ph": "Həkiminiz üçün əlavə qeydlər yazın...",
+  "namevotingscreen_partnyor_label": "Partnyor",
+  "partner_surprise_planned": "🎁 Həyat yoldaşın sənin üçün xüsusi bir sürpriz planladı!",
+  "partner_surprise_completed_1": "Həyat yoldaşın",
+  "partner_surprise_completed_2": "sürprizini sənin üçün tamamladı! 🎉",
+  "partner_points_earned_2": "xal qazandın! 🏆",
+  "partner_surprise_done": "tamamlandı!",
+  "partner_ready": "hazır",
+  "partner_will_receive_notification": "bildiriş alacaq",
+  "common_legv_et": "Ləğv et"
 }

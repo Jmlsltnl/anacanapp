@@ -330,5 +330,13 @@
   ],
   "arr": [],
   "json": []
+ },
+ "legal_documents": {
+  "text": [
+   "title",
+   "content"
+  ],
+  "arr": [],
+  "json": []
  }
 }

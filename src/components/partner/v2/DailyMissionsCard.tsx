@@ -12,11 +12,13 @@ import { tr } from '@/lib/tr';
  * Tam siyahı (7) açıla bilir. Səviyyə irəliləyişi + level-up konfetti.
  */
 
-const DIFF_TINT: Record<string, {bg: string;ink: string;label: string;}> = {
+// FUNKSIYA: tr() render anında qiymətləndirilsin (modul yüklənəndə dil overlay
+// hazır olmaya bilər → AZ "bake" olunurdu)
+const DIFF_TINT = (): Record<string, {bg: string;ink: string;label: string;}> => ({
   easy: { bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)', label: tr('partnerv2_asan', 'Asan') },
   medium: { bg: 'var(--a-yellow-1)', ink: 'var(--a-yellow-ink)', label: tr('partnerv2_orta', 'Orta') },
   hard: { bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)', label: tr('partnerv2_cetin', 'Çətin') }
-};
+});
 
 const CAT_TINT: Record<string, {bg: string;ink: string;}> = {
   care: { bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' },
@@ -94,7 +96,8 @@ const DailyMissionsCard = () => {
           {visible.map((m) => {
             const Icon = m.icon;
             const cat = CAT_TINT[m.category] || CAT_TINT.care;
-            const diff = DIFF_TINT[m.difficulty] || DIFF_TINT.easy;
+            const diffMap = DIFF_TINT();
+    const diff = diffMap[m.difficulty] || diffMap.easy;
             return (
               <motion.button
                 key={m.id}

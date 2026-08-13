@@ -7774,7 +7774,7 @@
   "usesosalert_dogus_basladi_push_body": "Contractions started — get in touch now!",
   "partnerv2_hefte_korpeniz": "week — your baby",
   "partnerv2_texminen": "About the size of",
-  "partnerv2_boyukluyunde": "",
+  "partnerv2_boyukluyunde": "in size",
   "partnerv2_davamini_oxu": "Read more",
   "partnerv2_kriz_dovru": "Crisis period",
   "partnerv2_hefte_short": "week",
@@ -8313,5 +8313,14 @@
   "ft_child_names_ph": "For example: Emma, Liam, Olivia...",
   "mc_example_prefix": "e.g.",
   "rf_urgent_guidance_n": "⚠️ Don't wait: call your doctor immediately or contact emergency services ({n}).",
-  "pdf_notes_ph": "Write additional notes for your doctor..."
+  "pdf_notes_ph": "Write additional notes for your doctor...",
+  "namevotingscreen_partnyor_label": "Partner",
+  "partner_surprise_planned": "🎁 Your partner has planned a special surprise for you!",
+  "partner_surprise_completed_1": "Your partner",
+  "partner_surprise_completed_2": "completed the surprise for you! 🎉",
+  "partner_points_earned_2": "points earned! 🏆",
+  "partner_surprise_done": "completed!",
+  "partner_ready": "ready",
+  "partner_will_receive_notification": "will receive a notification",
+  "common_legv_et": "Cancel"
 }
