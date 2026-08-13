@@ -64,7 +64,7 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
                   <Icon size={15} strokeWidth={2.4} />
                 </span>
               ) : (
-                <Icon size={19} strokeWidth={isActive ? 2.4 : 2} />
+                <Icon size={tab.id === 'tools' && !isPartner ? 17 : 19} strokeWidth={isActive ? 2.4 : 2} />
               )}
 
               {/* Unread badge */}

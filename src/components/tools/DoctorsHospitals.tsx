@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useAuth } from '@/hooks/useAuth';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProviderReviews from './doctors/ProviderReviews';
@@ -134,6 +135,11 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
   const [selectedProvider, setSelectedProvider] = useState<HealthcareProvider | null>(null);
   const [showReservationModal, setShowReservationModal] = useState(false);
   const language = useUserStore((state) => state.language);
+  const storeCountry = useUserStore((state) => state.countryCode);
+  const { profile: dhProfile } = useAuth();
+  const userCountry = ((dhProfile as any)?.country_code || storeCountry || 'AZ') as string;
+  // Seçilmiş ölkə — default: istifadəçinin ölkəsi (data varsa), yoxsa AZ
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
 
   const { data: providers = [], isLoading } = useQuery({
     queryKey: ['healthcare-providers', language],
@@ -163,7 +169,15 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
     }
   });
 
+  // Data olan ölkələr (country_code sütunu hələ yoxdursa hamısı AZ sayılır)
+  const providerCountry = (p: HealthcareProvider) => ((p as any).country_code || 'AZ') as string;
+  const availableCountries = [...new Set(providers.map(providerCountry))].sort();
+  // Aktiv ölkə: istifadəçinin ölkəsində data varsa o, yoxsa siyahıdakı ilk
+  const activeCountry = selectedCountry ||
+  (availableCountries.includes(userCountry) ? userCountry : availableCountries[0] || 'AZ');
+
   const filteredProviders = providers.filter((provider) => {
+    if (providerCountry(provider) !== activeCountry) return false;
     const matchesSearch = (provider.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     (provider.specialty || '').toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -237,6 +251,21 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
             onChange={(e) => setSearchQuery(e.target.value)} />
           
         </div>
+
+        {/* Ölkə seçimi — yalnız data olan ölkələr göstərilir */}
+        {availableCountries.length > 1 &&
+        <div className="a-tag-row hide-scrollbar" style={{ flexWrap: 'nowrap', overflowX: 'auto', marginTop: 12, marginBottom: 0, paddingBottom: 4 }}>
+            {availableCountries.map((cc) =>
+          <button
+            key={cc}
+            onClick={() => setSelectedCountry(cc)}
+            className={`a-tag${activeCountry === cc ? ' on' : ''}`}
+            style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+                🌍 {cc}
+              </button>
+          )}
+          </div>
+        }
 
         {/* Filter chips */}
         <div className="a-tag-row hide-scrollbar" style={{ flexWrap: 'nowrap', overflowX: 'auto', marginTop: 12, marginBottom: 0, paddingBottom: 4 }}>

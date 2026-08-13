@@ -330,7 +330,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                       value={customFood.name}
                       onChange={(e) => setCustomFood({ ...customFood, name: e.target.value })}
                       onBlur={(e) => autoFillCalories(e.target.value)}
-                      placeholder={language === 'en' ? "e.g. Salad" : "məs. Plov"} />
+                      placeholder={tr('nutrition_food_ph', 'məs. Plov')} />
                     
                     </div>
                     <div>

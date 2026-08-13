@@ -132,6 +132,13 @@ export const useChildren = () => {
     fetchChildren();
   }, [fetchChildren]);
 
+  // Profil redaktəsi kimi yerlərdən uşaq məlumatı dəyişəndə dərhal təzələ
+  useEffect(() => {
+    const handler = () => fetchChildren();
+    window.addEventListener('anacan:children-updated', handler);
+    return () => window.removeEventListener('anacan:children-updated', handler);
+  }, [fetchChildren]);
+
   const addChild = useCallback(async (childData: {
     name: string;
     birth_date: string;

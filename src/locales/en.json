@@ -7977,7 +7977,7 @@
   "ponb_mommy_title": "Tell us about your baby",
   "ponb_mommy_sub": "The development guide is personalized by age",
   "ponb_mommy_name": "Baby’s name",
-  "ponb_mommy_name_ph": "e.g. Aylin",
+  "ponb_mommy_name_ph": "e.g. Emma",
   "ponb_mommy_gender": "Gender",
   "ponb_mommy_birth": "Birth date",
   "ponb_gender_girl": "Girl",
@@ -8306,5 +8306,11 @@
   "countryselect_olke_secin": "Select country",
   "countryselect_axtar": "Search...",
   "countryselect_tapilmadi": "No countries found",
-  "dashboard_hero_fruit_tpl": "Mommy, right now I'm the size of {fruit}"
+  "dashboard_hero_fruit_tpl": "Mommy, right now I'm the size of {fruit}",
+  "aichat_input_ph": "Type your question for Anacan.AI...",
+  "nutrition_food_ph": "e.g. Salad",
+  "ft_child_name_ph": "For example: Emma, Liam...",
+  "ft_child_names_ph": "For example: Emma, Liam, Olivia...",
+  "mc_example_prefix": "e.g.",
+  "rf_urgent_guidance_n": "⚠️ Don't wait: call your doctor immediately or contact emergency services ({n})."
 }

@@ -541,7 +541,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
 
       {/* Add/Edit Modal */}
       <Dialog open={showAddModal} onOpenChange={(open) => !open && resetForm()}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[85dvh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>

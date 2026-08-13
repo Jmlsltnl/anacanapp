@@ -214,6 +214,33 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           formData.baby_name || tr("profileeditscreen_korpe_fa2b51", "K\xF6rp\u0259"),
           formData.baby_gender as 'boy' | 'girl'
         );
+
+        // KRİTİK: user_children əsas sətrini də yenilə — dashboard/alətlər
+        // yaş məlumatını oradan oxuyur (əvvəllər yalnız profiles yenilənirdi
+        // → "aktual məlumat dəyişmir" bugı)
+        try {
+          const { data: children } = await supabase.
+          from('user_children').
+          select('id').
+          eq('user_id', user.id).
+          eq('is_active', true).
+          order('sort_order').
+          limit(1);
+          if (children && children[0]) {
+            await supabase.
+            from('user_children').
+            update({
+              name: formData.baby_name || tr("profileeditscreen_korpe_fa2b51", "K\xF6rp\u0259"),
+              birth_date: formData.baby_birth_date,
+              gender: formData.baby_gender
+            }).
+            eq('id', children[0].id);
+          }
+          // Bütün useChildren instansiyalarına xəbər ver → dərhal təzələnsin
+          window.dispatchEvent(new CustomEvent('anacan:children-updated'));
+        } catch (e) {
+          console.warn('user_children sync failed:', e);
+        }
       } else if (formData.baby_name && babyBirthDate && babyGender) {
         setBabyData(new Date(babyBirthDate), formData.baby_name, babyGender);
       }

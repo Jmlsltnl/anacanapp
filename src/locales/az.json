@@ -6784,5 +6784,11 @@
   "countryselect_olke_secin": "Ölkə seçin",
   "countryselect_axtar": "Axtar...",
   "countryselect_tapilmadi": "Ölkə tapılmadı",
-  "dashboard_hero_fruit_tpl": "Anacan, hazırda {fruit} boydayam"
+  "dashboard_hero_fruit_tpl": "Anacan, hazırda {fruit} boydayam",
+  "aichat_input_ph": "Anacan.AI-yə sualınızı yazın...",
+  "nutrition_food_ph": "məs. Plov",
+  "ft_child_name_ph": "Məsələn: Aysel, Murad...",
+  "ft_child_names_ph": "Məsələn: Aysel, Murad, Ləman...",
+  "mc_example_prefix": "Məsələn",
+  "rf_urgent_guidance_n": "⚠️ Gözləməyin: dərhal həkiminizə zəng edin və ya təcili yardıma ({n}) müraciət edin."
 }

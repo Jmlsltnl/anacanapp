@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, ChevronDown, ShieldAlert, Siren, HeartHandshake } from 'lucide-react';
 import { ToolPage, ToolHeader } from '@/components/tools/anacan/ToolKit';
 import { getDangerSignsForStage, type DangerSign } from '@/lib/redFlags';
+import { getEmergencyNumber } from '@/lib/emergency';
+import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
 import { useSOSAlert } from '@/hooks/useSOSAlert';
 import { hapticFeedback } from '@/lib/native';
@@ -19,7 +21,10 @@ interface Props {
 }
 
 const DangerSignsScreen = ({ onBack }: Props) => {
-  const { lifeStage } = useUserStore();
+  const { lifeStage, countryCode } = useUserStore();
+  const { profile } = useAuth();
+  // Təcili nömrə İSTİFADƏÇİNİN ÖLKƏSİNƏ görə (dil yox)
+  const emergencyNum = getEmergencyNumber((profile as any)?.country_code || countryCode);
   const { sendSOS, hasPartner, loading: sosLoading } = useSOSAlert();
   const [openId, setOpenId] = useState<string | null>(null);
   const [notifiedIds, setNotifiedIds] = useState<Set<string>>(new Set());
@@ -103,17 +108,17 @@ const DangerSignsScreen = ({ onBack }: Props) => {
                 }}>
                   <p style={{ fontSize: 12, fontWeight: 700, color: isUrgent ? 'var(--a-alert-ink)' : 'var(--a-warn-ink)', lineHeight: 1.5 }}>
                     {isUrgent ?
-                  tr('rf_urgent_guidance', '⚠️ Gözləməyin: dərhal həkiminizə zəng edin və ya təcili yardıma (103) müraciət edin.') :
+                  tr('rf_urgent_guidance_n', '⚠️ Gözləməyin: dərhal həkiminizə zəng edin və ya təcili yardıma ({n}) müraciət edin.').replace('{n}', emergencyNum) :
                   tr('rf_soon_guidance', '📞 Bu gün ərzində həkiminizlə əlaqə saxlayın və vəziyyəti izləyin.')}
                   </p>
                 </div>
                 <div className="flex gap-2">
                   {isUrgent &&
                 <a
-                  href="tel:103"
+                  href={`tel:${emergencyNum}`}
                   className="flex-1 flex items-center justify-center gap-1.5 text-white"
                   style={{ height: 44, borderRadius: 999, background: 'var(--a-pink-ink)', fontSize: 13, fontWeight: 800 }}>
-                      <Phone size={15} /> 103
+                      <Phone size={15} /> {emergencyNum}
                     </a>
                 }
                   {hasPartner &&
@@ -155,9 +160,9 @@ const DangerSignsScreen = ({ onBack }: Props) => {
           </p>
         </div>
 
-        {/* Təcili 103 sətri */}
+        {/* Təcili yardım sətri — nömrə ölkəyə görə */}
         <a
-          href="tel:103"
+          href={`tel:${emergencyNum}`}
           className="flex items-center gap-3"
           style={{ background: 'var(--a-alert-bg)', borderRadius: 'var(--a-radius-md)', padding: 14, border: '1.5px solid rgba(177,39,91,0.35)' }}>
           <motion.div
@@ -171,7 +176,7 @@ const DangerSignsScreen = ({ onBack }: Props) => {
             <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--a-alert-ink)' }}>{tr('rf_103_title', 'Təcili Tibbi Yardım')}</p>
             <p style={{ fontSize: 11.5, color: 'var(--a-alert-soft)' }}>{tr('rf_103_sub', 'Zəng etmək üçün toxunun')}</p>
           </div>
-          <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--a-alert-ink)' }}>103</span>
+          <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--a-alert-ink)' }}>{emergencyNum}</span>
         </a>
 
         {/* Təcili əlamətlər */}

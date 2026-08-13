@@ -353,7 +353,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
 
       {/* Tooth Detail Modal */}
       <Dialog open={showToothModal} onOpenChange={setShowToothModal}>
-        <DialogContent className="a-scope max-w-sm rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
+        <DialogContent className="a-scope max-w-sm rounded-[26px] max-h-[85dvh] overflow-y-auto" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 a-heading" style={{ color: 'var(--a-ink)' }}>
               <span className="a-list-icon" style={{ width: 34, height: 34, borderRadius: 11, background: 'var(--a-grad-pink)' }}>

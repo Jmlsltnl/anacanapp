@@ -324,7 +324,9 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                     type="number"
                     value={salary}
                     onChange={(e) => setSalary(e.target.value)}
-                    placeholder={language === 'en' ? "e.g. 800" : "Məsələn: 800"}
+                    placeholder={`${tr('mc_example_prefix', 'Məsələn')}: ${
+                    ({ AZN: '800', TRY: '20000', RUB: '50000', USD: '2000', EUR: '2000', GBP: '1800', AED: '8000' } as Record<string, string>)[
+                    selectedRule.compensation.currency] || '1000'}`}
                     className="a-input"
                     style={{ width: '100%', padding: '13px 60px 13px 14px', fontSize: 15, fontWeight: 700 }}
                   />

@@ -487,7 +487,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
 
       {/* Complete Activity Modal */}
       <Dialog open={showComplete} onOpenChange={setShowComplete}>
-        <DialogContent className="a-scope max-w-sm rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
+        <DialogContent className="a-scope max-w-sm rounded-[26px] max-h-[85dvh] overflow-y-auto" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           <DialogHeader>
             <DialogTitle className="text-center a-heading" style={{ color: 'var(--a-ink)' }}>{tr("smartplaybox_ela_548a34", "🎉 Əla!")}</DialogTitle>
           </DialogHeader>

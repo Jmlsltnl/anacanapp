@@ -730,7 +730,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
               // Klaviatura açılanda pinned-diksə dibdə qal
               setTimeout(() => {if (pinnedRef.current) scrollToBottom(false);}, 250);
             }}
-            placeholder={language === 'en' ? "Type your question for Anacan.AI..." : "Anacan.AI-yə sualınızı yazın..."}
+            placeholder={tr('aichat_input_ph', 'Anacan.AI-yə sualınızı yazın...')}
             className="min-h-[34px] max-h-[100px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 py-2"
             disabled={isLoading} />
           

@@ -587,7 +587,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
 
       {/* Breathing Exercise Modal */}
       <Dialog open={showBreathing} onOpenChange={setShowBreathing}>
-        <DialogContent className="a-scope max-w-md rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
+        <DialogContent className="a-scope max-w-md rounded-[26px] max-h-[85dvh] overflow-y-auto" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 a-heading" style={{ color: 'var(--a-ink)' }}>
               <Wind className="w-5 h-5" style={{ color: 'var(--a-blue-2)' }} />
@@ -759,7 +759,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
 
       {/* Result Modal */}
       <Dialog open={!!showResult} onOpenChange={() => setShowResult(null)}>
-        <DialogContent className="a-scope max-w-md rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
+        <DialogContent className="a-scope max-w-md rounded-[26px] max-h-[85dvh] overflow-y-auto" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           {showResult &&
           <>
               <DialogHeader>

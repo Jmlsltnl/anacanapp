@@ -561,7 +561,7 @@
   "ponb_mommy_birth": "Дата рождения",
   "ponb_mommy_gender": "Пол",
   "ponb_mommy_name": "Имя малыша",
-  "ponb_mommy_name_ph": "напр. Айлин",
+  "ponb_mommy_name_ph": "напр. Алина",
   "ponb_mommy_sub": "Гид по развитию персонализируется по возрасту",
   "ponb_mommy_title": "Познакомимся с малышом",
   "ponb_saving": "Сохранение...",
@@ -4625,5 +4625,11 @@
   "paywallstep_yuxu_sesleri_meditasiya_fb635f": "Звуки сна и медитация",
   "funneldata_ciddi_yuxusuzluq_painpoint": "Серьёзная бессонница",
   "funneldata_yuxusuzluq_painpoint": "Бессонница",
-  "dashboard_hero_fruit_tpl": "Мамочка, сейчас я размером с {fruit}"
+  "dashboard_hero_fruit_tpl": "Мамочка, сейчас я размером с {fruit}",
+  "aichat_input_ph": "Напишите свой вопрос Anacan.AI...",
+  "nutrition_food_ph": "напр. Борщ",
+  "ft_child_name_ph": "Например: Алина, Артём...",
+  "ft_child_names_ph": "Например: Алина, Артём, София...",
+  "mc_example_prefix": "Например",
+  "rf_urgent_guidance_n": "⚠️ Не ждите: немедленно позвоните врачу или в скорую помощь ({n})."
 }

@@ -397,7 +397,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   className="a-input w-full"
                   value={directChildName}
                   onChange={(e) => setDirectChildName(e.target.value)}
-                  placeholder={getPersistedLanguage() === 'en' ? "For example: , Liam..." : "Məsələn: Aysel, Murad..."} />
+                  placeholder={tr('ft_child_name_ph', 'Məsələn: Aysel, Murad...')} />
 
               </div>
 
@@ -495,7 +495,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                         className="a-input w-full text-lg"
                         value={formData.child_name}
                         onChange={(e) => setFormData({ ...formData, child_name: e.target.value })}
-                        placeholder={getPersistedLanguage() === 'en' ? "For example: Alice, Liam, Olivia..." : "Məsələn: Aysel, Murad, Ləman..."}
+                        placeholder={tr('ft_child_names_ph', 'Məsələn: Aysel, Murad, Ləman...')}
                         autoFocus />
 
                     </div>
