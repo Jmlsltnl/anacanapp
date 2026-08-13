@@ -4538,7 +4538,7 @@
   "postcard_sikayetiniz_yoxlanilacaq_ad512c": "Şikayətiniz yoxlanılacaq",
   "postcard_tercume_edilir": "Tərcümə edilir...",
   "postcard_tercume_et_ai": "Tərcümə et *",
-  "postcard_tercume_xetasi": "Tərcümə edilə bilmədi.",
+  "postcard_tercume_xetasi": "Tərcümə alınmadı — yenidən cəhd edin",
   "postcard_xeta_3cdbb6": "Xəta",
   "postsearchfilter_en_son_473654": "Ən son",
   "postseenobserver_oxunmamis_post_42ef5b": "Oxunmamış post",
@@ -6800,5 +6800,11 @@
   "partner_surprise_done": "tamamlandı!",
   "partner_ready": "hazır",
   "partner_will_receive_notification": "bildiriş alacaq",
-  "common_legv_et": "Ləğv et"
+  "common_legv_et": "Ləğv et",
+  "postcard_tercumeni_gor": "Tərcüməni gör",
+  "postcard_tercume_olunur": "Tərcümə olunur…",
+  "createpost_post_dili": "Post dili",
+  "community_feed_dilleri": "Feed dilləri",
+  "community_diger_dillerde": "Digər dillərdə",
+  "community_min_bir_dil": "Ən azı bir dil seçili qalmalıdır"
 }

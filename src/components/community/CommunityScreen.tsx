@@ -8,6 +8,10 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
+import { useFeedLanguages } from '@/hooks/useFeedLanguages';
+import { FEED_LANGS } from '@/lib/langDetect';
+import { useToast } from '@/hooks/use-toast';
+import { hapticFeedback } from '@/lib/native';
 
 
 import GroupsList from './GroupsList';
@@ -54,6 +58,8 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   const { data: groups = [], isLoading: groupsLoading } = useCommunityGroups();
   const { data: memberships = [] } = useUserMemberships();
   const { totalUnread } = useDirectMessages();
+  const { feedLangs, toggleFeedLang } = useFeedLanguages();
+  const { toast } = useToast();
 
   const memberGroupIds = new Set(memberships.map((m) => m.group_id));
   const myGroups = groups.filter((g) => memberGroupIds.has(g.id));
@@ -171,6 +177,26 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
             </AnimatePresence>
           </div>
         </motion.div>
+
+        {/* Feed dil linzası — qlobal feed seçilmiş dillərdəki postları göstərir.
+            Başqa dildəki postlar üçün kartda "Tərcüməni gör" düyməsi var. */}
+        <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--a-ink-faint)', textTransform: 'uppercase', letterSpacing: 0.4 }}>
+            {tr("community_feed_dilleri", "Feed dilləri")}
+          </span>
+          {FEED_LANGS.map((l) =>
+          <button
+            key={l}
+            onClick={() => {
+              hapticFeedback.light();
+              if (!toggleFeedLang(l)) toast({ title: tr("community_min_bir_dil", "Ən azı bir dil seçili qalmalıdır") });
+            }}
+            className={`a-tag${feedLangs.includes(l) ? ' on' : ''}`}
+            style={{ cursor: 'pointer' }}>
+              {l.toUpperCase()}
+            </button>
+          )}
+        </div>
 
         <BannerSlot placement="community_top" className="mt-3" />
 

@@ -4659,5 +4659,13 @@
   "billingscreen_xeta_3cdbb6": "Error",
   "billingscreen_yenile_570ce2": "Refresh",
   "adminanalytics_aglama_analizi_0713b3": "Анализ плача",
-  "pdf_notes_ph": "Напишите дополнительные заметки для врача..."
+  "pdf_notes_ph": "Напишите дополнительные заметки для врача...",
+  "postcard_tercumeni_gor": "Показать перевод",
+  "postcard_orijinali_goster": "Показать оригинал",
+  "postcard_tercume_olunur": "Переводится…",
+  "postcard_tercume_xetasi": "Перевод не удался — попробуйте ещё раз",
+  "createpost_post_dili": "Язык поста",
+  "community_feed_dilleri": "Языки ленты",
+  "community_diger_dillerde": "На других языках",
+  "community_min_bir_dil": "Должен остаться хотя бы один язык"
 }

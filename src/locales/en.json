@@ -4608,7 +4608,7 @@
   "postcard_sikayetiniz_yoxlanilacaq_ad512c": "Your report will be reviewed",
   "postcard_tercume_edilir": "Translating...",
   "postcard_tercume_et_ai": "Translate *",
-  "postcard_tercume_xetasi": "Translation failed.",
+  "postcard_tercume_xetasi": "Translation failed — try again",
   "postcard_xeta_3cdbb6": "Error",
   "postsearchfilter_en_son_473654": "Latest",
   "postsearchfilter_populyar": "Popular",
@@ -8322,5 +8322,11 @@
   "partner_surprise_done": "completed!",
   "partner_ready": "ready",
   "partner_will_receive_notification": "will receive a notification",
-  "common_legv_et": "Cancel"
+  "common_legv_et": "Cancel",
+  "postcard_tercumeni_gor": "See translation",
+  "postcard_tercume_olunur": "Translating…",
+  "createpost_post_dili": "Post language",
+  "community_feed_dilleri": "Feed languages",
+  "community_diger_dillerde": "In other languages",
+  "community_min_bir_dil": "At least one language must stay selected"
 }

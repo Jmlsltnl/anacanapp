@@ -1,8 +1,8 @@
 import { useCallback, useEffect } from 'react';
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
+import { getFeedLanguagesSnapshot, feedLangsOrExpr, FEED_LANGS_CHANGED_EVENT } from '@/hooks/useFeedLanguages';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 type SeenPostMap = Record<string, boolean>;
@@ -79,11 +79,11 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
     const seenPostIds = { ...localSeenPostIds, ...serverSeenPostIds } satisfies SeenPostMap;
     writeSeenPostIds(userId, seenPostIds);
 
-    const currentLanguage = useUserStore.getState().language || 'az';
+    // Feed dil linzası — qlobal feed ilə EYNİ filtr (yoxsa badge yalan sayır)
     const { data: posts, error } = await supabase
       .from('community_posts')
       .select('id, created_at, user_id')
-      .eq('language', currentLanguage)
+      .or(feedLangsOrExpr(getFeedLanguagesSnapshot()))
       .eq('is_active', true)
       .is('group_id', null)
       .neq('user_id', userId)
@@ -135,11 +135,10 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
   },
 
   markCommunitySeen: async (userId: string) => {
-    const currentLanguage = useUserStore.getState().language || 'az';
     const { data: posts } = await supabase
       .from('community_posts')
       .select('id, created_at, user_id')
-      .eq('language', currentLanguage)
+      .or(feedLangsOrExpr(getFeedLanguagesSnapshot()))
       .eq('is_active', true)
       .is('group_id', null)
       .neq('user_id', userId)
@@ -238,11 +237,21 @@ export const useUnreadCommunityPosts = () => {
         .channel(`community-unread-${user.id}`)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, (payload) => {
           const newRow: any = payload.new;
+          // Hydrate ilə EYNİ semantika: yalnız qlobal feed + linzadakı dillər
+          // (əvvəllər filtr yox idi — yad dilli/qrup postları badge-i yalandan artırırdı)
+          if (newRow.group_id) return;
+          const rowLang = newRow.language || 'az';
+          if (!getFeedLanguagesSnapshot().includes(rowLang)) return;
           registerNewPost({ userId: user.id, postId: newRow.id, createdAt: newRow.created_at, postUserId: newRow.user_id });
         })
         .subscribe();
       activeUnreadChannelUserId = user.id;
     }
+
+    // Linza dəyişəndə unread yenidən hesablanır
+    const onFeedLangsChanged = () => { void hydrateForUser(user.id); };
+    window.addEventListener(FEED_LANGS_CHANGED_EVENT, onFeedLangsChanged);
+    return () => window.removeEventListener(FEED_LANGS_CHANGED_EVENT, onFeedLangsChanged);
   }, [user?.id, hydrateForUser, initializedUserId, registerNewPost, reset]);
 
   const refresh = useCallback(async () => {

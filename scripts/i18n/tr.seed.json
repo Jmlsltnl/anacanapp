@@ -4659,5 +4659,13 @@
   "billingscreen_xeta_3cdbb6": "Error",
   "billingscreen_yenile_570ce2": "Refresh",
   "adminanalytics_aglama_analizi_0713b3": "Ağlama Analizi",
-  "pdf_notes_ph": "Doktorunuz için ek notlar yazın..."
+  "pdf_notes_ph": "Doktorunuz için ek notlar yazın...",
+  "postcard_tercumeni_gor": "Çeviriyi gör",
+  "postcard_orijinali_goster": "Orijinali göster",
+  "postcard_tercume_olunur": "Çevriliyor…",
+  "postcard_tercume_xetasi": "Çeviri başarısız — tekrar deneyin",
+  "createpost_post_dili": "Gönderi dili",
+  "community_feed_dilleri": "Akış dilleri",
+  "community_diger_dillerde": "Diğer dillerde",
+  "community_min_bir_dil": "En az bir dil seçili kalmalıdır"
 }

@@ -1,7 +1,8 @@
 import { tr } from "@/lib/tr";import { useState, forwardRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, Users } from 'lucide-react';
-import { CommunityGroup, useGroupPosts } from '@/hooks/useCommunity';
+import { ArrowLeft, Plus, Users, Languages } from 'lucide-react';
+import { CommunityGroup, useGroupPosts, useOtherLanguagePosts } from '@/hooks/useCommunity';
+import { useFeedLanguages } from '@/hooks/useFeedLanguages';
 import { useGroupPresence } from '@/hooks/useGroupPresence';
 import PostCard from './PostCard';
 import PostSeenObserver from './PostSeenObserver';
@@ -23,11 +24,22 @@ interface GroupFeedProps {
 const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, onCreatePost, isEmbedded = false, onUserClick, externalSearchQuery }, ref) => {
   const { data: posts = [], isLoading } = useGroupPosts(group?.id || null);
   const { onlineCount, onlineUsers, typingUsers } = useGroupPresence(group?.id || null);
+  const { feedLangs } = useFeedLanguages();
 
   const [localSearchQuery, setLocalSearchQuery] = useState('');
   const searchQuery = externalSearchQuery !== undefined ? externalSearchQuery : localSearchQuery;
   const setSearchQuery = setLocalSearchQuery;
   const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
+
+  // Boş ekran qadağası: qlobal feed linzada az post göstərirsə,
+  // digər dillərdəki son postları "Digər dillərdə" bölməsində göstər (tərcümə düyməli)
+  const backfillEnabled = !group && !isLoading && posts.length < 10;
+  const { data: otherLangPosts = [] } = useOtherLanguagePosts(feedLangs, backfillEnabled);
+  const backfillPosts = useMemo(() => {
+    if (!backfillEnabled || searchQuery) return [];
+    const shownIds = new Set(posts.map((p) => p.id));
+    return otherLangPosts.filter((p) => !shownIds.has(p.id));
+  }, [backfillEnabled, searchQuery, posts, otherLangPosts]);
 
   const filteredPosts = useMemo(() => {
     let result = [...posts];
@@ -79,6 +91,20 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
               </PostSeenObserver>
             </motion.div>
         )
+        }
+        {/* Digər dillərdə — linzadan kənar son postlar (unread sayğacına daxil deyil) */}
+        {backfillPosts.length > 0 &&
+        <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingTop: 6 }}>
+              <Languages size={13} style={{ color: 'var(--a-ink-faint)' }} />
+              <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--a-ink-faint)', textTransform: 'uppercase', letterSpacing: 0.4 }}>
+                {tr("community_diger_dillerde", "Digər dillərdə")}
+              </span>
+            </div>
+            {backfillPosts.map((post) =>
+          <PostCard key={post.id} post={post} groupId={null} onUserClick={onUserClick} />
+          )}
+          </>
         }
       </div>);
 

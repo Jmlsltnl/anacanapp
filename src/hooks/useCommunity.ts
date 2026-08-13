@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getPublicProfileCards } from '@/lib/public-profile-cards';
 import { useUserStore } from '@/store/userStore';
+import { detectLang, isFeedLang, FeedLang } from '@/lib/langDetect';
+import { useFeedLanguages, feedLangsOrExpr } from '@/hooks/useFeedLanguages';
 
 export interface CommunityGroup {
   id: string;
@@ -30,6 +32,8 @@ export interface CommunityPost {
   comments_count: number;
   is_pinned: boolean;
   is_anonymous: boolean;
+  /** Postun MƏZMUN dili (az/en/ru/tr) — UI dili deyil; tərcümə düyməsi buna baxır */
+  language?: string | null;
   created_at: string;
   author?: {
     name: string;
@@ -142,63 +146,95 @@ export const useLeaveGroup = () => {
   });
 };
 
+/** Postlara müəllif kartı + like statusu əlavə et (feed və backfill üçün ortaq) */
+const enrichPosts = async (posts: any[], userId?: string | null): Promise<CommunityPost[]> => {
+  const authorMap = await getPublicProfileCards((posts || []).map((p: any) => p.user_id));
+
+  // İstifadəçinin bəyəndikləri — TƏK batch sorğu (əvvəllər hər post üçün ayrıca sorğu idi — N+1)
+  const likedSet = new Set<string>();
+  if (userId && posts && posts.length > 0) {
+    const { data: likeRows } = await supabase.
+    from('post_likes').
+    select('post_id').
+    eq('user_id', userId).
+    in('post_id', posts.map((p: any) => p.id));
+    (likeRows || []).forEach((r: any) => likedSet.add(r.post_id));
+  }
+
+  return (posts || []).map((post: any) => {
+    const isAnon = post.is_anonymous === true;
+    const authorData = isAnon ? null : authorMap[post.user_id];
+
+    return {
+      ...post,
+      is_anonymous: isAnon,
+      author: isAnon ?
+      { name: 'Anonim', avatar_url: null, badge_type: null } :
+      authorData ?
+      { name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null } :
+      { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
+      is_liked: likedSet.has(post.id)
+    };
+  }) as CommunityPost[];
+};
+
 export const useGroupPosts = (groupId: string | null) => {
+  const { feedLangs } = useFeedLanguages();
+
   return useQuery({
-    queryKey: ['group-posts', groupId],
+    // Qrup feedi linzadan asılı deyil — açara 'all' yazılır ki, linza dəyişəndə boş yerə refetch olmasın
+    queryKey: ['group-posts', groupId, groupId ? 'all' : feedLangs.join(',')],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
 
-      const currentLanguage = useUserStore.getState().language || 'az';
-      
       let query = supabase.
       from('community_posts').
       select('*').
-      eq('language', currentLanguage).
       eq('is_active', true).
       order('is_pinned', { ascending: false }).
       order('created_at', { ascending: false });
 
       if (groupId) {
+        // Qrup feedi dil filtrindən AZADDIR — kiçik hovuzu dillərə bölmək aktivliyi öldürür;
+        // başqa dildəki postlar üçün kartda "Tərcüməni gör" düyməsi var.
         query = query.eq('group_id', groupId);
       } else {
-        query = query.is('group_id', null);
+        // Qlobal feed — istifadəçinin dil linzası (feed_languages)
+        query = query.is('group_id', null).or(feedLangsOrExpr(feedLangs));
       }
 
       const { data: posts, error } = await query;
       if (error) throw error;
 
-      const authorMap = await getPublicProfileCards((posts || []).map((p: any) => p.user_id));
-
-      // İstifadəçinin bəyəndikləri — TƏK batch sorğu (əvvəllər hər post üçün ayrıca sorğu idi — N+1)
-      const likedSet = new Set<string>();
-      if (user && posts && posts.length > 0) {
-        const { data: likeRows } = await supabase.
-        from('post_likes').
-        select('post_id').
-        eq('user_id', user.id).
-        in('post_id', posts.map((p: any) => p.id));
-        (likeRows || []).forEach((r: any) => likedSet.add(r.post_id));
-      }
-
-      const postsWithDetails = (posts || []).map((post: any) => {
-        const isAnon = post.is_anonymous === true;
-        const authorData = isAnon ? null : authorMap[post.user_id];
-
-        return {
-          ...post,
-          is_anonymous: isAnon,
-          author: isAnon ?
-          { name: 'Anonim', avatar_url: null, badge_type: null } :
-          authorData ?
-          { name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null } :
-          { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
-          is_liked: likedSet.has(post.id)
-        };
-      });
-
-      return postsWithDetails as CommunityPost[];
+      return enrichPosts(posts || [], user?.id);
     },
     enabled: groupId !== undefined
+  });
+};
+
+/**
+ * Linzadan KƏNAR dillərdəki son qlobal postlar — feed az dolduqda
+ * "Digər dillərdə" bölməsi üçün (boş ekran qadağası).
+ */
+export const useOtherLanguagePosts = (excludeLangs: string[], enabled: boolean) => {
+  return useQuery({
+    queryKey: ['other-lang-posts', excludeLangs.join(',')],
+    enabled,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { data: posts, error } = await supabase.
+      from('community_posts').
+      select('*').
+      eq('is_active', true).
+      is('group_id', null).
+      not('language', 'in', `(${excludeLangs.join(',')})`).
+      order('created_at', { ascending: false }).
+      limit(10);
+
+      if (error) throw error;
+      return enrichPosts(posts || [], user?.id);
+    }
   });
 };
 
@@ -207,11 +243,16 @@ export const useCreatePost = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ groupId, content, mediaUrls, isAnonymous }: {groupId: string | null;content: string;mediaUrls?: string[];isAnonymous?: boolean;}) => {
+    mutationFn: async ({ groupId, content, mediaUrls, isAnonymous, language }: {groupId: string | null;content: string;mediaUrls?: string[];isAnonymous?: boolean;language?: FeedLang;}) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const currentLanguage = useUserStore.getState().language || 'az';
+      // Post dili = MƏZMUNUN dili (composer çipi > avtomatik aşkarlama > UI dili).
+      // Əvvəllər UI dili yazılırdı — EN interfeysdə az yazan ananın postu az feedində görünmürdü.
+      const uiLang = useUserStore.getState().language || 'az';
+      const fallbackLang: FeedLang = isFeedLang(uiLang) ? uiLang : 'az';
+      const postLanguage: FeedLang = language || detectLang(content, fallbackLang);
+
       const { error } = await supabase.
       from('community_posts').
       insert([
@@ -221,7 +262,7 @@ export const useCreatePost = () => {
           content,
           media_urls: mediaUrls || [],
           is_anonymous: isAnonymous || false,
-          language: currentLanguage
+          language: postLanguage
         }
       ]);
 
@@ -242,13 +283,18 @@ export const useEditPost = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ postId, content }: {postId: string;content: string;}) => {
+    mutationFn: async ({ postId, content, currentLanguage }: {postId: string;content: string;currentLanguage?: string | null;}) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Redaktədə dili yenidən aşkarla (qeyri-müəyyəndirsə köhnə dil qalır).
+      // Köhnəlmiş tərcümə keşini DB trigger özü silir (trg_purge_post_translations).
+      const uiLang = useUserStore.getState().language || 'az';
+      const fallbackLang: FeedLang = isFeedLang(currentLanguage) ? currentLanguage : isFeedLang(uiLang) ? uiLang : 'az';
+
       const { error } = await supabase.
       from('community_posts').
-      update({ content }).
+      update({ content, language: detectLang(content, fallbackLang) }).
       eq('id', postId).
       eq('user_id', user.id);
 

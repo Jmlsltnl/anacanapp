@@ -1,9 +1,11 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Crown, Shield, Flag, Pencil, EyeOff, Sparkles } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Crown, Shield, Flag, Pencil, EyeOff, Sparkles, Languages } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { CommunityPost, useToggleLike, usePostComments, useCreateComment, useEditPost, useDeletePost } from '@/hooks/useCommunity';
+import { useUserStore } from '@/store/userStore';
+import { isFeedLang } from '@/lib/langDetect';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,6 +53,9 @@ const UserBadge = ({ type }: {type: 'admin' | 'premium' | 'moderator' | null;}) 
 
 };
 
+// Sessiya-daxili tərcümə keşi — toggle təkrar sorğu atmır (server keşi ayrıca var)
+const postTranslationCache = new Map<string, string>();
+
 // anacan-demo avatar gradient cycle (stable per user)
 const AVATAR_GRADS = ['var(--a-grad-peach)', 'var(--a-grad-pink)', 'var(--a-grad-lav)', 'var(--a-grad-blue)', 'var(--a-grad-green)', 'var(--a-grad-yellow)'];
 const avatarGradFor = (seed: string) => {
@@ -68,9 +73,13 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const [showHeartBurst, setShowHeartBurst] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
+  const [translation, setTranslation] = useState<string | null>(null);
+  const [translating, setTranslating] = useState(false);
   const lastTapRef = useRef(0);
   const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
+  const uiLang = useUserStore((s) => s.language) || 'az';
 
   const toggleLike = useToggleLike();
   const { data: comments = [], isLoading: commentsLoading, refetch: refetchComments } = usePostComments(post.id);
@@ -121,7 +130,44 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
     const content = editContent.trim();
     if (!content) return;
     hapticFeedback.light();
-    editPost.mutate({ postId: post.id, content }, { onSuccess: () => setIsEditing(false) });
+    // Redaktədən sonra köhnə tərcümə göstərilməsin (server keşini DB trigger silir)
+    setShowTranslation(false);
+    setTranslation(null);
+    postTranslationCache.delete(`${post.id}:${uiLang}`);
+    editPost.mutate({ postId: post.id, content, currentLanguage: post.language }, { onSuccess: () => setIsEditing(false) });
+  };
+
+  // ── Tərcümə: post dili ≠ UI dili olduqda "Tərcüməni gör" düyməsi ──
+  const postLang = post.language || 'az';
+  const hasTranslatableText = /[A-Za-zА-Яа-яЁёƏəĞğIıİÖöŞşÜüÇç]/.test(post.content);
+  const canTranslate = hasTranslatableText && isFeedLang(uiLang) && postLang !== uiLang;
+
+  const handleTranslate = async () => {
+    hapticFeedback.light();
+    // Artıq göstərilirsə → orijinala qayıt (sorğusuz)
+    if (showTranslation) { setShowTranslation(false); return; }
+
+    const cacheKey = `${post.id}:${uiLang}`;
+    const cached = translation || postTranslationCache.get(cacheKey);
+    if (cached) { setTranslation(cached); setShowTranslation(true); return; }
+
+    setTranslating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('translate-post', {
+        body: { post_id: post.id, target_lang: uiLang }
+      });
+      if (error || !data?.success || !data?.content) {
+        throw new Error(data?.error || error?.message || 'translate failed');
+      }
+      postTranslationCache.set(cacheKey, data.content);
+      setTranslation(data.content);
+      setShowTranslation(true);
+    } catch (e) {
+      console.error('Post translate error:', e);
+      toast({ title: tr("postcard_tercume_xetasi", "Tərcümə alınmadı — yenidən cəhd edin"), variant: 'destructive' });
+    } finally {
+      setTranslating(false);
+    }
   };
 
   const handleReportPost = async () => {
@@ -237,13 +283,29 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
 
         <div onClick={handleDoubleTap} className="relative">
             <p className="a-post-text">
-              {post.content.split(/(\s+)/).map((word, index) => {
+              {(showTranslation && translation ? translation : post.content).split(/(\s+)/).map((word, index) => {
               if (word.startsWith('#')) return <span key={index} className="a-post-tag">{word}</span>;
               if (word.startsWith('@')) return <span key={index} style={{ color: 'var(--a-blue-2)', fontWeight: 700 }}>{word}</span>;
               if (/^https?:\/\/\S+/.test(word)) return <a key={index} href={word} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--a-blue-2)', textDecoration: 'underline', wordBreak: 'break-all' }} onClick={(e) => e.stopPropagation()}>{word}</a>;
               return word;
             })}
             </p>
+            {canTranslate &&
+          <button
+            onClick={(e) => { e.stopPropagation(); void handleTranslate(); }}
+            disabled={translating}
+            style={{ background: 'none', border: 'none', padding: '6px 0 0', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: 'var(--a-blue-2)', opacity: translating ? 0.6 : 1 }}>
+                <Languages size={12} strokeWidth={2.2} />
+                {translating ?
+            tr("postcard_tercume_olunur", "Tərcümə olunur…") :
+            showTranslation ?
+            tr("postcard_orijinali_goster", "Orijinalı göstər") :
+            tr("postcard_tercumeni_gor", "Tərcüməni gör")}
+                {showTranslation && !translating &&
+            <span style={{ color: 'var(--a-ink-faint)', fontWeight: 600 }}>· {postLang.toUpperCase()} → {uiLang.toUpperCase()}</span>
+            }
+              </button>
+          }
             {mediaItems.length > 0 &&
           <div style={{ marginTop: 12, borderRadius: 'var(--a-radius-md)', overflow: 'hidden' }}>
                 <MediaCarousel media={mediaItems} />

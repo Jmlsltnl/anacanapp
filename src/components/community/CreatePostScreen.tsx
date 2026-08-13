@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Image, Video, Send, Loader2, Play, Smile, Hash, AtSign, EyeOff, X } from 'lucide-react';
+import { ArrowLeft, Image, Video, Send, Loader2, Play, Smile, Hash, AtSign, EyeOff, X, Languages } from 'lucide-react';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { CommunityGroup, useCreatePost } from '@/hooks/useCommunity';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +9,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from 'next-themes';
+import { useUserStore } from '@/store/userStore';
+import { detectLang, FEED_LANGS, FeedLang, isFeedLang } from '@/lib/langDetect';
 import { tr } from "@/lib/tr";
 
 interface CreatePostScreenProps {
@@ -54,6 +56,13 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [cursorPosition, setCursorPosition] = useState(0);
+  // Post dili: null = avtomatik aşkarlama; istifadəçi çipə toxunsa manual olur
+  const [manualLang, setManualLang] = useState<FeedLang | null>(null);
+
+  const uiLang = useUserStore((s) => s.language);
+  const fallbackLang: FeedLang = isFeedLang(uiLang) ? uiLang : 'az';
+  const detectedLang = useMemo(() => detectLang(content, fallbackLang), [content, fallbackLang]);
+  const postLang: FeedLang = manualLang ?? detectedLang;
 
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -152,7 +161,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
     setIsUploading(true);
     try {
       const mediaUrls = await uploadMedia();
-      await createPost.mutateAsync({ groupId: selectedGroupId, content: content.trim() || '📷', mediaUrls, isAnonymous });
+      await createPost.mutateAsync({ groupId: selectedGroupId, content: content.trim() || '📷', mediaUrls, isAnonymous, language: postLang });
       mediaPreviews.forEach((p) => URL.revokeObjectURL(p.url));
       setContent('');setMediaFiles([]);setMediaPreviews([]);
       onBack();
@@ -290,6 +299,24 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
               <Video size={17} style={{ color: 'var(--a-blue-ink)' }} />
             </button>
             {mediaFiles.length > 0 && <span className="ml-auto" style={{ fontSize: 10, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{mediaFiles.length}/4</span>}
+          </div>
+
+          {/* Post dili — yazdıqca avtomatik aşkarlanır, çiplə düzəldilə bilər.
+              Feed bu dilə görə filtrlənir (UI dilinə görə YOX). */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--a-ink-soft)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <Languages size={12} /> {tr("createpost_post_dili", "Post dili")}:
+            </span>
+            {FEED_LANGS.map((l) =>
+            <button
+              key={l}
+              type="button"
+              onClick={() => { hapticFeedback.light(); setManualLang(l); }}
+              className={`a-tag${postLang === l ? ' on' : ''}`}
+              style={{ cursor: 'pointer' }}>
+                {l.toUpperCase()}
+              </button>
+            )}
           </div>
 
           {/* Anonymous Toggle */}
