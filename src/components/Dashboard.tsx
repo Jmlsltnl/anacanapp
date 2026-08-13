@@ -18,6 +18,7 @@ import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
 
 import { useAuth } from '@/hooks/useAuth';
+import { isCakesAvailable } from '@/lib/freemium';
 import { useKickSessions } from '@/hooks/useKickSessions';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
 import { useBabyMilestones } from '@/hooks/useBabyMilestones';
@@ -788,6 +789,7 @@ const getBabyDailyFunFact = (ageInDays: number): string => {
 const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (tool: string) => void;onNavigate?: (screen: string) => void;}) => {
   const { toast } = useToast();
   const { language } = useUserStore();
+  const { profile: mommyProfile } = useAuth();
   const { isMilestoneAchieved, toggleMilestone, getMilestoneDate, MILESTONES } = useBabyMilestones();
   const { unlockAchievement, getTotalPoints } = useAchievements();
   const { activeTimers, startTimer, stopTimer, getElapsedSeconds, getActiveTimer } = useTimerStore();
@@ -1679,8 +1681,8 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
         </PremiumBlurGate>
       </div>
 
-      {/* Cakes cross-sell — navigate to cakes tab, hide after 12 months, hide if disabled for language */}
-      {!isToolDisabled('cakes') && babyData.ageInMonths < 12 &&
+      {/* Cakes cross-sell — yalnız AZ bazarı (dil az/ru + ölkə AZ), 12 aydan sonra gizli */}
+      {!isToolDisabled('cakes') && isCakesAvailable((mommyProfile as any)?.country_code, language) && babyData.ageInMonths < 12 &&
       <section className="a-section">
           <motion.button
           className="a-card a-fade-in"

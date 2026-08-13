@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { saveScroll, restoreScroll } from '@/lib/scrollMemory';
 import { pushBackHandler } from '@/lib/backButton';
-import { isToolFree } from '@/lib/freemium';
+import { isToolFree, isCakesAvailable } from '@/lib/freemium';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Shield, Timer, Scale, Baby, Briefcase,
@@ -314,7 +314,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     bgColor: 'pink',
     stages: ['bump', 'mommy']
   };
-  const showCakes = !isToolDisabled('cakes') && (lifeStage === 'bump' || lifeStage === 'mommy' || isAdmin) && (
+  // Tortlar: yalnız AZ bazarı (dil az/ru + ölkə AZ) — admin istisna
+  const cakesMarketOk = isAdmin || isCakesAvailable((profile as any)?.country_code, language);
+  const showCakes = !isToolDisabled('cakes') && cakesMarketOk && (lifeStage === 'bump' || lifeStage === 'mommy' || isAdmin) && (
   cakesVirtual.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
   cakesVirtual.description.toLowerCase().includes(searchQuery.toLowerCase()));
   const displayedTools: Tool[] = showCakes ? [cakesVirtual, ...filteredTools] : filteredTools;

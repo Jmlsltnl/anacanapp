@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Pause, Play, Trophy, RotateCcw, Home, Puzzle, Target, Sparkles, Star } from 'lucide-react';
@@ -348,7 +349,7 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
     return <span style={{ fontSize: cellSize * 0.55 }}>{emoji}</span>;
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-b from-violet-50 via-rose-50 to-amber-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       <div className="flex-shrink-0" style={{ height: 'env(safe-area-inset-top)' }} />
 
@@ -622,8 +623,8 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
 
       {/* Bottom safe-area spacer (game covers the app bottom nav) */}
       <div className="flex-shrink-0" style={{ height: 'env(safe-area-inset-bottom)' }} />
-    </div>
-  );
+    </div>,
+  document.body);
 };
 
 export default BirlesdirGame;

@@ -21,9 +21,23 @@ const FREE_TOOL_IDS = new Set<string>([
 'secondhand-market', 'second-hand-market',
 'affiliate', 'affiliate-products',
 'blog',
+// Mini oyunlar — pulsuz (istifadəçi qərarı)
+'mini-games',
 // Təhlükəsizlik istisnası
 'first-aid']
 );
 
 /** Alət free siyahısındadır? */
 export const isToolFree = (toolId: string): boolean => FREE_TOOL_IDS.has(toolId);
+
+/**
+ * Tortlar aləti yalnız Azərbaycan bazarı üçündür:
+ * dil az/ru VƏ ölkə AZ (ölkə seçilməyibsə köhnə AZ hesabları sayılır → açıq).
+ */
+export const isCakesAvailable = (countryCode?: string | null, language?: string | null): boolean => {
+  const country = countryCode ?? null;
+  const lang = language || 'az';
+  const countryOk = country === null || country === 'AZ';
+  const langOk = lang === 'az' || lang === 'ru';
+  return countryOk && langOk;
+};

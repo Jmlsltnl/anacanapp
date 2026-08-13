@@ -858,10 +858,10 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
         {/* Gallery always visible at bottom */}
         {renderGallery()}
 
-        {/* Fixed Bottom Buttons - positioned above BottomNav */}
+        {/* Fixed Bottom Buttons — nav-ın ÜSTÜNDƏ dayanır (altında qalmasın) */}
         <div
-          className="fixed bottom-0 left-0 right-0 z-40 px-5 py-4"
-          style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid var(--a-line)', paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}>
+          className="fixed left-0 right-0 z-50 px-5 py-3"
+          style={{ bottom: 'calc(94px + env(safe-area-inset-bottom, 0px))', background: 'var(--a-nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid var(--a-line)' }}>
           
           <div className="flex gap-3">
             {step > 0 &&

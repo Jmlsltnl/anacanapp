@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { tr, mapRowsTranslation, mapRowTranslation } from '@/lib/tr';
 import { useLanguage } from '@/hooks/useLanguage';
+import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/hooks/useAuth';
 
 export type BlogLifeStage = 'flow' | 'bump' | 'mommy' | 'all';
 
@@ -31,6 +33,10 @@ export interface BlogPost {
   reading_time: number;
   is_featured: boolean;
   is_published: boolean;
+  /** Ölkə hədəfləməsi: include boş deyilsə yalnız o ölkələrə görünür */
+  countries_include?: string[] | null;
+  /** exclude siyahısındakı ölkələrdə gizlənir */
+  countries_exclude?: string[] | null;
   view_count: number;
   created_at: string;
   updated_at: string;
@@ -57,8 +63,21 @@ export interface BlogPostCategory {
   created_at: string;
 }
 
+/** Ölkə filtri: include boş deyilsə ölkə siyahıda OLMALIdır;
+    exclude boş deyilsə ölkə siyahıda OLMAMALIdır. null/boş = hamıya görünür. */
+const passesCountryFilter = (post: any, country: string | null): boolean => {
+  const inc: string[] = Array.isArray(post.countries_include) ? post.countries_include : [];
+  const exc: string[] = Array.isArray(post.countries_exclude) ? post.countries_exclude : [];
+  if (inc.length > 0 && (!country || !inc.includes(country))) return false;
+  if (exc.length > 0 && country && exc.includes(country)) return false;
+  return true;
+};
+
 export const useBlog = () => {
   const { language } = useLanguage();
+  const countryCode = useUserStore((s) => s.countryCode);
+  const { profile } = useAuth();
+  const userCountry = (profile as any)?.country_code || countryCode || null;
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
@@ -75,13 +94,15 @@ export const useBlog = () => {
       if (error) throw error;
       
       let typedPosts = (data || []) as BlogPost[];
+      // Ölkə hədəfləməsi (admin include/exclude)
+      typedPosts = typedPosts.filter((p) => passesCountryFilter(p, userCountry));
       typedPosts = mapRowsTranslation(typedPosts, language, ['title', 'content', 'excerpt', 'category', 'tags']);
       setPosts(typedPosts);
       setFeaturedPosts(typedPosts.filter(p => p.is_featured));
     } catch (error) {
       console.error('Error fetching blog posts:', error);
     }
-  }, [language]);
+  }, [language, userCountry]);
 
   const fetchCategories = useCallback(async () => {
     try {

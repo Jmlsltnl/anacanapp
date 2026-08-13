@@ -54,7 +54,9 @@ const AdminBlog = () => {
     reading_time: 5,
     is_featured: false,
     is_published: false,
-    life_stage: 'all' as BlogLifeStage
+    life_stage: 'all' as BlogLifeStage,
+    countries_include: [] as string[],
+    countries_exclude: [] as string[]
   });
 
   const lifeStageOptions: {value: BlogLifeStage;label: string;emoji: string;}[] = [
@@ -234,7 +236,9 @@ const AdminBlog = () => {
       reading_time: post.reading_time,
       is_featured: post.is_featured,
       is_published: post.is_published,
-      life_stage: (post.life_stage || 'all') as BlogLifeStage
+      life_stage: (post.life_stage || 'all') as BlogLifeStage,
+      countries_include: ((post as any).countries_include || []) as string[],
+      countries_exclude: ((post as any).countries_exclude || []) as string[]
     };
     setFormData(newFormData);
     initialFormDataRef.current = JSON.stringify({ ...newFormData, categoryIds: postCatIds });
@@ -387,7 +391,9 @@ const AdminBlog = () => {
       reading_time: 5,
       is_featured: false,
       is_published: false,
-      life_stage: 'all' as BlogLifeStage
+      life_stage: 'all' as BlogLifeStage,
+      countries_include: [] as string[],
+      countries_exclude: [] as string[]
     };
     setFormData(emptyForm);
     setSelectedCategoryIds([]);
@@ -916,6 +922,40 @@ const AdminBlog = () => {
                   <p className="text-xs text-muted-foreground mt-1.5">
                     {tr("adminblog_bu_meqale_hansi_istifadeci_qru_bd9c91", "Bu m\u0259qal\u0259 hans\u0131 istifad\u0259\xE7i qrupuna aiddir? Dashboard-da h\u0259min qrupa uy\u011Fun g\xF6st\u0259ril\u0259c\u0259k.")}
                   </p>
+                </div>
+
+                {/* Ölkə hədəfləməsi (include/exclude) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      🌍 {tr("adminblog_olke_include", "Yalnız bu ölkələrə göstər (include)")}
+                    </label>
+                    <Input
+                      value={formData.countries_include.join(', ')}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        countries_include: e.target.value.split(',').map((c) => c.trim().toUpperCase()).filter(Boolean)
+                      })}
+                      placeholder="AZ, TR" />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {tr("adminblog_olke_include_hint", "ISO kodlar, vergüllə (məs. AZ). Boş = bütün ölkələr.")}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      🚫 {tr("adminblog_olke_exclude", "Bu ölkələrdə gizlət (exclude)")}
+                    </label>
+                    <Input
+                      value={formData.countries_exclude.join(', ')}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        countries_exclude: e.target.value.split(',').map((c) => c.trim().toUpperCase()).filter(Boolean)
+                      })}
+                      placeholder="RU" />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {tr("adminblog_olke_exclude_hint", "Bu ölkə seçən istifadəçilərə görünməyəcək.")}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Toggles */}

@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -324,7 +325,9 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
   const twoStarScore = Math.ceil(config.targetScore * 1.25);
   const threeStarScore = Math.ceil(config.targetScore * 1.6);
 
-  return (
+  // PORTAL: transform-lu valideynlərdə (motion kartlar) fixed overlay stacking
+  // context tələsinə düşüb nav-ın altında qalırdı → səbət görünmürdü.
+  return createPortal(
     <div className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-b from-sky-100 via-emerald-50 to-amber-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       {/* Status bar spacer */}
       <div className="flex-shrink-0" style={{ height: 'env(safe-area-inset-top)' }} />
@@ -411,12 +414,14 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
             key={obj.id}
             className="absolute leading-none drop-shadow-md pointer-events-none"
             style={{
-              left: obj.x - obj.size / 2,
-              top: obj.y,
+              left: 0,
+              top: 0,
               width: obj.size,
               height: obj.size,
               fontSize: obj.size * 0.8,
-              transform: 'translateZ(0)',
+              // GPU compositing: layout (left/top) əvəzinə transform — daha axıcı
+              transform: `translate3d(${obj.x - obj.size / 2}px, ${obj.y}px, 0)`,
+              willChange: 'transform',
             }}
           >
             {obj.def.emoji}
@@ -444,10 +449,12 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
         <motion.div
           className="absolute flex items-end justify-center pointer-events-none"
           style={{
-            left: basketX - BASKET_WIDTH / 2,
+            left: 0,
             bottom: BASKET_BOTTOM_MARGIN,
             width: BASKET_WIDTH,
             height: BASKET_HEIGHT,
+            x: basketX - BASKET_WIDTH / 2,
+            willChange: 'transform',
           }}
           animate={{ scale: catchPulse ? 1.12 : 1 }}
           transition={{ duration: 0.15 }}
@@ -644,8 +651,8 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
 
       {/* Bottom safe-area spacer (game covers the app bottom nav) */}
       <div className="flex-shrink-0" style={{ height: 'env(safe-area-inset-bottom)' }} />
-    </div>
-  );
+    </div>,
+  document.body);
 };
 
 export default SaglamSebetGame;
