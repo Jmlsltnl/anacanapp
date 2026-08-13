@@ -7,9 +7,6 @@ import {
 import { BlogPost, BlogCategory } from '@/hooks/useBlog';
 import { useBlogInteractions, BlogComment } from '@/hooks/useBlogInteractions';
 import { useAuth } from '@/hooks/useAuth';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
@@ -109,31 +106,32 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
     animate={{ opacity: 1, y: 0 }}>
     
       <div className="flex gap-3">
-        <Avatar className="w-10 h-10 border-2 border-border">
+        <Avatar className="w-10 h-10" style={{ border: '2px solid var(--a-line)' }}>
           <AvatarImage src={comment.user_avatar || undefined} />
-          <AvatarFallback className="bg-gradient-to-br from-violet-500 to-purple-600 text-white text-sm">
+          <AvatarFallback className="text-sm" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
             {comment.user_name?.charAt(0) || '?'}
           </AvatarFallback>
         </Avatar>
 
         <div className="flex-1">
-          <div className="bg-muted/50 rounded-2xl rounded-tl-none p-3">
+          <div className="rounded-2xl rounded-tl-none p-3" style={{ background: 'var(--a-surface-soft)' }}>
             <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-sm text-foreground">{comment.user_name}</span>
+              <span className="font-bold text-sm" style={{ color: 'var(--a-ink)' }}>{comment.user_name}</span>
               {comment.user_badge &&
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-violet-500/10 text-violet-600">
+            <span className="text-[10px] px-1.5 py-0 rounded-full font-bold" style={{ background: 'var(--a-lav-1)', color: 'var(--a-lav-ink)' }}>
                   {comment.user_badge === 'admin' ? '👑 Admin' :
               comment.user_badge === 'premium' ? '⭐ Premium' : '🛡️ Mod'}
-                </Badge>
+                </span>
             }
             </div>
-            <p className="text-sm text-foreground">{comment.content}</p>
+            <p className="text-sm" style={{ margin: 0, color: 'var(--a-ink)' }}>{comment.content}</p>
           </div>
 
           <div className="flex items-center gap-4 mt-2 px-2">
             <button
             onClick={() => toggleCommentLike(comment.id)}
-            className={`flex items-center gap-1 text-xs font-medium transition-colors ${comment.is_liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'}`}>
+            className="flex items-center gap-1 text-xs font-semibold transition-colors"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: comment.is_liked ? 'var(--a-pink-2)' : 'var(--a-ink-soft)' }}>
             
               <Heart className={`w-3.5 h-3.5 ${comment.is_liked ? 'fill-current' : ''}`} />
               <span>{comment.likes_count || ''}</span>
@@ -142,20 +140,22 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             {!isReply &&
           <button
             onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-            className="text-xs font-medium text-muted-foreground hover:text-violet-500 transition-colors">
+            className="text-xs font-semibold transition-colors"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--a-accent-ink)' }}>
             
                 {tr("blogpostdetail_cavab_yaz_2cd434", "Cavab yaz")}
               </button>
           }
 
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs" style={{ color: 'var(--a-ink-faint)' }}>
               {format(new Date(comment.created_at), 'd MMM', { locale: getCurrentDateLocale() })}
             </span>
 
             {user?.id === comment.user_id &&
           <button
             onClick={() => deleteComment(comment.id)}
-            className="text-xs text-red-500 hover:text-red-600 ml-auto">
+            className="text-xs ml-auto"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--a-pink-ink)' }}>
             
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -169,28 +169,29 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}>
           
-              <Textarea
+              <textarea
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             placeholder={tr("blogpostdetail_cavabinizi_yazin_2cda33", "Cavabınızı yazın...")}
-            className="text-sm min-h-[60px] rounded-xl bg-muted/50" />
+            className="a-input flex-1 text-sm resize-none"
+            style={{ minHeight: 60, height: 'auto', fontFamily: 'inherit' }} />
           
               <div className="flex flex-col gap-1">
-                <Button
-              size="sm"
+                <button
               onClick={() => handleReply(comment.id)}
               disabled={submitting}
-              className="bg-gradient-to-r from-violet-600 to-purple-600">
+              className="a-cta-btn"
+              style={{ width: 38, height: 38, padding: 0, justifyContent: 'center', opacity: submitting ? 0.6 : 1 }}>
               
                   <Send className="w-4 h-4" />
-                </Button>
-                <Button
-              size="sm"
-              variant="ghost"
+                </button>
+                <button
+              className="a-icon-btn"
+              style={{ width: 38, height: 38 }}
               onClick={() => setReplyingTo(null)}>
               
                   ✕
-                </Button>
+                </button>
               </div>
             </motion.div>
         }
@@ -199,7 +200,8 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           {comment.replies && comment.replies.length > 0 &&
         <button
           onClick={() => toggleReplies(comment.id)}
-          className="flex items-center gap-1 mt-2 px-2 text-xs font-medium text-violet-600">
+          className="flex items-center gap-1 mt-2 px-2 text-xs font-bold"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--a-accent-ink)' }}>
           
               {expandedComments.includes(comment.id) ?
           <>
@@ -225,7 +227,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
 
   return (
-    <div className="min-h-screen bg-background pb-24 overflow-y-auto">
+    <div className="a-scope min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
       {/* Hero Image */}
       <div className="relative">
         {post.cover_image_url ?
@@ -235,10 +237,10 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             alt={post.title}
             className="w-full h-full object-cover" />
           
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, var(--a-bg), transparent 60%)' }} />
           </div> :
 
-        <div className="h-40 bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600" />
+        <div className="h-40" style={{ background: 'var(--a-grad-peach)' }} />
         }
         
         {/* Floating Back Button */}
@@ -248,7 +250,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             onBack();
           }}
           className="absolute left-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center cursor-pointer"
-          style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)' }}
+          style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)', border: 'none' }}
           whileTap={{ scale: 0.95 }}>
           
           <ArrowLeft className="w-5 h-5 text-white" />
@@ -261,32 +263,32 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             handleShare();
           }}
           className="absolute right-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center cursor-pointer"
-          style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)' }}
+          style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)', border: 'none' }}
           whileTap={{ scale: 0.95 }}>
           
           <Share2 className="w-5 h-5 text-white" />
         </motion.button>
       </div>
 
-      <div className="px-4 -mt-8 relative z-10">
+      <div className="a-shell -mt-8 relative z-10">
         {/* Main Content Card */}
         <motion.div
-          className="bg-card rounded-3xl shadow-xl border border-border/50 p-5"
+          className="a-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}>
           
           {/* Category */}
-          <Badge className="mb-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white border-0">
+          <span className="a-rank-tag mb-3 inline-flex" style={{ margin: '0 0 12px', background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
             {categories.find((c) => c.slug === post.category)?.icon} {categories.find((c) => c.slug === post.category)?.name || post.category}
-          </Badge>
+          </span>
 
           {/* Title */}
-          <h1 className="text-2xl font-black text-foreground mb-3 leading-tight">
+          <h1 className="text-2xl mb-3 leading-tight a-heading" style={{ margin: '0 0 12px', color: 'var(--a-ink)' }}>
             {post.title}
           </h1>
 
           {/* Meta */}
-          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-4">
+          <div className="flex flex-wrap items-center gap-3 text-sm mb-4" style={{ color: 'var(--a-ink-soft)' }}>
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
               {post.reading_time} {tr("blogpostdetail_deq_780a5c", "d\u0259q")}
@@ -301,14 +303,13 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2 pb-4 border-b border-border">
+          <div className="flex items-center gap-2 pb-4" style={{ borderBottom: '1px solid var(--a-line)' }}>
             <motion.button
               onClick={toggleLike}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
-              isLiked ?
-              'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-lg shadow-red-500/30' :
-              'bg-muted hover:bg-muted/80 text-foreground'}`
-              }
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full font-bold transition-all"
+              style={isLiked ?
+              { background: 'var(--a-pink-2)', color: '#fff', border: 'none', boxShadow: '0 8px 18px -8px rgba(255, 138, 164, 0.8)', cursor: 'pointer' } :
+              { background: 'var(--a-surface-soft)', color: 'var(--a-ink)', border: 'none', cursor: 'pointer' }}
               whileTap={{ scale: 0.98 }}>
               
               <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
@@ -317,27 +318,26 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
             <motion.button
               onClick={toggleSave}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all ${
-              isSaved ?
-              'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/30' :
-              'bg-muted hover:bg-muted/80 text-foreground'}`
-              }
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full font-bold transition-all"
+              style={isSaved ?
+              { background: 'var(--a-yellow-2)', color: '#5a3d00', border: 'none', boxShadow: '0 8px 18px -8px rgba(255, 201, 77, 0.8)', cursor: 'pointer' } :
+              { background: 'var(--a-surface-soft)', color: 'var(--a-ink)', border: 'none', cursor: 'pointer' }}
               whileTap={{ scale: 0.98 }}>
               
               <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
               <span>{isSaved ? tr("blogpostdetail_saxlanildi_66ffe7", "Saxlan\u0131ld\u0131") : tr("blogpostdetail_saxla_d9cfd1", "Saxla")}</span>
             </motion.button>
 
-            <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-muted text-muted-foreground">
+            <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-full" style={{ background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
               <MessageCircle className="w-5 h-5" />
-              <span className="font-semibold">{commentsCount}</span>
+              <span className="font-bold">{commentsCount}</span>
             </div>
           </div>
         </motion.div>
 
         {/* Content */}
         <motion.div
-          className="mt-4 bg-card rounded-3xl shadow-lg border border-border/50 p-5"
+          className="mt-3 a-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}>
@@ -352,82 +352,85 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         {/* Tags */}
         {post.tags && post.tags.length > 0 &&
         <motion.div
-          className="flex flex-wrap gap-2 mt-4"
+          className="flex flex-wrap gap-2 mt-3"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}>
           
             {post.tags.map((tag) =>
-          <Badge key={tag} variant="outline" className="rounded-full text-sm px-3 py-1">
+          <span key={tag} className="a-tag" style={{ cursor: 'default' }}>
                 #{tag}
-              </Badge>
+              </span>
           )}
           </motion.div>
         }
 
         {/* Author */}
         <motion.div
-          className="mt-4 p-4 bg-gradient-to-r from-violet-500/10 to-purple-500/10 rounded-2xl border border-violet-500/20 flex items-center gap-4"
+          className="mt-3 a-card flex items-center gap-4"
+          style={{ background: 'var(--a-peach-1)', border: 'none' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}>
           
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-            <User className="w-7 h-7 text-white" />
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'var(--a-grad-peach)' }}>
+            <User className="w-7 h-7" style={{ color: 'var(--a-accent-ink)' }} />
           </div>
           <div>
-            <p className="font-bold text-foreground">{post.author_name}</p>
-            <p className="text-sm text-muted-foreground">{tr("blogpostdetail_meqale_muellifi_1bf996", "Məqalə müəllifi")}</p>
+            <p className="font-bold" style={{ margin: 0, color: 'var(--a-accent-ink)' }}>{post.author_name}</p>
+            <p className="text-sm" style={{ margin: 0, color: 'var(--a-accent-ink)', opacity: 0.75 }}>{tr("blogpostdetail_meqale_muellifi_1bf996", "Məqalə müəllifi")}</p>
           </div>
         </motion.div>
 
         {/* Comments Section */}
         <motion.div
-          className="mt-4 bg-card rounded-3xl shadow-lg border border-border/50 p-5"
+          className="mt-3 a-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}>
           
-          <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-              <MessageCircle className="w-4 h-4 text-white" />
-            </div>
+          <h3 className="font-bold mb-4 flex items-center gap-2 a-heading" style={{ margin: '0 0 16px', color: 'var(--a-ink)' }}>
+            <span className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--a-grad-peach)' }}>
+              <MessageCircle className="w-4 h-4" style={{ color: 'var(--a-accent-ink)' }} />
+            </span>
             {tr("blogpostdetail_serhler_8b3fc3", "\u015E\u0259rhl\u0259r (")}{commentsCount})
           </h3>
 
           {/* New comment */}
           <div className="flex gap-3 mb-6">
-            <Avatar className="w-10 h-10 border-2 border-border">
-              <AvatarFallback className="bg-gradient-to-br from-violet-500 to-purple-600 text-white">
+            <Avatar className="w-10 h-10" style={{ border: '2px solid var(--a-line)' }}>
+              <AvatarFallback style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
                 <User className="w-4 h-4" />
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 flex gap-2">
-              <Textarea
+              <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder={user ? tr("blogpostdetail_serhinizi_yazin_9d6066", "\u015E\u0259rhinizi yaz\u0131n...") : tr("blogpostdetail_serh_yazmaq_ucun_giris_edin_d02910", "\u015E\u0259rh yazmaq \xFC\xE7\xFCn giri\u015F edin")}
-                className="min-h-[50px] rounded-xl bg-muted/50 resize-none"
+                className="a-input flex-1 resize-none"
+                style={{ minHeight: 50, height: 'auto', fontFamily: 'inherit', opacity: !user ? 0.6 : 1 }}
                 disabled={!user} />
               
-              <Button
+              <button
                 onClick={handleAddComment}
                 disabled={submitting || !newComment.trim()}
-                className="shrink-0 bg-gradient-to-r from-violet-600 to-purple-600">
+                className="a-cta-btn shrink-0"
+                style={{ width: 42, height: 42, padding: 0, justifyContent: 'center', opacity: submitting || !newComment.trim() ? 0.5 : 1 }}>
                 
                 <Send className="w-4 h-4" />
-              </Button>
+              </button>
             </div>
           </div>
 
           {/* Comments list */}
           {comments.length === 0 ?
-          <div className="text-center py-8 bg-muted/30 rounded-2xl">
-              <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30 flex items-center justify-center">
-                <MessageCircle className="w-7 h-7 text-violet-500" />
+          <div className="text-center py-8 rounded-2xl" style={{ background: 'var(--a-surface-soft)' }}>
+              <div className="w-14 h-14 mx-auto mb-3 rounded-2xl flex items-center justify-center" style={{ background: 'var(--a-grad-peach)' }}>
+                <MessageCircle className="w-7 h-7" style={{ color: 'var(--a-accent-ink)' }} />
               </div>
-              <p className="font-semibold text-foreground">{tr("blogpostdetail_hele_serh_yoxdur_1dfc90", "Hələ şərh yoxdur")}</p>
-              <p className="text-sm text-muted-foreground">{tr("blogpostdetail_ilk_serhi_siz_yazin_00a364", "İlk şərhi siz yazın!")}</p>
+              <p className="a-list-title" style={{ margin: 0 }}>{tr("blogpostdetail_hele_serh_yoxdur_1dfc90", "Hələ şərh yoxdur")}</p>
+              <p className="a-list-sub" style={{ margin: 0 }}>{tr("blogpostdetail_ilk_serhi_siz_yazin_00a364", "İlk şərhi siz yazın!")}</p>
             </div> :
 
           <div className="space-y-4">

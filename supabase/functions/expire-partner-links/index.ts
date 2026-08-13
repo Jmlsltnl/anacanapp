@@ -53,9 +53,27 @@ Deno.serve(async (req) => {
     // Get the partner profile that the woman is linked to
     const { data: partnerProfile } = await supabase
       .from('profiles')
-      .select('id, user_id')
+      .select('id, user_id, is_premium')
       .eq('id', womanProfile.linked_partner_id)
       .maybeSingle();
+
+    // Household premium: if the PARTNER holds an active premium, keep the link
+    if (partnerProfile?.user_id) {
+      if (partnerProfile.is_premium) continue;
+      const { data: partnerSub } = await supabase
+        .from('subscriptions')
+        .select('plan_type, status, expires_at')
+        .eq('user_id', partnerProfile.user_id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const partnerPremium =
+        partnerSub &&
+        (partnerSub.plan_type === 'premium' || partnerSub.plan_type === 'premium_plus') &&
+        (partnerSub.status === 'active' ||
+          (partnerSub.status === 'cancelled' && partnerSub.expires_at && new Date(partnerSub.expires_at) > new Date()));
+      if (partnerPremium) continue;
+    }
 
     // Detach both sides
     await supabase
@@ -76,26 +94,75 @@ Deno.serve(async (req) => {
     });
   }
 
-  // 2. Send push notification to both sides
+  // 2. Send push notification to both sides (localized per user's language)
   const saJson = Deno.env.get('FIREBASE_SERVICE_ACCOUNT_JSON');
   let pushSent = 0;
 
-  if (saJson && detached.length > 0) {
-    try {
-      const { accessToken, projectId } = await getFirebaseAccessToken(saJson);
+  const TEXTS: Record<string, { title: string; inApp: string; push: string }> = {
+    az: {
+      title: 'Premium müddəti bitdi',
+      inApp: 'Premium abunəliyiniz başa çatdı və partnyor bağlantısı dayandırıldı. Yenidən aktivləşdirmək üçün Premium-u uzadın.',
+      push: 'Partnyor bağlantınız dayandırıldı. Premium-u uzadın və yenidən qoşulun.',
+    },
+    en: {
+      title: 'Premium has expired',
+      inApp: 'Your Premium subscription has ended and the partner link has been paused. Renew Premium to reactivate it.',
+      push: 'Your partner link has been paused. Renew Premium to reconnect.',
+    },
+    ru: {
+      title: 'Срок Premium истёк',
+      inApp: 'Ваша подписка Premium закончилась, и связь с партнёром приостановлена. Продлите Premium, чтобы возобновить её.',
+      push: 'Связь с партнёром приостановлена. Продлите Premium и подключитесь снова.',
+    },
+    tr: {
+      title: 'Premium süresi doldu',
+      inApp: 'Premium aboneliğiniz sona erdi ve partner bağlantısı durduruldu. Yeniden etkinleştirmek için Premium\'u uzatın.',
+      push: 'Partner bağlantınız durduruldu. Premium\'u uzatın ve yeniden bağlanın.',
+    },
+  };
 
+  if (detached.length > 0) {
+    // Pre-fetch language preferences for everyone we're notifying
+    const allUserIds = detached
+      .flatMap((p) => [p.womanUserId, p.partnerUserId])
+      .filter(Boolean) as string[];
+    const langByUser = new Map<string, string>();
+    if (allUserIds.length > 0) {
+      const { data: prefs } = await supabase
+        .from('user_preferences')
+        .select('user_id, language')
+        .in('user_id', allUserIds);
+      prefs?.forEach((p: { user_id: string; language: string | null }) =>
+        langByUser.set(p.user_id, p.language || 'az')
+      );
+    }
+
+    let fcm: { accessToken: string; projectId: string } | null = null;
+    if (saJson) {
+      try {
+        fcm = await getFirebaseAccessToken(saJson);
+      } catch (e) {
+        console.error('FCM auth error:', e);
+      }
+    }
+
+    try {
       for (const pair of detached) {
         const userIds = [pair.womanUserId, pair.partnerUserId].filter(Boolean) as string[];
 
         for (const uid of userIds) {
+          const texts = TEXTS[langByUser.get(uid) || 'az'] || TEXTS.az;
+
           // store in-app notification
           await supabase.from('notifications').insert({
             user_id: uid,
-            title: 'Premium müddəti bitdi',
-            message: 'Premium abunəliyiniz başa çatdı və partnyor bağlantısı dayandırıldı. Yenidən aktivləşdirmək üçün Premium-u uzadın.',
+            title: texts.title,
+            message: texts.inApp,
             notification_type: 'premium_expired',
             is_read: false,
           });
+
+          if (!fcm) continue;
 
           const { data: tokens } = await supabase
             .from('device_tokens')
@@ -104,11 +171,11 @@ Deno.serve(async (req) => {
 
           for (const t of tokens ?? []) {
             const r = await sendFCMv1(
-              accessToken,
-              projectId,
+              fcm.accessToken,
+              fcm.projectId,
               t.token,
-              'Premium müddəti bitdi',
-              'Partnyor bağlantınız dayandırıldı. Premium-u uzadın və yenidən qoşulun.',
+              texts.title,
+              texts.push,
               { type: 'premium_expired' }
             );
             if (r.success) pushSent++;

@@ -2,10 +2,22 @@ import { useCallback } from 'react';
 import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { getOwnSharingSettings, type SharingKey } from './usePartnerSharing';
 
 type NotificationType = 'mood_update' | 'contraction_started' | 'contraction_511' | 'kick_session' | 'water_goal';
 
-const notificationMessages: Record<NotificationType, {title: string;getBody: (data?: any) => string;}> = {
+// Hər event tipinin hansı paylaşım açarına tabe olduğu
+const SHARING_GATE: Record<NotificationType, SharingKey> = {
+  mood_update: 'share_mood',
+  contraction_started: 'share_contractions',
+  contraction_511: 'share_contractions',
+  kick_session: 'share_kicks',
+  water_goal: 'share_water'
+};
+
+// FUNKSIYA kimi: tr() göndərmə anında qiymətləndirilir (modul yüklənəndə yox) —
+// əks halda dil dəyişəndə bildirişlər köhnə dildə qalırdı
+const getNotificationMessages = (): Record<NotificationType, {title: string;getBody: (data?: any) => string;}> => ({
   mood_update: {
     title: tr("usepartnernotifications_ehval_yenilendi_967cd7", "Əhval yeniləndi 💭"),
     getBody: (data) => {
@@ -30,7 +42,7 @@ const notificationMessages: Record<NotificationType, {title: string;getBody: (da
     title: tr("usepartnernotifications_su_hedefine_catdi_55f2fb", "Su hədəfinə çatdı! 💧"),
     getBody: () => tr("usepartnernotifications_partnyorunuz_gundelik_su_hedef_f06510", "Partnyorunuz g\xFCnd\u0259lik su h\u0259d\u0259fin\u0259 \xE7atd\u0131!")
   }
-};
+});
 
 export const usePartnerNotifications = () => {
   const { user, profile } = useAuth();
@@ -60,10 +72,14 @@ export const usePartnerNotifications = () => {
   {
     if (!user) return;
 
+    // Paylaşım icazəsi: ana bu kateqoriyanı bağlayıbsa partnyora göndərmə
+    const sharing = await getOwnSharingSettings(user.id);
+    if (!sharing[SHARING_GATE[type]]) return;
+
     const partnerUserId = await getPartnerUserId();
     if (!partnerUserId) return;
 
-    const notification = notificationMessages[type];
+    const notification = getNotificationMessages()[type];
     const content = JSON.stringify({
       type,
       title: notification.title,
@@ -79,6 +95,21 @@ export const usePartnerNotifications = () => {
         message_type: type,
         content
       });
+
+      // Kritik hadisə (5-1-1): tətbiq bağlı olsa belə FCM push ilə çatdır
+      if (type === 'contraction_511') {
+        try {
+          const { invokeSendPush } = await import('@/lib/push');
+          await invokeSendPush({
+            userId: partnerUserId,
+            title: notification.title,
+            body: notification.getBody(data),
+            data: { type }
+          });
+        } catch (pushErr) {
+          console.warn('511 push failed:', pushErr);
+        }
+      }
     } catch (error) {
       console.error('Error sending partner notification:', error);
     }

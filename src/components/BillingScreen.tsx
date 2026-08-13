@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useInAppPurchase } from '@/hooks/useInAppPurchase';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Crown, CheckCircle,
   XCircle, AlertTriangle, Loader2, RotateCcw,
-  CreditCard, icons, Calendar, TrendingUp,
+  CreditCard, Calendar, TrendingUp,
   Lock, ChevronRight, RefreshCw,
   Gift, LayoutGrid, Sparkles
 } from 'lucide-react';
@@ -17,6 +17,8 @@ import { PremiumModal } from '@/components/PremiumModal';
 import { useBillingConfig } from '@/hooks/usePaywallConfig';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
 import { getPlatform, isNativePlatform } from '@/lib/revenuecat';
+import { getDynamicIcon } from '@/lib/dynamicIcon';
+import WinBackCard from '@/components/WinBackCard';
 import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
@@ -130,72 +132,87 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const hasPremiumSub = subscription && (subscription.plan_type === 'premium' || subscription.plan_type === 'premium_plus');
   const isPremiumPlus = subscription?.plan_type === 'premium_plus';
   const planName = !hasPremiumSub && !isPremium ? config.free_plan_name : isPremiumPlus ? config.premium_yearly_name : config.premium_monthly_name;
-  const planPrice = !hasPremiumSub && !isPremium ? '₼0' : isPremiumPlus ? '₼79.99' : '₼9.99';
+  const planPrice = !hasPremiumSub && !isPremium ? '$0' : isPremiumPlus ? '$29.99' : '$3.99';
   const planPeriod = !hasPremiumSub && !isPremium ? '' : isPremiumPlus ? tr("common_per_year", "/year") : tr("common_per_month", "/month");
 
   const renderIcon = (iconName: string, className: string) => {
-    const IconComp = icons[iconName as keyof typeof icons];
-    return IconComp ? <IconComp className={className} /> : <Sparkles className={className} />;
+    const IconComp = getDynamicIcon(iconName, Sparkles);
+    return <IconComp className={className} />;
   };
 
   const isFreeUser = !hasPremiumSub && !isPremium;
   const allFeaturesList = dbFeatures.filter((f) => f.is_included_premium);
 
   return (
-    <div className="min-h-screen bg-muted/20 pb-safe overflow-y-auto">
+    <div className="a-scope safe-top min-h-screen pb-safe overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50 px-4 py-3 flex items-center gap-3">
-        <motion.button 
-          onClick={onBack} 
-          className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center text-foreground hover:bg-muted/80 transition-colors"
+      <div className="sticky top-0 z-50 px-4 py-2.5 flex items-center gap-3"
+      style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
+        <motion.button
+          onClick={onBack}
+          className="a-icon-btn"
           whileTap={{ scale: 0.95 }}
+          aria-label={tr("common_geri", "Geri")}
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft size={16} strokeWidth={2} />
         </motion.button>
-        <h1 className="text-lg font-bold text-foreground">{tr("billingscreen_title", "My Subscription")}</h1>
+        <h1 style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>{tr("billingscreen_title", "My Subscription")}</h1>
       </div>
 
-      <div className="px-4 py-4 space-y-4 max-w-lg mx-auto">
-        
-        {/* Status Card (Compact Bento) */}
-        <div className={`rounded-2xl p-4 border shadow-sm ${isPremium ? 'bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20' : 'bg-card border-border'}`}>
+      <div className="px-4 py-4 space-y-3.5 max-w-lg mx-auto">
+
+        {/* Status Card */}
+        <div style={{
+          background: 'var(--a-surface)',
+          borderRadius: 'var(--a-radius-md)',
+          padding: 18,
+          boxShadow: 'var(--a-card-shadow)',
+          border: isPremium ? '1.5px solid var(--a-peach-2)' : '1.5px solid transparent'
+        }}>
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isPremium ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}>
-                <Crown className="w-5 h-5" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 flex items-center justify-center shrink-0"
+              style={{
+                borderRadius: 14,
+                background: isPremium ? 'var(--a-grad-peach)' : 'var(--a-surface-soft)',
+                color: isPremium ? 'var(--a-accent-ink)' : 'var(--a-ink-soft)'
+              }}>
+                <Crown size={19} />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-foreground leading-tight">{planName}</h2>
+                <h2 style={{ fontSize: 17, fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1.2, color: 'var(--a-ink)' }}>{planName}</h2>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   {isPremium && !isCancelled ? (
-                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="flex items-center gap-1"
+                    style={{ background: 'var(--a-green-1)', color: 'var(--a-green-ink)', fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 999 }}>
+                      <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#63bd8b' }} />
                       {config.active_badge}
                     </span>
                   ) : isCancelled && isPremium ? (
-                    <span className="text-[10px] font-bold text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span className="flex items-center gap-1"
+                    style={{ background: 'var(--a-yellow-1)', color: 'var(--a-warn-ink)', fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 999 }}>
                       <AlertTriangle className="w-2.5 h-2.5" />
                       {config.cancelled_badge}
                     </span>
                   ) : (
-                    <span className="text-xs font-medium text-muted-foreground">{tr("billingscreen_status_free", "Current Status: Free")}</span>
+                    <span style={{ fontSize: 11.5, fontWeight: 500, color: 'var(--a-ink-soft)' }}>{tr("billingscreen_status_free", "Current Status: Free")}</span>
                   )}
                 </div>
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-end gap-1 mb-1">
-            <span className="text-3xl font-black text-foreground">{planPrice}</span>
-            <span className="text-sm font-semibold text-muted-foreground mb-1.5">{planPeriod}</span>
+            <span style={{ fontSize: 30, fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--a-ink)' }}>{planPrice}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--a-ink-soft)', marginBottom: 6 }}>{planPeriod}</span>
           </div>
 
           {isFreeUser && (
             <Button
               onClick={() => setShowPremiumModal(true)}
-              className="w-full mt-4 h-12 rounded-xl bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground font-bold shadow-md relative overflow-hidden group"
+              className="w-full mt-4 h-12 rounded-full text-white font-bold border-0 hover:opacity-95"
+              style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}
             >
-              <motion.div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
               <Crown className="w-4 h-4 mr-2" />
               {tr("billingscreen_upgrade_btn", "Upgrade to Premium")}
             </Button>
@@ -205,44 +222,44 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
         {/* Subscription Details (Compact Grid) */}
         {isPremium && subscription && (
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-card rounded-2xl p-3 border border-border flex flex-col justify-center">
-              <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1 flex items-center gap-1">
+            <div className="flex flex-col justify-center" style={{ background: 'var(--a-surface)', borderRadius: 18, padding: 14, boxShadow: 'var(--a-card-shadow)' }}>
+              <p className="flex items-center gap-1 mb-1" style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--a-ink-soft)' }}>
                 <Calendar className="w-3 h-3" /> {config.start_date_label}
               </p>
-              <p className="font-bold text-sm text-foreground">
+              <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>
                 {format(new Date(subscription.started_at), 'd MMM yyyy', { locale: getCurrentDateLocale() })}
               </p>
             </div>
 
             {subscription.expires_at && (
-              <div className="bg-card rounded-2xl p-3 border border-border flex flex-col justify-center">
-                <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1 flex items-center gap-1">
-                  {isCancelled ? <AlertTriangle className="w-3 h-3 text-amber-500" /> : <TrendingUp className="w-3 h-3 text-primary" />} 
+              <div className="flex flex-col justify-center" style={{ background: 'var(--a-surface)', borderRadius: 18, padding: 14, boxShadow: 'var(--a-card-shadow)' }}>
+                <p className="flex items-center gap-1 mb-1" style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--a-ink-soft)' }}>
+                  {isCancelled ? <AlertTriangle className="w-3 h-3" style={{ color: 'var(--a-yellow-ink)' }} /> : <TrendingUp className="w-3 h-3" style={{ color: 'var(--a-accent-ink)' }} />}
                   {isCancelled ? config.expiry_label : config.renewal_label}
                 </p>
-                <p className={`font-bold text-sm ${isCancelled ? 'text-amber-600' : 'text-foreground'}`}>
+                <p style={{ fontSize: 13.5, fontWeight: 700, color: isCancelled ? 'var(--a-yellow-ink)' : 'var(--a-ink)' }}>
                   {format(new Date(subscription.expires_at), 'd MMM yyyy', { locale: getCurrentDateLocale() })}
                 </p>
               </div>
             )}
 
-            <div className="col-span-2 bg-card rounded-2xl p-2 border border-border flex gap-2">
+            <div className="col-span-2 flex gap-2" style={{ background: 'var(--a-surface)', borderRadius: 18, padding: 8, boxShadow: 'var(--a-card-shadow)' }}>
               {isCancelled ? (
-                <Button onClick={handleRestoreSubscription} disabled={isRestoring} className="w-full h-11 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm shadow-sm">
+                <Button onClick={handleRestoreSubscription} disabled={isRestoring} className="w-full h-11 rounded-full text-white font-bold text-sm border-0 hover:opacity-95" style={{ background: '#63bd8b' }}>
                   {isRestoring ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RotateCcw className="w-4 h-4 mr-2" />}
                   {config.restore_cta}
                 </Button>
               ) : subscription?.plan_type === 'premium' ? (
                 <>
-                  <Button onClick={() => setShowPremiumModal(true)} className="flex-1 h-11 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 font-bold text-sm">
+                  <Button onClick={() => setShowPremiumModal(true)} className="flex-1 h-11 rounded-full font-bold text-sm border-0 hover:opacity-90" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
                     <Crown className="w-4 h-4 mr-1.5" /> {tr("billingscreen_upgrade", "Upgrade")}
                   </Button>
-                  <Button onClick={handleCancelSubscription} disabled={isCanceling} variant="ghost" className="flex-1 h-11 rounded-xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive font-bold text-sm">
+                  <Button onClick={handleCancelSubscription} disabled={isCanceling} variant="ghost" className="flex-1 h-11 rounded-full font-bold text-sm" style={{ color: 'var(--a-ink-soft)' }}>
                     {isCanceling ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <XCircle className="w-4 h-4 mr-1.5" />} {config.cancel_cta}
                   </Button>
                 </>
               ) : (
-                <Button onClick={handleCancelSubscription} disabled={isCanceling} variant="ghost" className="w-full h-11 rounded-xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive font-bold text-sm">
+                <Button onClick={handleCancelSubscription} disabled={isCanceling} variant="ghost" className="w-full h-11 rounded-full font-bold text-sm" style={{ color: 'var(--a-ink-soft)' }}>
                   {isCanceling ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <XCircle className="w-4 h-4 mr-2" />} {config.cancel_cta}
                 </Button>
               )}
@@ -251,30 +268,30 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
         )}
 
         {/* Compact Premium Tools Showcase */}
-        <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
-          <div className="px-4 py-3 border-b border-border bg-muted/30">
-            <h3 className="font-bold text-foreground text-sm flex items-center gap-1.5">
-              <LayoutGrid className="w-4 h-4 text-primary" />
+        <div className="overflow-hidden" style={{ background: 'var(--a-surface)', borderRadius: 'var(--a-radius-md)', boxShadow: 'var(--a-card-shadow)' }}>
+          <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--a-line)', background: 'var(--a-surface-soft)' }}>
+            <h3 className="flex items-center gap-1.5" style={{ fontSize: 13, fontWeight: 800, color: 'var(--a-ink)' }}>
+              <LayoutGrid size={15} style={{ color: 'var(--a-accent-ink)' }} />
               {tr("billingscreen_premium_features", "Premium Features")}
             </h3>
           </div>
-          
+
           <div className="p-2 grid grid-cols-1 gap-1">
             {allFeaturesList.map((f, i) => {
               const feat = 'title_en' in f ? f : null;
               const text = feat ? (getCurrentDateLocale().code === 'az' ? feat.title_az || feat.title : feat.title_en || feat.title) : (f as any).text;
               return (
-                <div key={i} className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/50 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    {feat ? <span className="text-sm">{feat.icon}</span> : renderIcon((f as any).icon, 'w-4 h-4 text-primary')}
+                <div key={i} className="flex items-center gap-3 p-2 rounded-xl transition-colors">
+                  <div className="w-8 h-8 flex items-center justify-center shrink-0" style={{ borderRadius: 10, background: 'var(--a-peach-1)' }}>
+                    {feat ? <span className="text-sm">{feat.icon}</span> : renderIcon((f as any).icon, 'w-4 h-4')}
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-xs text-foreground">{text}</p>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--a-ink)' }}>{text}</p>
                   </div>
                   {!isPremium ? (
-                    <Lock className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0 mr-1" />
+                    <Lock className="w-3.5 h-3.5 shrink-0 mr-1" style={{ color: 'var(--a-ink-faint)' }} />
                   ) : (
-                    <CheckCircle className="w-3.5 h-3.5 text-emerald-500/70 shrink-0 mr-1" />
+                    <CheckCircle className="w-3.5 h-3.5 shrink-0 mr-1" style={{ color: '#63bd8b' }} />
                   )}
                 </div>
               );
@@ -282,40 +299,49 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
           </div>
         </div>
 
+        {/* Win-back: ləğv edilmiş / bitmiş abunəliklər üçün geri qayıtma təklifi */}
+        <WinBackCard variant="card" />
+
         {/* Compact Payment History */}
         {isPremium && subscription && payments.length > 0 && (
-          <div className="bg-card rounded-2xl border border-border shadow-sm p-4">
+          <div style={{ background: 'var(--a-surface)', borderRadius: 'var(--a-radius-md)', padding: 16, boxShadow: 'var(--a-card-shadow)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-foreground text-sm flex items-center gap-1.5">
-                <CreditCard className="w-4 h-4 text-primary" />
+              <h3 className="flex items-center gap-1.5" style={{ fontSize: 13, fontWeight: 800, color: 'var(--a-ink)' }}>
+                <CreditCard size={15} style={{ color: 'var(--a-accent-ink)' }} />
                 {config.payment_title}
               </h3>
-              <button onClick={fetchPaymentHistory} disabled={loadingPayments} className="p-1.5 rounded-full hover:bg-muted transition-colors">
-                <RefreshCw className={`w-3.5 h-3.5 text-muted-foreground ${loadingPayments ? 'animate-spin text-primary' : ''}`} />
+              <button onClick={fetchPaymentHistory} disabled={loadingPayments} className="p-1.5 rounded-full transition-colors" aria-label={tr("billingscreen_refresh", "YenilÉ™")}>
+                <RefreshCw className={`w-3.5 h-3.5 ${loadingPayments ? 'animate-spin' : ''}`} style={{ color: loadingPayments ? 'var(--a-peach-2)' : 'var(--a-ink-soft)' }} />
               </button>
             </div>
 
-            <div className="relative pl-5 space-y-4 border-l border-border ml-1.5">
+            <div className="relative pl-5 space-y-4 ml-1.5" style={{ borderLeft: '1px solid var(--a-line-strong)' }}>
               {payments.map((p, i) => {
                 const isNext = p.type === 'next';
                 const isOriginal = p.type === 'original';
                 const isYearly = p.productId.toLowerCase().includes('year') || p.productId.toLowerCase().includes('annual');
-                
+
                 const label = isOriginal ? tr("billingscreen_first_purchase", "First Purchase") :
-                              isNext ? tr("billingscreen_next_renewal", "Next Renewal") : 
+                              isNext ? tr("billingscreen_next_renewal", "Next Renewal") :
                               tr("billingscreen_auto_renewal", "Auto Renewal");
 
                 return (
                   <div key={`${p.productId}-${p.date}-${i}`} className="relative">
-                    <div className={`absolute -left-[25px] top-1 w-2.5 h-2.5 rounded-full ring-2 ring-card ${isNext ? 'bg-amber-400' : 'bg-primary'}`} />
+                    <div className="absolute -left-[25px] top-1 w-2.5 h-2.5 rounded-full"
+                    style={{ background: isNext ? '#ffc94d' : 'var(--a-peach-2)', boxShadow: '0 0 0 2px var(--a-surface)' }} />
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-bold text-xs text-foreground">
+                        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--a-ink)' }}>
                           {isYearly ? tr("billingscreen_annual_premium", "Annual Premium") : tr("billingscreen_monthly_premium", "Monthly Premium")}
                         </p>
-                        <p className="text-[10px] text-muted-foreground">{format(new Date(p.date), 'd MMM yyyy', { locale: getCurrentDateLocale() })} · {label}</p>
+                        <p style={{ fontSize: 10, color: 'var(--a-ink-soft)' }}>{format(new Date(p.date), 'd MMM yyyy', { locale: getCurrentDateLocale() })} Â· {label}</p>
                       </div>
-                      <div className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${isNext ? 'bg-amber-500/10 text-amber-600' : 'bg-emerald-500/10 text-emerald-600'}`}>
+                      <div className="uppercase"
+                      style={{
+                        padding: '2px 7px', borderRadius: 7, fontSize: 9, fontWeight: 800, letterSpacing: '0.04em',
+                        background: isNext ? 'var(--a-yellow-1)' : 'var(--a-green-1)',
+                        color: isNext ? 'var(--a-yellow-ink)' : 'var(--a-green-ink)'
+                      }}>
                         {isNext ? tr("billingscreen_scheduled", "Scheduled") : config.paid_label}
                       </div>
                     </div>
@@ -327,7 +353,8 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
             {isIAPSupported && !isAndroidNative && (
               <button
                 onClick={async () => { await showCustomerCenter(); fetchPaymentHistory(); }}
-                className="w-full mt-4 py-2.5 rounded-xl bg-muted/40 hover:bg-muted transition-colors text-xs font-semibold text-primary flex items-center justify-center gap-1.5"
+                className="w-full mt-4 py-2.5 rounded-full transition-colors flex items-center justify-center gap-1.5"
+                style={{ background: 'var(--a-surface-soft)', fontSize: 12, fontWeight: 700, color: 'var(--a-accent-ink)' }}
               >
                 {tr("billingscreen_open_in_store", "View in App Store")}
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -338,9 +365,9 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
 
         {/* Footer Support */}
         <div className="text-center pt-2 pb-6">
-          <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5">
+          <p className="flex items-center justify-center gap-1.5" style={{ fontSize: 12, color: 'var(--a-ink-soft)' }}>
             <Gift className="w-3.5 h-3.5" />
-            {tr("billingscreen_need_help", "Need help?")} <a href={`mailto:${config.support_email}`} className="text-primary font-bold">{config.support_email}</a>
+            {tr("billingscreen_need_help", "Need help?")} <a href={`mailto:${config.support_email}`} style={{ color: 'var(--a-accent-ink)', fontWeight: 700 }}>{config.support_email}</a>
           </p>
         </div>
       </div>

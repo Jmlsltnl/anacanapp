@@ -55,11 +55,13 @@ export async function signInWithAppleNative() {
   const rawNonce = generateNonce();
   const hashedNonce = await sha256Hex(rawNonce);
 
+  // Plugin tipləri clientId/redirectURI tələb edir, amma native iOS axınında
+  // istifadə olunmurlar (yalnız web axını üçündür) — davranış dəyişmir.
   const res = await SignInWithApple.authorize({
     scopes: "email name",
     state: "signin",
     nonce: hashedNonce,
-  });
+  } as any);
 
   const idToken = res?.response?.identityToken;
   if (!idToken) throw new Error("Apple Sign-In returned no identityToken");

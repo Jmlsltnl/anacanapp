@@ -9,31 +9,42 @@ const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="a-scope min-h-screen flex items-center justify-center p-4 relative" style={{ background: 'var(--a-bg)' }}>
+      {/* Watercolor sky */}
+      <div className="a-sky" aria-hidden>
+        <span className="a-cloud c1" />
+        <span className="a-cloud c2" />
+        <span className="a-cloud c3" />
+      </div>
+
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-        className="bg-card rounded-3xl p-8 shadow-elevated border border-border/50 max-w-md w-full text-center">
-        
+        className="a-card max-w-md w-full text-center relative z-10"
+        style={{ padding: 32 }}>
+
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
-          className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-6">
-          
-          <CheckCircle className="w-10 h-10 text-green-500" />
+          className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+          style={{ background: 'var(--a-green-1)' }}>
+
+          <CheckCircle size={38} style={{ color: 'var(--a-green-ink)' }} />
         </motion.div>
 
-        <h1 className="text-2xl font-bold text-foreground mb-2">
+        <h1 className="mb-2" style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--a-ink)' }}>
           {tr("paymentsuccess_odenis_ugurlu_3d14c3", "\xD6d\u0259ni\u015F U\u011Furlu! \uD83C\uDF89")}
         </h1>
-        <p className="text-muted-foreground mb-8">
+        <p className="mb-8" style={{ fontSize: 13.5, color: 'var(--a-ink-soft)' }}>
           {tr("paymentsuccess_odenisiniz_muveffeqiyyetle_hey_b90350", "\xD6d\u0259ni\u015Finiz m\xFCv\u0259ff\u0259qiyy\u0259tl\u0259 h\u0259yata ke\xE7irildi. Sifari\u015Finiz emal olunacaq.")}
         </p>
 
         <div className="space-y-3">
-          <Button onClick={() => navigate('/')} className="w-full gap-2">
+          <Button onClick={() => navigate('/')}
+          className="w-full gap-2 rounded-full text-white border-0 hover:opacity-95"
+          style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}>
             <ArrowLeft className="w-4 h-4" />
             {tr("paymentsuccess_ana_sehifeye_qayit_2458e3", "Ana S\u0259hif\u0259y\u0259 Qay\u0131t")}
           </Button>

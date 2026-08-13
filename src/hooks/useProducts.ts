@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { mapRowsTranslation, getPersistedLanguage } from '@/lib/tr';
 
 export interface Product {
   id: string;
@@ -29,7 +30,7 @@ export const useProducts = () => {
 
       if (error) throw error;
       
-      setProducts((data || []) as Product[]);
+      setProducts(mapRowsTranslation(data || [], getPersistedLanguage(), ['name', 'description', 'category']) as Product[]);
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {

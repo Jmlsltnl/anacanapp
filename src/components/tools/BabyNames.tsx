@@ -42,202 +42,178 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
 
   if (isLoading || favsLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+        <div className="w-8 h-8 rounded-full animate-spin" style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
       </div>);
 
   }
 
   return (
-    <div ref={ref} className="min-h-screen bg-background">
-      {/* Compact Sticky Header */}
-      <div className="sticky top-0 z-20 bg-card border-b border-border/50">
-        <div className="px-4 pb-2">
-          {/* Top Row - Back, Title, Random */}
-          <div className="flex items-center gap-3 mb-3">
-            <motion.button
-              onClick={onBack}
-              className="w-9 h-9 rounded-xl bg-muted/60 flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-
-              <ArrowLeft className="w-5 h-5 text-foreground" />
+    <div ref={ref} className="a-scope pb-24" style={{ background: 'var(--a-bg)', minHeight: '100vh' }}>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
+              <ArrowLeft size={16} strokeWidth={2} />
             </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground">{tr("babynames_korpe_adlari_357880", "Körpə Adları")}</h1>
+            <div>
+              <p className="a-eyebrow">{names.length} {tr("babynames_ad_count_3c7a2d", "ad")} · {language === 'en' ? '🇬🇧 English' : language === 'tr' ? '🇹🇷 Türkçe' : language === 'ru' ? '🇷🇺 Русские' : `🇦🇿 ${tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan")}`}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("babynames_korpe_adlari_357880", "Körpə Adları")}</p>
             </div>
+          </div>
+          <div className="a-topbar-actions">
             <motion.button
               onClick={getRandomName}
-              className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center"
+              className="a-icon-btn"
+              style={{ background: 'var(--a-peach-2)', color: '#fff', border: 'none' }}
               whileHover={{ rotate: 180 }}
-              whileTap={{ scale: 0.95 }}
+              whileTap={{ scale: 0.9 }}
               transition={{ duration: 0.3 }}>
 
-              <Shuffle className="w-4 h-4 text-primary" />
+              <Shuffle size={15} strokeWidth={2.2} />
             </motion.button>
           </div>
+        </header>
 
-          {/* Search */}
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder={tr("babynames_ad_ve_ya_mena_axtarin_30a88e", "Ad və ya məna axtarın...")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/50 text-foreground placeholder:text-muted-foreground text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+        {/* Search */}
+        <div className="a-search">
+          <Search size={15} strokeWidth={2} color="var(--a-ink-faint)" />
+          <input
+            type="text"
+            placeholder={tr("babynames_ad_ve_ya_mena_axtarin_30a88e", "Ad və ya məna axtarın...")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)} />
 
-          </div>
-
-          {/* Gender Filter Pills */}
-          <div className="flex gap-2">
-            {[
-              { id: 'all', label: tr("babynames_hamisi_c73c4d", 'Hamısı'), color: 'primary' },
-              { id: 'boy', label: tr("babynames_oglan_e9715e", 'Oğlan'), color: 'blue' },
-              { id: 'girl', label: tr("babynames_qiz_79bf6b", 'Qız'), color: 'pink' }].
-              map((filter) =>
-                <motion.button
-                  key={filter.id}
-                  onClick={() => setGenderFilter(filter.id as any)}
-                  className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all ${genderFilter === filter.id ?
-                      filter.color === 'primary' ?
-                        'bg-primary text-primary-foreground' :
-                        filter.color === 'blue' ?
-                          'bg-blue-500 text-white' :
-                          'bg-pink-500 text-white' :
-                      'bg-muted/50 text-muted-foreground'}`
-                  }
-                  whileTap={{ scale: 0.98 }}>
-
-                  {filter.label}
-                </motion.button>
-              )}
-          </div>
         </div>
-      </div>
 
-      <div className="px-4 pt-4 pb-24">
-        {/* Quick Stats */}
-        <div className="flex items-center gap-4 mb-4 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-primary" />
-            {names.length} {tr("babynames_ad_count_3c7a2d", "ad")}
-          </span>
-          <span className="flex items-center gap-1">
-            <Heart className="w-3 h-3 text-pink-500 fill-pink-500" />
-            {favorites.length} {tr("babynames_secilmis_b067fa", "se\xE7ilmi\u015F")}
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="text-xs">{language === 'en' ? '🇬🇧' : '🇦🇿'}</span>
-            {language === 'en' ? 'English' : tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan")}
-          </span>
+        {/* Gender Filter Pills */}
+        <div className="a-tabs" style={{ display: 'flex', width: '100%', marginTop: 12 }}>
+          {[
+            { id: 'all', label: `✨ ${tr("babynames_hamisi_c73c4d", 'Hamısı')}` },
+            { id: 'boy', label: `👦 ${tr("babynames_oglan_e9715e", 'Oğlan')}` },
+            { id: 'girl', label: `👧 ${tr("babynames_qiz_79bf6b", 'Qız')}` }].
+            map((filter) =>
+              <button
+                key={filter.id}
+                onClick={() => setGenderFilter(filter.id as any)}
+                className={`a-tab${genderFilter === filter.id ? ' active' : ''}`}
+                style={{ flex: 1 }}>
+
+                {filter.label}
+              </button>
+            )}
         </div>
 
         {/* Favorites Section - Horizontal Scroll */}
         {favorites.length > 0 &&
-          <div className="mb-5">
-            <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
-              <Heart className="w-4 h-4 text-pink-500 fill-pink-500" />
-              {tr("babynames_secilmisler_cc04b8", "Se\xE7ilmi\u015Fl\u0259r")}
-            </h3>
-            <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+          <section className="a-section" style={{ marginTop: 16 }}>
+            <div className="a-section-head" style={{ marginBottom: 8 }}>
+              <h3 className="a-section-title a-heading" style={{ fontSize: 15 }}>
+                💗 {tr("babynames_secilmisler_cc04b8", "Se\xE7ilmi\u015Fl\u0259r")}
+              </h3>
+              <span className="a-section-link">{favorites.length}</span>
+            </div>
+            <div className="a-tag-row hide-scrollbar" style={{ flexWrap: 'nowrap', overflowX: 'auto', marginBottom: 0, paddingBottom: 4 }}>
               {favorites.map((fav) =>
-                <motion.span
+                <span
                   key={fav.id}
-                  className="px-3 py-1.5 rounded-full bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 font-medium text-sm whitespace-nowrap border border-pink-200 dark:border-pink-800"
-                  whileTap={{ scale: 0.95 }}>
+                  className="a-tag"
+                  style={{ cursor: 'default', flexShrink: 0, whiteSpace: 'nowrap', background: 'var(--a-pink-1)', color: 'var(--a-berry-ink)', fontWeight: 700 }}>
 
                   {fav.name}
-                </motion.span>
+                </span>
               )}
             </div>
-          </div>
+          </section>
         }
 
-        {/* Results Count */}
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-foreground">
-            {tr("babynames_neticeler_15e2bd", "N\u0259tic\u0259l\u0259r")}
-          </h3>
-          <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
-            {filteredNames.length} {tr("babynames_ad_count_3c7a2d", "ad")}
-          </span>
-        </div>
+        {/* Results */}
+        <section className="a-section" style={{ marginTop: favorites.length > 0 ? 16 : 20 }}>
+          <div className="a-section-head">
+            <h3 className="a-section-title a-heading" style={{ fontSize: 15 }}>
+              {tr("babynames_neticeler_15e2bd", "N\u0259tic\u0259l\u0259r")}
+            </h3>
+            <span className="a-section-link">
+              {filteredNames.length} {tr("babynames_ad_count_3c7a2d", "ad")}
+            </span>
+          </div>
 
-        {/* Names List */}
-        <div className="space-y-2">
-          {filteredNames.map((name, index) =>
-            <motion.button
-              key={name.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: Math.min(index * 0.02, 0.2) }}
-              onClick={() => setSelectedName(name)}
-              className="w-full bg-card rounded-xl p-3 border border-border/40 text-left flex items-center gap-3 hover:bg-muted/30 transition-colors active:scale-[0.99]">
+          {/* Names List */}
+          {filteredNames.length > 0 &&
+          <div className="a-list-card">
+            {filteredNames.map((name, index) =>
+              <motion.div
+                key={name.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(index * 0.02, 0.2) }}
+                onClick={() => setSelectedName(name)}
+                className="a-list-row"
+                style={{ cursor: 'pointer' }}>
 
-              {/* Gender Indicator */}
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${name.gender === 'boy' ?
-                  'bg-blue-100 dark:bg-blue-900/30' :
-                  name.gender === 'girl' ?
-                    'bg-pink-100 dark:bg-pink-900/30' :
-                    'bg-violet-100 dark:bg-violet-900/30'}`
-              }>
-                {name.gender === 'boy' ? '👦' : name.gender === 'girl' ? '👧' : '✨'}
-              </div>
+                {/* Gender Indicator */}
+                <span
+                  className="a-list-icon"
+                  style={{ fontSize: 17, background: name.gender === 'boy' ? 'var(--a-blue-1)' : name.gender === 'girl' ? 'var(--a-pink-1)' : 'var(--a-lav-1)' }}>
+                  {name.gender === 'boy' ? '👦' : name.gender === 'girl' ? '👧' : '✨'}
+                </span>
 
-              {/* Name & Meaning */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-foreground">{name.name}</h3>
-                  {(name.popularity || 0) >= 80 &&
-                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                  }
-                </div>
-                <p className="text-xs text-muted-foreground truncate">{name.meaning}</p>
-              </div>
-
-              {/* Popularity Bar */}
-              <div className="flex items-center gap-2">
-                <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${name.gender === 'boy' ? 'bg-blue-500' : name.gender === 'girl' ? 'bg-pink-500' : 'bg-violet-500'}`
+                {/* Name & Meaning */}
+                <div className="flex-1 min-w-0">
+                  <p className="a-list-title" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    {name.name}
+                    {(name.popularity || 0) >= 80 &&
+                      <Star size={12} style={{ color: 'var(--a-yellow-2)', fill: 'var(--a-yellow-2)' }} />
                     }
-                    style={{ width: `${name.popularity || 0}%` }} />
-
+                  </p>
+                  <p className="a-list-sub" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name.meaning}</p>
                 </div>
-                <span className="text-[10px] text-muted-foreground w-7">{name.popularity || 0}%</span>
-              </div>
 
-              {/* Favorite Button */}
-              <motion.button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleToggleFavorite(name);
-                }}
-                className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${isFavorite(name.name) ?
-                    'bg-pink-100 dark:bg-pink-900/30' :
-                    'bg-muted/50 hover:bg-muted'}`
-                }
-                whileTap={{ scale: 0.85 }}>
+                {/* Popularity mini bar */}
+                <span className="a-list-trail" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ width: 44, height: 5, borderRadius: 999, background: 'var(--a-line-strong)', overflow: 'hidden', display: 'block' }}>
+                    <span
+                      style={{
+                        display: 'block',
+                        height: '100%',
+                        borderRadius: 999,
+                        width: `${name.popularity || 0}%`,
+                        background: name.gender === 'boy' ? 'var(--a-grad-blue)' : name.gender === 'girl' ? 'var(--a-grad-pink)' : 'var(--a-grad-lav)'
+                      }} />
+                  </span>
 
-                <Heart className={`w-4 h-4 ${isFavorite(name.name) ? 'text-pink-500 fill-pink-500' : 'text-muted-foreground'}`} />
-              </motion.button>
-            </motion.button>
-          )}
+                  {/* Favorite Button */}
+                  <motion.button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleFavorite(name);
+                    }}
+                    className="a-icon-btn"
+                    style={{ width: 30, height: 30, ...(isFavorite(name.name) ? { background: 'var(--a-pink-1)', border: 'none' } : {}) }}
+                    whileTap={{ scale: 0.85 }}>
+
+                    <Heart size={13} style={isFavorite(name.name) ? { color: '#e05575', fill: '#e05575' } : { color: 'var(--a-ink-soft)' }} />
+                  </motion.button>
+                </span>
+              </motion.div>
+            )}
+          </div>
+          }
 
           {filteredNames.length === 0 &&
             <motion.div
-              className="text-center py-16"
+              className="a-card text-center"
+              style={{ padding: '36px 18px' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}>
 
-              <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
-                <Search className="w-7 h-7 text-muted-foreground/50" />
-              </div>
-              <p className="font-semibold text-foreground mb-1">{tr("babynames_ad_tapilmadi_cf4c7a", "Ad tapılmadı")}</p>
-              <p className="text-sm text-muted-foreground">{tr("babynames_axtaris_sorgusunu_deyisin_992b5e", "Axtarış sorğusunu dəyişin")}</p>
+              <Search size={36} style={{ color: 'var(--a-ink-faint)', margin: '0 auto 10px' }} />
+              <p className="a-list-title" style={{ marginBottom: 3 }}>{tr("babynames_ad_tapilmadi_cf4c7a", "Ad tapılmadı")}</p>
+              <p className="a-list-sub" style={{ margin: 0 }}>{tr("babynames_axtaris_sorgusunu_deyisin_992b5e", "Axtarış sorğusunu dəyişin")}</p>
             </motion.div>
           }
-        </div>
+        </section>
       </div>
 
       {/* Name Detail Modal */}
@@ -256,63 +232,68 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-card rounded-2xl overflow-hidden shadow-xl">
+              className="a-scope w-full max-w-sm overflow-hidden"
+              style={{ background: 'var(--a-surface)', borderRadius: 'var(--a-radius-lg)', boxShadow: 'var(--a-card-shadow)' }}>
 
               {/* Modal Header */}
-              <div className={`p-6 text-center relative ${selectedName.gender === 'boy' ?
-                  'bg-gradient-to-br from-blue-500 to-cyan-500' :
-                  selectedName.gender === 'girl' ?
-                    'bg-gradient-to-br from-pink-500 to-rose-500' :
-                    'bg-gradient-to-br from-violet-500 to-purple-500'}`
-              }>
-                <button
-                  onClick={() => setSelectedName(null)}
-                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+              <div
+                className="p-6 text-center relative"
+                style={{ background: selectedName.gender === 'boy' ? 'var(--a-grad-blue)' : selectedName.gender === 'girl' ? 'var(--a-grad-pink)' : 'var(--a-grad-lav)' }}>
+                {(() => {
+                  const ink = selectedName.gender === 'boy' ? '#153e57' : selectedName.gender === 'girl' ? 'var(--a-alert-ink)' : '#3c2e5c';
+                  return (
+                    <>
+                      <button
+                        onClick={() => setSelectedName(null)}
+                        className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center"
+                        style={{ background: 'rgba(255,255,255,0.5)', border: 'none', cursor: 'pointer' }}>
 
-                  <X className="w-4 h-4 text-white" />
-                </button>
+                        <X size={15} style={{ color: ink }} />
+                      </button>
 
-                <motion.div
-                  className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl mx-auto mb-3"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', delay: 0.1 }}>
+                      <motion.div
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3"
+                        style={{ background: 'var(--a-chip-overlay)' }}
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: 'spring', delay: 0.1 }}>
 
-                  {selectedName.gender === 'boy' ? '👦' : selectedName.gender === 'girl' ? '👧' : '✨'}
-                </motion.div>
+                        {selectedName.gender === 'boy' ? '👦' : selectedName.gender === 'girl' ? '👧' : '✨'}
+                      </motion.div>
 
-                <h2 className="text-2xl font-bold text-white mb-1">{selectedName.name}</h2>
-                <div className="flex items-center justify-center gap-2">
-                  <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-xs font-medium">
-                    {selectedName.gender === 'boy' ? tr("babynames_oglan_e9715e", "O\u011Flan") : selectedName.gender === 'girl' ? tr("babynames_qiz_79bf6b", "Q\u0131z") : 'Unisex'}
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-white/20 text-white text-xs font-medium">
-                    {selectedName.origin || (language === 'en' ? 'Azerbaijan' : tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan"))}
-                  </span>
-                </div>
+                      <h2 className="a-heading" style={{ margin: '0 0 6px', fontSize: 24, color: ink }}>{selectedName.name}</h2>
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: ink, padding: '4px 10px', fontSize: 10 }}>
+                          {selectedName.gender === 'boy' ? tr("babynames_oglan_e9715e", "O\u011Flan") : selectedName.gender === 'girl' ? tr("babynames_qiz_79bf6b", "Q\u0131z") : 'Unisex'}
+                        </span>
+                        <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: ink, padding: '4px 10px', fontSize: 10 }}>
+                          {selectedName.origin || (language === 'en' ? 'Azerbaijan' : language === 'tr' ? 'Türkçe' : language === 'ru' ? 'Русское' : tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan"))}
+                        </span>
+                      </div>
+                    </>);
+                })()}
               </div>
 
               <div className="p-5">
                 {/* Meaning */}
                 <div className="mb-4">
-                  <p className="text-xs text-muted-foreground mb-1">{tr("babynames_menasi_83a157", "Mənası")}</p>
-                  <p className="text-base font-medium text-foreground">{selectedName.meaning || tr("babynames_melumat_yoxdur_a3e271", "M\u0259lumat yoxdur")}</p>
+                  <p className="a-today-info-eyebrow" style={{ marginBottom: 3 }}>{tr("babynames_menasi_83a157", "Mənası")}</p>
+                  <p style={{ margin: 0, fontSize: 14.5, fontWeight: 600, color: 'var(--a-ink)', lineHeight: 1.5 }}>{selectedName.meaning || tr("babynames_melumat_yoxdur_a3e271", "M\u0259lumat yoxdur")}</p>
                 </div>
 
                 {/* Popularity */}
-                <div className="flex items-center justify-between mb-5 p-3 bg-muted/50 rounded-xl">
-                  <span className="text-sm text-muted-foreground">{tr("babynames_populyarliq_1501b1", "Populyarlıq")}</span>
+                <div className="a-stat-tile mb-5" style={{ justifyContent: 'space-between' }}>
+                  <span className="a-stat-tile-label" style={{ fontSize: 11.5 }}>{tr("babynames_populyarliq_1501b1", "Populyarlıq")}</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
+                    <div style={{ width: 80, height: 6, borderRadius: 999, background: 'var(--a-line-strong)', overflow: 'hidden' }}>
                       <motion.div
-                        className={`h-full rounded-full ${selectedName.gender === 'boy' ? 'bg-blue-500' : selectedName.gender === 'girl' ? 'bg-pink-500' : 'bg-violet-500'}`
-                        }
+                        style={{ height: '100%', borderRadius: 999, background: selectedName.gender === 'boy' ? 'var(--a-grad-blue)' : selectedName.gender === 'girl' ? 'var(--a-grad-pink)' : 'var(--a-grad-lav)' }}
                         initial={{ width: 0 }}
                         animate={{ width: `${selectedName.popularity || 0}%` }}
                         transition={{ duration: 0.5, delay: 0.2 }} />
 
                     </div>
-                    <span className="font-semibold text-foreground text-sm">{selectedName.popularity || 0}%</span>
+                    <span className="a-stat-tile-value" style={{ fontSize: 13 }}>{selectedName.popularity || 0}%</span>
                   </div>
                 </div>
 
@@ -322,18 +303,11 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                     handleToggleFavorite(selectedName);
                     setSelectedName(null);
                   }}
-                  className={`w-full h-12 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${isFavorite(selectedName.name) ?
-                      'bg-muted text-muted-foreground' :
-                      `${selectedName.gender === 'boy' ?
-                        'bg-blue-500' :
-                        selectedName.gender === 'girl' ?
-                          'bg-pink-500' :
-                          'bg-violet-500'} text-white`}`
-
-                  }
+                  className={isFavorite(selectedName.name) ? 'a-btn-soft w-full' : 'a-btn-solid w-full'}
+                  style={{ justifyContent: 'center', padding: '13px 18px', ...(isFavorite(selectedName.name) ? {} : { background: 'var(--a-pink-2)' }) }}
                   whileTap={{ scale: 0.98 }}>
 
-                  <Heart className={`w-4 h-4 ${isFavorite(selectedName.name) ? '' : 'fill-current'}`} />
+                  <Heart size={15} strokeWidth={2.2} fill={isFavorite(selectedName.name) ? 'none' : 'currentColor'} />
                   {isFavorite(selectedName.name) ? tr("babynames_secilmislerden_cixar_69b878", "Se\xE7ilmi\u015Fl\u0259rd\u0259n \xE7\u0131xar") : tr("babynames_secilmislere_elave_et_d53f1e", "Se\xE7ilmi\u015Fl\u0259r\u0259 \u0259lav\u0259 et")}
                 </motion.button>
               </div>

@@ -27,8 +27,69 @@ interface ImageValidation {
 }
 
 // Stage 1: Validate if image contains a diaper/poop
-async function validateImage(imageBase64: string, _apiKey?: string): Promise<ImageValidation> {
+async function validateImage(imageBase64: string, _apiKey?: string, language: string = 'az'): Promise<ImageValidation> {
   const models = ['gemini-2.5-flash-lite', 'gemini-2.5-flash'];
+
+  // User-visible rejection messages, localized
+  const VALIDATION_MESSAGES: Record<string, Record<string, string>> = {
+    az: {
+      'diaper_empty': 'Bu bez boşdur, nəcis görünmür. Nəcis olan bez şəkli çəkin.',
+      'baby_photo': 'Bu körpə şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
+      'adult_content': 'Bu şəkil körpə bezi deyil. Zəhmət olmasa düzgün şəkil seçin.',
+      'food': 'Bu yemək şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
+      'animal': 'Bu heyvan şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
+      'screenshot': 'Bu ekran görüntüsüdür. Zəhmət olmasa körpə bezinin real şəklini çəkin.',
+      'landscape': 'Bu mənzərə şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
+      'object': 'Bu əşya şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
+      'other': 'Bu şəkil analiz üçün uyğun deyil. Körpə bezinin içindəki nəcisin şəklini çəkin.',
+      'unknown': 'Şəkil tanınmadı. Zəhmət olmasa daha aydın şəkil çəkin.',
+      'valid': 'Şəkil uyğundur',
+      'failed': 'Şəkil yoxlanıla bilmədi. Yenidən cəhd edin.',
+    },
+    en: {
+      'diaper_empty': 'This diaper is empty, no stool is visible. Take a photo of a diaper with stool.',
+      'baby_photo': 'This is a baby photo. Please take a photo of the diaper.',
+      'adult_content': 'This image is not a baby diaper. Please choose a proper image.',
+      'food': 'This is a food photo. Please take a photo of the diaper.',
+      'animal': 'This is an animal photo. Please take a photo of the diaper.',
+      'screenshot': 'This is a screenshot. Please take a real photo of the diaper.',
+      'landscape': 'This is a landscape photo. Please take a photo of the diaper.',
+      'object': 'This is an object photo. Please take a photo of the diaper.',
+      'other': 'This image is not suitable for analysis. Take a photo of the stool inside the diaper.',
+      'unknown': 'The image was not recognized. Please take a clearer photo.',
+      'valid': 'The image is suitable',
+      'failed': 'The image could not be checked. Please try again.',
+    },
+    ru: {
+      'diaper_empty': 'Этот подгузник пуст, стула не видно. Сфотографируйте подгузник со стулом.',
+      'baby_photo': 'Это фото малыша. Пожалуйста, сфотографируйте подгузник.',
+      'adult_content': 'На этом фото не детский подгузник. Пожалуйста, выберите подходящее фото.',
+      'food': 'Это фото еды. Пожалуйста, сфотографируйте подгузник.',
+      'animal': 'Это фото животного. Пожалуйста, сфотографируйте подгузник.',
+      'screenshot': 'Это скриншот. Пожалуйста, сделайте настоящее фото подгузника.',
+      'landscape': 'Это фото пейзажа. Пожалуйста, сфотографируйте подгузник.',
+      'object': 'Это фото предмета. Пожалуйста, сфотографируйте подгузник.',
+      'other': 'Это фото не подходит для анализа. Сфотографируйте стул внутри подгузника.',
+      'unknown': 'Изображение не распознано. Пожалуйста, сделайте более чёткое фото.',
+      'valid': 'Изображение подходит',
+      'failed': 'Не удалось проверить изображение. Попробуйте ещё раз.',
+    },
+    tr: {
+      'diaper_empty': 'Bu bez boş, dışkı görünmüyor. Dışkılı bezin fotoğrafını çekin.',
+      'baby_photo': 'Bu bir bebek fotoğrafı. Lütfen bebek bezinin fotoğrafını çekin.',
+      'adult_content': 'Bu görsel bebek bezi değil. Lütfen uygun bir görsel seçin.',
+      'food': 'Bu bir yemek fotoğrafı. Lütfen bebek bezinin fotoğrafını çekin.',
+      'animal': 'Bu bir hayvan fotoğrafı. Lütfen bebek bezinin fotoğrafını çekin.',
+      'screenshot': 'Bu bir ekran görüntüsü. Lütfen bebek bezinin gerçek fotoğrafını çekin.',
+      'landscape': 'Bu bir manzara fotoğrafı. Lütfen bebek bezinin fotoğrafını çekin.',
+      'object': 'Bu bir eşya fotoğrafı. Lütfen bebek bezinin fotoğrafını çekin.',
+      'other': 'Bu görsel analiz için uygun değil. Bezin içindeki dışkının fotoğrafını çekin.',
+      'unknown': 'Görsel tanınamadı. Lütfen daha net bir fotoğraf çekin.',
+      'valid': 'Görsel uygun',
+      'failed': 'Görsel kontrol edilemedi. Lütfen tekrar deneyin.',
+    },
+  };
+  const vmsg = VALIDATION_MESSAGES[language] ?? VALIDATION_MESSAGES.az;
   
   for (const model of models) {
     try {
@@ -100,25 +161,11 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
                        imageType === 'diaper_with_poop' || 
                        imageType === 'poop_no_diaper';
         
-        // Generate appropriate message based on image type
-        const messages: Record<string, string> = {
-          'diaper_empty': 'Bu bez boşdur, nəcis görünmür. Nəcis olan bez şəkli çəkin.',
-          'baby_photo': 'Bu körpə şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
-          'adult_content': 'Bu şəkil körpə bezi deyil. Zəhmət olmasa düzgün şəkil seçin.',
-          'food': 'Bu yemək şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
-          'animal': 'Bu heyvan şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
-          'screenshot': 'Bu ekran görüntüsüdür. Zəhmət olmasa körpə bezinin real şəklini çəkin.',
-          'landscape': 'Bu mənzərə şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
-          'object': 'Bu əşya şəklidir. Zəhmət olmasa körpə bezinin şəklini çəkin.',
-          'other': 'Bu şəkil analiz üçün uyğun deyil. Körpə bezinin içindəki nəcisin şəklini çəkin.',
-          'unknown': 'Şəkil tanınmadı. Zəhmət olmasa daha aydın şəkil çəkin.'
-        };
-
         return {
           isValidDiaperImage: isValid,
           imageType: imageType,
           confidence: result.confidence || 0,
-          message: isValid ? 'Şəkil uyğundur' : (messages[imageType] || messages['other'])
+          message: isValid ? vmsg['valid'] : (vmsg[imageType] || vmsg['other'])
         };
       }
     } catch (e) {
@@ -131,13 +178,16 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
     isValidDiaperImage: false,
     imageType: 'unknown',
     confidence: 0,
-    message: 'Şəkil yoxlanıla bilmədi. Yenidən cəhd edin.'
+    message: vmsg['failed']
   };
 }
 
 // Stage 2: Analyze the poop
 async function analyzePoop(imageBase64: string, _apiKey?: string, userContext?: PoopAnalysisRequest['userContext'], language: string = 'az'): Promise<Response | null> {
   const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH' };
+  const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish' };
+  const outLang = OUT_LANG[language];
   
   // Build age context for prompt
   let ageContext = '';
@@ -209,7 +259,7 @@ CAVAB FORMATI (STRICT JSON):
   "doctorUrgency": "none|soon|today|immediate"
 }
 
-XƏBƏRDARLIQ: Ağ, qara və ya qırmızı rəng gördükdə "urgent" səviyyəsi VER!${language === 'en' ? '\n\nIMPORTANT: Write "colorNameAz", "explanation" and all "recommendations" entries in ENGLISH. Despite the field name "colorNameAz", put the English color name there. Keep JSON keys and enum values exactly as shown.' : ''}`
+XƏBƏRDARLIQ: Ağ, qara və ya qırmızı rəng gördükdə "urgent" səviyyəsi VER!${outLang ? `\n\nIMPORTANT: Write "colorNameAz", "explanation" and all "recommendations" entries in ${outLang}. Despite the field name "colorNameAz", put the ${OUT_LANG_NAME[language]} color name there. Keep JSON keys and enum values exactly as shown.` : ''}`
           }
         ]
       }],
@@ -276,7 +326,7 @@ Deno.serve(async (req) => {
 
     // Stage 1: Validate image
     console.log('Stage 1: Validating image...');
-    const validation = await validateImage(imageBase64);
+    const validation = await validateImage(imageBase64, undefined, language);
     console.log('Validation result:', validation);
 
     if (!validation.isValidDiaperImage) {
@@ -316,24 +366,37 @@ Deno.serve(async (req) => {
         throw new Error('No JSON found');
       }
     } catch {
-      analysisResult = language === 'en' ? {
+      const FALLBACK: Record<string, { colorNameAz: string; explanation: string; recommendations: string[] }> = {
+        az: {
+          colorNameAz: 'Naməlum',
+          explanation: 'Şəkil analiz edildi. Daha aydın şəkil çəkməyə cəhd edin.',
+          recommendations: ['Körpənin ümumi vəziyyətini izləyin', 'Hər hansı narahatlıq olsa həkimə müraciət edin'],
+        },
+        en: {
+          colorNameAz: 'Unknown',
+          explanation: 'The image was analyzed. Try taking a clearer picture.',
+          recommendations: ["Monitor the baby's general condition", 'Consult a doctor if you have any concerns'],
+        },
+        ru: {
+          colorNameAz: 'Неизвестно',
+          explanation: 'Изображение проанализировано. Попробуйте сделать более чёткое фото.',
+          recommendations: ['Наблюдайте за общим состоянием малыша', 'При любых сомнениях обратитесь к врачу'],
+        },
+        tr: {
+          colorNameAz: 'Bilinmiyor',
+          explanation: 'Görsel analiz edildi. Daha net bir fotoğraf çekmeyi deneyin.',
+          recommendations: ['Bebeğin genel durumunu takip edin', 'Herhangi bir endişeniz olursa doktora başvurun'],
+        },
+      };
+      const fb = FALLBACK[language] ?? FALLBACK.az;
+      analysisResult = {
         colorDetected: 'unknown',
-        colorNameAz: 'Unknown',
+        colorNameAz: fb.colorNameAz,
         consistency: 'normal',
         isNormal: true,
         concernLevel: 'normal',
-        explanation: 'The image was analyzed. Try taking a clearer picture.',
-        recommendations: ["Monitor the baby's general condition", 'Consult a doctor if you have any concerns'],
-        shouldSeeDoctor: false,
-        doctorUrgency: 'none'
-      } : {
-        colorDetected: 'unknown',
-        colorNameAz: 'Naməlum',
-        consistency: 'normal',
-        isNormal: true,
-        concernLevel: 'normal',
-        explanation: 'Şəkil analiz edildi. Daha aydın şəkil çəkməyə cəhd edin.',
-        recommendations: ['Körpənin ümumi vəziyyətini izləyin', 'Hər hansı narahatlıq olsa həkimə müraciət edin'],
+        explanation: fb.explanation,
+        recommendations: fb.recommendations,
         shouldSeeDoctor: false,
         doctorUrgency: 'none'
       };

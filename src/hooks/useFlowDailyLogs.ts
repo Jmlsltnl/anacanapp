@@ -19,6 +19,14 @@ export interface FlowDailyLog {
   temperature: number | null;
   water_glasses: number;
   notes: string | null;
+  /** Flow P0: servikal maye (fertillik göstəricisi) */
+  cervical_mucus: 'dry' | 'sticky' | 'creamy' | 'watery' | 'eggwhite' | null;
+  /** Flow P0: cinsi əlaqə */
+  sexual_activity: 'none' | 'protected' | 'unprotected' | null;
+  /** Flow P0: libido 1-3 */
+  libido: number | null;
+  /** Flow P1: OPK/LH ovulyasiya testi nəticəsi */
+  ovulation_test: 'negative' | 'positive' | 'peak' | null;
   created_at: string;
   updated_at: string;
 }

@@ -1,15 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  ArrowLeft, Plus, Search, Filter, Heart, MessageCircle, MapPin,
-  Camera, X, Check, Loader2, Package, Tag, User, Clock, Send,
-  ChevronRight, Sparkles, ImagePlus, Trash2, Image as ImageIcon } from
+  Plus, Search, MessageCircle, MapPin,
+  X, Check, Loader2, Package, Tag, Clock, Send,
+  Sparkles, ImagePlus, Image as ImageIcon } from
 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,7 +12,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
 interface SecondHandMarketProps {
   onBack: () => void;
@@ -39,21 +35,23 @@ interface Listing {
   created_at: string;
 }
 
+// Categories → anacan palette
 const categories = [
-{ id: 'clothing', label: 'Geyim', emoji: '👕', color: 'from-pink-500 to-rose-600' },
-{ id: 'toys', label: 'Oyuncaqlar', emoji: '🧸', color: 'from-amber-500 to-orange-600' },
-{ id: 'furniture', label: tr("secondhandmarket_mebel_3c7a2d", "Mebel"), emoji: '🛏️', color: 'from-blue-500 to-indigo-600' },
-{ id: 'stroller', label: tr("secondhandmarket_araba_3c7a2d", "Araba"), emoji: '👶', color: 'from-violet-500 to-purple-600' },
-{ id: 'feeding', label: tr("secondhandmarket_qidalanma_3c7a2d", "Qidalanma"), emoji: '🍼', color: 'from-emerald-500 to-green-600' },
-{ id: 'hygiene', label: tr("secondhandmarket_gigiyena_3c7a2d", "Gigiyena"), emoji: '🛁', color: 'from-cyan-500 to-teal-600' },
-{ id: 'other', label: tr("secondhandmarket_diger_293b3a", 'Digər'), emoji: '📦', color: 'from-gray-500 to-slate-600' }];
+{ id: 'clothing', label: 'Geyim', emoji: '👕', grad: 'var(--a-grad-pink)', ink: 'var(--a-alert-ink)' },
+{ id: 'toys', label: 'Oyuncaqlar', emoji: '🧸', grad: 'var(--a-grad-yellow)', ink: 'var(--a-warn-ink)' },
+{ id: 'furniture', label: tr("secondhandmarket_mebel_3c7a2d", "Mebel"), emoji: '🛏️', grad: 'var(--a-grad-peach)', ink: 'var(--a-accent-ink)' },
+{ id: 'stroller', label: tr("secondhandmarket_araba_3c7a2d", "Araba"), emoji: '👶', grad: 'var(--a-grad-lav)', ink: '#3c2e5c' },
+{ id: 'feeding', label: tr("secondhandmarket_qidalanma_3c7a2d", "Qidalanma"), emoji: '🍼', grad: 'var(--a-grad-green)', ink: '#14532d' },
+{ id: 'hygiene', label: tr("secondhandmarket_gigiyena_3c7a2d", "Gigiyena"), emoji: '🛁', grad: 'var(--a-grad-blue)', ink: '#153e57' },
+{ id: 'other', label: tr("secondhandmarket_diger_293b3a", 'Digər'), emoji: '📦', grad: 'linear-gradient(135deg, var(--a-surface-soft), var(--a-line-strong))', ink: 'var(--a-ink-soft)' }];
 
 
+// Conditions → anacan palette
 const conditions = [
-{ id: 'new', label: tr("secondhandmarket_yeni", 'Yeni'), color: 'bg-emerald-500', textColor: 'text-emerald-600' },
-{ id: 'like_new', label: tr("secondhandmarket_yeni_kimi", 'Yeni kimi'), color: 'bg-green-500', textColor: 'text-green-600' },
-{ id: 'good', label: tr("secondhandmarket_yaxsi_9d8595", 'Yaxşı'), color: 'bg-blue-500', textColor: 'text-blue-600' },
-{ id: 'fair', label: tr("common_normal", "Normal"), color: 'bg-amber-500', textColor: 'text-amber-600' }];
+{ id: 'new', label: tr("secondhandmarket_yeni", 'Yeni'), dot: 'var(--a-green-2)', ink: 'var(--a-green-ink)', soft: 'var(--a-green-1)' },
+{ id: 'like_new', label: tr("secondhandmarket_yeni_kimi", 'Yeni kimi'), dot: '#8fd19e', ink: 'var(--a-green-ink)', soft: 'var(--a-green-1)' },
+{ id: 'good', label: tr("secondhandmarket_yaxsi_9d8595", 'Yaxşı'), dot: 'var(--a-blue-2)', ink: 'var(--a-blue-ink)', soft: 'var(--a-blue-1)' },
+{ id: 'fair', label: tr("common_normal", "Normal"), dot: 'var(--a-yellow-2)', ink: 'var(--a-warn-ink)', soft: 'var(--a-yellow-1)' }];
 
 
 const ageRanges = [
@@ -313,81 +311,70 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
   // Stats
   const freeCount = listings.filter((l) => l.is_free).length;
 
+  const fieldLabel = (text: string) =>
+  <label className="text-sm font-bold mb-1.5 block" style={{ color: 'var(--a-ink)' }}>{text}</label>;
+
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Package className="w-5 h-5 text-emerald-500" />
-                {tr("secondhandmarket_i_kinci_el_bazari_ad9f9f", "\u0130kinci \u018Fl Bazar\u0131")}
-              </h1>
-            </div>
-            <motion.button
-              onClick={() => setShowCreateModal(true)}
-              className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <Plus className="w-5 h-5 text-primary-foreground" />
-            </motion.button>
-          </div>
-        </div>
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={tr("secondhandmarket_i_lk_elani_siz_yerlesdirin_02683c", "\u0130lk elan\u0131 siz yerl\u0259\u015Fdirin!")}
+        title={tr("secondhandmarket_i_kinci_el_bazari_ad9f9f", "\u0130kinci \u018Fl Bazar\u0131")}
+        actions={
+        <motion.button
+          onClick={() => setShowCreateModal(true)}
+          className="a-cta-btn"
+          style={{ width: 38, height: 38, padding: 0, justifyContent: 'center' }}
+          whileTap={{ scale: 0.95 }}>
+            <Plus size={16} strokeWidth={2.4} />
+          </motion.button>
+        } />
+
+      {/* Search */}
+      <div className="a-search mb-3">
+        <Search size={16} style={{ color: 'var(--a-ink-faint)', flexShrink: 0 }} />
+        <input
+          placeholder={tr("untranslated_axtar_92w4nn", "Axtar...")}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)} />
+        
       </div>
 
-      <div className="px-4 pt-4">
-        {/* Search */}
-        <div className="relative mb-4">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            placeholder={tr("untranslated_axtar_92w4nn", "Axtar...")}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-12 rounded-2xl bg-muted/50 border-border" />
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-3 mb-3">
+        <motion.div
+          className="rounded-2xl p-3 text-center"
+          style={{ background: 'var(--a-green-1)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}>
           
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <motion.div
-            className="bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-3 text-center border border-emerald-100 dark:border-emerald-500/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}>
-            
-            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{listings.length}</p>
-            <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">{tr("untranslated_elan_voiz8p", "Elan")}</p>
-          </motion.div>
-          <motion.div
-            className="bg-amber-50 dark:bg-amber-500/10 rounded-2xl p-3 text-center border border-amber-100 dark:border-amber-500/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}>
-            
-            <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{freeCount}</p>
-            <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">{tr("untranslated_pulsuz_27d02z", "Pulsuz")}</p>
-          </motion.div>
-          <motion.div
-            className="bg-violet-50 dark:bg-violet-500/10 rounded-2xl p-3 text-center border border-violet-100 dark:border-violet-500/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}>
-            
-            <p className="text-2xl font-black text-violet-600 dark:text-violet-400">{categories.length}</p>
-            <p className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">{tr("untranslated_kateqoriya_d7bf4y", "Kateqoriya")}</p>
-          </motion.div>
-        </div>
+          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#14532d' }}>{listings.length}</p>
+          <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-green-ink)', opacity: 0.8 }}>{tr("untranslated_elan_voiz8p", "Elan")}</p>
+        </motion.div>
+        <motion.div
+          className="rounded-2xl p-3 text-center"
+          style={{ background: 'var(--a-yellow-1)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}>
+          
+          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: 'var(--a-warn-ink)' }}>{freeCount}</p>
+          <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-warn-ink)', opacity: 0.8 }}>{tr("untranslated_pulsuz_27d02z", "Pulsuz")}</p>
+        </motion.div>
+        <motion.div
+          className="rounded-2xl p-3 text-center"
+          style={{ background: 'var(--a-lav-1)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}>
+          
+          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#3c2e5c' }}>{categories.length}</p>
+          <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-lav-ink)', opacity: 0.8 }}>{tr("untranslated_kateqoriya_d7bf4y", "Kateqoriya")}</p>
+        </motion.div>
       </div>
 
-      <div className="px-4 space-y-4">
+      <div className="space-y-3">
         {/* Category Filter */}
         <motion.div
           className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar"
@@ -397,11 +384,10 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           
           <motion.button
             onClick={() => setSelectedCategory(null)}
-            className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-            selectedCategory === null ?
-            'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30' :
-            'bg-card text-foreground border border-border/50'}`
-            }
+            className="shrink-0 px-4 py-2.5 rounded-full text-sm font-bold transition-all flex items-center gap-2"
+            style={selectedCategory === null ?
+            { background: 'var(--a-grad-cta)', border: '1px solid var(--a-btn-border)', color: 'var(--a-accent-ink)', boxShadow: 'var(--a-card-shadow)', cursor: 'pointer' } :
+            { background: 'var(--a-surface)', border: '1px solid var(--a-line)', color: 'var(--a-ink-soft)', cursor: 'pointer' }}
             whileTap={{ scale: 0.95 }}>
             
             <Sparkles className="w-4 h-4" />
@@ -411,11 +397,10 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           <motion.button
             key={cat.id}
             onClick={() => setSelectedCategory(cat.id)}
-            className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-            selectedCategory === cat.id ?
-            `bg-gradient-to-r ${cat.color} text-white shadow-lg` :
-            'bg-card text-foreground border border-border/50'}`
-            }
+            className="shrink-0 px-4 py-2.5 rounded-full text-sm font-bold transition-all flex items-center gap-2"
+            style={selectedCategory === cat.id ?
+            { background: cat.grad, border: '1px solid transparent', color: cat.ink, boxShadow: 'var(--a-card-shadow)', cursor: 'pointer' } :
+            { background: 'var(--a-surface)', border: '1px solid var(--a-line)', color: 'var(--a-ink-soft)', cursor: 'pointer' }}
             whileTap={{ scale: 0.95 }}>
             
               <span>{cat.emoji}</span>
@@ -425,52 +410,48 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
         </motion.div>
 
         {/* Toggle My Listings */}
-        <div className="flex gap-2">
-          <Button
-            variant={!showMyListings ? 'default' : 'outline'}
-            className={`flex-1 ${!showMyListings ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}`}
+        <div className="a-tabs w-full" style={{ display: 'flex' }}>
+          <button
+            className={`a-tab flex-1 ${!showMyListings ? 'active' : ''}`}
             onClick={() => setShowMyListings(false)}>
             {tr("secondhandmarket_butun_elanlar_033e6a", "B\xFCt\xFCn elanlar")}
           
-          </Button>
-          <Button
-            variant={showMyListings ? 'default' : 'outline'}
-            className={`flex-1 ${showMyListings ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}`}
+          </button>
+          <button
+            className={`a-tab flex-1 ${showMyListings ? 'active' : ''}`}
             onClick={() => setShowMyListings(true)}>
             {tr("secondhandmarket_menim_elanlarim_cec2c2", "M\u0259nim elanlar\u0131m")}
           
-          </Button>
+          </button>
         </div>
 
         {/* Listings */}
         {isLoading ?
         <div className="grid grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) =>
-          <div key={i} className="bg-card rounded-2xl overflow-hidden animate-pulse">
-                <div className="aspect-square bg-muted" />
+          <div key={i} className="a-card overflow-hidden animate-pulse" style={{ padding: 0 }}>
+                <div className="aspect-square" style={{ background: 'var(--a-surface-soft)' }} />
                 <div className="p-3">
-                  <div className="h-4 bg-muted rounded w-3/4 mb-2" />
-                  <div className="h-3 bg-muted rounded w-1/2" />
+                  <div className="h-4 rounded w-3/4 mb-2" style={{ background: 'var(--a-surface-soft)' }} />
+                  <div className="h-3 rounded w-1/2" style={{ background: 'var(--a-surface-soft)' }} />
                 </div>
               </div>
           )}
           </div> :
         filteredListings.length === 0 ?
-        <Card className="border-dashed">
-            <CardContent className="p-8 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 flex items-center justify-center">
-                <Package className="w-8 h-8 text-emerald-500" />
-              </div>
-              <h3 className="font-bold text-foreground mb-1">{tr("secondhandmarket_hele_elan_yoxdur_89fb8c", "Hələ elan yoxdur")}</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                {tr("secondhandmarket_i_lk_elani_siz_yerlesdirin_02683c", "\u0130lk elan\u0131 siz yerl\u0259\u015Fdirin!")}
-              </p>
-              <Button onClick={() => setShowCreateModal(true)} className="bg-gradient-to-r from-emerald-500 to-teal-600">
-                <Plus className="w-4 h-4 mr-2" />
-                {tr("secondhandmarket_i_lk_elani_yarat_a4e8b2", "\u0130lk elan\u0131 yarat")}
-              </Button>
-            </CardContent>
-          </Card> :
+        <div className="rounded-[26px] p-8 text-center" style={{ background: 'var(--a-surface)', border: '2px dashed var(--a-line-strong)' }}>
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'var(--a-grad-green)' }}>
+              <Package className="w-8 h-8" style={{ color: '#14532d' }} />
+            </div>
+            <h3 className="a-list-title mb-1" style={{ margin: '0 0 4px' }}>{tr("secondhandmarket_hele_elan_yoxdur_89fb8c", "Hələ elan yoxdur")}</h3>
+            <p className="a-list-sub mb-4" style={{ margin: '0 0 16px', whiteSpace: 'normal' }}>
+              {tr("secondhandmarket_i_lk_elani_siz_yerlesdirin_02683c", "\u0130lk elan\u0131 siz yerl\u0259\u015Fdirin!")}
+            </p>
+            <button onClick={() => setShowCreateModal(true)} className="a-cta-btn mx-auto">
+              <Plus size={15} strokeWidth={2.2} />
+              {tr("secondhandmarket_i_lk_elani_yarat_a4e8b2", "\u0130lk elan\u0131 yarat")}
+            </button>
+          </div> :
 
         <div className="grid grid-cols-2 gap-3">
             {filteredListings.map((listing, index) => {
@@ -482,16 +463,18 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 key={listing.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
+                transition={{ delay: Math.min(index * 0.05, 0.3) }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
                   setSelectedListing(listing);
                   setShowDetailModal(true);
                 }}>
                 
-                  <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-all group">
+                  <div
+                  className="overflow-hidden cursor-pointer transition-all group rounded-[20px]"
+                  style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', boxShadow: 'var(--a-card-shadow)' }}>
                     {/* Image */}
-                    <div className="aspect-square bg-muted relative overflow-hidden">
+                    <div className="aspect-square relative overflow-hidden" style={{ background: 'var(--a-surface-soft)' }}>
                       {listing.images && listing.images.length > 0 ?
                     <img
                       src={listing.images[0]}
@@ -499,7 +482,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform" /> :
 
 
-                    <div className={`w-full h-full bg-gradient-to-br ${catInfo.color} flex items-center justify-center`}>
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: catInfo.grad }}>
                           <span className="text-5xl">{catInfo.emoji}</span>
                         </div>
                     }
@@ -507,11 +490,11 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                       {/* Price badge */}
                       <div className="absolute top-2 left-2">
                         {listing.is_free ?
-                      <Badge className="bg-emerald-500 text-white border-0 shadow-lg">{tr("untranslated_pulsuz_27d02z", "Pulsuz")}</Badge> :
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold shadow-lg" style={{ background: 'var(--a-green-2)', color: '#fff' }}>{tr("untranslated_pulsuz_27d02z", "Pulsuz")}</span> :
 
-                      <Badge className="bg-white/90 dark:bg-card/90 text-foreground border-0 shadow-lg">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold shadow-lg" style={{ background: 'rgba(255,255,255,0.92)', color: 'var(--a-ink)' }}>
                             {listing.price} ₼
-                          </Badge>
+                          </span>
                       }
                       </div>
                       
@@ -524,28 +507,28 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                     }
                     </div>
                     
-                    <CardContent className="p-3">
-                      <h3 className="font-bold text-sm line-clamp-1 text-foreground">{listing.title}</h3>
+                    <div className="p-3">
+                      <h3 className="font-bold text-sm line-clamp-1" style={{ color: 'var(--a-ink)' }}>{listing.title}</h3>
                       
                       <div className="flex items-center gap-1.5 mt-1.5">
-                        <span className={`w-2 h-2 rounded-full ${condInfo.color}`} />
-                        <span className="text-xs text-muted-foreground">{condInfo.label}</span>
+                        <span className="w-2 h-2 rounded-full" style={{ background: condInfo.dot }} />
+                        <span className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>{condInfo.label}</span>
                         {listing.age_range &&
                       <>
-                            <span className="text-muted-foreground">•</span>
-                            <span className="text-xs text-muted-foreground">{listing.age_range}</span>
+                            <span style={{ color: 'var(--a-ink-faint)' }}>•</span>
+                            <span className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>{listing.age_range}</span>
                           </>
                       }
                       </div>
                       
                       {listing.location_city &&
-                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1 mt-2 text-xs" style={{ color: 'var(--a-ink-soft)' }}>
                           <MapPin className="w-3 h-3" />
                           {listing.location_city}
                         </div>
                     }
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </motion.div>);
 
           })}
@@ -555,12 +538,12 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
 
       {/* Create Listing Modal */}
       <Dialog open={showCreateModal} onOpenChange={(open) => {if (!open) resetForm();setShowCreateModal(open);}}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="a-scope max-h-[90vh] overflow-y-auto rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                <Plus className="w-4 h-4 text-white" />
-              </div>
+            <DialogTitle className="flex items-center gap-2 a-heading" style={{ color: 'var(--a-ink)' }}>
+              <span className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--a-grad-green)' }}>
+                <Plus className="w-4 h-4" style={{ color: '#14532d' }} />
+              </span>
               {tr("secondhandmarket_yeni_elan_yarat_3c7a2d", "Yeni elan yarat")}
             </DialogTitle>
           </DialogHeader>
@@ -568,14 +551,15 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           <div className="space-y-4 mt-4">
             {/* Image Upload */}
             <div>
-              <label className="text-sm font-medium mb-2 block">{tr("secondhandmarket_sekiller_maks_5_4281f8", "Şəkillər (maks. 5)")}</label>
+              {fieldLabel(tr("secondhandmarket_sekiller_maks_5_4281f8", "Şəkillər (maks. 5)"))}
               <div className="grid grid-cols-5 gap-2">
                 {uploadedImages.map((img, index) =>
                 <div key={index} className="aspect-square relative rounded-xl overflow-hidden group">
                     <img src={img} alt="" className="w-full h-full object-cover" />
                     <motion.button
                     onClick={() => removeImage(index)}
-                    className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 w-6 h-6 rounded-full text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: 'var(--a-pink-2)', border: 'none', cursor: 'pointer' }}
                     whileTap={{ scale: 0.9 }}>
                     
                       <X className="w-3 h-3" />
@@ -587,15 +571,16 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 <motion.button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingImages}
-                  className="aspect-square rounded-xl border-2 border-dashed border-border hover:border-primary flex flex-col items-center justify-center gap-1 transition-colors"
+                  className="aspect-square rounded-xl flex flex-col items-center justify-center gap-1 transition-colors"
+                  style={{ border: '2px dashed var(--a-line-strong)', background: 'var(--a-surface-soft)', cursor: 'pointer' }}
                   whileTap={{ scale: 0.95 }}>
                   
                     {uploadingImages ?
-                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /> :
+                  <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--a-ink-soft)' }} /> :
 
                   <>
-                        <ImagePlus className="w-5 h-5 text-muted-foreground" />
-                        <span className="text-[10px] text-muted-foreground">{tr("secondhandmarket_elave_et_6e1b9b", "Əlavə et")}</span>
+                        <ImagePlus className="w-5 h-5" style={{ color: 'var(--a-ink-soft)' }} />
+                        <span className="text-[10px]" style={{ color: 'var(--a-ink-soft)' }}>{tr("secondhandmarket_elave_et_6e1b9b", "Əlavə et")}</span>
                       </>
                   }
                   </motion.button>
@@ -612,39 +597,39 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-1.5 block">{tr("secondhandmarket_basliq_3dfed8", "Başlıq *")}</label>
-              <Input
+              {fieldLabel(tr("secondhandmarket_basliq_3dfed8", "Başlıq *"))}
+              <input
+                className="a-input w-full"
                 placeholder={tr("secondhandmarket_meselen_0_3_ay_oglan_geyimleri_55b327", "Məsələn: 0-3 ay oğlan geyimləri")}
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="bg-muted/50" />
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
               
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-1.5 block">{tr("secondhandmarket_tesvir_f85651", "Təsvir")}</label>
-              <Textarea
+              {fieldLabel(tr("secondhandmarket_tesvir_f85651", "Təsvir"))}
+              <textarea
+                className="a-input w-full resize-none"
+                style={{ height: 'auto', minHeight: 72, fontFamily: 'inherit' }}
                 placeholder={tr("secondhandmarket_esya_haqqinda_melumat_9e2aa1", "Əşya haqqında məlumat...")}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-                className="bg-muted/50" />
+                rows={3} />
               
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">{tr("untranslated_kateqoriya_d7bf4y", "Kateqoriya")}</label>
+              {fieldLabel(tr("untranslated_kateqoriya_d7bf4y", "Kateqoriya"))}
               <div className="flex flex-wrap gap-2">
                 {categories.map((cat) =>
                 <motion.button
                   key={cat.id}
                   type="button"
                   onClick={() => setFormData({ ...formData, category: cat.id })}
-                  className={`px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
-                  formData.category === cat.id ?
-                  `bg-gradient-to-r ${cat.color} text-white shadow-lg` :
-                  'bg-muted hover:bg-muted/80'}`
-                  }
+                  className="px-3 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-1.5"
+                  style={formData.category === cat.id ?
+                  { background: cat.grad, color: cat.ink, boxShadow: 'var(--a-card-shadow)', border: 'none', cursor: 'pointer' } :
+                  { background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)', border: 'none', cursor: 'pointer' }}
                   whileTap={{ scale: 0.95 }}>
                   
                     {cat.emoji} {cat.label}
@@ -654,21 +639,20 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">{tr("secondhandmarket_veziyyet_f0e993", "Vəziyyət")}</label>
+              {fieldLabel(tr("secondhandmarket_veziyyet_f0e993", "Vəziyyət"))}
               <div className="flex flex-wrap gap-2">
                 {conditions.map((cond) =>
                 <motion.button
                   key={cond.id}
                   type="button"
                   onClick={() => setFormData({ ...formData, condition: cond.id })}
-                  className={`px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
-                  formData.condition === cond.id ?
-                  `${cond.color} text-white shadow-lg` :
-                  'bg-muted hover:bg-muted/80'}`
-                  }
+                  className="px-3 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-1.5"
+                  style={formData.condition === cond.id ?
+                  { background: cond.soft, color: cond.ink, border: `1px solid ${cond.dot}`, cursor: 'pointer' } :
+                  { background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)', border: '1px solid transparent', cursor: 'pointer' }}
                   whileTap={{ scale: 0.95 }}>
                   
-                    <span className={`w-2 h-2 rounded-full ${formData.condition === cond.id ? 'bg-white' : cond.color}`} />
+                    <span className="w-2 h-2 rounded-full" style={{ background: cond.dot }} />
                     {cond.label}
                   </motion.button>
                 )}
@@ -676,18 +660,17 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">{tr("secondhandmarket_yas_araligi_2e277e", "Yaş aralığı")}</label>
+              {fieldLabel(tr("secondhandmarket_yas_araligi_2e277e", "Yaş aralığı"))}
               <div className="flex flex-wrap gap-2">
                 {ageRanges.map((age) =>
                 <motion.button
                   key={age}
                   type="button"
                   onClick={() => setFormData({ ...formData, age_range: age })}
-                  className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
-                  formData.age_range === age ?
-                  'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg' :
-                  'bg-muted hover:bg-muted/80'}`
-                  }
+                  className="px-3 py-2 rounded-full text-sm font-semibold transition-all"
+                  style={formData.age_range === age ?
+                  { background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', border: '1px solid var(--a-peach-2)', cursor: 'pointer' } :
+                  { background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)', border: '1px solid transparent', cursor: 'pointer' }}
                   whileTap={{ scale: 0.95 }}>
                   
                     {age}
@@ -697,76 +680,77 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">{tr("secondhandmarket_qiymet_54c4f3", "Qiymət")}</label>
+              {fieldLabel(tr("secondhandmarket_qiymet_54c4f3", "Qiymət"))}
               <div className="flex gap-2 mb-2">
-                <Button
+                <button
                   type="button"
-                  variant={formData.is_free ? 'default' : 'outline'}
-                  className={formData.is_free ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}
-                  onClick={() => setFormData({ ...formData, is_free: true, price: 0 })}>{tr("untranslated_pulsuz_27d02z", "Pulsuz")}</Button>
-                <Button
+                  className={formData.is_free ? 'a-cta-btn' : 'a-btn-soft'}
+                  style={{ height: 40, padding: '0 18px', ...(formData.is_free ? { background: 'var(--a-green-2)' } : {}) }}
+                  onClick={() => setFormData({ ...formData, is_free: true, price: 0 })}>{tr("untranslated_pulsuz_27d02z", "Pulsuz")}</button>
+                <button
                   type="button"
-                  variant={!formData.is_free ? 'default' : 'outline'}
-                  className={!formData.is_free ? 'bg-gradient-to-r from-emerald-500 to-teal-600' : ''}
+                  className={!formData.is_free ? 'a-cta-btn' : 'a-btn-soft'}
+                  style={{ height: 40, padding: '0 18px' }}
                   onClick={() => setFormData({ ...formData, is_free: false })}>
                   
                   {tr("secondhandmarket_pullu_3c7a2d", "Pullu")}
-                </Button>
+                </button>
               </div>
               {!formData.is_free &&
               <div className="flex items-center gap-2">
-                  <Input
+                  <input
+                  className="a-input w-24"
                   type="number"
                   placeholder="0"
                   value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                  className="w-24 bg-muted/50" />
+                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })} />
                 
-                  <span className="text-muted-foreground">₼</span>
+                  <span style={{ color: 'var(--a-ink-soft)' }}>₼</span>
                 </div>
               }
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-1.5 block">{tr("secondhandmarket_seher_5f373c", "Şəhər")}</label>
-              <Input
+              {fieldLabel(tr("secondhandmarket_seher_5f373c", "Şəhər"))}
+              <input
+                className="a-input w-full"
                 placeholder={tr("secondhandmarket_meselen_baki_425cda", "Məsələn: Bakı")}
                 value={formData.location_city}
-                onChange={(e) => setFormData({ ...formData, location_city: e.target.value })}
-                className="bg-muted/50" />
+                onChange={(e) => setFormData({ ...formData, location_city: e.target.value })} />
               
             </div>
             
-            <Button
-              className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
+            <button
+              className="a-cta-btn w-full"
+              style={{ justifyContent: 'center', height: 46, background: 'var(--a-green-2)', opacity: isSubmitting ? 0.6 : 1 }}
               onClick={handleCreateListing}
               disabled={isSubmitting}>
               
               {isSubmitting ?
               <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   {tr("secondhandmarket_yaradilir_9bb5ed", "Yarad\u0131l\u0131r...")}
                 </> :
 
               <>
-                  <Check className="w-4 h-4 mr-2" />
+                  <Check size={15} strokeWidth={2.2} />
                   Elan yarat
                 </>
               }
-            </Button>
+            </button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Listing Detail Modal */}
       <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto p-0">
+        <DialogContent className="a-scope max-h-[90vh] overflow-y-auto p-0 rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           {selectedListing &&
           <>
               {/* Image Gallery */}
               <div className="relative">
                 {selectedListing.images && selectedListing.images.length > 0 ?
-              <div className="aspect-video bg-muted">
+              <div className="aspect-video" style={{ background: 'var(--a-surface-soft)' }}>
                     <img
                   src={selectedListing.images[0]}
                   alt={selectedListing.title}
@@ -774,7 +758,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 
                   </div> :
 
-              <div className={`aspect-video bg-gradient-to-br ${getCategoryInfo(selectedListing.category).color} flex items-center justify-center`}>
+              <div className="aspect-video flex items-center justify-center" style={{ background: getCategoryInfo(selectedListing.category).grad }}>
                     <span className="text-7xl">{getCategoryInfo(selectedListing.category).emoji}</span>
                   </div>
               }
@@ -782,6 +766,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 <motion.button
                 onClick={() => setShowDetailModal(false)}
                 className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
+                style={{ border: 'none', cursor: 'pointer' }}
                 whileTap={{ scale: 0.95 }}>
                 
                   <X className="w-4 h-4 text-white" />
@@ -801,54 +786,56 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
               
               <div className="p-5 space-y-4">
                 <div>
-                  <h2 className="text-xl font-bold text-foreground">{selectedListing.title}</h2>
+                  <h2 className="text-xl font-bold a-heading" style={{ margin: 0, color: 'var(--a-ink)' }}>{selectedListing.title}</h2>
                   <div className="flex items-center gap-2 mt-2">
-                    <Badge className={`${getConditionInfo(selectedListing.condition).color} text-white border-0`}>
+                    <span
+                    className="a-rank-tag"
+                    style={{ margin: 0, background: getConditionInfo(selectedListing.condition).soft, color: getConditionInfo(selectedListing.condition).ink }}>
                       {getConditionInfo(selectedListing.condition).label}
-                    </Badge>
+                    </span>
                     {selectedListing.age_range &&
-                  <Badge variant="secondary">{selectedListing.age_range}</Badge>
+                  <span className="a-rank-tag" style={{ margin: 0, background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>{selectedListing.age_range}</span>
                   }
                   </div>
                 </div>
                 
                 {/* Price Card */}
-                <Card className={`${selectedListing.is_free ? 'bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-emerald-200 dark:border-emerald-900/30' : 'bg-muted/50'}`}>
-                  <CardContent className="p-4 flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{tr("secondhandmarket_qiymet_54c4f3", "Qiymət")}</p>
-                      <p className={`text-2xl font-black ${selectedListing.is_free ? 'text-emerald-600' : 'text-foreground'}`}>
-                        {selectedListing.is_free ? tr("secondhandmarket_pulsuz", 'Pulsuz') : `${selectedListing.price} ₼`}
-                      </p>
-                    </div>
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${selectedListing.is_free ? 'bg-emerald-500' : 'bg-muted'}`}>
-                      <Tag className={`w-6 h-6 ${selectedListing.is_free ? 'text-white' : 'text-muted-foreground'}`} />
-                    </div>
-                  </CardContent>
-                </Card>
+                <div
+                className="rounded-2xl p-4 flex items-center justify-between"
+                style={{ background: selectedListing.is_free ? 'var(--a-green-1)' : 'var(--a-surface-soft)' }}>
+                  <div>
+                    <p className="text-sm" style={{ margin: 0, color: selectedListing.is_free ? 'var(--a-green-ink)' : 'var(--a-ink-soft)', opacity: 0.8 }}>{tr("secondhandmarket_qiymet_54c4f3", "Qiymət")}</p>
+                    <p className="a-heading" style={{ margin: 0, fontSize: 24, color: selectedListing.is_free ? '#14532d' : 'var(--a-ink)' }}>
+                      {selectedListing.is_free ? tr("secondhandmarket_pulsuz", 'Pulsuz') : `${selectedListing.price} ₼`}
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: selectedListing.is_free ? 'var(--a-green-2)' : 'var(--a-line-strong)' }}>
+                    <Tag className="w-6 h-6" style={{ color: selectedListing.is_free ? '#fff' : 'var(--a-ink-soft)' }} />
+                  </div>
+                </div>
                 
                 {selectedListing.description &&
               <div>
-                    <h4 className="font-bold mb-2">{tr("secondhandmarket_tesvir_f85651", "Təsvir")}</h4>
-                    <p className="text-muted-foreground">{selectedListing.description}</p>
+                    <h4 className="font-bold mb-2" style={{ color: 'var(--a-ink)' }}>{tr("secondhandmarket_tesvir_f85651", "Təsvir")}</h4>
+                    <p style={{ margin: 0, color: 'var(--a-body-text)' }}>{selectedListing.description}</p>
                   </div>
               }
                 
                 {selectedListing.location_city &&
-              <div className="flex items-center gap-2 text-muted-foreground">
+              <div className="flex items-center gap-2" style={{ color: 'var(--a-ink-soft)' }}>
                     <MapPin className="w-4 h-4" />
                     {selectedListing.location_city}
                   </div>
               }
                 
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--a-ink-soft)' }}>
                   <Clock className="w-4 h-4" />
                   {format(new Date(selectedListing.created_at), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
                 </div>
                 
-              <Button
-                className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
-                size="lg"
+              <button
+                className="a-cta-btn w-full"
+                style={{ justifyContent: 'center', height: 48, background: 'var(--a-green-2)', opacity: selectedListing?.user_id === profile?.user_id ? 0.5 : 1 }}
                 onClick={() => {
                   setShowDetailModal(false);
                   if (selectedListing) {
@@ -858,9 +845,9 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 }}
                 disabled={selectedListing?.user_id === profile?.user_id}>
                 
-                <MessageCircle className="w-5 h-5 mr-2" />
+                <MessageCircle size={16} strokeWidth={2.2} />
                 {selectedListing?.user_id === profile?.user_id ? tr("secondhandmarket_oz_elaninizdir_4cfb3d", "\xD6z elan\u0131n\u0131zd\u0131r") : tr("secondhandmarket_satici_ile_elaqe_a7f3e8", "Sat\u0131c\u0131 il\u0259 \u0259laq\u0259")}
-              </Button>
+              </button>
               </div>
             </>
           }
@@ -869,10 +856,10 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
 
       {/* Contact Seller Modal */}
       <Dialog open={showContactModal} onOpenChange={setShowContactModal}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="a-scope max-h-[90vh] overflow-y-auto rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-emerald-500" />
+            <DialogTitle className="flex items-center gap-2 a-heading" style={{ color: 'var(--a-ink)' }}>
+              <MessageCircle className="w-5 h-5" style={{ color: 'var(--a-green-2)' }} />
               {tr("secondhandmarket_satici_ile_elaqe_a7f3e8", "Sat\u0131c\u0131 il\u0259 \u0259laq\u0259")}
             </DialogTitle>
           </DialogHeader>
@@ -880,17 +867,17 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           {contactListing &&
           <div className="space-y-4 mt-2">
               {/* Listing info */}
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
+              <div className="flex items-center gap-3 p-3 rounded-2xl" style={{ background: 'var(--a-surface-soft)' }}>
                 {contactListing.images?.[0] ?
               <img src={contactListing.images[0]} alt="" className="w-12 h-12 rounded-lg object-cover" /> :
 
-              <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getCategoryInfo(contactListing.category).color} flex items-center justify-center`}>
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ background: getCategoryInfo(contactListing.category).grad }}>
                     <span className="text-xl">{getCategoryInfo(contactListing.category).emoji}</span>
                   </div>
               }
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm truncate">{contactListing.title}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="a-list-title truncate" style={{ margin: 0 }}>{contactListing.title}</p>
+                  <p className="a-list-sub" style={{ margin: 0 }}>
                     {contactListing.is_free ? tr("secondhandmarket_pulsuz", 'Pulsuz') : `${contactListing.price} ₼`}
                   </p>
                 </div>
@@ -900,9 +887,9 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
               <div className="max-h-60 overflow-y-auto space-y-2 p-2">
                 {contactMessages.length === 0 ?
               <div className="text-center py-6">
-                    <MessageCircle className="w-10 h-10 mx-auto text-muted-foreground/30 mb-2" />
-                    <p className="text-sm text-muted-foreground">{tr("secondhandmarket_hele_mesaj_yoxdur_cf0b5e", "Hələ mesaj yoxdur")}</p>
-                    <p className="text-xs text-muted-foreground">{tr("secondhandmarket_saticiya_mesaj_gonderin_ad78e2", "Satıcıya mesaj göndərin")}</p>
+                    <MessageCircle className="w-10 h-10 mx-auto mb-2" style={{ color: 'var(--a-ink-faint)' }} />
+                    <p className="a-list-sub" style={{ margin: 0 }}>{tr("secondhandmarket_hele_mesaj_yoxdur_cf0b5e", "Hələ mesaj yoxdur")}</p>
+                    <p className="text-xs" style={{ margin: 0, color: 'var(--a-ink-faint)' }}>{tr("secondhandmarket_saticiya_mesaj_gonderin_ad78e2", "Satıcıya mesaj göndərin")}</p>
                   </div> :
 
               contactMessages.map((msg) =>
@@ -910,15 +897,14 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 key={msg.id}
                 className={`flex ${msg.sender_id === profile?.user_id ? 'justify-end' : 'justify-start'}`}>
                 
-                      <div className={`max-w-[75%] px-3 py-2 rounded-2xl text-sm ${
-                msg.sender_id === profile?.user_id ?
-                'bg-primary text-primary-foreground rounded-br-sm' :
-                'bg-muted rounded-bl-sm'}`
-                }>
-                        <p>{msg.content}</p>
-                        <p className={`text-[10px] mt-1 ${
-                  msg.sender_id === profile?.user_id ? 'text-primary-foreground/60' : 'text-muted-foreground'}`
-                  }>
+                      <div
+                  className={`max-w-[75%] px-3 py-2 text-sm ${
+                  msg.sender_id === profile?.user_id ? 'rounded-2xl rounded-br-sm' : 'rounded-2xl rounded-bl-sm'}`}
+                  style={msg.sender_id === profile?.user_id ?
+                  { background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' } :
+                  { background: 'var(--a-surface-soft)', color: 'var(--a-ink)' }}>
+                        <p style={{ margin: 0 }}>{msg.content}</p>
+                        <p className="text-[10px] mt-1" style={{ margin: '4px 0 0', opacity: 0.6 }}>
                           {format(new Date(msg.created_at), 'HH:mm')}
                         </p>
                       </div>
@@ -929,26 +915,27 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
 
               {/* Message input */}
               <div className="flex gap-2">
-                <Input
+                <input
+                className="a-input flex-1"
                 placeholder={tr("secondhandmarket_mesajinizi_yazin_21d48f", "Mesajınızı yazın...")}
                 value={contactMessage}
                 onChange={(e) => setContactMessage(e.target.value)}
-                onKeyDown={(e) => {if (e.key === 'Enter' && !e.shiftKey) {e.preventDefault();handleSendMessage();}}}
-                className="flex-1" />
+                onKeyDown={(e) => {if (e.key === 'Enter' && !e.shiftKey) {e.preventDefault();handleSendMessage();}}} />
               
-                <Button
+                <button
+                className="a-cta-btn"
+                style={{ width: 42, height: 42, padding: 0, justifyContent: 'center', background: 'var(--a-green-2)', opacity: !contactMessage.trim() || sendingMessage ? 0.5 : 1 }}
                 onClick={handleSendMessage}
-                disabled={!contactMessage.trim() || sendingMessage}
-                className="bg-gradient-to-r from-emerald-500 to-teal-600">
+                disabled={!contactMessage.trim() || sendingMessage}>
                 
                   {sendingMessage ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                </Button>
+                </button>
               </div>
             </div>
           }
         </DialogContent>
       </Dialog>
-    </div>);
+    </ToolPage>);
 
 };
 

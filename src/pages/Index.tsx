@@ -12,16 +12,25 @@ import FloatingTimerWidget from '@/components/FloatingTimerWidget';
 import { useUserStore } from '@/store/userStore';
 import { isNative } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
+import { useAppSetting } from '@/hooks/useAppSettings';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
 import { useForceUpdate } from '@/hooks/useForceUpdate';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { resetAppScrollPosition } from '@/lib/scroll';
 import { initDeeplinkListener, ParsedDeeplink } from '@/lib/deeplink';
+import { pushBackHandler } from '@/lib/backButton';
+import { PUSH_NAV_EVENT, consumePendingPushNav, type PushNavIntent } from '@/lib/pushNav';
+
+// PremiumOnboarding.PENDING_FUNNEL_KEY ilə sinxron saxlanmalıdır
+// (lazy chunk-u pozmamaq üçün static import edilmir)
+const PENDING_FUNNEL_KEY = 'anacan_pending_funnel';
 
 // Lazy load heavy screens
+const PremiumOnboarding = lazy(() => import('@/components/onboarding/PremiumOnboarding'));
+const ReverseTrialFunnel = lazy(() => import('@/components/funnel/ReverseTrialFunnel'));
 const Dashboard = lazy(() => import('@/components/Dashboard'));
-const PartnerDashboard = lazy(() => import('@/components/PartnerDashboard'));
 const ToolsHub = lazy(() => import('@/components/ToolsHub'));
+const DoctorReportScreen = lazy(() => import('@/components/DoctorReportScreen'));
 const AIChatScreen = lazy(() => import('@/components/AIChatScreen'));
 const PartnerAIPremiumGate = lazy(() => import('@/components/partner/PartnerAIPremiumGate'));
 const PartnerChatScreen = lazy(() => import('@/components/partner/PartnerChatScreen'));
@@ -31,6 +40,8 @@ const ProfileScreen = lazy(() => import('@/components/ProfileScreen'));
 const PartnerProfileScreen = lazy(() => import('@/components/PartnerProfileScreen'));
 const NotificationsScreen = lazy(() => import('@/components/NotificationsScreen'));
 const SettingsScreen = lazy(() => import('@/components/SettingsScreen'));
+const HealthSyncScreen = lazy(() => import('@/components/HealthSyncScreen'));
+const ReferralScreen = lazy(() => import('@/components/ReferralScreen'));
 const CalendarScreen = lazy(() => import('@/components/CalendarScreen'));
 const AdminPanel = lazy(() => import('@/components/AdminPanel'));
 const MotherChatScreen = lazy(() => import('@/components/MotherChatScreen'));
@@ -48,7 +59,18 @@ const LegalScreen = lazy(() => import('@/components/LegalScreen'));
 const NameVotingScreen = lazy(() => import('@/components/partner/NameVotingScreen'));
 const PartnerHospitalBagScreen = lazy(() => import('@/components/partner/PartnerHospitalBagScreen'));
 const DailySummaryScreen = lazy(() => import('@/components/partner/DailySummaryScreen'));
-const SOSAlertReceiverModule = lazy(() => import('@/components/partner/SOSButton').then(m => ({ default: m.SOSAlertReceiver })));
+// ── Partner Module 2.0 ──
+const PartnerHomeScreen = lazy(() => import('@/components/partner/v2/PartnerHomeScreen'));
+const PartnerTogetherScreen = lazy(() => import('@/components/partner/v2/PartnerTogetherScreen'));
+const PartnerShoppingScreen = lazy(() => import('@/components/partner/v2/PartnerShoppingScreen'));
+const PartnerAppointmentsScreen = lazy(() => import('@/components/partner/v2/PartnerAppointmentsScreen'));
+const PartnerBabyDayScreen = lazy(() => import('@/components/partner/v2/PartnerBabyDayScreen'));
+const PartnerWeeklyStatsScreen = lazy(() => import('@/components/partner/v2/PartnerWeeklyStatsScreen'));
+const PartnerSurprisesScreen = lazy(() => import('@/components/partner/v2/PartnerSurprisesScreen'));
+const HospitalRunScreen = lazy(() => import('@/components/partner/v2/HospitalRunScreen'));
+const LiveContractionsScreen = lazy(() => import('@/components/partner/v2/LiveContractionsScreen'));
+const PartnerSharingScreen = lazy(() => import('@/components/partner/v2/PartnerSharingScreen'));
+const AlertReceiver = lazy(() => import('@/components/partner/v2/AlertReceiver'));
 const PartnersScreen = lazy(() => import('@/components/partners/PartnersScreen'));
 
 const suspenseFallback = (
@@ -85,8 +107,11 @@ const Index = () => {
   const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, hasSelectedLanguage, setHasSelectedLanguage, lifeStage, hasCompletedFunnel, setFunnelCompleted } = useUserStore();
-  const { isAdmin, loading, profile, user } = useAuth();
+  const { isAdmin, loading, profile, user, profileLoaded } = useAuth();
   const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
+  // Premium onboarding (funnel ilə) — app_settings ilə idarə olunur; setting yoxdursa AKTİVDİR
+  const premiumOnbSetting = useAppSetting('premium_onboarding_enabled');
+  const premiumOnboardingEnabled = premiumOnbSetting !== false;
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const swipeRestoreRef = useRef<SwipeRestoreState>(null);
@@ -124,6 +149,45 @@ const Index = () => {
       window.clearTimeout(timeoutId);
     };
   }, [activeTab, activeScreen, activeTool]);
+
+  // Push bildirişi naviqasiyası: toxunuş → düzgün ekran/tab
+  useEffect(() => {
+    const applyIntent = (intent: PushNavIntent) => {
+      if (intent.motherChat) {
+        // Partner rolunda söhbət ayrıca tab-dır; qadında MessagesScreen
+        if (role === 'partner') setActiveTab('chat');else
+        setShowMotherChat(true);
+        return;
+      }
+      if (intent.screen) {setActiveScreen(intent.screen);return;}
+      if (intent.tab) {setActiveScreen(null);setActiveTab(intent.tab);}
+    };
+
+    // Soyuq başlanğıc: push app-ı açıbsa intent gözləyir
+    const pendingIntent = consumePendingPushNav();
+    if (pendingIntent) applyIntent(pendingIntent);
+
+    const onPushNav = (e: Event) => {
+      const intent = (e as CustomEvent<PushNavIntent>).detail;
+      if (intent) applyIntent(intent);
+    };
+    window.addEventListener(PUSH_NAV_EVENT, onPushNav);
+    return () => window.removeEventListener(PUSH_NAV_EVENT, onPushNav);
+  }, [role]);
+
+  // Android hardware geri: ekran iyerarxiyasını addım-addım bağla
+  // (sub-screen → tool → user-profil → söhbət → tab → home; sonra backButton.ts çıxış idarə edir)
+  useEffect(() => {
+    return pushBackHandler(() => {
+      if (showAdmin) {setShowAdmin(false);return true;}
+      if (viewingUserId) {setViewingUserId(null);return true;}
+      if (showMotherChat) {setShowMotherChat(false);return true;}
+      if (activeScreen) {setActiveScreen(null);return true;}
+      if (activeTool) {setActiveTool(null);setToolsResetKey((k) => k + 1);return true;}
+      if (activeTab !== 'home') {setActiveTab('home');return true;}
+      return false; // kök: backButton.ts "yenidən bas" göstərəcək
+    });
+  }, [showAdmin, viewingUserId, showMotherChat, activeScreen, activeTool, activeTab]);
 
   useEffect(() => {
     // Track screen/tab views with proper naming
@@ -293,7 +357,13 @@ const Index = () => {
         case 'home':
           return (
             <motion.div key="partner-home" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-              <PartnerDashboard onNavigate={setActiveScreen} />
+              <PartnerHomeScreen onNavigate={setActiveScreen} onOpenChat={() => setActiveTab('chat')} />
+            </motion.div>
+          );
+        case 'together':
+          return (
+            <motion.div key="partner-together" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+              <PartnerTogetherScreen onNavigate={setActiveScreen} />
             </motion.div>
           );
         case 'chat':
@@ -432,12 +502,35 @@ const Index = () => {
   const isPartnerUser = role === 'partner' || lifeStage === 'partner';
 
   // Onboarding - Partners skip onboarding entirely
+  // KRİTİK: login-dən sonra profil hələ yüklənməyibsə (hydration davam edir)
+  // onboarding GÖSTƏRMƏ — köhnə istifadəçi hər login-də modul seçiminə atılırdı.
+  // Onboarding yalnız profil yüklənəndən SONRA hələ də isOnboarded=false qalıbsa
+  // (həqiqətən yeni istifadəçi) açılır.
   if (!isOnboarded && !isPartnerUser) {
-    return <OnboardingScreen />;
+    if (!profileLoaded) {
+      return suspenseFallback;
+    }
+    return premiumOnboardingEnabled ?
+    <Suspense fallback={suspenseFallback}><PremiumOnboarding /></Suspense> :
+    <OnboardingScreen />;
   }
 
-  // Reverse Trial Funnel disabled for all users (production + dev).
+  // Premium funnel: yalnız YENİ qeydiyyatdan dərhal sonra (PENDING_FUNNEL_KEY bayrağı).
+  // Köhnə istifadəçilər / re-login / flag off → funnel atlanır (davranış dəyişməz).
   if (!hasCompletedFunnel) {
+    const pendingFunnel = (() => {
+      try {return localStorage.getItem(PENDING_FUNNEL_KEY) === '1';} catch {return false;}
+    })();
+    if (premiumOnboardingEnabled && !isPartnerUser && pendingFunnel) {
+      return (
+        <Suspense fallback={suspenseFallback}>
+          <ReverseTrialFunnel
+            onComplete={() => {
+              try {localStorage.removeItem(PENDING_FUNNEL_KEY);} catch {/* boş */}
+              setFunnelCompleted(true);
+            }} />
+        </Suspense>);
+    }
     setFunnelCompleted(true);
   }
 
@@ -455,7 +548,10 @@ const Index = () => {
 
   // Sub-screens
   if (activeScreen === 'notifications') return <Suspense fallback={suspenseFallback}><NotificationsScreen onBack={() => setActiveScreen(null)} onNavigateToCommunity={() => { setActiveScreen(null); setActiveTab('community'); }} /></Suspense>;
-  if (activeScreen === 'settings') return <Suspense fallback={suspenseFallback}><SettingsScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'settings') return <Suspense fallback={suspenseFallback}><SettingsScreen onBack={() => setActiveScreen(null)} onNavigate={setActiveScreen} /></Suspense>;
+  if (activeScreen === 'health-sync') return <Suspense fallback={suspenseFallback}><HealthSyncScreen onBack={() => setActiveScreen('settings')} /></Suspense>;
+  if (activeScreen === 'referral') return <Suspense fallback={suspenseFallback}><ReferralScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'doctor-report') return <Suspense fallback={suspenseFallback}><DoctorReportScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'calendar') return <Suspense fallback={suspenseFallback}><CalendarScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'edit-profile') return <Suspense fallback={suspenseFallback}><ProfileEditScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'help') return <Suspense fallback={suspenseFallback}><HelpScreen onBack={() => setActiveScreen(null)} /></Suspense>;
@@ -475,6 +571,15 @@ const Index = () => {
   if (activeScreen === 'name-voting' && role === 'partner') return <Suspense fallback={suspenseFallback}><NameVotingScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'partner-hospital-bag' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerHospitalBagScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'daily-summary' && role === 'partner') return <Suspense fallback={suspenseFallback}><DailySummaryScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  {/* ── Partner Module 2.0 sub-screens ── */}
+  if (activeScreen === 'partner-shopping' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerShoppingScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'partner-appointments' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerAppointmentsScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'partner-baby-day' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerBabyDayScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'partner-weekly-stats' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerWeeklyStatsScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'partner-surprises' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerSurprisesScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'hospital-run' && role === 'partner') return <Suspense fallback={suspenseFallback}><HospitalRunScreen onBack={() => setActiveScreen(null)} onNavigate={setActiveScreen} onOpenContractions={() => setActiveScreen('live-contractions')} /></Suspense>;
+  if (activeScreen === 'live-contractions' && role === 'partner') return <Suspense fallback={suspenseFallback}><LiveContractionsScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'partner-sharing' && role !== 'partner') return <Suspense fallback={suspenseFallback}><PartnerSharingScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'partners') return <Suspense fallback={suspenseFallback}><PartnersScreen onBack={() => setActiveScreen(null)} /></Suspense>;
 
   // Messages screen (unified: partner + community DMs)
@@ -489,22 +594,42 @@ const Index = () => {
     );
   }
 
+  // Redesigned (anacan-demo) screens paint their own peach background
+  const isAnacanRedesignHome =
+    role !== 'partner' && (
+      (activeTab === 'home' && (lifeStage === 'mommy' || lifeStage === 'bump' || lifeStage === 'flow')) ||
+      activeTab === 'tools' ||
+      activeTab === 'community' ||
+      activeTab === 'ai' ||
+      activeTab === 'profile'
+    );
+
   return (
-    <div className="fixed inset-0 flex flex-col bg-background overflow-hidden">
+    <div
+      className={`fixed inset-0 flex flex-col overflow-hidden ${isAnacanRedesignHome ? '' : 'bg-background'}`}
+      style={isAnacanRedesignHome ? { background: 'var(--a-bg)' } : undefined}
+    >
       {/* App Rating Prompt */}
       <AppRatingPrompt />
       
-      {/* SOS Alert Receiver for partners */}
-      {role === 'partner' && <Suspense fallback={null}><SOSAlertReceiverModule /></Suspense>}
+      {/* SOS / Doğuş siqnalı qəbuledicisi — bağlı olan HƏR İKİ tərəf üçün */}
+      {profile?.linked_partner_id &&
+        <Suspense fallback={null}>
+          <AlertReceiver
+            isPartner={role === 'partner'}
+            onHospitalRun={() => setActiveScreen('hospital-run')} />
+        </Suspense>
+      }
       
       {/* Status bar area - fills with card background */}
       <div 
-        className="bg-card flex-shrink-0" 
-        style={{ height: 'env(safe-area-inset-top)' }} 
+        className={`flex-shrink-0 ${isAnacanRedesignHome ? '' : 'bg-card'}`}
+        style={{ height: 'env(safe-area-inset-top)', ...(isAnacanRedesignHome ? { background: 'var(--a-bg)' } : {}) }} 
       />
       
       {/* Main scrollable content area */}
-      <div ref={scrollContainerRef} data-scroll-container className="flex-1 overflow-y-auto overflow-x-hidden overscroll-none pb-16">
+      {/* pb-nav: BottomNav + safe-area klirensi — son elementlər nav altında qalmasın */}
+      <div ref={scrollContainerRef} data-scroll-container className="flex-1 overflow-y-auto overflow-x-hidden overscroll-none pb-nav">
         <Suspense fallback={
           <div className="flex-1 flex items-center justify-center py-20">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />

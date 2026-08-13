@@ -117,18 +117,19 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
   };
 
   return (
-    <div className="bg-violet-50/50 dark:bg-violet-500/10 rounded-2xl overflow-hidden border border-violet-100 dark:border-violet-500/20">
+    <div className="rounded-[20px] overflow-hidden" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', boxShadow: 'var(--a-card-shadow)' }}>
       <button
         onClick={handleToggle}
-        className="w-full p-3 flex items-center justify-between hover:bg-violet-100/30 dark:hover:bg-violet-500/15 transition-colors"
+        className="w-full p-3 flex items-center justify-between transition-colors"
+        style={{ background: 'none', border: 'none', cursor: 'pointer' }}
       >
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-500/20 flex items-center justify-center">
-            <Moon className="w-4 h-4 text-violet-600 dark:text-violet-400" />
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'var(--a-grad-lav)' }}>
+            <Moon className="w-4 h-4" style={{ color: '#3c2e5c' }} />
           </div>
           <div className="text-left">
-            <p className="text-xs font-semibold text-foreground">{tr("sleephistorypanel_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-ink)' }}>{tr("sleephistorypanel_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
+            <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>
               {todaySleepStats.count > 0
                 ? `🌙 ${todaySleepStats.count} ${tr('sleephistorypanel_times','dəfə')} · ${formatDuration(todaySleepStats.totalMinutes)}`
                 : tr('sleephistorypanel_no_records','Qeyd yoxdur')}
@@ -138,13 +139,13 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
         <div className="flex items-center gap-2">
           {todaySleepStats.count > 0 && (
             <div className="text-right mr-2">
-              <p className="text-xs font-bold text-violet-600 dark:text-violet-400">
+              <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-lav-ink)' }}>
                 {formatDuration(todaySleepStats.totalMinutes)}
               </p>
-              <p className="text-[10px] text-muted-foreground">{tr("sleephistorypanel_bu_gun_7d7f30", "bu gün")}</p>
+              <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{tr("sleephistorypanel_bu_gun_7d7f30", "bu gün")}</p>
             </div>
           )}
-          {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+          {isExpanded ? <ChevronUp className="w-4 h-4" style={{ color: 'var(--a-ink-faint)' }} /> : <ChevronDown className="w-4 h-4" style={{ color: 'var(--a-ink-faint)' }} />}
         </div>
       </button>
 
@@ -161,12 +162,12 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
               {sleepHistory.map(([date, items]) => (
                 <div key={date} className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-semibold text-foreground">{getDateLabel(date)}</p>
-                    <p className="text-[10px] text-muted-foreground">{items.length} {tr('sleephistorypanel_sleep_sessions','yuxu')}</p>
+                    <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-ink)' }}>{getDateLabel(date)}</p>
+                    <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{items.length} {tr('sleephistorypanel_sleep_sessions','yuxu')}</p>
                   </div>
 
                   {items.length === 0 ? (
-                    <p className="text-xs text-muted-foreground text-center py-2">{tr('sleephistorypanel_no_records','Qeyd yoxdur')}</p>
+                    <p className="text-xs text-center py-2" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{tr('sleephistorypanel_no_records','Qeyd yoxdur')}</p>
                   ) : (
                     <div className="space-y-1">
                       {items.map((log) => {
@@ -177,69 +178,71 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
                         return (
                           <div key={log.id} className="relative">
                             {deletingId === log.id ? (
-                              <div className="flex items-center justify-between bg-destructive/10 rounded-lg px-2.5 py-2 border border-destructive/20">
-                                <span className="text-xs text-destructive font-medium">{tr("sleephistorypanel_silmek_isteyirsiniz_77af6b", "Silmək istəyirsiniz?")}</span>
+                              <div className="flex items-center justify-between rounded-lg px-2.5 py-2" style={{ background: 'var(--a-pink-1)' }}>
+                                <span className="text-xs font-semibold" style={{ color: 'var(--a-pink-ink)' }}>{tr("sleephistorypanel_silmek_isteyirsiniz_77af6b", "Silmək istəyirsiniz?")}</span>
                                 <div className="flex gap-1.5">
-                                  <button onClick={() => handleDelete(log.id)} className="p-1.5 rounded-full bg-destructive/20 text-destructive">
+                                  <button onClick={() => handleDelete(log.id)} className="p-1.5 rounded-full" style={{ background: 'var(--a-pink-2)', color: '#fff', border: 'none', cursor: 'pointer' }}>
                                     <Check className="w-3 h-3" />
                                   </button>
-                                  <button onClick={() => setDeletingId(null)} className="p-1.5 rounded-full bg-muted text-muted-foreground">
+                                  <button onClick={() => setDeletingId(null)} className="p-1.5 rounded-full" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-pink-ink)', border: 'none', cursor: 'pointer' }}>
                                     <X className="w-3 h-3" />
                                   </button>
                                 </div>
                               </div>
                             ) : editingId === log.id ? (
-                              <div className="bg-primary/5 rounded-lg px-2.5 py-2 border border-primary/20 space-y-2">
+                              <div className="rounded-lg px-2.5 py-2 space-y-2" style={{ background: 'var(--a-lav-1)' }}>
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm">🌙</span>
-                                  <span className="text-xs font-medium text-foreground">{tr('sleephistorypanel_sleep_label','Yuxu')}</span>
+                                  <span className="text-xs font-semibold" style={{ color: 'var(--a-lav-ink)' }}>{tr('sleephistorypanel_sleep_label','Yuxu')}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <input
                                     type="time"
                                     value={editStartTime}
                                     onChange={(e) => setEditStartTime(e.target.value)}
-                                    className="text-xs bg-background border border-border rounded px-2 py-1 w-24"
+                                    className="text-xs rounded px-2 py-1 w-24"
+                                    style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line-strong)', color: 'var(--a-ink)' }}
                                   />
-                                  <span className="text-xs text-muted-foreground">-</span>
+                                  <span className="text-xs" style={{ color: 'var(--a-lav-ink)' }}>-</span>
                                   <input
                                     type="time"
                                     value={editEndTime}
                                     onChange={(e) => setEditEndTime(e.target.value)}
-                                    className="text-xs bg-background border border-border rounded px-2 py-1 w-24"
+                                    className="text-xs rounded px-2 py-1 w-24"
+                                    style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line-strong)', color: 'var(--a-ink)' }}
                                   />
                                 </div>
                                 <div className="flex justify-end gap-1.5">
-                                  <button onClick={() => handleSaveEdit(log)} className="p-1.5 rounded-full bg-primary/20 text-primary">
+                                  <button onClick={() => handleSaveEdit(log)} className="p-1.5 rounded-full" style={{ background: 'var(--a-green-2)', color: '#fff', border: 'none', cursor: 'pointer' }}>
                                     <Check className="w-3 h-3" />
                                   </button>
-                                  <button onClick={() => setEditingId(null)} className="p-1.5 rounded-full bg-muted text-muted-foreground">
+                                  <button onClick={() => setEditingId(null)} className="p-1.5 rounded-full" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-lav-ink)', border: 'none', cursor: 'pointer' }}>
                                     <X className="w-3 h-3" />
                                   </button>
                                 </div>
                               </div>
                             ) : (
-                              <div className="flex items-center justify-between bg-white/60 dark:bg-card/60 rounded-lg px-2.5 py-1.5 border border-transparent dark:border-border/30 group">
+                              <div className="flex items-center justify-between rounded-lg px-2.5 py-1.5 group" style={{ background: 'var(--a-surface-soft)' }}>
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm">🌙</span>
                                   <div>
-                                    <p className="text-xs font-medium text-foreground">{tr('sleephistorypanel_sleep_label','Yuxu')}</p>
-                                    <p className="text-[10px] text-muted-foreground">
+                                    <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-ink)' }}>{tr('sleephistorypanel_sleep_label','Yuxu')}</p>
+                                    <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>
                                       {format(startTime, 'HH:mm')}
                                       {endTime && ` - ${format(endTime, 'HH:mm')}`}
                                     </p>
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <div className="flex items-center gap-1 text-violet-600 dark:text-violet-400">
+                                  <div className="flex items-center gap-1" style={{ color: 'var(--a-lav-ink)' }}>
                                     <Clock className="w-3 h-3" />
                                     <span className="text-xs font-bold">{formatDuration(durationMin)}</span>
                                   </div>
                                   <div className="flex gap-0.5">
-                                    <button onClick={() => handleEdit(log)} className="p-1 rounded text-muted-foreground hover:text-primary">
+                                    <button onClick={() => handleEdit(log)} className="p-1 rounded" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--a-ink-soft)' }}>
                                       <Pencil className="w-3 h-3" />
                                     </button>
-                                    <button onClick={() => setDeletingId(log.id)} className="p-1 rounded text-muted-foreground hover:text-destructive">
+                                    <button onClick={() => setDeletingId(log.id)} className="p-1 rounded" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--a-pink-ink)' }}>
                                       <Trash2 className="w-3 h-3" />
                                     </button>
                                   </div>

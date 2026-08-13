@@ -1,12 +1,16 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { Check, Search, ChevronLeft, Globe } from 'lucide-react';
-import { clearTranslationCache, loadTranslations } from '@/lib/i18n';
+import { clearTranslationCache, loadTranslations, fetchActiveLanguages } from '@/lib/i18n';
 import logoImage from '@/assets/logo.png';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import countriesData from '../../countries.json';
 
-const LANGS = [
+// flagcdn ölkə kodu xəritəsi (dil kodu → bayraq kodu)
+const FLAG_BY_CODE: Record<string, string> = { az: 'az', en: 'gb', ru: 'ru', tr: 'tr' };
+
+// İlkin/fallback siyahı — app_languages sorğusu gələnə qədər və ya offline halda.
+const FALLBACK_LANGS = [
   {
     code: 'az',
     label: 'Azərbaycan',
@@ -18,7 +22,7 @@ const LANGS = [
     code: 'en',
     label: 'English',
     nativeLabel: 'English',
-    subLabel: 'İngilis dili',
+    subLabel: 'English',
     flag: 'gb',
   },
 ];
@@ -29,6 +33,24 @@ export default function InitialLanguageScreen() {
   const [selectedLang, setSelectedLang] = useState<string>(useUserStore.getState().language || 'az');
   const [isSwitching, setIsSwitching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [langs, setLangs] = useState(FALLBACK_LANGS);
+
+  // Aktiv dillər DB-dən (app_languages.is_active) — ru/tr açılışı app release tələb etmir.
+  useEffect(() => {
+    fetchActiveLanguages()
+      .then((list) =>
+        setLangs(
+          list.map((l) => ({
+            code: l.code,
+            label: l.native_name,
+            nativeLabel: l.native_name,
+            subLabel: l.name,
+            flag: FLAG_BY_CODE[l.code] || 'az',
+          }))
+        )
+      )
+      .catch(() => {});
+  }, []);
 
   const handleLangSelect = (code: string) => {
     if (isSwitching) return;
@@ -60,29 +82,34 @@ export default function InitialLanguageScreen() {
     return countriesData.filter(c => c.name.toLowerCase().includes(lowerQuery));
   }, [searchQuery]);
 
+  // Bu ekran tərcümə yüklənməzdən ƏVVƏL göstərilir — mətnlər inline saxlanır.
+  const L = (m: Record<string, string>) => m[selectedLang] ?? m.az;
   const t = {
-    selectCountry: selectedLang === 'en' ? 'Select Country' : 'Ölkə seçin',
-    selectCountryCap: selectedLang === 'en' ? 'SELECT COUNTRY' : 'SELECT COUNTRY',
-    searchPlaceholder: selectedLang === 'en' ? 'Search' : 'Axtar',
-    noneFound: selectedLang === 'en' ? 'No countries found' : 'Ölkə tapılmadı',
-    selectLanguage: selectedLang === 'en' ? 'Select Language' : 'Dil seçin',
+    selectCountry: L({ az: 'Ölkə seçin', en: 'Select Country', ru: 'Выберите страну', tr: 'Ülke seçin' }),
+    selectCountryCap: 'SELECT COUNTRY',
+    searchPlaceholder: L({ az: 'Axtar', en: 'Search', ru: 'Поиск', tr: 'Ara' }),
+    noneFound: L({ az: 'Ölkə tapılmadı', en: 'No countries found', ru: 'Страны не найдены', tr: 'Ülke bulunamadı' }),
+    selectLanguage: L({ az: 'Dil seçin', en: 'Select Language', ru: 'Выберите язык', tr: 'Dil seçin' }),
     selectLanguageCap: 'SELECT LANGUAGE',
-    continue: selectedLang === 'en' ? 'Continue' : 'Davam et',
+    continue: L({ az: 'Davam et', en: 'Continue', ru: 'Продолжить', tr: 'Devam et' }),
     continueEn: 'Continue',
   };
 
   return (
     <div
-      className="h-[100dvh] flex flex-col bg-background relative overflow-hidden"
+      className="a-scope h-[100dvh] flex flex-col relative overflow-hidden"
       style={{
+        background: 'var(--a-bg)',
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
-      {/* Subtle warm accents */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-24 -right-16 w-[320px] h-[320px] rounded-full bg-primary/15 blur-[110px]" />
-        <div className="absolute -bottom-24 -left-16 w-[320px] h-[320px] rounded-full bg-accent/10 blur-[110px]" />
+      {/* Watercolor sky */}
+      <div className="a-sky" aria-hidden>
+        <span className="a-cloud c1" />
+        <span className="a-cloud c2" />
+        <span className="a-cloud c3" />
+        <span className="a-cloud c4" />
       </div>
 
       <div className="flex-1 flex flex-col px-6 py-8 relative z-10 w-full max-w-md mx-auto h-full">
@@ -98,20 +125,21 @@ export default function InitialLanguageScreen() {
             >
               {/* Compact brand */}
               <div className="flex flex-col items-center mb-8">
-                <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center shadow-md shadow-primary/20 mb-5 overflow-hidden">
-                  <img src={logoImage} alt="Anacan" className="w-8 h-8 object-contain" />
+                <div className="w-14 h-14 flex items-center justify-center mb-5 overflow-hidden"
+                style={{ borderRadius: 18, background: 'var(--a-grad-peach)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.5)' }}>
+                  <img src={logoImage} alt="Anacan" className="w-9 h-9 object-contain" />
                 </div>
-                <h1 className="text-xl font-bold text-foreground leading-tight">
+                <h1 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 1.2, color: 'var(--a-ink)' }}>
                   {t.selectLanguage}
                 </h1>
-                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide mt-1">
+                <p style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--a-on-bg-soft)', marginTop: 4 }}>
                   {t.selectLanguageCap}
                 </p>
               </div>
 
               {/* 2-column language grid */}
               <div className="grid grid-cols-2 gap-3 w-full">
-                {LANGS.map((lang, idx) => {
+                {langs.map((lang, idx) => {
                   const isSelected = selectedLang === lang.code;
                   return (
                     <motion.button
@@ -122,23 +150,26 @@ export default function InitialLanguageScreen() {
                       whileTap={{ scale: 0.97 }}
                       onClick={() => handleLangSelect(lang.code)}
                       disabled={isSwitching}
-                      className={`relative flex flex-col items-center p-4 rounded-2xl bg-card transition-all cursor-pointer disabled:cursor-not-allowed ${
-                        isSelected
-                          ? 'border-2 border-primary shadow-[var(--shadow-button)]'
-                          : 'border border-border/60 shadow-sm'
-                      }`}
+                      className="relative flex flex-col items-center transition-all cursor-pointer disabled:cursor-not-allowed"
+                      style={{
+                        padding: 16,
+                        borderRadius: 20,
+                        background: 'var(--a-surface)',
+                        border: isSelected ? '2px solid var(--a-peach-2)' : '2px solid transparent',
+                        boxShadow: 'var(--a-card-shadow)'
+                      }}
                     >
-                      <div className="mb-2.5 rounded-md overflow-hidden border border-border/40 shadow-sm">
+                      <div className="mb-2.5 rounded-md overflow-hidden" style={{ border: '1px solid var(--a-line)', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}>
                         <img
                           src={`https://flagcdn.com/w40/${lang.flag}.png`}
                           alt={lang.code}
                           className="w-9 h-6 object-cover"
                         />
                       </div>
-                      <span className="text-sm font-bold text-foreground">
+                      <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>
                         {lang.nativeLabel}
                       </span>
-                      <span className="text-[10px] text-muted-foreground font-medium uppercase mt-0.5 tracking-wide">
+                      <span style={{ fontSize: 9.5, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--a-ink-soft)', marginTop: 2 }}>
                         {lang.subLabel}
                       </span>
                       {isSelected && (
@@ -146,9 +177,10 @@ export default function InitialLanguageScreen() {
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ type: 'spring', stiffness: 400, damping: 18 }}
-                          className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center"
+                          className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
+                          style={{ background: 'var(--a-peach-2)' }}
                         >
-                          <Check className="w-3 h-3 text-primary-foreground" strokeWidth={3.5} />
+                          <Check className="w-3 h-3 text-white" strokeWidth={3.5} />
                         </motion.div>
                       )}
                     </motion.button>
@@ -164,14 +196,15 @@ export default function InitialLanguageScreen() {
                 whileTap={{ scale: 0.98 }}
                 onClick={handleContinue}
                 disabled={isSwitching || !selectedLang}
-                className="w-full mt-8 py-4 bg-primary text-primary-foreground rounded-2xl font-bold text-sm shadow-md shadow-primary/20 transition-all disabled:opacity-70"
+                className="w-full mt-8 py-4 rounded-full text-white transition-all disabled:opacity-70"
+                style={{ background: 'var(--a-peach-2)', fontSize: 14, fontWeight: 700, boxShadow: '0 16px 32px -12px rgba(217, 108, 74, 0.6)' }}
               >
                 {t.continue}
                 <span className="font-normal opacity-70 mx-1.5">·</span>
                 <span className="font-medium opacity-90">{t.continueEn}</span>
               </motion.button>
 
-              <p className="text-center text-[11px] text-muted-foreground/80 mt-5 leading-relaxed">
+              <p className="text-center mt-5 leading-relaxed" style={{ fontSize: 11, color: 'var(--a-on-bg-soft)' }}>
                 {selectedLang === 'en'
                   ? 'You can change the language later in settings'
                   : 'Dili sonradan tənzimləmələrdən dəyişə bilərsiniz'}
@@ -190,15 +223,16 @@ export default function InitialLanguageScreen() {
               <div className="flex items-center justify-between mb-5 pt-2">
                 <button
                   onClick={() => setStep(1)}
-                  className="w-10 h-10 flex items-center justify-center bg-card rounded-xl border border-border/60 text-muted-foreground hover:text-foreground transition-colors shadow-sm"
+                  className="a-icon-btn"
+                  aria-label="Back"
                 >
-                  <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
+                  <ChevronLeft size={18} strokeWidth={2.5} />
                 </button>
                 <div className="text-center">
-                  <h2 className="text-lg font-bold text-foreground leading-tight">
+                  <h2 style={{ fontSize: 17, fontWeight: 800, lineHeight: 1.2, color: 'var(--a-ink)' }}>
                     {t.selectCountry}
                   </h2>
-                  <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">
+                  <p style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--a-on-bg-soft)', marginTop: 2 }}>
                     {t.selectCountryCap}
                   </p>
                 </div>
@@ -207,18 +241,19 @@ export default function InitialLanguageScreen() {
 
               {/* Search */}
               <div className="relative mb-4">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" strokeWidth={2.5} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" strokeWidth={2.5} style={{ color: 'var(--a-ink-faint)' }} />
                 <input
                   type="text"
                   placeholder={t.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full py-3.5 pl-11 pr-4 bg-card border border-border/60 rounded-xl text-sm focus:outline-none focus:border-primary transition-colors shadow-sm"
+                  className="w-full py-3.5 pl-11 pr-4 rounded-2xl text-sm focus:outline-none transition-colors"
+                  style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', color: 'var(--a-ink)', boxShadow: 'var(--a-card-shadow)' }}
                 />
               </div>
 
               {/* List card */}
-              <div className="flex-1 bg-card rounded-2xl border border-border/60 shadow-sm overflow-hidden mb-4">
+              <div className="flex-1 overflow-hidden mb-4" style={{ background: 'var(--a-surface)', borderRadius: 20, boxShadow: 'var(--a-card-shadow)' }}>
                 <div className="h-full overflow-y-auto scrollbar-hide">
                   {filteredCountries.length > 0 ? (
                     filteredCountries.map((country, idx) => (
@@ -228,25 +263,26 @@ export default function InitialLanguageScreen() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: Math.min(idx * 0.02, 0.3), duration: 0.25 }}
                         onClick={() => handleCountrySelect(country.isoAlpha2)}
-                        className="w-full flex items-center px-4 py-3 hover:bg-background transition-colors cursor-pointer border-b border-border/40 last:border-b-0"
+                        className="w-full flex items-center px-4 py-3 transition-colors cursor-pointer"
+                        style={{ borderBottom: '1px solid var(--a-line)' }}
                       >
-                        <div className="w-6 h-4 mr-3 overflow-hidden rounded-sm border border-border/40 flex-shrink-0 shadow-sm">
+                        <div className="w-6 h-4 mr-3 overflow-hidden rounded-sm flex-shrink-0" style={{ border: '1px solid var(--a-line)' }}>
                           <img
                             src={country.flag.startsWith('data:') ? country.flag : `data:image/png;base64,${country.flag}`}
                             alt={country.name}
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <span className="text-sm font-semibold text-foreground text-left flex-1">
+                        <span className="text-left flex-1" style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--a-ink)' }}>
                           {country.name}
                         </span>
-                        <ChevronLeft className="w-4 h-4 text-muted-foreground/60 rotate-180" />
+                        <ChevronLeft className="w-4 h-4 rotate-180" style={{ color: 'var(--a-ink-faint)' }} />
                       </motion.button>
                     ))
                   ) : (
                     <div className="text-center py-12 px-4">
-                      <Globe className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
-                      <p className="text-sm text-muted-foreground">{t.noneFound}</p>
+                      <Globe className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--a-ink-faint)' }} />
+                      <p style={{ fontSize: 13, color: 'var(--a-ink-soft)' }}>{t.noneFound}</p>
                     </div>
                   )}
                 </div>

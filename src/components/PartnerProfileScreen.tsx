@@ -292,12 +292,6 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
         
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-foreground">{tr("partnerprofilescreen_nailiyyetler_92db73", "Nailiyyətlər")}</h3>
-          <button
-            onClick={() => onNavigate?.('achievements')}
-            className="text-primary text-sm font-semibold flex items-center gap-1">
-            {tr("partnerprofilescreen_hamisi_c73c4d", "Ham\u0131s\u0131")} 
-            <ChevronRight className="w-4 h-4" />
-          </button>
         </div>
         <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
           {achievements.map((achievement) =>

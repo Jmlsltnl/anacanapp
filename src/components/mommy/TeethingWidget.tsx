@@ -1,14 +1,17 @@
 import { motion } from 'framer-motion';
 import { tr } from '@/lib/tr';
-import { Sparkles, ChevronRight, Check, Clock } from 'lucide-react';
+import { ChevronRight, Check, Clock } from 'lucide-react';
 import { useTeething } from '@/hooks/useTeething';
 import { useChildren } from '@/hooks/useChildren';
-import { Progress } from '@/components/ui/progress';
 
 interface TeethingWidgetProps {
   onOpen: () => void;
 }
 
+/**
+ * Teething tracker summary — redesigned to the anacan-demo card.
+ * Same data source (useTeething / baby_teeth) and same tap-to-open behaviour.
+ */
 const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
   const { selectedChild, getChildAge, hasChildren, loading: childrenLoading } = useChildren();
   const { emergedCount, totalTeeth, progress, loading: teethingLoading } = useTeething();
@@ -16,8 +19,8 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
   // Don't render if still loading
   if (childrenLoading || teethingLoading) {
     return (
-      <div className="bg-card rounded-2xl p-4 animate-pulse">
-        <div className="h-20 bg-muted rounded-xl" />
+      <div className="a-card animate-pulse">
+        <div style={{ height: 80, borderRadius: 16, background: 'var(--a-surface-soft)' }} />
       </div>);
 
   }
@@ -60,74 +63,69 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
 
   // Determine status
   const isOnTrack = emergedCount >= expectedTeeth - 2;
-  const statusColor = isOnTrack ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400';
-  const statusBg = isOnTrack ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-amber-50 dark:bg-amber-950/30';
 
   return (
     <motion.button
       onClick={onOpen}
       className="w-full text-left"
+      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}>
       
-      <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-primary/10 dark:from-primary/15 dark:via-primary/10 dark:to-primary/15 rounded-2xl p-4 border border-primary/20 relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-2xl" />
-        
-        <div className="relative">
-          {/* Header */}
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
-                <Sparkles className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-sm">{tr("teethingwidget_dis_cixarma_ca53f7", "Diş Çıxarma")}</h3>
-                <p className="text-xs text-muted-foreground">
-                  {selectedChild.name} • {childAge.displayText}
-                </p>
-              </div>
-            </div>
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
-          </div>
+      <div className="a-card a-fade-in">
+        <div className="a-card-head" style={{ marginBottom: 6 }}>
+          <h3 className="a-card-title a-heading">{tr("teethingwidget_dis_cixarma_ca53f7", "Diş Çıxarma")}</h3>
+          <span className="a-section-link" style={{ color: 'var(--a-ink-soft)' }}>
+            {emergedCount}/{totalTeeth} <ChevronRight size={13} />
+          </span>
+        </div>
 
-          {/* Progress */}
-          <div className="mb-3">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs text-muted-foreground">{tr("teethingwidget_cixan_disler_a9eadd", "Çıxan dişlər")}</span>
-              <span className="text-sm font-bold text-primary">{emergedCount} / {totalTeeth}</span>
-            </div>
-            <Progress value={progress} className="h-2 bg-primary/10" />
-          </div>
+        {/* Progress */}
+        <div className="a-inline-bar">
+          <div className="a-inline-bar-fill" style={{ width: `${progress}%`, background: 'var(--a-grad-peach)' }} />
+        </div>
+        <p style={{ margin: '10px 0 0', fontSize: 12.5, color: 'var(--a-ink-soft)' }}>
+          <strong style={{ color: 'var(--a-ink)' }}>{emergedCount} / {totalTeeth}</strong> {tr("teethingwidget_cixan_disler_a9eadd", "Çıxan dişlər").toLowerCase()}
+        </p>
 
-          {/* Stats Row */}
-          <div className="flex gap-2">
-            {/* Status Badge */}
-            <div className={`flex-1 rounded-xl p-2.5 ${statusBg}`}>
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <Check className={`w-3.5 h-3.5 ${statusColor}`} />
-                <span className={`text-xs font-medium ${statusColor}`}>
-                  {isOnTrack ? tr('teethingwidget_normal_development', 'Normal inkişaf') : tr("teethingwidget_diqqet_764567", "Diqq\u0259t")}
-                </span>
-              </div>
-              <p className="text-[10px] text-muted-foreground">
+        {/* Stats Row */}
+        <div className="a-grid-2">
+          {/* Status tile */}
+          <div className="a-stat-tile" style={{ background: isOnTrack ? 'var(--a-green-1)' : 'var(--a-yellow-1)' }}>
+            <span className="a-stat-tile-icon" style={{ background: 'var(--a-chip-overlay)', color: isOnTrack ? 'var(--a-green-2)' : 'var(--a-yellow-2)' }}>
+              <Check size={14} />
+            </span>
+            <div style={{ minWidth: 0 }}>
+              <p className="a-stat-tile-label">
+                {isOnTrack ? tr('teethingwidget_normal_development', 'Normal inkişaf') : tr("teethingwidget_diqqet_764567", "Diqq\u0259t")}
+              </p>
+              <p className="a-stat-tile-label" style={{ fontWeight: 600 }}>
                 {tr('teethingwidget_expected_teeth', '{n} aylıq üçün ~{t} diş gözlənilir').replace('{n}', String(ageMonths)).replace('{t}', String(expectedTeeth))}
               </p>
             </div>
-
-            {/* Next Teeth */}
-            {nextTeeth &&
-            <div className="flex-1 rounded-xl p-2.5 bg-muted/50">
-                <div className="flex items-center gap-1 mb-0.5">
-                  <Clock className="w-3 h-3 text-muted-foreground" />
-                  <p className="text-[10px] text-muted-foreground">{tr("teethingwidget_novbeti_0fff9a", "Növbəti:")}</p>
-                </div>
-                <p className="text-xs font-medium line-clamp-1">{nextTeeth.name}</p>
-                <p className="text-[10px] text-muted-foreground">{nextTeeth.timeframe}</p>
-              </div>
-            }
           </div>
+
+          {/* Next Teeth tile */}
+          {nextTeeth &&
+          <div className="a-stat-tile">
+              <span className="a-stat-tile-icon" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+                <Clock size={14} />
+              </span>
+              <div style={{ minWidth: 0 }}>
+                <p className="a-stat-tile-label">{tr("teethingwidget_novbeti_0fff9a", "Növbəti:")}</p>
+                <p className="a-stat-tile-value" style={{ fontSize: 12, lineHeight: 1.3 }}>{nextTeeth.name}</p>
+                <p className="a-stat-tile-label" style={{ fontWeight: 600 }}>{nextTeeth.timeframe}</p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div className="a-teaser" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span>
+            {selectedChild.name} · <strong>{childAge.displayText}</strong>
+          </span>
+          <ChevronRight size={15} style={{ color: 'var(--a-ink-faint)', flexShrink: 0 }} />
         </div>
       </div>
     </motion.button>);

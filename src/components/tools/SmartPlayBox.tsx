@@ -1,29 +1,25 @@
 import { useState, useMemo } from 'react';
-import { ArrowLeft, Play, Check, Clock, Sparkles, Package, Star, Trophy, Baby, ChevronRight, Filter, Loader2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Play, Check, Clock, Package, Trophy, Baby, ChevronRight, Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Progress } from '@/components/ui/progress';
 import { usePlayActivities, usePlayInventoryItems, useUserPlayInventory, useToggleInventoryItem, useLogPlayActivity, PlayActivity } from '@/hooks/usePlayActivities';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { differenceInDays, differenceInMonths } from 'date-fns';
-import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
 
 interface SmartPlayBoxProps {
   onBack: () => void;
 }
 
-const SKILL_COLORS: Record<string, string> = {
-  motor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
-  sensory: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
-  language: 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300',
-  cognitive: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
-  social: 'bg-pink-100 text-pink-700 dark:bg-pink-900/50 dark:text-pink-300'
+// Skill → anacan palette
+const SKILL_STYLES: Record<string, {bg: string;ink: string;}> = {
+  motor: { bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' },
+  sensory: { bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' },
+  language: { bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' },
+  cognitive: { bg: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)' },
+  social: { bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' }
 };
 
 const SKILL_LABELS: Record<string, string> = {
@@ -42,10 +38,10 @@ const SKILL_ICONS: Record<string, string> = {
   social: '👥'
 };
 
-const DIFFICULTY_LABELS: Record<string, {label: string;color: string;}> = {
-  easy: { label: tr("smartplaybox_easy", 'Asan'), color: 'bg-green-100 text-green-700' },
-  medium: { label: tr("smartplaybox_medium", 'Orta'), color: 'bg-amber-100 text-amber-700' },
-  hard: { label: tr("smartplaybox_cetin_4bf032", 'Çətin'), color: 'bg-red-100 text-red-700' }
+const DIFFICULTY_LABELS: Record<string, {label: string;bg: string;ink: string;}> = {
+  easy: { label: tr("smartplaybox_easy", 'Asan'), bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' },
+  medium: { label: tr("smartplaybox_medium", 'Orta'), bg: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)' },
+  hard: { label: tr("smartplaybox_cetin_4bf032", 'Çətin'), bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' }
 };
 
 const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
@@ -184,73 +180,73 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
     return '🎮';
   };
 
+  const renderItemChip = (item: string, size: 'sm' | 'md' = 'sm') => {
+    const invItem = inventoryItems.find((i) =>
+    i.name.toLowerCase().replace(/\s+/g, '_') === item.toLowerCase().replace(/\s+/g, '_')
+    );
+    const hasItem = isItemSelected(item);
+    return (
+      <span
+        key={item}
+        className={`${size === 'md' ? 'px-3 py-1.5' : 'px-3 py-1'} rounded-full text-sm font-semibold flex items-center gap-1`}
+        style={hasItem ?
+        { background: 'var(--a-green-1)', color: 'var(--a-green-ink)' } :
+        { background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
+        
+        {hasItem && <Check className="h-3 w-3" />}
+        {invItem?.emoji} {invItem?.name || item}
+      </span>);
+
+  };
+
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-500 text-white px-4 pb-3">
-        <div className="flex items-center gap-3 relative z-20">
-          <button onClick={onBack} className="p-2 hover:bg-white/20 rounded-full transition-colors relative z-30">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold flex items-center gap-2">
-              <Sparkles className="h-5 w-5" />
-              {tr("smartplaybox_agilli_oyun_qutusu_db6ef9", "A\u011F\u0131ll\u0131 Oyun Qutusu")}
-            </h1>
-            {babyInfo.label &&
-            <p className="text-xs text-white/80 flex items-center gap-1">
-                <Baby className="h-3 w-3" />
-                {tr("smartplaybox_korpeniz_da99de", "K\xF6rp\u0259niz")} {babyInfo.label}
-              </p>
-            }
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white hover:bg-white/20 relative z-30"
-            onClick={() => setShowInventory(true)}>
-            
-            <Package className="h-5 w-5" />
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={babyInfo.label ? `${tr("smartplaybox_korpeniz_da99de", "K\xF6rp\u0259niz")} ${babyInfo.label}` : tr("smartplaybox_bugunku_tovsiye_ec6c3a", "Bugünkü Tövsiyə")}
+        title={tr("smartplaybox_agilli_oyun_qutusu_db6ef9", "A\u011F\u0131ll\u0131 Oyun Qutusu")}
+        actions={
+        <button className="a-icon-btn relative" onClick={() => setShowInventory(true)} aria-label="Inventory">
+            <Package size={16} strokeWidth={2} />
             {userInventory.length > 0 &&
-            <span className="absolute -top-1 -right-1 bg-white text-violet-600 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+          <span
+            className="absolute -top-1 -right-1 text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold"
+            style={{ background: 'var(--a-lav-2)', color: '#fff' }}>
                 {userInventory.length}
               </span>
-            }
-          </Button>
-        </div>
-      </div>
+          }
+          </button>
+        } />
 
-      <div className="p-4 space-y-4">
+      <div className="space-y-3">
         {/* Setup prompt if no inventory */}
         {userInventory.length === 0 &&
         <motion.div
           initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}>
+          animate={{ opacity: 1, y: 0 }}
+          className="a-card"
+          style={{ background: 'var(--a-lav-1)', border: 'none' }}>
           
-            <Card className="border-violet-200 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-full bg-violet-100 dark:bg-violet-900/50">
-                    <Package className="h-5 w-5 text-violet-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-violet-800 dark:text-violet-200">
-                      {tr("smartplaybox_evdeki_esyalari_secin_3b81dd", "Evd\u0259ki \u0259\u015Fyalar\u0131 se\xE7in")}
-                    </h3>
-                    <p className="text-sm text-violet-700 dark:text-violet-300 mt-1">
-                      {tr("smartplaybox_daha_deqiq_oyun_teklifleri_ucu_c0c456", "Daha d\u0259qiq oyun t\u0259klifl\u0259ri \xFC\xE7\xFCn evinizd\u0259ki \u0259\u015Fyalar\u0131 qeyd edin.")}
-                    </p>
-                    <Button
-                    size="sm"
-                    className="mt-3 bg-violet-600 hover:bg-violet-700"
-                    onClick={() => setShowInventory(true)}>
-                      {tr("smartplaybox_esyalari_sec_67bfb1", "\u018F\u015Fyalar\u0131 se\xE7")}
-                    
-                  </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="flex items-start gap-3">
+              <span className="a-list-icon" style={{ background: 'var(--a-grad-lav)', flexShrink: 0 }}>
+                <Package size={17} strokeWidth={2.2} style={{ color: '#3c2e5c' }} />
+              </span>
+              <div className="flex-1">
+                <h3 className="a-list-title" style={{ margin: 0, color: 'var(--a-lav-ink)' }}>
+                  {tr("smartplaybox_evdeki_esyalari_secin_3b81dd", "Evd\u0259ki \u0259\u015Fyalar\u0131 se\xE7in")}
+                </h3>
+                <p className="text-sm mt-1" style={{ margin: 0, color: 'var(--a-lav-ink)', opacity: 0.8 }}>
+                  {tr("smartplaybox_daha_deqiq_oyun_teklifleri_ucu_c0c456", "Daha d\u0259qiq oyun t\u0259klifl\u0259ri \xFC\xE7\xFCn evinizd\u0259ki \u0259\u015Fyalar\u0131 qeyd edin.")}
+                </p>
+                <button
+                className="a-cta-btn mt-3"
+                style={{ height: 38, padding: '0 16px', fontSize: 11.5, background: 'var(--a-lav-2)', color: '#fff' }}
+                onClick={() => setShowInventory(true)}>
+                  {tr("smartplaybox_esyalari_sec_67bfb1", "\u018F\u015Fyalar\u0131 se\xE7")}
+                
+              </button>
+              </div>
+            </div>
           </motion.div>
         }
 
@@ -258,111 +254,96 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
         {todaysActivity &&
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}>
+          animate={{ opacity: 1, scale: 1 }}
+          className="a-card overflow-hidden"
+          style={{ padding: 0 }}>
           
-            <Card className="overflow-hidden border-0 shadow-xl">
-              <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-500 text-white p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <Trophy className="h-5 w-5" />
-                  <span className="font-semibold">{tr("smartplaybox_bugunku_tovsiye_ec6c3a", "Bugünkü Tövsiyə")}</span>
-                </div>
-                <div className="flex items-start gap-4">
-                  <motion.div
-                  className="text-5xl"
-                  animate={{ rotate: [0, 5, -5, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}>
-                  
-                    {getActivityEmoji(todaysActivity.skill_tags || [])}
-                  </motion.div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-1">{todaysActivity.title}</h3>
-                    <p className="text-sm text-white/90">{todaysActivity.description}</p>
-                  </div>
+            <div className="p-5" style={{ background: 'var(--a-grad-lav)' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Trophy className="h-5 w-5" style={{ color: '#3c2e5c' }} />
+                <span className="font-bold a-heading" style={{ color: '#3c2e5c' }}>{tr("smartplaybox_bugunku_tovsiye_ec6c3a", "Bugünkü Tövsiyə")}</span>
+              </div>
+              <div className="flex items-start gap-4">
+                <motion.div
+                className="text-5xl"
+                animate={{ rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}>
+                
+                  {getActivityEmoji(todaysActivity.skill_tags || [])}
+                </motion.div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold mb-1 a-heading" style={{ color: '#3c2e5c' }}>{todaysActivity.title}</h3>
+                  <p className="text-sm" style={{ margin: 0, color: '#3c2e5c', opacity: 0.85 }}>{todaysActivity.description}</p>
                 </div>
               </div>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-sm font-medium">{todaysActivity.duration_minutes} {tr("smartplaybox_deq_780a5c", "d\u0259q")}</span>
-                  </div>
-                  {todaysActivity.difficulty_level && DIFFICULTY_LABELS[todaysActivity.difficulty_level] &&
-                <Badge className={DIFFICULTY_LABELS[todaysActivity.difficulty_level].color}>
-                      {DIFFICULTY_LABELS[todaysActivity.difficulty_level].label}
-                    </Badge>
-                }
-                  <div className="flex gap-1">
-                    {todaysActivity.skill_tags?.map((skill) =>
-                  <span key={skill} className="text-lg" title={SKILL_LABELS[skill]}>
-                        {SKILL_ICONS[skill]}
-                      </span>
-                  )}
+            </div>
+            <div className="p-4">
+              <div className="flex items-center gap-4 mb-4 flex-wrap">
+                <div className="flex items-center gap-1" style={{ color: 'var(--a-ink-soft)' }}>
+                  <Clock className="h-4 w-4" />
+                  <span className="text-sm font-semibold">{todaysActivity.duration_minutes} {tr("smartplaybox_deq_780a5c", "d\u0259q")}</span>
+                </div>
+                {todaysActivity.difficulty_level && DIFFICULTY_LABELS[todaysActivity.difficulty_level] &&
+              <span
+                className="a-rank-tag"
+                style={{
+                  margin: 0,
+                  background: DIFFICULTY_LABELS[todaysActivity.difficulty_level].bg,
+                  color: DIFFICULTY_LABELS[todaysActivity.difficulty_level].ink
+                }}>
+                    {DIFFICULTY_LABELS[todaysActivity.difficulty_level].label}
+                  </span>
+              }
+                <div className="flex gap-1">
+                  {todaysActivity.skill_tags?.map((skill) =>
+                <span key={skill} className="text-lg" title={SKILL_LABELS[skill]}>
+                      {SKILL_ICONS[skill]}
+                    </span>
+                )}
+                </div>
+              </div>
+
+              {todaysActivity.required_items?.length > 0 &&
+            <div className="mb-4">
+                  <p className="a-list-sub mb-2" style={{ margin: '0 0 8px' }}>{tr("smartplaybox_lazim_olan_esyalar_b33d1b", "Lazım olan əşyalar:")}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {todaysActivity.required_items.map((item) => renderItemChip(item))}
                   </div>
                 </div>
+            }
 
-                {todaysActivity.required_items?.length > 0 &&
-              <div className="mb-4">
-                    <p className="text-xs text-muted-foreground mb-2">{tr("smartplaybox_lazim_olan_esyalar_b33d1b", "Lazım olan əşyalar:")}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {todaysActivity.required_items.map((item) => {
-                    const invItem = inventoryItems.find((i) =>
-                    i.name.toLowerCase().replace(/\s+/g, '_') === item.toLowerCase().replace(/\s+/g, '_')
-                    );
-                    const hasItem = isItemSelected(item);
-                    return (
-                      <span
-                        key={item}
-                        className={`text-sm px-3 py-1 rounded-full flex items-center gap-1 ${
-                        hasItem ?
-                        'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' :
-                        'bg-muted'}`
-                        }>
-                        
-                            {hasItem && <Check className="h-3 w-3" />}
-                            {invItem?.emoji} {invItem?.name || item}
-                          </span>);
-
-                  })}
-                    </div>
-                  </div>
-              }
-
-                <Button
-                className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
-                onClick={() => setSelectedActivity(todaysActivity)}>
-                
-                  <Play className="h-4 w-4 mr-2" />
-                  {tr("smartplaybox_oyuna_basla_fe4574", "Oyuna Ba\u015Fla")}
-                </Button>
-              </CardContent>
-            </Card>
+              <button
+              className="a-cta-btn w-full"
+              style={{ justifyContent: 'center', height: 46, background: 'var(--a-lav-2)', color: '#fff' }}
+              onClick={() => setSelectedActivity(todaysActivity)}>
+              
+                <Play size={15} strokeWidth={2.2} />
+                {tr("smartplaybox_oyuna_basla_fe4574", "Oyuna Ba\u015Fla")}
+              </button>
+            </div>
           </motion.div>
         }
 
         {/* Skills Overview */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">{tr("smartplaybox_bacariq_saheleri_d5133c", "Bacarıq Sahələri")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-5 gap-2">
-              {Object.entries(SKILL_ICONS).map(([skill, icon]) => {
-                const count = filteredActivities.filter((a) => a.skill_tags?.includes(skill)).length;
-                return (
-                  <div key={skill} className="text-center">
-                    <div className="text-2xl mb-1">{icon}</div>
-                    <p className="text-xs text-muted-foreground">{count}</p>
-                  </div>);
+        <div className="a-card">
+          <p className="a-card-title a-heading" style={{ marginBottom: 10 }}>{tr("smartplaybox_bacariq_saheleri_d5133c", "Bacarıq Sahələri")}</p>
+          <div className="grid grid-cols-5 gap-2">
+            {Object.entries(SKILL_ICONS).map(([skill, icon]) => {
+              const count = filteredActivities.filter((a) => a.skill_tags?.includes(skill)).length;
+              return (
+                <div key={skill} className="text-center rounded-2xl py-2" style={{ background: SKILL_STYLES[skill]?.bg || 'var(--a-surface-soft)' }}>
+                  <div className="text-2xl mb-1">{icon}</div>
+                  <p className="text-xs font-bold" style={{ margin: 0, color: SKILL_STYLES[skill]?.ink || 'var(--a-ink-soft)' }}>{count}</p>
+                </div>);
 
-              })}
-            </div>
-          </CardContent>
-        </Card>
+            })}
+          </div>
+        </div>
 
         {/* All Activities */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold">
+          <div className="a-section-head">
+            <h2 className="a-section-title a-heading" style={{ fontSize: 15 }}>
               {matchedActivities.length > 0 ?
               `${tr("playbox_for_you", "Sizin üçün")} (${matchedActivities.length})` :
               `${tr("playbox_all_games", "Bütün Oyunlar")} (${filteredActivities.length})`}
@@ -370,63 +351,47 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           </div>
           
           {isLoading ?
-          <div className="text-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-2" />
-              <p className="text-muted-foreground">{tr("smartplaybox_oyunlar_yuklenir_d1edd2", "Oyunlar yüklənir...")}</p>
+          <div className="a-card text-center" style={{ padding: '34px 18px' }}>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" style={{ color: 'var(--a-lav-2)' }} />
+              <p className="a-list-sub" style={{ margin: 0 }}>{tr("smartplaybox_oyunlar_yuklenir_d1edd2", "Oyunlar yüklənir...")}</p>
             </div> :
           filteredActivities.length === 0 ?
-          <div className="text-center py-12 text-muted-foreground">
-              <Baby className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>{tr("smartplaybox_bu_yasa_uygun_oyun_tapilmadi_72e443", "Bu yaşa uyğun oyun tapılmadı")}</p>
+          <div className="a-card text-center" style={{ padding: '34px 18px' }}>
+              <Baby className="h-12 w-12 mx-auto mb-2" style={{ color: 'var(--a-ink-faint)' }} />
+              <p className="a-list-title" style={{ margin: 0 }}>{tr("smartplaybox_bu_yasa_uygun_oyun_tapilmadi_72e443", "Bu yaşa uyğun oyun tapılmadı")}</p>
               {!profile?.baby_birth_date &&
-            <p className="text-sm mt-2">{tr("smartplaybox_profilde_korpenin_dogum_tarixini_elave_e_696d85", "Profildə körpənin doğum tarixini əlavə edin")}</p>
+            <p className="a-list-sub mt-2" style={{ margin: '8px 0 0', whiteSpace: 'normal' }}>{tr("smartplaybox_profilde_korpenin_dogum_tarixini_elave_e_696d85", "Profildə körpənin doğum tarixini əlavə edin")}</p>
             }
             </div> :
 
-          <div className="space-y-3">
+          <div className="a-list-card pb-4">
               <AnimatePresence>
                 {(matchedActivities.length > 0 ? matchedActivities : filteredActivities).map((activity, index) =>
-              <motion.div
+              <motion.button
                 key={activity.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}>
+                transition={{ delay: Math.min(index * 0.05, 0.3) }}
+                className="a-list-row w-full text-left"
+                style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}
+                onClick={() => setSelectedActivity(activity)}>
                 
-                    <Card
-                  className="cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden group"
-                  onClick={() => setSelectedActivity(activity)}>
-                  
-                      <CardContent className="p-0">
-                        <div className="flex">
-                          <div className="w-2 bg-gradient-to-b from-violet-500 to-purple-500 group-hover:w-3 transition-all" />
-                          <div className="flex-1 p-4">
-                            <div className="flex items-start gap-3">
-                              <div className="p-3 rounded-xl bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30 text-2xl group-hover:scale-110 transition-transform">
-                                {getActivityEmoji(activity.skill_tags || [])}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold">{activity.title}</h3>
-                                <p className="text-sm text-muted-foreground line-clamp-1">{activity.description}</p>
-                                <div className="flex items-center gap-3 mt-2">
-                                  <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                    <Clock className="h-3 w-3" /> {activity.duration_minutes} {tr("smartplaybox_deq_780a5c", "d\u0259q")}
-                                  </span>
-                                  <div className="flex gap-1">
-                                    {activity.skill_tags?.slice(0, 3).map((skill) =>
-                                <span key={skill} className="text-sm" title={SKILL_LABELS[skill]}>
-                                        {SKILL_ICONS[skill]}
-                                      </span>
-                                )}
-                                  </div>
-                                </div>
-                              </div>
-                              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
+                    <span className="a-list-icon" style={{ background: 'var(--a-grad-lav)', fontSize: 18 }}>
+                      {getActivityEmoji(activity.skill_tags || [])}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="a-list-title">{activity.title}</p>
+                      <p className="a-list-sub" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {activity.duration_minutes} {tr("smartplaybox_deq_780a5c", "d\u0259q")} · {activity.description}
+                      </p>
+                    </div>
+                    <span className="a-list-trail" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 13 }}>
+                        {activity.skill_tags?.slice(0, 3).map((skill) => SKILL_ICONS[skill]).join(' ')}
+                      </span>
+                      <ChevronRight size={16} className="a-list-chevron" />
+                    </span>
+                  </motion.button>
               )}
               </AnimatePresence>
             </div>
@@ -436,17 +401,17 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
 
       {/* Activity Detail Modal */}
       <Dialog open={!!selectedActivity && !showComplete} onOpenChange={(open) => !open && setSelectedActivity(null)}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto p-0">
+        <DialogContent className="a-scope max-w-md max-h-[85vh] overflow-y-auto p-0 rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           {selectedActivity &&
           <>
-              <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-500 text-white p-6">
+              <div className="p-6" style={{ background: 'var(--a-grad-lav)' }}>
                 <div className="flex items-center gap-4">
                   <div className="text-5xl">
                     {getActivityEmoji(selectedActivity.skill_tags || [])}
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold">{selectedActivity.title}</h2>
-                    <div className="flex items-center gap-2 mt-1 text-sm text-white/80">
+                    <h2 className="text-xl font-bold a-heading" style={{ margin: 0, color: '#3c2e5c' }}>{selectedActivity.title}</h2>
+                    <div className="flex items-center gap-2 mt-1 text-sm" style={{ color: '#3c2e5c', opacity: 0.8 }}>
                       <Clock className="h-4 w-4" />
                       <span>{selectedActivity.duration_minutes} {tr("smartplaybox_deqiqe_94641a", "d\u0259qiq\u0259")}</span>
                     </div>
@@ -455,46 +420,41 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
               </div>
               
               <div className="p-6 space-y-5">
-                <p className="text-muted-foreground">{selectedActivity.description}</p>
+                <p className="a-cta-text" style={{ margin: 0 }}>{selectedActivity.description}</p>
                 
                 {/* Skills */}
                 <div className="flex flex-wrap gap-2">
                   {selectedActivity.skill_tags?.map((skill) =>
-                <Badge key={skill} className={SKILL_COLORS[skill]}>
+                <span
+                  key={skill}
+                  className="a-rank-tag"
+                  style={{
+                    margin: 0,
+                    background: SKILL_STYLES[skill]?.bg || 'var(--a-surface-soft)',
+                    color: SKILL_STYLES[skill]?.ink || 'var(--a-ink-soft)'
+                  }}>
                       {SKILL_LABELS[skill]}
-                    </Badge>
+                    </span>
                 )}
                   {selectedActivity.difficulty_level && DIFFICULTY_LABELS[selectedActivity.difficulty_level] &&
-                <Badge className={DIFFICULTY_LABELS[selectedActivity.difficulty_level].color}>
+                <span
+                  className="a-rank-tag"
+                  style={{
+                    margin: 0,
+                    background: DIFFICULTY_LABELS[selectedActivity.difficulty_level].bg,
+                    color: DIFFICULTY_LABELS[selectedActivity.difficulty_level].ink
+                  }}>
                       {DIFFICULTY_LABELS[selectedActivity.difficulty_level].label}
-                    </Badge>
+                    </span>
                 }
                 </div>
 
                 {/* Required items */}
                 {selectedActivity.required_items?.length > 0 &&
               <div>
-                    <h4 className="font-semibold mb-2">{tr("smartplaybox_lazim_olan_esyalar_8e1429", "📦 Lazım olan əşyalar")}</h4>
+                    <h4 className="font-bold mb-2" style={{ color: 'var(--a-ink)' }}>{tr("smartplaybox_lazim_olan_esyalar_8e1429", "📦 Lazım olan əşyalar")}</h4>
                     <div className="flex flex-wrap gap-2">
-                      {selectedActivity.required_items.map((item) => {
-                    const invItem = inventoryItems.find((i) =>
-                    i.name.toLowerCase().replace(/\s+/g, '_') === item.toLowerCase().replace(/\s+/g, '_')
-                    );
-                    const hasItem = isItemSelected(item);
-                    return (
-                      <span
-                        key={item}
-                        className={`px-3 py-1.5 rounded-full text-sm flex items-center gap-1 ${
-                        hasItem ?
-                        'bg-green-100 text-green-700 dark:bg-green-900/50' :
-                        'bg-muted'}`
-                        }>
-                        
-                            {hasItem && <Check className="h-3 w-3" />}
-                            {invItem?.emoji} {invItem?.name || item}
-                          </span>);
-
-                  })}
+                      {selectedActivity.required_items.map((item) => renderItemChip(item, 'md'))}
                     </div>
                   </div>
               }
@@ -502,22 +462,23 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                 {/* Instructions */}
                 {selectedActivity.instructions &&
               <div>
-                    <h4 className="font-semibold mb-2">{tr("smartplaybox_nece_oynamali_6cadac", "📝 Necə oynamalı")}</h4>
-                    <div className="bg-muted rounded-lg p-4">
-                      <p className="text-sm whitespace-pre-line leading-relaxed">
+                    <h4 className="font-bold mb-2" style={{ color: 'var(--a-ink)' }}>{tr("smartplaybox_nece_oynamali_6cadac", "📝 Necə oynamalı")}</h4>
+                    <div className="rounded-2xl p-4" style={{ background: 'var(--a-surface-soft)' }}>
+                      <p className="text-sm whitespace-pre-line leading-relaxed" style={{ margin: 0, color: 'var(--a-body-text)' }}>
                         {selectedActivity.instructions}
                       </p>
                     </div>
                   </div>
               }
 
-                <Button
-                className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                <button
+                className="a-cta-btn w-full"
+                style={{ justifyContent: 'center', height: 46, background: 'var(--a-lav-2)', color: '#fff' }}
                 onClick={() => setShowComplete(true)}>
                 
-                  <Check className="h-4 w-4 mr-2" />
+                  <Check size={15} strokeWidth={2.2} />
                   {tr("smartplaybox_oyunu_tamamladim_51cdab", "Oyunu Tamamlad\u0131m!")}
-                </Button>
+                </button>
               </div>
             </>
           }
@@ -526,12 +487,12 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
 
       {/* Complete Activity Modal */}
       <Dialog open={showComplete} onOpenChange={setShowComplete}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="a-scope max-w-sm rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           <DialogHeader>
-            <DialogTitle className="text-center">{tr("smartplaybox_ela_548a34", "🎉 Əla!")}</DialogTitle>
+            <DialogTitle className="text-center a-heading" style={{ color: 'var(--a-ink)' }}>{tr("smartplaybox_ela_548a34", "🎉 Əla!")}</DialogTitle>
           </DialogHeader>
           <div className="text-center space-y-4">
-            <p className="text-muted-foreground">{tr("smartplaybox_oyun_nece_kecdi_c5f5f4", "Oyun necə keçdi?")}</p>
+            <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>{tr("smartplaybox_oyun_nece_kecdi_c5f5f4", "Oyun necə keçdi?")}</p>
             <div className="flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((star) =>
               <motion.button
@@ -545,8 +506,9 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                 </motion.button>
               )}
             </div>
-            <Button
-              className="w-full bg-gradient-to-r from-violet-600 to-purple-600"
+            <button
+              className="a-cta-btn w-full"
+              style={{ justifyContent: 'center', height: 46, background: 'var(--a-lav-2)', color: '#fff', opacity: logActivity.isPending ? 0.7 : 1 }}
               onClick={handleCompleteActivity}
               disabled={logActivity.isPending}>
               
@@ -555,27 +517,27 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
 
               tr("playbox_log_note", "Qeyd et")
               }
-            </Button>
+            </button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Inventory Modal */}
       <Dialog open={showInventory} onOpenChange={setShowInventory}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className="a-scope max-w-md max-h-[85vh] overflow-y-auto rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-violet-500" />
+            <DialogTitle className="flex items-center gap-2 a-heading" style={{ color: 'var(--a-ink)' }}>
+              <Package className="h-5 w-5" style={{ color: 'var(--a-lav-2)' }} />
               {tr("smartplaybox_evde_olan_esyalar_382e9a", "Evd\u0259 Olan \u018F\u015Fyalar")}
             </DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
+          <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>
             {tr("smartplaybox_evinizde_olan_esyalari_secin_s_ec7864", "Evinizd\u0259 olan \u0259\u015Fyalar\u0131 se\xE7in, siz\u0259 uy\u011Fun oyunlar t\xF6vsiy\u0259 ed\u0259k.")}
           </p>
           
           {userInventory.length > 0 &&
-          <div className="bg-violet-50 dark:bg-violet-900/20 p-3 rounded-lg">
-              <p className="text-sm font-medium text-violet-700 dark:text-violet-300">
+          <div className="p-3 rounded-2xl" style={{ background: 'var(--a-lav-1)' }}>
+              <p className="text-sm font-bold" style={{ margin: 0, color: 'var(--a-lav-ink)' }}>
                 ✓ {userInventory.length} {tr("smartplaybox_esya_secilib_cfd789", "\u0259\u015Fya se\xE7ilib")}
               </p>
             </div>
@@ -584,7 +546,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           <div className="space-y-4">
             {Object.entries(groupedInventory).map(([category, items]) =>
             <div key={category}>
-                <h4 className="font-semibold text-sm mb-2">{categoryLabels[category] || category}</h4>
+                <h4 className="font-bold text-sm mb-2" style={{ color: 'var(--a-ink)' }}>{categoryLabels[category] || category}</h4>
                 <div className="flex flex-wrap gap-2">
                   {items.map((item) =>
                 <motion.button
@@ -593,11 +555,10 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleToggleItem(item)}
                   disabled={toggleInventory.isPending}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-sm transition-all ${
-                  isItemSelected(item.name) ?
-                  'bg-violet-500 text-white shadow-md' :
-                  'bg-muted hover:bg-muted/80'}`
-                  }>
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold transition-all"
+                  style={isItemSelected(item.name) ?
+                  { background: 'var(--a-lav-2)', color: '#fff', boxShadow: '0 6px 14px -6px rgba(171, 132, 238, 0.6)' } :
+                  { background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
                   
                       <span>{item.emoji}</span>
                       <span>{item.name}</span>
@@ -610,7 +571,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>);
+    </ToolPage>);
 
 };
 

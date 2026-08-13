@@ -66,6 +66,12 @@
 	<string>UIStatusBarStyleDefault</string>
 
 	<!-- ===== Background Modes ===== -->
+	<!-- Live Activities: kilid ekranı taymerləri -->
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>NSSupportsLiveActivitiesFrequentUpdates</key>
+	<false/>
+
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
@@ -103,6 +109,12 @@
 
 	<key>NSMotionUsageDescription</key>
 	<string>Gündəlik aktivlik və addım sayını izləmək üçün hərəkət sensoru istifadə olunur.</string>
+
+	<key>NSHealthShareUsageDescription</key>
+	<string>Anacan gündəlik addım, aktivlik və məşq məlumatlarınızı göstərmək üçün Apple Health-dən oxuyur. Məlumatlar cihazınızdan kənara göndərilmir.</string>
+
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Anacan sağlamlıq qeydlərini Apple Health-ə əlavə edə bilər.</string>
 
 
 	<key>NSBluetoothAlwaysUsageDescription</key>

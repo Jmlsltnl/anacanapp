@@ -1,17 +1,16 @@
 import { useState, forwardRef, useMemo } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  ArrowLeft, Heart, Calendar, Plus,
-  Sparkles, TrendingUp, Loader2 } from
-'lucide-react';
+import { Heart, Calendar, Plus, Sparkles, TrendingUp } from 'lucide-react';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { hapticFeedback } from '@/lib/native';
 import { useMoodOptions, useSymptoms } from '@/hooks/useDynamicConfig';
 import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
+import { ToolPage, ToolHeader, ToolLoading } from './anacan/ToolKit';
 
 interface MoodDiaryProps {
   onBack: () => void;
@@ -31,7 +30,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   const { data: dbMoods, isLoading: moodsLoading } = useMoodOptions();
   const { data: dbSymptoms, isLoading: symptomsLoading } = useSymptoms(lifeStage);
 
-  const locale = language === 'en' ? 'en-US' : language === 'ru' ? 'ru-RU' : 'az-AZ';
+  const locale = getLocaleTag();
 
   // Map DB data to component format
   const moodEmojis = useMemo(() => {
@@ -109,88 +108,66 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   const loading = logsLoading || moodsLoading || symptomsLoading;
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>);
-
+    return <ToolLoading />;
   }
 
   return (
-    <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
-      {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Heart className="w-5 h-5 text-fuchsia-500" />
-                {tr("mooddiary_ehval_gundeliyi_831844", "\u018Fhval G\xFCnd\u0259liyi")}
-              </h1>
-            </div>
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={<>{tr("mooddiary_bu_hefte_a5f60b", "Bu həftə")}: {logs.length} {tr("common_qeyd", "qeyd")}</>}
+        title={tr("mooddiary_ehval_gundeliyi_831844", "\u018Fhval G\xFCnd\u0259liyi")} />
+
+      <MedicalDisclaimer variant="compact" className="mb-3" />
+
+      {/* Mood Summary */}
+      <motion.div
+        className="a-grid-2 a-fade-in"
+        style={{ marginTop: 0 }}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}>
+        
+        <div className="a-stat-tile" style={{ background: 'var(--a-pink-1)' }}>
+          <span style={{ fontSize: 26 }}>{logs[0]?.mood ? moodEmojis.find((m) => m.value === logs[0].mood)?.emoji : '😊'}</span>
+          <div>
+            <p className="a-stat-tile-label" style={{ color: 'var(--a-berry-ink)' }}>{tr("mooddiary_ortalama_ehval_72856f", "Ortalama əhval")}</p>
+            <p className="a-stat-tile-value" style={{ fontSize: 17 }}>{averageMood}</p>
           </div>
         </div>
-      </div>
-
-      <div className="px-4 pt-4">
-        <MedicalDisclaimer variant="compact" className="mb-4" />
-        {/* Mood Summary */}
-        <motion.div
-          className="bg-fuchsia-50 dark:bg-fuchsia-500/10 rounded-2xl p-4 border border-fuchsia-100 dark:border-fuchsia-500/20 mb-4"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-fuchsia-600/70 dark:text-fuchsia-400/70 text-xs font-medium">{tr("mooddiary_ortalama_ehval_72856f", "Ortalama əhval")}</p>
-              <div className="flex items-center gap-3 mt-1">
-                <span className="text-4xl">{logs[0]?.mood ? moodEmojis.find((m) => m.value === logs[0].mood)?.emoji : '😊'}</span>
-                <span className="text-3xl font-black text-fuchsia-600 dark:text-fuchsia-400">{averageMood}</span>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-fuchsia-600/70 dark:text-fuchsia-400/70 text-xs font-medium">{tr("mooddiary_bu_hefte_a5f60b", "Bu həftə")}</p>
-              <p className="text-2xl font-black text-fuchsia-600 dark:text-fuchsia-400">{logs.length} {tr("common_qeyd", "qeyd")}</p>
-            </div>
+        <div className="a-stat-tile">
+          <span className="a-stat-tile-icon" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
+            <Calendar size={15} />
+          </span>
+          <div>
+            <p className="a-stat-tile-label">{tr("mooddiary_bu_hefte_a5f60b", "Bu həftə")}</p>
+            <p className="a-stat-tile-value" style={{ fontSize: 17 }}>{logs.length} {tr("common_qeyd", "qeyd")}</p>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
 
       {/* Tabs */}
-      <div className="px-3 -mt-3">
-        <div className="bg-card rounded-xl p-1 flex gap-1 shadow-lg">
-          {[
-          { id: 'log', label: tr("mooddiary_qeyd", 'Qeyd'), icon: Plus },
-          { id: 'history', label: tr("mooddiary_tarixce_b09a14", 'Tarixçə'), icon: Calendar },
-          { id: 'insights', label: tr("mooddiary_analiz", 'Analiz'), icon: TrendingUp }].
-          map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
-                activeTab === tab.id ?
-                'bg-primary text-white shadow-md' :
-                'text-muted-foreground'}`
-                }>
-                
-                <Icon className="w-4 h-4" />
-                {tab.label}
-              </button>);
+      <div className="a-tabs" style={{ display: 'flex', width: '100%', marginTop: 12 }}>
+        {[
+        { id: 'log', label: tr("mooddiary_qeyd", 'Qeyd'), icon: Plus },
+        { id: 'history', label: tr("mooddiary_tarixce_b09a14", 'Tarixçə'), icon: Calendar },
+        { id: 'insights', label: tr("mooddiary_analiz", 'Analiz'), icon: TrendingUp }].
+        map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`a-tab${activeTab === tab.id ? ' active' : ''}`}
+              style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+              
+              <Icon size={13} strokeWidth={2.2} />
+              {tab.label}
+            </button>);
 
-          })}
-        </div>
+        })}
       </div>
 
-      <div className="px-4 mt-5">
+      <div className="mt-4">
         <AnimatePresence mode="wait">
           {activeTab === 'log' &&
           <motion.div
@@ -201,21 +178,22 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
             className="space-y-3">
             
               {/* Mood Selection */}
-              <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50">
-                <h2 className="font-bold text-sm mb-2 text-center">{tr("mooddiary_bu_gun_ozunuzu_nece_hiss_edirsiniz_b2d818", "Bu gün özünüzü necə hiss edirsiniz?")}</h2>
+              <div className="a-card">
+                <h2 className="a-card-title a-heading text-center" style={{ marginBottom: 12 }}>{tr("mooddiary_bu_gun_ozunuzu_nece_hiss_edirsiniz_b2d818", "Bu gün özünüzü necə hiss edirsiniz?")}</h2>
                 <div className="flex justify-between">
                   {moodEmojis.map((mood, index) =>
                 <motion.button
                   key={mood.value}
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.08 }}
                   onClick={() => setSelectedMood(mood.value)}
-                  className={`w-10 h-10 rounded-2xl flex items-center justify-center text-lg border-2 transition-all ${
+                  className={`w-11 h-11 rounded-2xl flex items-center justify-center text-lg border-2 transition-all ${
                   selectedMood === mood.value ?
                   `${mood.color} scale-110 shadow-lg` :
-                  'bg-muted/30 border-transparent'}`
+                  ''}`
                   }
+                  style={selectedMood === mood.value ? { cursor: 'pointer' } : { background: 'var(--a-surface-soft)', borderColor: 'transparent', cursor: 'pointer' }}
                   whileTap={{ scale: 0.95 }}>
                   
                       {mood.emoji}
@@ -226,7 +204,8 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               <motion.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center mt-2 text-primary text-sm font-medium">
+                className="text-center a-list-value"
+                style={{ marginTop: 10, color: 'var(--a-accent-ink)', fontSize: 12.5 }}>
                 
                     {moodEmojis.find((m) => m.value === selectedMood)?.label}
                   </motion.p>
@@ -234,18 +213,14 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               </div>
 
               {/* Symptoms */}
-              <div className="bg-card rounded-2xl p-3 shadow-card border border-border/50">
-                <h2 className="font-bold text-sm mb-2">{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</h2>
-                <div className="flex flex-wrap gap-1.5">
+              <div className="a-card">
+                <h2 className="a-card-title a-heading" style={{ marginBottom: 10 }}>{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</h2>
+                <div className="a-tag-row" style={{ marginBottom: 0 }}>
                   {symptomOptions.map((symptom) =>
                 <motion.button
                   key={symptom.id}
                   onClick={() => toggleSymptom(symptom.id)}
-                  className={`px-2 py-0.5 rounded-full flex items-center gap-1 text-[11px] font-medium transition-all ${
-                  selectedSymptoms.includes(symptom.id) ?
-                  'bg-primary text-white' :
-                  'bg-muted/50 text-muted-foreground'}`
-                  }
+                  className={`a-tag${selectedSymptoms.includes(symptom.id) ? ' on' : ''}`}
                   whileTap={{ scale: 0.95 }}>
                   
                       <span className="text-xs">{symptom.emoji}</span>
@@ -256,13 +231,13 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               </div>
 
               {/* Notes */}
-              <div className="bg-card rounded-2xl p-3 shadow-card border border-border/50">
-                <h2 className="font-bold text-sm mb-2">{tr("mooddiary_qeydler_a7a98b", "Qeydlər")}</h2>
+              <div className="a-card">
+                <h2 className="a-card-title a-heading" style={{ marginBottom: 10 }}>{tr("mooddiary_qeydler_a7a98b", "Qeydlər")}</h2>
                 <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={tr("mooddiary_bu_gun_haqqinda_yazmaq_istedikleriniz_1e2d2d", "Bu gün haqqında yazmaq istədikləriniz...")}
-                  className="w-full bg-muted/30 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+                  className="a-input w-full resize-none"
                   rows={2} />
               
               </div>
@@ -271,7 +246,8 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
               <motion.button
               onClick={handleSave}
               disabled={selectedMood === null}
-              className="w-full gradient-primary text-white font-bold py-3 rounded-2xl shadow-elevated disabled:opacity-50"
+              className="a-btn-solid w-full"
+              style={{ justifyContent: 'center', padding: '13px 18px', opacity: selectedMood === null ? 0.45 : 1 }}
               whileTap={{ scale: 0.98 }}>{tr("untranslated_yadda_saxla_bpdu9v", "Yadda saxla")}</motion.button>
             </motion.div>
           }
@@ -284,53 +260,57 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
             exit={{ opacity: 0, x: 20 }}
             className="space-y-3">
             
-              <h2 className="font-bold text-lg">{tr("mooddiary_son_qeydler_181e41", "Son qeydlər")}</h2>
+              <div className="a-section-head" style={{ marginBottom: 8 }}>
+                <h2 className="a-section-title a-heading" style={{ fontSize: 15 }}>{tr("mooddiary_son_qeydler_181e41", "Son qeydlər")}</h2>
+              </div>
                 {logs.length === 0 ?
-            <p className="text-center text-muted-foreground py-8">{tr("mooddiary_hele_qeyd_yoxdur_a3d826", "Hələ qeyd yoxdur")}</p> :
+            <p className="a-list-sub text-center" style={{ padding: '24px 0', margin: 0 }}>{tr("mooddiary_hele_qeyd_yoxdur_a3d826", "Hələ qeyd yoxdur")}</p> :
 
-            logs.slice(0, 10).map((entry, index) =>
+            <div className="a-list-card">
+              {logs.slice(0, 10).map((entry, index) =>
             <motion.div
               key={entry.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-card rounded-2xl p-3 shadow-sm border border-border/50">
+              transition={{ delay: Math.min(index * 0.06, 0.3) }}
+              className="a-list-row"
+              style={{ alignItems: 'flex-start' }}>
               
-                    <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-fuchsia-100 dark:bg-fuchsia-900/30 flex items-center justify-center text-xl">
-                        {entry.mood ? moodEmojis.find((m) => m.value === entry.mood)?.emoji : '😐'}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="font-semibold text-xs text-foreground">
-                            {new Date(entry.log_date).toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'short' })}
-                          </p>
-                          <div className="flex">
-                            {Array.from({ length: 5 }).map((_, i) =>
-                      <Heart
-                        key={i}
-                        className={`w-4 h-4 ${i < (entry.mood || 0) ? 'text-fuchsia-500 fill-current' : 'text-muted-foreground/30'}`} />
+                    <span className="a-list-icon" style={{ background: 'var(--a-pink-1)', fontSize: 19 }}>
+                      {entry.mood ? moodEmojis.find((m) => m.value === entry.mood)?.emoji : '😐'}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="a-list-title" style={{ fontSize: 12.5 }}>
+                          {new Date(entry.log_date).toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'short' })}
+                        </p>
+                        <div className="flex">
+                          {Array.from({ length: 5 }).map((_, i) =>
+                    <Heart
+                      key={i}
+                      size={13}
+                      style={i < (entry.mood || 0) ? { color: 'var(--a-pink-2)', fill: 'var(--a-pink-2)' } : { color: 'var(--a-line-strong)' }} />
 
-                      )}
-                          </div>
+                    )}
                         </div>
-                        {entry.notes &&
-                  <p className="text-sm text-muted-foreground mb-2">{entry.notes}</p>
-                  }
-                        <div className="flex flex-wrap gap-1">
-                          {(entry.symptoms || []).map((s) => {
-                      const symptom = symptomOptions.find((opt) => opt.id === s);
-                      return symptom ?
-                      <span key={s} className="text-xs bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600 dark:text-fuchsia-400 px-2 py-0.5 rounded-full">
-                                {symptom.emoji} {symptom.label}
-                              </span> :
-                      null;
-                    })}
-                        </div>
+                      </div>
+                      {entry.notes &&
+                <p className="a-list-sub" style={{ whiteSpace: 'normal', marginBottom: 6 }}>{entry.notes}</p>
+                }
+                      <div className="a-tag-row" style={{ marginBottom: 0, gap: 5 }}>
+                        {(entry.symptoms || []).map((s) => {
+                    const symptom = symptomOptions.find((opt) => opt.id === s);
+                    return symptom ?
+                    <span key={s} className="a-tag" style={{ cursor: 'default', padding: '4px 9px', fontSize: 10, background: 'var(--a-pink-1)', color: 'var(--a-berry-ink)' }}>
+                              {symptom.emoji} {symptom.label}
+                            </span> :
+                    null;
+                  })}
                       </div>
                     </div>
                   </motion.div>
-            )
+            )}
+            </div>
             }
             </motion.div>
           }
@@ -343,38 +323,41 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
             exit={{ opacity: 0, x: 20 }}
             className="space-y-3">
             
-              <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
-                <div className="flex items-center gap-3 mb-4">
-                  <Sparkles className="w-6 h-6 text-fuchsia-500" />
-                  <h2 className="font-bold text-lg">{tr("mooddiary_ai_analizi_070626", "AI Analizi")}</h2>
+              <div className="a-card">
+                <div className="a-card-head" style={{ marginBottom: 10 }}>
+                  <h2 className="a-card-title a-heading">✨ {tr("mooddiary_ai_analizi_070626", "AI Analizi")}</h2>
+                  <Sparkles size={15} style={{ color: 'var(--a-lav-2)' }} />
                 </div>
-                <p className="text-muted-foreground mb-4">
+                <p className="a-cta-text" style={{ marginBottom: 12 }}>
                   {tr("mooddiary_son_bir_heftede_ehvaliniz_umum_c383f6", "Son bir h\u0259ft\u0259d\u0259 \u0259hval\u0131n\u0131z \xFCmumiyy\u0259tl\u0259 yax\u015F\u0131 olub. \u018Fn \xE7ox qeyd etdiyiniz simptomlar\u0131 izl\u0259yin.")}
                 </p>
-                <div className="bg-fuchsia-100 dark:bg-fuchsia-900/30 rounded-2xl p-4 border border-fuchsia-200 dark:border-fuchsia-800/50">
-                  <p className="text-fuchsia-800 dark:text-fuchsia-200 text-sm">
-                    💡 <strong>{tr("mooddiary_meslehet_6a93f2", "Məsləhət:")}</strong> {tr("mooddiary_yorgunluq_hiss_etdiyiniz_gunle_478815", "Yor\u011Funluq hiss etdiyiniz g\xFCnl\u0259rd\u0259 istirah\u0259t etm\u0259yi unutmay\u0131n. Hamil\u0259lik zaman\u0131 b\u0259d\u0259ninizin ehtiyaclar\u0131na qulaq asmaq vacibdir.")}
-                  </p>
+                <div className="a-today-info-tip">
+                  <span style={{ fontSize: 15, lineHeight: 1 }}>💡</span>
+                  <span>
+                    <strong>{tr("mooddiary_meslehet_6a93f2", "Məsləhət:")}</strong> {tr("mooddiary_yorgunluq_hiss_etdiyiniz_gunle_478815", "Yor\u011Funluq hiss etdiyiniz g\xFCnl\u0259rd\u0259 istirah\u0259t etm\u0259yi unutmay\u0131n. Hamil\u0259lik zaman\u0131 b\u0259d\u0259ninizin ehtiyaclar\u0131na qulaq asmaq vacibdir.")}
+                  </span>
                 </div>
               </div>
 
               {/* Weekly Mood Chart */}
-              <div className="bg-card rounded-3xl p-6 shadow-card border border-border/50">
-                <h3 className="font-bold mb-4 text-foreground">{tr("mooddiary_heftelik_ehval_trendi_5796d9", "Həftəlik əhval trendi")}</h3>
-                <div className="flex items-end justify-between h-32 px-2">
+              <div className="a-card">
+                <div className="a-card-head">
+                  <h3 className="a-card-title a-heading">{tr("mooddiary_heftelik_ehval_trendi_5796d9", "Həftəlik əhval trendi")}</h3>
+                </div>
+                <div className="a-trend-bars">
                   {Array.from({ length: 7 }).map((_, i) => {
                   const day = new Date(2024, 0, 1 + i).toLocaleDateString(locale, { weekday: 'short' });
                   const dayLog = logs.find((l) => new Date(l.log_date).getDay() === (i + 1) % 7);
                   const height = dayLog?.mood ? dayLog.mood / 5 * 100 : 50;
                   return (
-                    <div key={i} className="flex flex-col items-center gap-2">
+                    <div key={i} className="a-trend-bar-col">
                         <motion.div
                         initial={{ height: 0 }}
                         animate={{ height: `${height}%` }}
                         transition={{ delay: i * 0.1, duration: 0.5 }}
-                        className="w-8 bg-gradient-to-t from-fuchsia-500 to-pink-400 rounded-t-lg" />
+                        className={`a-trend-bar${dayLog?.mood ? ' hi' : ''}`} />
                       
-                        <span className="text-xs text-muted-foreground">{day}</span>
+                        <span className="a-trend-bar-label">{day}</span>
                       </div>);
 
                 })}
@@ -384,7 +367,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
           }
         </AnimatePresence>
       </div>
-    </div>);
+    </ToolPage>);
 
 });
 

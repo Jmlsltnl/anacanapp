@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Reply, Send, X, Heart, Trash2, ChevronDown, ChevronUp, Crown, Shield, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
-import { PostComment, useCreateComment } from '@/hooks/useCommunity';
+import { PostComment, useCreateComment, useToggleCommentLike } from '@/hooks/useCommunity';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,26 +44,17 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [showReplies, setShowReplies] = useState(level === 0);
   const [replyText, setReplyText] = useState('');
-  const [isLiking, setIsLiking] = useState(false);
   const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
   const createComment = useCreateComment();
+  const toggleCommentLike = useToggleCommentLike();
   const replies = allComments.filter((c) => c.parent_comment_id === comment.id);
 
-  const handleLikeComment = async () => {
-    if (!user || isLiking) return;
+  // Optimistic — ürək dərhal dolur, tam refetch YOXDUR (əvvəllər hər like bütün şərhləri yenidən çəkirdi)
+  const handleLikeComment = () => {
+    if (!user || toggleCommentLike.isPending) return;
     hapticFeedback.light();
-    setIsLiking(true);
-    try {
-      if (comment.is_liked) {
-        await supabase.from('comment_likes').delete().eq('comment_id', comment.id).eq('user_id', user.id);
-      } else {
-        await supabase.from('comment_likes').insert({ comment_id: comment.id, user_id: user.id });
-      }
-      onRefetch();
-    } catch (error) {
-      console.error('Like error:', error);
-    } finally {setIsLiking(false);}
+    toggleCommentLike.mutate({ commentId: comment.id, isLiked: comment.is_liked || false, postId });
   };
 
   const handleReply = async () => {
@@ -130,7 +121,7 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
           {/* Actions */}
           <div className="flex items-center gap-3 mt-1 ml-2">
             <motion.button
-              onClick={handleLikeComment} disabled={isLiking}
+              onClick={handleLikeComment}
               className={`flex items-center gap-0.5 text-[9px] transition-colors ${comment.is_liked ? 'text-rose-500' : 'text-muted-foreground/30 active:text-rose-400'}`}
               whileTap={{ scale: 0.85 }}>
               

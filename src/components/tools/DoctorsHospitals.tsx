@@ -212,149 +212,135 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3 mb-3">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <ArrowLeft className="w-5 h-5 text-foreground" />
+    <div className="a-scope pb-24" style={{ background: 'var(--a-bg)', minHeight: '100vh' }}>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
+              <ArrowLeft size={16} strokeWidth={2} />
             </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-primary" />
-                {tr("doctorshospitals_hekimler_ve_xestexanalar_b29ffa", "H\u0259kiml\u0259r v\u0259 X\u0259st\u0259xanalar")}
-              </h1>
+            <div>
+              <p className="a-eyebrow">{tr("doctorshospitals_klinika_3c7a2d", "Klinika")} · {tr("doctorshospitals_hekim_c127f7", 'Həkim')}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("doctorshospitals_hekimler_ve_xestexanalar_b29ffa", "H\u0259kiml\u0259r v\u0259 X\u0259st\u0259xanalar")}</p>
             </div>
           </div>
+        </header>
 
-          {/* Search */}
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder={tr("doctorshospitals_hekim_xestexana_axtar_be2094", "Həkim, xəstəxana axtar...")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-3 rounded-xl bg-muted border-0 text-sm transition-all outline-none focus:ring-2 focus:ring-primary/20" />
-            
-          </div>
-
-          {/* Filter Tabs - Scrollable */}
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {specialtyCategories.map((filter) =>
-            <button
-              key={filter.id}
-              onClick={() => setActiveFilter(filter.id)}
-              className={`shrink-0 px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
-              activeFilter === filter.id ?
-              'bg-primary text-primary-foreground shadow-md' :
-              'bg-muted text-muted-foreground hover:bg-muted/80'}`
-              }>
-              
-                <span>{filter.emoji}</span>
-                {filter.label}
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="px-4 py-3 space-y-3">
-        {isLoading ?
-        Array(4).fill(0).map((_, i) =>
-        <div key={i} className="bg-card rounded-2xl p-4 border border-border/50">
-              <div className="flex gap-3">
-                <Skeleton className="w-20 h-20 rounded-xl" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-5 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-4 w-2/3" />
-                </div>
-              </div>
-            </div>
-        ) :
-        filteredProviders.length === 0 ?
-        <div className="text-center py-12">
-            <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">{tr("doctorshospitals_hec_bir_netice_tapilmadi_5745d9", "Heç bir nəticə tapılmadı")}</p>
-          </div> :
-
-        filteredProviders.map((provider, index) =>
-        <motion.button
-          key={provider.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05 }}
-          onClick={() => setSelectedProvider(provider)}
-          className="w-full bg-card rounded-2xl p-4 border border-border/50 text-left hover:border-primary/30 transition-colors">
+        {/* Search */}
+        <div className="a-search">
+          <Search size={15} strokeWidth={2} color="var(--a-ink-faint)" />
+          <input
+            type="text"
+            placeholder={tr("doctorshospitals_hekim_xestexana_axtar_be2094", "Həkim, xəstəxana axtar...")}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)} />
           
-              <div className="flex gap-3">
-                {/* Image */}
-                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0 overflow-hidden">
-                  {provider.image_url ?
-              <img src={provider.image_url} alt={provider.name} className="w-full h-full object-cover" /> :
+        </div>
 
-              <Building2 className="w-8 h-8 text-primary" />
-              }
-                </div>
+        {/* Filter chips */}
+        <div className="a-tag-row hide-scrollbar" style={{ flexWrap: 'nowrap', overflowX: 'auto', marginTop: 12, marginBottom: 0, paddingBottom: 4 }}>
+          {specialtyCategories.map((filter) =>
+          <button
+            key={filter.id}
+            onClick={() => setActiveFilter(filter.id)}
+            className={`a-tag${activeFilter === filter.id ? ' on' : ''}`}
+            style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+            
+              <span>{filter.emoji}</span>
+              {filter.label}
+            </button>
+          )}
+        </div>
 
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      {provider.is_featured &&
-                  <Badge className="mb-1 text-[10px] bg-amber-500/10 text-amber-600 border-amber-500/20">
-                          {tr("doctorshospitals_tovsiyye_olunan_626cbb", "\u2B50 T\xF6vsiyy\u0259 olunan")}
-                        </Badge>
-                  }
-                      <h3 className="font-semibold text-sm line-clamp-1">{provider.name}</h3>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 mt-1" />
-                  </div>
-                  
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                    {(() => {
-                  const TypeIcon = providerTypeLabels[provider.provider_type]?.icon || Building2;
-                  return <TypeIcon className="w-3 h-3" />;
-                })()}
-                    <span>{providerTypeLabels[provider.provider_type]?.label || provider.provider_type}</span>
-                    {provider.specialty &&
-                <>
-                        <span className="mx-1">•</span>
-                        <span>{provider.specialty}</span>
-                      </>
-                }
-                  </div>
-
-                  {provider.address &&
-              <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                      <MapPin className="w-3 h-3 shrink-0" />
-                      <span className="line-clamp-1">{provider.address}</span>
-                    </div>
-              }
-
-                  <div className="flex items-center gap-2 mt-2">
-                    {provider.rating > 0 &&
-                <div className="flex items-center gap-1 text-xs">
-                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                        <span className="font-medium">{provider.rating.toFixed(1)}</span>
-                        {provider.review_count > 0 &&
-                  <span className="text-muted-foreground">({provider.review_count})</span>
-                  }
-                      </div>
-                }
+        {/* Content */}
+        <div className="mt-3 space-y-2.5">
+          {isLoading ?
+          Array(4).fill(0).map((_, i) =>
+          <div key={i} className="a-card animate-pulse">
+                <div className="flex gap-3">
+                  <div style={{ width: 64, height: 64, borderRadius: 15, background: 'var(--a-surface-soft)', flexShrink: 0 }} />
+                  <div className="flex-1" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div style={{ height: 16, width: '75%', borderRadius: 8, background: 'var(--a-surface-soft)' }} />
+                    <div style={{ height: 12, width: '50%', borderRadius: 8, background: 'var(--a-surface-soft)' }} />
+                    <div style={{ height: 12, width: '66%', borderRadius: 8, background: 'var(--a-surface-soft)' }} />
                   </div>
                 </div>
               </div>
-            </motion.button>
-        )
-        }
+          ) :
+          filteredProviders.length === 0 ?
+          <div className="a-card" style={{ textAlign: 'center', padding: '32px 18px' }}>
+              <Building2 size={40} style={{ color: 'var(--a-ink-faint)', margin: '0 auto 10px' }} />
+              <p className="a-list-sub" style={{ margin: 0 }}>{tr("doctorshospitals_hec_bir_netice_tapilmadi_5745d9", "Heç bir nəticə tapılmadı")}</p>
+            </div> :
+
+          filteredProviders.map((provider, index) =>
+          <motion.button
+            key={provider.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: Math.min(index * 0.05, 0.3) }}
+            onClick={() => setSelectedProvider(provider)}
+            className="a-card w-full text-left"
+            style={{ padding: '14px 16px', cursor: 'pointer' }}>
+            
+                <div className="flex gap-3">
+                  {/* Image */}
+                  <span className="a-article-thumb" style={{ width: 64, height: 64, background: 'var(--a-peach-1)' }}>
+                    {provider.image_url ?
+                <img src={provider.image_url} alt={provider.name} /> :
+
+                <Building2 size={24} style={{ color: 'var(--a-accent-ink)' }} />
+                }
+                  </span>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div style={{ minWidth: 0 }}>
+                        {provider.is_featured &&
+                    <span className="a-partner-recommended" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10, fontWeight: 800, color: 'var(--a-yellow-ink)', marginBottom: 2 }}>
+                            ⭐ {tr("doctorshospitals_tovsiyye_olunan_626cbb", "\u2B50 T\xF6vsiyy\u0259 olunan").replace('⭐ ', '')}
+                          </span>
+                    }
+                        <h3 className="a-list-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{provider.name}</h3>
+                      </div>
+                      <ChevronRight size={15} className="a-list-chevron" style={{ marginTop: 3 }} />
+                    </div>
+                    
+                    <p className="a-list-sub" style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--a-peach-2)', fontWeight: 600 }}>
+                      {(() => {
+                    const TypeIcon = providerTypeLabels[provider.provider_type]?.icon || Building2;
+                    return <TypeIcon size={11} />;
+                  })()}
+                      <span>{providerTypeLabels[provider.provider_type]?.label || provider.provider_type}</span>
+                      {provider.specialty &&
+                  <span style={{ color: 'var(--a-ink-soft)' }}> · {provider.specialty}</span>
+                  }
+                    </p>
+
+                    {provider.address &&
+                <p className="a-list-sub" style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
+                        <MapPin size={11} style={{ flexShrink: 0, marginTop: 2 }} />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{provider.address}</span>
+                      </p>
+                }
+
+                    {provider.rating > 0 &&
+                <p style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6, fontSize: 12, fontWeight: 800, color: 'var(--a-ink)' }}>
+                        <Star size={12} style={{ fill: 'var(--a-yellow-2)', color: 'var(--a-yellow-2)' }} />
+                        {provider.rating.toFixed(1)}
+                        {provider.review_count > 0 &&
+                  <span style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--a-ink-faint)' }}>({provider.review_count})</span>
+                  }
+                      </p>
+                }
+                  </div>
+                </div>
+              </motion.button>
+          )
+          }
+        </div>
       </div>
     </div>);
 
@@ -415,9 +401,9 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
   const parsedDesc = parseDescription(provider.description || '');
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="a-scope pb-24" style={{ background: 'var(--a-bg)', minHeight: '100vh' }}>
       {/* Hero */}
-      <div className="relative h-48 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10">
+      <div className="relative h-48" style={{ background: 'var(--a-grad-peach)' }}>
         {provider.image_url &&
         <img
           src={provider.image_url}
@@ -425,108 +411,104 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
           className="w-full h-full object-cover" />
 
         }
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent" />
-        <Button
-          variant="ghost"
-          size="icon"
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, var(--a-bg), transparent 60%)' }} />
+        <button
           onClick={onBack}
-          className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm">
+          className="a-icon-btn absolute top-4 left-4">
           
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
+          <ArrowLeft size={16} strokeWidth={2} />
+        </button>
       </div>
 
       {/* Content */}
-      <div className="px-4 -mt-12 relative z-10">
+      <div className="a-shell -mt-12 relative z-10">
         {/* Main Card */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50 shadow-lg mb-4">
+        <div className="a-card mb-3">
           {provider.is_featured &&
-          <Badge className="mb-2 text-[10px] bg-amber-500/10 text-amber-600 border-amber-500/20">
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10, fontWeight: 800, color: 'var(--a-yellow-ink)', marginBottom: 6 }}>
               {tr("doctorshospitals_tovsiyye_olunan_626cbb", "⭐ Tövsiyyə olunan")}
-            </Badge>
+            </span>
           }
           
-          <h1 className="text-xl font-bold mb-1">{provider.name}</h1>
+          <h1 className="a-heading" style={{ margin: '0 0 4px', fontSize: 19, color: 'var(--a-ink)' }}>{provider.name}</h1>
           
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-            <TypeIcon className="w-4 h-4" />
+          <p className="a-list-sub" style={{ display: 'flex', alignItems: 'center', gap: 5, margin: '0 0 10px', color: 'var(--a-peach-2)', fontWeight: 600 }}>
+            <TypeIcon size={13} />
             <span>{providerTypeLabels[provider.provider_type]?.label}</span>
             {provider.specialty &&
-            <>
-                <span>•</span>
-                <span>{provider.specialty}</span>
-              </>
+            <span style={{ color: 'var(--a-ink-soft)' }}> · {provider.specialty}</span>
             }
-          </div>
+          </p>
 
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
+            <div className="flex items-center gap-0.5">
               {[1, 2, 3, 4, 5].map((star) =>
               <Star
                 key={star}
-                className={`w-4 h-4 ${star <= Math.round(currentRating) ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/30'}`} />
+                size={15}
+                style={star <= Math.round(currentRating) ? { fill: 'var(--a-yellow-2)', color: 'var(--a-yellow-2)' } : { color: 'var(--a-line-strong)' }} />
 
               )}
             </div>
-            <span className="font-semibold">{currentRating > 0 ? currentRating.toFixed(1) : '0.0'}</span>
-            <span className="text-muted-foreground text-sm">({currentReviewCount} {tr("doctorshospitals_rey_f2285f", "rəy)")}</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--a-ink)' }}>{currentRating > 0 ? currentRating.toFixed(1) : '0.0'}</span>
+            <span className="a-list-sub" style={{ margin: 0 }}>({currentReviewCount} {tr("doctorshospitals_rey_f2285f", "rəy)")}</span>
           </div>
 
           {/* Detailed Badges */}
-          <div className="flex flex-wrap gap-2 mb-3 mt-3">
+          {(parsedDesc.experience || parsedDesc.languages || parsedDesc.education) &&
+          <div className="a-tag-row" style={{ marginBottom: 12 }}>
             {parsedDesc.experience &&
-              <Badge variant="secondary" className="flex items-center gap-1 bg-primary/10 text-primary hover:bg-primary/20">
-                <Briefcase className="w-3 h-3" />
+              <span className="a-tag" style={{ cursor: 'default', background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+                <Briefcase size={11} />
                 {parsedDesc.experience}
-              </Badge>
+              </span>
             }
             {parsedDesc.languages &&
-              <Badge variant="secondary" className="flex items-center gap-1 bg-blue-500/10 text-blue-600 hover:bg-blue-500/20">
-                <Languages className="w-3 h-3" />
+              <span className="a-tag" style={{ cursor: 'default', background: 'var(--a-blue-1)', color: 'var(--a-blue-ink)' }}>
+                <Languages size={11} />
                 {parsedDesc.languages}
-              </Badge>
+              </span>
             }
             {parsedDesc.education &&
-              <Badge variant="secondary" className="flex items-center gap-1 bg-green-500/10 text-green-600 hover:bg-green-500/20">
-                <GraduationCap className="w-3 h-3" />
+              <span className="a-tag" style={{ cursor: 'default', background: 'var(--a-green-1)', color: 'var(--a-green-ink)' }}>
+                <GraduationCap size={11} />
                 {parsedDesc.education}
-              </Badge>
+              </span>
             }
           </div>
+          }
 
           {parsedDesc.basicDescription &&
-            <div className="text-sm text-muted-foreground whitespace-pre-wrap">{parsedDesc.basicDescription}</div>
+            <p className="a-cta-text" style={{ whiteSpace: 'pre-wrap' }}>{parsedDesc.basicDescription}</p>
           }
         </div>
 
         {/* Interests and Services */}
         {parsedDesc.interests && (
-          <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4 shadow-sm">
-            <h2 className="font-semibold text-sm flex items-center gap-2 mb-3">
-              <Heart className="w-4 h-4 text-primary" />
-              {tr("doctorshospitals_maraq_saheleri", "Maraq sahələri")}
-            </h2>
-            <div className="flex flex-wrap gap-2">
+          <div className="a-card mb-3">
+            <div className="a-card-head" style={{ marginBottom: 10 }}>
+              <h2 className="a-card-title a-heading">❤️ {tr("doctorshospitals_maraq_saheleri", "Maraq sahələri")}</h2>
+            </div>
+            <div className="a-tag-row" style={{ marginBottom: 0 }}>
               {parsedDesc.interests.split(',').map((interest: string, i: number) => (
-                <Badge key={i} variant="outline" className="text-xs font-normal border-primary/20 bg-card">
+                <span key={i} className="a-tag" style={{ cursor: 'default' }}>
                   {interest.trim()}
-                </Badge>
+                </span>
               ))}
             </div>
           </div>
         )}
 
         {parsedDesc.servicesList && (
-          <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4 shadow-sm">
-            <h2 className="font-semibold text-sm flex items-center gap-2 mb-3">
-              <Stethoscope className="w-4 h-4 text-primary" />
-              {tr("doctorshospitals_xidmetler", "Xidmətlər")}
-            </h2>
-            <ul className="space-y-2">
+          <div className="a-card mb-3">
+            <div className="a-card-head" style={{ marginBottom: 10 }}>
+              <h2 className="a-card-title a-heading">🩺 {tr("doctorshospitals_xidmetler", "Xidmətlər")}</h2>
+            </div>
+            <ul className="space-y-2" style={{ margin: 0, padding: 0, listStyle: 'none' }}>
               {parsedDesc.servicesList.split(',').map((service: string, i: number) => (
-                <li key={i} className="flex gap-2 text-sm text-muted-foreground">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary/50 mt-1.5 shrink-0" />
-                  <span>{service.trim()}</span>
+                <li key={i} className="flex gap-2">
+                  <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--a-peach-2)', marginTop: 6, flexShrink: 0 }} />
+                  <span className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>{service.trim()}</span>
                 </li>
               ))}
             </ul>
@@ -534,53 +516,55 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
         )}
 
         {/* Contact Info */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4 space-y-3">
-          <h2 className="font-semibold text-sm">{tr("doctorshospitals_elaqe_melumatlari_ddd442", "Əlaqə məlumatları")}</h2>
+        <div className="a-list-card mb-3">
+          <div className="a-list-row" style={{ paddingBottom: 4 }}>
+            <p className="a-card-title a-heading" style={{ margin: 0 }}>{tr("doctorshospitals_elaqe_melumatlari_ddd442", "Əlaqə məlumatları")}</p>
+          </div>
           
           {provider.address &&
-          <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <MapPin className="w-4 h-4 text-primary" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">{tr("doctorshospitals_unvan_b8651a", "Ünvan")}</p>
-                <p className="text-sm">{provider.address}{provider.city ? `, ${provider.city}` : ''}</p>
+          <div className="a-list-row">
+              <span className="a-list-icon" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
+                <MapPin size={17} strokeWidth={2} />
+              </span>
+              <div style={{ minWidth: 0 }}>
+                <p className="a-list-sub" style={{ margin: 0 }}>{tr("doctorshospitals_unvan_b8651a", "Ünvan")}</p>
+                <p className="a-list-title" style={{ whiteSpace: 'normal' }}>{provider.address}{provider.city ? `, ${provider.city}` : ''}</p>
               </div>
             </div>
           }
 
           {provider.phone &&
-          <a href={`tel:${provider.phone}`} className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
-                <Phone className="w-4 h-4 text-green-600" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">{tr("untranslated_telefon_vwjgg5", "Telefon")}</p>
-                <p className="text-sm text-primary">{provider.phone}</p>
+          <a href={`tel:${provider.phone}`} className="a-list-row" style={{ textDecoration: 'none' }}>
+              <span className="a-list-icon" style={{ background: 'var(--a-grad-green)', color: 'var(--a-green-ink)' }}>
+                <Phone size={17} strokeWidth={2} />
+              </span>
+              <div style={{ minWidth: 0 }}>
+                <p className="a-list-sub" style={{ margin: 0 }}>{tr("untranslated_telefon_vwjgg5", "Telefon")}</p>
+                <p className="a-list-title" style={{ color: 'var(--a-accent-ink)' }}>{provider.phone}</p>
               </div>
             </a>
           }
 
           {provider.email &&
-          <a href={`mailto:${provider.email}`} className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
-                <Mail className="w-4 h-4 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">{tr("doctorshospitals_e_poct_f5c193", "E-poçt")}</p>
-                <p className="text-sm text-primary">{provider.email}</p>
+          <a href={`mailto:${provider.email}`} className="a-list-row" style={{ textDecoration: 'none' }}>
+              <span className="a-list-icon" style={{ background: 'var(--a-grad-blue)', color: 'var(--a-blue-ink)' }}>
+                <Mail size={17} strokeWidth={2} />
+              </span>
+              <div style={{ minWidth: 0 }}>
+                <p className="a-list-sub" style={{ margin: 0 }}>{tr("doctorshospitals_e_poct_f5c193", "E-poçt")}</p>
+                <p className="a-list-title" style={{ color: 'var(--a-accent-ink)' }}>{provider.email}</p>
               </div>
             </a>
           }
 
           {provider.website &&
-          <a href={provider.website} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
-                <Globe className="w-4 h-4 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">{tr("untranslated_vebsayt_7bupzh", "Vebsayt")}</p>
-                <p className="text-sm text-primary">{provider.website}</p>
+          <a href={provider.website} target="_blank" rel="noopener noreferrer" className="a-list-row" style={{ textDecoration: 'none' }}>
+              <span className="a-list-icon" style={{ background: 'var(--a-grad-lav)', color: 'var(--a-lav-ink)' }}>
+                <Globe size={17} strokeWidth={2} />
+              </span>
+              <div style={{ minWidth: 0 }}>
+                <p className="a-list-sub" style={{ margin: 0 }}>{tr("untranslated_vebsayt_7bupzh", "Vebsayt")}</p>
+                <p className="a-list-title" style={{ color: 'var(--a-accent-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{provider.website}</p>
               </div>
             </a>
           }
@@ -588,16 +572,15 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
 
         {/* Working Hours */}
         {provider.working_hours && typeof provider.working_hours === 'object' && Object.keys(provider.working_hours as Record<string, string>).length > 0 &&
-        <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-4 h-4 text-primary" />
-              <h2 className="font-semibold text-sm">{tr("doctorshospitals_is_saatlari_cfa6fe", "İş saatları")}</h2>
+        <div className="a-card mb-3">
+            <div className="a-card-head" style={{ marginBottom: 10 }}>
+              <h2 className="a-card-title a-heading">🕐 {tr("doctorshospitals_is_saatlari_cfa6fe", "İş saatları")}</h2>
             </div>
             <div className="space-y-2">
               {Object.entries(provider.working_hours as Record<string, string>).map(([day, hours]) =>
-            <div key={day} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{dayLabels[day] || day}</span>
-                  <span className="font-medium">{hours}</span>
+            <div key={day} className="flex justify-between">
+                  <span className="a-list-sub" style={{ margin: 0 }}>{dayLabels[day] || day}</span>
+                  <span className="a-list-value" style={{ color: 'var(--a-ink)' }}>{hours}</span>
                 </div>
             )}
             </div>
@@ -606,18 +589,17 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
 
         {/* Services */}
         {provider.services && Array.isArray(provider.services) && provider.services.length > 0 &&
-        <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <DollarSign className="w-4 h-4 text-primary" />
-              <h2 className="font-semibold text-sm">{tr("doctorshospitals_xidmetler_ve_qiymetler_8e63a7", "Xidmətlər və qiymətlər")}</h2>
+        <div className="a-card mb-3">
+            <div className="a-card-head" style={{ marginBottom: 6 }}>
+              <h2 className="a-card-title a-heading">💰 {tr("doctorshospitals_xidmetler_ve_qiymetler_8e63a7", "Xidmətlər və qiymətlər")}</h2>
             </div>
-            <div className="space-y-2">
+            <div>
               {(provider.services as Service[]).map((service, index) =>
-            <div key={index} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
-                  <span className="text-sm">{service.name}</span>
-                  <Badge variant="secondary" className="font-semibold">
+            <div key={index} className="a-rank-row" style={{ padding: '10px 0' }}>
+                  <span className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal', flex: 1 }}>{service.name}</span>
+                  <span className="a-rank-tag intensive">
                     {service.price} AZN
-                  </Badge>
+                  </span>
                 </div>
             )}
             </div>
@@ -629,14 +611,15 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
 
         {/* Reserve Button - Disabled for now */}
         {provider.accepts_reservations &&
-        <Button
-          className="w-full h-12 rounded-xl font-semibold"
+        <button
+          className="a-btn-solid w-full"
+          style={{ justifyContent: 'center', padding: '13px 18px', marginTop: 12, opacity: 0.5, cursor: 'not-allowed' }}
           disabled={true}
           onClick={() => onReserve(provider)}>
           
-            <Calendar className="w-4 h-4 mr-2" />
+            <Calendar size={15} strokeWidth={2.2} />
             {tr("doctorshospitals_rezervasiya_et_tezlikle_225276", "Rezervasiya et (Tezlikl\u0259)")}
-          </Button>
+          </button>
         }
       </div>
     </div>);

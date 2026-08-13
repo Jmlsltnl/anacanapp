@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Send, Cake as CakeIcon, CreditCard, Banknote, Lock, ArrowLeftRight, Upload, Loader2, FileText, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useCakeOrders } from '@/hooks/useCakes';
 import { useCakeCart } from '@/hooks/useCakeCart';
@@ -202,7 +199,7 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
   // Card processing overlay
   if (showCardProcessing) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center px-6" style={{ background: 'var(--a-bg)' }}>
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -211,15 +208,16 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
           <motion.div
             animate={{ rotateY: [0, 180, 360] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center">
+            className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center"
+            style={{ background: 'var(--a-grad-peach)' }}>
             
-            <CreditCard className="w-10 h-10 text-primary" />
+            <CreditCard className="w-10 h-10" style={{ color: 'var(--a-accent-ink)' }} />
           </motion.div>
-          <h2 className="text-lg font-bold text-foreground mb-2">{tr("cakeorderform_odenis_emal_olunur_7b4caf", "Ödəniş emal olunur...")}</h2>
-          <p className="text-sm text-muted-foreground">{tr("cakeorderform_zehmet_olmasa_gozleyin_219fe5", "Zəhmət olmasa gözləyin")}</p>
+          <h2 className="text-lg mb-2 a-heading" style={{ margin: '0 0 8px', color: 'var(--a-ink)' }}>{tr("cakeorderform_odenis_emal_olunur_7b4caf", "Ödəniş emal olunur...")}</h2>
+          <p className="text-sm" style={{ margin: 0, color: 'var(--a-on-bg-soft)' }}>{tr("cakeorderform_zehmet_olmasa_gozleyin_219fe5", "Zəhmət olmasa gözləyin")}</p>
           <div className="flex items-center justify-center gap-1.5 mt-4">
-            <Lock className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">{tr("cakeorderform_tehlukesiz_odenis_4211a5", "Təhlükəsiz ödəniş")}</span>
+            <Lock className="w-3.5 h-3.5" style={{ color: 'var(--a-on-bg-soft)' }} />
+            <span className="text-xs" style={{ color: 'var(--a-on-bg-soft)' }}>{tr("cakeorderform_tehlukesiz_odenis_4211a5", "Təhlükəsiz ödəniş")}</span>
           </div>
         </motion.div>
       </div>);
@@ -244,245 +242,267 @@ const CakeOrderForm = ({ onBack, onSuccess }: CakeOrderFormProps) => {
     }
   };
 
+  const fieldLabel = (text: string) =>
+  <label className="text-sm font-bold" style={{ color: 'var(--a-ink)' }}>{text}</label>;
+
   return (
-    <div className="min-h-screen bg-background pb-44 pt-2 px-4 overflow-y-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-muted">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="text-xl font-black text-foreground">{tr("cakeorderform_sifaris_ver_f2be54", "Sifariş ver")}</h1>
-          <p className="text-sm text-muted-foreground">{items.length} tort, {totalPrice.toFixed(2)}₼</p>
-        </div>
-      </div>
-
-      {/* Cart Summary */}
-      <div className="space-y-2 mb-6">
-        {items.map((item, i) =>
-        <div key={i} className="flex items-center gap-3 bg-card rounded-xl p-3 border border-border/50">
-            {item.cake.image_url ?
-          <img src={item.cake.image_url} alt={item.cake.name} className="w-12 h-12 rounded-lg object-cover" /> :
-
-          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <CakeIcon className="w-5 h-5 text-primary" />
-              </div>
-          }
-            <div className="flex-1 min-w-0">
-              <h4 className="font-bold text-sm truncate">{item.cake.name}</h4>
-              <p className="text-xs text-muted-foreground">x{item.quantity} — {(item.cake.price * item.quantity).toFixed(2)}₼</p>
+    <div className="a-scope min-h-screen pb-44 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-shell pt-2">
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label="Back">
+              <ArrowLeft size={16} strokeWidth={2} />
+            </motion.button>
+            <div style={{ minWidth: 0 }}>
+              <p className="a-eyebrow">{items.length} tort, {totalPrice.toFixed(2)}₼</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("cakeorderform_sifaris_ver_f2be54", "Sifariş ver")}</p>
             </div>
           </div>
-        )}
-      </div>
+        </header>
 
-      {/* Form */}
-      <div className="space-y-4">
-        <div>
-          <Label className="text-sm font-semibold">{tr("cakeorderform_musteri_adi_e9554d", "Müştəri adı *")}</Label>
-          <Input value={formData.customer_name} onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })} placeholder={tr("cakeorderform_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} className="mt-1" />
-        </div>
-        <div>
-          <Label className="text-sm font-semibold">{tr("cakeorderform_usagin_adi_80632b", "Uşağın adı")}</Label>
-          <Input value={formData.child_name} onChange={(e) => setFormData({ ...formData, child_name: e.target.value })} placeholder={tr("cakeorderform_korpenin_adi_8a4e9e", "Körpənin adı")} className="mt-1" />
-        </div>
-        <div>
-          <Label className="text-sm font-semibold">{tr("cakeorderform_elaqe_nomresi_feb8b9", "Əlaqə nömrəsi *")}</Label>
-          <Input value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} placeholder="+994 XX XXX XX XX" className="mt-1" />
-        </div>
-        <div>
-          <Label className="text-sm font-semibold">{tr("cakeorderform_catdirilma_tarixi_716cbd", "Çatdırılma tarixi")}</Label>
-          <Input type="date" value={formData.delivery_date} onChange={(e) => setFormData({ ...formData, delivery_date: e.target.value })} className="mt-1" />
-        </div>
-        <div>
-          <Label className="text-sm font-semibold">{tr("cakeorderform_catdirilma_unvani_5cec99", "Çatdırılma ünvanı")}</Label>
-          <Input value={formData.delivery_address} onChange={(e) => setFormData({ ...formData, delivery_address: e.target.value })} placeholder={tr("cakeorderform_unvani_daxil_edin_b8da41", "Ünvanı daxil edin")} className="mt-1" />
-        </div>
-        <div>
-          <Label className="text-sm font-semibold">{tr("cakeorderform_elave_qeydler_c98a42", "Əlavə qeydlər")}</Label>
-          <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} placeholder={tr("cakeorderform_xususi_istekler_allergiya_ve_s_49d429", "Xüsusi istəklər, allergiya və s.")} className="mt-1 w-full min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm" />
-        </div>
+        {/* Cart Summary */}
+        <div className="a-list-card mb-4">
+          {items.map((item, i) =>
+          <div key={i} className="a-list-row">
+              {item.cake.image_url ?
+            <img src={item.cake.image_url} alt={item.cake.name} className="w-12 h-12 rounded-xl object-cover shrink-0" /> :
 
-        {/* Payment Method */}
-        <div className="space-y-3">
-          <Label className="text-sm font-semibold">{tr("cakeorderform_odenis_usulu_b9d87a", "Ödəniş üsulu")}</Label>
-          <div className={`grid gap-3 ${activeMethods.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-            {activeMethods.map((method) => {
-              const { title, sub } = getMethodLabel(method);
-              const isSelected = paymentMethod === method.method_key;
-              return (
-                <button
-                  key={method.id}
-                  onClick={() => setPaymentMethod(method.method_key)}
-                  className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl border-2 transition-all ${
-                  isSelected ? 'border-primary bg-primary/5' : 'border-border/50 bg-card'}`
-                  }>
-                  
-                  <span className={isSelected ? 'text-primary' : 'text-muted-foreground'}>
-                    {getMethodIcon(method.method_key)}
-                  </span>
-                  <span className={`text-xs font-bold ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>{title}</span>
-                  <span className="text-[9px] text-muted-foreground leading-tight text-center">{sub}</span>
-                </button>);
-
-            })}
-          </div>
-        </div>
-
-        {/* Card Details */}
-        <AnimatePresence>
-          {paymentMethod === 'card_simulated' &&
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden">
-            
-              <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-3">
-                <div className="flex items-center gap-2 mb-1">
-                  <Lock className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">{tr("cakeorderform_tehlukesiz_odenis_4211a5", "Təhlükəsiz ödəniş")}</span>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">{tr("cakeorderform_kart_nomresi_ace5c5", "Kart nömrəsi")}</Label>
-                  <Input
-                  value={cardData.number}
-                  onChange={(e) => setCardData({ ...cardData, number: formatCardNumber(e.target.value) })}
-                  placeholder="0000 0000 0000 0000"
-                  maxLength={19}
-                  className="mt-1 font-mono tracking-wider" />
-                
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs text-muted-foreground">{tr("cakeorderform_son_istifade_9d3239", "Son istifadə")}</Label>
-                    <Input
-                    value={cardData.expiry}
-                    onChange={(e) => setCardData({ ...cardData, expiry: formatExpiry(e.target.value) })}
-                    placeholder="MM/YY"
-                    maxLength={5}
-                    className="mt-1 font-mono" />
-                  
-                  </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground">CVV</Label>
-                    <Input
-                    value={cardData.cvv}
-                    onChange={(e) => setCardData({ ...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                    placeholder="•••"
-                    maxLength={4}
-                    type="password"
-                    className="mt-1 font-mono" />
-                  
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">{tr("untranslated_kart_sahibi_hixmbt", "Kart sahibi")}</Label>
-                  <Input
-                  value={cardData.holder}
-                  onChange={(e) => setCardData({ ...cardData, holder: e.target.value.toUpperCase() })}
-                  placeholder={tr("untranslated_ad_soyad_by9a9b", "AD SOYAD")}
-                  className="mt-1 uppercase" />
-                
-                </div>
-              </div>
-            </motion.div>
-          }
-        </AnimatePresence>
-
-        {/* C2C Transfer Details */}
-        <AnimatePresence>
-          {paymentMethod === 'c2c_transfer' &&
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden">
-            
-              <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-4">
-                {/* Transfer info */}
-                <div className="bg-primary/5 rounded-xl p-3 space-y-2">
-                  <h4 className="font-bold text-sm text-primary">{tr("cakeorderform_kocurme_melumatlari_1800d6", "💳 Köçürmə məlumatları")}</h4>
-                  {c2cConfig.card_number &&
-                <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">{tr("cakeorderform_kart_nomresi_3a8392", "Kart nömrəsi:")}</span>
-                      <span className="font-mono font-bold text-sm">{c2cConfig.card_number}</span>
-                    </div>
-                }
-                  {c2cConfig.card_holder &&
-                <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">{tr("untranslated_kart_sahibi_lpyfn9", "Kart sahibi:")}</span>
-                      <span className="font-bold text-sm">{c2cConfig.card_holder}</span>
-                    </div>
-                }
-                  {c2cConfig.bank_name &&
-                <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">{tr("untranslated_bank_cclvmv", "Bank:")}</span>
-                      <span className="text-sm">{c2cConfig.bank_name}</span>
-                    </div>
-                }
-                  <div className="flex justify-between items-center border-t border-primary/10 pt-2">
-                    <span className="text-xs text-muted-foreground">{tr("cakeorderform_mebleg_f038e4", "Məbləğ:")}</span>
-                    <span className="font-black text-primary">{totalPrice.toFixed(2)} ₼</span>
-                  </div>
-                  {c2cConfig.instructions &&
-                <p className="text-[10px] text-muted-foreground mt-1">ℹ️ {c2cConfig.instructions}</p>
-                }
-                </div>
-
-                {/* Upload proof */}
-                <div>
-                  <Label className="text-sm font-semibold">{tr("cakeorderform_kocurme_tesdiqi_yukleyin_3bd84d", "Köçürmə təsdiqi yükləyin *")}</Label>
-                  <p className="text-[10px] text-muted-foreground mb-2">{tr("cakeorderform_kocurmenin_screenshotunu_ve_ya_pdf_ini_y_ff7238", "Köçürmənin screenshotunu və ya PDF-ini yükləyin")}</p>
-                  
-                  {proofUrl ?
-                <div className="flex items-center gap-3 bg-green-50 dark:bg-green-950/30 rounded-xl p-3 border border-green-200 dark:border-green-800">
-                      <FileText className="w-5 h-5 text-green-600" />
-                      <span className="text-sm text-green-700 dark:text-green-400 flex-1 truncate">{proofFileName}</span>
-                      <button onClick={() => {setProofUrl(null);setProofFileName(null);}} className="p-1 hover:bg-green-100 dark:hover:bg-green-900 rounded-full">
-                        <X className="w-4 h-4 text-green-600" />
-                      </button>
-                    </div> :
-
-                <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:border-primary/50 transition bg-muted/30">
-                      <input type="file" accept="image/*,.pdf" onChange={handleProofUpload} className="hidden" />
-                      {uploadingProof ?
-                  <Loader2 className="w-6 h-6 animate-spin text-primary" /> :
-
-                  <>
-                          <Upload className="w-6 h-6 text-muted-foreground mb-1" />
-                          <span className="text-xs text-muted-foreground">{tr("cakeorderform_sekil_ve_ya_pdf_b7f3aa", "Şəkil və ya PDF")}</span>
-                        </>
-                  }
-                    </label>
-                }
-                </div>
-              </div>
-            </motion.div>
-          }
-        </AnimatePresence>
-
-        {/* Total & Submit */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-muted-foreground">{tr("cakeorderform_cemi_fbbec6", "Cəmi:")}</span>
-            <span className="text-xl font-black text-primary">{totalPrice.toFixed(2)}₼</span>
-          </div>
-          <Button className="w-full h-14 text-base font-bold rounded-2xl" onClick={handleSubmit} disabled={submitting}>
-            {submitting ?
-            <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" /> :
-
-            <>
-                {paymentMethod === 'card_simulated' ? <CreditCard className="w-5 h-5 mr-2" /> :
-              paymentMethod === 'c2c_transfer' ? <ArrowLeftRight className="w-5 h-5 mr-2" /> :
-              <Send className="w-5 h-5 mr-2" />}
-                {paymentMethod === 'card_simulated' ? tr("cake_pay_and_order", "Ödə və sifariş ver") :
-              paymentMethod === 'c2c_transfer' ? tr("cake_confirm_order", "Sifarişi təsdiqlə") :
-              tr("cake_send_order", "Sifariş göndər")} — {totalPrice.toFixed(2)}₼
-              </>
+            <span className="a-list-icon" style={{ background: 'var(--a-peach-1)' }}>
+                  <CakeIcon size={17} strokeWidth={2.2} style={{ color: 'var(--a-accent-ink)' }} />
+                </span>
             }
-          </Button>
+              <div className="flex-1 min-w-0">
+                <p className="a-list-title truncate">{item.cake.name}</p>
+                <p className="a-list-sub">x{item.quantity} — {(item.cake.price * item.quantity).toFixed(2)}₼</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Form */}
+        <div className="space-y-4">
+          <div>
+            {fieldLabel(tr("cakeorderform_musteri_adi_e9554d", "Müştəri adı *"))}
+            <input className="a-input w-full mt-1" value={formData.customer_name} onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })} placeholder={tr("cakeorderform_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} />
+          </div>
+          <div>
+            {fieldLabel(tr("cakeorderform_usagin_adi_80632b", "Uşağın adı"))}
+            <input className="a-input w-full mt-1" value={formData.child_name} onChange={(e) => setFormData({ ...formData, child_name: e.target.value })} placeholder={tr("cakeorderform_korpenin_adi_8a4e9e", "Körpənin adı")} />
+          </div>
+          <div>
+            {fieldLabel(tr("cakeorderform_elaqe_nomresi_feb8b9", "Əlaqə nömrəsi *"))}
+            <input className="a-input w-full mt-1" value={formData.contact_phone} onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })} placeholder="+994 XX XXX XX XX" />
+          </div>
+          <div>
+            {fieldLabel(tr("cakeorderform_catdirilma_tarixi_716cbd", "Çatdırılma tarixi"))}
+            <input className="a-input w-full mt-1" type="date" value={formData.delivery_date} onChange={(e) => setFormData({ ...formData, delivery_date: e.target.value })} />
+          </div>
+          <div>
+            {fieldLabel(tr("cakeorderform_catdirilma_unvani_5cec99", "Çatdırılma ünvanı"))}
+            <input className="a-input w-full mt-1" value={formData.delivery_address} onChange={(e) => setFormData({ ...formData, delivery_address: e.target.value })} placeholder={tr("cakeorderform_unvani_daxil_edin_b8da41", "Ünvanı daxil edin")} />
+          </div>
+          <div>
+            {fieldLabel(tr("cakeorderform_elave_qeydler_c98a42", "Əlavə qeydlər"))}
+            <textarea
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              placeholder={tr("cakeorderform_xususi_istekler_allergiya_ve_s_49d429", "Xüsusi istəklər, allergiya və s.")}
+              className="a-input w-full mt-1 resize-none"
+              style={{ minHeight: 80, height: 'auto', fontFamily: 'inherit' }} />
+          </div>
+
+          {/* Payment Method */}
+          <div className="space-y-3">
+            {fieldLabel(tr("cakeorderform_odenis_usulu_b9d87a", "Ödəniş üsulu"))}
+            <div className={`grid gap-3 ${activeMethods.length === 3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+              {activeMethods.map((method) => {
+                const { title, sub } = getMethodLabel(method);
+                const isSelected = paymentMethod === method.method_key;
+                return (
+                  <button
+                    key={method.id}
+                    onClick={() => setPaymentMethod(method.method_key)}
+                    className="flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-all"
+                    style={isSelected ?
+                    { border: '2px solid var(--a-peach-2)', background: 'var(--a-peach-1)', cursor: 'pointer' } :
+                    { border: '2px solid var(--a-line)', background: 'var(--a-surface)', cursor: 'pointer' }}>
+                    
+                    <span style={{ color: isSelected ? 'var(--a-accent-ink)' : 'var(--a-ink-soft)' }}>
+                      {getMethodIcon(method.method_key)}
+                    </span>
+                    <span className="text-xs font-bold" style={{ color: isSelected ? 'var(--a-accent-ink)' : 'var(--a-ink-soft)' }}>{title}</span>
+                    <span className="text-[9px] leading-tight text-center" style={{ color: 'var(--a-ink-soft)' }}>{sub}</span>
+                  </button>);
+
+              })}
+            </div>
+          </div>
+
+          {/* Card Details */}
+          <AnimatePresence>
+            {paymentMethod === 'card_simulated' &&
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden">
+              
+                <div className="a-card space-y-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Lock className="w-3.5 h-3.5" style={{ color: 'var(--a-ink-soft)' }} />
+                    <span className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>{tr("cakeorderform_tehlukesiz_odenis_4211a5", "Təhlükəsiz ödəniş")}</span>
+                  </div>
+                  <div>
+                    <label className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>{tr("cakeorderform_kart_nomresi_ace5c5", "Kart nömrəsi")}</label>
+                    <input
+                    className="a-input w-full mt-1 font-mono tracking-wider"
+                    value={cardData.number}
+                    onChange={(e) => setCardData({ ...cardData, number: formatCardNumber(e.target.value) })}
+                    placeholder="0000 0000 0000 0000"
+                    maxLength={19} />
+                  
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>{tr("cakeorderform_son_istifade_9d3239", "Son istifadə")}</label>
+                      <input
+                      className="a-input w-full mt-1 font-mono"
+                      value={cardData.expiry}
+                      onChange={(e) => setCardData({ ...cardData, expiry: formatExpiry(e.target.value) })}
+                      placeholder="MM/YY"
+                      maxLength={5} />
+                    
+                    </div>
+                    <div>
+                      <label className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>CVV</label>
+                      <input
+                      className="a-input w-full mt-1 font-mono"
+                      value={cardData.cvv}
+                      onChange={(e) => setCardData({ ...cardData, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) })}
+                      placeholder="•••"
+                      maxLength={4}
+                      type="password" />
+                    
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>{tr("untranslated_kart_sahibi_hixmbt", "Kart sahibi")}</label>
+                    <input
+                    className="a-input w-full mt-1 uppercase"
+                    value={cardData.holder}
+                    onChange={(e) => setCardData({ ...cardData, holder: e.target.value.toUpperCase() })}
+                    placeholder={tr("untranslated_ad_soyad_by9a9b", "AD SOYAD")} />
+                  
+                  </div>
+                </div>
+              </motion.div>
+            }
+          </AnimatePresence>
+
+          {/* C2C Transfer Details */}
+          <AnimatePresence>
+            {paymentMethod === 'c2c_transfer' &&
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden">
+              
+                <div className="a-card space-y-4">
+                  {/* Transfer info */}
+                  <div className="rounded-xl p-3 space-y-2" style={{ background: 'var(--a-peach-1)' }}>
+                    <h4 className="font-bold text-sm" style={{ margin: 0, color: 'var(--a-accent-ink)' }}>{tr("cakeorderform_kocurme_melumatlari_1800d6", "💳 Köçürmə məlumatları")}</h4>
+                    {c2cConfig.card_number &&
+                  <div className="flex justify-between items-center">
+                        <span className="text-xs" style={{ color: 'var(--a-accent-ink)', opacity: 0.7 }}>{tr("cakeorderform_kart_nomresi_3a8392", "Kart nömrəsi:")}</span>
+                        <span className="font-mono font-bold text-sm" style={{ color: 'var(--a-accent-ink)' }}>{c2cConfig.card_number}</span>
+                      </div>
+                  }
+                    {c2cConfig.card_holder &&
+                  <div className="flex justify-between items-center">
+                        <span className="text-xs" style={{ color: 'var(--a-accent-ink)', opacity: 0.7 }}>{tr("untranslated_kart_sahibi_lpyfn9", "Kart sahibi:")}</span>
+                        <span className="font-bold text-sm" style={{ color: 'var(--a-accent-ink)' }}>{c2cConfig.card_holder}</span>
+                      </div>
+                  }
+                    {c2cConfig.bank_name &&
+                  <div className="flex justify-between items-center">
+                        <span className="text-xs" style={{ color: 'var(--a-accent-ink)', opacity: 0.7 }}>{tr("untranslated_bank_cclvmv", "Bank:")}</span>
+                        <span className="text-sm" style={{ color: 'var(--a-accent-ink)' }}>{c2cConfig.bank_name}</span>
+                      </div>
+                  }
+                    <div className="flex justify-between items-center pt-2" style={{ borderTop: '1px solid rgba(138, 69, 20, 0.15)' }}>
+                      <span className="text-xs" style={{ color: 'var(--a-accent-ink)', opacity: 0.7 }}>{tr("cakeorderform_mebleg_f038e4", "Məbləğ:")}</span>
+                      <span className="a-heading" style={{ fontSize: 16, color: 'var(--a-accent-ink)' }}>{totalPrice.toFixed(2)} ₼</span>
+                    </div>
+                    {c2cConfig.instructions &&
+                  <p className="text-[10px] mt-1" style={{ margin: '4px 0 0', color: 'var(--a-accent-ink)', opacity: 0.7 }}>ℹ️ {c2cConfig.instructions}</p>
+                  }
+                  </div>
+
+                  {/* Upload proof */}
+                  <div>
+                    {fieldLabel(tr("cakeorderform_kocurme_tesdiqi_yukleyin_3bd84d", "Köçürmə təsdiqi yükləyin *"))}
+                    <p className="text-[10px] mb-2" style={{ margin: '2px 0 8px', color: 'var(--a-ink-soft)' }}>{tr("cakeorderform_kocurmenin_screenshotunu_ve_ya_pdf_ini_y_ff7238", "Köçürmənin screenshotunu və ya PDF-ini yükləyin")}</p>
+                    
+                    {proofUrl ?
+                  <div className="flex items-center gap-3 rounded-xl p-3" style={{ background: 'var(--a-green-1)' }}>
+                        <FileText className="w-5 h-5" style={{ color: 'var(--a-green-ink)' }} />
+                        <span className="text-sm flex-1 truncate" style={{ color: 'var(--a-green-ink)' }}>{proofFileName}</span>
+                        <button
+                      onClick={() => {setProofUrl(null);setProofFileName(null);}}
+                      className="p-1 rounded-full"
+                      style={{ background: 'var(--a-chip-overlay)', border: 'none', cursor: 'pointer' }}>
+                          <X className="w-4 h-4" style={{ color: 'var(--a-green-ink)' }} />
+                        </button>
+                      </div> :
+
+                  <label
+                    className="flex flex-col items-center justify-center w-full h-28 rounded-2xl cursor-pointer transition"
+                    style={{ border: '2px dashed var(--a-line-strong)', background: 'var(--a-surface-soft)' }}>
+                        <input type="file" accept="image/*,.pdf" onChange={handleProofUpload} className="hidden" />
+                        {uploadingProof ?
+                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'var(--a-peach-2)' }} /> :
+
+                    <>
+                            <Upload className="w-6 h-6 mb-1" style={{ color: 'var(--a-ink-soft)' }} />
+                            <span className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>{tr("cakeorderform_sekil_ve_ya_pdf_b7f3aa", "Şəkil və ya PDF")}</span>
+                          </>
+                    }
+                      </label>
+                  }
+                  </div>
+                </div>
+              </motion.div>
+            }
+          </AnimatePresence>
+
+          {/* Total & Submit */}
+          <div className="a-card">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm" style={{ color: 'var(--a-ink-soft)' }}>{tr("cakeorderform_cemi_fbbec6", "Cəmi:")}</span>
+              <span className="a-heading" style={{ fontSize: 20, color: 'var(--a-accent-ink)' }}>{totalPrice.toFixed(2)}₼</span>
+            </div>
+            <button
+              className="a-cta-btn w-full"
+              style={{ justifyContent: 'center', height: 52, fontSize: 14, opacity: submitting ? 0.6 : 1 }}
+              onClick={handleSubmit}
+              disabled={submitting}>
+              {submitting ?
+              <div className="w-5 h-5 rounded-full animate-spin" style={{ border: '2px solid var(--a-accent-ink)', borderTopColor: 'transparent' }} /> :
+
+              <>
+                  {paymentMethod === 'card_simulated' ? <CreditCard size={18} strokeWidth={2.2} /> :
+                paymentMethod === 'c2c_transfer' ? <ArrowLeftRight size={18} strokeWidth={2.2} /> :
+                <Send size={18} strokeWidth={2.2} />}
+                  {paymentMethod === 'card_simulated' ? tr("cake_pay_and_order", "Ödə və sifariş ver") :
+                paymentMethod === 'c2c_transfer' ? tr("cake_confirm_order", "Sifarişi təsdiqlə") :
+                tr("cake_send_order", "Sifariş göndər")} — {totalPrice.toFixed(2)}₼
+                </>
+              }
+            </button>
+          </div>
         </div>
       </div>
     </div>);

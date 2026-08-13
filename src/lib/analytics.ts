@@ -60,6 +60,8 @@ export type AnalyticsEvent =
   | 'ai_chat_message'
   | 'partner_linked'
   | 'premium_subscribed'
+  | 'premium_trial_started'
+  | 'purchase'
   | 'premium_cancelled'
   | 'premium_paywall_shown'
   | 'premium_paywall_clicked'
@@ -101,6 +103,7 @@ const EVENT_CATEGORIES: Record<string, string> = {
   community_post_created: 'community', community_post_liked: 'community',
   ai_chat_started: 'ai', ai_chat_message: 'ai',
   premium_subscribed: 'premium', premium_cancelled: 'premium',
+  premium_trial_started: 'premium', purchase: 'premium',
   premium_paywall_shown: 'premium', premium_paywall_clicked: 'premium',
   water_logged: 'health', symptom_logged: 'health', weight_logged: 'health',
   kick_counted: 'health', contraction_timed: 'health', meal_logged: 'health',
@@ -225,8 +228,23 @@ export const setUserProperties = async (properties: Record<string, string>): Pro
 
 /**
  * Log screen view
+ * Native-də GA4-ün RƏSMİ screen reporting-i üçün setCurrentScreen çağırılır
+ * (əvvəllər yalnız custom screen_view eventi gedirdi → GA4 "Screens" hesabatı boş qalırdı).
+ * screen_view eventi Mixpanel/internal DB üçün saxlanılır.
  */
 export const logScreenView = async (screenName: string, screenClass?: string): Promise<void> => {
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const { FirebaseAnalytics } = await import('@capacitor-firebase/analytics');
+      await FirebaseAnalytics.setCurrentScreen({
+        screenName,
+        screenClassOverride: screenClass || screenName,
+      });
+    } catch (error) {
+      console.warn('setCurrentScreen failed:', error);
+    }
+  }
+
   await logEvent('screen_view', {
     screen_name: screenName,
     screen_class: screenClass || screenName,
@@ -288,7 +306,21 @@ export const analytics = {
   logProductViewed: (productId: string) => logEvent('product_viewed', { product_id: productId }),
   
   // Premium events
-  logPremiumSubscribed: (plan: string) => logEvent('premium_subscribed', { plan }),
+  // price/currency ötürülsə: (1) FB Subscribe _valueToSum alır,
+  // (2) GA4 standart 'purchase' eventi də göndərilir (value-based optimization + gəlir hesabatı)
+  logPremiumSubscribed: (plan: string, price?: number, currency?: string) => {
+    void logEvent('premium_subscribed', { plan, price, currency });
+    if (price && price > 0) {
+      void logEvent('purchase', {
+        value: price,
+        currency: currency || 'USD',
+        item_id: plan,
+        transaction_id: `sub_${Date.now()}`
+      });
+    }
+  },
+  logTrialStarted: (plan: string, price?: number, currency?: string) =>
+  logEvent('premium_trial_started', { plan, price, currency }),
   logPremiumCancelled: () => logEvent('premium_cancelled'),
   logPaywallShown: (source: string) => logEvent('premium_paywall_shown', { source }),
   logPaywallClicked: (source: string, plan: string) => logEvent('premium_paywall_clicked', { source, plan }),

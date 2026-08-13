@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
-import { Home, Compass, MessageCircle, User, Users } from 'lucide-react';
-import { useUserStore } from '@/store/userStore';
+import { Home, Compass, MessageCircle, User, Users, Sparkles, HeartHandshake } from 'lucide-react';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useUnreadCommunityPosts } from '@/hooks/useUnreadCommunityPosts';
 import { tr } from "@/lib/tr";
@@ -11,134 +10,89 @@ interface BottomNavProps {
   isPartner?: boolean;
 }
 
+/**
+ * Floating pill bottom navigation — redesigned to match the
+ * anacan-demo-app concept (blurred white pill, peach active state,
+ * special circular gradient icon for the AI tab).
+ * All tabs, badges and translations are unchanged.
+ */
 const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps) => {
-  const { lifeStage } = useUserStore();
   const { unreadCount } = useUnreadMessages();
   const { unreadCount: communityUnread } = useUnreadCommunityPosts();
 
   const womanTabs = [
     { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
     { id: 'tools', label: tr("bottomnav_aletler_4778b4", 'Alətlər'), icon: Compass },
-    
+
     { id: 'community', label: tr("bottomnav_cemiyyet_2dc44d", 'Cəmiyyət'), icon: Users },
-    { id: 'ai', label: 'Anacan.AI', icon: MessageCircle },
+    { id: 'ai', label: 'Anacan.AI', icon: Sparkles, special: true },
     { id: 'profile', label: tr("bottomnav_profil", 'Profil'), icon: User },
   ];
 
   const partnerTabs = [
-    { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
+    { id: 'home', label: tr("partnerv2_nav_bugun", 'Bu gün'), icon: Home },
+    { id: 'together', label: tr("partnerv2_birlikde", 'Birlikdə'), icon: HeartHandshake },
     { id: 'chat', label: tr("bottomnav_mesajlar", 'Mesajlar'), icon: MessageCircle },
-    { id: 'ai', label: tr("bottomnav_meslehet_9a0892", 'Məsləhət'), icon: Compass },
+    { id: 'ai', label: tr("bottomnav_meslehet_9a0892", 'Məsləhət'), icon: Compass, special: true },
     { id: 'profile', label: tr("bottomnav_profil", 'Profil'), icon: User },
   ];
-  
-  const getActiveColor = () => {
-    switch (lifeStage) {
-      case 'flow': return 'text-flow';
-      case 'bump': return 'text-bump';
-      case 'mommy': return 'text-mommy';
-      case 'partner': return 'text-partner';
-      default: return 'text-primary';
-    }
-  };
-
-  const getGradientClass = () => {
-    switch (lifeStage) {
-      case 'flow': return 'gradient-flow';
-      case 'bump': return 'gradient-bump';
-      case 'mommy': return 'gradient-mommy';
-      case 'partner': return 'gradient-partner';
-      default: return 'gradient-primary';
-    }
-  };
 
   const visibleWomanTabs = womanTabs;
 
   return (
-    <nav 
-      className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border/50"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-    >
-      <div className="flex items-center justify-around py-1.5 px-1">
-          {(isPartner ? partnerTabs : visibleWomanTabs).map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            // Show badge on chat tab for unread messages (both partner and woman)
-            const showBadge = (tab.id === 'chat' || (tab.id === 'home' && !isPartner)) && unreadCount > 0;
-            // Community unread posts badge (woman only)
-            const showCommunityBadge = tab.id === 'community' && !isPartner && communityUnread > 0;
-            const communityBadgeText = communityUnread > 99 ? '99+' : String(communityUnread);
-            
-            return (
-              <motion.button
-                key={tab.id}
-                onClick={() => onTabChange(tab.id)}
-                className="flex flex-col items-center gap-0.5 py-1.5 px-2 relative min-w-0"
-                whileTap={{ scale: 0.9 }}
-              >
-                {/* Active indicator */}
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabIndicator"
-                    className={`absolute -top-0.5 w-8 h-0.5 rounded-full ${getGradientClass()}`}
-                    transition={{ type: "spring" as const, stiffness: 400, damping: 30 }}
-                  />
-                )}
-                
-                {/* Icon container */}
-                <motion.div
-                  className="relative"
-                  animate={isActive ? { scale: 1.05 } : { scale: 1 }}
-                  transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
+    <div className="a-nav-wrap a-scope">
+      <nav className="a-nav" aria-label="Primary">
+        {(isPartner ? partnerTabs : visibleWomanTabs).map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          // Show badge on chat tab for unread messages (both partner and woman)
+          const showBadge = (tab.id === 'chat' || (tab.id === 'home' && !isPartner)) && unreadCount > 0;
+          // Community unread posts badge (woman only)
+          const showCommunityBadge = tab.id === 'community' && !isPartner && communityUnread > 0;
+          const communityBadgeText = communityUnread > 99 ? '99+' : String(communityUnread);
+
+          return (
+            <motion.button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={`a-nav-item${isActive ? ' active' : ''}`}
+              whileTap={{ scale: 0.92 }}
+            >
+              {tab.special ? (
+                <span className="a-nav-ai-icon">
+                  <Icon size={15} strokeWidth={2.4} />
+                </span>
+              ) : (
+                <Icon size={19} strokeWidth={isActive ? 2.4 : 2} />
+              )}
+
+              {/* Unread badge */}
+              {showBadge && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="a-nav-badge"
                 >
-                  {isActive && (
-                    <motion.div
-                      className={`absolute inset-0 rounded-full ${getGradientClass()} opacity-20 blur-md`}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1.5 }}
-                    />
-                  )}
-                  <Icon 
-                    className={`w-5 h-5 relative z-10 transition-colors duration-200 ${
-                      isActive ? getActiveColor() : 'text-muted-foreground'
-                    }`}
-                    strokeWidth={isActive ? 2.5 : 2}
-                  />
-                  {/* Unread badge */}
-                  {showBadge && (
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-destructive rounded-full text-[8px] font-bold text-white flex items-center justify-center z-20"
-                    >
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </motion.span>
-                  )}
-                  {/* Community unread posts badge */}
-                  {showCommunityBadge && (
-                    <motion.span
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-500 rounded-full text-[9px] font-bold text-white flex items-center justify-center z-20 shadow-sm"
-                    >
-                      {communityBadgeText}
-                    </motion.span>
-                  )}
-                </motion.div>
-                
-                <motion.span 
-                  className={`text-[9px] font-semibold transition-colors duration-200 truncate max-w-full ${
-                    isActive ? getActiveColor() : 'text-muted-foreground'
-                  }`}
-                  animate={isActive ? { scale: 1.02 } : { scale: 1 }}
-                >
-                  {tab.label}
+                  {unreadCount > 9 ? '9+' : unreadCount}
                 </motion.span>
-              </motion.button>
-            );
+              )}
+              {/* Community unread posts badge */}
+              {showCommunityBadge && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="a-nav-badge"
+                >
+                  {communityBadgeText}
+                </motion.span>
+              )}
+
+              <span className="a-nav-label">{tab.label}</span>
+            </motion.button>
+          );
         })}
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 };
 

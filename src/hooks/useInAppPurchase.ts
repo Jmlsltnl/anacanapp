@@ -13,6 +13,7 @@ import {
   presentPaywall,
   presentCustomerCenter,
   RC_PRODUCTS,
+  RC_OFFERING_ID,
   REVENUECAT_CONFIG } from
 '@/lib/revenuecat';
 
@@ -69,7 +70,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   const [isSupported, setIsSupported] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const syncWithDatabaseRef = useRef<
-    ((isPro: boolean, productId?: string, expiresAtOverride?: string | null) => Promise<void>) | null>(
+    ((isPro: boolean, productId?: string, expiresAtOverride?: string | null, willRenew?: boolean) => Promise<void>) | null>(
     null);
 
 
@@ -98,15 +99,30 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         const ent = await checkEntitlement();
         setIsPro(ent.isPro);
 
-        // Self-heal: if store says Pro but DB/profile is out of sync, re-sync now
+        // Self-heal: if store says Pro but DB/profile is out of sync, re-sync now.
+        // willRenew ötürülür → store-dan ləğv (auto-renew off) hər açılışda tutulur.
         if (ent.isPro && user?.id) {
-          syncWithDatabaseRef.current?.(true, ent.productId || undefined, ent.expiresAt || null);
+          syncWithDatabaseRef.current?.(true, ent.productId || undefined, ent.expiresAt || null, ent.willRenew);
         }
 
-        // Load offerings
+        // Referral: trial→premium konversiyasını aşkarla (dəvət edənə +7 gün)
+        if (user?.id) {
+          import('@/lib/referralSync').then((m) =>
+          m.syncReferralStatusFromEntitlement(ent.periodType, ent.isPro)
+          ).catch(() => {});
+        }
+
+        // Load offerings — YENİ build versiyalı offering-i üstün tutur
+        // (pricing_2026: $3.99 ay trial-sız / $29.99 il). Tapılmasa current-ə
+        // düşür. Köhnə build-lər bu kodu daşımadığından current-də qalır →
+        // qiymət/trial dəyişikliyini görmürlər.
         const offerings = await getOfferings();
-        if (offerings?.current?.availablePackages) {
-          const pkgs: RCPackage[] = offerings.current.availablePackages.map((pkg: any) => {
+        const activeOffering =
+        offerings?.all?.[RC_OFFERING_ID]?.availablePackages?.length ?
+        offerings.all[RC_OFFERING_ID] :
+        offerings?.current;
+        if (activeOffering?.availablePackages) {
+          const pkgs: RCPackage[] = activeOffering.availablePackages.map((pkg: any) => {
             const defaultOption = pkg.product?.defaultOption;
             const subscriptionOptions = Array.isArray(pkg.product?.subscriptionOptions) ?
             pkg.product.subscriptionOptions.map((option: any) => ({
@@ -151,11 +167,16 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     init();
   }, [user?.id]);
 
-  const syncWithDatabase = useCallback(async (isPro: boolean, productId?: string, expiresAtOverride?: string | null) => {
+  const syncWithDatabase = useCallback(async (isPro: boolean, productId?: string, expiresAtOverride?: string | null, willRenew?: boolean) => {
     if (!user) return;
     try {
       const planType = productId?.includes('yearly') || productId?.includes('lifetime') ?
       'premium_plus' : 'premium';
+
+      // Store-dan ləğv edilmiş amma hələ aktiv abunə: RC willRenew=false →
+      // DB status 'cancelled' (win-back axını bunu görür). willRenew yenidən
+      // açılıbsa 'active'-ə sağalır. Əvvəllər store-side ləğvlər DB-yə düşmürdü.
+      const status = !isPro ? 'expired' : willRenew === false ? 'cancelled' : 'active';
 
       const expiresAt = expiresAtOverride ?
       new Date(expiresAtOverride) :
@@ -176,7 +197,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
       upsert({
         user_id: user.id,
         plan_type: isPro ? planType : 'free',
-        status: isPro ? 'active' : 'expired',
+        status,
         started_at: new Date().toISOString(),
         expires_at: expiresAt.toISOString()
       }, { onConflict: 'user_id' });
@@ -217,8 +238,23 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
       if (result.success) {
         setIsPro(true);
         const entitlement = result.customerInfo?.entitlements?.active?.[REVENUECAT_CONFIG.ENTITLEMENT_ID];
-        await syncWithDatabase(true, pkg.product.identifier, entitlement?.expirationDate || null);
-        import('@/lib/analytics').then((m) => m.analytics.logPremiumSubscribed(pkg.identifier)).catch(() => {});
+        await syncWithDatabase(true, pkg.product.identifier, entitlement?.expirationDate || null, (entitlement as any)?.willRenew ?? true);
+
+        // Analytics: real qiymət/valyuta ilə (FB value-optimization + GA4 purchase).
+        // Trial başlanğıcı ayrıca konversiyadır (Meta StartTrial / GA4).
+        const isTrial = (entitlement as any)?.periodType === 'TRIAL' || (entitlement as any)?.periodType === 'INTRO';
+        import('@/lib/analytics').then((m) => {
+          if (isTrial) {
+            m.analytics.logTrialStarted(pkg.identifier, pkg.product.price, pkg.product.currencyCode);
+          } else {
+            m.analytics.logPremiumSubscribed(pkg.identifier, pkg.product.price, pkg.product.currencyCode);
+          }
+        }).catch(() => {});
+
+        // Referral: alış anında statusu sinxronla (TRIAL → 'trial', NORMAL → 'converted')
+        import('@/lib/referralSync').then((m) =>
+        m.syncReferralStatusFromEntitlement((entitlement as any)?.periodType || 'NORMAL', true)
+        ).catch(() => {});
         return true;
       }
 
@@ -234,9 +270,14 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   }, [syncWithDatabase]);
 
   const purchaseByIdentifier = useCallback(async (identifier: string): Promise<boolean> => {
+    // packageType uyğunluğu: məhsul ID-lərində 'monthly'/'yearly' olmasa belə işləsin
+    // (məs. yeni pricing_2026 məhsulları 'annual' adlandırıla bilər)
+    const TYPE_MAP: Record<string, string> = { monthly: 'MONTHLY', yearly: 'ANNUAL', lifetime: 'LIFETIME' };
     const pkg = packages.find((p) =>
     p.identifier === identifier ||
-    p.product.identifier.includes(identifier)
+    p.product.identifier.includes(identifier) ||
+    (TYPE_MAP[identifier] ? p.packageType === TYPE_MAP[identifier] : false) ||
+    (identifier === 'yearly' && p.product.identifier.includes('annual'))
     );
     if (!pkg) {
       setError(tr("useinapppurchase_mehsul_tapilmadi_ff5957", "M\u0259hsul tap\u0131lmad\u0131"));
@@ -305,6 +346,9 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     if (!ent.isPro && isPro) {
       // User lost entitlement, sync DB
       await syncWithDatabase(false);
+    } else if (ent.isPro) {
+      // Customer Center-də ləğv / bərpa oluna bilər → willRenew statusunu dərhal əks etdir
+      await syncWithDatabase(true, ent.productId || undefined, ent.expiresAt || null, ent.willRenew);
     }
   }, [isPro, syncWithDatabase]);
 

@@ -1,29 +1,28 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, Plus, Trash2, Check, ShoppingCart,
+  Plus, Trash2, Check, ShoppingCart,
   AlertCircle, Users, User, ChevronDown, ChevronUp, Clock, Sparkles } from
 'lucide-react';
 import { useShoppingItems } from '@/hooks/useShoppingItems';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useDefaultShoppingItems } from '@/hooks/useDefaultShoppingItems';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { formatRelativeDateAz } from '@/lib/date-utils';
+import { ToolPage, ToolHeader, ToolLoading } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
 
 interface ShoppingListProps {
   onBack: () => void;
 }
 
-const priorityColors = {
-  low: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
-  medium: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
-  high: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800'
+// Priority → anacan palette
+const priorityStyles: Record<string, {bg: string;ink: string;}> = {
+  low: { bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' },
+  medium: { bg: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)' },
+  high: { bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' }
 };
 
 const priorityLabels = {
@@ -82,253 +81,238 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
   const checkedItems = items.filter((item) => item.is_checked);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>);
-
+    return <ToolLoading />;
   }
 
   return (
-    <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
-      {/* Header */}
-      <div className="gradient-primary px-3 pb-3 relative z-20">
-        <div className="flex items-center gap-2 mb-2 relative z-20">
-          <motion.button
-            onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}>
-            
-            <ArrowLeft className="w-4 h-4 text-white" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-white">
-              {isShared ? tr("shoppinglist_ortaq_alisveris_828573", "Ortaq Al\u0131\u015Fveri\u015F") : tr("shoppinglist_alisveris_siyahisi_5fe638", "Al\u0131\u015Fveri\u015F Siyah\u0131s\u0131")}
-            </h1>
-            <div className="flex items-center gap-1.5 text-white/80 text-xs">
-              {isShared ?
-              <>
-                  <Users className="w-3 h-3" />
-                  <span>{tr("shoppinglist_partnyor_ile_ortaq_bbdb50", "Partnyor ilə ortaq")}</span>
-                </> :
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            {isShared ? <Users size={10} /> : <User size={10} />}
+            {isShared ? tr("shoppinglist_partnyor_ile_ortaq_bbdb50", "Partnyor ilə ortaq") : tr("shoppinglist_sexsi_siyahi_93858e", "Şəxsi siyahı")}
+          </span>
+        }
+        title={isShared ? tr("shoppinglist_ortaq_alisveris_828573", "Ortaq Al\u0131\u015Fveri\u015F") : tr("shoppinglist_alisveris_siyahisi_5fe638", "Al\u0131\u015Fveri\u015F Siyah\u0131s\u0131")}
+        actions={
+        <span className="a-icon-btn" style={{ cursor: 'default' }}>
+            <ShoppingCart size={16} strokeWidth={2} />
+          </span>
+        } />
 
-              <>
-                  <User className="w-3 h-3" />
-                  <span>{tr("shoppinglist_sexsi_siyahi_93858e", "Şəxsi siyahı")}</span>
-                </>
-              }
-            </div>
-          </div>
-          <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-            <ShoppingCart className="w-5 h-5 text-white" />
-          </div>
+      {/* Stats */}
+      <div className="flex gap-2 mb-3">
+        <div className="flex-1 rounded-2xl p-3 flex items-center gap-2" style={{ background: 'var(--a-peach-1)' }}>
+          <div className="a-heading" style={{ fontSize: 22, color: 'var(--a-accent-ink)' }}>{uncheckedCount}</div>
+          <div className="text-xs font-semibold" style={{ color: 'var(--a-accent-ink)', opacity: 0.8 }}>{tr("shoppinglist_alinacaq_c49c64", "alınacaq")}</div>
+        </div>
+        <div className="flex-1 rounded-2xl p-3 flex items-center gap-2" style={{ background: 'var(--a-green-1)' }}>
+          <div className="a-heading" style={{ fontSize: 22, color: 'var(--a-green-ink)' }}>{checkedCount}</div>
+          <div className="text-xs font-semibold" style={{ color: 'var(--a-green-ink)', opacity: 0.8 }}>{tr("shoppinglist_alindi_63cabc", "alındı")}</div>
         </div>
       </div>
 
-      <div className="px-3 py-2">
-        {/* Stats + Add */}
+      {/* Add item form */}
+      <div className="a-card mb-3" style={{ padding: 14 }}>
         <div className="flex gap-2 mb-2">
-          <div className="flex-1 bg-card rounded-xl p-2.5 border border-border/50 flex items-center gap-2">
-            <div className="text-xl font-black text-primary">{uncheckedCount}</div>
-            <div className="text-xs text-muted-foreground">{tr("shoppinglist_alinacaq_c49c64", "alınacaq")}</div>
-          </div>
-          <div className="flex-1 bg-card rounded-xl p-2.5 border border-border/50 flex items-center gap-2">
-            <div className="text-xl font-black text-green-600">{checkedCount}</div>
-            <div className="text-xs text-muted-foreground">{tr("shoppinglist_alindi_63cabc", "alındı")}</div>
-          </div>
-        </div>
-
-        {/* Add item form */}
-        <div className="bg-card rounded-xl p-3 border border-border/50 mb-2">
-          <div className="flex gap-2 mb-2">
-            <Input
-              value={newItemName}
-              onChange={(e) => setNewItemName(e.target.value)}
-              placeholder={tr("shoppinglist_mehsul_adi_a5d2df", "Məhsul adı...")}
-              onKeyPress={(e) => e.key === 'Enter' && handleAddItem()}
-              className="flex-1 h-9 text-sm" />
-            
-            <Button
-              onClick={handleAddItem}
-              disabled={submitting || !newItemName.trim()}
-              className="shrink-0 h-9 w-9 p-0">
-              
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
+          <input
+            className="a-input flex-1"
+            value={newItemName}
+            onChange={(e) => setNewItemName(e.target.value)}
+            placeholder={tr("shoppinglist_mehsul_adi_a5d2df", "Məhsul adı...")}
+            onKeyPress={(e) => e.key === 'Enter' && handleAddItem()} />
           
-          {/* Priority selector */}
-          <div className="flex gap-1.5">
-            {(['low', 'medium', 'high'] as const).map((priority) =>
-            <button
-              key={priority}
-              onClick={() => setNewItemPriority(priority)}
-              className={`flex-1 py-1.5 rounded-lg text-[10px] font-medium transition-all border ${
-              newItemPriority === priority ?
-              priorityColors[priority] :
-              'bg-muted text-muted-foreground border-transparent'}`
-              }>
-              
-                {priorityLabels[priority]}
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Recommendations */}
-        {filteredRecommendations.length > 0 &&
-        <div className="mb-3">
-            <button
-            onClick={() => setShowRecommendations(!showRecommendations)}
-            className="flex items-center gap-2 text-primary hover:text-primary/80 w-full mb-2">
+          <button
+            onClick={handleAddItem}
+            disabled={submitting || !newItemName.trim()}
+            className="a-cta-btn shrink-0"
+            style={{ width: 42, height: 42, padding: 0, justifyContent: 'center', opacity: submitting || !newItemName.trim() ? 0.5 : 1 }}>
             
-              <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-medium">{tr("shoppinglist_platformanin_tovsiyeleri_2e687e", "Platforman\u0131n t\xF6vsiy\u0259l\u0259ri (")}{filteredRecommendations.length})</span>
-              {showRecommendations ? <ChevronUp className="w-4 h-4 ml-auto" /> : <ChevronDown className="w-4 h-4 ml-auto" />}
+            <Plus size={16} strokeWidth={2.4} />
+          </button>
+        </div>
+        
+        {/* Priority selector */}
+        <div className="flex gap-1.5">
+          {(['low', 'medium', 'high'] as const).map((priority) =>
+          <button
+            key={priority}
+            onClick={() => setNewItemPriority(priority)}
+            className="flex-1 py-1.5 rounded-full text-[10px] font-bold transition-all"
+            style={newItemPriority === priority ?
+            { background: priorityStyles[priority].bg, color: priorityStyles[priority].ink, border: '1px solid transparent', cursor: 'pointer' } :
+            { background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)', border: '1px solid transparent', cursor: 'pointer' }}>
+            
+              {priorityLabels[priority]}
             </button>
+          )}
+        </div>
+      </div>
 
-            <AnimatePresence>
-              {showRecommendations &&
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden">
-              
-                  <div className="flex flex-wrap gap-1.5">
-                    {filteredRecommendations.slice(0, 8).map((item) =>
-                <motion.button
-                  key={item.id}
-                  onClick={async () => {
-                    const result = await addItem({
-                      name: item.name,
-                      priority: item.priority
-                    });
-                    if (!result.error) {
-                      toast({ title: `${item.name} ${tr("shopping_item_added", "əlavə edildi!")}` });
-                    }
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 rounded-full text-xs font-medium text-primary transition-colors border border-primary/20"
-                  whileTap={{ scale: 0.95 }}>
-                  
-                        <Plus className="w-3 h-3" />
-                        {item.name}
-                      </motion.button>
-                )}
-                  </div>
-                </motion.div>
-            }
-            </AnimatePresence>
-          </div>
-        }
+      {/* Recommendations */}
+      {filteredRecommendations.length > 0 &&
+      <div className="mb-3">
+          <button
+          onClick={() => setShowRecommendations(!showRecommendations)}
+          className="flex items-center gap-2 w-full mb-2"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--a-accent-ink)' }}>
+          
+            <Sparkles className="w-4 h-4" style={{ color: 'var(--a-peach-2)' }} />
+            <span className="text-sm font-bold">{tr("shoppinglist_platformanin_tovsiyeleri_2e687e", "Platforman\u0131n t\xF6vsiy\u0259l\u0259ri (")}{filteredRecommendations.length})</span>
+            {showRecommendations ? <ChevronUp className="w-4 h-4 ml-auto" /> : <ChevronDown className="w-4 h-4 ml-auto" />}
+          </button>
 
-        {/* Unchecked items */}
-        <div className="space-y-1.5 mb-3">
           <AnimatePresence>
-            {uncheckedItems.map((item) =>
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              className="bg-card rounded-xl p-2.5 border border-border/50 flex items-center gap-2">
-              
-                <button
-                onClick={() => toggleItem(item.id)}
-                className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center shrink-0">
-                
-                </button>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm text-foreground truncate">{item.name}</p>
-                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                    <Badge variant="outline" className={`text-[9px] px-1.5 py-0 ${priorityColors[item.priority]}`}>
-                      {priorityLabels[item.priority]}
-                    </Badge>
-                    <span className="text-[9px] text-muted-foreground flex items-center gap-0.5">
-                      <Clock className="w-2.5 h-2.5" />
-                      {formatRelativeDateAz(item.created_at)}
-                    </span>
-                  </div>
-                </div>
-                <button
-                onClick={() => deleteItem(item.id)}
-                className="w-7 h-7 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500">
-                
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {uncheckedItems.length === 0 &&
-          <div className="text-center py-6">
-              <div className="text-3xl mb-1">🛒</div>
-              <p className="text-sm text-muted-foreground">{tr("shoppinglist_siyahi_bosdur_c420ab", "Siyahı boşdur")}</p>
-            </div>
-          }
-        </div>
-
-        {/* Completed items toggle */}
-        {checkedItems.length > 0 &&
-        <div className="mb-4">
-            <button
-            onClick={() => setShowCompleted(!showCompleted)}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground w-full">
+            {showRecommendations &&
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden">
             
-              {showCompleted ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              <span className="text-sm">{tr("shoppinglist_alinmis_mehsullar_957a1f", "Al\u0131nm\u0131\u015F m\u0259hsullar (")}{checkedCount})</span>
-            </button>
+                <div className="flex flex-wrap gap-1.5">
+                  {filteredRecommendations.slice(0, 8).map((item) =>
+              <motion.button
+                key={item.id}
+                onClick={async () => {
+                  const result = await addItem({
+                    name: item.name,
+                    priority: item.priority
+                  });
+                  if (!result.error) {
+                    toast({ title: `${item.name} ${tr("shopping_item_added", "əlavə edildi!")}` });
+                  }
+                }}
+                className="a-tag"
+                whileTap={{ scale: 0.95 }}>
+                
+                      <Plus className="w-3 h-3" />
+                      {item.name}
+                    </motion.button>
+              )}
+                </div>
+              </motion.div>
+          }
+          </AnimatePresence>
+        </div>
+      }
 
-            <AnimatePresence>
-              {showCompleted &&
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="overflow-hidden">
+      {/* Unchecked items */}
+      <div className="space-y-1.5 mb-3">
+        <AnimatePresence>
+          {uncheckedItems.map((item) =>
+          <motion.div
+            key={item.id}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            className="a-card flex items-center gap-3"
+            style={{ padding: '12px 14px' }}>
+            
+              <button
+              onClick={() => toggleItem(item.id)}
+              className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+              style={{ border: '2px solid var(--a-peach-2)', background: 'none', cursor: 'pointer' }}>
               
-                  <div className="space-y-2 mt-3">
-                    {checkedItems.map((item) =>
-                <div
-                  key={item.id}
-                  className="bg-muted/50 rounded-xl p-4 border border-border/30 flex items-center gap-3 opacity-60">
-                  
-                        <button
-                    onClick={() => toggleItem(item.id)}
-                    className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center shrink-0">
-                    
-                          <Check className="w-4 h-4 text-white" />
-                        </button>
-                        <p className="flex-1 font-medium text-foreground line-through">{item.name}</p>
-                        <button
-                    onClick={() => deleteItem(item.id)}
-                    className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-red-500">
-                    
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                )}
-                  </div>
-                </motion.div>
-            }
-            </AnimatePresence>
-          </div>
-        }
+              </button>
+              <div className="flex-1 min-w-0">
+                <p className="a-list-title truncate" style={{ margin: 0 }}>{item.name}</p>
+                <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                  <span
+                  className="text-[9px] px-1.5 py-0 rounded-full font-bold"
+                  style={{ background: priorityStyles[item.priority].bg, color: priorityStyles[item.priority].ink }}>
+                    {priorityLabels[item.priority]}
+                  </span>
+                  <span className="text-[9px] flex items-center gap-0.5" style={{ color: 'var(--a-ink-faint)' }}>
+                    <Clock className="w-2.5 h-2.5" />
+                    {formatRelativeDateAz(item.created_at)}
+                  </span>
+                </div>
+              </div>
+              <button
+              onClick={() => deleteItem(item.id)}
+              className="w-7 h-7 rounded-full flex items-center justify-center"
+              style={{ background: 'var(--a-pink-1)', border: 'none', cursor: 'pointer' }}>
+              
+                <Trash2 className="w-3.5 h-3.5" style={{ color: 'var(--a-pink-ink)' }} />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Partner info */}
-        {isShared &&
-        <div className="bg-primary/5 rounded-2xl p-4 border border-primary/10 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-foreground">{tr("shoppinglist_ortaq_siyahi_e10fff", "Ortaq siyahı")}</p>
-              <p className="text-xs text-muted-foreground">
-                {tr("shoppinglist_bu_siyahiya_elave_etdiyiniz_me_0ba1c1", "Bu siyah\u0131ya \u0259lav\u0259 etdiyiniz m\u0259hsullar partnyorunuz t\u0259r\u0259find\u0259n d\u0259 g\xF6r\xFCn\xFCr v\u0259 real vaxtda sinxronla\u015F\u0131r.")}
-              </p>
-            </div>
+        {uncheckedItems.length === 0 &&
+        <div className="a-card text-center" style={{ padding: '26px 18px' }}>
+            <div className="text-3xl mb-1">🛒</div>
+            <p className="a-list-sub" style={{ margin: 0 }}>{tr("shoppinglist_siyahi_bosdur_c420ab", "Siyahı boşdur")}</p>
           </div>
         }
       </div>
-    </div>);
+
+      {/* Completed items toggle */}
+      {checkedItems.length > 0 &&
+      <div className="mb-4">
+          <button
+          onClick={() => setShowCompleted(!showCompleted)}
+          className="flex items-center gap-2 w-full"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--a-on-bg-soft)' }}>
+          
+            {showCompleted ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            <span className="text-sm font-semibold">{tr("shoppinglist_alinmis_mehsullar_957a1f", "Al\u0131nm\u0131\u015F m\u0259hsullar (")}{checkedCount})</span>
+          </button>
+
+          <AnimatePresence>
+            {showCompleted &&
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden">
+            
+                <div className="space-y-2 mt-3">
+                  {checkedItems.map((item) =>
+              <div
+                key={item.id}
+                className="rounded-2xl p-3.5 flex items-center gap-3"
+                style={{ background: 'var(--a-surface-soft)', opacity: 0.7 }}>
+                
+                      <button
+                  onClick={() => toggleItem(item.id)}
+                  className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                  style={{ background: 'var(--a-green-2)', border: 'none', cursor: 'pointer' }}>
+                  
+                        <Check className="w-4 h-4 text-white" />
+                      </button>
+                      <p className="flex-1 font-semibold line-through" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{item.name}</p>
+                      <button
+                  onClick={() => deleteItem(item.id)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center"
+                  style={{ background: 'var(--a-pink-1)', border: 'none', cursor: 'pointer' }}>
+                  
+                        <Trash2 className="w-4 h-4" style={{ color: 'var(--a-pink-ink)' }} />
+                      </button>
+                    </div>
+              )}
+                </div>
+              </motion.div>
+          }
+          </AnimatePresence>
+        </div>
+      }
+
+      {/* Partner info */}
+      {isShared &&
+      <div className="a-card flex items-start gap-3" style={{ background: 'var(--a-blue-1)', border: 'none' }}>
+          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: 'var(--a-blue-ink)' }} />
+          <div>
+            <p className="text-sm font-bold" style={{ margin: 0, color: '#153e57' }}>{tr("shoppinglist_ortaq_siyahi_e10fff", "Ortaq siyahı")}</p>
+            <p className="text-xs" style={{ margin: 0, color: 'var(--a-blue-ink)' }}>
+              {tr("shoppinglist_bu_siyahiya_elave_etdiyiniz_me_0ba1c1", "Bu siyah\u0131ya \u0259lav\u0259 etdiyiniz m\u0259hsullar partnyorunuz t\u0259r\u0259find\u0259n d\u0259 g\xF6r\xFCn\xFCr v\u0259 real vaxtda sinxronla\u015F\u0131r.")}
+            </p>
+          </div>
+        </div>
+      }
+    </ToolPage>);
 
 };
 

@@ -112,43 +112,42 @@ const FlowPeriodCalendar = () => {
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.1 }}
-      className="bg-card rounded-2xl p-4 border border-border">
+      className="a-card a-fade-in">
       
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-foreground flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-primary" />
-          {tr("flowperiodcalendar_period_teqvimi_d04269", "Period T\u0259qvimi")}
-        </h3>
+      <div className="a-card-head">
+        <h3 className="a-card-title a-heading">{tr("flowperiodcalendar_period_teqvimi_d04269", "Period T\u0259qvimi")}</h3>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))}
-            className="p-1.5 hover:bg-muted rounded-lg transition-colors">
+            className="a-icon-btn"
+            style={{ width: 28, height: 28 }}>
             
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft size={14} />
           </button>
-          <span className="text-sm font-medium min-w-[110px] text-center">
+          <span className="a-section-link" style={{ minWidth: 100, justifyContent: 'center', color: 'var(--a-ink)' }}>
             {format(calendarMonth, 'MMMM yyyy', { locale: getCurrentDateLocale() })}
           </span>
           <button
             onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))}
-            className="p-1.5 hover:bg-muted rounded-lg transition-colors">
+            className="a-icon-btn"
+            style={{ width: 28, height: 28 }}>
             
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight size={14} />
           </button>
         </div>
       </div>
 
       {/* Instruction */}
-      <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1.5">
-        <Droplets className="w-3.5 h-3.5" />
+      <p className="a-list-sub" style={{ margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <Droplets size={13} />
         {tr("flowperiodcalendar_gune_toxunaraq_period_gunlerin_3b5f8a", "G\xFCn\u0259 toxunaraq period g\xFCnl\u0259rini qeyd edin")}
       </p>
 
       {/* Day Labels */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {[tr('day_sun_short', 'B'), tr('day_mon_short', 'BE'), tr('day_tue_short', 'ÇA'), tr('day_wed_short', 'Ç'), tr('day_thu_short', 'CA'), tr('day_fri_short', 'C'), tr('day_sat_short', 'Ş')].map((day, i) =>
-        <div key={i} className="text-center text-xs text-muted-foreground font-medium py-1">
+        <div key={i} className="text-center py-1" style={{ fontSize: 10, fontWeight: 700, color: 'var(--a-ink-faint)' }}>
             {day}
           </div>
         )}

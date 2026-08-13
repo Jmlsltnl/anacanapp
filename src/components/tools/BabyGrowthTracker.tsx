@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ComposedChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { buildCurveData, percentile, percentileLabel, ageInMonths, type Sex, type Measure } from '@/lib/whoGrowth';
 import {
   ArrowLeft, Scale, Ruler, Plus, TrendingUp, TrendingDown,
   Calendar, ChevronRight, Sparkles, Baby, LineChart, Edit2, Trash2 } from
@@ -21,6 +23,146 @@ import { tr } from "@/lib/tr";
 interface BabyGrowthTrackerProps {
   onBack: () => void;
 }
+
+/**
+ * WHO percentil əyriləri (0-24 ay) — çəki və boy.
+ * P3/P15/P50/P85/P97 zolaqları + uşağın real ölçüləri.
+ */
+const WHOPercentileCard = ({ entries, birthDate, sex }: {
+  entries: {entry_date: string;weight_kg: number | null;height_cm: number | null;}[];
+  birthDate: string;
+  sex: Sex;
+}) => {
+  const [measure, setMeasure] = useState<Measure>('weight');
+
+  const { chartData, latestPercentile } = useMemo(() => {
+    const curve = buildCurveData(measure, sex);
+
+    // Uşağın ölçülərini aylara yerləşdir
+    const childPoints: {month: number;value: number;}[] = [];
+    for (const e of entries) {
+      const val = measure === 'weight' ? e.weight_kg : e.height_cm;
+      if (!val) continue;
+      const m = ageInMonths(birthDate, e.entry_date);
+      if (m >= 0 && m <= 24) childPoints.push({ month: Math.round(m * 10) / 10, value: val });
+    }
+    childPoints.sort((a, b) => a.month - b.month);
+
+    // recharts: əyri + uşaq nöqtələri birləşmiş data
+    const merged: any[] = curve.map((c) => ({ ...c }));
+    for (const p of childPoints) {
+      merged.push({ month: p.month, child: p.value });
+    }
+    merged.sort((a, b) => a.month - b.month);
+
+    // Son ölçünün percentili
+    let latest: number | null = null;
+    if (childPoints.length > 0) {
+      const last = childPoints[childPoints.length - 1];
+      latest = percentile(measure, sex, last.month, last.value);
+    }
+
+    return { chartData: merged, latestPercentile: latest };
+  }, [entries, birthDate, sex, measure]);
+
+  const tone = latestPercentile !== null ? percentileLabel(latestPercentile).tone : null;
+  const toneStyle = tone === 'ok' ?
+  { bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' } :
+  tone === 'watch' ?
+  { bg: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)' } :
+  { bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
+
+  return (
+    <motion.div
+      className="a-card a-fade-in"
+      style={{ marginTop: 12 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.22 }}>
+
+      <div className="a-card-head">
+        <h3 className="a-card-title a-heading">{tr('who_curves_title', 'WHO inkişaf əyriləri')}</h3>
+        {latestPercentile !== null &&
+        <span className="a-rank-tag" style={{ background: toneStyle.bg, color: toneStyle.ink }}>
+            P{latestPercentile} · {tone === 'ok' ? tr('who_normal', 'normal') : tone === 'watch' ? tr('who_watch', 'izləyin') : tr('who_alert', 'həkimlə danışın')}
+          </span>
+        }
+      </div>
+
+      {/* Ölçü seçimi */}
+      <div className="flex gap-2 mb-3">
+        {[
+        { id: 'weight' as Measure, label: tr('who_weight', 'Çəki (kq)') },
+        { id: 'height' as Measure, label: tr('who_height', 'Boy (sm)') }].
+        map((m) =>
+        <button
+          key={m.id}
+          onClick={() => setMeasure(m.id)}
+          className="flex-1 py-2 rounded-xl text-xs font-bold transition-all"
+          style={{
+            background: measure === m.id ? 'var(--a-peach-1)' : 'var(--a-surface-soft)',
+            color: measure === m.id ? 'var(--a-accent-ink)' : 'var(--a-ink-soft)',
+            border: measure === m.id ? '2px solid var(--a-peach-2)' : '2px solid transparent'
+          }}>
+            {m.label}
+          </button>
+        )}
+      </div>
+
+      <div style={{ width: '100%', height: 220 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart data={chartData} margin={{ top: 6, right: 6, bottom: 0, left: -14 }}>
+            <XAxis
+              dataKey="month"
+              type="number"
+              domain={[0, 24]}
+              ticks={[0, 6, 12, 18, 24]}
+              tick={{ fontSize: 10, fill: 'var(--a-ink-soft)' }}
+              tickLine={false}
+              axisLine={{ stroke: 'var(--a-line)' }}
+              tickFormatter={(m) => `${m}${tr('who_month_short', 'ay')}`} />
+            <YAxis
+              domain={['auto', 'auto']}
+              tick={{ fontSize: 10, fill: 'var(--a-ink-soft)' }}
+              tickLine={false}
+              axisLine={false}
+              width={40} />
+            <Tooltip
+              contentStyle={{ borderRadius: 12, border: '1px solid var(--a-line)', fontSize: 11, background: 'var(--a-surface)' }}
+              formatter={(value: any, name: string) => {
+                const labels: Record<string, string> = {
+                  p3: 'P3', p15: 'P15', p50: tr('who_median', 'P50 (median)'), p85: 'P85', p97: 'P97',
+                  child: tr('who_child', 'Körpəniz')
+                };
+                return [value, labels[name] || name];
+              }}
+              labelFormatter={(m) => `${m} ${tr('who_month_short', 'ay')}`} />
+
+            {/* Percentil əyriləri */}
+            <Line dataKey="p97" stroke="#e4a3b8" strokeWidth={1} dot={false} connectNulls isAnimationActive={false} strokeDasharray="4 3" />
+            <Line dataKey="p85" stroke="#d4b48c" strokeWidth={1} dot={false} connectNulls isAnimationActive={false} />
+            <Line dataKey="p50" stroke="#63bd8b" strokeWidth={2} dot={false} connectNulls isAnimationActive={false} />
+            <Line dataKey="p15" stroke="#d4b48c" strokeWidth={1} dot={false} connectNulls isAnimationActive={false} />
+            <Line dataKey="p3" stroke="#e4a3b8" strokeWidth={1} dot={false} connectNulls isAnimationActive={false} strokeDasharray="4 3" />
+
+            {/* Körpənin ölçüləri */}
+            <Line
+              dataKey="child"
+              stroke="var(--a-peach-2)"
+              strokeWidth={2.5}
+              connectNulls
+              dot={{ r: 3.5, fill: 'var(--a-peach-2)', strokeWidth: 0 }}
+              activeDot={{ r: 5 }}
+              isAnimationActive={false} />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+
+      <p className="a-teaser" style={{ marginTop: 8 }}>
+        {tr('who_explainer', 'Yaşıl xətt — WHO medianı (P50). P15-P85 arası tam normaldır; P3-dən aşağı və ya P97-dən yuxarıdırsa pediatrla məsləhətləşin.')}
+      </p>
+    </motion.div>);
+};
 
 interface BabyGrowthEntry {
   id: string;
@@ -199,207 +341,202 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
   null;
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <ArrowLeft className="w-5 h-5 text-foreground" />
+    <div className="a-scope pb-24" style={{ background: 'var(--a-bg)', minHeight: '100vh' }}>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
+              <ArrowLeft size={16} strokeWidth={2} />
             </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Baby className="w-5 h-5 text-rose-500" />
-                {tr("babygrowthtracker_i_nkisaf_izleyicisi_71039e", "\u0130nki\u015Faf izl\u0259yicisi")}
-              </h1>
+            <div>
+              <p className="a-eyebrow">{selectedChild?.name || tr("common_qeyd", "qeyd")}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("babygrowthtracker_i_nkisaf_izleyicisi_71039e", "\u0130nki\u015Faf izl\u0259yicisi")}</p>
             </div>
+          </div>
+          <div className="a-topbar-actions">
             <motion.button
               onClick={() => setShowAddModal(true)}
-              className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
+              className="a-icon-btn"
+              style={{ background: 'var(--a-peach-2)', color: '#fff', border: 'none' }}
+              whileTap={{ scale: 0.9 }}>
               
-              <Plus className="w-5 h-5 text-primary-foreground" />
+              <Plus size={17} strokeWidth={2.4} />
             </motion.button>
           </div>
-        </div>
-      </div>
+        </header>
 
-      <div className="px-4 pt-4">
-        {/* Current Stats Cards */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        {/* Current Stats */}
+        <div className="a-trio" style={{ marginTop: 6 }}>
           <motion.div
-            className="bg-rose-50 dark:bg-rose-500/10 rounded-2xl p-3 text-center border border-rose-100 dark:border-rose-500/20"
+            className="a-trio-item"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}>
             
-            <Scale className="w-5 h-5 mx-auto mb-1 text-rose-500" />
-            <p className="text-2xl font-black text-rose-600 dark:text-rose-400">
+            <span className="a-trio-icon" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
+              <Scale size={17} strokeWidth={2} />
+            </span>
+            <p className="a-trio-value" style={{ fontSize: 17 }}>
               {latestEntry?.weight_kg ? `${latestEntry.weight_kg}` : '—'}
             </p>
-            <p className="text-xs text-rose-600/70 dark:text-rose-400/70 font-medium">{tr('unit_kg', 'kq')}</p>
+            <p className="a-trio-label">{tr('unit_kg', 'kq')}</p>
             {weightChange !== null && weightChange !== 0 &&
-            <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs font-semibold ${weightChange > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                {weightChange > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+            <p className="a-trio-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3, marginTop: 3, color: weightChange > 0 ? 'var(--a-green-2)' : 'var(--a-pink-2)' }}>
+                {weightChange > 0 ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
                 {weightChange > 0 ? '+' : ''}{weightChange.toFixed(2)}
-              </div>
+              </p>
             }
           </motion.div>
 
           <motion.div
-            className="bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl p-3 text-center border border-indigo-100 dark:border-indigo-500/20"
+            className="a-trio-item"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}>
             
-            <Ruler className="w-5 h-5 mx-auto mb-1 text-indigo-500" />
-            <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
+            <span className="a-trio-icon" style={{ background: 'var(--a-grad-blue)', color: 'var(--a-blue-ink)' }}>
+              <Ruler size={17} strokeWidth={2} />
+            </span>
+            <p className="a-trio-value" style={{ fontSize: 17 }}>
               {latestEntry?.height_cm ? `${latestEntry.height_cm}` : '—'}
             </p>
-            <p className="text-xs text-indigo-600/70 dark:text-indigo-400/70 font-medium">{tr('unit_cm', 'sm')}</p>
+            <p className="a-trio-label">{tr('unit_cm', 'sm')}</p>
             {heightChange !== null && heightChange !== 0 &&
-            <div className={`flex items-center justify-center gap-0.5 mt-1 text-xs font-semibold ${heightChange > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                {heightChange > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+            <p className="a-trio-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3, marginTop: 3, color: heightChange > 0 ? 'var(--a-green-2)' : 'var(--a-pink-2)' }}>
+                {heightChange > 0 ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
                 {heightChange > 0 ? '+' : ''}{heightChange.toFixed(1)}
-              </div>
+              </p>
             }
           </motion.div>
 
           <motion.div
-            className="bg-amber-50 dark:bg-amber-500/10 rounded-2xl p-3 text-center border border-amber-100 dark:border-amber-500/20"
+            className="a-trio-item"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}>
             
-            <Baby className="w-5 h-5 mx-auto mb-1 text-amber-500" />
-            <p className="text-2xl font-black text-amber-600 dark:text-amber-400">
+            <span className="a-trio-icon" style={{ background: 'var(--a-grad-yellow)', color: 'var(--a-warn-ink)' }}>
+              <Baby size={17} strokeWidth={2} />
+            </span>
+            <p className="a-trio-value" style={{ fontSize: 17 }}>
               {latestEntry?.head_cm ? `${latestEntry.head_cm}` : '—'}
             </p>
-            <p className="text-xs text-amber-600/70 dark:text-amber-400/70 font-medium">{tr("babygrowthtracker_bas_sm_1367d0", "baş sm")}</p>
+            <p className="a-trio-label">{tr("babygrowthtracker_bas_sm_1367d0", "baş sm")}</p>
           </motion.div>
         </div>
 
+        {/* WHO Percentil Əyriləri */}
+        {selectedChild?.birth_date && selectedChild?.gender && entries.length > 0 &&
+        <WHOPercentileCard
+          entries={entries}
+          birthDate={selectedChild.birth_date}
+          sex={selectedChild.gender === 'boy' ? 'boy' : 'girl'} />
+        }
+
         {/* History Section */}
-        <motion.div
+        <motion.section
+          className="a-section"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}>
           
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-400 to-pink-600 flex items-center justify-center">
-                <LineChart className="w-4 h-4 text-white" />
-              </div>
-              <h2 className="font-bold text-foreground">{tr("babygrowthtracker_olcu_tarixcesi_249279", "Ölçü Tarixçəsi")}</h2>
-            </div>
-            <span className="text-xs text-muted-foreground">{entries.length} {tr("common_qeyd", "qeyd")}</span>
+          <div className="a-section-head">
+            <h2 className="a-section-title a-heading">{tr("babygrowthtracker_olcu_tarixcesi_249279", "Ölçü Tarixçəsi")}</h2>
+            <span className="a-section-link">{entries.length} {tr("common_qeyd", "qeyd")}</span>
           </div>
 
           {isLoading ?
-          <div className="space-y-3">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[1, 2, 3].map((i) =>
-            <div key={i} className="bg-card rounded-2xl p-4 animate-pulse">
-                  <div className="h-4 bg-muted rounded w-1/3 mb-2" />
-                  <div className="h-3 bg-muted rounded w-2/3" />
+            <div key={i} className="a-card animate-pulse">
+                  <div style={{ height: 16, width: '33%', borderRadius: 8, background: 'var(--a-surface-soft)', marginBottom: 8 }} />
+                  <div style={{ height: 12, width: '66%', borderRadius: 8, background: 'var(--a-surface-soft)' }} />
                 </div>
             )}
             </div> :
           entries.length === 0 ?
-          <Card className="border-dashed">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-900/30 dark:to-pink-900/30 flex items-center justify-center">
-                  <Scale className="w-8 h-8 text-rose-500" />
-                </div>
-                <h3 className="font-bold text-foreground mb-1">{tr("babygrowthtracker_hele_olcu_yoxdur_7f7813", "Hələ ölçü yoxdur")}</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {tr("babygrowthtracker_korpenizin_ceki_ve_boyunu_izle_36b05f", "K\xF6rp\u0259nizin \xE7\u0259ki v\u0259 boyunu izl\u0259m\u0259k \xFC\xE7\xFCn ilk \xF6l\xE7\xFCn\xFC \u0259lav\u0259 edin")}
-                </p>
-                <Button onClick={() => setShowAddModal(true)} className="bg-gradient-to-r from-rose-500 to-pink-600">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {tr("babygrowthtracker_i_lk_olcunu_elave_et_5a19bb", "\u0130lk \xF6l\xE7\xFCn\xFC \u0259lav\u0259 et")}
-                </Button>
-              </CardContent>
-            </Card> :
+          <div className="a-card" style={{ textAlign: 'center', padding: '32px 18px' }}>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: 'var(--a-grad-peach)' }}>
+                <Scale size={26} style={{ color: 'var(--a-accent-ink)' }} />
+              </div>
+              <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr("babygrowthtracker_hele_olcu_yoxdur_7f7813", "Hələ ölçü yoxdur")}</h3>
+              <p className="a-list-sub" style={{ margin: '0 0 16px', whiteSpace: 'normal' }}>
+                {tr("babygrowthtracker_korpenizin_ceki_ve_boyunu_izle_36b05f", "K\xF6rp\u0259nizin \xE7\u0259ki v\u0259 boyunu izl\u0259m\u0259k \xFC\xE7\xFCn ilk \xF6l\xE7\xFCn\xFC \u0259lav\u0259 edin")}
+              </p>
+              <button onClick={() => setShowAddModal(true)} className="a-cta-btn">
+                <Plus size={14} strokeWidth={2.4} />
+                {tr("babygrowthtracker_i_lk_olcunu_elave_et_5a19bb", "\u0130lk \xF6l\xE7\xFCn\xFC \u0259lav\u0259 et")}
+              </button>
+            </div> :
 
-          <div className="space-y-3">
+          <div className="a-list-card">
               {entries.map((entry, index) =>
             <motion.div
               key={entry.id}
+              className="a-list-row"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}>
+              transition={{ delay: Math.min(index * 0.05, 0.3) }}>
               
-                  <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      index === 0 ?
-                      'bg-gradient-to-br from-rose-500 to-pink-600 text-white' :
-                      'bg-muted text-muted-foreground'}`
-                      }>
-                            <Calendar className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <p className="font-bold text-foreground">
-                              {formatDateAz(new Date(entry.entry_date), true)}
-                            </p>
-                            <div className="flex items-center gap-3 mt-1 text-sm">
-                              {entry.weight_kg &&
-                          <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400">
-                                  <Scale className="w-3.5 h-3.5" />
-                                  {entry.weight_kg} {tr('unit_kg', 'kq')}
-                                </span>
-                          }
-                              {entry.height_cm &&
-                          <span className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400">
-                                  <Ruler className="w-3.5 h-3.5" />
-                                  {entry.height_cm} {tr('unit_cm', 'sm')}
-                                </span>
-                          }
-                              {entry.head_cm &&
-                          <span className="flex items-center gap-1 text-violet-600 dark:text-violet-400">
-                                  <Baby className="w-3.5 h-3.5" />
-                                  {entry.head_cm} {tr('unit_cm', 'sm')}
-                                </span>
-                          }
-                            </div>
-                            {entry.notes &&
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                                📝 {entry.notes}
-                              </p>
-                        }
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-1">
-                          <motion.button
-                        onClick={() => openEditModal(entry)}
-                        className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center hover:bg-muted"
-                        whileTap={{ scale: 0.95 }}>
-                        
-                            <Edit2 className="w-4 h-4 text-muted-foreground" />
-                          </motion.button>
-                          <motion.button
-                        onClick={() => handleDelete(entry.id)}
-                        className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center hover:bg-red-500/20"
-                        whileTap={{ scale: 0.95 }}>
-                        
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </motion.button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <span
+                className="a-list-icon"
+                style={index === 0 ?
+                { background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' } :
+                { background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
+                    <Calendar size={17} strokeWidth={2} />
+                  </span>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <p className="a-list-title">
+                      {formatDateAz(new Date(entry.entry_date), true)}
+                    </p>
+                    <p className="a-list-sub" style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                      {entry.weight_kg &&
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          <Scale size={11} /> {entry.weight_kg} {tr('unit_kg', 'kq')}
+                        </span>
+                  }
+                      {entry.height_cm &&
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          <Ruler size={11} /> {entry.height_cm} {tr('unit_cm', 'sm')}
+                        </span>
+                  }
+                      {entry.head_cm &&
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          <Baby size={11} /> {entry.head_cm} {tr('unit_cm', 'sm')}
+                        </span>
+                  }
+                    </p>
+                    {entry.notes &&
+                <p className="a-list-time" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        📝 {entry.notes}
+                      </p>
+                }
+                  </div>
+                  
+                  <span className="a-list-trail" style={{ display: 'flex', gap: 6 }}>
+                    <motion.button
+                  onClick={() => openEditModal(entry)}
+                  className="a-icon-btn"
+                  style={{ width: 30, height: 30 }}
+                  whileTap={{ scale: 0.9 }}>
+                  
+                      <Edit2 size={13} strokeWidth={2} />
+                    </motion.button>
+                    <motion.button
+                  onClick={() => handleDelete(entry.id)}
+                  className="a-icon-btn"
+                  style={{ width: 30, height: 30, background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)', border: 'none' }}
+                  whileTap={{ scale: 0.9 }}>
+                  
+                      <Trash2 size={13} strokeWidth={2} />
+                    </motion.button>
+                  </span>
                 </motion.div>
             )}
             </div>
           }
-        </motion.div>
+        </motion.section>
       </div>
 
       {/* Add/Edit Modal */}
@@ -407,8 +544,8 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center">
-                <Scale className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
+                <Scale className="w-4 h-4" />
               </div>
               {editingEntry ? tr("babygrowthtracker_olcunu_redakte_et_44cfb4", "\xD6l\xE7\xFCn\xFC redakt\u0259 et") : tr("babygrowthtracker_yeni_olcu_elave_et_45ac37", "Yeni \xF6l\xE7\xFC \u0259lav\u0259 et")}
             </DialogTitle>
@@ -480,13 +617,14 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
               
             </div>
             
-            <Button
+            <button
               onClick={handleSubmit}
-              className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700">
+              className="a-btn-solid w-full"
+              style={{ justifyContent: 'center', padding: '12px 18px' }}>
               
-              <Sparkles className="w-4 h-4 mr-2" />
+              <Sparkles size={15} strokeWidth={2.2} />
               {editingEntry ? tr("babygrowthtracker_yenile_570ce2", "Yenilə") : tr("babygrowthtracker_yadda_saxla_3c7a2d", "Yadda saxla")}
-            </Button>
+            </button>
           </div>
         </DialogContent>
       </Dialog>

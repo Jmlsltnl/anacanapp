@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Send, Trash2, User, MessageSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useProviderReviews } from '@/hooks/useProviderReviews';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
@@ -38,21 +37,20 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
   }
 
   return (
-    <div className="bg-card rounded-2xl p-4 border border-border/50 mb-4">
+    <div className="a-card mb-4">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <MessageSquare className="w-4 h-4 text-primary" />
-          <h2 className="font-semibold text-sm">{tr("providerreviews_reyler_8be233", "R\u0259yl\u0259r (")}{reviews.length})</h2>
+          <MessageSquare className="w-4 h-4" style={{ color: 'var(--a-peach-2)' }} />
+          <h2 className="a-card-title a-heading" style={{ margin: 0 }}>{tr("providerreviews_reyler_8be233", "R\u0259yl\u0259r (")}{reviews.length})</h2>
         </div>
         {isAuthenticated && !isExpanded &&
-        <Button
-          variant="outline"
-          size="sm"
+        <button
           onClick={() => setIsExpanded(true)}
-          className="text-xs">
+          className="a-btn-soft"
+          style={{ height: 32, padding: '0 12px', fontSize: 11 }}>
           
             {userReview ? tr("providerreviews_reyi_redakte_et_12797e", "R\u0259yi redakt\u0259 et") : tr("providerreviews_rey_yaz_7b3aab", "R\u0259y yaz")}
-          </Button>
+          </button>
         }
       </div>
 
@@ -63,9 +61,10 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          className="mb-4 pb-4 border-b border-border/50">
+          className="mb-4 pb-4"
+          style={{ borderBottom: '1px solid var(--a-line)' }}>
           
-            <p className="text-sm text-muted-foreground mb-3">
+            <p className="a-list-sub mb-3" style={{ margin: '0 0 12px', whiteSpace: 'normal' }}>
               {providerName} {tr("providerreviews_haqqinda_reyinizi_yazin_049e5e", "haqq\u0131nda r\u0259yinizi yaz\u0131n")}
             </p>
             
@@ -77,18 +76,16 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
               onClick={() => setRating(star)}
               onMouseEnter={() => setHoverRating(star)}
               onMouseLeave={() => setHoverRating(0)}
-              className="p-1 transition-transform hover:scale-110">
+              className="p-1 transition-transform hover:scale-110"
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
               
                   <Star
-                className={`w-7 h-7 transition-colors ${
-                star <= (hoverRating || rating) ?
-                'fill-amber-400 text-amber-400' :
-                'text-muted-foreground/30'}`
-                } />
+                className={`w-7 h-7 transition-colors ${star <= (hoverRating || rating) ? 'fill-current' : ''}`}
+                style={{ color: star <= (hoverRating || rating) ? 'var(--a-yellow-2)' : 'var(--a-line-strong)' }} />
               
                 </button>
             )}
-              <span className="ml-2 text-sm text-muted-foreground">
+              <span className="ml-2 text-sm" style={{ color: 'var(--a-ink-soft)' }}>
                 {rating > 0 ? `${rating}/5` : tr("providerreviews_qiymetlendirin_df8e66", "Qiym\u0259tl\u0259ndirin")}
               </span>
             </div>
@@ -98,15 +95,16 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder={tr("providerreviews_tecrubenizi_bolusun_isteye_bagli_3f9da1", "Təcrübənizi bölüşün (istəyə bağlı)...")}
-            className="w-full p-3 rounded-xl bg-muted border-0 text-sm resize-none h-24 outline-none focus:ring-2 focus:ring-primary/20" />
+            className="a-input w-full resize-none"
+            style={{ height: 96, fontFamily: 'inherit' }} />
           
 
             {/* Actions */}
             <div className="flex items-center justify-between mt-3">
               <div className="flex gap-2">
-                <Button
-                variant="ghost"
-                size="sm"
+                <button
+                className="a-btn-soft"
+                style={{ height: 34, padding: '0 12px', fontSize: 11 }}
                 onClick={() => {
                   setIsExpanded(false);
                   setRating(userReview?.rating || 0);
@@ -114,25 +112,25 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
                 }}>
                   {tr("providerreviews_legv_et_b5e49c", "L\u0259\u011Fv et")}
                 
-              </Button>
+              </button>
                 {userReview &&
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
                 onClick={handleDelete}
-                className="text-destructive hover:text-destructive">
+                className="a-btn-soft"
+                style={{ height: 34, padding: '0 12px', fontSize: 11, background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)' }}>
                 
-                    <Trash2 className="w-4 h-4 mr-1" />{tr("untranslated_sil_zwa7lz", "Sil")}</Button>
+                    <Trash2 size={13} strokeWidth={2.2} />{tr("untranslated_sil_zwa7lz", "Sil")}</button>
               }
               </div>
-              <Button
-              size="sm"
+              <button
+              className="a-cta-btn"
+              style={{ height: 36, padding: '0 16px', fontSize: 11.5, opacity: rating === 0 || submitReview.isPending ? 0.5 : 1 }}
               onClick={handleSubmit}
               disabled={rating === 0 || submitReview.isPending}>
               
-                <Send className="w-4 h-4 mr-1" />
+                <Send size={13} strokeWidth={2.2} />
                 {userReview ? tr("providerreviews_yenile_570ce2", "Yenil\u0259") : tr("providerreviews_gonder_3f11bd", "G\xF6nd\u0259r")}
-              </Button>
+              </button>
             </div>
           </motion.div>
         }
@@ -140,8 +138,8 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
 
       {/* Not authenticated message */}
       {!isAuthenticated &&
-      <div className="text-center py-4 mb-4 bg-muted/50 rounded-xl">
-          <p className="text-sm text-muted-foreground">
+      <div className="text-center py-4 mb-4 rounded-2xl" style={{ background: 'var(--a-surface-soft)' }}>
+          <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>
             {tr("providerreviews_rey_yazmaq_ucun_hesabiniza_dax_d75d40", "R\u0259y yazmaq \xFC\xE7\xFCn hesab\u0131n\u0131za daxil olun")}
           </p>
         </div>
@@ -153,10 +151,10 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
           {[1, 2].map((i) =>
         <div key={i} className="animate-pulse">
               <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-muted" />
+                <div className="w-10 h-10 rounded-full" style={{ background: 'var(--a-surface-soft)' }} />
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 w-24 bg-muted rounded" />
-                  <div className="h-3 w-full bg-muted rounded" />
+                  <div className="h-4 w-24 rounded" style={{ background: 'var(--a-surface-soft)' }} />
+                  <div className="h-3 w-full rounded" style={{ background: 'var(--a-surface-soft)' }} />
                 </div>
               </div>
             </div>
@@ -164,9 +162,9 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
         </div> :
       reviews.length === 0 ?
       <div className="text-center py-6">
-          <Star className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">{tr("providerreviews_hele_hec_bir_rey_yoxdur_410969", "Hələ heç bir rəy yoxdur")}</p>
-          <p className="text-xs text-muted-foreground/70">{tr("providerreviews_ilk_reyi_siz_yazin_cc6119", "İlk rəyi siz yazın!")}</p>
+          <Star className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--a-ink-faint)' }} />
+          <p className="a-list-sub" style={{ margin: 0 }}>{tr("providerreviews_hele_hec_bir_rey_yoxdur_410969", "Hələ heç bir rəy yoxdur")}</p>
+          <p className="text-xs" style={{ margin: 0, color: 'var(--a-ink-faint)' }}>{tr("providerreviews_ilk_reyi_siz_yazin_cc6119", "İlk rəyi siz yazın!")}</p>
         </div> :
 
       <div className="space-y-4">
@@ -175,23 +173,23 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
           key={review.id}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05 }}
+          transition={{ delay: Math.min(index * 0.05, 0.3) }}
           className="flex gap-3">
           
               {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden" style={{ background: 'var(--a-peach-1)' }}>
                 {review.user_avatar ?
             <img src={review.user_avatar} alt="" className="w-full h-full object-cover" /> :
 
-            <User className="w-5 h-5 text-primary" />
+            <User className="w-5 h-5" style={{ color: 'var(--a-accent-ink)' }} />
             }
               </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-sm">{review.user_name}</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="a-list-title" style={{ margin: 0 }}>{review.user_name}</span>
+                  <span className="a-list-time" style={{ margin: 0 }}>
                     {formatDistanceToNow(new Date(review.created_at), { addSuffix: true, locale: getCurrentDateLocale() })}
                   </span>
                 </div>
@@ -201,17 +199,14 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
                   {[1, 2, 3, 4, 5].map((star) =>
               <Star
                 key={star}
-                className={`w-3 h-3 ${
-                star <= review.rating ?
-                'fill-amber-400 text-amber-400' :
-                'text-muted-foreground/30'}`
-                } />
+                className={`w-3 h-3 ${star <= review.rating ? 'fill-current' : ''}`}
+                style={{ color: star <= review.rating ? 'var(--a-yellow-2)' : 'var(--a-line-strong)' }} />
 
               )}
                 </div>
 
                 {review.comment &&
-            <p className="text-sm text-muted-foreground mt-1">{review.comment}</p>
+            <p className="text-sm mt-1" style={{ margin: '4px 0 0', color: 'var(--a-body-text)' }}>{review.comment}</p>
             }
               </div>
             </motion.div>

@@ -79,10 +79,10 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
 
       if (profileError) throw profileError;
 
-      // Create child record in user_children
+      // Create child record in user_children (idempotent — dublikat yaratmır)
       const { error: childError } = await supabase.
       from('user_children').
-      insert({
+      upsert({
         user_id: user.id,
         name: babyName.trim(),
         birth_date: birthDateStr,
@@ -91,7 +91,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
         is_active: true,
         sort_order: 0,
         notes: tr("birthonboardingmodal_notes_template", "Doğum çəkisi: {weight} {weightUnit}, Boy: {height} {heightUnit}, Doğum tipi: {type}").replace("{weight}", birthWeight || '-').replace("{weightUnit}", tr('unit_kg', 'kq')).replace("{height}", birthHeight || '-').replace("{heightUnit}", tr('unit_cm', 'sm')).replace("{type}", deliveryOptions.find(d => d.value === deliveryType)?.label || deliveryType)
-      });
+      }, { onConflict: 'user_id,name,birth_date', ignoreDuplicates: true });
 
       // Ignore if child already exists
       if (childError && !childError.message.includes('duplicate')) {

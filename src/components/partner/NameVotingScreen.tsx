@@ -5,8 +5,6 @@ import { ArrowLeft, Heart, Search, Sparkles, Users } from 'lucide-react';
 import { useFavoriteNames } from '@/hooks/useFavoriteNames';
 import { usePartnerFavoriteNames } from '@/hooks/usePartnerFavoriteNames';
 import { useBabyNames } from '@/hooks/useDynamicContent';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface NameVotingScreenProps {
   onBack: () => void;
@@ -24,6 +22,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
   const { data: names = [] } = useBabyNames();
   const [search, setSearch] = useState('');
   const [genderFilter, setGenderFilter] = useState<'all' | 'boy' | 'girl'>('all');
+  const [activeTab, setActiveTab] = useState<'browse' | 'mine' | 'matches'>('browse');
 
   const partnerFavSet = useMemo(
     () => new Set(partnerFavorites.map((f) => f.name)),
@@ -73,34 +72,42 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
     return (
       <motion.div
         layout
-        className={`flex items-center gap-3 p-3 rounded-xl border ${
-        isMatch ? 'bg-pink-50 dark:bg-pink-900/10 border-pink-300 dark:border-pink-800' : 'bg-card border-border/40'}`
-        }>
-        
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
-        n.gender === 'boy' ? 'bg-blue-100 dark:bg-blue-900/30' :
-        n.gender === 'girl' ? 'bg-pink-100 dark:bg-pink-900/30' :
-        'bg-violet-100 dark:bg-violet-900/30'}`
-        }>
+        className="flex items-center gap-3"
+        style={{
+          padding: 13,
+          borderRadius: 16,
+          background: isMatch ? 'var(--a-pink-1)' : 'var(--a-surface)',
+          border: isMatch ? '1.5px solid var(--a-pink-2)' : '1.5px solid transparent',
+          boxShadow: isMatch ? 'none' : 'var(--a-card-shadow)'
+        }}>
+
+        <div className="w-10 h-10 flex items-center justify-center text-lg shrink-0"
+        style={{
+          borderRadius: 13,
+          background: n.gender === 'boy' ? 'var(--a-blue-1)' :
+          n.gender === 'girl' ? (isMatch ? 'var(--a-chip-overlay)' : 'var(--a-pink-1)') :
+          'var(--a-lav-1)'
+        }}>
           {n.gender === 'boy' ? '👦' : n.gender === 'girl' ? '👧' : '✨'}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-foreground truncate">{n.name}</h3>
+            <h3 className="truncate" style={{ fontSize: 13.5, fontWeight: 700, color: isMatch ? 'var(--a-alert-ink)' : 'var(--a-ink)' }}>{n.name}</h3>
             {isMatch &&
-            <Badge className="bg-pink-500 text-white text-[10px] px-1.5 py-0 h-5">
+            <span className="inline-flex items-center shrink-0"
+            style={{ background: 'var(--a-pink-2)', color: '#fff', borderRadius: 999, padding: '2px 7px', fontSize: 9.5, fontWeight: 800 }}>
                 <Sparkles className="w-2.5 h-2.5 mr-0.5" />
                 Match
-              </Badge>
+              </span>
             }
           </div>
           {n.meaning &&
-          <p className="text-xs text-muted-foreground truncate">{n.meaning}</p>
+          <p className="truncate" style={{ fontSize: 11.5, color: isMatch ? 'var(--a-berry-ink)' : 'var(--a-ink-soft)' }}>{n.meaning}</p>
           }
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-[10px] text-muted-foreground">{genderLabels[n.gender] || n.gender}</span>
+            <span style={{ fontSize: 10, color: isMatch ? 'var(--a-berry-ink)' : 'var(--a-ink-faint)' }}>{genderLabels[n.gender] || n.gender}</span>
             {partnerFav &&
-            <span className="text-[10px] text-pink-600 dark:text-pink-400 flex items-center gap-0.5">
+            <span className="flex items-center gap-0.5" style={{ fontSize: 10, color: 'var(--a-pink-ink)' }}>
                 <Heart className="w-2.5 h-2.5 fill-current" /> {tr("namevotingscreen_partnyor_label", "Partnyor")}
               </span>
             }
@@ -109,112 +116,123 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
         <motion.button
           onClick={() => toggleFavorite(n.name, n.gender, n.meaning, n.origin)}
           whileTap={{ scale: 0.85 }}
-          className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-          fav ? 'bg-pink-100 dark:bg-pink-900/30' : 'bg-muted/50'}`
-          }>
-          
-          <Heart className={`w-5 h-5 ${fav ? 'text-pink-500 fill-pink-500' : 'text-muted-foreground'}`} />
+          className="w-10 h-10 flex items-center justify-center shrink-0"
+          style={{ borderRadius: 13, background: fav ? (isMatch ? 'var(--a-chip-overlay)' : 'var(--a-pink-1)') : 'var(--a-surface-soft)' }}
+          aria-label={n.name}>
+
+          <Heart className="w-5 h-5" style={fav ? { color: 'var(--a-pink-ink)', fill: 'var(--a-pink-ink)' } : { color: 'var(--a-ink-faint)' }} />
         </motion.button>
       </motion.div>);
 
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border/50">
-        <div className="px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3">
-          <div className="flex items-center gap-3">
-            <button onClick={onBack} className="w-9 h-9 rounded-xl bg-muted/60 flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold">{tr("namevotingscreen_ad_secimi_465d2a", "Ad Seçimi")}</h1>
-              <p className="text-[11px] text-muted-foreground">{tr("namevotingscreen_her_ikiniz_beyendikde_match_olur_28c3f5", "Hər ikiniz bəyəndikdə match olur")}</p>
+    <div className="a-scope min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar" style={{ paddingTop: 'max(env(safe-area-inset-top), 14px)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
+              <ArrowLeft size={16} strokeWidth={2} />
+            </motion.button>
+            <div style={{ minWidth: 0 }}>
+              <p className="a-eyebrow">{tr("namevotingscreen_her_ikiniz_beyendikde_match_olur_28c3f5", "Hər ikiniz bəyəndikdə match olur")}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("namevotingscreen_ad_secimi_465d2a", "Ad Seçimi")}</p>
             </div>
-            {matches.length > 0 &&
-            <Badge className="bg-pink-500 text-white">
-                <Sparkles className="w-3 h-3 mr-1" />
-                {matches.length}
-              </Badge>
-            }
           </div>
-        </div>
-      </div>
+          {matches.length > 0 &&
+          <div className="a-topbar-actions">
+              <span className="inline-flex items-center gap-1"
+            style={{ background: 'var(--a-pink-2)', color: '#fff', borderRadius: 999, padding: '5px 12px', fontSize: 12, fontWeight: 800 }}>
+                <Sparkles className="w-3 h-3" />
+                {matches.length}
+              </span>
+            </div>
+          }
+        </header>
 
-      <Tabs defaultValue="browse" className="w-full">
-        <TabsList className="grid grid-cols-3 mx-4 mt-3 max-w-[calc(100%-2rem)]">
-          <TabsTrigger value="browse">{tr("namevotingscreen_adlari_beyen_67dae3", "Adları Bəyən")}</TabsTrigger>
-          <TabsTrigger value="mine">{tr("namevotingscreen_sevimlilerim_c5c6a9", "Sevimlil\u0259rim (")}{favorites.length})</TabsTrigger>
-          <TabsTrigger value="matches">
+        {/* Tabs */}
+        <div className="a-tabs" style={{ marginBottom: 14 }}>
+          <button onClick={() => setActiveTab('browse')} className={`a-tab ${activeTab === 'browse' ? 'active' : ''}`}>
+            {tr("namevotingscreen_adlari_beyen_67dae3", "Adları Bəyən")}
+          </button>
+          <button onClick={() => setActiveTab('mine')} className={`a-tab ${activeTab === 'mine' ? 'active' : ''}`}>
+            {tr("namevotingscreen_sevimlilerim_c5c6a9", "Sevimlil\u0259rim (")}{favorites.length})
+          </button>
+          <button onClick={() => setActiveTab('matches')} className={`a-tab ${activeTab === 'matches' ? 'active' : ''}`}>
             Match
             {matches.length > 0 &&
-            <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-pink-500 text-white rounded-full">
+            <span className="ml-1 px-1.5 py-0.5 rounded-full" style={{ fontSize: 10, background: 'var(--a-pink-2)', color: '#fff', fontWeight: 800 }}>
                 {matches.length}
               </span>
             }
-          </TabsTrigger>
-        </TabsList>
+          </button>
+        </div>
 
-        <TabsContent value="browse" className="px-4 mt-3 space-y-3">
-          {/* Search + filter */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={tr("namevotingscreen_ad_ve_ya_mena_axtarin_30a88e", "Ad və ya məna axtarın...")}
-              className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/50 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
-            
-          </div>
-          <div className="flex gap-2">
-            {(['all', 'boy', 'girl'] as const).map((g) =>
-            <button
-              key={g}
-              onClick={() => setGenderFilter(g)}
-              className={`flex-1 py-2 rounded-xl text-sm font-medium ${
-              genderFilter === g ? 'bg-primary text-primary-foreground' : 'bg-muted/50 text-muted-foreground'}`
-              }>
-              
-                {g === 'all' ? tr("namevotingscreen_hamisi_c73c4d", "Ham\u0131s\u0131") : g === 'boy' ? tr("namevotingscreen_oglan_e9715e", "O\u011Flan") : tr("namevotingscreen_qiz_79bf6b", "Q\u0131z")}
-              </button>
-            )}
-          </div>
-          <div className="space-y-2">
-            {filtered.slice(0, 200).map((n) =>
-            <NameRow key={n.name} n={n} />
-            )}
-            {filtered.length === 0 &&
-            <div className="text-center py-12 text-sm text-muted-foreground">{tr("namevotingscreen_ad_tapilmadi_cf4c7a", "Ad tapılmadı")}</div>
-            }
-          </div>
-        </TabsContent>
+        {activeTab === 'browse' &&
+        <div className="space-y-3">
+            {/* Search + filter */}
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--a-ink-faint)' }} />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={tr("namevotingscreen_ad_ve_ya_mena_axtarin_30a88e", "Ad və ya məna axtarın...")}
+                className="w-full h-11 pl-11 pr-4 outline-none"
+                style={{ borderRadius: 999, background: 'var(--a-surface)', border: '1px solid var(--a-line)', fontSize: 13, color: 'var(--a-ink)', boxShadow: 'var(--a-card-shadow)' }} />
 
-        <TabsContent value="mine" className="px-4 mt-3 space-y-2">
-          {favorites.length === 0 ?
-          <div className="flex flex-col items-center py-16 text-center">
-              <Heart className="w-12 h-12 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">{tr("namevotingscreen_hele_ad_secmemisiniz_7c1388", "Hələ ad seçməmisiniz")}</p>
-            </div> :
+            </div>
+            <div className="a-tabs">
+              {(['all', 'boy', 'girl'] as const).map((g) =>
+              <button
+                key={g}
+                onClick={() => setGenderFilter(g)}
+                className={`a-tab ${genderFilter === g ? 'active' : ''}`}>
+
+                  {g === 'all' ? tr("namevotingscreen_hamisi_c73c4d", "Ham\u0131s\u0131") : g === 'boy' ? tr("namevotingscreen_oglan_e9715e", "O\u011Flan") : tr("namevotingscreen_qiz_79bf6b", "Q\u0131z")}
+                </button>
+              )}
+            </div>
+            <div className="space-y-2">
+              {filtered.slice(0, 200).map((n) =>
+              <NameRow key={n.name} n={n} />
+              )}
+              {filtered.length === 0 &&
+              <div className="text-center py-12" style={{ fontSize: 13, color: 'var(--a-ink-soft)' }}>{tr("namevotingscreen_ad_tapilmadi_cf4c7a", "Ad tapılmadı")}</div>
+              }
+            </div>
+          </div>
+        }
+
+        {activeTab === 'mine' &&
+        <div className="space-y-2">
+            {favorites.length === 0 ?
+          <div className="a-card flex flex-col items-center text-center" style={{ padding: '34px 18px' }}>
+                <Heart size={40} className="mb-3" style={{ color: 'var(--a-ink-faint)' }} />
+                <p style={{ fontSize: 13, color: 'var(--a-ink-soft)' }}>{tr("namevotingscreen_hele_ad_secmemisiniz_7c1388", "Hələ ad seçməmisiniz")}</p>
+              </div> :
 
           favorites.map((f) => <NameRow key={f.name} n={f} />)
           }
-        </TabsContent>
+          </div>
+        }
 
-        <TabsContent value="matches" className="px-4 mt-3 space-y-2">
-          {matches.length === 0 ?
-          <div className="flex flex-col items-center py-16 text-center">
-              <Users className="w-12 h-12 text-muted-foreground/30 mb-3" />
-              <p className="text-sm font-medium">{tr("namevotingscreen_hele_match_yoxdur_ad5fb8", "Hələ match yoxdur")}</p>
-              <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-                {tr("namevotingscreen_her_ikiniz_eyni_adi_beyendikde_f8a0e8", "H\u0259r ikiniz eyni ad\u0131 b\u0259y\u0259ndikd\u0259 burada g\xF6r\xFCn\u0259c\u0259k")}
-              </p>
-            </div> :
+        {activeTab === 'matches' &&
+        <div className="space-y-2">
+            {matches.length === 0 ?
+          <div className="a-card flex flex-col items-center text-center" style={{ padding: '34px 18px' }}>
+                <Users size={40} className="mb-3" style={{ color: 'var(--a-ink-faint)' }} />
+                <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{tr("namevotingscreen_hele_match_yoxdur_ad5fb8", "Hələ match yoxdur")}</p>
+                <p className="mt-1 max-w-xs" style={{ fontSize: 12, color: 'var(--a-ink-soft)' }}>
+                  {tr("namevotingscreen_her_ikiniz_eyni_adi_beyendikde_f8a0e8", "H\u0259r ikiniz eyni ad\u0131 b\u0259y\u0259ndikd\u0259 burada g\xF6r\xFCn\u0259c\u0259k")}
+                </p>
+              </div> :
 
           matches.map((f) => <NameRow key={f.name} n={f} />)
           }
-        </TabsContent>
-      </Tabs>
+          </div>
+        }
+      </div>
     </div>);
 
 };

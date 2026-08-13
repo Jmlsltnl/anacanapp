@@ -54,6 +54,36 @@ const SLEEP_QUALITY = [
 { value: 5, label: tr("flowdailylogger_ela_720a0e", 'Əla'), emoji: '😇' }];
 
 
+// Flow P0: servikal maye (fertillik göstəricisi)
+const MUCUS_OPTIONS = [
+{ value: 'dry', label: tr("flowdailylogger_mucus_dry", 'Quru'), emoji: '🏜️' },
+{ value: 'sticky', label: tr("flowdailylogger_mucus_sticky", 'Yapışqan'), emoji: '🍯' },
+{ value: 'creamy', label: tr("flowdailylogger_mucus_creamy", 'Kremvari'), emoji: '🥛' },
+{ value: 'watery', label: tr("flowdailylogger_mucus_watery", 'Sulu'), emoji: '💧' },
+{ value: 'eggwhite', label: tr("flowdailylogger_mucus_eggwhite", 'Yumurta ağı'), emoji: '🥚' }];
+
+
+// Flow P0: cinsi əlaqə
+const SEX_OPTIONS = [
+{ value: 'none', label: tr("common_yoxdur", 'Yoxdur'), emoji: '➖' },
+{ value: 'protected', label: tr("flowdailylogger_sex_protected", 'Qorunmalı'), emoji: '🛡️' },
+{ value: 'unprotected', label: tr("flowdailylogger_sex_unprotected", 'Qorunmasız'), emoji: '💞' }];
+
+
+// Flow P0: libido
+const LIBIDO_OPTIONS = [
+{ value: 1, label: tr("flowdailylogger_asagi_1c27f1", 'Aşağı'), emoji: '🤍' },
+{ value: 2, label: tr("common_orta", 'Orta'), emoji: '💗' },
+{ value: 3, label: tr("flowdailylogger_yuksek_492584", 'Yüksək'), emoji: '❤️‍🔥' }];
+
+
+// Flow P1: ovulyasiya (OPK/LH) testi
+const OPK_OPTIONS = [
+{ value: 'negative', label: tr("flowdailylogger_opk_negative", 'Mənfi'), emoji: '➖' },
+{ value: 'positive', label: tr("flowdailylogger_opk_positive", 'Müsbət'), emoji: '➕' },
+{ value: 'peak', label: tr("flowdailylogger_opk_peak", 'Pik'), emoji: '🌟' }];
+
+
 const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDailyLoggerProps) => {
   const dateStr = format(date, 'yyyy-MM-dd');
   const { data: existingLog, isLoading } = useFlowDailyLog(dateStr);
@@ -72,7 +102,11 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
     sleep_quality: null,
     temperature: null,
     water_glasses: 0,
-    notes: null
+    notes: null,
+    cervical_mucus: null,
+    sexual_activity: null,
+    libido: null,
+    ovulation_test: null
   });
 
   useEffect(() => {
@@ -87,7 +121,11 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
         sleep_quality: existingLog.sleep_quality,
         temperature: existingLog.temperature,
         water_glasses: existingLog.water_glasses || 0,
-        notes: existingLog.notes
+        notes: existingLog.notes,
+        cervical_mucus: (existingLog as any).cervical_mucus ?? null,
+        sexual_activity: (existingLog as any).sexual_activity ?? null,
+        libido: (existingLog as any).libido ?? null,
+        ovulation_test: (existingLog as any).ovulation_test ?? null
       });
     }
   }, [existingLog]);
@@ -124,14 +162,18 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
     sleep_quality: existingLog?.sleep_quality ?? null,
     temperature: existingLog?.temperature ?? null,
     water_glasses: existingLog?.water_glasses || 0,
-    notes: existingLog?.notes ?? null
+    notes: existingLog?.notes ?? null,
+    cervical_mucus: (existingLog as any)?.cervical_mucus ?? null,
+    sexual_activity: (existingLog as any)?.sexual_activity ?? null,
+    libido: (existingLog as any)?.libido ?? null,
+    ovulation_test: (existingLog as any)?.ovulation_test ?? null
   });
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-2xl p-4 border border-border animate-pulse">
-        <div className="h-6 bg-muted rounded w-1/3 mb-4" />
-        <div className="h-12 bg-muted rounded" />
+      <div className="a-card animate-pulse">
+        <div style={{ height: 24, width: '33%', borderRadius: 8, background: 'var(--a-surface-soft)', marginBottom: 14 }} />
+        <div style={{ height: 48, borderRadius: 14, background: 'var(--a-surface-soft)' }} />
       </div>);
 
   }
@@ -140,32 +182,32 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl border border-border overflow-hidden">
+      className="a-card a-fade-in"
+      style={{ padding: 0, overflow: 'hidden' }}>
       
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
+        className="a-list-row w-full"
+        style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', borderTop: 'none', cursor: 'pointer', padding: '16px 18px' }}>
         
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
-            <Heart className="w-5 h-5 text-white" />
-          </div>
-          <div className="text-left">
-            <h3 className="font-bold text-foreground">{tr("flowdailylogger_gundelik_qeyd_32e154", "Gündəlik Qeyd")}</h3>
-            <p className="text-xs text-muted-foreground">
-              {format(date, 'd MMMM, EEEE', { locale: getCurrentDateLocale() })}
-            </p>
-          </div>
+        <span className="a-list-icon" style={{ background: 'var(--a-grad-pink)', color: 'var(--a-berry-ink)' }}>
+          <Heart size={17} strokeWidth={2} />
+        </span>
+        <div>
+          <p className="a-list-title">{tr("flowdailylogger_gundelik_qeyd_32e154", "Gündəlik Qeyd")}</p>
+          <p className="a-list-sub">
+            {format(date, 'd MMMM, EEEE', { locale: getCurrentDateLocale() })}
+          </p>
         </div>
-        <div className="flex items-center gap-2">
+        <span className="a-list-trail" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {existingLog &&
-          <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded-full flex items-center gap-1">
-              <Check className="w-3 h-3" /> Doldurulub
+          <span className="a-tag on" style={{ cursor: 'default', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <Check size={11} /> {tr("flowdailylogger_doldurulub", "Doldurulub")}
             </span>
           }
-          {expanded ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
-        </div>
+          {expanded ? <ChevronUp size={17} className="a-list-chevron" /> : <ChevronDown size={17} className="a-list-chevron" />}
+        </span>
       </button>
 
       {/* Content */}
@@ -175,7 +217,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
-          className="border-t border-border">
+          style={{ borderTop: '1px solid var(--a-line)' }}>
           
             <div className="p-4 space-y-6">
               {/* Mood */}
@@ -245,6 +287,123 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
                       {option.emoji} {option.label}
                     </button>
                 )}
+                </div>
+              </div>
+
+              {/* Servikal maye (Flow P0) */}
+              <div>
+                <label className="text-sm font-medium text-foreground mb-3 block">
+                  {tr("flowdailylogger_servikal_maye", "Servikal maye")}
+                  <span className="ml-1.5" style={{ fontSize: 11, fontWeight: 500, color: 'var(--a-ink-soft)' }}>
+                    ({tr("flowdailylogger_fertillik_gostericisi", "fertillik göstəricisi")})
+                  </span>
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                  {MUCUS_OPTIONS.map((option) =>
+                <button
+                  key={option.value}
+                  onClick={() => setFormData((prev) => ({
+                    ...prev,
+                    cervical_mucus: prev.cervical_mucus === option.value ? null : option.value as FlowDailyLog['cervical_mucus']
+                  }))}
+                  className="px-3.5 py-2 rounded-xl text-sm font-medium transition-all"
+                  style={{
+                    background: formData.cervical_mucus === option.value ? 'var(--a-blue-1)' : 'var(--a-surface-soft)',
+                    color: formData.cervical_mucus === option.value ? 'var(--a-blue-ink)' : 'var(--a-ink-soft)',
+                    border: formData.cervical_mucus === option.value ? '2px solid var(--a-blue-2)' : '2px solid transparent'
+                  }}>
+
+                      {option.emoji} {option.label}
+                    </button>
+                )}
+                </div>
+              </div>
+
+              {/* Ovulyasiya testi (Flow P1) */}
+              <div>
+                <label className="text-sm font-medium text-foreground mb-3 block">
+                  {tr("flowdailylogger_ovulyasiya_testi", "Ovulyasiya testi")}
+                  <span className="ml-1.5" style={{ fontSize: 11, fontWeight: 500, color: 'var(--a-ink-soft)' }}>
+                    (OPK/LH)
+                  </span>
+                </label>
+                <div className="flex gap-2">
+                  {OPK_OPTIONS.map((option) =>
+                <button
+                  key={option.value}
+                  onClick={() => setFormData((prev) => ({
+                    ...prev,
+                    ovulation_test: prev.ovulation_test === option.value ? null : option.value as FlowDailyLog['ovulation_test']
+                  }))}
+                  className="flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+                  style={{
+                    background: formData.ovulation_test === option.value ? 'var(--a-green-1)' : 'var(--a-surface-soft)',
+                    color: formData.ovulation_test === option.value ? 'var(--a-green-ink)' : 'var(--a-ink-soft)',
+                    border: formData.ovulation_test === option.value ? '2px solid var(--a-green-2)' : '2px solid transparent'
+                  }}>
+
+                      {option.emoji} {option.label}
+                    </button>
+                )}
+                </div>
+                {(formData.ovulation_test === 'positive' || formData.ovulation_test === 'peak') &&
+              <p className="text-xs mt-2" style={{ color: 'var(--a-green-ink)', fontWeight: 600 }}>
+                    {formData.ovulation_test === 'peak' ?
+                tr("flowdailylogger_opk_peak_hint", "🌟 Pik LH — ovulyasiya təxminən 24 saat ərzində gözlənilir") :
+                tr("flowdailylogger_opk_positive_hint", "➕ LH yüksəlişi — ovulyasiya 24-36 saat ərzində gözlənilir")}
+                  </p>
+              }
+              </div>
+
+              {/* Cinsi əlaqə + Libido (Flow P0) */}
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-3 block">
+                    {tr("flowdailylogger_cinsi_elaqe", "Cinsi əlaqə")}
+                  </label>
+                  <div className="flex gap-2 flex-wrap">
+                    {SEX_OPTIONS.map((option) =>
+                  <button
+                    key={option.value}
+                    onClick={() => setFormData((prev) => ({
+                      ...prev,
+                      sexual_activity: prev.sexual_activity === option.value ? null : option.value as FlowDailyLog['sexual_activity']
+                    }))}
+                    className="px-3.5 py-2 rounded-xl text-sm font-medium transition-all"
+                    style={{
+                      background: formData.sexual_activity === option.value ? 'var(--a-pink-1)' : 'var(--a-surface-soft)',
+                      color: formData.sexual_activity === option.value ? 'var(--a-pink-ink)' : 'var(--a-ink-soft)',
+                      border: formData.sexual_activity === option.value ? '2px solid var(--a-pink-2)' : '2px solid transparent'
+                    }}>
+
+                        {option.emoji} {option.label}
+                      </button>
+                  )}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground mb-3 block">
+                    {tr("flowdailylogger_libido", "Libido")}
+                  </label>
+                  <div className="flex gap-2">
+                    {LIBIDO_OPTIONS.map((option) =>
+                  <button
+                    key={option.value}
+                    onClick={() => setFormData((prev) => ({
+                      ...prev,
+                      libido: prev.libido === option.value ? null : option.value
+                    }))}
+                    className="flex-1 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+                    style={{
+                      background: formData.libido === option.value ? 'var(--a-pink-1)' : 'var(--a-surface-soft)',
+                      color: formData.libido === option.value ? 'var(--a-pink-ink)' : 'var(--a-ink-soft)',
+                      border: formData.libido === option.value ? '2px solid var(--a-pink-2)' : '2px solid transparent'
+                    }}>
+
+                        {option.emoji} {option.label}
+                      </button>
+                  )}
+                  </div>
                 </div>
               </div>
 

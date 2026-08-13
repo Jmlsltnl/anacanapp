@@ -8,6 +8,8 @@ import { getCurrentDateLocale } from '@/lib/date-utils';
 interface RecentBlogPostsProps {
   onNavigate: (screen: string) => void;
   lifeStage?: BlogLifeStage;
+  /** 'anacan' renders the redesigned (anacan-demo) article rows */
+  variant?: 'default' | 'anacan';
 }
 
 const BlogPostCard = ({ post, index, onClick }: {post: BlogPost;index: number;onClick: () => void;}) => {
@@ -67,7 +69,7 @@ const BlogPostCard = ({ post, index, onClick }: {post: BlogPost;index: number;on
 
 };
 
-const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
+const RecentBlogPosts = ({ onNavigate, lifeStage, variant = 'default' }: RecentBlogPostsProps) => {
   const { posts, loading } = useBlog();
 
   // Filter posts strictly by life stage - only show posts for the current stage
@@ -77,6 +79,68 @@ const RecentBlogPosts = ({ onNavigate, lifeStage }: RecentBlogPostsProps) => {
 
   // Get only the 3 most recent filtered posts
   const recentPosts = filteredByStage.slice(0, 4);
+
+  // ——— Anacan redesign (anacan-demo) article rows ———
+  if (variant === 'anacan') {
+    if (loading) {
+      return (
+        <section className="a-section">
+          <div className="a-card animate-pulse" style={{ height: 180 }} />
+        </section>);
+
+    }
+
+    if (recentPosts.length === 0) {
+      return null;
+    }
+
+    return (
+      <section className="a-section">
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading">{tr("recentblogposts_son_meqaleler_0618a6", "Son Məqalələr")}</h2>
+          <button type="button" className="a-section-link" onClick={() => onNavigate('blog')}>
+            {tr('blogscreen_all_filter', 'Hamısı')} <ChevronRight size={13} />
+          </button>
+        </div>
+        <div className="a-card a-fade-in" style={{ padding: '6px 18px' }}>
+          {recentPosts.map((post) => {
+            const timeAgo = formatDistanceToNow(new Date(post.created_at), {
+              addSuffix: true,
+              locale: getCurrentDateLocale()
+            });
+            return (
+              <button
+                key={post.id}
+                type="button"
+                className="a-article-row"
+                onClick={() => onNavigate(`blog/${post.slug}`)}>
+                
+                <span className="a-article-thumb" style={{ background: 'var(--a-peach-1)' }}>
+                  {post.cover_image_url ?
+                  <img src={post.cover_image_url} alt={post.title} loading="lazy" /> :
+
+                  <BookOpen size={20} style={{ color: 'var(--a-accent-ink)' }} />
+                  }
+                </span>
+                <div style={{ minWidth: 0 }}>
+                  <p className="a-article-title">{post.title}</p>
+                  <div className="a-article-meta">
+                    <span>
+                      <Clock size={10} /> {post.reading_time} {tr("recentblogposts_deq_780a5c", "d\u0259q")}
+                    </span>
+                    <span>
+                      <Eye size={10} /> {post.view_count}
+                    </span>
+                    <span>{timeAgo}</span>
+                  </div>
+                </div>
+              </button>);
+
+          })}
+        </div>
+      </section>);
+
+  }
 
   if (loading) {
     return (

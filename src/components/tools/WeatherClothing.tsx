@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, MapPin, Thermometer, Droplets, Wind, Sun, CloudRain,
-  AlertTriangle, Shirt, Loader2, RefreshCw, Shield, Flower2, CloudSun, MapPinOff, Baby, User, Home } from
+  MapPin, Thermometer, Droplets, Wind, Sun,
+  AlertTriangle, Shirt, RefreshCw, Shield, Flower2, CloudSun, Baby, User, Home } from
 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { getCurrentPosition, requestLocationPermission } from '@/lib/permissions';
@@ -14,6 +12,7 @@ import { useUserStore } from '@/store/userStore';
 import { differenceInMonths, differenceInDays } from 'date-fns';
 import { getPregnancyWeek } from '@/lib/pregnancy-utils';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr, getPersistedLanguage } from "@/lib/tr";
 
 interface WeatherClothingProps {
@@ -145,12 +144,13 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
     }
   };
 
+  // Alert level → anacan palette
   const getAlertColor = (level: string) => {
     switch (level) {
-      case 'danger':return 'bg-red-500';
-      case 'warning':return 'bg-orange-500';
-      case 'caution':return 'bg-yellow-500';
-      default:return 'bg-green-500';
+      case 'danger':return 'var(--a-pink-2)';
+      case 'warning':return 'var(--a-peach-2)';
+      case 'caution':return 'var(--a-yellow-2)';
+      default:return 'var(--a-green-2)';
     }
   };
 
@@ -164,61 +164,52 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
   const userContext = getUserContext();
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 pb-2">
-        <div className="flex items-center gap-3 relative z-20">
-          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0 text-white hover:bg-white/20 relative z-30">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold">{tr("weatherclothing_title", "Hava & Geyim")}</h1>
-            <p className="text-xs text-white/80">
-              {userContext.babyAgeMonths !== undefined ?
-              tr("weatherclothing_baby_age_for", "{months} aylıq körpə üçün").replace("{months}", String(userContext.babyAgeMonths)) :
-              userContext.pregnancyWeek ?
-              tr("weatherclothing_pregnancy_week_for", "Hamiləliyin {week}. həftəsi üçün").replace("{week}", String(userContext.pregnancyWeek)) : tr("weatherclothing_korpeniz_ucun_geyim_mesleheti_f5cbde", "Körpəniz üçün geyim məsləhəti")
-              }
-            </p>
-          </div>
-          <Button variant="ghost" size="icon" onClick={fetchWeather} disabled={isLoading} className="text-white hover:bg-white/20 relative z-30">
-            <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
-      </div>
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={
+        userContext.babyAgeMonths !== undefined ?
+        tr("weatherclothing_baby_age_for", "{months} aylıq körpə üçün").replace("{months}", String(userContext.babyAgeMonths)) :
+        userContext.pregnancyWeek ?
+        tr("weatherclothing_pregnancy_week_for", "Hamiləliyin {week}. həftəsi üçün").replace("{week}", String(userContext.pregnancyWeek)) : tr("weatherclothing_korpeniz_ucun_geyim_mesleheti_f5cbde", "Körpəniz üçün geyim məsləhəti")
+        }
+        title={tr("weatherclothing_title", "Hava & Geyim")}
+        actions={
+        <button className="a-icon-btn" onClick={fetchWeather} disabled={isLoading} aria-label="Refresh">
+            <RefreshCw size={16} strokeWidth={2} className={isLoading ? 'animate-spin' : ''} />
+          </button>
+        } />
 
-      <div className="p-4 space-y-4">
+      <div className="space-y-3">
         {/* User Context Card */}
         {(userContext.babyAgeMonths !== undefined || userContext.pregnancyWeek) &&
-        <Card className="border-primary/20 bg-primary/5">
-            <CardContent className="p-3">
-              <div className="flex items-center gap-3">
-                {userContext.babyAgeMonths !== undefined ?
-              <>
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Baby className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{tr("weatherclothing_korpenin_yasi_1dfff9", "Körpənin yaşı")}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {userContext.babyAgeMonths} {tr("weatherclothing_ay_suffix_3c7a2d", "ay")} ({userContext.babyAgeDays} {tr("weatherclothing_gun_4835dd", "g\xFCn)")}
-                      </p>
-                    </div>
-                  </> :
-              userContext.pregnancyWeek ?
-              <>
-                    <div className="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center">
-                      <User className="w-5 h-5 text-pink-500" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{tr("weatherclothing_hamilelik_heftesi_c9e362", "Hamiləlik həftəsi")}</p>
-                      <p className="text-xs text-muted-foreground">{userContext.pregnancyWeek}{tr("weatherclothing_hefte_459cfe", ". h\u0259ft\u0259")}</p>
-                    </div>
-                  </> :
-              null}
-              </div>
-            </CardContent>
-          </Card>
+        <div className="a-card" style={{ padding: '12px 14px' }}>
+            <div className="flex items-center gap-3">
+              {userContext.babyAgeMonths !== undefined ?
+            <>
+                  <span className="a-list-icon" style={{ background: 'var(--a-grad-blue)' }}>
+                    <Baby size={17} strokeWidth={2.2} style={{ color: '#153e57' }} />
+                  </span>
+                  <div>
+                    <p className="a-list-title" style={{ margin: 0 }}>{tr("weatherclothing_korpenin_yasi_1dfff9", "Körpənin yaşı")}</p>
+                    <p className="a-list-sub" style={{ margin: 0 }}>
+                      {userContext.babyAgeMonths} {tr("weatherclothing_ay_suffix_3c7a2d", "ay")} ({userContext.babyAgeDays} {tr("weatherclothing_gun_4835dd", "g\xFCn)")}
+                    </p>
+                  </div>
+                </> :
+            userContext.pregnancyWeek ?
+            <>
+                  <span className="a-list-icon" style={{ background: 'var(--a-grad-pink)' }}>
+                    <User size={17} strokeWidth={2.2} style={{ color: 'var(--a-alert-ink)' }} />
+                  </span>
+                  <div>
+                    <p className="a-list-title" style={{ margin: 0 }}>{tr("weatherclothing_hamilelik_heftesi_c9e362", "Hamiləlik həftəsi")}</p>
+                    <p className="a-list-sub" style={{ margin: 0 }}>{userContext.pregnancyWeek}{tr("weatherclothing_hefte_459cfe", ". h\u0259ft\u0259")}</p>
+                  </div>
+                </> :
+            null}
+            </div>
+          </div>
         }
 
         {/* Loading State */}
@@ -228,28 +219,26 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}>
             
-              <CloudSun className="w-16 h-16 text-primary mb-4" />
+              <CloudSun className="w-16 h-16 mb-4" style={{ color: 'var(--a-blue-2)' }} />
             </motion.div>
-            <p className="text-muted-foreground">{tr("weatherclothing_mekan_teyin_edilir_526792", "Məkan təyin edilir...")}</p>
+            <p style={{ color: 'var(--a-on-bg-soft)' }}>{tr("weatherclothing_mekan_teyin_edilir_526792", "Məkan təyin edilir...")}</p>
           </div>
         }
 
         {/* Error State */}
         {locationError && !isLoading &&
-        <Card className="border-destructive/30 bg-destructive/5">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="w-6 h-6 text-destructive shrink-0" />
-                <div>
-                  <h3 className="font-semibold text-destructive">{tr("weatherclothing_mekan_xetasi_bd9e1d", "Məkan xətası")}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{locationError}</p>
-                  <Button variant="outline" size="sm" className="mt-3" onClick={fetchWeather}>
-                    {tr("weatherclothing_yeniden_cehd_et_d273ac", "Yenid\u0259n c\u0259hd et")}
-                  </Button>
-                </div>
+        <div className="rounded-2xl p-4" style={{ background: 'var(--a-alert-bg)' }}>
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-6 h-6 shrink-0" style={{ color: 'var(--a-alert-ink)' }} />
+              <div>
+                <h3 className="font-bold" style={{ margin: 0, color: 'var(--a-alert-ink)' }}>{tr("weatherclothing_mekan_xetasi_bd9e1d", "Məkan xətası")}</h3>
+                <p className="text-sm mt-1" style={{ margin: '4px 0 0', color: 'var(--a-alert-soft)' }}>{locationError}</p>
+                <button className="a-btn-soft mt-3" style={{ height: 38, padding: '0 16px' }} onClick={fetchWeather}>
+                  {tr("weatherclothing_yeniden_cehd_et_d273ac", "Yenid\u0259n c\u0259hd et")}
+                </button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         }
 
         {/* Weather Data */}
@@ -258,18 +247,20 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="space-y-4">
+            className="space-y-3">
             
               {/* Location & Current Weather */}
-              <Card className="overflow-hidden">
-                <div className={`h-1.5 ${getAlertColor(advice.alertLevel)}`} />
-                <CardContent className="p-4">
+              <div className="a-card overflow-hidden" style={{ padding: 0 }}>
+                <div style={{ height: 6, background: getAlertColor(advice.alertLevel) }} />
+                <div className="p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <MapPin className="w-4 h-4 text-primary" />
-                    <span className="font-medium">{cityName}</span>
-                    <span className={`ml-auto px-3 py-1 rounded-full text-xs font-semibold ${
-                  advice.safeToGoOut ? 'bg-green-500/20 text-green-600' : 'bg-red-500/20 text-red-600'}`
-                  }>
+                    <MapPin className="w-4 h-4" style={{ color: 'var(--a-peach-2)' }} />
+                    <span className="a-list-title" style={{ margin: 0 }}>{cityName}</span>
+                    <span
+                    className="ml-auto px-3 py-1 rounded-full text-xs font-bold"
+                    style={advice.safeToGoOut ?
+                    { background: 'var(--a-green-1)', color: 'var(--a-green-ink)' } :
+                    { background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)' }}>
                       {advice.safeToGoOut ? tr("weatherclothing_cixmaq_olar_ab7b33", "\u2713 \xC7\u0131xmaq olar") : tr("weatherclothing_diqqetli_olun_c597f9", "\u26A0 Diqq\u0259tli olun")}
                     </span>
                   </div>
@@ -277,176 +268,166 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                   <div className="flex items-center gap-4">
                     <div className="text-6xl">{getWeatherIcon(advice.temperature)}</div>
                     <div>
-                      <div className="text-5xl font-bold">{Math.round(advice.temperature)}°C</div>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <div className="a-heading" style={{ fontSize: 44, color: 'var(--a-ink)' }}>{Math.round(advice.temperature)}°C</div>
+                      <p className="a-list-sub mt-1" style={{ margin: '4px 0 0' }}>
                         {tr("weatherclothing_feels_like", "Hiss:")} {Math.round(advice.feelsLike)}°C
                       </p>
                     </div>
                   </div>
                   
-                  <p className="text-sm mt-3 text-muted-foreground">{advice.weatherDescription}</p>
+                  <p className="text-sm mt-3" style={{ margin: '12px 0 0', color: 'var(--a-body-text)' }}>{advice.weatherDescription}</p>
                   
                   {/* Weather Stats */}
                   <div className="grid grid-cols-3 gap-2 mt-4">
-                    <div className="bg-blue-500/10 rounded-xl p-3 text-center">
-                      <Droplets className="w-5 h-5 mx-auto text-blue-500" />
-                      <p className="text-xs text-muted-foreground mt-1">{tr("weatherclothing_rutubet_3d8e74", "Rütubət")}</p>
-                      <p className="font-bold text-sm">{advice.humidity}%</p>
+                    <div className="rounded-xl p-3 text-center" style={{ background: 'var(--a-blue-1)' }}>
+                      <Droplets className="w-5 h-5 mx-auto" style={{ color: 'var(--a-blue-ink)' }} />
+                      <p className="text-xs mt-1" style={{ margin: '4px 0 0', color: 'var(--a-blue-ink)', opacity: 0.8 }}>{tr("weatherclothing_rutubet_3d8e74", "Rütubət")}</p>
+                      <p className="font-bold text-sm" style={{ margin: 0, color: '#153e57' }}>{advice.humidity}%</p>
                     </div>
-                    <div className="bg-cyan-500/10 rounded-xl p-3 text-center">
-                      <Wind className="w-5 h-5 mx-auto text-cyan-500" />
-                      <p className="text-xs text-muted-foreground mt-1">{tr("weatherclothing_kulek_cc8bf6", "Külək")}</p>
-                      <p className="font-bold text-sm">{Math.round(advice.windSpeed)} km/h</p>
+                    <div className="rounded-xl p-3 text-center" style={{ background: 'var(--a-green-1)' }}>
+                      <Wind className="w-5 h-5 mx-auto" style={{ color: 'var(--a-green-ink)' }} />
+                      <p className="text-xs mt-1" style={{ margin: '4px 0 0', color: 'var(--a-green-ink)', opacity: 0.8 }}>{tr("weatherclothing_kulek_cc8bf6", "Külək")}</p>
+                      <p className="font-bold text-sm" style={{ margin: 0, color: '#14532d' }}>{Math.round(advice.windSpeed)} km/h</p>
                     </div>
-                    <div className="bg-orange-500/10 rounded-xl p-3 text-center">
-                      <Sun className="w-5 h-5 mx-auto text-orange-500" />
-                      <p className="text-xs text-muted-foreground mt-1">UV</p>
-                      <p className="font-bold text-sm">{advice.uvIndex}</p>
+                    <div className="rounded-xl p-3 text-center" style={{ background: 'var(--a-yellow-1)' }}>
+                      <Sun className="w-5 h-5 mx-auto" style={{ color: 'var(--a-warn-ink)' }} />
+                      <p className="text-xs mt-1" style={{ margin: '4px 0 0', color: 'var(--a-warn-ink)', opacity: 0.8 }}>UV</p>
+                      <p className="font-bold text-sm" style={{ margin: 0, color: '#5a3d00' }}>{advice.uvIndex}</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
 
               {/* Clothing Advice */}
-              <Card className="border-primary/20">
-                <CardContent className="p-4">
-                  <h3 className="font-semibold flex items-center gap-2 mb-3">
-                    <Shirt className="w-5 h-5 text-primary" />
-                    {userContext.babyAgeMonths !== undefined ?
-                  tr("weatherclothing_baby_outdoor_clothing", "{months} aylıq körpə üçün bayır geyimi").replace("{months}", String(userContext.babyAgeMonths)) : tr("weatherclothing_bayirda_geyim_tovsiyesi_650ba0", "Bayırda Geyim Tövsiyəsi")
-                  }
-                  </h3>
-                  <p className="text-sm mb-4">{advice.clothingAdvice}</p>
+              <div className="a-card">
+                <h3 className="a-card-title a-heading flex items-center gap-2 mb-3" style={{ margin: '0 0 12px' }}>
+                  <Shirt className="w-5 h-5" style={{ color: 'var(--a-peach-2)' }} />
+                  {userContext.babyAgeMonths !== undefined ?
+                tr("weatherclothing_baby_outdoor_clothing", "{months} aylıq körpə üçün bayır geyimi").replace("{months}", String(userContext.babyAgeMonths)) : tr("weatherclothing_bayirda_geyim_tovsiyesi_650ba0", "Bayırda Geyim Tövsiyəsi")
+                }
+                </h3>
+                <p className="a-cta-text mb-4" style={{ margin: '0 0 16px' }}>{advice.clothingAdvice}</p>
+                
+                <div className="flex flex-wrap gap-2">
+                  {advice.clothingItems.map((item, idx) =>
+                <motion.span
+                  key={idx}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="px-3 py-1.5 rounded-full text-sm font-semibold"
+                  style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
                   
-                  <div className="flex flex-wrap gap-2">
-                    {advice.clothingItems.map((item, idx) =>
+                      {item}
+                    </motion.span>
+                )}
+                </div>
+              </div>
+
+              {/* Indoor Clothing & Room Temperature */}
+              {(advice.indoorClothingAdvice || advice.idealRoomTemperature) &&
+            <div className="a-card" style={{ background: 'var(--a-lav-1)', border: 'none' }}>
+                  <h3 className="font-bold flex items-center gap-2 mb-3 a-heading" style={{ margin: '0 0 12px', color: '#3c2e5c' }}>
+                    <Home className="w-5 h-5" style={{ color: 'var(--a-lav-ink)' }} />
+                    {tr("weatherclothing_ev_daxilinde_d10128", "Ev daxilind\u0259")}
+                  </h3>
+                  
+                  {/* Room Temperature */}
+                  {advice.idealRoomTemperature &&
+              <div className="rounded-xl p-3 mb-3" style={{ background: 'rgba(255,255,255,0.5)' }}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Thermometer className="w-4 h-4" style={{ color: 'var(--a-lav-ink)' }} />
+                        <span className="font-bold text-sm" style={{ color: 'var(--a-lav-ink)' }}>{tr("weatherclothing_ideal_otaq_temperaturu_6bf977", "İdeal otaq temperaturu")}</span>
+                      </div>
+                      <p className="a-heading" style={{ margin: 0, fontSize: 24, color: '#3c2e5c' }}>{advice.idealRoomTemperature}</p>
+                      {advice.roomTemperatureAdvice &&
+                <p className="text-xs mt-1" style={{ margin: '4px 0 0', color: 'var(--a-lav-ink)', opacity: 0.8 }}>{advice.roomTemperatureAdvice}</p>
+                }
+                    </div>
+              }
+
+                  {/* Indoor Clothing */}
+                  {advice.indoorClothingAdvice &&
+              <>
+                      <p className="text-sm mb-3" style={{ margin: '0 0 12px', color: '#3c2e5c', opacity: 0.85 }}>{advice.indoorClothingAdvice}</p>
+                      {advice.indoorClothingItems && advice.indoorClothingItems.length > 0 &&
+                <div className="flex flex-wrap gap-2">
+                          {advice.indoorClothingItems.map((item, idx) =>
                   <motion.span
                     key={idx}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: idx * 0.1 }}
-                    className="px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                    className="px-3 py-1.5 rounded-full text-sm font-semibold"
+                    style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-lav-ink)' }}>
                     
-                        {item}
-                      </motion.span>
+                              {item}
+                            </motion.span>
                   )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Indoor Clothing & Room Temperature */}
-              {(advice.indoorClothingAdvice || advice.idealRoomTemperature) &&
-            <Card className="border-purple-500/20 bg-purple-500/5">
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold flex items-center gap-2 mb-3">
-                      <Home className="w-5 h-5 text-purple-500" />
-                      {tr("weatherclothing_ev_daxilinde_d10128", "Ev daxilind\u0259")}
-                    </h3>
-                    
-                    {/* Room Temperature */}
-                    {advice.idealRoomTemperature &&
-                <div className="bg-purple-500/10 rounded-xl p-3 mb-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Thermometer className="w-4 h-4 text-purple-600" />
-                          <span className="font-semibold text-sm text-purple-700">{tr("weatherclothing_ideal_otaq_temperaturu_6bf977", "İdeal otaq temperaturu")}</span>
                         </div>
-                        <p className="text-2xl font-bold text-purple-600">{advice.idealRoomTemperature}</p>
-                        {advice.roomTemperatureAdvice &&
-                  <p className="text-xs text-muted-foreground mt-1">{advice.roomTemperatureAdvice}</p>
-                  }
-                      </div>
                 }
-
-                    {/* Indoor Clothing */}
-                    {advice.indoorClothingAdvice &&
-                <>
-                        <p className="text-sm mb-3">{advice.indoorClothingAdvice}</p>
-                        {advice.indoorClothingItems && advice.indoorClothingItems.length > 0 &&
-                  <div className="flex flex-wrap gap-2">
-                            {advice.indoorClothingItems.map((item, idx) =>
-                    <motion.span
-                      key={idx}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="px-3 py-1.5 bg-purple-500/10 text-purple-700 rounded-full text-sm font-medium">
-                      
-                                {item}
-                              </motion.span>
-                    )}
-                          </div>
-                  }
-                      </>
-                }
-                  </CardContent>
-                </Card>
+                    </>
+              }
+                </div>
             }
 
               {/* Outdoor Advice */}
-              <Card className={advice.safeToGoOut ? 'border-green-500/20 bg-green-500/5' : 'border-orange-500/30 bg-orange-500/5'}>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold flex items-center gap-2 mb-2">
-                    <CloudSun className={`w-5 h-5 ${advice.safeToGoOut ? 'text-green-500' : 'text-orange-500'}`} />
-                    {tr("weatherclothing_bayirda_gezme_0ae215", "Bay\u0131rda g\u0259zm\u0259")}
-                  </h3>
-                  <p className="text-sm">{advice.outdoorAdvice}</p>
-                </CardContent>
-              </Card>
+              <div className="a-card" style={{ background: advice.safeToGoOut ? 'var(--a-green-1)' : 'var(--a-peach-1)', border: 'none' }}>
+                <h3 className="font-bold flex items-center gap-2 mb-2 a-heading" style={{ margin: '0 0 8px', color: advice.safeToGoOut ? '#14532d' : 'var(--a-accent-ink)' }}>
+                  <CloudSun className="w-5 h-5" />
+                  {tr("weatherclothing_bayirda_gezme_0ae215", "Bay\u0131rda g\u0259zm\u0259")}
+                </h3>
+                <p className="text-sm" style={{ margin: 0, color: advice.safeToGoOut ? 'var(--a-green-ink)' : 'var(--a-accent-ink)', opacity: 0.9 }}>{advice.outdoorAdvice}</p>
+              </div>
 
               {/* Warnings */}
               {advice.warnings.length > 0 &&
-            <Card className="border-orange-500/30 bg-orange-500/5">
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold flex items-center gap-2 text-orange-600 mb-3">
-                      <AlertTriangle className="w-5 h-5" />
-                      {tr("weatherclothing_xeberdarliqlar_5542c4", "X\u0259b\u0259rdarl\u0131qlar")}
-                    </h3>
-                    <ul className="space-y-2">
-                      {advice.warnings.map((warning, idx) =>
-                  <li key={idx} className="flex items-start gap-2 text-sm">
-                          <span className="w-1.5 h-1.5 rounded-full bg-orange-500 mt-2 shrink-0" />
-                          {warning}
-                        </li>
-                  )}
-                    </ul>
-                  </CardContent>
-                </Card>
+            <div className="rounded-2xl p-4" style={{ background: 'var(--a-alert-bg)' }}>
+                  <h3 className="font-bold flex items-center gap-2 mb-3 a-heading" style={{ margin: '0 0 12px', color: 'var(--a-alert-ink)' }}>
+                    <AlertTriangle className="w-5 h-5" />
+                    {tr("weatherclothing_xeberdarliqlar_5542c4", "X\u0259b\u0259rdarl\u0131qlar")}
+                  </h3>
+                  <ul className="space-y-2" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                    {advice.warnings.map((warning, idx) =>
+                <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: 'var(--a-alert-soft)' }}>
+                        <span className="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style={{ background: 'var(--a-pink-2)' }} />
+                        {warning}
+                      </li>
+                )}
+                  </ul>
+                </div>
             }
 
               {/* Pollen Warning */}
               {advice.pollenWarning &&
-            <Card className="border-yellow-500/30 bg-yellow-500/5">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <Flower2 className="w-5 h-5 text-yellow-600 shrink-0" />
-                      <div>
-                        <h3 className="font-semibold text-yellow-700">{tr("weatherclothing_polen_xeberdarligi_1ae540", "Polen Xəbərdarlığı")}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">{advice.pollenWarning}</p>
-                      </div>
+            <div className="rounded-2xl p-4" style={{ background: 'var(--a-yellow-1)' }}>
+                  <div className="flex items-start gap-3">
+                    <Flower2 className="w-5 h-5 shrink-0" style={{ color: 'var(--a-warn-ink)' }} />
+                    <div>
+                      <h3 className="font-bold" style={{ margin: 0, color: 'var(--a-warn-ink)' }}>{tr("weatherclothing_polen_xeberdarligi_1ae540", "Polen Xəbərdarlığı")}</h3>
+                      <p className="text-sm mt-1" style={{ margin: '4px 0 0', color: 'var(--a-warn-ink)', opacity: 0.85 }}>{advice.pollenWarning}</p>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
             }
 
               {/* UV Warning */}
               {advice.uvWarning &&
-            <Card className="border-orange-500/30 bg-orange-500/5">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <Shield className="w-5 h-5 text-orange-600 shrink-0" />
-                      <div>
-                        <h3 className="font-semibold text-orange-700">{tr("weatherclothing_uv_xeberdarligi_327432", "UV Xəbərdarlığı")}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">{advice.uvWarning}</p>
-                      </div>
+            <div className="rounded-2xl p-4" style={{ background: 'var(--a-peach-1)' }}>
+                  <div className="flex items-start gap-3">
+                    <Shield className="w-5 h-5 shrink-0" style={{ color: 'var(--a-accent-ink)' }} />
+                    <div>
+                      <h3 className="font-bold" style={{ margin: 0, color: 'var(--a-accent-ink)' }}>{tr("weatherclothing_uv_xeberdarligi_327432", "UV Xəbərdarlığı")}</h3>
+                      <p className="text-sm mt-1" style={{ margin: '4px 0 0', color: 'var(--a-accent-ink)', opacity: 0.85 }}>{advice.uvWarning}</p>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
             }
             </motion.div>
           }
         </AnimatePresence>
       </div>
-    </div>);
+    </ToolPage>);
 
 };
 

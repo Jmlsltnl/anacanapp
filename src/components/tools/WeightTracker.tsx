@@ -1,17 +1,18 @@
 import { useState, useEffect, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Plus, TrendingUp, TrendingDown, Minus, Scale, Loader2, Sparkles, Target, Activity, Calendar, Trash2, RotateCcw, MoreVertical } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Plus, TrendingUp, TrendingDown, Minus, Scale, Loader2, Sparkles, Target, Activity, Trash2, RotateCcw, MoreVertical } from 'lucide-react';
+import { ComposedChart, Area, Line, XAxis, YAxis, ReferenceLine, ResponsiveContainer, Tooltip } from 'recharts';
+import { differenceInDays } from 'date-fns';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
 import { useWeightRecommendations } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { supabase } from '@/integrations/supabase/client';
 import { formatDateAz, formatTimeAz } from '@/lib/date-utils';
 import { tr, getPersistedLanguage } from "@/lib/tr";
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 
 interface WeightTrackerProps {
   onBack: () => void;
@@ -50,13 +51,58 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
     return { min: 8, max: 14 };
   }, [recommendations, trimester]);
 
+  // Status → anacan design palette (bg gradient + ink color)
   const getStatus = () => {
-    if (totalGain < recommended.min) return { status: 'low', text: tr("weighttracker_status_low", "Az"), color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30', gradient: 'from-amber-400 to-orange-500' };
-    if (totalGain > recommended.max) return { status: 'high', text: tr("weighttracker_cox_72c890", "Çox"), color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-900/30', gradient: 'from-red-400 to-rose-500' };
-    return { status: 'normal', text: tr("weighttracker_status_normal", "Normal"), color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-100 dark:bg-emerald-900/30', gradient: 'from-emerald-400 to-green-500' };
+    if (totalGain < recommended.min) return { status: 'low', text: tr("weighttracker_status_low", "Az"), grad: 'var(--a-grad-yellow)', ink: 'var(--a-warn-ink)' };
+    if (totalGain > recommended.max) return { status: 'high', text: tr("weighttracker_cox_72c890", "Çox"), grad: 'var(--a-grad-pink)', ink: 'var(--a-berry-ink)' };
+    return { status: 'normal', text: tr("weighttracker_status_normal", "Normal"), grad: 'var(--a-grad-green)', ink: 'var(--a-green-ink)' };
   };
 
   const status = getStatus();
+
+  // ── Hamiləlik həftə qrafiki (İOM tövsiyə zolağı ilə) ──
+  // Anker nöqtələri: hf13 [0.5-2], hf26 [4-8], hf40 [8-14] kq kumulyativ artım
+  // (weight_recommendations fallback dəyərləri ilə uyğun).
+  const lmpDate = pregData?.lastPeriodDate ? new Date(pregData.lastPeriodDate) : null;
+
+  const pregnancyChartData = useMemo(() => {
+    if (!lmpDate || entries.length < 2) return null;
+
+    const gainAt = (week: number): [number, number] => {
+      const anchors: [number, number, number][] = [
+      [0, 0, 0], [13, 0.5, 2], [26, 4, 8], [40, 8, 14]];
+      if (week <= 0) return [0, 0];
+      if (week >= 40) return [anchors[3][1], anchors[3][2]];
+      for (let i = 1; i < anchors.length; i++) {
+        if (week <= anchors[i][0]) {
+          const [w0, min0, max0] = anchors[i - 1];
+          const [w1, min1, max1] = anchors[i];
+          const t = (week - w0) / (w1 - w0);
+          return [min0 + t * (min1 - min0), max0 + t * (max1 - max0)];
+        }
+      }
+      return [anchors[3][1], anchors[3][2]];
+    };
+
+    // Hər həftə üçün son çəki qeydi (entries DESC sıralıdır → xronoloji gedişat üçün tərsinə)
+    const weekWeight = new Map<number, number>();
+    [...entries].reverse().forEach((e) => {
+      const wk = Math.floor(differenceInDays(new Date(e.entry_date), lmpDate) / 7);
+      if (wk >= 0 && wk <= 42) weekWeight.set(wk, e.weight);
+    });
+    if (weekWeight.size === 0) return null;
+
+    const data: {week: number;band: [number, number];weight: number | null;}[] = [];
+    for (let wk = 4; wk <= 42; wk++) {
+      const [gMin, gMax] = gainAt(wk);
+      data.push({
+        week: wk,
+        band: [Math.round((startWeight + gMin) * 10) / 10, Math.round((startWeight + gMax) * 10) / 10],
+        weight: weekWeight.get(wk) ?? null
+      });
+    }
+    return data;
+  }, [entries, lmpDate, startWeight]);
 
   useEffect(() => {
     const fetchAIAdvice = async () => {
@@ -100,312 +146,375 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Scale className="w-5 h-5 text-emerald-500" />
-                {tr("weighttracker_ceki_i_zleyici_9dfe43", "\xC7\u0259ki \u0130zl\u0259yici")}
-              </h1>
-            </div>
-            <motion.button
-              onClick={() => setShowAddForm(true)}
-              className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <Plus className="w-5 h-5 text-primary-foreground" />
-            </motion.button>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-4 pt-4">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <motion.div
-            className="bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-3 text-center border border-emerald-100 dark:border-emerald-500/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}>
-            
-            <Scale className="w-5 h-5 mx-auto mb-1 text-emerald-500" />
-            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{currentWeight}</p>
-            <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">{tr("weighttracker_hazirki_kg_426054", "Hazırkı (kg)")}</p>
-          </motion.div>
-          <motion.div
-            className="bg-cyan-50 dark:bg-cyan-500/10 rounded-2xl p-3 text-center border border-cyan-100 dark:border-cyan-500/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            title={tr("weighttracker_baslangic_cekiden_ferq_8a58c5", "Başlanğıc çəkidən fərq")}>
-            
-            <Activity className="w-5 h-5 mx-auto mb-1 text-cyan-500" />
-            <p className="text-2xl font-black text-cyan-600 dark:text-cyan-400">{totalGain >= 0 ? '+' : ''}{totalGain.toFixed(1)}</p>
-            <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 font-medium">{tr("weighttracker_ferq_kg_8bd06d", "Fərq (kg)")}</p>
-          </motion.div>
-          <motion.div
-            className="bg-violet-50 dark:bg-violet-500/10 rounded-2xl p-3 text-center border border-violet-100 dark:border-violet-500/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}>
-            
-            <Target className="w-5 h-5 mx-auto mb-1 text-violet-500" />
-            <p className="text-2xl font-black text-violet-600 dark:text-violet-400">{recommended.min}-{recommended.max}</p>
-            <p className="text-xs text-violet-600/70 dark:text-violet-400/70 font-medium">{tr("weighttracker_tovsiye_kg_6a77a1", "Tövsiyə (kg)")}</p>
-          </motion.div>
-        </div>
-        {/* Status Card */}
-        <motion.div
-          className="bg-card rounded-3xl p-5 shadow-lg border border-border/50 mb-4"
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}>
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={<>{currentWeek}. {tr("weighttracker_ai_prompt_week", "həftə")} · {trimester}. trimestr</>}
+        title={tr("weighttracker_ceki_i_zleyici_9dfe43", "\xC7\u0259ki \u0130zl\u0259yici")}
+        actions={
+        <motion.button
+          onClick={() => setShowAddForm(true)}
+          className="a-icon-btn"
+          style={{ background: 'var(--a-peach-2)', color: '#fff', border: 'none' }}
+          whileTap={{ scale: 0.9 }}>
           
-          <div className="flex items-center gap-4">
-            <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${status.gradient} flex items-center justify-center shadow-lg`}>
-              {status.status === 'normal' && <Minus className="w-8 h-8 text-white" />}
-              {status.status === 'low' && <TrendingDown className="w-8 h-8 text-white" />}
-              {status.status === 'high' && <TrendingUp className="w-8 h-8 text-white" />}
-            </div>
-            <div className="flex-1">
-              <p className="text-sm text-muted-foreground">{tr("weighttracker_ceki_statusu_d932ab", "Çəki statusu")}</p>
-              <h3 className="text-2xl font-black text-foreground">{status.text}</h3>
-              <p className="text-xs text-muted-foreground mt-1">
-                {tr("weighttracker_baslangic_ef1964", "Başlanğıc:")} {startWeight} kg → {tr("weighttracker_indi_eef", "Cari:")} {currentWeight} kg
-              </p>
-            </div>
-          </div>
+            <Plus size={17} strokeWidth={2.4} />
+          </motion.button>
+        } />
 
-          {/* Progress Bar */}
-          <div className="mt-4">
-            <div className="flex justify-between text-xs text-muted-foreground mb-1">
-              <span>{recommended.min} kg</span>
-              <span>{tr("weighttracker_tovsiye_olunan_araliq_4810a8", "Tövsiyə olunan aralıq")}</span>
-              <span>{recommended.max} kg</span>
-            </div>
-            <div className="h-3 bg-muted rounded-full overflow-hidden relative">
-              <div
-                className={`h-full bg-gradient-to-r ${status.gradient} rounded-full transition-all`}
-                style={{ width: `${Math.min(totalGain / recommended.max * 100, 100)}%` }} />
-              
-              <div
-                className="absolute top-0 left-0 h-full border-r-2 border-dashed border-emerald-600"
-                style={{ left: `${recommended.min / recommended.max * 100}%` }} />
-              
-            </div>
-          </div>
-        </motion.div>
-
-        {/* AI Analysis */}
+      {/* Stats trio */}
+      <div className="a-trio">
         <motion.div
-          className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-3xl p-5 mb-4 border border-emerald-200 dark:border-emerald-800"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
+          className="a-trio-item"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}>
+          
+          <span className="a-trio-icon" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
+            <Scale size={17} strokeWidth={2} />
+          </span>
+          <p className="a-trio-value" style={{ fontSize: 17 }}>{currentWeight}</p>
+          <p className="a-trio-label">{tr("weighttracker_hazirki_kg_426054", "Hazırkı (kg)")}</p>
+        </motion.div>
+        <motion.div
+          className="a-trio-item"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          title={tr("weighttracker_baslangic_cekiden_ferq_8a58c5", "Başlanğıc çəkidən fərq")}>
+          
+          <span className="a-trio-icon" style={{ background: 'var(--a-grad-blue)', color: 'var(--a-blue-ink)' }}>
+            <Activity size={17} strokeWidth={2} />
+          </span>
+          <p className="a-trio-value" style={{ fontSize: 17 }}>{totalGain >= 0 ? '+' : ''}{totalGain.toFixed(1)}</p>
+          <p className="a-trio-label">{tr("weighttracker_ferq_kg_8bd06d", "Fərq (kg)")}</p>
+        </motion.div>
+        <motion.div
+          className="a-trio-item"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}>
           
-          <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg">
-              <Sparkles className="w-7 h-7 text-white" />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-bold text-foreground mb-1 flex items-center gap-2">
-                {tr("weighttracker_ai_analiz_41639d", "AI Analiz")}
-                {aiLoading && <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />}
-              </h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {aiLoading ? tr("weighttracker_analiz_edilir_e11d27", "Analiz edilir...") : aiAdvice || tr("weighttracker_melumat_yuklenir_355722", "Məlumat yüklənir...")}
-              </p>
-            </div>
-          </div>
+          <span className="a-trio-icon" style={{ background: 'var(--a-grad-lav)', color: 'var(--a-lav-ink)' }}>
+            <Target size={17} strokeWidth={2} />
+          </span>
+          <p className="a-trio-value" style={{ fontSize: 17 }}>{recommended.min}-{recommended.max}</p>
+          <p className="a-trio-label">{tr("weighttracker_tovsiye_kg_6a77a1", "Tövsiyə (kg)")}</p>
         </motion.div>
-
-        {/* Progress Chart */}
-        {entries.length > 0 &&
-        <motion.div
-          className="bg-card rounded-3xl p-5 shadow-lg border border-border/50 mb-4"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}>
-          
-            <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-emerald-500" />
-              {tr("weighttracker_son_7_qeyd", "Son 7 qeyd")}
-            </h3>
-            <div className="h-36 flex items-end gap-2">
-              {entries.slice(0, 7).reverse().map((entry, index) => {
-              const maxWeight = Math.max(...entries.slice(0, 7).map((e) => e.weight));
-              const minWeight = Math.min(...entries.slice(0, 7).map((e) => e.weight));
-              const range = maxWeight - minWeight || 1;
-              const height = (entry.weight - minWeight) / range * 60 + 40;
-
-              return (
-                <motion.div
-                  key={entry.id}
-                  className="flex-1 bg-gradient-to-t from-emerald-500 to-teal-400 rounded-xl relative group cursor-pointer"
-                  initial={{ height: 0 }}
-                  animate={{ height: `${height}%` }}
-                  transition={{ delay: 0.4 + index * 0.08 }}>
-                  
-                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs font-bold px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
-                      {entry.weight} kg
-                    </div>
-                  </motion.div>);
-
-            })}
-            </div>
-            <div className="flex justify-between mt-3">
-              {entries.slice(0, 7).reverse().map((entry) =>
-            <span key={entry.id} className="text-[10px] text-muted-foreground text-center flex-1">
-                  {formatDateAz(entry.entry_date)}
-                </span>
-            )}
-            </div>
-          </motion.div>
-        }
-
-        {/* History */}
-        {entries.length > 0 &&
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}>
-          
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-bold text-foreground flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-emerald-500" />
-                {tr("weighttracker_tarixce_b09a14", "Tarixçə")}
-              </h3>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground">
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                  onClick={() => setShowResetConfirm(true)}
-                  className="text-destructive focus:text-destructive">
-                  
-                    <RotateCcw className="w-4 h-4 mr-2" />
-                    {tr("weighttracker_tarixceni_sifirla_577dd6", "Tarixçəni sıfırla")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <div className="space-y-3 pb-24">
-              {entries.slice(0, 10).map((entry, index) =>
-            <motion.div
-              key={entry.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.05 * index }}
-              className="bg-card rounded-2xl p-4 shadow-sm border border-border/50 flex items-center justify-between group">
-              
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 flex items-center justify-center">
-                      <Scale className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-foreground text-lg">{entry.weight} kg</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDateAz(entry.created_at)}, {formatTimeAz(entry.created_at)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {index > 0 && entries[index - 1] &&
-                <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-                entry.weight > entries[index - 1].weight ?
-                'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' :
-                entry.weight < entries[index - 1].weight ?
-                'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' :
-                'bg-muted text-muted-foreground'}`
-                }>
-                        {entry.weight > entries[index - 1].weight ?
-                  `+${(entry.weight - entries[index - 1].weight).toFixed(1)}` :
-                  entry.weight < entries[index - 1].weight ?
-                  (entry.weight - entries[index - 1].weight).toFixed(1) :
-                  '0'}
-                      </div>
-                }
-                    <Button
-                  variant="ghost"
-                  size="icon"
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-                  onClick={() => {
-                    if (confirm(tr("weighttracker_bu_qeydi_silmek_isteyirsiniz_c4a2fa", "Bu qeydi silmək istəyirsiniz?"))) {
-                      deleteEntry(entry.id);
-                    }
-                  }}>
-                  
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </motion.div>
-            )}
-            </div>
-          </motion.div>
-        }
-
-        {/* Reset Confirmation Modal */}
-        <AnimatePresence>
-          {showResetConfirm &&
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowResetConfirm(false)}>
-            
-              <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-sm bg-card rounded-3xl p-6 shadow-xl">
-              
-                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                  <Trash2 className="w-8 h-8 text-red-500" />
-                </div>
-                <h2 className="text-xl font-bold text-foreground text-center mb-2">{tr("weighttracker_tarixceni_sifirla_577dd6", "Tarixçəni sıfırla")}</h2>
-                <p className="text-sm text-muted-foreground text-center mb-6">
-                  {tr("weighttracker_butun_ceki_qeydleri_silinecek__3a01e1", "Bütün çəki qeydləri silinəcək. Bu əməliyyat geri qaytarıla bilməz.")}
-                </p>
-                <div className="flex gap-3">
-                  <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setShowResetConfirm(false)}>
-                    {tr("weighttracker_legv_et_b5e49c", "Ləğv et")}
-                  
-                </Button>
-                  <Button
-                  variant="destructive"
-                  className="flex-1"
-                  onClick={() => {
-                    deleteAllEntries();
-                    setShowResetConfirm(false);
-                  }}>
-                  
-                    {tr("weighttracker_sil", "Sil")}
-                  </Button>
-                </div>
-              </motion.div>
-            </motion.div>
-          }
-        </AnimatePresence>
       </div>
 
-      {/* Add Weight Modal */}
+      {/* Status Card */}
+      <motion.div
+        className="a-card a-fade-in"
+        style={{ marginTop: 12 }}
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}>
+        
+        <div className="a-list-row" style={{ padding: 0, borderTop: 'none' }}>
+          <span className="a-rank-avatar" style={{ background: status.grad, color: status.ink }}>
+            {status.status === 'normal' && <Minus size={19} strokeWidth={2.2} />}
+            {status.status === 'low' && <TrendingDown size={19} strokeWidth={2.2} />}
+            {status.status === 'high' && <TrendingUp size={19} strokeWidth={2.2} />}
+          </span>
+          <div>
+            <p className="a-today-info-eyebrow" style={{ margin: 0 }}>{tr("weighttracker_ceki_statusu_d932ab", "Çəki statusu")}</p>
+            <p className="a-heading" style={{ margin: '2px 0 0', fontSize: 19, color: 'var(--a-ink)' }}>{status.text}</p>
+            <p className="a-list-sub">
+              {tr("weighttracker_baslangic_ef1964", "Başlanğıc:")} {startWeight} kg → {tr("weighttracker_indi_eef", "Cari:")} {currentWeight} kg
+            </p>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div style={{ marginTop: 14 }}>
+          <div className="flex justify-between" style={{ marginBottom: 5 }}>
+            <span className="a-list-time" style={{ margin: 0 }}>{recommended.min} kg</span>
+            <span className="a-list-value" style={{ color: 'var(--a-ink-soft)' }}>{tr("weighttracker_tovsiye_olunan_araliq_4810a8", "Tövsiyə olunan aralıq")}</span>
+            <span className="a-list-time" style={{ margin: 0 }}>{recommended.max} kg</span>
+          </div>
+          <div className="a-inline-bar relative" style={{ marginTop: 0, height: 8 }}>
+            <div
+              className="a-inline-bar-fill"
+              style={{ background: status.grad, width: `${Math.min(totalGain / recommended.max * 100, 100)}%`, transition: 'width 300ms ease' }} />
+            
+            <div
+              className="absolute top-0 h-full"
+              style={{ left: `${recommended.min / recommended.max * 100}%`, borderRight: '2px dashed var(--a-green-2)' }} />
+            
+          </div>
+        </div>
+      </motion.div>
+
+      {/* AI Analysis */}
+      <motion.div
+        className="a-cta a-fade-in"
+        style={{ background: 'var(--a-grad-green)', marginTop: 12 }}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}>
+        
+        <span className="a-cta-shape" style={{ width: 110, height: 110, top: -40, right: -30, background: 'rgba(255,255,255,0.35)' }} />
+        <div className="a-cta-top">
+          <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: '#14532d' }}>
+            <Sparkles size={11} strokeWidth={2.4} /> {tr("weighttracker_ai_analiz_41639d", "AI Analiz")}
+          </span>
+          {aiLoading && <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#14532d' }} />}
+        </div>
+        <p className="a-cta-text" style={{ position: 'relative', marginTop: 12, color: 'rgba(20, 83, 45, 0.85)', fontWeight: 500 }}>
+          {aiLoading ? tr("weighttracker_analiz_edilir_e11d27", "Analiz edilir...") : aiAdvice || tr("weighttracker_melumat_yuklenir_355722", "Məlumat yüklənir...")}
+        </p>
+      </motion.div>
+
+      {/* Hamiləlik həftə qrafiki (İOM zolağı ilə) — bump istifadəçiləri */}
+      {pregnancyChartData &&
+      <motion.div
+        className="a-card a-fade-in"
+        style={{ marginTop: 12 }}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.25 }}>
+        
+          <div className="a-card-head">
+            <h3 className="a-card-title a-heading">{tr("weighttracker_hamilelik_qrafiki", "Hamiləlik qrafiki")}</h3>
+            <span className="a-rank-tag" style={{ background: 'var(--a-green-1)', color: 'var(--a-green-ink)' }}>
+              {tr("weighttracker_tovsiye_zolagi", "yaşıl = tövsiyə aralığı")}
+            </span>
+          </div>
+          <div style={{ width: '100%', height: 200 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={pregnancyChartData} margin={{ top: 6, right: 6, bottom: 0, left: -18 }}>
+                <XAxis
+                dataKey="week"
+                type="number"
+                domain={[4, 42]}
+                ticks={[8, 16, 24, 32, 40]}
+                tick={{ fontSize: 10, fill: 'var(--a-ink-soft)' }}
+                tickLine={false}
+                axisLine={{ stroke: 'var(--a-line)' }}
+                tickFormatter={(w) => `${w}h`} />
+              
+                <YAxis
+                domain={['auto', 'auto']}
+                tick={{ fontSize: 10, fill: 'var(--a-ink-soft)' }}
+                tickLine={false}
+                axisLine={false}
+                width={46}
+                tickFormatter={(v) => `${v}kq`} />
+              
+                <Tooltip
+                formatter={(value: any, name: string) => {
+                  if (name === 'band') return [`${value[0]}–${value[1]} kq`, tr("weighttracker_tovsiye_araligi", "Tövsiyə aralığı")];
+                  return [`${value} kq`, tr("weighttracker_cekiniz", "Çəkiniz")];
+                }}
+                labelFormatter={(w) => `${w}. ${tr("weighttracker_ai_prompt_week", "həftə")}`}
+                contentStyle={{ borderRadius: 12, border: '1px solid var(--a-line)', fontSize: 12, background: 'var(--a-surface)' }} />
+              
+                <Area
+                dataKey="band"
+                stroke="none"
+                fill="#63bd8b"
+                fillOpacity={0.18}
+                isAnimationActive={false} />
+              
+                <ReferenceLine
+                x={currentWeek}
+                stroke="var(--a-ink-faint)"
+                strokeDasharray="4 4"
+                label={{ value: tr("weighttracker_indi_ref", "indi"), position: 'top', fontSize: 10, fill: 'var(--a-ink-soft)' }} />
+              
+                <Line
+                dataKey="weight"
+                type="monotone"
+                connectNulls
+                stroke="var(--a-peach-2)"
+                strokeWidth={2.5}
+                dot={{ r: 3, fill: 'var(--a-peach-2)', strokeWidth: 0 }}
+                activeDot={{ r: 5 }}
+                isAnimationActive={false} />
+              
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="a-teaser" style={{ marginTop: 8 }}>
+            {tr("weighttracker_qrafik_izah", "Xətt — çəki qeydləriniz, yaşıl zolaq — həftəyə görə tövsiyə olunan artım aralığı (başlanğıc çəkiyə əsasən).")}
+          </p>
+        </motion.div>
+      }
+
+      {/* Progress Chart */}
+      {entries.length > 0 && !pregnancyChartData &&
+      <motion.div
+        className="a-card a-fade-in"
+        style={{ marginTop: 12 }}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}>
+        
+          <div className="a-card-head">
+            <h3 className="a-card-title a-heading">{tr("weighttracker_son_7_qeyd", "Son 7 qeyd")}</h3>
+          </div>
+          <div className="h-32 flex items-end gap-2">
+            {entries.slice(0, 7).reverse().map((entry, index) => {
+            const maxWeight = Math.max(...entries.slice(0, 7).map((e) => e.weight));
+            const minWeight = Math.min(...entries.slice(0, 7).map((e) => e.weight));
+            const range = maxWeight - minWeight || 1;
+            const height = (entry.weight - minWeight) / range * 60 + 40;
+
+            return (
+              <motion.div
+                key={entry.id}
+                className="flex-1 relative group cursor-pointer"
+                style={{ background: 'var(--a-grad-peach)', borderRadius: '8px 8px 4px 4px' }}
+                initial={{ height: 0 }}
+                animate={{ height: `${height}%` }}
+                transition={{ delay: 0.4 + index * 0.08 }}>
+                
+                  <div className="a-chart-tooltip opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" style={{ left: '50%', top: -4 }}>
+                    {entry.weight} kg
+                  </div>
+                </motion.div>);
+
+          })}
+          </div>
+          <div className="a-chart-axis" style={{ marginTop: 10 }}>
+            {entries.slice(0, 7).reverse().map((entry) =>
+          <span key={entry.id} className="text-center flex-1">
+                {formatDateAz(entry.entry_date)}
+              </span>
+          )}
+          </div>
+        </motion.div>
+      }
+
+      {/* History */}
+      {entries.length > 0 &&
+      <motion.section
+        className="a-section pb-24"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4 }}>
+        
+          <div className="a-section-head">
+            <h2 className="a-section-title a-heading">{tr("weighttracker_tarixce_b09a14", "Tarixçə")}</h2>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="a-icon-btn" style={{ width: 30, height: 30 }}>
+                  <MoreVertical size={14} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                onClick={() => setShowResetConfirm(true)}
+                className="text-destructive focus:text-destructive">
+                
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  {tr("weighttracker_tarixceni_sifirla_577dd6", "Tarixçəni sıfırla")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="a-list-card">
+            {entries.slice(0, 10).map((entry, index) =>
+          <motion.div
+            key={entry.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: Math.min(0.05 * index, 0.3) }}
+            className="a-list-row">
+            
+                <span className="a-list-icon" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+                  <Scale size={17} strokeWidth={2} />
+                </span>
+                <div>
+                  <p className="a-list-title" style={{ fontSize: 14.5 }}>{entry.weight} kg</p>
+                  <p className="a-list-sub">
+                    {formatDateAz(entry.created_at)}, {formatTimeAz(entry.created_at)}
+                  </p>
+                </div>
+                <span className="a-list-trail" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {index > 0 && entries[index - 1] &&
+              <span
+                className="a-rank-tag"
+                style={entry.weight > entries[index - 1].weight ?
+                { background: 'var(--a-green-1)', color: 'var(--a-green-ink)' } :
+                entry.weight < entries[index - 1].weight ?
+                { background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)' } :
+                { background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
+                      {entry.weight > entries[index - 1].weight ?
+                `+${(entry.weight - entries[index - 1].weight).toFixed(1)}` :
+                entry.weight < entries[index - 1].weight ?
+                (entry.weight - entries[index - 1].weight).toFixed(1) :
+                '0'}
+                    </span>
+              }
+                  <button
+                className="a-icon-btn"
+                style={{ width: 30, height: 30 }}
+                onClick={() => {
+                  if (confirm(tr("weighttracker_bu_qeydi_silmek_isteyirsiniz_c4a2fa", "Bu qeydi silmək istəyirsiniz?"))) {
+                    deleteEntry(entry.id);
+                  }
+                }}>
+                
+                    <Trash2 size={13} strokeWidth={2} />
+                  </button>
+                </span>
+              </motion.div>
+          )}
+          </div>
+        </motion.section>
+      }
+
+      {/* Reset Confirmation Modal */}
+      <AnimatePresence>
+        {showResetConfirm &&
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowResetConfirm(false)}>
+          
+            <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            onClick={(e) => e.stopPropagation()}
+            className="a-scope w-full max-w-sm p-6"
+            style={{ background: 'var(--a-surface)', borderRadius: 'var(--a-radius-lg)', boxShadow: 'var(--a-card-shadow)' }}>
+            
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'var(--a-pink-1)' }}>
+                <Trash2 size={26} style={{ color: 'var(--a-pink-ink)' }} />
+              </div>
+              <h2 className="a-heading text-center" style={{ margin: '0 0 6px', fontSize: 18, color: 'var(--a-ink)' }}>{tr("weighttracker_tarixceni_sifirla_577dd6", "Tarixçəni sıfırla")}</h2>
+              <p className="a-list-sub text-center" style={{ margin: '0 0 20px', whiteSpace: 'normal' }}>
+                {tr("weighttracker_butun_ceki_qeydleri_silinecek__3a01e1", "Bütün çəki qeydləri silinəcək. Bu əməliyyat geri qaytarıla bilməz.")}
+              </p>
+              <div className="flex gap-2">
+                <button
+                className="a-btn-soft flex-1"
+                style={{ justifyContent: 'center' }}
+                onClick={() => setShowResetConfirm(false)}>
+                  {tr("weighttracker_legv_et_b5e49c", "Ləğv et")}
+                
+              </button>
+                <button
+                className="a-cta-btn flex-1"
+                style={{ justifyContent: 'center', background: 'var(--a-pink-2)' }}
+                onClick={() => {
+                  deleteAllEntries();
+                  setShowResetConfirm(false);
+                }}>
+                
+                  {tr("weighttracker_sil", "Sil")}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        }
+      </AnimatePresence>
+
+      {/* Add Weight Sheet */}
       <AnimatePresence>
         {showAddForm &&
         <motion.div
@@ -421,44 +530,45 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 25 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full bg-card rounded-t-3xl overflow-hidden"
-            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 20px)' }}>
+            className="a-scope w-full overflow-hidden"
+            style={{ background: 'var(--a-surface)', borderRadius: '30px 30px 0 0', paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 20px)' }}>
             
-              <div className="h-20 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+              <div className="h-20 flex items-center justify-center" style={{ background: 'var(--a-grad-peach)' }}>
                 <motion.div
-                className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center"
+                className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                style={{ background: 'var(--a-chip-overlay)' }}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', delay: 0.1 }}>
                 
-                  <Scale className="w-8 h-8 text-white" />
+                  <Scale size={28} style={{ color: 'var(--a-accent-ink)' }} />
                 </motion.div>
               </div>
               
               <div className="p-6">
-                <h2 className="text-xl font-bold text-foreground mb-2 text-center">{tr("weighttracker_ceki_elave_et_252a47", "Çəki əlavə et")}</h2>
-                <p className="text-sm text-muted-foreground text-center mb-6">{tr("weighttracker_bugunku_cekinizi_daxil_edin_24f734", "Bugünkü çəkinizi daxil edin")}</p>
+                <h2 className="a-heading text-center" style={{ margin: '0 0 4px', fontSize: 18, color: 'var(--a-ink)' }}>{tr("weighttracker_ceki_elave_et_252a47", "Çəki əlavə et")}</h2>
+                <p className="a-list-sub text-center" style={{ margin: '0 0 20px', whiteSpace: 'normal' }}>{tr("weighttracker_bugunku_cekinizi_daxil_edin_24f734", "Bugünkü çəkinizi daxil edin")}</p>
                 
-                <div className="mb-6">
-                  <div className="relative">
-                    <Input
-                    type="number"
-                    step="0.1"
-                    placeholder="65.5"
-                    value={newWeight}
-                    onChange={(e) => setNewWeight(e.target.value)}
-                    className="h-16 rounded-2xl text-center text-3xl font-black border-2 border-emerald-200 dark:border-emerald-800 focus:border-emerald-500" />
-                  
-                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">kg</span>
-                  </div>
+                <div className="mb-5 relative">
+                  <input
+                  type="number"
+                  step="0.1"
+                  placeholder="65.5"
+                  value={newWeight}
+                  onChange={(e) => setNewWeight(e.target.value)}
+                  className="a-input w-full text-center"
+                  style={{ height: 60, fontSize: 28, fontWeight: 800, borderRadius: 18 }} />
+                
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 a-list-value" style={{ color: 'var(--a-ink-soft)' }}>kg</span>
                 </div>
 
                 <motion.button
                 onClick={handleAddWeight}
-                className="w-full h-14 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold shadow-lg flex items-center justify-center gap-2"
+                className="a-btn-solid w-full"
+                style={{ justifyContent: 'center', padding: '14px 18px', fontSize: 14 }}
                 whileTap={{ scale: 0.98 }}>
                 
-                  <Sparkles className="w-5 h-5" />
+                  <Sparkles size={17} strokeWidth={2.2} />
                   {tr("weighttracker_yadda_saxla", "Yadda saxla")}
                 </motion.button>
               </div>
@@ -466,7 +576,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
           </motion.div>
         }
       </AnimatePresence>
-    </div>);
+    </ToolPage>);
 
 });
 

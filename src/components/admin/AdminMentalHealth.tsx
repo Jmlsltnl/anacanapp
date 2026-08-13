@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { tr } from '@/lib/tr';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,8 +32,8 @@ const AdminMentalHealth = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">{tr("adminmentalhealth_mental_saglamliq_idareetmesi_1b85ab", "Mental Sağlamlıq İdarəetməsi")}</h2>
-        <p className="text-muted-foreground">{tr("adminmentalhealth_epds_suallari_ehval_nefes_mesqleri_ses_h_577a68", "EPDS sualları, əhval, nəfəs məşqləri, səs hədləri və dəstək resursları")}</p>
+        <h2 className="text-2xl font-bold">{tr("adminmentalhealth_mental_saglamliq_idareetmesi_1b85ab", "Mental SaÄŸlamlÄ±q Ä°darÉ™etmÉ™si")}</h2>
+        <p className="text-muted-foreground">{tr("adminmentalhealth_epds_suallari_ehval_nefes_mesqleri_ses_h_577a68", "EPDS suallarÄ±, É™hval, nÉ™fÉ™s mÉ™ÅŸqlÉ™ri, sÉ™s hÉ™dlÉ™ri vÉ™ dÉ™stÉ™k resurslarÄ±")}</p>
       </div>
 
       <Tabs defaultValue="epds" className="space-y-4">
@@ -72,6 +72,7 @@ const AdminMentalHealth = () => {
 
 // EPDS Tab
 const EPDSTab = () => {
+  const localize = useAdminLocalize();
   const { data: questions = [], create, update, remove } = useAdminEPDSQuestions();
   const [editItem, setEditItem] = useState<EPDSQuestion | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -108,10 +109,10 @@ const EPDSTab = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>№</TableHead>
+              <TableHead>â„–</TableHead>
               <TableHead>Sual (AZ)</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="w-[100px]">{tr("adminmentalhealth_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
+              <TableHead className="w-[100px]">{tr("adminmentalhealth_emeliyyatlar_54d70c", "ÆmÉ™liyyatlar")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -158,11 +159,11 @@ const EPDSForm = ({ item, onSave }: {item: EPDSQuestion | null;onSave: (data: Pa
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>Sual №</Label>
+          <Label>Sual â„–</Label>
           <Input type="number" value={formData.question_number} onChange={(e) => setFormData({ ...formData, question_number: parseInt(e.target.value) })} />
         </div>
         <div>
-          <Label>{tr("adminmentalhealth_sira_421c5f", "Sıra")}</Label>
+          <Label>{tr("adminmentalhealth_sira_421c5f", "SÄ±ra")}</Label>
           <Input type="number" value={formData.sort_order} onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })} />
         </div>
       </div>
@@ -176,7 +177,7 @@ const EPDSForm = ({ item, onSave }: {item: EPDSQuestion | null;onSave: (data: Pa
       </div>
       <div className="flex items-center gap-4">
         <Switch checked={formData.is_reverse_scored} onCheckedChange={(v) => setFormData({ ...formData, is_reverse_scored: v })} />
-        <Label>{tr("adminmentalhealth_tersine_hesablanir_dfe11e", "Tərsinə hesablanır")}</Label>
+        <Label>{tr("adminmentalhealth_tersine_hesablanir_dfe11e", "TÉ™rsinÉ™ hesablanÄ±r")}</Label>
         <Switch checked={formData.is_active} onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} />
         <Label>Aktiv</Label>
       </div>
@@ -187,6 +188,7 @@ const EPDSForm = ({ item, onSave }: {item: EPDSQuestion | null;onSave: (data: Pa
 
 // Mood Tab
 const MoodTab = () => {
+  const localize = useAdminLocalize();
   const { data: moods = [], create, update, remove } = useAdminMoodLevels();
   const [editItem, setEditItem] = useState<MoodLevel | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -247,7 +249,7 @@ const MoodForm = ({ item, onSave }: {item: MoodLevel | null;onSave: (data: Parti
     mood_value: item?.mood_value || 1,
     label: item?.label || '',
     label_az: item?.label_az || '',
-    emoji: item?.emoji || '😊',
+    emoji: item?.emoji || 'ðŸ˜Š',
     color: item?.color || '#22c55e',
     is_active: item?.is_active ?? true,
     sort_order: item?.sort_order || 0
@@ -257,7 +259,7 @@ const MoodForm = ({ item, onSave }: {item: MoodLevel | null;onSave: (data: Parti
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>{tr("adminmentalhealth_deyer_1_5_24b5f4", "Dəyər (1-5)")}</Label>
+          <Label>{tr("adminmentalhealth_deyer_1_5_24b5f4", "DÉ™yÉ™r (1-5)")}</Label>
           <Input type="number" min={1} max={5} value={formData.mood_value} onChange={(e) => setFormData({ ...formData, mood_value: parseInt(e.target.value) })} />
         </div>
         <div>
@@ -276,7 +278,7 @@ const MoodForm = ({ item, onSave }: {item: MoodLevel | null;onSave: (data: Parti
         </div>
       </div>
       <div>
-        <Label>{tr("adminmentalhealth_reng_8c6bc5", "Rəng")}</Label>
+        <Label>{tr("adminmentalhealth_reng_8c6bc5", "RÉ™ng")}</Label>
         <Input type="color" value={formData.color} onChange={(e) => setFormData({ ...formData, color: e.target.value })} />
       </div>
       <Button onClick={() => onSave(formData)} className="w-full">Yadda saxla</Button>
@@ -286,6 +288,7 @@ const MoodForm = ({ item, onSave }: {item: MoodLevel | null;onSave: (data: Parti
 
 // Breathing Tab
 const BreathingTab = () => {
+  const localize = useAdminLocalize();
   const { data: exercises = [], create, update, remove } = useAdminBreathingExercises();
   const [editItem, setEditItem] = useState<BreathingExercise | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -323,11 +326,11 @@ const BreathingTab = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Ad</TableHead>
-              <TableHead>{tr("adminmentalhealth_nefes_al_50ff18", "Nəfəs al")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_nefes_al_50ff18", "NÉ™fÉ™s al")}</TableHead>
               <TableHead>Saxla</TableHead>
-              <TableHead>{tr("adminmentalhealth_nefes_ver_6ccae7", "Nəfəs ver")}</TableHead>
-              <TableHead>{tr("adminmentalhealth_dovrler_24f55e", "Dövrlər")}</TableHead>
-              <TableHead>{tr("adminmentalhealth_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_nefes_ver_6ccae7", "NÉ™fÉ™s ver")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_dovrler_24f55e", "DÃ¶vrlÉ™r")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_emeliyyatlar_54d70c", "ÆmÉ™liyyatlar")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -388,7 +391,7 @@ const BreathingForm = ({ item, onSave }: {item: BreathingExercise | null;onSave:
       </div>
       <div className="grid grid-cols-4 gap-2">
         <div>
-          <Label>{tr("adminmentalhealth_nefes_al_s_197780", "Nəfəs al (s)")}</Label>
+          <Label>{tr("adminmentalhealth_nefes_al_s_197780", "NÉ™fÉ™s al (s)")}</Label>
           <Input type="number" value={formData.inhale_seconds} onChange={(e) => setFormData({ ...formData, inhale_seconds: parseInt(e.target.value) })} />
         </div>
         <div>
@@ -396,16 +399,16 @@ const BreathingForm = ({ item, onSave }: {item: BreathingExercise | null;onSave:
           <Input type="number" value={formData.hold_seconds} onChange={(e) => setFormData({ ...formData, hold_seconds: parseInt(e.target.value) })} />
         </div>
         <div>
-          <Label>{tr("adminmentalhealth_nefes_ver_s_119735", "Nəfəs ver (s)")}</Label>
+          <Label>{tr("adminmentalhealth_nefes_ver_s_119735", "NÉ™fÉ™s ver (s)")}</Label>
           <Input type="number" value={formData.exhale_seconds} onChange={(e) => setFormData({ ...formData, exhale_seconds: parseInt(e.target.value) })} />
         </div>
         <div>
-          <Label>{tr("adminmentalhealth_dovr_ce797b", "Dövr")}</Label>
+          <Label>{tr("adminmentalhealth_dovr_ce797b", "DÃ¶vr")}</Label>
           <Input type="number" value={formData.total_cycles} onChange={(e) => setFormData({ ...formData, total_cycles: parseInt(e.target.value) })} />
         </div>
       </div>
       <div>
-        <Label>{tr("adminmentalhealth_tesvir_az_2c237a", "Təsvir (AZ)")}</Label>
+        <Label>{tr("adminmentalhealth_tesvir_az_2c237a", "TÉ™svir (AZ)")}</Label>
         <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Description" />
       </div>
       <Button onClick={() => onSave(formData)} className="w-full">Yadda saxla</Button>
@@ -415,6 +418,7 @@ const BreathingForm = ({ item, onSave }: {item: BreathingExercise | null;onSave:
 
 // Noise Tab
 const NoiseTab = () => {
+  const localize = useAdminLocalize();
   const { data: thresholds = [], create, update, remove } = useAdminNoiseThresholds();
   const [editItem, setEditItem] = useState<NoiseThreshold | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -451,18 +455,18 @@ const NoiseTab = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{tr("adminmentalhealth_acar_644193", "Açar")}</TableHead>
-              <TableHead>{tr("adminmentalhealth_araliq_db_a88377", "Aralıq (dB)")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_acar_644193", "AÃ§ar")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_araliq_db_a88377", "AralÄ±q (dB)")}</TableHead>
               <TableHead>Etiket</TableHead>
               <TableHead>Emoji</TableHead>
-              <TableHead>{tr("adminmentalhealth_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_emeliyyatlar_54d70c", "ÆmÉ™liyyatlar")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {thresholds.map((t) =>
             <TableRow key={t.id}>
                 <TableCell>{t.threshold_key}</TableCell>
-                <TableCell>{t.min_db} - {t.max_db || '∞'} dB</TableCell>
+                <TableCell>{t.min_db} - {t.max_db || 'âˆž'} dB</TableCell>
                 <TableCell>{localize(t, 'label')}</TableCell>
                 <TableCell>{t.emoji}</TableCell>
                 <TableCell>
@@ -492,7 +496,7 @@ const NoiseForm = ({ item, onSave }: {item: NoiseThreshold | null;onSave: (data:
     label: item?.label || '',
     label_az: item?.label_az || '',
     color: item?.color || '#22c55e',
-    emoji: item?.emoji || '😊',
+    emoji: item?.emoji || 'ðŸ˜Š',
     description_az: item?.description_az || '',
     is_active: item?.is_active ?? true,
     sort_order: item?.sort_order || 0
@@ -501,7 +505,7 @@ const NoiseForm = ({ item, onSave }: {item: NoiseThreshold | null;onSave: (data:
   return (
     <div className="space-y-4">
       <div>
-        <Label>{tr("adminmentalhealth_acar_mes_silent_quiet_9eed69", "Açar (məs: silent, quiet)")}</Label>
+        <Label>{tr("adminmentalhealth_acar_mes_silent_quiet_9eed69", "AÃ§ar (mÉ™s: silent, quiet)")}</Label>
         <Input value={formData.threshold_key} onChange={(e) => setFormData({ ...formData, threshold_key: e.target.value })} />
       </div>
       <div className="grid grid-cols-2 gap-4">
@@ -526,7 +530,7 @@ const NoiseForm = ({ item, onSave }: {item: NoiseThreshold | null;onSave: (data:
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label>{tr("adminmentalhealth_reng_8c6bc5", "Rəng")}</Label>
+          <Label>{tr("adminmentalhealth_reng_8c6bc5", "RÉ™ng")}</Label>
           <Input type="color" value={formData.color || '#22c55e'} onChange={(e) => setFormData({ ...formData, color: e.target.value })} />
         </div>
         <div>
@@ -535,7 +539,7 @@ const NoiseForm = ({ item, onSave }: {item: NoiseThreshold | null;onSave: (data:
         </div>
       </div>
       <div>
-        <Label>{tr("adminmentalhealth_tesvir_az_2c237a", "Təsvir (AZ)")}</Label>
+        <Label>{tr("adminmentalhealth_tesvir_az_2c237a", "TÉ™svir (AZ)")}</Label>
         <LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Description" />
       </div>
       <Button onClick={() => onSave(formData)} className="w-full">Yadda saxla</Button>
@@ -598,7 +602,7 @@ const ResourcesTab = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg">{tr("adminmentalhealth_tecili_yardim_destek_resurslari_1ed147", "Təcili Yardım & Dəstək Resursları")}</CardTitle>
+        <CardTitle className="text-lg">{tr("adminmentalhealth_tecili_yardim_destek_resurslari_1ed147", "TÉ™cili YardÄ±m & DÉ™stÉ™k ResurslarÄ±")}</CardTitle>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button size="sm" onClick={() => {setEditItem(null);setFormData({ name: '', name_az: '', description: '', description_az: '', resource_type: 'hotline', phone: '', website: '', address: '', address_az: '', is_emergency: false, is_active: true, sort_order: 0 });}}>
@@ -615,25 +619,25 @@ const ResourcesTab = () => {
                 <div><Label>Ad (AZ)</Label><LocalizedInput formData={formData} setFormData={setFormData} field="name" label="Name" /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div><Label>{tr("adminmentalhealth_tesvir_en_c64521", "Təsvir (EN)")}</Label><Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} /></div>
-                <div><Label>{tr("adminmentalhealth_tesvir_az_2c237a", "Təsvir (AZ)")}</Label><LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Description" /></div>
+                <div><Label>{tr("adminmentalhealth_tesvir_en_c64521", "TÉ™svir (EN)")}</Label><Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} /></div>
+                <div><Label>{tr("adminmentalhealth_tesvir_az_2c237a", "TÉ™svir (AZ)")}</Label><LocalizedTextarea formData={formData} setFormData={setFormData} field="description" label="Description" /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Telefon</Label><Input value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} /></div>
                 <div><Label>Sayt</Label><Input value={formData.website} onChange={(e) => setFormData({ ...formData, website: e.target.value })} /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div><Label>{tr("adminmentalhealth_unvan_en_18f4d9", "Ünvan (EN)")}</Label><Input value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} /></div>
-                <div><Label>{tr("adminmentalhealth_unvan_az_9434ac", "Ünvan (AZ)")}</Label><LocalizedInput formData={formData} setFormData={setFormData} field="address" label="Address" /></div>
+                <div><Label>{tr("adminmentalhealth_unvan_en_18f4d9", "Ãœnvan (EN)")}</Label><Input value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} /></div>
+                <div><Label>{tr("adminmentalhealth_unvan_az_9434ac", "Ãœnvan (AZ)")}</Label><LocalizedInput formData={formData} setFormData={setFormData} field="address" label="Address" /></div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Tip</Label><Input value={formData.resource_type} onChange={(e) => setFormData({ ...formData, resource_type: e.target.value })} placeholder="hotline, clinic, support" /></div>
-                <div><Label>{tr("adminmentalhealth_sira_421c5f", "Sıra")}</Label><Input type="number" value={formData.sort_order} onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })} /></div>
+                <div><Label>{tr("adminmentalhealth_sira_421c5f", "SÄ±ra")}</Label><Input type="number" value={formData.sort_order} onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })} /></div>
               </div>
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <Switch checked={formData.is_emergency} onCheckedChange={(v) => setFormData({ ...formData, is_emergency: v })} />
-                  <Label>{tr("adminmentalhealth_tecili_ab784b", "Təcili")}</Label>
+                  <Label>{tr("adminmentalhealth_tecili_ab784b", "TÉ™cili")}</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch checked={formData.is_active} onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} />
@@ -652,18 +656,18 @@ const ResourcesTab = () => {
               <TableHead>Ad (AZ)</TableHead>
               <TableHead>Telefon</TableHead>
               <TableHead>Tip</TableHead>
-              <TableHead>{tr("adminmentalhealth_tecili_ab784b", "Təcili")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_tecili_ab784b", "TÉ™cili")}</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>{tr("adminmentalhealth_emeliyyat_580469", "Əməliyyat")}</TableHead>
+              <TableHead>{tr("adminmentalhealth_emeliyyat_580469", "ÆmÉ™liyyat")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {resources.map((r) =>
             <TableRow key={r.id}>
                 <TableCell className="font-medium">{r.name_az}</TableCell>
-                <TableCell>{r.phone || '—'}</TableCell>
+                <TableCell>{r.phone || 'â€”'}</TableCell>
                 <TableCell><Badge variant="outline">{r.resource_type}</Badge></TableCell>
-                <TableCell>{r.is_emergency ? <Badge className="bg-red-500">{tr("adminmentalhealth_tecili_ab784b", "Təcili")}</Badge> : '—'}</TableCell>
+                <TableCell>{r.is_emergency ? <Badge className="bg-red-500">{tr("adminmentalhealth_tecili_ab784b", "TÉ™cili")}</Badge> : 'â€”'}</TableCell>
                 <TableCell>{r.is_active ? <Badge className="bg-green-500">Aktiv</Badge> : <Badge variant="secondary">Deaktiv</Badge>}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">

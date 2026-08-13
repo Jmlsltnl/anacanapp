@@ -95,7 +95,11 @@ export const useSOSAlert = () => {
     }
   };
 
-  const sendSOS = async (message?: string, includeLocation: boolean = true) => {
+  const sendSOS = async (
+  message?: string,
+  includeLocation: boolean = true,
+  alertType: 'emergency' | 'birth' = 'emergency') =>
+  {
     if (!user) return { error: 'No user logged in' };
 
     setLoading(true);
@@ -116,13 +120,18 @@ export const useSOSAlert = () => {
         location = await getCurrentLocation();
       }
 
+      const isBirth = alertType === 'birth';
+      const defaultMessage = isBirth ?
+      tr("usesosalert_dogus_basladi_msg", "Do\u011Fu\u015F ba\u015Flad\u0131! X\u0259st\u0259xanaya getm\u0259 vaxt\u0131d\u0131r!") :
+      tr("usesosalert_teci_li_mene_komek_lazimdir_032838", "T\u018FC\u0130L\u0130! M\u0259n\u0259 k\xF6m\u0259k laz\u0131md\u0131r!");
+
       const { data, error } = await supabase.
       from('sos_alerts').
       insert({
         sender_id: user.id,
         receiver_id: partnerUserId,
-        alert_type: 'emergency',
-        message: message || tr("usesosalert_teci_li_mene_komek_lazimdir_032838", "T\u018FC\u0130L\u0130! M\u0259n\u0259 k\xF6m\u0259k laz\u0131md\u0131r!"),
+        alert_type: alertType,
+        message: message || defaultMessage,
         latitude: location?.latitude || null,
         longitude: location?.longitude || null,
         location_name: location?.locationName || null
@@ -132,21 +141,45 @@ export const useSOSAlert = () => {
 
       if (error) throw error;
 
-      // Also send a partner message for push notification
-      await supabase.from('partner_messages').insert({
-        sender_id: user.id,
-        receiver_id: partnerUserId,
-        message_type: 'sos_alert',
-        content: JSON.stringify({
-          type: 'sos_alert',
-          title: tr("usesosalert_tecili_xeberdarliq_5bfb41", "🆘 TƏCİLİ XƏBƏRDARLIQ!"),
-          body: message || tr("usesosalert_partnyorunuz_tecili_komek_iste_b7a70c", "Partnyorunuz t\u0259cili k\xF6m\u0259k ist\u0259yir!"),
-          alertId: data.id,
-          latitude: location?.latitude,
-          longitude: location?.longitude,
-          timestamp: new Date().toISOString()
-        })
-      });
+      const pushTitle = isBirth ?
+      tr("usesosalert_dogus_siqnali_title", "\uD83D\uDC76 DO\u011EU\u015E S\u0130QNALI!") :
+      tr("usesosalert_tecili_xeberdarliq_5bfb41", "🆘 TƏCİLİ XƏBƏRDARLIQ!");
+      const pushBody = message || (isBirth ?
+      tr("usesosalert_dogus_basladi_push_body", "Sanc\u0131lar ba\u015Flad\u0131 \u2014 d\u0259rhal \u0259laq\u0259 saxla!") :
+      tr("usesosalert_partnyorunuz_tecili_komek_iste_b7a70c", "Partnyorunuz t\u0259cili k\xF6m\u0259k ist\u0259yir!"));
+
+      // Also send a partner message for in-app notification
+      try {
+        await supabase.from('partner_messages').insert({
+          sender_id: user.id,
+          receiver_id: partnerUserId,
+          message_type: isBirth ? 'birth_alert' : 'sos_alert',
+          content: JSON.stringify({
+            type: isBirth ? 'birth_alert' : 'sos_alert',
+            title: pushTitle,
+            body: pushBody,
+            alertId: data.id,
+            latitude: location?.latitude,
+            longitude: location?.longitude,
+            timestamp: new Date().toISOString()
+          })
+        });
+      } catch (msgErr) {
+        console.warn('partner_messages insert failed (sos):', msgErr);
+      }
+
+      // Kritik hadisə: tətbiq bağlı olsa belə çatsın (FCM push)
+      try {
+        const { invokeSendPush } = await import('@/lib/push');
+        await invokeSendPush({
+          userId: partnerUserId,
+          title: pushTitle,
+          body: pushBody,
+          data: { type: isBirth ? 'birth_alert' : 'sos_alert', alertId: data.id }
+        });
+      } catch (pushErr) {
+        console.warn('SOS push failed:', pushErr);
+      }
 
       await fetchAlerts();
       return { data, error: null };

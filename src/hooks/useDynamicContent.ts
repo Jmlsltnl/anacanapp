@@ -132,18 +132,23 @@ export const useBabyNames = () => {
   return useQuery({
     queryKey: ['baby_names', language],
     queryFn: async () => {
-      let query = supabase
+      // Hər dil öz ad dəstini görür: az→Azərbaycan, tr→Türk, ru→Rus, en→beynəlxalq.
+      // lang sütunu 20260813150020 migrasiyası ilə gəlir; köhnə DB-lərdə (sütun yoxdursa)
+      // origin_en markerinə fallback edirik.
+      const targetLang = ['az', 'en', 'ru', 'tr'].includes(language) ? language : 'az';
+      let { data, error } = await (supabase as any)
         .from('baby_names_db')
         .select('*')
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .eq('lang', targetLang)
+        .order('popularity', { ascending: false });
 
-      if (language === 'en') {
-        query = query.not('origin_en', 'is', null);
-      } else {
-        query = query.is('origin_en', null);
+      if (error && /lang/.test(error.message || '')) {
+        // Fallback: lang sütunu hələ yoxdur (migrasiya tətbiq olunmayıb)
+        let q = supabase.from('baby_names_db').select('*').eq('is_active', true);
+        q = language === 'en' ? q.not('origin_en', 'is', null) : q.is('origin_en', null);
+        ({ data, error } = await q.order('popularity', { ascending: false }));
       }
-
-      const { data, error } = await query.order('popularity', { ascending: false });
 
       if (error) throw error;
       return mapRowsTranslation(data, language, ['meaning', 'origin']) as BabyName[];

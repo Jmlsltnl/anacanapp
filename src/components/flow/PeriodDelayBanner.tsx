@@ -56,30 +56,31 @@ const PeriodDelayBanner = () => {
   if (delayDays < 3) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl p-4 bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-900/30 dark:to-pink-900/30 border border-rose-200 dark:border-rose-800">
-      
-      <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-900/50 flex items-center justify-center flex-shrink-0">
-          <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400" />
-        </div>
-        <div className="flex-1">
-          <h4 className="font-bold text-foreground text-sm mb-0.5">{tr("perioddelaybanner_period_late", "Periodunuz {days} gün gecikir").replace("{days}", String(delayDays))}</h4>
-          <p className="text-xs text-muted-foreground leading-snug mb-3">
-            {tr("perioddelaybanner_avg_cycle_desc", "Orta tsikliniz {days} gündür. Stress, çəki dəyişikliyi, hormonal dalğalanma və ya hamiləlik səbəb ola bilər. Hamiləlik testi etməyi düşünün.").replace("{days}", String(avgCycle))}
-          </p>
-          <button
-            onClick={() => navigate(`/ai-chat?prompt=${encodeURIComponent(`${tr("flow_period_delay_prompt_1", "Periodum")} ${delayDays} ${tr("flow_period_delay_prompt_2", "gün gecikib, nə edə bilərəm?")}`)}`)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 transition-colors">
-            
-            <MessageCircle className="w-3.5 h-3.5" />
-            {tr("perioddelaybanner_dr_anacan_dan_sorus_1fb5f1", "Dr. Anacan-dan soru\u015F")}
-          </button>
-        </div>
-      </div>
-    </motion.div>);
+    <section className="a-section" style={{ marginTop: 8 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="a-alert-card a-fade-in">
+        
+        <span className="a-alert-eyebrow">
+          <AlertCircle size={13} strokeWidth={2.3} /> {tr("flow_cycle_alert", "Tsikl xəbərdarlığı")}
+        </span>
+        <h1 className="a-alert-headline a-heading">
+          {tr("perioddelaybanner_period_late", "Periodunuz {days} gün gecikir").replace("{days}", String(delayDays))}
+        </h1>
+        <p className="a-alert-text">
+          {tr("perioddelaybanner_avg_cycle_desc", "Orta tsikliniz {days} gündür. Stress, çəki dəyişikliyi, hormonal dalğalanma və ya hamiləlik səbəb ola bilər. Hamiləlik testi etməyi düşünün.").replace("{days}", String(avgCycle))}
+        </p>
+        <button
+          onClick={() => navigate(`/ai-chat?prompt=${encodeURIComponent(`${tr("flow_period_delay_prompt_1", "Periodum")} ${delayDays} ${tr("flow_period_delay_prompt_2", "gün gecikib, nə edə bilərəm?")}`)}`)}
+          className="a-cta-btn"
+          style={{ background: 'var(--a-pink-2)' }}>
+          
+          <MessageCircle size={14} strokeWidth={2.2} />
+          {tr("perioddelaybanner_dr_anacan_dan_sorus_1fb5f1", "Dr. Anacan-dan soru\u015F")}
+        </button>
+      </motion.div>
+    </section>);
 
 };
 

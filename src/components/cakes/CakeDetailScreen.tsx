@@ -1,9 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Minus, Plus, ShoppingCart, Cake as CakeIcon, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { type Cake } from '@/hooks/useCakes';
 import { useCakeCart } from '@/hooks/useCakeCart';
@@ -64,28 +61,32 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
   };
 
   return (
-    <div className="min-h-screen bg-background pb-44 overflow-y-auto">
+    <div className="a-scope min-h-screen pb-44 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
       {/* Sticky Header */}
       <div
-        className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-card/80 backdrop-blur-md border-b border-border/30"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)' }}>
+        className="sticky top-0 z-50 flex items-center justify-between px-4 py-3"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 12px)', background: 'var(--a-nav-bg)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--a-line)' }}>
         
         <button
           onClick={(e) => {e.stopPropagation();onBack();}}
-          className="w-10 h-10 rounded-full bg-muted/60 flex items-center justify-center"
-          style={{ pointerEvents: 'auto' }}>
+          className="a-icon-btn"
+          style={{ pointerEvents: 'auto' }}
+          aria-label="Back">
           
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+          <ArrowLeft size={16} strokeWidth={2} />
         </button>
-        <h2 className="text-sm font-bold text-foreground truncate max-w-[50%]">{cake.name}</h2>
+        <h2 className="a-wordmark truncate max-w-[50%]" style={{ fontSize: 15 }}>{cake.name}</h2>
         <button
           onClick={(e) => {e.stopPropagation();onOpenCart();}}
-          className="relative w-10 h-10 rounded-full bg-muted/60 flex items-center justify-center"
-          style={{ pointerEvents: 'auto' }}>
+          className="a-icon-btn relative"
+          style={{ pointerEvents: 'auto' }}
+          aria-label="Cart">
           
-          <ShoppingCart className="w-5 h-5 text-foreground" />
+          <ShoppingCart size={16} strokeWidth={2} />
           {totalItems > 0 &&
-          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+          <span
+            className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center"
+            style={{ background: 'var(--a-peach-2)', color: '#fff' }}>
               {totalItems}
             </span>
           }
@@ -94,7 +95,8 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
 
       {/* Image Carousel */}
       <div
-        className="relative w-full aspect-square bg-muted/30 overflow-hidden"
+        className="relative w-full aspect-square overflow-hidden"
+        style={{ background: 'var(--a-surface-soft)' }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}>
@@ -114,7 +116,7 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
           </AnimatePresence> :
 
         <div className="w-full h-full flex items-center justify-center">
-            <CakeIcon className="w-20 h-20 text-primary/15" />
+            <CakeIcon className="w-20 h-20" style={{ color: 'var(--a-peach-1)' }} />
           </div>
         }
 
@@ -123,15 +125,17 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
         <>
             <button
             onClick={goToPrev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/70 backdrop-blur flex items-center justify-center shadow-md">
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center shadow-md"
+            style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)', border: 'none', cursor: 'pointer' }}>
             
-              <ChevronLeft className="w-5 h-5 text-foreground" />
+              <ChevronLeft className="w-5 h-5" style={{ color: 'var(--a-ink)' }} />
             </button>
             <button
             onClick={goToNext}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-background/70 backdrop-blur flex items-center justify-center shadow-md">
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center shadow-md"
+            style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)', border: 'none', cursor: 'pointer' }}>
             
-              <ChevronRight className="w-5 h-5 text-foreground" />
+              <ChevronRight className="w-5 h-5" style={{ color: 'var(--a-ink)' }} />
             </button>
           </>
         }
@@ -143,9 +147,12 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
           <button
             key={i}
             onClick={() => setCurrentImageIndex(i)}
-            className={`w-2 h-2 rounded-full transition-all ${
-            i === currentImageIndex ? 'bg-primary w-5' : 'bg-background/60'}`
-            } />
+            className="h-2 rounded-full transition-all"
+            style={{
+              width: i === currentImageIndex ? 20 : 8,
+              background: i === currentImageIndex ? 'var(--a-peach-2)' : 'rgba(255,255,255,0.7)',
+              border: 'none', cursor: 'pointer'
+            }} />
 
           )}
           </div>
@@ -153,48 +160,50 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
 
         {/* Badge */}
         {cake.category === 'month' && cake.month_number &&
-        <span className="absolute top-3 left-3 px-3 py-1 bg-primary/90 rounded-full text-xs font-bold text-primary-foreground shadow">
+        <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold shadow" style={{ background: 'var(--a-peach-2)', color: '#fff' }}>
             {tr(`common_month_label_${cake.month_number}`, `${cake.month_number}-ci ay`)}
           </span>
         }
         {cake.category === 'milestone' && cake.milestone_label &&
-        <span className="absolute top-3 left-3 px-3 py-1 bg-accent rounded-full text-xs font-bold text-accent-foreground shadow">
+        <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold shadow" style={{ background: 'var(--a-yellow-2)', color: '#5a3d00' }}>
             {cake.milestone_label}
           </span>
         }
       </div>
 
       {/* Content */}
-      <div className="px-4 pt-5 space-y-5">
+      <div className="a-shell pt-5 space-y-4">
         {/* Title & Price Row */}
         <div>
-          <h1 className="text-xl font-black text-foreground leading-tight">{cake.name}</h1>
+          <h1 className="text-xl leading-tight a-heading" style={{ margin: 0, color: 'var(--a-ink)' }}>{cake.name}</h1>
           {cake.description &&
-          <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{cake.description}</p>
+          <p className="text-sm mt-2 leading-relaxed" style={{ margin: '8px 0 0', color: 'var(--a-body-text)' }}>{cake.description}</p>
           }
           <div className="mt-3">
-            <span className="text-2xl font-black text-primary">{cake.price}₼</span>
+            <span className="a-heading" style={{ fontSize: 24, color: 'var(--a-accent-ink)' }}>{cake.price}₼</span>
           </div>
         </div>
 
         {/* Quantity */}
-        <div className="bg-card rounded-2xl p-4 border border-border/50">
-          <Label className="text-sm font-semibold mb-3 block">{tr("cakedetailscreen_say_secin_431dab", "Say seçin")}</Label>
+        <div className="a-card">
+          <p className="text-sm font-bold mb-3" style={{ margin: '0 0 12px', color: 'var(--a-ink)' }}>{tr("cakedetailscreen_say_secin_431dab", "Say seçin")}</p>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center active:scale-95 transition-transform">
+              className="w-11 h-11 rounded-2xl flex items-center justify-center active:scale-95 transition-transform"
+              style={{ background: 'var(--a-surface-soft)', border: 'none', cursor: 'pointer', color: 'var(--a-ink)' }}>
               
               <Minus className="w-4 h-4" />
             </button>
-            <span className="text-xl font-black w-10 text-center text-foreground">{quantity}</span>
+            <span className="a-heading w-10 text-center" style={{ fontSize: 20, color: 'var(--a-ink)' }}>{quantity}</span>
             <button
               onClick={() => setQuantity(quantity + 1)}
-              className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center active:scale-95 transition-transform">
+              className="w-11 h-11 rounded-2xl flex items-center justify-center active:scale-95 transition-transform"
+              style={{ background: 'var(--a-peach-1)', border: 'none', cursor: 'pointer', color: 'var(--a-accent-ink)' }}>
               
               <Plus className="w-4 h-4" />
             </button>
-            <span className="ml-auto text-lg font-bold text-muted-foreground">
+            <span className="ml-auto text-lg font-bold" style={{ color: 'var(--a-ink-soft)' }}>
               {(cake.price * quantity).toFixed(2)}₼
             </span>
           </div>
@@ -202,16 +211,16 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
 
         {/* Custom Fields */}
         {showCustomFields &&
-        <div className="bg-card rounded-2xl p-4 border border-border/50 space-y-3">
-            <Label className="text-sm font-semibold">{tr("cakedetailscreen_ferdilesdirme_cc39bc", "✨ Fərdiləşdirmə")}</Label>
+        <div className="a-card space-y-3">
+            <p className="text-sm font-bold" style={{ margin: 0, color: 'var(--a-ink)' }}>{tr("cakedetailscreen_ferdilesdirme_cc39bc", "✨ Fərdiləşdirmə")}</p>
             {fieldLabels.map((label) =>
           <div key={label}>
-                <Label className="text-xs text-muted-foreground">{label}</Label>
-                <Input
+                <label className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>{label}</label>
+                <input
+              className="a-input w-full mt-1"
               value={customFields[label] || ''}
               onChange={(e) => setCustomFields({ ...customFields, [label]: e.target.value })}
-              placeholder={label}
-              className="mt-1" />
+              placeholder={label} />
             
               </div>
           )}
@@ -225,9 +234,10 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
           <button
             key={i}
             onClick={() => setCurrentImageIndex(i)}
-            className={`flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${
-            i === currentImageIndex ? 'border-primary shadow-md' : 'border-transparent opacity-60'}`
-            }>
+            className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden transition-all"
+            style={i === currentImageIndex ?
+            { border: '2px solid var(--a-peach-2)', boxShadow: 'var(--a-card-shadow)', cursor: 'pointer' } :
+            { border: '2px solid transparent', opacity: 0.6, cursor: 'pointer' }}>
             
                 <img src={img} alt="" className="w-full h-full object-cover" />
               </button>
@@ -238,16 +248,17 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
 
       {/* Fixed Bottom CTA - above BottomNav */}
       <div
-        className="fixed left-0 right-0 z-40 bg-card/90 backdrop-blur-md border-t border-border/30 px-4 py-3"
-        style={{ bottom: 'calc(72px + env(safe-area-inset-bottom))' }}>
+        className="fixed left-0 right-0 z-40 px-4 py-3"
+        style={{ bottom: 'calc(72px + env(safe-area-inset-bottom))', background: 'var(--a-nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid var(--a-line)' }}>
         
-        <Button
-          className="w-full h-14 text-base font-bold rounded-2xl"
+        <button
+          className="a-cta-btn w-full"
+          style={{ justifyContent: 'center', height: 52, fontSize: 14 }}
           onClick={handleAddToCart}>
           
-          <ShoppingCart className="w-5 h-5 mr-2" />
+          <ShoppingCart size={18} strokeWidth={2.2} />
           {tr("cakedetailscreen_sebete_elave_et_074411", "S\u0259b\u0259t\u0259 \u0259lav\u0259 et \u2014")} {(cake.price * quantity).toFixed(2)}₼
-        </Button>
+        </button>
       </div>
     </div>);
 

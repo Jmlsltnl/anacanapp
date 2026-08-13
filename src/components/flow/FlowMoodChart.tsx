@@ -45,9 +45,9 @@ const FlowMoodChart = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-2xl p-4 border border-border animate-pulse">
-        <div className="h-6 bg-muted rounded w-1/3 mb-4" />
-        <div className="h-40 bg-muted rounded" />
+      <div className="a-card animate-pulse">
+        <div style={{ height: 24, width: '33%', borderRadius: 8, background: 'var(--a-surface-soft)', marginBottom: 14 }} />
+        <div style={{ height: 150, borderRadius: 16, background: 'var(--a-surface-soft)' }} />
       </div>);
 
   }
@@ -56,7 +56,7 @@ const FlowMoodChart = () => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+        <div className="rounded-lg p-3" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line-strong)', boxShadow: 'var(--a-card-shadow)' }}>
           <p className="text-sm font-medium text-foreground mb-2">
             {format(parseISO(data.date), 'd MMMM', { locale: getCurrentDateLocale() })}
           </p>
@@ -85,32 +85,39 @@ const FlowMoodChart = () => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl p-4 border border-border">
+      className="a-card a-fade-in">
       
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-foreground flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-purple-500" />
-          {tr("flowmoodchart_ehval_qrafiki_fe3531", "\u018Fhval Qrafiki")}
-        </h3>
-        <span className="text-xs text-muted-foreground">{tr("flowmoodchart_son_14_gun_6be43a", "Son 14 gün")}</span>
+      <div className="a-card-head" style={{ marginBottom: 4 }}>
+        <h3 className="a-card-title a-heading">{tr("flowmoodchart_ehval_qrafiki_fe3531", "\u018Fhval Qrafiki")}</h3>
+        <span className="a-section-link" style={{ color: 'var(--a-ink-soft)' }}>{tr("flowmoodchart_son_14_gun_6be43a", "Son 14 gün")}</span>
       </div>
 
+      <p className="a-today-info-eyebrow" style={{ margin: '0 0 14px' }}>
+        {tr("flowmoodchart_ehval_qrafiki_fe3531", "\u018Fhval Qrafiki")} · {tr("flowmoodchart_son_14_gun_6be43a", "Son 14 gün")}
+      </p>
+
       {/* Stats Summary */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-3 text-center">
-          <Smile className="w-5 h-5 text-pink-500 mx-auto mb-1" />
-          <p className="text-lg font-bold text-foreground">{averages.mood}</p>
-          <p className="text-[10px] text-muted-foreground">{tr("flowmoodchart_orta_ehval_d444a0", "Orta Əhval")}</p>
+      <div className="a-trio" style={{ marginBottom: 14 }}>
+        <div className="a-trio-item" style={{ border: 'none', boxShadow: 'none', background: 'var(--a-surface-soft)' }}>
+          <span className="a-trio-icon" style={{ background: 'var(--a-grad-pink)', color: 'var(--a-berry-ink)' }}>
+            <Smile size={16} strokeWidth={2} />
+          </span>
+          <p className="a-trio-value">{averages.mood}</p>
+          <p className="a-trio-label">{tr("flowmoodchart_orta_ehval_d444a0", "Orta Əhval")}</p>
         </div>
-        <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 text-center">
-          <Zap className="w-5 h-5 text-amber-500 mx-auto mb-1" />
-          <p className="text-lg font-bold text-foreground">{averages.energy}</p>
-          <p className="text-[10px] text-muted-foreground">{tr("untranslated_orta_enerji_ojxdi0", "Orta Enerji")}</p>
+        <div className="a-trio-item" style={{ border: 'none', boxShadow: 'none', background: 'var(--a-surface-soft)' }}>
+          <span className="a-trio-icon" style={{ background: 'var(--a-grad-yellow)', color: 'var(--a-warn-ink)' }}>
+            <Zap size={16} strokeWidth={2} />
+          </span>
+          <p className="a-trio-value">{averages.energy}</p>
+          <p className="a-trio-label">{tr("untranslated_orta_enerji_ojxdi0", "Orta Enerji")}</p>
         </div>
-        <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-3 text-center">
-          <Heart className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
-          <p className="text-lg font-bold text-foreground">{averages.totalLogs}</p>
-          <p className="text-[10px] text-muted-foreground">{tr("flowmoodchart_qeyd_sayi_3b2708", "Qeyd Sayı")}</p>
+        <div className="a-trio-item" style={{ border: 'none', boxShadow: 'none', background: 'var(--a-surface-soft)' }}>
+          <span className="a-trio-icon" style={{ background: 'var(--a-grad-lav)', color: 'var(--a-lav-ink)' }}>
+            <Heart size={16} strokeWidth={2} />
+          </span>
+          <p className="a-trio-value">{averages.totalLogs}</p>
+          <p className="a-trio-label">{tr("flowmoodchart_qeyd_sayi_3b2708", "Qeyd Sayı")}</p>
         </div>
       </div>
 
@@ -164,8 +171,8 @@ const FlowMoodChart = () => {
 
       <div className="h-40 flex items-center justify-center">
           <div className="text-center">
-            <Smile className="w-10 h-10 text-muted-foreground/50 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">
+            <Smile size={36} style={{ color: 'var(--a-ink-faint)', margin: '0 auto 8px' }} />
+            <p className="a-list-sub" style={{ margin: 0 }}>
               {tr("flowmoodchart_ehval_qeydleri_elave_edin_f86771", "\u018Fhval qeydl\u0259ri \u0259lav\u0259 edin")}
             </p>
           </div>
@@ -173,15 +180,13 @@ const FlowMoodChart = () => {
       }
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-4 mt-3 pt-3 border-t border-border">
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-pink-500" />
-          <span className="text-xs text-muted-foreground">{tr("flowmoodchart_ehval_0457f9", "Əhval")}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-full bg-amber-500" />
-          <span className="text-xs text-muted-foreground">{tr("untranslated_enerji_q6zcss", "Enerji")}</span>
-        </div>
+      <div className="a-legend-row" style={{ justifyContent: 'center' }}>
+        <span className="a-legend-item">
+          <span className="a-legend-dot" style={{ background: '#ec4899' }} /> {tr("flowmoodchart_ehval_0457f9", "Əhval")}
+        </span>
+        <span className="a-legend-item">
+          <span className="a-legend-dot" style={{ background: '#f59e0b' }} /> {tr("untranslated_enerji_q6zcss", "Enerji")}
+        </span>
       </div>
     </motion.div>);
 

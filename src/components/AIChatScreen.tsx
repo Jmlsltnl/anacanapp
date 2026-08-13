@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, forwardRef } from 'react';
+import { useState, useRef, useEffect, forwardRef, memo, useCallback } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sparkles, User, Bot, Loader2, RefreshCw } from 'lucide-react';
+import { Send, Sparkles, User, Bot, Loader2, RefreshCw, X, ChevronDown, ChevronUp, Copy, Check, Square, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import { useUserStore } from '@/store/userStore';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
@@ -23,6 +24,8 @@ import { useChildren } from '@/hooks/useChildren';
 import { useMealLogs } from '@/hooks/useMealLogs';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
 import { useKickSessions } from '@/hooks/useKickSessions';
+import { useSubscription } from '@/hooks/useSubscription';
+import PremiumModal from '@/components/PremiumModal';
 import MarkdownContent from './MarkdownContent';
 import { tr } from "@/lib/tr";
 
@@ -34,6 +37,71 @@ interface Message {
   isStreaming?: boolean;
 }
 
+/**
+ * Memo-lu mesaj sətri — streaming zamanı YALNIZ aktiv mesaj yenidən render olunur.
+ * Uzun tarixçələrdə markdown parse yükünü kəskin azaldır (peşəkar chat sürəti).
+ */
+const ChatMessageRow = memo(({ message, copied, onCopy }: {
+  message: Message;
+  copied: boolean;
+  onCopy: (id: string, content: string) => void;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.18 }}
+    className={`a-chat-msg-row${message.role === 'user' ? ' user' : ''}`}>
+
+    <span className={`a-chat-avatar${message.role === 'user' ? ' user' : ''}`}>
+      {message.role === 'user' ?
+      <User size={13} strokeWidth={2.2} /> :
+      <Bot size={13} strokeWidth={2.2} />}
+    </span>
+    <div className="a-chat-bubble-wrap">
+      <div className={`a-chat-bubble ${message.role === 'user' ? 'user' : 'ai'}`}>
+        {/* Typing göstəricisi — ilk token gələnə qədər 3 nöqtə */}
+        {message.isStreaming && !message.content ?
+        <span className="inline-flex items-center gap-1 py-1" aria-label={tr('aichat_thinking', 'Düşünür...')}>
+            {[0, 1, 2].map((i) =>
+          <motion.span
+            key={i}
+            className="inline-block w-1.5 h-1.5 rounded-full"
+            style={{ background: 'var(--a-peach-2)' }}
+            animate={{ opacity: [0.25, 1, 0.25], y: [0, -2, 0] }}
+            transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.15 }} />
+          )}
+          </span> :
+        message.role === 'assistant' ?
+        <MarkdownContent content={message.content} variant="chat" /> :
+        <span className="whitespace-pre-wrap">{message.content}</span>}
+        {message.isStreaming && message.content &&
+        <motion.span
+          className="inline-block w-1.5 h-3.5 ml-1 align-middle"
+          style={{ background: 'var(--a-peach-2)', borderRadius: 2 }}
+          animate={{ opacity: [1, 0.2] }}
+          transition={{ duration: 0.55, repeat: Infinity }} />}
+      </div>
+      {!message.isStreaming &&
+      <span className="a-chat-time" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          {message.timestamp.toLocaleTimeString(getLocaleTag(), { hour: '2-digit', minute: '2-digit' })}
+          {/* Kopyala — text seçimi bağlı olduğu üçün vacibdir */}
+          {message.role === 'assistant' && message.content &&
+        <button
+          type="button"
+          onClick={() => onCopy(message.id, message.content)}
+          aria-label={tr('aichat_copy', 'Kopyala')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: 'inherit', display: 'inline-flex', alignItems: 'center', gap: 3, opacity: 0.75 }}>
+              {copied ?
+          <><Check size={11} strokeWidth={2.4} style={{ color: 'var(--a-green-ink)' }} /><span style={{ fontSize: 9.5, color: 'var(--a-green-ink)', fontWeight: 700 }}>{tr('aichat_copied', 'Kopyalandı')}</span></> :
+          <Copy size={11} strokeWidth={2.2} />}
+            </button>}
+        </span>}
+    </div>
+  </motion.div>
+));
+ChatMessageRow.displayName = 'ChatMessageRow';
+
 const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   useScrollToTop();
   useScreenAnalytics('AIChat', 'Chat');
@@ -41,12 +109,79 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const { checkAndConsume } = useSubscription();
   const [isInitialized, setIsInitialized] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Tibbi xəbərdarlıq banneri: default YIĞILMIŞ, toxununca açılır, X ilə birdəfəlik bağlanır
+  const [warnExpanded, setWarnExpanded] = useState(false);
+  const [warnVisible, setWarnVisible] = useState(() => {
+    try {return !localStorage.getItem('anacan_ai_warn_dismissed');} catch {return true;}
+  });
+  const dismissWarn = () => {
+    setWarnVisible(false);
+    try {localStorage.setItem('anacan_ai_warn_dismissed', '1');} catch {/* boş */}
+  };
+
+  // ── Peşəkar scroll sistemi (ChatGPT/Claude davranışı) ──
+  // pinned = istifadəçi dibdədir → streaming zamanı avtomatik aşağıda qalır.
+  // Yuxarı sürüşdürsə → pin açılır, məcburi scroll YOXDUR, "aşağı" düyməsi görünür.
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const pinnedRef = useRef(true);
+  const [showJumpDown, setShowJumpDown] = useState(false);
+
+  const scrollToBottom = (smooth = false) => {
+    const el = viewportRef.current;
+    if (!el) return;
+    if (smooth) {
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    } else {
+      el.scrollTop = el.scrollHeight;
+    }
+  };
+
+  const handleViewportScroll = () => {
+    const el = viewportRef.current;
+    if (!el) return;
+    const distance = el.scrollHeight - el.scrollTop - el.clientHeight;
+    const pinned = distance < 90;
+    pinnedRef.current = pinned;
+    setShowJumpDown(!pinned);
+  };
+
+  // Streaming zamanı hər token-də: pinned-disə dibdə saxla (rAF ilə, jitter-siz)
+  useEffect(() => {
+    if (!pinnedRef.current) return;
+    const raf = requestAnimationFrame(() => scrollToBottom(false));
+    return () => cancelAnimationFrame(raf);
+  }, [messages]);
+
+  // İlk yüklənmədə (tarixçə bərpasında) dərhal dibə düş
+  useEffect(() => {
+    if (isInitialized) {
+      requestAnimationFrame(() => scrollToBottom(false));
+    }
+  }, [isInitialized]);
+
+  // Cavabı yarıda saxlamaq üçün
+  const abortRef = useRef<AbortController | null>(null);
+  // Kopyalama feedback-i
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
   const { lifeStage, getPregnancyData, name, dueDate, babyName, babyBirthDate, lastPeriodDate, cycleLength, periodLength, language } = useUserStore();
   const { user } = useAuth();
   const { messages: savedMessages, addMessage, clearHistory, loading: historyLoading } = useAIChatHistory('woman');
   const { toast } = useToast();
+
+  const copyMessage = useCallback(async (id: string, content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 1600);
+    } catch {
+      toast({ title: tr('aichat_copy_failed', 'Kopyalanmadı'), variant: 'destructive' });
+    }
+  }, [toast]);
   
   const { todayLogs: babyTodayLogs } = useBabyLogs();
   const { todayLog: motherTodayLog } = useDailyLogs();
@@ -145,27 +280,27 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   };
 
 
-  // Auto-scroll to bottom only when a new message is added.
-  // This allows the user to read long AI responses from the top down while they stream.
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      if (scrollRef.current) {
-        // ScrollArea uses a viewport div inside
-        const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        if (viewport) {
-          viewport.scrollTop = viewport.scrollHeight;
-        }
-      }
-    });
-  }, [messages.length]);
+  const sendMessage = async (rawText: string) => {
+    const text = rawText.trim();
+    if (!text || isLoading) return;
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    // Pulsuz plan: gündəlik sual limiti (paywall "Limitsiz AI" vədinin real tətbiqi)
+    const { allowed, remaining } = await checkAndConsume('ai_chat');
+    if (!allowed) {
+      setShowPremiumModal(true);
+      return;
+    }
+    if (Number.isFinite(remaining) && remaining <= 2) {
+      toast({
+        title: tr('aichat_limit_warn_title', 'Pulsuz limit azalır'),
+        description: tr('aichat_limit_warn_desc', 'Bu gün {n} pulsuz sualınız qalıb. Premium ilə limitsizdir.').replace('{n}', String(remaining))
+      });
+    }
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: input.trim(),
+      content: text,
       timestamp: new Date()
     };
 
@@ -179,11 +314,20 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       isStreaming: true
     }]);
 
-    // Save user message to database
-    await addMessage('user', userMessage.content);
+    // Öz mesajını göndərəndə HƏMİŞƏ dibə düş (peşəkar chat davranışı)
+    pinnedRef.current = true;
+    setShowJumpDown(false);
+    requestAnimationFrame(() => scrollToBottom(false));
+
+    // DB yazısı arxa planda — sorğunu GECİKDİRMİR (əvvəllər await edilirdi)
+    void addMessage('user', text).catch((e) => console.error('addMessage error:', e));
 
     setInput('');
     setIsLoading(true);
+
+    // Stop düyməsi üçün abort controller
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     try {
       const conversationHistory = messages.
@@ -195,7 +339,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
       conversationHistory.push({
         role: 'user',
-        content: userMessage.content
+        content: text
       });
 
       // Use fetch for streaming support — must use the user's session JWT, not the anon key
@@ -205,6 +349,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       }
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dr-anacan-chat`, {
         method: 'POST',
+        signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
@@ -353,22 +498,43 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           await addMessage('assistant', data.message);
         }
       }
-    } catch (error) {
-      console.error('Chat error:', error);
-      toast({
-        title: tr("aichatscreen_xeta_3cdbb6", 'Xəta'),
-        description: tr("aichatscreen_mesaj_gonderile_bilmedi_yeniden_cehd_edi_aa6662", 'Mesaj göndərilə bilmədi. Yenidən cəhd edin.'),
-        variant: 'destructive'
-      });
+    } catch (error: any) {
+      // Stop düyməsi ilə dayandırıldı — qismən cavabı saxla, xəta göstərmə
+      if (error?.name === 'AbortError') {
+        setMessages((prev) => {
+          const target = prev.find((m) => m.id === assistantMessageId);
+          const partial = target?.content || '';
+          if (partial) {
+            void addMessage('assistant', partial).catch(() => {});
+            return prev.map((m) => m.id === assistantMessageId ? { ...m, isStreaming: false } : m);
+          }
+          // Heç nə gəlməmişdisə boş bubble-ı sil
+          return prev.filter((m) => m.id !== assistantMessageId);
+        });
+      } else {
+        console.error('Chat error:', error);
+        toast({
+          title: tr("aichatscreen_xeta_3cdbb6", 'Xəta'),
+          description: tr("aichatscreen_mesaj_gonderile_bilmedi_yeniden_cehd_edi_aa6662", 'Mesaj göndərilə bilmədi. Yenidən cəhd edin.'),
+          variant: 'destructive'
+        });
 
-      setMessages((prev) => prev.map((m) =>
-      m.id === assistantMessageId ?
-      { ...m, isStreaming: false, content: tr("aichatscreen_bagislayin_texniki_xeta_bas_verdi_zehmet_feb7d7", "Bağışlayın, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd edin. 🙏") } :
-      m
-      ));
+        setMessages((prev) => prev.map((m) =>
+        m.id === assistantMessageId ?
+        { ...m, isStreaming: false, content: tr("aichatscreen_bagislayin_texniki_xeta_bas_verdi_zehmet_feb7d7", "Bağışlayın, texniki xəta baş verdi. Zəhmət olmasa yenidən cəhd edin. 🙏") } :
+        m
+        ));
+      }
     } finally {
+      abortRef.current = null;
       setIsLoading(false);
     }
+  };
+
+  const handleSend = () => sendMessage(input);
+
+  const stopGeneration = () => {
+    abortRef.current?.abort();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -412,146 +578,188 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
 
   return (
-    <div ref={ref} className="fixed inset-0 bottom-[80px] flex flex-col bg-gradient-to-b from-background to-muted/20" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-      {/* Compact Header */}
-      <div className="px-4 pb-2 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between safe-area-top">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center">
-            <Sparkles className="w-4.5 h-4.5 text-white" />
-          </div>
-          <div>
-            <h1 className="font-bold text-sm text-foreground">Anacan.AI</h1>
-            <div className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-              <span className="text-[10px] text-muted-foreground">{tr("untranslated_onlayn_xfaffi", "Onlayn")}</span>
+    <div ref={ref} className="a-scope fixed inset-0 bottom-[80px] flex flex-col" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)', background: 'var(--a-bg)' }}>
+      {/* Chat header (anacan-demo) */}
+      <div className="safe-area-top" style={{ paddingLeft: 20, paddingRight: 20, flexShrink: 0 }}>
+        <div className="a-chat-header">
+          <span className="a-chat-header-avatar">
+            <Sparkles size={19} strokeWidth={2} />
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h1 className="a-chat-header-name a-heading">Anacan.AI</h1>
+            <div className="a-chat-header-status">
+              <span className="a-chat-status-dot" />
+              {tr("untranslated_onlayn_xfaffi", "Onlayn")} · {tr("aichatscreen_hekim_mesleheti_evezi_deyil_a1808c", "⚕️ Həkim məsləhəti əvəzi deyil").replace('⚕️ ', '')}
             </div>
           </div>
+          <button type="button" className="a-icon-btn" onClick={clearChat} aria-label="Reset">
+            <RefreshCw size={15} strokeWidth={2} />
+          </button>
         </div>
-        <div className="flex items-center gap-1">
-          <span className="text-[10px] text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 rounded-full">{tr("aichatscreen_hekim_mesleheti_evezi_deyil_a1808c", "⚕️ Həkim məsləhəti əvəzi deyil")}</span>
-          <Button variant="ghost" size="icon" className="w-8 h-8" onClick={clearChat}>
-            <RefreshCw className="w-4 h-4" />
-          </Button>
-        </div>
+
+        {/* Tibbi xəbərdarlıq — yığılmış default, toxununca açılır, X ilə bağlanır */}
+        {warnVisible &&
+        <div className="a-chat-warn">
+            <div
+            className="a-chat-warn-summary"
+            style={{ cursor: 'pointer', alignItems: 'flex-start' }}
+            onClick={() => setWarnExpanded((v) => !v)}
+            role="button"
+            aria-expanded={warnExpanded}>
+
+              <span style={{ fontSize: 15, lineHeight: 1, flexShrink: 0 }}>⚕️</span>
+              <span
+              className="txt"
+              style={warnExpanded ? undefined : {
+                display: '-webkit-box',
+                WebkitLineClamp: 1,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden'
+              }}>
+                {warnExpanded ?
+              tr("aichatscreen_medical_disclaimer_banner", "Anacan.AI tibbi məsləhət, diaqnoz və ya müalicə əvəzi DEYİL. Verilən məlumatlar yalnız informasiya xarakterli olub yalnız təhsil məqsədi daşıyır. Hər hansı tibbi qərar verməzdən əvvəl mütləq həkiminizə və ya ixtisaslı tibb işçisinə müraciət edin. Təcili hallarda 103-ə zəng edin.") :
+              tr("aichatscreen_warn_short", "Tibbi məsləhət əvəzi deyil — ətraflı üçün toxunun")}
+              </span>
+              <span style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                {warnExpanded ?
+              <ChevronUp size={13} strokeWidth={2.2} style={{ opacity: 0.6 }} /> :
+              <ChevronDown size={13} strokeWidth={2.2} style={{ opacity: 0.6 }} />}
+                <button
+                type="button"
+                onClick={(e) => {e.stopPropagation();dismissWarn();}}
+                aria-label={tr("aichatscreen_warn_close", "Xəbərdarlığı bağla")}
+                style={{
+                  background: 'rgba(0,0,0,0.06)', border: 'none', cursor: 'pointer',
+                  width: 20, height: 20, borderRadius: 999,
+                  display: 'grid', placeItems: 'center', color: 'inherit'
+                }}>
+                  <X size={11} strokeWidth={2.4} />
+                </button>
+              </span>
+            </div>
+          </div>
+        }
       </div>
 
-      {/* Persistent medical disclaimer banner */}
-      <div className="px-3 py-2 bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900/50 flex items-start gap-2">
-        <span className="text-base leading-none mt-0.5">⚕️</span>
-        <p className="text-[11px] leading-snug text-amber-900 dark:text-amber-200">
-          {tr("aichatscreen_medical_disclaimer_banner", "Anacan.AI tibbi məsləhət, diaqnoz və ya müalicə əvəzi DEYİL. Verilən məlumatlar yalnız informasiya xarakterli olub yalnız təhsil məqsədi daşıyır. Hər hansı tibbi qərar verməzdən əvvəl mütləq həkiminizə və ya ixtisaslı tibb işçisinə müraciət edin. Təcili hallarda 103-ə zəng edin.")}
-        </p>
-      </div>
+      {/* Messages — idarə olunan viewport (global scroll reset-dən qorunur) */}
+      <div
+        ref={viewportRef}
+        onScroll={handleViewportScroll}
+        data-scroll-ignore
+        className="flex-1 overflow-y-auto overscroll-contain relative"
+        style={{ paddingLeft: 20, paddingRight: 20, WebkitOverflowScrolling: 'touch' }}>
 
-      {/* Messages */}
-      <ScrollArea className="flex-1 px-4 py-4" ref={scrollRef}>
-
-        <div className="space-y-4 pb-4">
-          <AnimatePresence>
+        <div className="pb-4 pt-1">
+          <AnimatePresence initial={false}>
             {messages.map((message) =>
-            <motion.div
+            <ChatMessageRow
               key={message.id}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className={`flex gap-2 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
-              
-                <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${
-              message.role === 'user' ?
-              'bg-primary/10' :
-              'gradient-primary'}`
-              }>
-                  {message.role === 'user' ?
-                <User className="w-3.5 h-3.5 text-primary" /> :
-                <Bot className="w-3.5 h-3.5 text-white" />
-                }
-                </div>
-                <div className={`max-w-[80%] px-3 py-2 rounded-2xl ${
-              message.role === 'user' ?
-              'bg-primary text-primary-foreground rounded-br-md' :
-              'bg-card border border-border shadow-sm rounded-bl-md'}`
-              }>
-                <div className="text-[13px] leading-relaxed">
-                  {message.role === 'assistant' ?
-                  <MarkdownContent content={message.content} variant="chat" /> :
-
-                  <span className="whitespace-pre-wrap">{message.content}</span>
-                  }
-                  {message.isStreaming &&
-                  <motion.span
-                    className="inline-block w-1.5 h-3.5 bg-primary ml-1"
-                    animate={{ opacity: [1, 0] }}
-                    transition={{ duration: 0.5, repeat: Infinity }} />
-
-                  }
-                </div>
-                {!message.isStreaming &&
-                <span className="text-[9px] opacity-50 mt-1 block">
-                    {message.timestamp.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                }
-                </div>
-              </motion.div>
+              message={message}
+              copied={copiedId === message.id}
+              onCopy={copyMessage} />
             )}
           </AnimatePresence>
         </div>
 
-        {/* Suggested Questions */}
-        {messages.length <= 1 &&
+        {/* Suggested Questions — toxunan kimi göndərilir */}
+        {messages.length <= 1 && !isLoading &&
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="space-y-2 mt-4">
+          className="pb-4">
           
-            <p className="text-xs text-muted-foreground text-center mb-3">{tr("aichatscreen_meslehet_ucun_sual_secin_3c0236", "Məsləhət üçün sual seçin:")}</p>
-            {suggestedQuestions.map((question, index) =>
-          <motion.button
-            key={index}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setInput(question)}
-            className="w-full p-3 text-left text-sm bg-card border border-border rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all">
-            
-                {question}
-              </motion.button>
-          )}
+            <p className="a-chat-suggest-label">{tr("aichatscreen_meslehet_ucun_sual_secin_3c0236", "Məsləhət üçün sual seçin:")}</p>
+            <div className="a-chat-suggest-row">
+              {suggestedQuestions.map((question, index) =>
+            <motion.button
+              key={index}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => sendMessage(question)}
+              className="a-chat-suggest-btn">
+              
+                  {question}
+                </motion.button>
+            )}
+            </div>
           </motion.div>
         }
-      </ScrollArea>
-
-      {/* Input Area */}
-      <div className="px-3 py-2 pb-1 border-t border-border bg-card/80 backdrop-blur-md flex-shrink-0 mb-0">
-        <div className="flex gap-2 items-end">
-          <div className="flex-1 relative">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder={language === 'en' ? "Type your question for Anacan.AI..." : "Anacan.AI-yə sualınızı yazın..."}
-              className="min-h-[40px] max-h-[100px] pr-4 resize-none rounded-xl border-2 focus:border-primary/50 text-sm py-2"
-              disabled={isLoading} />
-            
-          </div>
-          <Button
-            onClick={handleSend}
-            disabled={!input.trim() || isLoading}
-            size="icon"
-            className="h-10 w-10 rounded-xl gradient-primary shadow-lg disabled:opacity-50">
-            
-            {isLoading ?
-            <Loader2 className="w-4 h-4 animate-spin" /> :
-
-            <Send className="w-4 h-4" />
-            }
-          </Button>
-        </div>
-        <p className="text-[9px] text-center text-muted-foreground mt-1 px-2 leading-tight">
-          {tr("aichatscreen_input_disclaimer", "Anacan.AI səhv edə bilər. Tibbi qərarlar üçün həkiminizə müraciət edin.")}
-        </p>
       </div>
 
+      {/* "Aşağı düş" düyməsi — yuxarı sürüşdürəndə görünür */}
+      <AnimatePresence>
+        {showJumpDown &&
+        <motion.button
+          initial={{ opacity: 0, y: 8, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 8, scale: 0.9 }}
+          onClick={() => {
+            pinnedRef.current = true;
+            setShowJumpDown(false);
+            scrollToBottom(true);
+          }}
+          aria-label={tr('aichat_jump_down', 'Ən son mesaja keç')}
+          className="absolute grid place-items-center"
+          style={{
+            right: 18, bottom: 86, zIndex: 5,
+            width: 38, height: 38, borderRadius: 999,
+            background: 'var(--a-surface)', border: '1px solid var(--a-line)',
+            boxShadow: '0 10px 24px -8px rgba(217, 108, 74, 0.45)',
+            color: 'var(--a-accent-ink)', cursor: 'pointer'
+          }}>
+            <ArrowDown size={16} strokeWidth={2.4} />
+            {isLoading &&
+          <motion.span
+            className="absolute inset-0 rounded-full"
+            style={{ border: '2px solid var(--a-peach-2)' }}
+            animate={{ opacity: [0.7, 0], scale: [1, 1.35] }}
+            transition={{ duration: 1.4, repeat: Infinity }} />
+          }
+          </motion.button>
+        }
+      </AnimatePresence>
+
+      {/* Input Area (anacan-demo pill) */}
+      <div style={{ padding: '8px 16px 6px', flexShrink: 0 }}>
+        <div className="a-chat-input">
+          <Textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyPress}
+            onFocus={() => {
+              // Klaviatura açılanda pinned-diksə dibdə qal
+              setTimeout(() => {if (pinnedRef.current) scrollToBottom(false);}, 250);
+            }}
+            placeholder={language === 'en' ? "Type your question for Anacan.AI..." : "Anacan.AI-yə sualınızı yazın..."}
+            className="min-h-[34px] max-h-[100px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 py-2"
+            disabled={isLoading} />
+          
+          {isLoading ?
+          <button
+            type="button"
+            className="a-chat-send"
+            onClick={stopGeneration}
+            aria-label={tr('aichat_stop', 'Dayandır')}
+            title={tr('aichat_stop', 'Dayandır')}>
+              <Square size={12} strokeWidth={2.6} fill="currentColor" />
+            </button> :
+
+          <button
+            type="button"
+            className="a-chat-send"
+            onClick={handleSend}
+            disabled={!input.trim()}
+            aria-label="Send">
+              <Send size={15} strokeWidth={2.2} />
+            </button>
+          }
+        </div>
+      </div>
+
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="ai_chat" />
 
     </div>);
 

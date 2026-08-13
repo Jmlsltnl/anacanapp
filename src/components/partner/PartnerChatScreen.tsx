@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Send, Heart, Smile } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -217,7 +218,7 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
 
     if (date.toDateString() === today.toDateString()) return tr("partnerchatscreen_bu_gun_786fd4", "Bu g\xFCn");
     if (date.toDateString() === yesterday.toDateString()) return tr("partnerchatscreen_dunen_52b701", "D\xFCn\u0259n");
-    return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' });
+    return date.toLocaleDateString(getLocaleTag(), { day: 'numeric', month: 'long' });
   };
 
   // Group messages by date
@@ -233,60 +234,67 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
   });
 
   return (
-    <div className="fixed inset-0 z-[60] bg-background flex flex-col" style={{ height: '100dvh' }}>
+    <div className="a-scope fixed inset-0 z-[60] flex flex-col" style={{ background: 'var(--a-bg)', height: '100dvh' }}>
       {/* Minimal Header */}
-      <div className="bg-card border-b border-border px-3 pb-2 pt-[max(env(safe-area-inset-top),10px)] flex-shrink-0">
+      <div className="px-3 pb-2 pt-[max(env(safe-area-inset-top),10px)] flex-shrink-0"
+      style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
         <div className="flex items-center gap-2">
           <motion.button
             onClick={onBack}
-            className="w-9 h-9 rounded-full hover:bg-muted flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}>
-            
-            <ArrowLeft className="w-5 h-5 text-foreground" />
+            className="a-icon-btn shrink-0"
+            style={{ borderRadius: 999 }}
+            whileTap={{ scale: 0.95 }}
+            aria-label={tr("common_geri", "Geri")}>
+
+            <ArrowLeft size={16} strokeWidth={2} />
           </motion.button>
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-lg">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center text-lg shrink-0" style={{ background: 'var(--a-pink-1)' }}>
               {partnerProfile?.life_stage === 'bump' ? '🤰' : partnerProfile?.life_stage === 'mommy' ? '👩‍🍼' : '👩'}
             </div>
             <div className="min-w-0">
-              <h1 className="text-sm font-semibold text-foreground truncate">{partnerProfile?.name || 'Partner'}</h1>
+              <h1 className="truncate" style={{ fontSize: 14, fontWeight: 700, color: 'var(--a-ink)' }}>{partnerProfile?.name || 'Partner'}</h1>
               <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                <span className="text-muted-foreground text-[10px]">Online</span>
+                <span className="a-chat-status-dot" style={{ width: 6, height: 6 }} />
+                <span style={{ fontSize: 10, color: 'var(--a-ink-soft)' }}>Online</span>
               </div>
             </div>
           </div>
           <motion.button
             onClick={sendLove}
-            className="w-9 h-9 rounded-full hover:bg-pink-50 dark:hover:bg-pink-900/20 flex items-center justify-center"
-            whileTap={{ scale: 0.9 }}>
-            
-            <Heart className="w-4 h-4 text-pink-500 fill-pink-500" />
+            className="w-9 h-9 rounded-full flex items-center justify-center"
+            style={{ background: 'var(--a-pink-1)' }}
+            whileTap={{ scale: 0.9 }}
+            aria-label={tr("partnerdashboard_sevgi_gonderildi_4284b1", '💕 Sevgi göndərildi!')}>
+
+            <Heart className="w-4 h-4" style={{ color: 'var(--a-pink-ink)', fill: 'var(--a-pink-ink)' }} />
           </motion.button>
         </div>
       </div>
 
-      {/* Messages - Same styling as Mother Chat */}
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {loading ?
         <div className="flex items-center justify-center h-full">
             <motion.div
-            className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full"
+            className="w-8 h-8 rounded-full"
+            style={{ border: '4px solid var(--a-blue-2)', borderTopColor: 'transparent' }}
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }} />
-          
+
           </div> :
         messages.length === 0 ?
         <div className="flex flex-col items-center justify-center h-full text-center">
             <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
-            
-              <Smile className="w-10 h-10 text-muted-foreground" />
+            className="w-20 h-20 rounded-full flex items-center justify-center mb-4"
+            style={{ background: 'var(--a-surface-soft)' }}>
+
+              <Smile size={38} style={{ color: 'var(--a-ink-faint)' }} />
             </motion.div>
-            <p className="text-muted-foreground">{tr("partnerchatscreen_hele_mesaj_yoxdur_cf0b5e", "Hələ mesaj yoxdur")}</p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr("partnerchatscreen_hele_mesaj_yoxdur_cf0b5e", "Hələ mesaj yoxdur")}</p>
+            <p style={{ fontSize: 12.5, color: 'var(--a-ink-faint)', marginTop: 4 }}>
               {tr("partnerchatscreen_i_lk_mesaji_siz_gonderin_a2529e", "\u0130lk mesaj\u0131 siz g\xF6nd\u0259rin!")}
             </p>
           </div> :
@@ -295,7 +303,7 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
         <div key={group.date}>
               {/* Date separator */}
               <div className="flex items-center justify-center my-4">
-                <span className="px-3 py-1 bg-muted rounded-full text-xs text-muted-foreground">
+                <span style={{ padding: '4px 13px', background: 'var(--a-chip-overlay)', borderRadius: 999, fontSize: 11, fontWeight: 600, color: 'var(--a-ink-soft)' }}>
                   {formatDateSeparator(group.messages[0].created_at)}
                 </span>
               </div>
@@ -312,7 +320,7 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: msgIdx * 0.02 }}
                   className={`flex ${isMe ? 'justify-end' : 'justify-start'} mb-2`}>
-                  
+
                       <ChatMessageBubble message={msg} isMe={isMe} />
                     </motion.div>);
 
@@ -330,9 +338,10 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
         <motion.button
           key={msg}
           onClick={() => sendQuickMessage(msg)}
-          className="px-2.5 py-1 bg-muted rounded-full text-[11px] font-medium whitespace-nowrap"
+          className="whitespace-nowrap"
+          style={{ padding: '5px 12px', background: 'var(--a-surface)', border: '1px solid var(--a-line)', borderRadius: 999, fontSize: 11, fontWeight: 600, color: 'var(--a-ink)', boxShadow: '0 4px 10px -6px rgba(217, 108, 74, 0.3)' }}
           whileTap={{ scale: 0.95 }}>
-          
+
             {msg}
           </motion.button>
         )}
@@ -340,9 +349,9 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
 
       {/* Input */}
       <div
-        className="px-2 pt-2 bg-card border-t border-border flex-shrink-0"
-        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}>
-        
+        className="px-2 pt-2 flex-shrink-0"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)', borderTop: '1px solid var(--a-line)' }}>
+
         <div className="flex items-end gap-1.5">
           <ChatMediaUpload onUpload={sendMediaMessage} />
           <input
@@ -351,15 +360,18 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder={tr("partnerchatscreen_mesaj_yazin_e69f84", "Mesaj yazın...")}
-            className="flex-1 h-10 px-3.5 rounded-full bg-muted text-sm outline-none border border-transparent focus:border-primary/40 transition-colors" />
-          
+            className="flex-1 h-10 px-4 rounded-full outline-none transition-colors min-w-0"
+            style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', fontSize: 13, color: 'var(--a-ink)' }} />
+
           <motion.button
             onClick={sendMessage}
             disabled={!newMessage.trim()}
-            className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center disabled:opacity-40"
-            whileTap={{ scale: 0.95 }}>
-            
-            <Send className="w-4 h-4" />
+            className="a-chat-send shrink-0"
+            style={{ width: 40, height: 40 }}
+            whileTap={{ scale: 0.95 }}
+            aria-label={tr("helpscreen_gonder_3f11bd", "G\xF6nd\u0259r")}>
+
+            <Send size={16} />
           </motion.button>
         </div>
       </div>

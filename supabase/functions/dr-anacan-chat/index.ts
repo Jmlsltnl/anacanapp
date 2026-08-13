@@ -80,12 +80,36 @@ Deno.serve(async (req) => {
       resolvedLifeStage = "bump";
     }
 
-    const langInstruction = language === "en"
-      ? `\n\nIMPORTANT: Reply ONLY in English. Keep the same professional tone, no "honey/sweetie" endearments, no markdown decorators, no medical disclaimer headers.`
+    const LANG_NAME: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish" };
+    const replyLangName = LANG_NAME[language];
+
+    const langInstruction = replyLangName
+      ? `\n\nIMPORTANT: Reply ONLY in ${replyLangName}. Keep the same professional tone, no "honey/sweetie" endearments, no markdown decorators, no medical disclaimer headers.`
       : "";
 
+    // Localized fallback/error messages shown directly to the user
+    const ERR_TEXTS: Record<string, { unavailable: string; noAnswer: string }> = {
+      az: {
+        unavailable: "Bağışlayın, xidmət müvəqqəti əlçatmazdır. Zəhmət olmasa bir az sonra yenidən cəhd edin.",
+        noAnswer: "Bağışlayın, cavab ala bilmədim. Yenidən cəhd edin.",
+      },
+      en: {
+        unavailable: "Sorry, the service is temporarily unavailable. Please try again a little later.",
+        noAnswer: "Sorry, I couldn't get a response. Please try again.",
+      },
+      ru: {
+        unavailable: "Извините, сервис временно недоступен. Пожалуйста, попробуйте ещё раз чуть позже.",
+        noAnswer: "Извините, не удалось получить ответ. Попробуйте ещё раз.",
+      },
+      tr: {
+        unavailable: "Üzgünüz, hizmet geçici olarak kullanılamıyor. Lütfen biraz sonra tekrar deneyin.",
+        noAnswer: "Üzgünüm, yanıt alamadım. Lütfen tekrar deneyin.",
+      },
+    };
+    const errTexts = ERR_TEXTS[language] ?? ERR_TEXTS.az;
+
     const systemPrompt = (isWeightAnalysis
-      ? `Sən çəki məsləhətçisisən. QAYDALAR: Salamlama yoxdur. "Canım", "əzizim", "balacam" kimi ifadələr İSTİFADƏ ETMƏ. Disclaimer/xəbərdarlıq yoxdur. Birbaşa 1-2 cümlə ilə praktik məsləhət ver. ${language === "en" ? "Reply ONLY in English." : "Yalnız Azərbaycan dilində."}`
+      ? `Sən çəki məsləhətçisisən. QAYDALAR: Salamlama yoxdur. "Canım", "əzizim", "balacam" kimi ifadələr İSTİFADƏ ETMƏ. Disclaimer/xəbərdarlıq yoxdur. Birbaşa 1-2 cümlə ilə praktik məsləhət ver. ${replyLangName ? `Reply ONLY in ${replyLangName}.` : "Yalnız Azərbaycan dilində."}`
       : getSystemPrompt(resolvedLifeStage, pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay, language)) + langInstruction;
 
     // Convert OpenAI-style messages to Gemini format
@@ -156,7 +180,7 @@ Deno.serve(async (req) => {
     if (!response || !response.ok) {
       return new Response(
         JSON.stringify({ 
-          message: "Bağışlayın, xidmət müvəqqəti əlçatmazdır. Zəhmət olmasa bir az sonra yenidən cəhd edin.", 
+          message: errTexts.unavailable, 
           success: true 
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -232,7 +256,7 @@ Deno.serve(async (req) => {
     // Non-streaming response
     const data = await response.json();
     const assistantMessage =
-      data.candidates?.[0]?.content?.parts?.[0]?.text || "Bağışlayın, cavab ala bilmədim. Yenidən cəhd edin.";
+      data.candidates?.[0]?.content?.parts?.[0]?.text || errTexts.noAnswer;
 
     return new Response(
       JSON.stringify({ message: assistantMessage, success: true }),

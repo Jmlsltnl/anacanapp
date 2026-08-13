@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { getLocaleTag } from '@/lib/i18n';
+import { motion } from 'framer-motion';
 import { ArrowLeft, Send, Image, Mic, Video, X, Square, Loader2, Play, Pause } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
@@ -69,7 +70,7 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
+
       let mimeType = 'audio/webm';
       if (MediaRecorder.isTypeSupported('audio/webm')) mimeType = 'audio/webm';
       else if (MediaRecorder.isTypeSupported('audio/mp4')) mimeType = 'audio/mp4';
@@ -88,7 +89,7 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
         const actualMimeType = recorder.mimeType || mimeType || 'audio/mp4';
         const blob = new Blob(audioChunksRef.current, { type: actualMimeType });
         stream.getTracks().forEach((t) => t.stop());
-        
+
         if (blob.size === 0) {
           console.error("Audio blob is empty, ignoring upload");
           setIsRecording(false);
@@ -135,35 +136,38 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
   };
 
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
-  const formatMsgTime = (d: string) => new Date(d).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' });
+  const formatMsgTime = (d: string) => new Date(d).toLocaleTimeString(getLocaleTag(), { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="a-scope flex flex-col h-screen" style={{ background: 'var(--a-bg)' }}>
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50 px-4 py-3 flex items-center gap-3 safe-area-top">
-        <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center" whileTap={{ scale: 0.9 }}>
-          <ArrowLeft className="w-4 h-4" />
-        </motion.button>
-        <Avatar className="w-9 h-9">
-          <AvatarImage src={userAvatar || undefined} />
-          <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">{userName?.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <h1 className="text-[15px] font-bold text-foreground flex-1">{userName}</h1>
+      <div className="sticky top-0 z-40 safe-area-top" style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
+        <div className="flex items-center gap-3 px-4 py-2.5">
+          <motion.button onClick={onBack} className="a-icon-btn shrink-0" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
+            <ArrowLeft size={16} strokeWidth={2} />
+          </motion.button>
+          <Avatar className="w-9 h-9" style={{ border: '2px solid var(--a-peach-1)' }}>
+            <AvatarImage src={userAvatar || undefined} />
+            <AvatarFallback style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', fontSize: 13, fontWeight: 700 }}>{userName?.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <h1 className="flex-1 truncate" style={{ fontSize: 15, fontWeight: 700, color: 'var(--a-ink)' }}>{userName}</h1>
+        </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2">
+      <div className="flex-1 overflow-y-auto px-4 py-4">
         {loading ?
         <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            <div className="w-7 h-7 rounded-full animate-spin"
+          style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
           </div> :
         messages.length === 0 ?
         <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Avatar className="w-16 h-16 mb-3">
+            <Avatar className="w-16 h-16 mb-3" style={{ border: '3px solid var(--a-peach-1)' }}>
               <AvatarImage src={userAvatar || undefined} />
-              <AvatarFallback className="bg-primary/10 text-primary text-xl font-bold">{userName?.charAt(0)}</AvatarFallback>
+              <AvatarFallback style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', fontSize: 20, fontWeight: 700 }}>{userName?.charAt(0)}</AvatarFallback>
             </Avatar>
-            <p className="text-sm text-muted-foreground">
+            <p style={{ fontSize: 13, color: 'var(--a-ink-soft)' }}>
               {userName} {tr("directmessagescreen_ile_sohbete_baslayin_3ce758", "il\u0259 s\xF6hb\u0259t\u0259 ba\u015Flay\u0131n")}
             </p>
           </div> :
@@ -171,7 +175,7 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
         messages.map((msg) => {
           const isMe = msg.sender_id === user?.id;
           return (
-            <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+            <div key={msg.id} className={`a-chat-msg-row ${isMe ? 'user' : ''}`} style={{ marginBottom: 10 }}>
                 <MessageBubble message={msg} isMe={isMe} formatTime={formatMsgTime} />
               </div>);
 
@@ -181,36 +185,36 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
       </div>
 
       {/* Input */}
-      <div className="border-t border-border/50 bg-background/95 backdrop-blur-sm px-3 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
+      <div className="px-3 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]" style={{ borderTop: '1px solid var(--a-line)' }}>
         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
         <input ref={videoInputRef} type="file" accept="video/*" onChange={handleVideoSelect} className="hidden" />
 
         {uploading ?
         <div className="flex items-center justify-center gap-2 py-2">
-            <Loader2 className="w-5 h-5 animate-spin text-primary" />
-            <span className="text-xs text-muted-foreground">{tr("directmessagescreen_yuklenir_5557de", "Yüklənir...")}</span>
+            <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--a-peach-2)' }} />
+            <span style={{ fontSize: 12, color: 'var(--a-ink-soft)' }}>{tr("directmessagescreen_yuklenir_5557de", "Yüklənir...")}</span>
           </div> :
         isRecording ?
         <div className="flex items-center gap-3 py-1">
-            <motion.div className="w-3 h-3 rounded-full bg-red-500" animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1, repeat: Infinity }} />
-            <span className="text-sm text-muted-foreground min-w-[40px]">{formatTime(recordingTime)}</span>
+            <motion.div className="w-3 h-3 rounded-full" style={{ background: 'var(--a-pink-ink)' }} animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1, repeat: Infinity }} />
+            <span className="min-w-[40px]" style={{ fontSize: 13, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{formatTime(recordingTime)}</span>
             <div className="flex-1" />
-            <motion.button onClick={cancelRecording} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center" whileTap={{ scale: 0.9 }}>
-              <X className="w-4 h-4 text-muted-foreground" />
+            <motion.button onClick={cancelRecording} className="a-icon-btn" style={{ borderRadius: 999 }} whileTap={{ scale: 0.9 }} aria-label={tr("common_legv_et", "Ləğv et")}>
+              <X size={16} />
             </motion.button>
-            <motion.button onClick={stopRecording} className="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center" whileTap={{ scale: 0.9 }}>
+            <motion.button onClick={stopRecording} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'var(--a-pink-ink)' }} whileTap={{ scale: 0.9 }} aria-label={tr("directmessagescreen_stop", "Dayandır")}>
               <Square className="w-3 h-3 text-white fill-white" />
             </motion.button>
           </div> :
 
         <div className="flex items-center gap-1.5">
-            <motion.button onClick={() => fileInputRef.current?.click()} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted" whileTap={{ scale: 0.9 }}>
+            <motion.button onClick={() => fileInputRef.current?.click()} className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ color: 'var(--a-ink-soft)' }} whileTap={{ scale: 0.9 }} aria-label={tr("directmessagescreen_sekil_43e2e3", "Şəkil")}>
               <Image className="w-[18px] h-[18px]" />
             </motion.button>
-            <motion.button onClick={() => videoInputRef.current?.click()} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted" whileTap={{ scale: 0.9 }}>
+            <motion.button onClick={() => videoInputRef.current?.click()} className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ color: 'var(--a-ink-soft)' }} whileTap={{ scale: 0.9 }} aria-label="Video">
               <Video className="w-[18px] h-[18px]" />
             </motion.button>
-            <motion.button onClick={startRecording} className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted" whileTap={{ scale: 0.9 }}>
+            <motion.button onClick={startRecording} className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ color: 'var(--a-ink-soft)' }} whileTap={{ scale: 0.9 }} aria-label={tr("conversationlistscreen_ses_mesaji_acd8d9", "🎤 Səs mesajı")}>
               <Mic className="w-[18px] h-[18px]" />
             </motion.button>
 
@@ -219,16 +223,19 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendText())}
             placeholder={tr("directmessagescreen_mesaj_yazin_e69f84", "Mesaj yazın...")}
-            className="flex-1 h-10 px-3.5 rounded-full bg-muted/50 border border-border/30 text-sm outline-none placeholder:text-muted-foreground/40 focus:border-primary/30" />
-          
+            className="flex-1 h-10 px-4 rounded-full outline-none min-w-0"
+            style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', fontSize: 13, color: 'var(--a-ink)' }} />
+
 
             <motion.button
             onClick={handleSendText}
             disabled={!text.trim()}
-            className="w-9 h-9 rounded-full bg-primary flex items-center justify-center disabled:opacity-40"
-            whileTap={{ scale: 0.9 }}>
-            
-              <Send className="w-4 h-4 text-primary-foreground" />
+            className="a-chat-send"
+            style={{ width: 38, height: 38 }}
+            whileTap={{ scale: 0.9 }}
+            aria-label={tr("directmessagescreen_send", "Göndər")}>
+
+              <Send size={15} />
             </motion.button>
           </div>
         }
@@ -250,15 +257,19 @@ const MessageBubble = ({ message, isMe, formatTime }: {message: any;isMe: boolea
     setIsPlaying(!isPlaying);
   };
 
+  const mediaFooterStyle: React.CSSProperties = isMe ?
+  { background: 'var(--a-ink)', color: 'var(--a-bg)' } :
+  { background: 'var(--a-surface)', color: 'var(--a-ink-soft)', borderTop: '1px solid var(--a-line)' };
+
   // Image
   if (message.message_type === 'image' && message.media_url) {
     return (
-      <div className={`max-w-[72%] rounded-2xl overflow-hidden ${isMe ? 'rounded-br-md' : 'rounded-bl-md'}`}>
+      <div className="max-w-[72%] overflow-hidden" style={{ borderRadius: 18, borderBottomRightRadius: isMe ? 4 : 18, borderBottomLeftRadius: isMe ? 18 : 4, boxShadow: 'var(--a-card-shadow)' }}>
         <a href={message.media_url} target="_blank" rel="noopener noreferrer">
-          <img src={message.media_url} alt={tr("directmessagescreen_sekil_43e2e3", "Şəkil")} className="max-w-full max-h-56 object-cover" loading="lazy" />
+          <img src={message.media_url} alt={tr("directmessagescreen_sekil_43e2e3", "Şəkil")} className="max-w-full max-h-56 object-cover block" loading="lazy" />
         </a>
-        <div className={`px-3 py-1 ${isMe ? 'bg-primary' : 'bg-muted'}`}>
-          <p className={`text-[10px] ${isMe ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{formatTime(message.created_at)}</p>
+        <div className="px-3 py-1" style={mediaFooterStyle}>
+          <p style={{ fontSize: 10, opacity: 0.7 }}>{formatTime(message.created_at)}</p>
         </div>
       </div>);
 
@@ -267,10 +278,10 @@ const MessageBubble = ({ message, isMe, formatTime }: {message: any;isMe: boolea
   // Video
   if (message.message_type === 'video' && message.media_url) {
     return (
-      <div className={`max-w-[72%] rounded-2xl overflow-hidden ${isMe ? 'rounded-br-md' : 'rounded-bl-md'}`}>
-        <video src={message.media_url} controls className="max-w-full max-h-56 object-cover rounded-t-2xl" preload="metadata" />
-        <div className={`px-3 py-1 ${isMe ? 'bg-primary' : 'bg-muted'}`}>
-          <p className={`text-[10px] ${isMe ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{formatTime(message.created_at)}</p>
+      <div className="max-w-[72%] overflow-hidden" style={{ borderRadius: 18, borderBottomRightRadius: isMe ? 4 : 18, borderBottomLeftRadius: isMe ? 18 : 4, boxShadow: 'var(--a-card-shadow)' }}>
+        <video src={message.media_url} controls className="max-w-full max-h-56 object-cover block" preload="metadata" />
+        <div className="px-3 py-1" style={mediaFooterStyle}>
+          <p style={{ fontSize: 10, opacity: 0.7 }}>{formatTime(message.created_at)}</p>
         </div>
       </div>);
 
@@ -279,22 +290,28 @@ const MessageBubble = ({ message, isMe, formatTime }: {message: any;isMe: boolea
   // Audio
   if (message.message_type === 'audio' && message.media_url) {
     return (
-      <div className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl min-w-[180px] ${isMe ? 'bg-primary rounded-br-md' : 'bg-muted rounded-bl-md'}`}>
+      <div className="flex items-center gap-2.5 px-3.5 py-2.5 min-w-[180px]"
+      style={isMe ?
+      { background: 'var(--a-ink)', borderRadius: 18, borderBottomRightRadius: 4 } :
+      { background: 'var(--a-surface)', border: '1px solid var(--a-line)', borderRadius: 18, borderBottomLeftRadius: 4, boxShadow: 'var(--a-card-shadow)' }}>
         <audio
           ref={audioRef}
           src={message.media_url}
           onTimeUpdate={() => audioRef.current && setProgress(audioRef.current.currentTime / audioRef.current.duration * 100)}
           onEnded={() => {setIsPlaying(false);setProgress(0);}}
           preload="metadata" />
-        
-        <motion.button onClick={toggleAudio} className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isMe ? 'bg-primary-foreground/20' : 'bg-primary/10'}`} whileTap={{ scale: 0.9 }}>
-          {isPlaying ? <Pause className={`w-3.5 h-3.5 ${isMe ? 'text-primary-foreground' : 'text-primary'}`} /> : <Play className={`w-3.5 h-3.5 ${isMe ? 'text-primary-foreground' : 'text-primary'}`} />}
+
+        <motion.button onClick={toggleAudio} className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+        style={{ background: isMe ? 'rgba(255,255,255,0.18)' : 'var(--a-peach-1)' }} whileTap={{ scale: 0.9 }}>
+          {isPlaying ?
+          <Pause className="w-3.5 h-3.5" style={{ color: isMe ? 'var(--a-bg)' : 'var(--a-accent-ink)' }} /> :
+          <Play className="w-3.5 h-3.5" style={{ color: isMe ? 'var(--a-bg)' : 'var(--a-accent-ink)' }} />}
         </motion.button>
         <div className="flex-1 min-w-0">
-          <div className={`h-1 rounded-full ${isMe ? 'bg-primary-foreground/20' : 'bg-primary/15'}`}>
-            <div className={`h-full rounded-full transition-all ${isMe ? 'bg-primary-foreground' : 'bg-primary'}`} style={{ width: `${progress}%` }} />
+          <div className="h-1 rounded-full" style={{ background: isMe ? 'rgba(255,255,255,0.25)' : 'var(--a-peach-1)' }}>
+            <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: isMe ? 'var(--a-bg)' : 'var(--a-peach-2)' }} />
           </div>
-          <p className={`text-[10px] mt-1 text-right ${isMe ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{formatTime(message.created_at)}</p>
+          <p className="mt-1 text-right" style={{ fontSize: 10, color: isMe ? 'rgba(255,231,225,0.7)' : 'var(--a-ink-faint)' }}>{formatTime(message.created_at)}</p>
         </div>
       </div>);
 
@@ -302,9 +319,11 @@ const MessageBubble = ({ message, isMe, formatTime }: {message: any;isMe: boolea
 
   // Text (default)
   return (
-    <div className={`max-w-[72%] px-3.5 py-2 rounded-2xl ${isMe ? 'bg-primary text-primary-foreground rounded-br-md' : 'bg-muted text-foreground rounded-bl-md'}`}>
-      <p className="text-[13px] whitespace-pre-wrap break-words leading-relaxed">{message.content}</p>
-      <p className={`text-[10px] mt-0.5 ${isMe ? 'text-primary-foreground/60' : 'text-muted-foreground'}`}>{formatTime(message.created_at)}</p>
+    <div className="a-chat-bubble-wrap">
+      <div className={`a-chat-bubble ${isMe ? 'user' : 'ai'}`}>
+        <p className="whitespace-pre-wrap break-words" style={{ margin: 0 }}>{message.content}</p>
+      </div>
+      <span className="a-chat-time">{formatTime(message.created_at)}</span>
     </div>);
 
 };

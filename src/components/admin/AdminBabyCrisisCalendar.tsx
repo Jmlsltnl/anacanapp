@@ -316,7 +316,7 @@ const AdminBabyCrisisCalendar = () => {
                       Simptomlar
                     </h4>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      {(localize(period, 'symptoms') || []).map((s, i) =>
+                      {((localize(period, 'symptoms') || []) as unknown as string[]).map((s, i) =>
                     <li key={i}>• {s}</li>
                     )}
                     </ul>
@@ -327,7 +327,7 @@ const AdminBabyCrisisCalendar = () => {
                       {tr("adminbabycrisiscalendar_tovsiyeler_17a8f7", "T\xF6vsiy\u0259l\u0259r")}
                     </h4>
                     <ul className="text-sm text-muted-foreground space-y-1">
-                      {(localize(period, 'tips') || []).map((t, i) =>
+                      {((localize(period, 'tips') || []) as unknown as string[]).map((t, i) =>
                     <li key={i}>• {t}</li>
                     )}
                     </ul>

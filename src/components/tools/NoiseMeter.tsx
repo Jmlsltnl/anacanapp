@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Volume2, VolumeX, Mic, MicOff, Moon, AlertTriangle, CheckCircle, Play, Pause, History } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Volume2, Mic, MicOff, Moon, AlertTriangle, History } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useNoiseThresholdsDB } from '@/hooks/useMentalHealthData';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
 
 interface NoiseMeterProps {
@@ -174,12 +174,13 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
     };
   }, []);
 
+  // Noise level → anacan palette
   const getNoiseLevel = (db: number) => {
-    if (db < NOISE_THRESHOLDS.ideal) return { label: tr("noisemeter_mukemmel_ae2244", 'Mükəmməl'), color: 'text-green-500', bg: 'bg-green-500' };
-    if (db < NOISE_THRESHOLDS.acceptable) return { label: tr("noisemeter_yaxsi_9d8595", 'Yaxşı'), color: 'text-emerald-500', bg: 'bg-emerald-500' };
-    if (db < NOISE_THRESHOLDS.warning) return { label: tr("noisemeter_qebulolunandir_0cab62", 'Qəbulolunandır'), color: 'text-yellow-500', bg: 'bg-yellow-500' };
-    if (db < NOISE_THRESHOLDS.danger) return { label: tr("noisemeter_yuksek_492584", 'Yüksək'), color: 'text-orange-500', bg: 'bg-orange-500' };
-    return { label: tr("noisemeter_cox_yuksek_86dadc", 'Çox yüksək!'), color: 'text-red-500', bg: 'bg-red-500' };
+    if (db < NOISE_THRESHOLDS.ideal) return { label: tr("noisemeter_mukemmel_ae2244", 'Mükəmməl'), color: 'var(--a-green-ink)', dot: 'var(--a-green-2)', soft: 'var(--a-green-1)' };
+    if (db < NOISE_THRESHOLDS.acceptable) return { label: tr("noisemeter_yaxsi_9d8595", 'Yaxşı'), color: 'var(--a-green-ink)', dot: 'var(--a-green-2)', soft: 'var(--a-green-1)' };
+    if (db < NOISE_THRESHOLDS.warning) return { label: tr("noisemeter_qebulolunandir_0cab62", 'Qəbulolunandır'), color: 'var(--a-warn-ink)', dot: 'var(--a-yellow-2)', soft: 'var(--a-yellow-1)' };
+    if (db < NOISE_THRESHOLDS.danger) return { label: tr("noisemeter_yuksek_492584", 'Yüksək'), color: 'var(--a-accent-ink)', dot: 'var(--a-peach-2)', soft: 'var(--a-peach-1)' };
+    return { label: tr("noisemeter_cox_yuksek_86dadc", 'Çox yüksək!'), color: 'var(--a-pink-ink)', dot: 'var(--a-pink-2)', soft: 'var(--a-pink-1)' };
   };
 
   const noiseLevel = getNoiseLevel(currentDb);
@@ -192,109 +193,99 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3">
-        <div className="flex items-center gap-3 relative z-20">
-          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0 relative z-30">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold">{tr("noisemeter_ses_kuy_olcer_68f0b6", "Səs-Küy Ölçər")}</h1>
-            <p className="text-xs text-muted-foreground">{tr("noisemeter_korpe_yuxusu_ucun_ideal_muhit_4a6c06", "Körpə yuxusu üçün ideal mühit")}</p>
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={tr("noisemeter_korpe_yuxusu_ucun_ideal_muhit_4a6c06", "Körpə yuxusu üçün ideal mühit")}
+        title={tr("noisemeter_ses_kuy_olcer_68f0b6", "Səs-Küy Ölçər")} />
+
+      <div className="space-y-3">
+        {/* Main Gauge */}
+        <div className="a-card" style={{ padding: 24 }}>
+          <div className="flex flex-col items-center">
+            {/* Circular Gauge */}
+            <div className="relative w-48 h-48">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                {/* Background circle */}
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="var(--a-line-strong)"
+                  strokeWidth="8" />
+                
+                {/* Progress circle */}
+                <motion.circle
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke={noiseLevel.dot}
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray={`${gaugePercentage * 2.64} 264`}
+                  animate={{ strokeDasharray: `${gaugePercentage * 2.64} 264` }}
+                  transition={{ duration: 0.3 }} />
+                
+              </svg>
+              
+              {/* Center content */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <motion.span
+                  className="text-5xl font-bold a-heading"
+                  style={{ color: noiseLevel.color }}
+                  key={currentDb}
+                  initial={{ scale: 1.1 }}
+                  animate={{ scale: 1 }}>
+                  
+                  {currentDb}
+                </motion.span>
+                <span className="text-lg" style={{ color: 'var(--a-ink-soft)' }}>dB</span>
+              </div>
+            </div>
+
+            {/* Status Label */}
+            <div className="mt-4 px-4 py-2 rounded-full" style={{ background: isListening ? noiseLevel.soft : 'var(--a-surface-soft)' }}>
+              <span className="font-bold" style={{ color: isListening ? noiseLevel.color : 'var(--a-ink-soft)' }}>
+                {isListening ? noiseLevel.label : tr("noisemeter_olcum_basladilmayib_46107a", 'Ölçüm başladılmayıb')}
+              </span>
+            </div>
+
+            {/* Stats */}
+            {isListening &&
+            <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-xs">
+                <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-surface-soft)' }}>
+                  <p className="a-list-sub" style={{ margin: 0 }}>{tr("untranslated_orta_yslkg0", "Orta")}</p>
+                  <p className="a-heading" style={{ margin: 0, fontSize: 20 }}>{avgDb} dB</p>
+                </div>
+                <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-surface-soft)' }}>
+                  <p className="a-list-sub" style={{ margin: 0 }}>{tr("untranslated_maks_6z8ju8", "Maks")}</p>
+                  <p className="a-heading" style={{ margin: 0, fontSize: 20 }}>{maxDb} dB</p>
+                </div>
+              </div>
+            }
+
+            {/* Control Button */}
+            <motion.button
+              className="mt-6 w-32 h-32 rounded-full flex items-center justify-center"
+              style={isListening ?
+              { background: 'var(--a-pink-2)', border: 'none', color: '#fff', boxShadow: '0 14px 30px -12px rgba(255, 138, 164, 0.7)', cursor: 'pointer' } :
+              { background: 'var(--a-grad-cta)', border: '1px solid var(--a-btn-border)', color: 'var(--a-accent-ink)', boxShadow: 'var(--a-card-shadow)', cursor: 'pointer' }}
+              whileTap={{ scale: 0.95 }}
+              onClick={isListening ? stopListening : startListening}>
+              
+              {isListening ?
+              <MicOff className="w-12 h-12" /> :
+
+              <Mic className="w-12 h-12" />
+              }
+            </motion.button>
+            <p className="mt-2 text-sm font-semibold" style={{ margin: '8px 0 0', color: 'var(--a-ink-soft)' }}>
+              {isListening ? tr("noisemeter_dayandirmaq_ucun_toxunun_d02de1", "Dayand\u0131rmaq \xFC\xE7\xFCn toxunun") : tr("noisemeter_baslamaq_ucun_toxunun_ee2514", "Ba\u015Flamaq \xFC\xE7\xFCn toxunun")}
+            </p>
           </div>
         </div>
-      </div>
-
-      <div className="p-4 space-y-4">
-        {/* Main Gauge */}
-        <Card className="overflow-hidden">
-          <CardContent className="p-6">
-            <div className="flex flex-col items-center">
-              {/* Circular Gauge */}
-              <div className="relative w-48 h-48">
-                <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                  {/* Background circle */}
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="42"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="8"
-                    className="text-muted/30" />
-                  
-                  {/* Progress circle */}
-                  <motion.circle
-                    cx="50"
-                    cy="50"
-                    r="42"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                    className={noiseLevel.color}
-                    strokeDasharray={`${gaugePercentage * 2.64} 264`}
-                    animate={{ strokeDasharray: `${gaugePercentage * 2.64} 264` }}
-                    transition={{ duration: 0.3 }} />
-                  
-                </svg>
-                
-                {/* Center content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <motion.span
-                    className={`text-5xl font-bold ${noiseLevel.color}`}
-                    key={currentDb}
-                    initial={{ scale: 1.1 }}
-                    animate={{ scale: 1 }}>
-                    
-                    {currentDb}
-                  </motion.span>
-                  <span className="text-lg text-muted-foreground">dB</span>
-                </div>
-              </div>
-
-              {/* Status Label */}
-              <div className={`mt-4 px-4 py-2 rounded-full ${noiseLevel.bg}/20`}>
-                <span className={`font-semibold ${noiseLevel.color}`}>
-                  {isListening ? noiseLevel.label : tr("noisemeter_olcum_basladilmayib_46107a", 'Ölçüm başladılmayıb')}
-                </span>
-              </div>
-
-              {/* Stats */}
-              {isListening &&
-              <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-xs">
-                  <div className="bg-muted/50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground">{tr("untranslated_orta_yslkg0", "Orta")}</p>
-                    <p className="text-xl font-bold">{avgDb} dB</p>
-                  </div>
-                  <div className="bg-muted/50 rounded-lg p-3 text-center">
-                    <p className="text-xs text-muted-foreground">{tr("untranslated_maks_6z8ju8", "Maks")}</p>
-                    <p className="text-xl font-bold">{maxDb} dB</p>
-                  </div>
-                </div>
-              }
-
-              {/* Control Button */}
-              <Button
-                size="lg"
-                className={`mt-6 w-32 h-32 rounded-full ${
-                isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-primary hover:bg-primary/90'}`
-                }
-                onClick={isListening ? stopListening : startListening}>
-                
-                {isListening ?
-                <MicOff className="w-12 h-12" /> :
-
-                <Mic className="w-12 h-12" />
-                }
-              </Button>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {isListening ? tr("noisemeter_dayandirmaq_ucun_toxunun_d02de1", "Dayand\u0131rmaq \xFC\xE7\xFCn toxunun") : tr("noisemeter_baslamaq_ucun_toxunun_ee2514", "Ba\u015Flamaq \xFC\xE7\xFCn toxunun")}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* White Noise Prompt */}
         {showWhiteNoisePrompt && isListening &&
@@ -302,103 +293,85 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}>
           
-            <Card className="border-orange-500/30 bg-orange-500/5">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="w-6 h-6 text-orange-500 shrink-0" />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-orange-600">{tr("noisemeter_ses_seviyyesi_yuksekdir_f91956", "Səs səviyyəsi yüksəkdir")}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {tr("noisemeter_bu_seviyye_derin_yuxu_ucun_cox_b27a60", "Bu s\u0259viyy\u0259 d\u0259rin yuxu \xFC\xE7\xFCn \xE7ox y\xFCks\u0259kdir. A\u011F s\u0259s a\xE7\u0131m?")}
-                    </p>
-                    <div className="flex gap-2 mt-3">
-                      <Button
-                      size="sm"
-                      className="bg-orange-500 hover:bg-orange-600"
-                      onClick={navigateToWhiteNoise}>
-                      
-                        <Volume2 className="w-4 h-4 mr-1" />
-                        {tr("noisemeter_ag_ses_ac_06be65", "A\u011F s\u0259s a\xE7")}
-                      </Button>
-                      <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setShowWhiteNoisePrompt(false)}>
-                      
-                        {tr("untranslated_sonra_1f3m9s", "Sonra")}
-                      </Button>
-                    </div>
+            <div className="a-card" style={{ background: 'var(--a-peach-1)', border: 'none' }}>
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-6 h-6 shrink-0" style={{ color: 'var(--a-accent-ink)' }} />
+                <div className="flex-1">
+                  <h3 className="font-bold" style={{ margin: 0, color: 'var(--a-accent-ink)' }}>{tr("noisemeter_ses_seviyyesi_yuksekdir_f91956", "Səs səviyyəsi yüksəkdir")}</h3>
+                  <p className="text-sm mt-1" style={{ margin: '4px 0 0', color: 'var(--a-accent-ink)', opacity: 0.85 }}>
+                    {tr("noisemeter_bu_seviyye_derin_yuxu_ucun_cox_b27a60", "Bu s\u0259viyy\u0259 d\u0259rin yuxu \xFC\xE7\xFCn \xE7ox y\xFCks\u0259kdir. A\u011F s\u0259s a\xE7\u0131m?")}
+                  </p>
+                  <div className="flex gap-2 mt-3">
+                    <button
+                    className="a-cta-btn"
+                    style={{ height: 38, padding: '0 16px', fontSize: 11.5 }}
+                    onClick={navigateToWhiteNoise}>
+                    
+                      <Volume2 size={13} strokeWidth={2.2} />
+                      {tr("noisemeter_ag_ses_ac_06be65", "A\u011F s\u0259s a\xE7")}
+                    </button>
+                    <button
+                    className="a-btn-soft"
+                    style={{ height: 38, padding: '0 16px', fontSize: 11.5 }}
+                    onClick={() => setShowWhiteNoisePrompt(false)}>
+                    
+                      {tr("untranslated_sonra_1f3m9s", "Sonra")}
+                    </button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </motion.div>
         }
 
         {/* Noise Level Guide */}
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold mb-3 flex items-center gap-2">
-              <Moon className="w-4 h-4" />
-              {tr("noisemeter_korpe_yuxusu_ucun_ses_seviyyel_d8f4f9", "K\xF6rp\u0259 yuxusu \xFC\xE7\xFCn s\u0259s s\u0259viyy\u0259l\u0259ri")}
-            </h3>
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="text-sm flex-1">0-40 dB</span>
-                <span className="text-xs text-muted-foreground">{tr("noisemeter_mukemmel_ae2244", "Mükəmməl")}</span>
+        <div className="a-card">
+          <h3 className="a-card-title a-heading mb-3 flex items-center gap-2" style={{ margin: '0 0 12px' }}>
+            <Moon className="w-4 h-4" style={{ color: 'var(--a-lav-2)' }} />
+            {tr("noisemeter_korpe_yuxusu_ucun_ses_seviyyel_d8f4f9", "K\xF6rp\u0259 yuxusu \xFC\xE7\xFCn s\u0259s s\u0259viyy\u0259l\u0259ri")}
+          </h3>
+          <div className="space-y-2">
+            {[
+            { dot: 'var(--a-green-2)', range: '0-40 dB', label: tr("noisemeter_mukemmel_ae2244", "Mükəmməl") },
+            { dot: '#8fd19e', range: '40-50 dB', label: tr("noisemeter_yaxsi_9d8595", "Yaxşı") },
+            { dot: 'var(--a-yellow-2)', range: '50-60 dB', label: tr("noisemeter_qebulolunandir_0cab62", "Qəbulolunandır") },
+            { dot: 'var(--a-peach-2)', range: '60-70 dB', label: tr("noisemeter_yuksek_492584", "Yüksək") },
+            { dot: 'var(--a-pink-2)', range: '70+ dB', label: tr("noisemeter_cox_yuksek_c4d475", "Çox yüksək") }].
+            map((row) =>
+            <div key={row.range} className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full" style={{ background: row.dot }} />
+                <span className="text-sm flex-1 font-semibold" style={{ color: 'var(--a-ink)' }}>{row.range}</span>
+                <span className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>{row.label}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                <span className="text-sm flex-1">40-50 dB</span>
-                <span className="text-xs text-muted-foreground">{tr("noisemeter_yaxsi_9d8595", "Yaxşı")}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <span className="text-sm flex-1">50-60 dB</span>
-                <span className="text-xs text-muted-foreground">{tr("noisemeter_qebulolunandir_0cab62", "Qəbulolunandır")}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-orange-500" />
-                <span className="text-sm flex-1">60-70 dB</span>
-                <span className="text-xs text-muted-foreground">{tr("noisemeter_yuksek_492584", "Yüksək")}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-red-500" />
-                <span className="text-sm flex-1">70+ dB</span>
-                <span className="text-xs text-muted-foreground">{tr("noisemeter_cox_yuksek_c4d475", "Çox yüksək")}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            )}
+          </div>
+        </div>
 
         {/* Recent History */}
         {history.length > 0 &&
-        <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <History className="w-4 h-4" />
-                {tr("noisemeter_son_olcmeler_b024cf", "Son \xF6l\xE7m\u0259l\u0259r")}
-              </h3>
-              <div className="space-y-2">
-                {history.slice().reverse().map((item, idx) => {
-                const level = getNoiseLevel(item.db);
-                return (
-                  <div key={idx} className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
-                      <div className={`w-2 h-2 rounded-full ${level.bg}`} />
-                      <span className="font-medium">{item.db} dB</span>
-                      <span className="text-xs text-muted-foreground ml-auto">
-                        {item.time.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>);
+        <div className="a-card">
+            <h3 className="a-card-title a-heading mb-3 flex items-center gap-2" style={{ margin: '0 0 12px' }}>
+              <History className="w-4 h-4" style={{ color: 'var(--a-peach-2)' }} />
+              {tr("noisemeter_son_olcmeler_b024cf", "Son \xF6l\xE7m\u0259l\u0259r")}
+            </h3>
+            <div className="space-y-2">
+              {history.slice().reverse().map((item, idx) => {
+              const level = getNoiseLevel(item.db);
+              return (
+                <div key={idx} className="flex items-center gap-3 p-2.5 rounded-xl" style={{ background: 'var(--a-surface-soft)' }}>
+                    <div className="w-2 h-2 rounded-full" style={{ background: level.dot }} />
+                    <span className="a-list-title" style={{ margin: 0 }}>{item.db} dB</span>
+                    <span className="a-list-time ml-auto" style={{ margin: '0 0 0 auto' }}>
+                      {item.time.toLocaleTimeString(getLocaleTag(), { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>);
 
-              })}
-              </div>
-            </CardContent>
-          </Card>
+            })}
+            </div>
+          </div>
         }
       </div>
-    </div>);
+    </ToolPage>);
 
 };
 

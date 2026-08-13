@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+﻿import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { getLocaleTag } from '@/lib/i18n';
 import { ArrowLeft, Bell, Check, Trash2, Calendar, Heart, Pill, Gift, MessageCircle, Reply, Megaphone } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
@@ -29,18 +30,19 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
     return true;
   });
 
+  // Palitra: tint fon + sabit ink (dizayn sistemi konvensiyasÄ±)
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'community_like':return { icon: Heart, color: 'bg-rose-500/10 text-rose-500' };
-      case 'community_comment':return { icon: MessageCircle, color: 'bg-blue-500/10 text-blue-500' };
-      case 'community_reply':return { icon: Reply, color: 'bg-violet-500/10 text-violet-500' };
-      case 'reminder':return { icon: Bell, color: 'bg-blue-500/10 text-blue-500' };
-      case 'appointment':return { icon: Calendar, color: 'bg-violet-500/10 text-violet-500' };
-      case 'tip':return { icon: Pill, color: 'bg-emerald-500/10 text-emerald-500' };
-      case 'partner':return { icon: Heart, color: 'bg-pink-500/10 text-pink-500' };
-      case 'achievement':return { icon: Gift, color: 'bg-amber-500/10 text-amber-500' };
-      case 'push':case 'scheduled':return { icon: Megaphone, color: 'bg-primary/10 text-primary' };
-      default:return { icon: Bell, color: 'bg-muted text-muted-foreground' };
+      case 'community_like':return { icon: Heart, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
+      case 'community_comment':return { icon: MessageCircle, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' };
+      case 'community_reply':return { icon: Reply, bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
+      case 'reminder':return { icon: Bell, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' };
+      case 'appointment':return { icon: Calendar, bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
+      case 'tip':return { icon: Pill, bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' };
+      case 'partner':return { icon: Heart, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
+      case 'achievement':return { icon: Gift, bg: 'var(--a-yellow-1)', ink: 'var(--a-yellow-ink)' };
+      case 'push':case 'scheduled':return { icon: Megaphone, bg: 'var(--a-peach-1)', ink: 'var(--a-accent-ink)' };
+      default:return { icon: Bell, bg: 'var(--a-surface-soft)', ink: 'var(--a-ink-soft)' };
     }
   };
 
@@ -52,11 +54,11 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     if (diffMins < 1) return tr("notificationsscreen_i_ndice_3c9745", "\u0130ndic\u0259");
-    if (diffMins < 60) return `${diffMins} ${tr("notificationsscreen_mins", "dəq")}`;
+    if (diffMins < 60) return `${diffMins} ${tr("notificationsscreen_mins", "dÉ™q")}`;
     if (diffHours < 24) return `${diffHours} ${tr("notificationsscreen_hours", "saat")}`;
     if (diffDays === 1) return tr("notificationsscreen_dunen_52b701", "D\xFCn\u0259n");
     const { language } = useUserStore.getState();
-    return date.toLocaleDateString(language === 'en' ? 'en-US' : language === 'ru' ? 'ru-RU' : language === 'tr' ? 'tr-TR' : 'az-AZ', { day: 'numeric', month: 'short' });
+    return date.toLocaleDateString(getLocaleTag(), { day: 'numeric', month: 'short' });
   };
 
   const handleNotificationClick = (notification: any) => {
@@ -67,63 +69,63 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
   };
 
   const filters: {id: FilterType;label: string;}[] = [
-  { id: 'all', label: tr("notificationsscreen_hamisi_c73c4d", 'Hamısı') },
-  { id: 'community', label: tr("notificationsscreen_cemiyyet_2dc44d", 'Cəmiyyət') },
+  { id: 'all', label: tr("notificationsscreen_hamisi_c73c4d", 'HamÄ±sÄ±') },
+  { id: 'community', label: tr("notificationsscreen_cemiyyet_2dc44d", 'CÉ™miyyÉ™t') },
   { id: 'system', label: tr("notificationsscreen_filter_system", "Sistem") }];
 
 
   return (
-    <div className="h-[100dvh] overflow-y-auto bg-background pb-24" data-scroll-container>
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/70 backdrop-blur-3xl border-b border-border/10">
-        <div className="px-4 py-3">
-          <div className="flex items-center gap-3">
-            <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted/40 flex items-center justify-center" whileTap={{ scale: 0.9 }}>
-              <ArrowLeft className="w-4 h-4 text-foreground" />
+    <div className="a-scope safe-top h-[100dvh] overflow-y-auto pb-24" style={{ background: 'var(--a-bg)' }} data-scroll-container>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
+              <ArrowLeft size={16} strokeWidth={2} />
             </motion.button>
-            <div className="flex-1">
-              <h1 className="text-[18px] font-black text-foreground">{tr("notificationsscreen_bildirisler_54eb88", "Bildirişlər")}</h1>
-              {unreadCount > 0 && <p className="text-[10px] text-muted-foreground/50 font-medium">{unreadCount} {tr("notificationsscreen_oxunmamis_8bfc41", "oxunmam\u0131\u015F")}</p>}
+            <div style={{ minWidth: 0 }}>
+              {unreadCount > 0 && <p className="a-eyebrow">{unreadCount} {tr("notificationsscreen_oxunmamis_8bfc41", "oxunmam\u0131\u015F")}</p>}
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("notificationsscreen_bildirisler_54eb88", "BildiriÅŸlÉ™r")}</p>
             </div>
-            {unreadCount > 0 &&
-            <motion.button onClick={markAllAsRead} className="px-3 py-1.5 rounded-full bg-primary/8 text-primary text-[10px] font-bold" whileTap={{ scale: 0.95 }}>
-                <Check className="w-3 h-3 inline mr-1" />{tr("notificationsscreen_hamisini_oxu_29ceea", "Ham\u0131s\u0131n\u0131 oxu")}
+          </div>
+          {unreadCount > 0 &&
+          <div className="a-topbar-actions">
+              <motion.button onClick={markAllAsRead} className="a-btn-soft" whileTap={{ scale: 0.95 }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
+                <Check size={12} strokeWidth={2.5} />{tr("notificationsscreen_hamisini_oxu_29ceea", "Ham\u0131s\u0131n\u0131 oxu")}
               </motion.button>
-            }
-          </div>
-
-          {/* Filter tabs */}
-          <div className="flex gap-1 mt-3">
-            {filters.map((f) =>
-            <button key={f.id} onClick={() => setFilter(f.id)}
-            className={`relative px-3.5 py-1.5 text-[11px] font-bold transition-colors ${filter === f.id ? 'text-foreground' : 'text-muted-foreground/35'}`}>
-                {f.label}
-                {filter === f.id &&
-              <motion.div layoutId="notif-filter" className="absolute bottom-0 left-1 right-1 h-[2px] rounded-full bg-primary"
-              transition={{ type: 'spring', stiffness: 500, damping: 30 }} />
-              }
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* List */}
-      <div className="px-4 pt-3">
-        {loading ?
-        <div className="text-center py-16"><div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" /></div> :
-        filteredNotifications.length === 0 ?
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
-            <div className="w-16 h-16 rounded-full bg-muted/15 flex items-center justify-center mx-auto mb-3">
-              <Bell className="w-7 h-7 text-muted-foreground/20" />
             </div>
-            <p className="text-[13px] font-bold text-muted-foreground/35">{tr("notificationsscreen_bildiris_yoxdur_6ccf4d", "Bildiriş yoxdur")}</p>
-            <p className="text-[11px] text-muted-foreground/25 mt-1">{tr("notificationsscreen_yeni_bildirisler_burada_gorunecek_a0484a", "Yeni bildirişlər burada görünəcək")}</p>
+          }
+        </header>
+
+        {/* Filter tabs */}
+        <div className="a-tabs" style={{ marginBottom: 14 }}>
+          {filters.map((f) =>
+          <button key={f.id} onClick={() => setFilter(f.id)} className={`a-tab ${filter === f.id ? 'active' : ''}`}>
+              {f.label}
+            </button>
+          )}
+        </div>
+
+        {/* List */}
+        {loading ?
+        <div className="text-center py-16">
+            <div className="w-7 h-7 rounded-full animate-spin mx-auto"
+          style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
+          </div> :
+        filteredNotifications.length === 0 ?
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="a-card" style={{ textAlign: 'center', padding: '34px 18px' }}>
+            <div className="mx-auto mb-4 flex items-center justify-center"
+          style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--a-surface-soft)' }}>
+              <Bell size={26} style={{ color: 'var(--a-ink-faint)' }} />
+            </div>
+            <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr("notificationsscreen_bildiris_yoxdur_6ccf4d", "BildiriÅŸ yoxdur")}</h3>
+            <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("notificationsscreen_yeni_bildirisler_burada_gorunecek_a0484a", "Yeni bildiriÅŸlÉ™r burada gÃ¶rÃ¼nÉ™cÉ™k")}</p>
           </motion.div> :
 
-        <div className="space-y-2">
+        <div className="space-y-2.5">
             {filteredNotifications.map((notification, index) => {
-            const { icon: Icon, color } = getNotificationIcon(notification.notification_type);
+            const { icon: Icon, bg, ink } = getNotificationIcon(notification.notification_type);
             const isCommunity = communityTypes.includes(notification.notification_type);
             return (
               <motion.div
@@ -132,38 +134,45 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03 }}
                 onClick={() => handleNotificationClick(notification)}
-                className={`bg-card rounded-2xl p-3.5 border transition-all ${
-                notification.is_read ? 'border-border/8' : 'border-primary/15 bg-primary/3'} ${
-                isCommunity ? 'cursor-pointer active:scale-[0.99]' : ''}`}>
-                
+                className={isCommunity ? 'cursor-pointer active:scale-[0.99]' : ''}
+                style={{
+                  background: 'var(--a-surface)',
+                  borderRadius: 'var(--a-radius-md)',
+                  padding: '14px 15px',
+                  boxShadow: 'var(--a-card-shadow)',
+                  border: notification.is_read ? '1.5px solid transparent' : '1.5px solid var(--a-peach-2)',
+                  transition: 'border-color 0.2s, transform 0.1s'
+                }}>
+
                   <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 rounded-full ${color} flex items-center justify-center flex-shrink-0`}>
-                      <Icon className="w-4.5 h-4.5" />
+                    <div className="flex items-center justify-center flex-shrink-0"
+                  style={{ width: 40, height: 40, borderRadius: 14, background: bg }}>
+                      <Icon size={17} style={{ color: ink }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <h3 className={`text-[12px] font-bold ${notification.is_read ? 'text-foreground' : 'text-primary'}`}>
+                        <h3 style={{ fontSize: 12.5, fontWeight: 700, color: notification.is_read ? 'var(--a-ink)' : 'var(--a-accent-ink)', lineHeight: 1.3 }}>
                           {notification.title}
                         </h3>
-                        <span className="text-[9px] text-muted-foreground/40 whitespace-nowrap font-medium">{formatTime(notification.created_at)}</span>
+                        <span className="whitespace-nowrap" style={{ fontSize: 9.5, fontWeight: 500, color: 'var(--a-ink-faint)' }}>{formatTime(notification.created_at)}</span>
                       </div>
-                      <p className="text-[11px] text-muted-foreground/60 mt-0.5 leading-relaxed line-clamp-2">{notification.message}</p>
+                      <p className="mt-0.5 leading-relaxed line-clamp-2" style={{ fontSize: 11.5, color: 'var(--a-ink-soft)' }}>{notification.message}</p>
                       {isCommunity &&
-                    <p className="text-[9px] text-primary/50 font-bold mt-1.5">{tr("notificationsscreen_gormek_ucun_toxun_04883f", "Görmək üçün toxun →")}</p>
+                    <p className="mt-1.5" style={{ fontSize: 9.5, fontWeight: 700, color: 'var(--a-accent-ink)' }}>{tr("notificationsscreen_gormek_ucun_toxun_04883f", "GÃ¶rmÉ™k Ã¼Ã§Ã¼n toxun â†’")}</p>
                     }
                     </div>
                   </div>
-                  {/* Swipe actions alternative: button row */}
-                  <div className="flex gap-1.5 mt-2.5 ml-13 justify-end">
+                  <div className="flex gap-1.5 mt-2.5 justify-end">
                     {!notification.is_read &&
                   <button onClick={(e) => {e.stopPropagation();markAsRead(notification.id);}}
-                  className="px-2.5 py-1 rounded-full bg-primary/8 text-primary text-[9px] font-bold">
+                  style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', borderRadius: 999, padding: '4px 11px', fontSize: 9.5, fontWeight: 700 }}>
                         {tr("notificationsscreen_read", "Oxundu")}
                       </button>
                   }
                     <button onClick={(e) => {e.stopPropagation();deleteNotification(notification.id);}}
-                  className="px-2.5 py-1 rounded-full bg-destructive/8 text-destructive text-[9px] font-bold">
-                      <Trash2 className="w-2.5 h-2.5 inline mr-0.5" />{tr("notificationsscreen_delete", "Sil")}
+                  className="inline-flex items-center gap-1"
+                  style={{ background: 'var(--a-alert-bg)', color: 'var(--a-alert-ink)', borderRadius: 999, padding: '4px 11px', fontSize: 9.5, fontWeight: 700 }}>
+                      <Trash2 size={10} />{tr("notificationsscreen_delete", "Sil")}
                     </button>
                   </div>
                 </motion.div>);

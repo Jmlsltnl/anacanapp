@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MessageCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, MessageCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useDirectMessages, Conversation } from '@/hooks/useDirectMessages';
 import { usePartnerConversation } from '@/hooks/usePartnerConversation';
@@ -41,64 +41,75 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50 px-5 py-4 flex items-center gap-3 safe-area-top">
-        <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center" whileTap={{ scale: 0.9 }}>
-          <ArrowLeft className="w-4 h-4" />
-        </motion.button>
-        <h1 className="text-lg font-bold text-foreground flex-1">{tr("untranslated_mesajlar_ak8wzw", "Mesajlar")}</h1>
-      </div>
-
-      {loading || partnerLoading ?
-      <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        </div> :
-      allConversations.length === 0 ?
-      <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <MessageCircle className="w-7 h-7 text-primary" />
-          </div>
-          <p className="text-base font-semibold text-foreground mb-1">{tr("conversationlistscreen_hele_mesajiniz_yoxdur_79d3c7", "Hələ mesajınız yoxdur")}</p>
-          <p className="text-sm text-muted-foreground">{tr("conversationlistscreen_istifadeci_profilinden_mesaj_gondere_bil_777661", "İstifadəçi profilindən mesaj göndərə bilərsiniz")}</p>
-        </div> :
-
-      <div className="divide-y divide-border/30">
-          {allConversations.map((conv) =>
-        <motion.button
-          key={conv.user_id}
-          onClick={() => onOpenChat(conv.user_id, conv.name, conv.avatar_url)}
-          className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-muted/30 transition-colors text-left"
-          whileTap={{ scale: 0.98 }}>
-          
-              <div className="relative">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={conv.avatar_url || undefined} />
-                  <AvatarFallback className="bg-primary/10 text-primary font-bold">{conv.name?.charAt(0)}</AvatarFallback>
-                </Avatar>
-                {conv.unread_count > 0 &&
-            <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
-                    {conv.unread_count > 9 ? '9+' : conv.unread_count}
-                  </span>
-            }
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <p className={`text-[14px] font-semibold text-foreground truncate ${conv.unread_count > 0 ? 'font-bold' : ''}`}>
-                    {conv.name}
-                  </p>
-                  <span className="text-[10px] text-muted-foreground flex-shrink-0 ml-2">
-                    {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: false, locale: getCurrentDateLocale() })}
-                  </span>
-                </div>
-                <p className={`text-[12px] truncate mt-0.5 ${conv.unread_count > 0 ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
-                  {getLastMessagePreview(conv.last_message_type, conv.last_message)}
-                </p>
-              </div>
+    <div className="a-scope min-h-screen pb-24" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar safe-area-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
+              <ArrowLeft size={16} strokeWidth={2} />
             </motion.button>
-        )}
-        </div>
-      }
+            <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("untranslated_mesajlar_ak8wzw", "Mesajlar")}</p>
+          </div>
+        </header>
+
+        {loading || partnerLoading ?
+        <div className="flex items-center justify-center py-16">
+            <div className="w-7 h-7 rounded-full animate-spin"
+          style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
+          </div> :
+        allConversations.length === 0 ?
+        <div className="a-card" style={{ textAlign: 'center', padding: '38px 18px' }}>
+            <div className="mx-auto mb-4 flex items-center justify-center"
+          style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--a-peach-1)' }}>
+              <MessageCircle size={26} style={{ color: 'var(--a-accent-ink)' }} />
+            </div>
+            <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr("conversationlistscreen_hele_mesajiniz_yoxdur_79d3c7", "Hələ mesajınız yoxdur")}</h3>
+            <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("conversationlistscreen_istifadeci_profilinden_mesaj_gondere_bil_777661", "İstifadəçi profilindən mesaj göndərə bilərsiniz")}</p>
+          </div> :
+
+        <div className="a-list-card" style={{ padding: '4px 0' }}>
+            {allConversations.map((conv, idx) =>
+          <motion.button
+            key={conv.user_id}
+            onClick={() => onOpenChat(conv.user_id, conv.name, conv.avatar_url)}
+            className="w-full flex items-center gap-3 text-left"
+            whileTap={{ scale: 0.98 }}
+            style={{
+              padding: '12px 16px',
+              borderBottom: idx < allConversations.length - 1 ? '1px solid var(--a-line)' : 'none'
+            }}>
+
+                <div className="relative shrink-0">
+                  <Avatar className="w-12 h-12" style={{ border: '2px solid var(--a-peach-1)' }}>
+                    <AvatarImage src={conv.avatar_url || undefined} />
+                    <AvatarFallback style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', fontWeight: 700 }}>{conv.name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  {conv.unread_count > 0 &&
+              <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center"
+              style={{ width: 20, height: 20, borderRadius: 999, background: 'var(--a-peach-2)', color: '#fff', fontSize: 10, fontWeight: 800, border: '2px solid var(--a-surface)' }}>
+                      {conv.unread_count > 9 ? '9+' : conv.unread_count}
+                    </span>
+              }
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <p className="truncate" style={{ fontSize: 14, fontWeight: conv.unread_count > 0 ? 800 : 600, color: 'var(--a-ink)' }}>
+                      {conv.name}
+                    </p>
+                    <span className="flex-shrink-0 ml-2" style={{ fontSize: 10, color: 'var(--a-ink-faint)', fontWeight: 500 }}>
+                      {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: false, locale: getCurrentDateLocale() })}
+                    </span>
+                  </div>
+                  <p className="truncate mt-0.5" style={{ fontSize: 12, color: conv.unread_count > 0 ? 'var(--a-ink)' : 'var(--a-ink-soft)', fontWeight: conv.unread_count > 0 ? 600 : 400 }}>
+                    {getLastMessagePreview(conv.last_message_type, conv.last_message)}
+                  </p>
+                </div>
+              </motion.button>
+          )}
+          </div>
+        }
+      </div>
     </div>);
 
 };

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Calculator, Baby, FileText, ChevronRight,
@@ -12,7 +13,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format, addDays, subDays } from 'date-fns';
-import { az, enUS } from 'date-fns/locale';
+import { getCurrentDateLocale } from '@/lib/date-utils';
 
 import { useMaternityBenefits } from '@/hooks/useMaternityBenefits';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
@@ -38,7 +39,10 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
   const [activeTab, setActiveTab] = useState('calculator');
   const [salary, setSalary] = useState('');
   const [pregnancyType, setPregnancyType] = useState<'normal' | 'complicated' | 'multiple'>('normal');
-  const [selectedCountryCode, setSelectedCountryCode] = useState<string>('AZ');
+  // Default ölkə tətbiq dilinə görə (tr→TR, ru→RU, əks halda AZ); istifadəçi istənilən vaxt dəyişə bilər
+  const [selectedCountryCode, setSelectedCountryCode] = useState<string>(
+    language === 'tr' ? 'TR' : language === 'ru' ? 'RU' : 'AZ'
+  );
   const [eddDate, setEddDate] = useState<string>('');
   const [role, setRole] = useState<'mother' | 'father'>('mother');
   
@@ -193,63 +197,59 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+        <div className="animate-spin w-8 h-8 rounded-full" style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
       </div>
     );
   }
 
-  const dateLocale = isAZ ? az : enUS;
+  const dateLocale = getCurrentDateLocale();
   const formatDate = (date: Date) => format(date, 'dd MMMM yyyy', { locale: dateLocale });
 
   return (
-    <div className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
-      {/* Minimalist Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              <ArrowLeft className="w-5 h-5 text-foreground" />
+    <div className="a-scope" style={{ background: 'var(--a-bg)', minHeight: '100vh', paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
+              <ArrowLeft size={16} strokeWidth={2} />
             </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Calculator className="w-5 h-5 text-primary" />
-                {tr("maternitycalculator_title_3c7a2d", "Dekret Kalkulyatoru")}
-              </h1>
+            <div>
+              <p className="a-eyebrow">{isAZ ? selectedRule.name_az : selectedRule.name_en} {selectedRule.flag}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("maternitycalculator_title_3c7a2d", "Dekret Kalkulyatoru")}</p>
             </div>
           </div>
-        </div>
-      </div>
+        </header>
 
-      <div className="px-4 pt-3 relative z-30">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-2 bg-card/95 backdrop-blur-sm shadow-lg rounded-xl p-1">
-            <TabsTrigger value="calculator" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Calculator className="w-4 h-4 mr-2" />
+          <TabsList className="w-full grid grid-cols-2 h-auto rounded-full p-[3px] border-0" style={{ background: 'var(--a-surface-soft)' }}>
+            <TabsTrigger
+              value="calculator"
+              className="rounded-full py-1.5 text-[11.5px] font-bold border-0 shadow-none data-[state=active]:shadow-none data-[state=active]:bg-[var(--a-peach-1)] data-[state=active]:text-[var(--a-accent-ink)] text-[var(--a-ink-soft)]">
+              <Calculator className="w-3.5 h-3.5 mr-1.5" />
               {tr("maternitycalculator_calculate_3c7a2d", "Hesabla")}
             </TabsTrigger>
-            <TabsTrigger value="guide" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <FileText className="w-4 h-4 mr-2" />
+            <TabsTrigger
+              value="guide"
+              className="rounded-full py-1.5 text-[11.5px] font-bold border-0 shadow-none data-[state=active]:shadow-none data-[state=active]:bg-[var(--a-peach-1)] data-[state=active]:text-[var(--a-accent-ink)] text-[var(--a-ink-soft)]">
+              <FileText className="w-3.5 h-3.5 mr-1.5" />
               {tr("maternitycalculator_beledci_013a52", "Bələdçi")}
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="calculator" className="mt-4 space-y-4">
+          <TabsContent value="calculator" className="mt-4 space-y-3">
             
             {/* Country Selection */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-card rounded-2xl p-4 border border-border">
-              <Label className="text-base font-semibold mb-3 flex items-center gap-2">
-                <Globe className="w-5 h-5 text-primary" />
-                {tr("country", "Ölkə")}
-              </Label>
+              className="a-card">
+              <div className="a-card-head" style={{ marginBottom: 10 }}>
+                <h3 className="a-card-title a-heading">🌍 {tr("country", "Ölkə")}</h3>
+              </div>
               <Select value={selectedCountryCode} onValueChange={setSelectedCountryCode}>
-                <SelectTrigger className="h-14 text-lg bg-background rounded-xl border-border">
+                <SelectTrigger className="h-12 rounded-xl border-0 text-sm font-semibold" style={{ background: 'var(--a-surface-soft)', color: 'var(--a-ink)' }}>
                   <SelectValue placeholder={tr("select_country", "Ölkə seçin")} />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
@@ -267,26 +267,26 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-card rounded-2xl p-4 border border-border">
-              <Label className="text-base font-semibold mb-3 flex items-center gap-2">
-                {tr("maternitycalculator_rolunuz", "Rolunuz")}
-              </Label>
-              <div className="grid grid-cols-2 gap-3">
+              className="a-card">
+              <div className="a-card-head" style={{ marginBottom: 10 }}>
+                <h3 className="a-card-title a-heading">{tr("maternitycalculator_rolunuz", "Rolunuz")}</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => setRole('mother')}
-                  className={`p-3 rounded-xl border-2 font-semibold transition-all ${
-                    role === 'mother' ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'
-                  }`}
+                  className={`a-choice peach${role === 'mother' ? '' : ''}`}
+                  style={role === 'mother' ? { borderColor: 'var(--a-peach-2)', background: 'var(--a-tag-on-bg)', color: 'var(--a-accent-ink)', fontWeight: 700 } : { background: 'var(--a-surface-soft)' }}
                 >
-                  🤰 {tr("maternitycalculator_ana", "Ana")}
+                  <span className="text-xl">🤰</span>
+                  <span className="a-choice-label">{tr("maternitycalculator_ana", "Ana")}</span>
                 </button>
                 <button
                   onClick={() => setRole('father')}
-                  className={`p-3 rounded-xl border-2 font-semibold transition-all ${
-                    role === 'father' ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'
-                  }`}
+                  className="a-choice"
+                  style={role === 'father' ? { borderColor: 'var(--a-peach-2)', background: 'var(--a-tag-on-bg)', color: 'var(--a-accent-ink)', fontWeight: 700 } : { background: 'var(--a-surface-soft)' }}
                 >
-                  👨‍🍼 {tr("maternitycalculator_ata", "Ata")}
+                  <span className="text-xl">👨‍🍼</span>
+                  <span className="a-choice-label">{tr("maternitycalculator_ata", "Ata")}</span>
                 </button>
               </div>
             </motion.div>
@@ -296,16 +296,16 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-card rounded-2xl p-4 border border-border">
-              <Label className="text-base font-semibold mb-3 flex items-center gap-2">
-                <CalendarDays className="w-5 h-5 text-primary" />
-                {tr("maternitycalculator_edd_date", "Təxmini Doğuş Tarixi (EDD)")}
-              </Label>
-              <Input
+              className="a-card">
+              <div className="a-card-head" style={{ marginBottom: 10 }}>
+                <h3 className="a-card-title a-heading">📅 {tr("maternitycalculator_edd_date", "Təxmini Doğuş Tarixi (EDD)")}</h3>
+              </div>
+              <input
                 type="date"
                 value={eddDate}
                 onChange={(e) => setEddDate(e.target.value)}
-                className="h-14 text-lg bg-background rounded-xl border-border"
+                className="a-input"
+                style={{ width: '100%', padding: '13px 14px', fontSize: 14 }}
               />
             </motion.div>
 
@@ -315,26 +315,27 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
-                className="bg-card rounded-2xl p-4 border border-border">
-                <Label className="text-base font-semibold mb-3 block">
-                  {tr("maternitycalculator_ayliq_emek_haqqiniz", "Aylıq əmək haqqınız")} ({selectedRule.compensation.currency})
-                </Label>
+                className="a-card">
+                <div className="a-card-head" style={{ marginBottom: 10 }}>
+                  <h3 className="a-card-title a-heading">💵 {tr("maternitycalculator_ayliq_emek_haqqiniz", "Aylıq əmək haqqınız")} ({selectedRule.compensation.currency})</h3>
+                </div>
                 <div className="relative">
-                  <Input
+                  <input
                     type="number"
                     value={salary}
                     onChange={(e) => setSalary(e.target.value)}
                     placeholder={language === 'en' ? "e.g. 800" : "Məsələn: 800"}
-                    className="h-14 text-lg pr-16" 
+                    className="a-input"
+                    style={{ width: '100%', padding: '13px 60px 13px 14px', fontSize: 15, fontWeight: 700 }}
                   />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 a-list-value" style={{ color: 'var(--a-ink-soft)' }}>
                     {selectedRule.compensation.currency}
                   </span>
                 </div>
                 {selectedCountryCode === 'AZ' && config && parseFloat(salary) > 0 && parseFloat(salary) < config.minSalary &&
-                <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {tr("maternitycalculator_minimum_emek_haqqi_f94050", "Minimum əmək haqqı (")}{config.minSalary} AZN) {tr("maternitycalculator_azn_esas_goturulecek_5cb1de", "əsas götürüləcək")}
+                <p className="a-today-info-tip" style={{ marginTop: 10 }}>
+                    <AlertCircle size={13} />
+                    <span>{tr("maternitycalculator_minimum_emek_haqqi_f94050", "Minimum əmək haqqı (")}{config.minSalary} AZN) {tr("maternitycalculator_azn_esas_goturulecek_5cb1de", "əsas götürüləcək")}</span>
                   </p>
                 }
               </motion.div>
@@ -346,10 +347,10 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-card rounded-2xl p-4 border border-border">
-              <Label className="text-base font-semibold mb-3 block">
-                {tr("maternitycalculator_hamilelik_novu_ace2e8", "Hamiləlik növü")}
-              </Label>
+              className="a-card">
+              <div className="a-card-head" style={{ marginBottom: 10 }}>
+                <h3 className="a-card-title a-heading">{tr("maternitycalculator_hamilelik_novu_ace2e8", "Hamiləlik növü")}</h3>
+              </div>
               <RadioGroup
                 value={pregnancyType}
                 onValueChange={(v) => setPregnancyType(v as 'normal' | 'complicated' | 'multiple')}
@@ -357,16 +358,18 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                 {pregnancyTypes.map((type) =>
                 <label
                   key={type.value}
-                  className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                  pregnancyType === type.value ?
-                  'border-primary bg-primary/5' :
-                  'border-border hover:border-primary/50'}`
-                  }>
+                  className="flex items-center gap-3 cursor-pointer transition-all"
+                  style={{
+                    padding: 12,
+                    borderRadius: 16,
+                    border: pregnancyType === type.value ? '1.5px solid var(--a-peach-2)' : '1.5px solid var(--a-line)',
+                    background: pregnancyType === type.value ? 'var(--a-tag-on-bg)' : 'var(--a-surface-soft)'
+                  }}>
                     <RadioGroupItem value={type.value} id={type.value} />
                     <span className="text-2xl">{type.icon}</span>
                     <div className="flex-1">
-                      <p className="font-medium">{type.label}</p>
-                      <p className="text-xs text-muted-foreground">{type.description}</p>
+                      <p className="a-list-title">{type.label}</p>
+                      <p className="a-list-sub">{type.description}</p>
                     </div>
                   </label>
                 )}
@@ -379,13 +382,14 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}>
-              <Button
+              <button
                 onClick={handleCalculate}
                 disabled={!eddDate || (role === 'mother' && selectedRule.compensation?.type !== 'UNPAID' && (!salary || parseFloat(salary) <= 0))}
-                className="w-full h-14 text-lg font-semibold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500">
-                <Calculator className="w-5 h-5 mr-2" />
+                className="a-btn-solid w-full"
+                style={{ justifyContent: 'center', padding: '14px 18px', fontSize: 14, opacity: (!eddDate || (role === 'mother' && selectedRule.compensation?.type !== 'UNPAID' && (!salary || parseFloat(salary) <= 0))) ? 0.45 : 1 }}>
+                <Calculator size={17} strokeWidth={2.2} />
                 {tr("maternitycalculator_calculate_3c7a2d", "Hesabla")}
-              </Button>
+              </button>
             </motion.div>
 
             {/* Results */}
@@ -397,128 +401,124 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                 exit={{ opacity: 0, y: -20, height: 0 }}
                 className="space-y-3 pb-8">
                 
-                  {/* Total Result Card */}
-                  <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white">
-                    <div className="flex items-center justify-between mb-4">
-                      <p className="text-white/90 font-medium text-lg">
-                        {isAZ ? result.rule.name_az : result.rule.name_en} - {tr("maternitycalculator_cemi_mezuniyyet_93196a", "Cəmi məzuniyyət")}
-                      </p>
-                      <span className="text-3xl">{result.rule.flag}</span>
+                  {/* Total Result Card (anacan-demo CTA) */}
+                  <div className="a-cta" style={{ background: 'var(--a-grad-green)' }}>
+                    <span className="a-cta-shape" style={{ width: 120, height: 120, top: -40, right: -30, background: 'rgba(255,255,255,0.35)' }} />
+                    <div className="a-cta-top">
+                      <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: '#14532d' }}>
+                        {result.rule.flag} {isAZ ? result.rule.name_az : result.rule.name_en} · {tr("maternitycalculator_cemi_mezuniyyet_93196a", "Cəmi məzuniyyət")}
+                      </span>
                     </div>
-                    <p className="text-4xl font-black mb-1">
+                    <h2 className="a-cta-title a-heading" style={{ color: '#14532d', fontSize: 30, margin: '14px 0 4px' }}>
                       {result.totalDays} {tr("maternitycalculator_gun_54e78d", "gün")}
-                    </p>
-                    <p className="text-white/80 text-sm">
+                    </h2>
+                    <p className="a-cta-text" style={{ color: 'rgba(20, 83, 45, 0.75)' }}>
                       {result.daysBefore} {tr("days_before", "gün əvvəl")} + {result.daysAfter} {tr("days_after", "gün sonra")}
                     </p>
                   </div>
 
                   {/* Visual Timeline */}
-                  <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                    <div className="p-4 border-b border-border">
-                      <p className="font-semibold flex items-center gap-2">
-                        <CalendarDays className="w-4 h-4 text-primary" />
-                        {tr("maternitycalculator_zaman_xetti_visual", "Zaman Xətti")}
-                      </p>
+                  <div className="a-card">
+                    <div className="a-card-head" style={{ marginBottom: 14 }}>
+                      <h3 className="a-card-title a-heading">📅 {tr("maternitycalculator_zaman_xetti_visual", "Zaman Xətti")}</h3>
                     </div>
-                    <div className="p-5">
-                      <div className="relative pl-6 space-y-6 border-l-2 border-primary/20 ml-2">
-                        {/* Start Date */}
+                    <div className="relative pl-6 space-y-5 ml-2" style={{ borderLeft: '2px solid var(--a-line-strong)' }}>
+                      {/* Start Date */}
+                      <div className="relative">
+                        <span className="absolute top-1 w-4 h-4 rounded-full" style={{ left: -33, background: 'var(--a-peach-1)', border: '2.5px solid var(--a-peach-2)' }} />
+                        <p className="a-list-title">{formatDate(result.leaveStartDate)}</p>
+                        <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{result.role === 'father' ? tr("maternitycalculator_paternity_start", "Atalıq məzuniyyətinin başlanğıcı") : tr("maternitycalculator_leave_start_date", "Məzuniyyətin Başlanğıcı")}</p>
+                      </div>
+                      
+                      {/* EDD */}
+                      {result.role === 'mother' && (
                         <div className="relative">
-                          <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-primary/20 border-2 border-primary" />
-                          <p className="font-bold text-foreground text-sm">{formatDate(result.leaveStartDate)}</p>
-                          <p className="text-muted-foreground text-sm">{result.role === 'father' ? tr("maternitycalculator_paternity_start", "Atalıq məzuniyyətinin başlanğıcı") : tr("maternitycalculator_leave_start_date", "Məzuniyyətin Başlanğıcı")}</p>
+                          <span className="absolute top-1 w-4 h-4 rounded-full" style={{ left: -33, background: 'var(--a-yellow-1)', border: '2.5px solid var(--a-yellow-2)' }} />
+                          <p className="a-list-title">{formatDate(new Date(eddDate))}</p>
+                          <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("maternitycalculator_edd_date", "Təxmini Doğuş Tarixi (EDD)")}</p>
                         </div>
-                        
-                        {/* EDD */}
-                        {result.role === 'mother' && (
-                          <div className="relative">
-                            <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-amber-500/20 border-2 border-amber-500" />
-                            <p className="font-bold text-foreground text-sm">{formatDate(new Date(eddDate))}</p>
-                            <p className="text-muted-foreground text-sm">{tr("maternitycalculator_edd_date", "Təxmini Doğuş Tarixi (EDD)")}</p>
-                          </div>
-                        )}
-                        
-                        {/* End Date */}
-                        <div className="relative">
-                          <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-orange-500/20 border-2 border-orange-500" />
-                          <p className="font-bold text-foreground text-sm">{formatDate(result.leaveEndDate)}</p>
-                          <p className="text-muted-foreground text-sm">{tr("maternitycalculator_leave_end_date", "Məzuniyyətin Sonu")}</p>
-                        </div>
-                        
-                        {/* Return to Work */}
-                        <div className="relative">
-                          <div className="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-emerald-500/20 border-2 border-emerald-500" />
-                          <p className="font-bold text-foreground text-sm">{formatDate(result.returnToWorkDate)}</p>
-                          <p className="text-muted-foreground text-sm">{tr("maternitycalculator_return_to_work", "İşə Qayıdış Tarixi")}</p>
-                        </div>
+                      )}
+                      
+                      {/* End Date */}
+                      <div className="relative">
+                        <span className="absolute top-1 w-4 h-4 rounded-full" style={{ left: -33, background: 'var(--a-pink-1)', border: '2.5px solid var(--a-pink-2)' }} />
+                        <p className="a-list-title">{formatDate(result.leaveEndDate)}</p>
+                        <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("maternitycalculator_leave_end_date", "Məzuniyyətin Sonu")}</p>
+                      </div>
+                      
+                      {/* Return to Work */}
+                      <div className="relative">
+                        <span className="absolute top-1 w-4 h-4 rounded-full" style={{ left: -33, background: 'var(--a-green-1)', border: '2.5px solid var(--a-green-2)' }} />
+                        <p className="a-list-title">{formatDate(result.returnToWorkDate)}</p>
+                        <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("maternitycalculator_return_to_work", "İşə Qayıdış Tarixi")}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Financial Breakdown */}
                   {result.benefitResult ? (
-                    <div className="bg-card rounded-2xl border border-border overflow-hidden">
-                      <div className="p-4 border-b border-border">
-                        <p className="font-semibold flex items-center gap-2">
-                          <Banknote className="w-4 h-4 text-primary" />
-                          {tr("financial_details", "Maliyyə Hesablaması")}
-                        </p>
+                    <div className="a-card" style={{ padding: 0, overflow: 'hidden' }}>
+                      <div style={{ padding: '16px 18px 12px' }}>
+                        <h3 className="a-card-title a-heading">💰 {tr("financial_details", "Maliyyə Hesablaması")}</h3>
                       </div>
-                      <div className="divide-y divide-border">
-                        <div className="flex justify-between items-center p-4">
-                          <span className="text-muted-foreground">{tr("maternitycalculator_orta_gunluk_emek_haqqi_39d8be", "Orta günlük əmək haqqı")}</span>
-                          <span className="font-semibold">{result.benefitResult.dailySalary.toFixed(2)} {result.benefitResult.currency}</span>
+                      <div>
+                        <div className="flex justify-between items-center" style={{ padding: '12px 18px', borderTop: '1px solid var(--a-line)' }}>
+                          <span className="a-list-sub" style={{ margin: 0 }}>{tr("maternitycalculator_orta_gunluk_emek_haqqi_39d8be", "Orta günlük əmək haqqı")}</span>
+                          <span className="a-list-title">{result.benefitResult.dailySalary.toFixed(2)} {result.benefitResult.currency}</span>
                         </div>
-                        <div className="flex justify-between items-center p-4">
-                          <span className="text-muted-foreground">{tr("maternitycalculator_dekret_odenisi_af1939", "Dekret ödənişi")}</span>
-                          <span className="font-semibold text-emerald-600">{result.benefitResult.maternityBenefit.toLocaleString(isAZ ? 'az-AZ' : 'en-US', {maximumFractionDigits: 2})} {result.benefitResult.currency}</span>
+                        <div className="flex justify-between items-center" style={{ padding: '12px 18px', borderTop: '1px solid var(--a-line)' }}>
+                          <span className="a-list-sub" style={{ margin: 0 }}>{tr("maternitycalculator_dekret_odenisi_af1939", "Dekret ödənişi")}</span>
+                          <span className="a-list-title" style={{ color: 'var(--a-green-ink)' }}>{result.benefitResult.maternityBenefit.toLocaleString(getLocaleTag(), {maximumFractionDigits: 2})} {result.benefitResult.currency}</span>
                         </div>
                         {result.benefitResult.isNativeAz && result.benefitResult.birthBenefit && (
-                          <div className="flex justify-between items-center p-4">
-                            <span className="text-muted-foreground">{tr("maternitycalculator_dogum_muavineti_22766f", "Doğum müavinəti")}</span>
-                            <span className="font-semibold text-emerald-600">+{result.benefitResult.birthBenefit} {result.benefitResult.currency}</span>
+                          <div className="flex justify-between items-center" style={{ padding: '12px 18px', borderTop: '1px solid var(--a-line)' }}>
+                            <span className="a-list-sub" style={{ margin: 0 }}>{tr("maternitycalculator_dogum_muavineti_22766f", "Doğum müavinəti")}</span>
+                            <span className="a-list-title" style={{ color: 'var(--a-green-ink)' }}>+{result.benefitResult.birthBenefit} {result.benefitResult.currency}</span>
                           </div>
                         )}
-                        <div className="flex justify-between items-center p-4 bg-emerald-50 dark:bg-emerald-900/20">
-                          <span className="font-semibold text-emerald-900 dark:text-emerald-100">{tr("total_payment", "Yekun Ödəniş")}</span>
-                          <span className="font-bold text-xl text-emerald-700 dark:text-emerald-400">
-                            {result.benefitResult.totalBenefit.toLocaleString(isAZ ? 'az-AZ' : 'en-US', {maximumFractionDigits: 2})} {result.benefitResult.currency}
+                        <div className="flex justify-between items-center" style={{ padding: '14px 18px', borderTop: '1px solid var(--a-line)', background: 'var(--a-green-1)' }}>
+                          <span className="a-list-title" style={{ color: '#14532d' }}>{tr("total_payment", "Yekun Ödəniş")}</span>
+                          <span className="a-heading" style={{ fontSize: 19, fontWeight: 800, color: 'var(--a-green-ink)' }}>
+                            {result.benefitResult.totalBenefit.toLocaleString(getLocaleTag(), {maximumFractionDigits: 2})} {result.benefitResult.currency}
                           </span>
                         </div>
                       </div>
-                      <div className="bg-muted/50 p-4 text-xs text-muted-foreground">
+                      <div style={{ background: 'var(--a-surface-soft)', padding: '12px 18px' }}>
                         {result.benefitResult.formula && (
-                          <div className="mb-2">
-                            <strong>Formula:</strong> {result.benefitResult.formula}
-                          </div>
+                          <p className="a-list-sub" style={{ margin: '0 0 8px', whiteSpace: 'normal' }}>
+                            <strong style={{ color: 'var(--a-ink)' }}>Formula:</strong> {result.benefitResult.formula}
+                          </p>
                         )}
-                        <div className="text-amber-600 flex items-start gap-1">
-                          <AlertCircle className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                        <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal', display: 'flex', gap: 5, color: 'var(--a-yellow-ink)' }}>
+                          <AlertCircle size={12} style={{ flexShrink: 0, marginTop: 2 }} />
                           <span>{tr("maternitycalculator_approximate_note", "Qeyd: Hesablama qanunvericiliyin ümumi şərtlərinə əsaslanır və təxminidir. Real məbləğ stajdan və vergilərdən asılı olaraq dəyişə bilər.")}</span>
-                        </div>
+                        </p>
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-amber-50 dark:bg-amber-900/20 rounded-2xl border border-amber-200 dark:border-amber-800 p-4">
-                       <p className="font-semibold text-amber-800 dark:text-amber-200 flex items-center gap-2 mb-2">
-                          <Banknote className="w-4 h-4" />
-                          {tr("payment_rules", "Ödəniş Qaydaları")}
-                        </p>
-                        <p className="text-sm text-amber-700 dark:text-amber-300">
-                          {result.role === 'father' && result.rule.paternity ? (isAZ ? result.rule.paternity.payDescription_az : result.rule.paternity.payDescription_en) : (isAZ ? result.rule.payDescription_az : result.rule.payDescription_en)}
-                        </p>
+                    <div className="a-card">
+                      <div className="a-list-row" style={{ padding: 0, borderTop: 'none' }}>
+                        <span className="a-list-icon" style={{ background: 'var(--a-grad-yellow)', color: 'var(--a-warn-ink)' }}>
+                          <Banknote size={17} strokeWidth={2} />
+                        </span>
+                        <p className="a-list-title">{tr("payment_rules", "Ödəniş Qaydaları")}</p>
+                      </div>
+                      <p style={{ margin: '10px 0 0', fontSize: 12.5, lineHeight: 1.65, color: 'var(--a-ink-soft)' }}>
+                        {result.role === 'father' && result.rule.paternity ? (isAZ ? result.rule.paternity.payDescription_az : result.rule.paternity.payDescription_en) : (isAZ ? result.rule.payDescription_az : result.rule.payDescription_en)}
+                      </p>
                     </div>
                   )}
 
                   {/* Tenure Requirements */}
                   {result.rule.tenureRequirementMonths !== undefined && result.rule.tenureRequirementMonths > 0 && (
-                    <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800 p-4">
-                      <p className="font-semibold text-blue-800 dark:text-blue-200 flex items-center gap-2 mb-2">
-                        <CheckCircle2 className="w-4 h-4" />
-                        {language === 'en' ? "Tenure Requirement" : "İş Stajı Tələbi"}
-                      </p>
-                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                    <div className="a-card">
+                      <div className="a-list-row" style={{ padding: 0, borderTop: 'none' }}>
+                        <span className="a-list-icon" style={{ background: 'var(--a-grad-blue)', color: 'var(--a-blue-ink)' }}>
+                          <CheckCircle2 size={17} strokeWidth={2} />
+                        </span>
+                        <p className="a-list-title">{language === 'en' ? "Tenure Requirement" : "İş Stajı Tələbi"}</p>
+                      </div>
+                      <p style={{ margin: '10px 0 0', fontSize: 12.5, lineHeight: 1.65, color: 'var(--a-ink-soft)' }}>
                         {isAZ ? `Məzuniyyət ödənişi almaq üçün son iş yerində minimum ${result.rule.tenureRequirementMonths} ay iş stajınız olmalıdır.` : `You must have at least ${result.rule.tenureRequirementMonths} months of tenure at your current job to receive paid leave.`}
                       </p>
                     </div>
@@ -526,19 +526,19 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
 
                   {/* Parental Leave */}
                   {result.rule.parental && result.rule.parental.months > 0 && (
-                    <div className="bg-purple-50 dark:bg-purple-900/20 rounded-2xl border border-purple-200 dark:border-purple-800 p-4">
-                      <p className="font-semibold text-purple-800 dark:text-purple-200 flex items-center gap-2 mb-2">
-                        <Baby className="w-4 h-4" />
-                        {language === 'en' ? "Parental Leave" : "Uşağa Qulluq Məzuniyyəti"}
-                      </p>
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                          {language === 'en' ? "Duration" : "Müddət"}: {result.rule.parental.months} {language === 'en' ? "months" : "ay"}
-                        </p>
-                        <p className="text-sm text-purple-700/80 dark:text-purple-300/80">
-                          {isAZ ? result.rule.parental.payDescription_az : result.rule.parental.payDescription_en}
-                        </p>
+                    <div className="a-card">
+                      <div className="a-list-row" style={{ padding: 0, borderTop: 'none' }}>
+                        <span className="a-list-icon" style={{ background: 'var(--a-grad-lav)', color: 'var(--a-lav-ink)' }}>
+                          <Baby size={17} strokeWidth={2} />
+                        </span>
+                        <div>
+                          <p className="a-list-title">{language === 'en' ? "Parental Leave" : "Uşağa Qulluq Məzuniyyəti"}</p>
+                          <p className="a-list-sub">{language === 'en' ? "Duration" : "Müddət"}: {result.rule.parental.months} {language === 'en' ? "months" : "ay"}</p>
+                        </div>
                       </div>
+                      <p style={{ margin: '10px 0 0', fontSize: 12.5, lineHeight: 1.65, color: 'var(--a-ink-soft)' }}>
+                        {isAZ ? result.rule.parental.payDescription_az : result.rule.parental.payDescription_en}
+                      </p>
                     </div>
                   )}
                 </motion.div>
@@ -546,21 +546,24 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
             </AnimatePresence>
           </TabsContent>
 
-          <TabsContent value="guide" className="mt-4 space-y-3 pb-8">
+          <TabsContent value="guide" className="mt-4 space-y-2.5 pb-8">
             {guidelines.map((guide, index) =>
             <motion.div
               key={guide.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-card rounded-xl border border-border overflow-hidden">
+              transition={{ delay: Math.min(index * 0.05, 0.3) }}
+              className="a-card"
+              style={{ padding: 0, overflow: 'hidden' }}>
                 <button
                 onClick={() => setExpandedGuideline(expandedGuideline === guide.id ? null : guide.id)}
-                className="w-full flex items-center gap-3 p-4 text-left">
-                  <span className="text-2xl">{guide.icon}</span>
-                  <span className="flex-1 font-medium">{guide.title}</span>
+                className="a-list-row w-full text-left"
+                style={{ width: '100%', background: 'none', border: 'none', borderTop: 'none', cursor: 'pointer' }}>
+                  <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', fontSize: 18 }}>{guide.icon}</span>
+                  <p className="a-list-title" style={{ flex: 1, whiteSpace: 'normal' }}>{guide.title}</p>
                   <ChevronRight
-                  className={`w-5 h-5 text-muted-foreground transition-transform ${
+                  size={16}
+                  className={`a-list-chevron transition-transform ${
                   expandedGuideline === guide.id ? 'rotate-90' : ''}`
                   } />
                 </button>
@@ -571,8 +574,8 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden">
-                      <div className="px-4 pb-4 pt-0">
-                        <div className="bg-muted/50 rounded-xl p-4">
+                      <div style={{ padding: '0 16px 16px' }}>
+                        <div style={{ background: 'var(--a-surface-soft)', borderRadius: 14, padding: 14 }}>
                           <MarkdownContent content={guide.content} />
                         </div>
                       </div>
@@ -584,14 +587,11 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
             
             {/* DSMF Contact - Only for AZ */}
             {selectedCountryCode === 'AZ' && (
-              <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-4 border border-primary/20">
-                <div className="flex items-center gap-3">
-                  <HelpCircle className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="font-medium">{tr("maternitycalculator_elave_melumat_ucun_9e3dfc", "Əlavə məlumat üçün")}</p>
-                    <p className="text-sm text-muted-foreground">{tr("maternitycalculator_dsmf_qaynar_xetti_d8e628", "DSMF qaynar xətti:")}<strong>142</strong></p>
-                  </div>
-                </div>
+              <div className="a-today-info-tip" style={{ marginTop: 12 }}>
+                <HelpCircle size={15} />
+                <span>
+                  <strong>{tr("maternitycalculator_elave_melumat_ucun_9e3dfc", "Əlavə məlumat üçün")}</strong> — {tr("maternitycalculator_dsmf_qaynar_xetti_d8e628", "DSMF qaynar xətti:")} <strong>142</strong>
+                </span>
               </div>
             )}
           </TabsContent>

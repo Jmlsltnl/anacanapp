@@ -62,17 +62,20 @@ const RelatedPosts = ({ currentPost, allPosts, onSelectPost }: RelatedPostsProps
   if (relatedPosts.length === 0) return null;
 
   return (
-    <div className="mt-8 pt-6 border-t border-border">
-      <h3 className="font-bold text-lg text-foreground mb-4 flex items-center gap-2">
-        {tr("relatedposts_oxsar_meqaleler_c3c8cf", "\uD83D\uDCDA Ox\u015Far M\u0259qal\u0259l\u0259r")}
-      </h3>
+    <div className="mt-6 pt-2">
+      <div className="a-section-head">
+        <h3 className="a-section-title a-heading" style={{ fontSize: 15 }}>
+          {tr("relatedposts_oxsar_meqaleler_c3c8cf", "\uD83D\uDCDA Ox\u015Far M\u0259qal\u0259l\u0259r")}
+        </h3>
+      </div>
       
-      <div className="space-y-3">
+      <div className="a-list-card">
         {relatedPosts.map((post, index) =>
         <motion.button
           key={post.id}
           onClick={() => onSelectPost(post)}
-          className="w-full bg-card rounded-xl p-3 border border-border/50 flex items-center gap-3 text-left hover:bg-muted/50 transition-colors"
+          className="a-list-row w-full text-left"
+          style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}
@@ -82,27 +85,27 @@ const RelatedPosts = ({ currentPost, allPosts, onSelectPost }: RelatedPostsProps
           <img
             src={post.cover_image_url}
             alt={post.title}
-            className="w-16 h-16 rounded-lg object-cover shrink-0" /> :
+            className="w-14 h-14 rounded-xl object-cover shrink-0" /> :
 
 
-          <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <span className="text-2xl">📖</span>
-              </div>
+          <span className="a-list-icon" style={{ background: 'var(--a-illus-grad)', fontSize: 20 }}>
+                📖
+              </span>
           }
             
             <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-foreground text-sm line-clamp-2 mb-1">
+              <p className="a-list-title line-clamp-2" style={{ whiteSpace: 'normal' }}>
                 {post.title}
-              </h4>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              </p>
+              <p className="a-list-sub flex items-center gap-1.5">
                 <Clock className="w-3 h-3" />
                 <span>{post.reading_time} {tr("relatedposts_deq_780a5c", "d\u0259q")}</span>
                 <span>•</span>
                 <span>{post.view_count} {tr("relatedposts_baxis_d4da3e", "bax\u0131\u015F")}</span>
-              </div>
+              </p>
             </div>
             
-            <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+            <ChevronRight size={16} className="a-list-chevron" />
           </motion.button>
         )}
       </div>

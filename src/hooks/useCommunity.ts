@@ -169,36 +169,32 @@ export const useGroupPosts = (groupId: string | null) => {
 
       const authorMap = await getPublicProfileCards((posts || []).map((p: any) => p.user_id));
 
-      // Fetch like status for each post (author info is now batched)
-      const postsWithDetails = await Promise.all(
-        (posts || []).map(async (post: any) => {
-          const isAnon = post.is_anonymous === true;
-          const authorData = isAnon ? null : authorMap[post.user_id];
+      // İstifadəçinin bəyəndikləri — TƏK batch sorğu (əvvəllər hər post üçün ayrıca sorğu idi — N+1)
+      const likedSet = new Set<string>();
+      if (user && posts && posts.length > 0) {
+        const { data: likeRows } = await supabase.
+        from('post_likes').
+        select('post_id').
+        eq('user_id', user.id).
+        in('post_id', posts.map((p: any) => p.id));
+        (likeRows || []).forEach((r: any) => likedSet.add(r.post_id));
+      }
 
-          // Check if user liked this post
-          let isLiked = false;
-          if (user) {
-            const { data: likeData } = await supabase.
-            from('post_likes').
-            select('id').
-            eq('post_id', post.id).
-            eq('user_id', user.id).
-            single();
-            isLiked = !!likeData;
-          }
+      const postsWithDetails = (posts || []).map((post: any) => {
+        const isAnon = post.is_anonymous === true;
+        const authorData = isAnon ? null : authorMap[post.user_id];
 
-          return {
-            ...post,
-            is_anonymous: isAnon,
-            author: isAnon ?
-            { name: 'Anonim', avatar_url: null, badge_type: null } :
-            authorData ?
-            { name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null } :
-            { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
-            is_liked: isLiked
-          };
-        })
-      );
+        return {
+          ...post,
+          is_anonymous: isAnon,
+          author: isAnon ?
+          { name: 'Anonim', avatar_url: null, badge_type: null } :
+          authorData ?
+          { name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null } :
+          { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
+          is_liked: likedSet.has(post.id)
+        };
+      });
 
       return postsWithDetails as CommunityPost[];
     },
@@ -295,8 +291,25 @@ export const useDeletePost = () => {
   });
 };
 
+/**
+ * Post like toggle — optimistic.
+ *  - Ürək DƏRHAL dolur/boşalır (server cavabı gözlənilmir)
+ *  - Push bildirişi arxa planda göndərilir (like-ı bloklamır)
+ *  - Duplicate insert (sürətli double-tap, 23505) uğur sayılır, push təkrarlanmır
+ *  - Xətada cache geri qaytarılır (rollback)
+ *  - Feed invalidate EDİLMİR — tam refetch (N+1) hər like-da lazımsız yük idi
+ */
 export const useToggleLike = () => {
   const queryClient = useQueryClient();
+
+  // Postu bütün feed cache-lərində yenilə (ümumi feed, qrup feed-ləri, profil postları)
+  const patchPostInCaches = (postId: string, patch: (p: any) => any) => {
+    (['group-posts', 'user-posts'] as const).forEach((root) => {
+      queryClient.setQueriesData({ queryKey: [root] }, (old: any) =>
+      Array.isArray(old) ? old.map((p: any) => p.id === postId ? patch(p) : p) : old
+      );
+    });
+  };
 
   return useMutation({
     mutationFn: async ({ postId, isLiked, groupId }: {postId: string;isLiked: boolean;groupId: string | null;}) => {
@@ -304,21 +317,31 @@ export const useToggleLike = () => {
       if (!user) throw new Error('Not authenticated');
 
       if (isLiked) {
-        await supabase.
+        const { error } = await supabase.
         from('post_likes').
         delete().
         eq('post_id', postId).
         eq('user_id', user.id);
-      } else {
-        await supabase.
-        from('post_likes').
-        insert({ post_id: postId, user_id: user.id });
+        if (error) throw error;
+        return;
+      }
 
-        // Send push notification (which also stores in-app notification)
+      const { error } = await supabase.
+      from('post_likes').
+      insert({ post_id: postId, user_id: user.id });
+
+      if (error) {
+        // 23505 = unikal açar (artıq bəyənilib) — double-tap yarışı, uğur say + push YOX
+        if ((error as any).code === '23505') return;
+        throw error;
+      }
+
+      // Push bildirişi ARXA PLANDA — istifadəçini gözlətmir
+      void (async () => {
         try {
-          const { data: post } = await supabase.from('community_posts').select('user_id').eq('id', postId).single();
+          const { data: post } = await supabase.from('community_posts').select('user_id').eq('id', postId).maybeSingle();
           if (post && post.user_id !== user.id) {
-            const { data: profile } = await supabase.from('public_profile_cards').select('name').eq('user_id', user.id).single();
+            const { data: profile } = await supabase.from('public_profile_cards').select('name').eq('user_id', user.id).maybeSingle();
             const likerName = profile?.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i");
             await supabase.functions.invoke('send-push-notification', {
               body: {
@@ -330,10 +353,75 @@ export const useToggleLike = () => {
             });
           }
         } catch (e) {console.error('Like notification error:', e);}
+      })();
+    },
+    onMutate: async ({ postId, isLiked }) => {
+      // Uçuşdakı refetch-lər optimistic dəyəri əzməsin
+      await queryClient.cancelQueries({ queryKey: ['group-posts'] });
+      await queryClient.cancelQueries({ queryKey: ['user-posts'] });
+
+      // Rollback üçün snapshot
+      const prevGroup = queryClient.getQueriesData({ queryKey: ['group-posts'] });
+      const prevUser = queryClient.getQueriesData({ queryKey: ['user-posts'] });
+
+      patchPostInCaches(postId, (p) => ({
+        ...p,
+        is_liked: !isLiked,
+        likes_count: Math.max(0, (p.likes_count || 0) + (isLiked ? -1 : 1))
+      }));
+
+      return { prevGroup, prevUser };
+    },
+    onError: (_err, _vars, ctx) => {
+      // Server xətası → köhnə vəziyyətə qaytar
+      ctx?.prevGroup?.forEach(([key, data]) => queryClient.setQueryData(key, data));
+      ctx?.prevUser?.forEach(([key, data]) => queryClient.setQueryData(key, data));
+    }
+  });
+};
+
+/**
+ * Şərh like toggle — optimistic (postlarla eyni prinsip).
+ * Əvvəllər CommentReply xam supabase + tam refetch edirdi.
+ */
+export const useToggleCommentLike = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ commentId, isLiked }: {commentId: string;isLiked: boolean;postId: string;}) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      if (isLiked) {
+        const { error } = await supabase.
+        from('comment_likes').
+        delete().
+        eq('comment_id', commentId).
+        eq('user_id', user.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.
+        from('comment_likes').
+        insert({ comment_id: commentId, user_id: user.id });
+        if (error && (error as any).code !== '23505') throw error;
       }
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['group-posts', variables.groupId] });
+    onMutate: async ({ commentId, isLiked, postId }) => {
+      await queryClient.cancelQueries({ queryKey: ['post-comments', postId] });
+      const prev = queryClient.getQueryData(['post-comments', postId]);
+
+      queryClient.setQueryData(['post-comments', postId], (old: any) =>
+      Array.isArray(old) ?
+      old.map((c: any) => c.id === commentId ?
+      { ...c, is_liked: !isLiked, likes_count: Math.max(0, (c.likes_count || 0) + (isLiked ? -1 : 1)) } :
+      c) :
+      old
+      );
+
+      return { prev };
+    },
+    onError: (_err, vars, ctx) => {
+      if (ctx?.prev !== undefined) queryClient.setQueryData(['post-comments', vars.postId], ctx.prev);
     }
   });
 };
@@ -355,33 +443,30 @@ export const usePostComments = (postId: string) => {
 
       const authorMap = await getPublicProfileCards((comments || []).map((c: any) => c.user_id));
 
-      const commentsWithDetails = await Promise.all(
-        (comments || []).map(async (comment: any) => {
-          const authorData = authorMap[comment.user_id];
+      // Şərh like-ları — TƏK batch sorğu (əvvəllər hər şərh üçün ayrıca — N+1)
+      const likedSet = new Set<string>();
+      if (user && comments && comments.length > 0) {
+        const { data: likeRows } = await supabase.
+        from('comment_likes').
+        select('comment_id').
+        eq('user_id', user.id).
+        in('comment_id', comments.map((c: any) => c.id));
+        (likeRows || []).forEach((r: any) => likedSet.add(r.comment_id));
+      }
 
-          let isLiked = false;
-          if (user) {
-            const { data: likeData } = await supabase.
-            from('comment_likes').
-            select('id').
-            eq('comment_id', comment.id).
-            eq('user_id', user.id).
-            single();
-            isLiked = !!likeData;
-          }
-
-          const isAnon = comment.is_anonymous === true;
-          return {
-            ...comment,
-            author: isAnon ?
-            { name: 'Anonim', avatar_url: null, badge_type: null } :
-            authorData ?
-            { name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null } :
-            { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
-            is_liked: isLiked
-          };
-        })
-      );
+      const commentsWithDetails = (comments || []).map((comment: any) => {
+        const authorData = authorMap[comment.user_id];
+        const isAnon = comment.is_anonymous === true;
+        return {
+          ...comment,
+          author: isAnon ?
+          { name: 'Anonim', avatar_url: null, badge_type: null } :
+          authorData ?
+          { name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null } :
+          { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
+          is_liked: likedSet.has(comment.id)
+        };
+      });
 
       return commentsWithDetails as PostComment[];
     },

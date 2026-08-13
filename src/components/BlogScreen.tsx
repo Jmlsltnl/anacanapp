@@ -100,12 +100,12 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center animate-pulse">
-            <BookOpen className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center animate-pulse" style={{ background: 'var(--a-grad-lav)' }}>
+            <BookOpen size={28} style={{ color: 'var(--a-lav-ink)' }} />
           </div>
-          <p className="text-muted-foreground">{tr("blogscreen_meqaleler_yuklenir_3f3d01", "Məqalələr yüklənir...")}</p>
+          <p className="a-list-sub" style={{ margin: 0 }}>{tr("blogscreen_meqaleler_yuklenir_3f3d01", "Məqalələr yüklənir...")}</p>
         </div>
       </div>);
 
@@ -127,212 +127,168 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24 overflow-y-auto">
-      {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2 safe-area-top">
-          <div className="flex items-center gap-3 mb-3">
+    <div className="a-scope pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)', minHeight: '100vh' }}>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar safe-area-top">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button
               onClick={(e) => {
                 e.stopPropagation();
                 onBack();
               }}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
+              className="a-icon-btn"
+              whileTap={{ scale: 0.9 }}>
               
-              <ArrowLeft className="w-5 h-5 text-foreground" />
+              <ArrowLeft size={16} strokeWidth={2} />
             </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-violet-500" />
-                {tr("blogscreen_ana_bloqu_28124b", "Qadın Bloqları")}
-              </h1>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="px-2 py-1 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium">
-                {posts.length} {tr("blogscreen_meqale_63f1b2", "m\u0259qal\u0259")}
-              </span>
+            <div>
+              <p className="a-eyebrow">{posts.length} {tr("blogscreen_meqale_63f1b2", "m\u0259qal\u0259")}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("blogscreen_ana_bloqu_28124b", "Qadın Bloqları")}</p>
             </div>
           </div>
+        </header>
 
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setShowSaved(false);
-              }}
-              placeholder={tr("blogscreen_meqale_axtar_0441c1", "Məqalə axtar...")}
-              className="pl-10 h-10 rounded-xl bg-muted border-0 text-sm" />
-            
-          </div>
+        {/* Search */}
+        <div className="a-search">
+          <Search size={15} strokeWidth={2} color="var(--a-ink-faint)" />
+          <input
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowSaved(false);
+            }}
+            placeholder={tr("blogscreen_meqale_axtar_0441c1", "Məqalə axtar...")} />
+          
         </div>
-      </div>
 
-      <div className="px-4 pt-4 space-y-4">
         {/* Categories */}
         <motion.div
-          className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar"
+          className="a-tag-row hide-scrollbar"
+          style={{ flexWrap: 'nowrap', overflowX: 'auto', marginTop: 12, marginBottom: 0, paddingBottom: 4 }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}>
+          transition={{ delay: 0.15 }}>
           
-          <motion.button
+          <button
             onClick={() => {setSelectedCategory(null);setShowSaved(false);}}
-            className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-            !selectedCategory && !showSaved ?
-            'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/30' :
-            'bg-card text-foreground border border-border/50'}`
-            }
-            whileTap={{ scale: 0.95 }}>
+            className={`a-tag${!selectedCategory && !showSaved ? ' on' : ''}`}
+            style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
             
-            <Sparkles className="w-4 h-4" />
+            <Sparkles size={12} />
             {tr('blogscreen_all_filter', 'Hamısı')}
-          </motion.button>
+          </button>
 
           {user &&
-          <motion.button
+          <button
             onClick={() => {setShowSaved(true);setSelectedCategory(null);setSearchQuery('');}}
-            className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-            showSaved ?
-            'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/30' :
-            'bg-card text-foreground border border-border/50'}`
-            }
-            whileTap={{ scale: 0.95 }}>
+            className={`a-tag${showSaved ? ' on' : ''}`}
+            style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
             
-              <Bookmark className="w-4 h-4" />
+              <Bookmark size={12} />
               {tr("blogscreen_saxlanilanlar_8882c1", "Saxlan\u0131lanlar")}
-              {savedPosts.length > 0 &&
-            <span className="px-1.5 py-0.5 rounded-full bg-white/20 text-xs">{savedPosts.length}</span>
-            }
-            </motion.button>
+              {savedPosts.length > 0 && <span style={{ fontWeight: 800 }}>· {savedPosts.length}</span>}
+            </button>
           }
 
-          {categories.map((category, index) =>
-          <motion.button
+          {categories.map((category) =>
+          <button
             key={category.id}
             onClick={() => {setSelectedCategory(category.slug);setShowSaved(false);}}
-            className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-            selectedCategory === category.slug && !showSaved ?
-            'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/30' :
-            'bg-card text-foreground border border-border/50'}`
-            }
-            whileTap={{ scale: 0.95 }}>
+            className={`a-tag${selectedCategory === category.slug && !showSaved ? ' on' : ''}`}
+            style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
             
               <span>{category.icon}</span>
               {category.name}
-            </motion.button>
+            </button>
           )}
         </motion.div>
 
         {/* Featured Posts */}
         {!selectedCategory && !searchQuery && !showSaved && featuredPosts.length > 0 &&
-        <motion.div
+        <motion.section
+          className="a-section"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}>
+          transition={{ delay: 0.2 }}>
           
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-                <Star className="w-4 h-4 text-white" />
-              </div>
-              <h2 className="font-bold text-foreground">{tr("blogscreen_one_cixan_648e68", "Önə Çıxan")}</h2>
-              <TrendingUp className="w-4 h-4 text-amber-500" />
+            <div className="a-section-head">
+              <h2 className="a-section-title a-heading">⭐ {tr("blogscreen_one_cixan_648e68", "Önə Çıxan")}</h2>
             </div>
             
-            <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar -mx-4 px-4">
+            <div className="a-hscroll hide-scrollbar">
               {featuredPosts.slice(0, 3).map((post, index) =>
             <motion.button
               key={post.id}
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.35 + index * 0.1 }}
+              transition={{ delay: 0.25 + index * 0.08 }}
               onClick={() => handleSelectPost(post)}
-              className="shrink-0 w-72 bg-card rounded-2xl overflow-hidden shadow-lg border border-border/50 text-left group">
+              className="a-hscroll-card"
+              style={{ width: 240, padding: 0, overflow: 'hidden' }}>
               
                   <div className="relative">
                     {post.cover_image_url ?
                 <img
                   src={post.cover_image_url}
                   alt={post.title}
-                  className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300" /> :
+                  style={{ width: '100%', height: 120, objectFit: 'cover' }} /> :
 
 
-                <div className="w-full h-36 bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                        <BookOpen className="w-12 h-12 text-white/50" />
+                <div style={{ width: '100%', height: 120, background: 'var(--a-grad-lav)', display: 'grid', placeItems: 'center' }}>
+                        <BookOpen size={32} style={{ color: 'rgba(75, 47, 138, 0.5)' }} />
                       </div>
                 }
-                    <div className="absolute top-3 left-3">
-                      <Badge className="bg-gradient-to-r from-amber-500 to-orange-600 text-white border-0 shadow-lg">
-                        <Star className="w-3 h-3 mr-1 fill-current" />
-                        {tr("blogscreen_secilmis_1fa6ef", "Se\xE7ilmi\u015F")}
-                      </Badge>
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <Badge variant="secondary" className="bg-white/90 dark:bg-card/90 text-foreground border-0 text-xs">
-                        {categories.find((c) => c.slug === post.category)?.icon} {categories.find((c) => c.slug === post.category)?.name || post.category}
-                      </Badge>
-                    </div>
+                    <span className="a-cta-badge" style={{ position: 'absolute', top: 8, left: 8, padding: '4px 9px', fontSize: 9.5 }}>
+                      ⭐ {tr("blogscreen_secilmis_1fa6ef", "Se\xE7ilmi\u015F")}
+                    </span>
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-foreground line-clamp-2 mb-2">{post.title}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{post.excerpt}</p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {post.reading_time} {tr("blogscreen_deq_780a5c", "d\u0259q")}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Eye className="w-3 h-3" />
-                        {post.view_count}
-                      </span>
+                  <div style={{ padding: 12 }}>
+                    <p className="a-hscroll-title" style={{ margin: '0 0 4px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{post.title}</p>
+                    <p className="a-hscroll-text" style={{ WebkitLineClamp: 2 }}>{post.excerpt}</p>
+                    <div className="a-article-meta" style={{ marginTop: 8 }}>
+                      <span><Clock size={10} /> {post.reading_time} {tr("blogscreen_deq_780a5c", "d\u0259q")}</span>
+                      <span><Eye size={10} /> {post.view_count}</span>
                     </div>
                   </div>
                 </motion.button>
             )}
             </div>
-          </motion.div>
+          </motion.section>
         }
 
         {/* All Posts */}
-        <motion.div
+        <motion.section
+          className="a-section"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}>
+          transition={{ delay: 0.3 }}>
           
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                <BookOpen className="w-4 h-4 text-white" />
-              </div>
-              <h2 className="font-bold text-foreground">
-                {showSaved ? tr("blogscreen_saxlanilan_meqaleler_7e3136", "Saxlan\u0131lan M\u0259qal\u0259l\u0259r") :
+          <div className="a-section-head">
+            <h2 className="a-section-title a-heading">
+              {showSaved ? tr("blogscreen_saxlanilan_meqaleler_7e3136", "Saxlan\u0131lan M\u0259qal\u0259l\u0259r") :
 
-                selectedCategory ?
-                categories.find((c) => c.slug === selectedCategory)?.name :
-                searchQuery ?
-                tr("blogscreen_x_ucun_neticeler_b1a2c3", '"{query}" üçün nəticələr').replace('{query}', searchQuery) : tr("blogscreen_butun_meqaleler_df9384", "B\xFCt\xFCn M\u0259qal\u0259l\u0259r")
+              selectedCategory ?
+              categories.find((c) => c.slug === selectedCategory)?.name :
+              searchQuery ?
+              tr("blogscreen_x_ucun_neticeler_b1a2c3", '"{query}" üçün nəticələr').replace('{query}', searchQuery) : tr("blogscreen_butun_meqaleler_df9384", "B\xFCt\xFCn M\u0259qal\u0259l\u0259r")
 
-                }
-              </h2>
-            </div>
-            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
+              }
+            </h2>
+            <span className="a-section-link">
               {filteredPosts.length} {tr("blogscreen_meqale_63f1b2", "m\u0259qal\u0259")}
             </span>
           </div>
 
           {filteredPosts.length === 0 ?
-          <div className="text-center py-12 bg-card rounded-2xl border border-border/50">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/30 dark:to-purple-900/30 flex items-center justify-center">
-                <BookOpen className="w-8 h-8 text-violet-500" />
+          <div className="a-card" style={{ textAlign: 'center', padding: '32px 18px' }}>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'var(--a-lav-1)' }}>
+                <BookOpen size={26} style={{ color: 'var(--a-lav-ink)' }} />
               </div>
-              <h3 className="font-bold text-foreground mb-1">
+              <h3 className="a-list-title" style={{ marginBottom: 4 }}>
                 {showSaved ? tr("blogscreen_saxlanilmis_meqale_yoxdur_a9cc59", "Saxlan\u0131lm\u0131\u015F m\u0259qal\u0259 yoxdur") : tr("blogscreen_meqale_tapilmadi_746d12", "M\u0259qal\u0259 tap\u0131lmad\u0131")}
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>
                 {showSaved ? tr("blogscreen_beyendiyiniz_meqaleleri_saxlay_a35db1", "B\u0259y\u0259ndiyiniz m\u0259qal\u0259l\u0259ri saxlay\u0131n") :
 
               searchQuery ? tr("blogscreen_ferqli_acar_sozlerle_axtarin_cb3a83", "F\u0259rqli a\xE7ar s\xF6zl\u0259rl\u0259 axtar\u0131n") : tr("blogscreen_tezlikle_yeni_meqaleler_elave__20524a", "Tezlikl\u0259 yeni m\u0259qal\u0259l\u0259r \u0259lav\u0259 olunacaq")
@@ -342,62 +298,46 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
               </p>
             </div> :
 
-          <div className="space-y-3">
+          <div className="a-card" style={{ padding: '6px 18px' }}>
               {filteredPosts.map((post, index) =>
             <motion.button
               key={post.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45 + index * 0.03 }}
+              transition={{ delay: Math.min(0.35 + index * 0.03, 0.6) }}
               onClick={() => handleSelectPost(post)}
-              className="w-full bg-card rounded-2xl p-3 flex gap-4 shadow-sm border border-border/50 text-left hover:shadow-md transition-all group">
+              className="a-article-row">
               
-                  <div className="relative shrink-0">
+                  <span className="a-article-thumb" style={{ background: 'var(--a-lav-1)', position: 'relative' }}>
                     {post.cover_image_url ?
-                <img
-                  src={post.cover_image_url}
-                  alt={post.title}
-                  className="w-24 h-24 rounded-xl object-cover group-hover:scale-105 transition-transform" /> :
+                <img src={post.cover_image_url} alt={post.title} loading="lazy" /> :
 
-
-                <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                        <BookOpen className="w-8 h-8 text-white/50" />
-                      </div>
+                <BookOpen size={20} style={{ color: 'var(--a-lav-ink)' }} />
                 }
                     {savedPosts.includes(post.id) &&
-                <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center">
-                        <Bookmark className="w-3 h-3 text-white fill-current" />
-                      </div>
+                <span style={{ position: 'absolute', top: 3, right: 3, width: 18, height: 18, borderRadius: 999, background: 'var(--a-yellow-2)', display: 'grid', placeItems: 'center' }}>
+                        <Bookmark size={9} style={{ color: '#fff', fill: '#fff' }} />
+                      </span>
                 }
-                  </div>
+                  </span>
                   
-                  <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-                    <div>
-                      <Badge variant="secondary" className="mb-1.5 bg-violet-500/10 text-violet-600 dark:text-violet-400 border-0 text-xs">
-                        {categories.find((c) => c.slug === post.category)?.icon} {categories.find((c) => c.slug === post.category)?.name || post.category}
-                      </Badge>
-                      <h3 className="font-bold text-foreground text-sm line-clamp-2 leading-tight">{post.title}</h3>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {post.reading_time} {tr("blogscreen_deq_780a5c", "d\u0259q")}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Eye className="w-3 h-3" />
-                        {post.view_count}
-                      </span>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <p className="a-list-value" style={{ color: 'var(--a-peach-2)', marginBottom: 2 }}>
+                      {categories.find((c) => c.slug === post.category)?.icon} {categories.find((c) => c.slug === post.category)?.name || post.category}
+                    </p>
+                    <p className="a-article-title">{post.title}</p>
+                    <div className="a-article-meta">
+                      <span><Clock size={10} /> {post.reading_time} {tr("blogscreen_deq_780a5c", "d\u0259q")}</span>
+                      <span><Eye size={10} /> {post.view_count}</span>
                     </div>
                   </div>
                   
-                  <div className="shrink-0 self-center">
-                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                  </div>
+                  <ChevronRight size={15} className="a-list-chevron" />
                 </motion.button>
             )}
             </div>
           }
-        </motion.div>
+        </motion.section>
       </div>
     </div>);
 

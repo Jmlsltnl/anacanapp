@@ -18,6 +18,7 @@ import { PremiumModal } from '@/components/PremiumModal';
 import { useSubscription } from '@/hooks/useSubscription';
 import { nativeShare } from '@/lib/native';
 import BannerSlot from '@/components/banners/BannerSlot';
+import LanguageSelector from '@/components/LanguageSelector';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -98,8 +99,10 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
 
   const menuItems = [
   { id: 'billing', icon: CreditCard, label: tr("profilescreen_abuneliyim_f6c8ed", 'Abunəliyim') },
+  { id: 'referral', icon: Gift, label: tr("profilescreen_referral", 'Dostunu dəvət et'), badge: tr("profilescreen_referral_badge", '+7 gün') },
   { id: 'partners', icon: Sparkles, label: tr("profilescreen_partnyor_endirimleri_e44036", "Partnyor Endirimləri"), badge: tr("profilescreen_badge_yeni", "Yeni") },
   { id: 'notifications', icon: Bell, label: tr("profilescreen_bildirisler_54eb88", 'Bildirişlər'), badge: unreadCount > 0 ? String(unreadCount) : undefined },
+  { id: 'doctor-report', icon: FileText, label: tr("profilescreen_hekim_hesabati", 'Həkim Hesabatı (PDF)') },
   { id: 'appearance', icon: Palette, label: tr("profilescreen_gorunus_165fe3", 'Görünüş') },
   { id: 'calendar', icon: Calendar, label: tr("profilescreen_teqvim_ayarlari_012790", 'Təqvim Ayarları') },
   { id: 'privacy', icon: Shield, label: tr("profilescreen_gizlilik", "Gizlilik") },
@@ -168,60 +171,66 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   };
 
   return (
-    <div className="pb-24 pt-1 px-3">
-      {/* Top Banner Slot */}
-      <BannerSlot placement="profile_top" onNavigate={onNavigate} className="mb-3" />
-
-      {/* Header */}
-      <motion.div
-        className="flex items-center justify-between mb-3"
+    <div className="a-scope pb-8" style={{ background: 'var(--a-bg)', minHeight: '100%' }}>
+      <div className="a-shell">
+      {/* Top bar */}
+      <motion.header
+        className="a-topbar"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}>
         
-        <h1 className="text-lg font-black text-foreground">{tr("untranslated_profil_v8b0sk", "Profil")}</h1>
-        <motion.button
-          onClick={() => onNavigate?.('settings')}
-          className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}>
-          
-          <Settings className="w-4 h-4 text-muted-foreground" />
-        </motion.button>
-      </motion.div>
+        <div>
+          <p className="a-eyebrow">{stageInfo.name}</p>
+          <p className="a-wordmark" style={{ fontSize: 18 }}>{tr("untranslated_profil_v8b0sk", "Profil")}</p>
+        </div>
+        <div className="a-topbar-actions">
+          <motion.button
+            onClick={() => onNavigate?.('settings')}
+            className="a-icon-btn"
+            whileTap={{ scale: 0.9 }}>
+            
+            <Settings size={16} strokeWidth={2} />
+          </motion.button>
+        </div>
+      </motion.header>
 
-      {/* Profile Card */}
+      {/* Top Banner Slot */}
+      <BannerSlot placement="profile_top" onNavigate={onNavigate} className="mb-3" />
+
+      {/* Profile Card (anacan-demo CTA hero) */}
       <motion.div
-        className="relative overflow-hidden rounded-2xl gradient-primary p-4 mb-3 shadow-elevated"
+        className="a-cta a-fade-in"
+        style={{ background: 'var(--a-grad-peach)' }}
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1 }}>
         
-        <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -left-10 -bottom-10 w-32 h-32 rounded-full bg-white/5 blur-xl" />
-        
+        <span className="a-cta-shape" style={{ width: 140, height: 140, top: -50, right: -40, background: 'rgba(255,255,255,0.35)' }} />
         <div className="relative z-10 flex items-center gap-3">
-          <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center text-3xl shadow-lg overflow-hidden">
+          <div
+            className="w-14 h-14 flex items-center justify-center text-3xl overflow-hidden flex-shrink-0"
+            style={{ borderRadius: 16, background: 'var(--a-chip-overlay)', boxShadow: '0 8px 16px -8px rgba(138, 69, 20, 0.4)' }}>
             {profile?.avatar_url ?
             <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" /> :
 
             stageInfo.emoji
             }
           </div>
-          <div className="flex-1">
-            <h2 className="text-lg font-black text-white">{profile?.name || name || tr("profilescreen_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}</h2>
-            <p className="text-white/80 font-medium text-xs">{profile?.email || email || 'email@example.com'}</p>
-            <div className="mt-2 flex gap-2">
-              <span className="inline-flex items-center px-3 py-1 bg-white/20 rounded-full text-white text-xs font-bold">
-                {stageInfo.name}
+          <div className="flex-1 min-w-0">
+            <h2 className="a-heading" style={{ margin: 0, fontSize: 17, color: 'var(--a-cta-ink)' }}>{profile?.name || name || tr("profilescreen_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}</h2>
+            <p style={{ margin: '2px 0 0', fontSize: 11.5, fontWeight: 600, color: 'var(--a-cta-ink)', opacity: 0.75, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile?.email || email || 'email@example.com'}</p>
+            <div className="mt-2 flex gap-1.5 flex-wrap">
+              <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-cta-ink)', padding: '4px 9px', fontSize: 10 }}>
+                {stageInfo.emoji} {stageInfo.name}
               </span>
               {userCountry && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 rounded-full text-white text-xs font-bold">
-                  <img src={userCountry.flag.startsWith('data:') ? userCountry.flag : `data:image/png;base64,${userCountry.flag}`} alt="" className="w-4 h-3 object-cover rounded-sm" />
+                <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-cta-ink)', padding: '4px 9px', fontSize: 10 }}>
+                  <img src={userCountry.flag.startsWith('data:') ? userCountry.flag : `data:image/png;base64,${userCountry.flag}`} alt="" style={{ width: 14, height: 10, objectFit: 'cover', borderRadius: 2 }} />
                   {userCountry.name}
                 </span>
               )}
               {isAdmin && (
-                <span className="inline-flex items-center px-3 py-1 bg-amber-500/80 rounded-full text-white text-xs font-bold">
+                <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-cta-ink)', padding: '4px 9px', fontSize: 10 }}>
                   👑 Admin
                 </span>
               )}
@@ -229,89 +238,68 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           </div>
           <motion.button
             onClick={() => onNavigate?.('edit-profile')}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
-            whileHover={{ scale: 1.1 }}
+            className="a-icon-btn"
+            style={{ flexShrink: 0 }}
             whileTap={{ scale: 0.9 }}>
             
-            <Edit className="w-5 h-5 text-white" />
+            <Edit size={15} strokeWidth={2} />
           </motion.button>
         </div>
       </motion.div>
 
       {/* Premium Banner */}
-      {isPremium ?
       <motion.button
-        onClick={() => onNavigate?.('billing')}
-        className="w-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-2xl p-4 mb-3 border border-amber-200 dark:border-amber-800/50 text-left"
+        onClick={() => isPremium ? onNavigate?.('billing') : setShowPremiumModal(true)}
+        className="a-card a-fade-in"
+        style={{ width: '100%', textAlign: 'left', cursor: 'pointer', padding: '14px 18px', marginTop: 12 }}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}>
         
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-              <Crown className="w-7 h-7 text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-foreground">Anacan Premium ✨</h3>
-              <p className="text-sm text-muted-foreground">{tr("profilescreen_premium_abuneliyiniz_aktivdir_9f6e62", "Premium abunəliyiniz aktivdir")}</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        <div className="a-rank-row" style={{ borderTop: 'none', padding: 0 }}>
+          <span className="a-rank-avatar" style={{ background: 'var(--a-grad-yellow)', color: 'var(--a-warn-ink)' }}>
+            <Crown size={18} strokeWidth={2} />
+          </span>
+          <div style={{ minWidth: 0 }}>
+            <p className="a-rank-title">{isPremium ? 'Anacan Premium ✨' : 'Anacan Premium'}</p>
+            <p className="a-rank-sub">
+              {isPremium ? tr("profilescreen_premium_abuneliyiniz_aktivdir_9f6e62", "Premium abunəliyiniz aktivdir") : tr("profilescreen_butun_xususiyyetleri_acin_a7583b", "Bütün xüsusiyyətləri açın")}
+            </p>
           </div>
-        </motion.button> :
-
-      <motion.button
-        onClick={() => setShowPremiumModal(true)}
-        className="w-full bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-2xl p-4 mb-3 border border-amber-100 dark:border-amber-900/50 text-left"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}>
-        
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-              <Crown className="w-7 h-7 text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-foreground">Anacan Premium</h3>
-              <p className="text-sm text-muted-foreground">{tr("profilescreen_butun_xususiyyetleri_acin_a7583b", "Bütün xüsusiyyətləri açın")}</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
-          </div>
-        </motion.button>
-      }
+          <ChevronRight className="a-list-chevron" style={{ marginLeft: 'auto' }} size={18} />
+        </div>
+      </motion.button>
 
       {/* Partner Code */}
       {role === 'woman' &&
       <motion.div
-        className="bg-card rounded-2xl p-4 mb-3 shadow-card border border-border/50 relative overflow-hidden"
+        className="a-card a-fade-in"
+        style={{ marginTop: 12 }}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.25 }}>
         
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-partner/10 flex items-center justify-center">
-                <Heart className="w-4 h-4 text-partner" />
-              </div>
-              <div>
-                <h3 className="font-bold text-foreground text-sm flex items-center gap-1.5">
-                  {tr("profile_partnyor_kodu", "Partnyor Kodu")}
-                  {!isPremium && <Crown className="w-3.5 h-3.5 text-amber-500" />}
-                </h3>
-                <p className="text-[10px] text-muted-foreground">
-                  {isPremium ? tr("profilescreen_heyat_yoldasinizla_paylasin_49ec6d", "H\u0259yat yolda\u015F\u0131n\u0131zla payla\u015F\u0131n") : tr("profilescreen_premium_ile_partnyorunuzu_deve_d6917f", "Premium il\u0259 partnyorunuzu d\u0259v\u0259t edin")}
-                </p>
-              </div>
+          <div className="a-list-row" style={{ padding: '0 0 12px', borderTop: 'none' }}>
+            <span className="a-list-icon" style={{ background: 'var(--a-grad-pink)', color: 'var(--a-berry-ink)' }}>
+              <Heart size={17} strokeWidth={2} />
+            </span>
+            <div>
+              <p className="a-list-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {tr("profile_partnyor_kodu", "Partnyor Kodu")}
+                {!isPremium && <Crown size={13} style={{ color: 'var(--a-yellow-2)' }} />}
+              </p>
+              <p className="a-list-sub">
+                {isPremium ? tr("profilescreen_heyat_yoldasinizla_paylasin_49ec6d", "H\u0259yat yolda\u015F\u0131n\u0131zla payla\u015F\u0131n") : tr("profilescreen_premium_ile_partnyorunuzu_deve_d6917f", "Premium il\u0259 partnyorunuzu d\u0259v\u0259t edin")}
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-muted rounded-2xl relative">
+          <div className="flex items-center gap-2 relative" style={{ padding: 12, borderRadius: 16, background: 'var(--a-surface-soft)' }}>
             <code
-            className={`flex-1 text-center font-mono font-bold text-lg tracking-wider text-foreground ${
+            className={`flex-1 text-center font-mono font-bold text-lg tracking-wider ${
             !isPremium ? 'blur-sm select-none' : ''}`
-            }>
+            }
+            style={{ color: 'var(--a-ink)' }}>
             
               {partnerCode}
             </code>
@@ -319,28 +307,28 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           <>
                 <motion.button
               onClick={copyPartnerCode}
-              className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"
-              whileHover={{ scale: 1.1 }}
+              className="a-icon-btn"
               whileTap={{ scale: 0.9 }}>
               
-                  <Copy className="w-5 h-5 text-primary" />
+                  <Copy size={16} strokeWidth={2} />
                 </motion.button>
                 <motion.button
               onClick={sharePartnerCode}
-              className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center"
-              whileHover={{ scale: 1.1 }}
+              className="a-icon-btn"
+              style={{ background: 'var(--a-peach-2)', color: '#fff', border: 'none' }}
               whileTap={{ scale: 0.9 }}>
               
-                  <Share2 className="w-5 h-5 text-white" />
+                  <Share2 size={16} strokeWidth={2} />
                 </motion.button>
               </> :
 
           <motion.button
             onClick={() => setShowPremiumModal(true)}
-            className="absolute inset-0 rounded-2xl flex items-center justify-center bg-gradient-to-r from-amber-500/90 to-orange-500/90 text-white font-bold text-sm gap-2"
+            className="absolute inset-0 flex items-center justify-center gap-2"
+            style={{ borderRadius: 16, background: 'var(--a-grad-yellow)', color: 'var(--a-warn-ink)', fontWeight: 800, fontSize: 13, border: 'none', cursor: 'pointer' }}
             whileTap={{ scale: 0.97 }}>
             
-                <Crown className="w-4 h-4" />
+                <Crown size={15} strokeWidth={2.2} />
                 {tr("profilescreen_premium_ile_ac_7aa6ba", "Premium il\u0259 a\xE7")}
               </motion.button>
           }
@@ -349,13 +337,28 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           {/* Partner Info Button */}
           <motion.button
           onClick={() => setShowPartnerInfo(true)}
-          className="w-full mt-3 p-3 rounded-xl bg-partner/5 border border-partner/20 flex items-center gap-3"
+          className="a-teaser w-full"
+          style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', background: 'none', border: 'none', borderTop: '1px dashed var(--a-line-strong)', cursor: 'pointer' }}
           whileTap={{ scale: 0.98 }}>
           
-            <Info className="w-5 h-5 text-partner" />
-            <span className="flex-1 text-left text-sm font-medium text-foreground">{tr("profilescreen_partnyor_neler_gore_ve_ede_biler_3fa7fa", "Partnyor nələr görə və edə bilər?")}</span>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            <Info size={15} style={{ color: 'var(--a-pink-2)', flexShrink: 0 }} />
+            <span style={{ flex: 1 }}>{tr("profilescreen_partnyor_neler_gore_ve_ede_biler_3fa7fa", "Partnyor nələr görə və edə bilər?")}</span>
+            <ChevronRight size={15} className="a-list-chevron" />
           </motion.button>
+
+          {/* Paylaşım ayarları — yalnız bağlı partnyor olduqda */}
+          {profile?.linked_partner_id &&
+          <motion.button
+          onClick={() => onNavigate?.('partner-sharing')}
+          className="a-teaser w-full"
+          style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', background: 'none', border: 'none', borderTop: '1px dashed var(--a-line-strong)', cursor: 'pointer' }}
+          whileTap={{ scale: 0.98 }}>
+
+              <Shield size={15} style={{ color: 'var(--a-blue-2)', flexShrink: 0 }} />
+              <span style={{ flex: 1 }}>{tr("partnerv2_partnyor_nleri_gorur", "Partnyor nələri görür?")}</span>
+              <ChevronRight size={15} className="a-list-chevron" />
+            </motion.button>
+          }
         </motion.div>
       }
 
@@ -454,19 +457,20 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
       {/* Children Management Section - Only for mommy stage */}
       {lifeStage === 'mommy' &&
       <motion.div
-        className="bg-card rounded-2xl p-4 mb-3 shadow-card border border-border/50"
+        className="a-card a-fade-in"
+        style={{ marginTop: 12 }}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.28 }}>
         
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
-                <Users className="w-4 h-4 text-pink-600" />
-              </div>
+          <div className="a-card-head" style={{ marginBottom: children.length > 0 ? 4 : 12 }}>
+            <div className="a-list-row" style={{ padding: 0, borderTop: 'none', gap: 10 }}>
+              <span className="a-list-icon" style={{ width: 34, height: 34, borderRadius: 11, background: 'var(--a-pink-1)', color: 'var(--a-berry-ink)' }}>
+                <Users size={15} strokeWidth={2} />
+              </span>
               <div>
-                <h3 className="font-bold text-foreground text-sm">{tr("profilescreen_usaqlarim_d988f7", "Uşaqlarım")}</h3>
-                <p className="text-[10px] text-muted-foreground">
+                <h3 className="a-card-title a-heading">{tr("profilescreen_usaqlarim_d988f7", "Uşaqlarım")}</h3>
+                <p className="a-list-sub">
                   {children.length === 0 ? tr("profilescreen_usaq_elave_et_48f1f0", "U\u015Faq \u0259lav\u0259 et") : children.length === 1 ? tr("profilescreen_one_child_count", "1 uşaq") : `${children.length} ${tr("profilescreen_child_plural_suffix", "uşaq")}`}
                 </p>
               </div>
@@ -476,34 +480,32 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               setChildForm({ name: '', birth_date: '', gender: 'boy' });
               setShowChildModal(true);
             }}
-            className="w-9 h-9 rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center"
-            whileHover={{ scale: 1.1 }}
+            className="a-icon-btn"
+            style={{ width: 32, height: 32 }}
             whileTap={{ scale: 0.9 }}>
             
-              <Plus className="w-4 h-4 text-pink-600" />
+              <Plus size={15} strokeWidth={2.4} />
             </motion.button>
           </div>
 
           {children.length > 0 &&
-        <div className="space-y-2">
+        <div>
               {children.map((child) => {
             const age = getChildAge(child);
             return (
-              <div
-                key={child.id}
-                className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
-                
-                    <span className="text-2xl">{child.avatar_emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{child.name}</p>
-                      <p className="text-xs text-muted-foreground">{age.displayText}</p>
+              <div key={child.id} className="a-rank-row">
+                    <span className="a-rank-avatar" style={{ background: 'var(--a-surface-soft)', fontSize: 20 }}>{child.avatar_emoji}</span>
+                    <div style={{ minWidth: 0 }}>
+                      <p className="a-rank-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{child.name}</p>
+                      <p className="a-rank-sub">{age.displayText}</p>
                     </div>
                     <motion.button
                   onClick={() => openEditChild(child)}
-                  className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center"
+                  className="a-icon-btn"
+                  style={{ width: 30, height: 30, marginLeft: 'auto' }}
                   whileTap={{ scale: 0.9 }}>
                   
-                      <Edit className="w-3.5 h-3.5 text-muted-foreground" />
+                      <Edit size={13} strokeWidth={2} />
                     </motion.button>
                   </div>);
 
@@ -517,10 +519,11 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
             setChildForm({ name: '', birth_date: '', gender: 'boy' });
             setShowChildModal(true);
           }}
-          className="w-full p-4 rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center gap-2 text-muted-foreground hover:border-pink-400 hover:text-pink-500 transition-colors">
+          className="w-full flex flex-col items-center gap-2"
+          style={{ padding: 16, borderRadius: 16, border: '2px dashed var(--a-line-strong)', background: 'none', cursor: 'pointer', color: 'var(--a-ink-soft)' }}>
           
-              <Baby className="w-8 h-8" />
-              <span className="text-sm font-medium">{tr("profilescreen_ilk_usagi_elave_et_251a77", "İlk uşağı əlavə et")}</span>
+              <Baby size={28} />
+              <span style={{ fontSize: 13, fontWeight: 600 }}>{tr("profilescreen_ilk_usagi_elave_et_251a77", "İlk uşağı əlavə et")}</span>
             </button>
         }
         </motion.div>
@@ -597,102 +600,102 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
 
       {/* Menu Items */}
       <motion.div
-        className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/50"
+        className="a-list-card a-fade-in"
+        style={{ marginTop: 12 }}
         variants={containerVariants}
         initial="hidden"
         animate="visible">
         
-        {menuItems.map((item, index) => {
+        {menuItems.map((item) => {
           const Icon = item.icon;
           return (
             <motion.button
               key={item.id}
               variants={itemVariants}
               onClick={() => onNavigate?.(item.id)}
-              className={`w-full flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors ${
-              index !== menuItems.length - 1 ? 'border-b border-border/50' : ''}`
-              }>
+              className="a-list-row w-full"
+              style={{ width: '100%', textAlign: 'left', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}>
               
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-              item.id === 'admin' ? 'bg-amber-100 dark:bg-amber-900/30' :
-              item.id === 'billing' ? 'bg-green-100 dark:bg-green-900/30' : 'bg-muted'}`
-              }>
-                <Icon className={`w-4 h-4 ${
-                item.id === 'admin' ? 'text-amber-600' :
-                item.id === 'billing' ? 'text-green-600' : 'text-muted-foreground'}`
-                } />
-              </div>
-              <span className="flex-1 text-left font-medium text-foreground text-sm">{item.label}</span>
+              <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
+                <Icon size={17} strokeWidth={2} />
+              </span>
+              <p className="a-list-title" style={{ flex: 1 }}>{item.label}</p>
               {item.badge &&
-              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-              item.id === 'admin' ?
-              'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
-              'bg-destructive text-white'}`
-              }>
+              <span className="a-tag on" style={{ cursor: 'default', padding: '4px 9px', fontSize: 10 }}>
                   {item.badge}
                 </span>
               }
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              <ChevronRight size={16} className="a-list-chevron" />
             </motion.button>);
 
         })}
+      </motion.div>
+
+      {/* Dil seçimi — əlçatan yerdə (Settings-də deyil) */}
+      <motion.div
+        style={{ marginTop: 12 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4 }}>
+        <LanguageSelector />
       </motion.div>
 
       {/* Logout */}
       <motion.button
         onClick={handleLogout}
-        className="w-full mt-3 p-3 rounded-xl bg-destructive/10 text-destructive font-bold flex items-center justify-center gap-2"
+        className="a-cta-btn"
+        style={{ width: '100%', justifyContent: 'center', marginTop: 12, background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}>
         
-        <LogOut className="w-5 h-5" />
+        <LogOut size={16} strokeWidth={2.2} />
         {tr("profilescreen_cixis_c2de5c", "\xC7\u0131x\u0131\u015F")}
       </motion.button>
 
       {/* Legal Links */}
-      <motion.div
-        className="mt-4 bg-card rounded-2xl overflow-hidden shadow-card border border-border/50"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.55 }}>
-        
-        <div className="px-3 pt-3 pb-1">
-          <h2 className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{tr("profilescreen_huquqi_ceb5d3", "Hüquqi")}</h2>
+      <section className="a-section">
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading" style={{ fontSize: 15 }}>{tr("profilescreen_huquqi_ceb5d3", "Hüquqi")}</h2>
         </div>
-        {[
-        { id: 'legal/privacy_policy', icon: FileText, label: tr("profilescreen_gizlilik_siyaseti_dc3f28", 'Gizlilik Siyasəti') },
-        { id: 'legal/terms_of_service', icon: Scale, label: tr("profilescreen_i_stifade_sertleri_fbbe3d", 'İstifadə Şərtləri') },
-        { id: 'legal/disclaimer', icon: AlertCircle, label: tr("profilescreen_mesuliyyetden_i_mtina_beyanati_857abd", 'Məsuliyyətdən İmtina Bəyanatı') },
-        { id: 'legal/refund_policy', icon: RotateCcw, label: tr("profilescreen_geri_qaytarma_siyaseti_767324", 'Geri Qaytarma Siyasəti') },
-        { id: 'legal/gdpr_ccpa', icon: Shield, label: 'GDPR / CCPA' },
-        { id: 'legal/data_usage', icon: Database, label: tr("profilescreen_melumat_i_stifadesi_af1211", 'Məlumat İstifadəsi') }].
-        map((item, index, arr) => {
-          const Icon = item.icon;
-          return (
-            <motion.button
-              key={item.id}
-              onClick={() => onNavigate?.(item.id)}
-              className={`w-full flex items-center gap-3 p-2.5 hover:bg-muted/50 transition-colors ${
-              index !== arr.length - 1 ? 'border-b border-border/30' : ''}`
-              }
-              whileTap={{ scale: 0.99 }}>
-              
-              <div className="w-7 h-7 rounded-lg bg-muted/70 flex items-center justify-center">
-                <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-              </div>
-              <span className="flex-1 text-left text-xs font-medium text-muted-foreground">{item.label}</span>
-              <ChevronRight className="w-4 h-4 text-muted-foreground/50" />
-            </motion.button>);
+        <motion.div
+          className="a-list-card"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.55 }}>
+          
+          {[
+          { id: 'legal/privacy_policy', icon: FileText, label: tr("profilescreen_gizlilik_siyaseti_dc3f28", 'Gizlilik Siyasəti') },
+          { id: 'legal/terms_of_service', icon: Scale, label: tr("profilescreen_i_stifade_sertleri_fbbe3d", 'İstifadə Şərtləri') },
+          { id: 'legal/disclaimer', icon: AlertCircle, label: tr("profilescreen_mesuliyyetden_i_mtina_beyanati_857abd", 'Məsuliyyətdən İmtina Bəyanatı') },
+          { id: 'legal/refund_policy', icon: RotateCcw, label: tr("profilescreen_geri_qaytarma_siyaseti_767324", 'Geri Qaytarma Siyasəti') },
+          { id: 'legal/gdpr_ccpa', icon: Shield, label: 'GDPR / CCPA' },
+          { id: 'legal/data_usage', icon: Database, label: tr("profilescreen_melumat_i_stifadesi_af1211", 'Məlumat İstifadəsi') }].
+          map((item) => {
+            const Icon = item.icon;
+            return (
+              <motion.button
+                key={item.id}
+                onClick={() => onNavigate?.(item.id)}
+                className="a-list-row w-full"
+                style={{ width: '100%', textAlign: 'left', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer', padding: '11px 16px' }}
+                whileTap={{ scale: 0.99 }}>
+                
+                <span className="a-list-icon" style={{ width: 30, height: 30, borderRadius: 10, background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
+                  <Icon size={13} strokeWidth={2} />
+                </span>
+                <p className="a-list-sub" style={{ flex: 1, margin: 0, fontWeight: 600 }}>{item.label}</p>
+                <ChevronRight size={14} className="a-list-chevron" />
+              </motion.button>);
 
-        })}
-      </motion.div>
+          })}
+        </motion.div>
+      </section>
 
       {/* Version */}
       <div className="flex flex-col items-center gap-2 mt-3">
-        <div className="text-center text-xs text-muted-foreground select-none px-6 py-2">
+        <div className="text-center select-none px-6 py-2" style={{ fontSize: 11, color: 'var(--a-on-bg-soft)', fontWeight: 600 }}>
           {tr("profilescreen_anacan_v1_0_0_azerbaycan_68472e", "Anacan v1.0.0 \u2022 Az\u0259rbaycan \uD83C\uDDE6\uD83C\uDDFF")}
         </div>
       </div>
@@ -702,6 +705,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         isOpen={showPremiumModal}
         onClose={() => setShowPremiumModal(false)} />
       
+      </div>
     </div>);
 
 };

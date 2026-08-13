@@ -163,15 +163,11 @@ export const useDeviceToken = () => {
 
       FirebaseMessaging.addListener('notificationActionPerformed', (action) => {
         console.log('[DeviceToken] Push action performed:', action);
-        // Route based on data.type using global hash navigation
+        // data.type → state-əsaslı naviqasiya (Index dinləyir).
+        // Əvvəlki hash yanaşması heç nə etmirdi — heç kim hash-ı oxumurdu.
         try {
           const data: any = action?.notification?.data || {};
-          const type = data.type;
-          if (typeof window === 'undefined') return;
-          if (type === 'message' || type === 'partner_message') window.location.hash = '#/?tab=chat';else
-          if (type === 'comment' || type === 'like' || type === 'community') window.location.hash = '#/?tab=community';else
-          if (type === 'premium_expired') window.location.hash = '#/?tab=profile';else
-          if (data.deeplink) window.location.href = data.deeplink;
+          import('@/lib/pushNav').then((m) => m.navigateFromPush(data)).catch(() => {});
         } catch (e) {
           console.warn('[DeviceToken] Routing failed:', e);
         }

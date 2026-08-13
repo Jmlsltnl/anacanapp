@@ -11,7 +11,9 @@ export const resetAppScrollPosition = () => {
   document
     .querySelectorAll('[data-scroll-container], [data-reset-scroll], .overflow-y-auto, .overflow-auto')
     .forEach((el) => {
-      if (el instanceof HTMLElement) {
+      // data-scroll-ignore: öz scroll vəziyyətini idarə edən konteynerlər
+      // (məs. AI chat — aşağıda qalmalıdır, yuxarı sıfırlanmamalıdır)
+      if (el instanceof HTMLElement && !el.hasAttribute('data-scroll-ignore')) {
         scrollableElements.add(el);
       }
     });

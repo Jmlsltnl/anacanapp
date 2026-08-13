@@ -4,7 +4,14 @@ import { supabase } from '@/integrations/supabase/client';
 export type MenstrualPhase = 'menstrual' | 'follicular' | 'ovulation' | 'luteal';
 export type TipCategory = 'general' | 'nutrition' | 'exercise' | 'selfcare' | 'mood' | 'intimacy';
 
-export interface PhaseTip {
+export interface PhaseTipLoc {
+  title_ru?: string | null;
+  title_tr?: string | null;
+  content_ru?: string | null;
+  content_tr?: string | null;
+}
+
+export interface PhaseTip extends PhaseTipLoc {
   id: string;
   phase: MenstrualPhase;
   title: string;

@@ -76,34 +76,15 @@ export const useNotificationSettings = () => {
     loadSettings();
   }, [user]);
 
-  // Schedule water reminders
+  // Schedule the water reminder — exactly ONE notification per day at 10:00
+  // (repeats daily). Legacy every-2-hours reminders are cancelled first.
   const scheduleWaterReminders = useCallback(async () => {
     if (!settings.notifications_enabled || !settings.water_reminder || !isNative) {
       return;
     }
 
-    const now = new Date();
-    const reminders = [];
-
-    // Schedule reminders every 2 hours from 8am to 8pm
-    for (let hour = 8; hour <= 20; hour += 2) {
-      const reminderTime = new Date(now);
-      reminderTime.setHours(hour, 0, 0, 0);
-
-      if (reminderTime > now) {
-        reminders.push({
-          id: 100 + hour,
-          title: tr("usenotificationsettings_su_icmek_vaxti_cecdf9", "Su içmək vaxtı! 💧"),
-          body: tr("usenotificationsettings_saglamliginiz_ve_korpeniz_ucun_2d7315", "Sa\u011Flaml\u0131\u011F\u0131n\u0131z v\u0259 k\xF6rp\u0259niz \xFC\xE7\xFCn su i\xE7m\u0259yi unutmay\u0131n."),
-          schedule: { at: reminderTime }
-        });
-      }
-    }
-
-    if (reminders.length > 0) {
-      await localNotifications.schedule(reminders);
-      console.log(`Scheduled ${reminders.length} water reminders`);
-    }
+    await localNotifications.scheduleWaterReminder();
+    console.log('Scheduled daily water reminder (10:00)');
   }, [settings.notifications_enabled, settings.water_reminder, language]);
 
   // Schedule vitamin reminder
@@ -245,10 +226,20 @@ export const useNotificationSettings = () => {
 
     // Re-schedule notifications based on changes
     if (key === 'water_reminder') {
+      // Mirror to localStorage so app-start scheduling (initializeNativeFeatures)
+      // respects the toggle even before the DB settings are loaded.
+      try {
+        localStorage.setItem('anacan_water_reminder_enabled', value ? 'true' : 'false');
+      } catch {
+        // ignore storage errors
+      }
       if (value) {
         await scheduleWaterReminders();
         toast.success(tr("usenotificationsettings_su_xatirlatmalari_aktivlesdiri_dd0c67", "Su xat\u0131rlatmalar\u0131 aktivl\u0259\u015Fdirildi"));
       } else {
+        if (isNative) {
+          await localNotifications.cancelWaterReminders();
+        }
         toast.info(tr("usenotificationsettings_su_xatirlatmalari_deaktiv_edil_153c1c", "Su xat\u0131rlatmalar\u0131 deaktiv edildi"));
       }
     }

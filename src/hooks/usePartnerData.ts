@@ -3,6 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { getPregnancyWeek, getDaysUntilDue as calcDaysUntilDue, getDaysElapsed, getRealCalendarAge } from '@/lib/pregnancy-utils';
 import { getPhaseInfoForDate, type CyclePhaseInfo } from '@/lib/cycle-utils';
+import { usePartnerSharedSettings } from './usePartnerSharing';
+import { readCache, writeCache } from '@/lib/offlineCache';
+
+const PARTNER_PROFILE_CACHE = 'partner_profile';
+const PARTNER_DAILYLOG_CACHE = 'partner_dailylog';
 
 export interface PartnerWomanData {
   id: string;
@@ -27,10 +32,24 @@ export interface PartnerDailyLog {
 
 export const usePartnerData = () => {
   const { profile } = useAuth();
+  const { sharing } = usePartnerSharedSettings();
   const [partnerProfile, setPartnerProfile] = useState<PartnerWomanData | null>(null);
   const [partnerDailyLog, setPartnerDailyLog] = useState<PartnerDailyLog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  /** Offline fallback: son uğurlu fetch-in nəticəsini göstər. */
+  const restoreFromCache = (): boolean => {
+    if (!profile?.user_id) return false;
+    const cachedProfile = readCache<PartnerWomanData>(PARTNER_PROFILE_CACHE, profile.user_id);
+    if (!cachedProfile) return false;
+    setPartnerProfile(cachedProfile);
+    // Gündəlik log yalnız bu günə aiddirsə göstərilsin (dünənki əhval "bu gün" kimi görünməsin)
+    const cachedLog = readCache<PartnerDailyLog>(PARTNER_DAILYLOG_CACHE, profile.user_id);
+    const today = new Date().toISOString().split('T')[0];
+    if (cachedLog?.log_date === today) setPartnerDailyLog(cachedLog);
+    return true;
+  };
 
   const fetchPartnerData = async () => {
     if (!profile?.linked_partner_id) {
@@ -48,13 +67,17 @@ export const usePartnerData = () => {
 
       if (profileError) {
         console.error('Error fetching partner profile:', profileError);
-        setError(tr("usepartnerdata_partner_melumatlari_yuklene_bi_430423", "Partner m\u0259lumatlar\u0131 y\xFCkl\u0259n\u0259 bilm\u0259di"));
+        // Offline/server xətası → son vəziyyət cache-dən
+        if (!restoreFromCache()) {
+          setError(tr("usepartnerdata_partner_melumatlari_yuklene_bi_430423", "Partner m\u0259lumatlar\u0131 y\xFCkl\u0259n\u0259 bilm\u0259di"));
+        }
         setLoading(false);
         return;
       }
 
       if (partnerData) {
         setPartnerProfile(partnerData as PartnerWomanData);
+        if (profile?.user_id) writeCache(PARTNER_PROFILE_CACHE, profile.user_id, partnerData);
 
         // Fetch today's daily log for the partner
         const today = new Date().toISOString().split('T')[0];
@@ -67,11 +90,14 @@ export const usePartnerData = () => {
 
         if (!logError && logData) {
           setPartnerDailyLog(logData);
+          if (profile?.user_id) writeCache(PARTNER_DAILYLOG_CACHE, profile.user_id, logData);
         }
       }
     } catch (err) {
       console.error('Error in fetchPartnerData:', err);
-      setError(tr("usepartnerdata_xeta_bas_verdi_f22fba", "X\u0259ta ba\u015F verdi"));
+      if (!restoreFromCache()) {
+        setError(tr("usepartnerdata_xeta_bas_verdi_f22fba", "X\u0259ta ba\u015F verdi"));
+      }
     } finally {
       setLoading(false);
     }
@@ -134,6 +160,7 @@ export const usePartnerData = () => {
 
   // Get cycle phase info for 'flow' stage
   const getCyclePhaseInfo = (): CyclePhaseInfo | null => {
+    if (!sharing.share_cycle) return null;
     if (!partnerProfile?.last_period_date || partnerProfile.life_stage !== 'flow') {
       return null;
     }
@@ -147,6 +174,7 @@ export const usePartnerData = () => {
 
   // Days until next period for 'flow' stage
   const getDaysUntilNextPeriod = (): number => {
+    if (!sharing.share_cycle) return 0;
     if (!partnerProfile?.last_period_date || partnerProfile.life_stage !== 'flow') {
       return 0;
     }
@@ -158,9 +186,18 @@ export const usePartnerData = () => {
     return Math.max(0, cycleLength - daysIntoCycle);
   };
 
+  // Paylaşım maskası: ana bağladığı sahələr partnyora null görünür
+  const maskedDailyLog: PartnerDailyLog | null = partnerDailyLog ? {
+    ...partnerDailyLog,
+    mood: sharing.share_mood ? partnerDailyLog.mood : null,
+    symptoms: sharing.share_symptoms ? partnerDailyLog.symptoms : null,
+    water_intake: sharing.share_water ? partnerDailyLog.water_intake : null
+  } : null;
+
   return {
     partnerProfile,
-    partnerDailyLog,
+    partnerDailyLog: maskedDailyLog,
+    sharing,
     loading,
     error,
     refetch: fetchPartnerData,

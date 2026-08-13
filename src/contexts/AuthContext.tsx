@@ -1,9 +1,13 @@
 import { tr } from "@/lib/tr";import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { readCache, writeCache, clearAllCaches } from '@/lib/offlineCache';
 const isCapacitorNative = typeof (window as any)?.Capacitor?.isNativePlatform === 'function' &&
   (window as any).Capacitor.isNativePlatform();
 import { useUserStore } from '@/store/userStore';
 import type { User, Session } from '@supabase/supabase-js';
+
+const PROFILE_CACHE_KEY = 'profile';
+const ROLE_CACHE_KEY = 'role';
 
 // ─────────────────────────────────────────
 // Types
@@ -45,6 +49,8 @@ interface AuthContextValue {
   profile: Profile | null;
   userRole: UserRole | null;
   loading: boolean;
+  /** hydrateUser bitib (profil DB/cache-dən oxunub). Onboarding qərarı bundan ƏVVƏL verilməməlidir. */
+  profileLoaded: boolean;
   isAdmin: boolean;
   isModerator: boolean;
   signUp: (email: string, password: string, name: string, countryCode?: string | null) => Promise<{data: any;error: any;}>;
@@ -69,6 +75,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
   const {
     setAuth,
@@ -88,21 +95,33 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
   // ─────────────────────────────────────────
   // Helpers
   // ─────────────────────────────────────────
+  /**
+   * Sərt variant: şəbəkə/server xətasında THROW edir.
+   * Beləliklə "profil həqiqətən yoxdur" (null) ilə "fetch alınmadı" (throw)
+   * fərqlənir — offline-da istifadəçini onboarding-ə atmamaq üçün kritikdir.
+   */
+  const fetchProfileStrict = useCallback(async (userId: string): Promise<Profile | null> => {
+    const { data, error } = await supabase.
+    from('profiles').
+    select('*').
+    eq('user_id', userId).
+    maybeSingle();
+
+    if (error) throw error;
+    const p = data as Profile | null;
+    if (p) writeCache(PROFILE_CACHE_KEY, userId, p); // son uğurlu profil → cache
+    return p;
+  }, []);
+
   const fetchProfile = useCallback(async (userId: string): Promise<Profile | null> => {
     try {
-      const { data, error } = await supabase.
-      from('profiles').
-      select('*').
-      eq('user_id', userId).
-      maybeSingle();
-
-      if (error) throw error;
-      return data as Profile | null;
+      return await fetchProfileStrict(userId);
     } catch (error) {
       console.error('Error fetching profile:', error);
-      return null;
+      // Offline/server xətası → son vəziyyət cache-dən
+      return readCache<Profile>(PROFILE_CACHE_KEY, userId);
     }
-  }, []);
+  }, [fetchProfileStrict]);
 
   const fetchUserRole = useCallback(async (userId: string): Promise<UserRole | null> => {
     try {
@@ -116,10 +135,13 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
 
       const rolesPriority = ['admin', 'moderator', 'user'];
       const highestRole = rolesPriority.find((r) => data.some((d) => d.role === r));
-      return highestRole ? { role: highestRole as UserRole['role'] } : null;
+      const role = highestRole ? { role: highestRole as UserRole['role'] } : null;
+      if (role) writeCache(ROLE_CACHE_KEY, userId, role);
+      return role;
     } catch (error) {
       console.error('Error fetching user role:', error);
-      return null;
+      // Offline → cache (UI rahatlığıdır; real icazələr RLS-dədir)
+      return readCache<UserRole>(ROLE_CACHE_KEY, userId);
     }
   }, []);
 
@@ -289,6 +311,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       setProfile(null);
       setUserRole(null);
       storeLogout();
+      clearAllCaches(); // offline "son vəziyyət" cache-ləri də getsin
       // Reset Mixpanel on logout
       import('@/lib/mixpanel').then(({ resetMixpanel }) => resetMixpanel()).catch(() => {});
     }
@@ -298,16 +321,30 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { data: null, error: 'No user logged in' };
     try {
-      const { data, error } = await supabase.
+      // .single() istifadə etmirik: 0 sətir (profil sətri yaranmayıb) və ya
+      // dublikat sətir hallarında PGRST116 ilə çökməsin.
+      const { data: rows, error } = await supabase.
       from('profiles').
       update(updates).
       eq('user_id', user.id).
-      select().
-      single();
+      select();
 
       if (error) throw error;
-      const newProfile = data as Profile;
+
+      let row = rows?.[0] ?? null;
+      if (!row) {
+        // Profil sətri yoxdur (signup trigger-i işləməyib) — özümüz yaradaq
+        const { data: inserted, error: insErr } = await supabase.
+        from('profiles').
+        insert({ user_id: user.id, email: user.email, ...updates } as any).
+        select();
+        if (insErr) throw insErr;
+        row = inserted?.[0] ?? null;
+      }
+      if (!row) throw new Error('Profile row could not be created');
+      const newProfile = row as Profile;
       setProfile(newProfile);
+      writeCache(PROFILE_CACHE_KEY, user.id, newProfile);
       syncProfileToStore(newProfile, user?.id);
       return { data: newProfile, error: null };
     } catch (error) {
@@ -352,9 +389,13 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
   const refreshProfile = useCallback(async () => {
     if (!user) return;
     const [profileData, roleData] = await Promise.all([fetchProfile(user.id), fetchUserRole(user.id)]);
-    setProfile(profileData);
-    setUserRole(roleData);
-    syncProfileToStore(profileData, user.id);
+    // Offline-da fetchProfile cache qaytarır; null yalnız cache də yoxdursa gəlir —
+    // o halda mövcud vəziyyəti pozmuruq (onboarding-ə atmamaq üçün).
+    if (profileData) {
+      setProfile(profileData);
+      syncProfileToStore(profileData, user.id);
+    }
+    if (roleData) setUserRole(roleData);
   }, [user, fetchProfile, fetchUserRole, syncProfileToStore]);
 
   // ─────────────────────────────────────────
@@ -387,26 +428,45 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
     const hydrateUser = async (u: User) => {
       try {
         const [profileRes, roleRes, prefsRes] = await Promise.allSettled([
-          fetchProfile(u.id),
+          fetchProfileStrict(u.id),
           fetchUserRole(u.id),
           supabase.from('user_preferences').select('language').eq('user_id', u.id).maybeSingle()
         ]);
 
         if (!mounted) return;
 
-        const profileData = profileRes.status === 'fulfilled' ? profileRes.value : null;
-        const roleData = roleRes.status === 'fulfilled' ? roleRes.value : null;
+        // Profil: server cavabı ilə şəbəkə xətasını fərqləndir.
+        //  - fulfilled + null  → profil həqiqətən yoxdur (yeni istifadəçi)
+        //  - rejected          → offline/server xətası → son vəziyyət cache-dən
+        const profileFetchFailed = profileRes.status === 'rejected';
+        const profileData = profileRes.status === 'fulfilled' ?
+        profileRes.value :
+        readCache<Profile>(PROFILE_CACHE_KEY, u.id);
+        if (profileFetchFailed) {
+          console.warn('Profile fetch failed — using cached profile:', !!profileData);
+        }
+        const roleData = roleRes.status === 'fulfilled' ? roleRes.value : readCache<UserRole>(ROLE_CACHE_KEY, u.id);
         const prefsData = prefsRes.status === 'fulfilled' ? prefsRes.value?.data : null;
         const createdTime = new Date(u.created_at).getTime();
         const lastSignInTime = u.last_sign_in_at ? new Date(u.last_sign_in_at).getTime() : createdTime;
         const isFirstLogin = Math.abs(lastSignInTime - createdTime) < 60000;
         const localLang = useUserStore.getState().language;
 
+        const localHasSelected = useUserStore.getState().hasSelectedLanguage;
+
         if (isFirstLogin) {
           // For newly registered users, their local language choice should be pushed to the DB
           // overriding the default 'az' that the database trigger might have inserted.
           Promise.resolve(supabase.from('user_preferences').upsert({ user_id: u.id, language: localLang }, { onConflict: 'user_id' })).catch(console.error);
+        } else if (localHasSelected && localLang) {
+          // Bu cihazda istifadəçi dil seçimini AÇIQ şəkildə edib (məs. ilk açılış ekranında tr).
+          // Lokal seçim qalib gəlir — serverdəki köhnə dəyər (məs. az) onu ƏZMƏMƏLİDİR.
+          // Server yalnız sinxronlanır ki, push bildirişləri düzgün dildə gəlsin.
+          if (prefsData?.language !== localLang) {
+            Promise.resolve(supabase.from('user_preferences').upsert({ user_id: u.id, language: localLang }, { onConflict: 'user_id' })).catch(console.error);
+          }
         } else if (prefsData?.language) {
+          // Lokal açıq seçim yoxdur → serverdəki üstünlük tətbiq olunur.
           useUserStore.getState().setLanguage(prefsData.language);
           useUserStore.getState().setHasSelectedLanguage(true);
         } else {
@@ -421,10 +481,21 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
           u.email || '',
           profileData?.name || u.user_metadata?.name || tr("authcontext_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")
         );
-        syncProfileToStore(profileData, u.id);
+
+        if (profileData) {
+          syncProfileToStore(profileData, u.id);
+        } else if (!profileFetchFailed) {
+          // Server qəti dedi: profil yoxdur → onboarding düzgündür
+          syncProfileToStore(null, u.id);
+        }
+        // profileFetchFailed && !profileData → persist olunmuş zustand vəziyyətinə
+        // TOXUNMA: istifadəçi son bildiyi dashboard-da qalır (offline-first).
       } catch (error) {
         console.error('Error hydrating user:', error);
         // Don't clear user/session on hydration error - keep the session alive
+      } finally {
+        // Onboarding gate-i yalnız bundan sonra qərar verə bilər
+        if (mounted) setProfileLoaded(true);
       }
     };
 
@@ -441,7 +512,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
         setUser(null);
         setProfile(null);
         setUserRole(null);
+        setProfileLoaded(false);
         storeLogout();
+        clearAllCaches();
         finishLoading();
         import('@/lib/revenuecat').then((m) => m.logOutRevenueCat()).catch(() => {});
         return;
@@ -528,6 +601,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
         profile,
         userRole,
         loading,
+        profileLoaded,
         isAdmin,
         isModerator,
         signUp,

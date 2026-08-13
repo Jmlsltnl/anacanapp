@@ -47,16 +47,16 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
   }, [posts, searchQuery, sortBy]);
 
   const EmptyState = ({ emoji, text, subtext }: {emoji: string;text: string;subtext: string;}) =>
-  <motion.div className="text-center py-16" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
-      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/8 to-accent/5 flex items-center justify-center mx-auto mb-4">
+  <motion.div className="a-card text-center" style={{ padding: '36px 18px' }} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
+      <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--a-surface-soft)' }}>
         <span className="text-3xl">{emoji}</span>
       </div>
-      <h3 className="font-bold text-foreground mb-1.5 text-[14px]">{text}</h3>
-      <p className="text-[12px] text-muted-foreground/40 mb-5 max-w-[240px] mx-auto leading-relaxed">{subtext}</p>
+      <h3 className="a-list-title" style={{ marginBottom: 4 }}>{text}</h3>
+      <p className="a-list-sub" style={{ margin: '0 auto 16px', maxWidth: 240, whiteSpace: 'normal', lineHeight: 1.5 }}>{subtext}</p>
       {!searchQuery &&
-    <Button onClick={onCreatePost} size="sm" className="gradient-primary text-[12px] h-9 px-5 rounded-full shadow-sm shadow-primary/20">
-          <Plus className="w-3.5 h-3.5 mr-1.5" /> {tr("groupfeed_paylasim_yarat_69bdcd", "Payla\u015F\u0131m yarat")}
-        </Button>
+    <button onClick={onCreatePost} className="a-cta-btn">
+          <Plus size={14} strokeWidth={2.4} /> {tr("groupfeed_paylasim_yarat_69bdcd", "Payla\u015F\u0131m yarat")}
+        </button>
     }
     </motion.div>;
 

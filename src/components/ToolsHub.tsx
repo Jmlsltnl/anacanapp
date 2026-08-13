@@ -1,4 +1,7 @@
-import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { pushBackHandler } from '@/lib/backButton';
+import { isToolFree } from '@/lib/freemium';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Shield, Timer, Scale, Baby, Briefcase,
@@ -27,6 +30,8 @@ const ShoppingList = lazy(() => import('./tools/ShoppingList'));
 const Recipes = lazy(() => import('./tools/Recipes'));
 const DoctorsHospitals = lazy(() => import('./tools/DoctorsHospitals'));
 const BloodSugarTracker = lazy(() => import('./tools/BloodSugarTracker'));
+const BloodPressureTracker = lazy(() => import('./tools/BloodPressureTracker'));
+const DangerSignsScreen = lazy(() => import('./tools/DangerSignsScreen'));
 const PregnancyAlbum = lazy(() => import('./tools/PregnancyAlbum'));
 const AffiliateProducts = lazy(() => import('./tools/AffiliateProducts'));
 const CryTranslator = lazy(() => import('./tools/CryTranslator'));
@@ -47,6 +52,7 @@ const VitaminTracker = lazy(() => import('./tools/VitaminTracker'));
 const VaccineCalendar = lazy(() => import('./tools/VaccineCalendar'));
 const BabyMonthlyAlbum = lazy(() => import('./baby/BabyMonthlyAlbum'));
 const CakesScreen = lazy(() => import('./CakesScreen'));
+const MiniGamesHub = lazy(() => import('./games/MiniGamesHub'));
 import { PremiumModal } from './PremiumModal';
 
 import { useToast } from '@/hooks/use-toast';
@@ -119,12 +125,37 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTool, setActiveTool] = useState<string | null>(initialTool);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
-  const scrollPositionRef = useRef(0);
+
+  // Alət açılanda VƏ siyahıya qayıdanda həmişə yuxarıdan başla.
+  // (Əvvəllər window.scrollY saxlanılırdı — real scroller [data-scroll-container]
+  // olduğu üçün həmişə 0 idi və heç nə işləmirdi → alət səhifəsi ortadan açılırdı.)
+  useScrollToTop([activeTool]);
+
+  // Android geri: açıq alət → alətlər siyahısına qayıt (Index-dən ƏVVƏL işləyir)
+  useEffect(() => {
+    if (!activeTool) return;
+    return pushBackHandler(() => {
+      if (onBack && initialTool) {
+        onBack(); // Dashboard-dan açılıb → Dashboard-a
+      } else {
+        setActiveTool(null);
+      }
+      return true;
+    });
+  }, [activeTool, onBack, initialTool]);
 
   const openTool = (toolId: string) => {
-    // Save scroll position before opening tool
-    scrollPositionRef.current = window.scrollY || document.documentElement.scrollTop;
     setActiveTool(toolId);
+  };
+
+  // Freemium gate — hero/mini-games kimi birbaşa açılışlar üçün
+  const gatedOpenTool = (toolId: string) => {
+    if (!isAdmin && !isPremium && !isToolFree(toolId)) {
+      import('@/lib/analytics').then((m) => m.analytics.logPaywallShown(toolId)).catch(() => {});
+      setShowPremiumModal(true);
+      return;
+    }
+    openTool(toolId);
   };
   const { lifeStage, getPregnancyData } = useUserStore();
   const { profile, isAdmin } = useAuth();
@@ -175,7 +206,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         bgColor: config.bg_color,
         minWeek: config.min_week || undefined,
         stages: config.life_stages,
-        isPremium: config.is_premium || false,
+        // Freemium siyasəti (yalnız bu build): free siyahısında olmayan HƏR alət premium.
+        // DB flag-larına toxunulmur → köhnə versiyalar təsirlənmir.
+        isPremium: (config.is_premium || false) || !isToolFree(config.tool_id),
         premiumType: config.premium_type || 'none',
         premiumLimit: config.premium_limit || 0,
         isLocked: getLockedStatus(config)
@@ -183,11 +216,18 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     });
   }, [toolConfigs, hasPartner, lifeStage, language, isNonAz, disabledTools]);
 
-  // Set initial tool from props on mount
+  // Set initial tool from props on mount (Dashboard qısayolları / banner deeplink-ləri)
+  // Freemium: free olmayan alət premium-suz açılmır — paywall göstərilir.
   useEffect(() => {
     if (initialTool) {
+      if (!isAdmin && !isPremium && !isToolFree(initialTool)) {
+        import('@/lib/analytics').then((m) => m.analytics.logPaywallShown(initialTool)).catch(() => {});
+        setShowPremiumModal(true);
+        return;
+      }
       setActiveTool(initialTool);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isToolAvailable = (tool: Tool) => {
@@ -279,11 +319,8 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       if (onBack && initialTool) {
         onBack();
       } else {
+        // useScrollToTop([activeTool]) siyahını da yuxarıdan açır
         setActiveTool(null);
-        // Restore scroll position after React re-renders
-        requestAnimationFrame(() => {
-          window.scrollTo(0, scrollPositionRef.current);
-        });
       }
     } else if (onBack) {
       onBack();
@@ -315,6 +352,8 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       case 'recipes':return <Recipes onBack={handleBack} />;
       case 'doctors':return <DoctorsHospitals onBack={handleBack} />;
       case 'blood-sugar':return <BloodSugarTracker onBack={handleBack} />;
+      case 'blood-pressure':return <BloodPressureTracker onBack={handleBack} />;
+      case 'danger-signs':return <DangerSignsScreen onBack={handleBack} />;
       case 'pregnancy-album':return <PregnancyAlbum onBack={handleBack} />;
       case 'baby-album':return <BabyMonthlyAlbum onBack={handleBack} />;
       case 'cry-translator':return <CryTranslator onBack={handleBack} />;
@@ -335,6 +374,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       case 'vaccine-calendar':case 'vaccines-calendar':return <VaccineCalendar onBack={handleBack} />;
       case 'vitamin-tracker':case 'vitamins':return <VitaminTracker onBack={handleBack} />;
       case 'cakes':return <CakesScreen onBack={handleBack} />;
+      case 'mini-games':return <MiniGamesHub onBack={handleBack} />;
       default:return null;
     }
   })();
@@ -349,184 +389,196 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
 
   const getLifeStageInfo = () => {
     switch (lifeStage) {
-      case 'flow':return { label: tr("toolshub_dovriyye_f65b93", 'Dövriyyə'), emoji: '🌸', color: 'from-pink-500 to-rose-600' };
-      case 'bump':return { label: tr("toolshub_hamilelik_e86feb", 'Hamiləlik'), emoji: '🤰', color: 'from-primary to-orange-500' };
-      case 'mommy':return { label: tr("toolshub_analiq_9e762d", 'Analıq'), emoji: '👶', color: 'from-teal-500 to-cyan-600' };
-      default:return { label: tr("toolshub_aletler_4778b4", 'Alətlər'), emoji: '✨', color: 'from-primary to-orange-500' };
+      case 'flow':return { label: tr("toolshub_dovriyye_f65b93", 'Dövriyyə'), emoji: '🌸' };
+      case 'bump':return { label: tr("toolshub_hamilelik_e86feb", 'Hamiləlik'), emoji: '🤰' };
+      case 'mommy':return { label: tr("toolshub_analiq_9e762d", 'Analıq'), emoji: '👶' };
+      default:return { label: tr("toolshub_aletler_4778b4", 'Alətlər'), emoji: '✨' };
     }
   };
 
   const stageInfo = getLifeStageInfo();
 
+  // anacan-demo tool tile gradient cycle
+  const TILE_GRADIENTS = ['var(--a-grad-peach)', 'var(--a-grad-pink)', 'var(--a-grad-lav)', 'var(--a-grad-blue)', 'var(--a-grad-green)', 'var(--a-grad-yellow)'];
+  const TILE_INKS = ['var(--a-accent-ink)', 'var(--a-berry-ink)', 'var(--a-lav-ink)', 'var(--a-blue-ink)', 'var(--a-green-ink)', 'var(--a-warn-ink)'];
+  // Featured (hero) banner backgrounds cycle
+  const HERO_BGS = ['var(--a-grad-lav)', 'var(--a-grad-peach)', 'var(--a-grad-green)', 'var(--a-grad-blue)'];
+  const HERO_INKS = ['#3c2e5c', 'var(--a-cta-ink)', '#14532d', '#153e57'];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-muted/30 to-background pb-24">
-      {/* Minimal Header */}
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl">
-        <div className="px-4 pt-2 pb-2">
-          {/* Search Bar with integrated title */}
-          <div className="flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${stageInfo.color} flex items-center justify-center shadow-md flex-shrink-0`}>
-              <span className="text-lg">{stageInfo.emoji}</span>
-            </div>
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder={tr("toolshub_alet_axtarin_fad58b", "Alət axtarın...")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 rounded-full bg-muted/60 text-foreground placeholder:text-muted-foreground text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
-              
-            </div>
+    <div className="a-scope pb-8" style={{ background: 'var(--a-bg)', minHeight: '100%' }}>
+      <div className="a-shell">
+        {/* Search header */}
+        <div style={{ paddingTop: 14 }}>
+          <div className="a-search">
+            <span style={{ fontSize: 15 }}>{stageInfo.emoji}</span>
+            <input
+              type="text"
+              placeholder={tr("toolshub_alet_axtarin_fad58b", "Alət axtarın...")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label={tr("toolshub_alet_axtarin_fad58b", "Alət axtarın...")} />
+            
+            {!searchQuery && <Search size={15} strokeWidth={2} color="var(--a-ink-faint)" />}
           </div>
         </div>
-      </div>
 
-      <div className="px-4 pt-3">
         {/* Top Banner */}
-        <BannerSlot placement="tools_top" onNavigate={() => {}} onToolOpen={openTool} className="mb-4" />
+        <BannerSlot placement="tools_top" onNavigate={() => {}} onToolOpen={gatedOpenTool} className="mt-3" />
 
-        {/* Hero Tools - DB driven */}
-        {(() => {
+        {/* Featured trio — Mini Games + DB hero tools as compact side-by-side tiles */}
+        {!searchQuery &&
+        (() => {
           const heroTools = toolConfigs.
           filter((t) => t.is_hero && !disabledTools.includes(t.tool_id)).
           sort((a, b) => (a.hero_order || 0) - (b.hero_order || 0));
 
-          return heroTools.map((hero, idx) => {
+          const featuredItems: {key: string;label: string;icon: LucideIcon;emoji?: string;bg: string;ink: string;premium: boolean;onClick: () => void;}[] = [];
+
+          if (!isToolDisabled('mini-games')) {
+            featuredItems.push({
+              key: 'mini-games',
+              label: tr("toolshub_minigames_title", "Mini Oyunlar"),
+              icon: Gamepad2,
+              bg: 'var(--a-grad-green)',
+              ink: '#14532d',
+              premium: !isToolFree('mini-games'),
+              onClick: () => gatedOpenTool('mini-games')
+            });
+          }
+
+          heroTools.forEach((hero, idx) => {
             const HeroIcon = iconMap[hero.icon] || Wrench;
             const displayName = (hero as any).display_name || hero.name;
+            featuredItems.push({
+              key: hero.tool_id,
+              label: displayName,
+              icon: HeroIcon,
+              bg: HERO_BGS[idx % HERO_BGS.length],
+              ink: HERO_INKS[idx % HERO_INKS.length],
+              premium: !!hero.is_premium || !isToolFree(hero.tool_id),
+              onClick: () => gatedOpenTool(hero.tool_id)
+            });
+          });
 
-            return (
-              <motion.button
-                key={hero.tool_id}
-                onClick={() => openTool(hero.tool_id)}
-                className={`w-full relative overflow-hidden rounded-3xl bg-gradient-to-r ${hero.hero_gradient || 'from-primary to-primary/80'} p-4 mb-3 text-left shadow-xl`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                whileTap={{ scale: 0.98 }}>
-                
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent_60%)]" />
-                <div className="absolute right-0 bottom-0 opacity-10">
-                  <HeroIcon className="w-32 h-32 text-white -mr-6 -mb-6" />
-                </div>
-                <div className="relative z-10 flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <HeroIcon className="w-7 h-7 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      {hero.hero_badge &&
-                      <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] text-white font-semibold">
-                        {hero.hero_badge.includes('Populyar') ? hero.hero_badge.replace('Populyar', language === 'en' ? 'Popular' : language === 'ru' ? 'Популярный' : language === 'tr' ? 'Popüler' : 'Populyar') : hero.hero_badge}
-                      </span>
-                      }
-                      {hero.is_premium &&
-                      <span className="px-2 py-0.5 rounded-full bg-amber-400/30 text-[10px] text-amber-200 font-semibold flex items-center gap-1">
-                          <Crown className="w-3 h-3" /> Premium
+          if (featuredItems.length === 0) return null;
+
+          return (
+            <section className="a-section">
+              <div className="a-section-head">
+                <h2 className="a-section-title a-heading">{tr("toolshub_featured_title", "Seçilmişlər")}</h2>
+              </div>
+              <div className="a-trio" style={{ gridTemplateColumns: `repeat(${Math.min(3, featuredItems.length)}, 1fr)` }}>
+                {featuredItems.slice(0, 3).map((item, idx) => {
+                  const ItemIcon = item.icon;
+                  return (
+                    <motion.button
+                      key={item.key}
+                      onClick={item.onClick}
+                      className="a-trio-item a-fade-in"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      whileTap={{ scale: 0.92 }}>
+                      
+                      {item.premium &&
+                      <span className="a-crown-chip">
+                          <Crown size={11} strokeWidth={2.6} />
                         </span>
                       }
-                    </div>
-                    <h3 className="text-white font-bold text-base">{displayName}</h3>
-                    <p className="text-white/70 text-xs">
+                      <span className="a-trio-icon" style={{ background: item.bg, color: item.ink }}>
+                        <ItemIcon size={17} strokeWidth={2} />
+                      </span>
+                      <p className="a-trio-label" style={{ color: 'var(--a-ink)' }}>{item.label}</p>
+                    </motion.button>);
+
+                })}
+              </div>
+            </section>);
+
+        })()
+        }
+
+        {/* Tools grid section */}
+        <section className="a-section">
+          <div className="a-section-head">
+            <h2 className="a-section-title a-heading">
+              {searchQuery ? `${displayedTools.length} ${tr("toolshub_netice", "nəticə")}` : tr("toolshub_butun_aletler_88b643", "B\xFCt\xFCn Al\u0259tl\u0259r")}
+            </h2>
+            <span className="a-section-link">
+              {displayedTools.length} {tr("toolshub_alet_9a099a", "al\u0259t")}
+            </span>
+          </div>
+
+          {/* Tools Grid - anacan-demo 2 columns */}
+          <div className="a-tool-grid">
+            <AnimatePresence mode="popLayout">
+              {displayedTools.map((tool, index) => {
+                const Icon = tool.icon;
+                const available = isToolAvailable(tool);
+                const needsPremium = (tool.isLocked || tool.isPremium) && !isPremium;
+
+                return (
+                  <motion.button
+                    key={tool.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ delay: Math.min(index * 0.015, 0.18) }}
+                    onClick={() => tool.id === 'cakes' ? openTool('cakes') : handleToolClick(tool)}
+                    className="a-tool-tile"
+                    style={!available ? { opacity: 0.4 } : undefined}>
+                    
+                    {/* Premium/Lock indicator */}
+                    {needsPremium &&
+                    <span className="a-crown-chip">
+                        <Lock size={10} strokeWidth={2.6} />
+                      </span>
+                    }
+                    {!needsPremium && tool.isPremium &&
+                    <span className="a-crown-chip">
+                        <Crown size={10} strokeWidth={2.6} />
+                      </span>
+                    }
+                    
+                    {/* Icon */}
+                    <span className="a-tool-icon" style={{ background: TILE_GRADIENTS[index % TILE_GRADIENTS.length], color: TILE_INKS[index % TILE_INKS.length] }}>
+                      <Icon size={17} strokeWidth={2} />
+                    </span>
+                    
+                    <p className="a-tool-title">{tool.name}</p>
+                    <p className="a-tool-sub">
                       {(() => {
-                        const desc = hero.hero_subtitle || hero.description || '';
-                        if (language === 'en' && hero.tool_id === 'photoshoot') return 'Create magical photoshoots for your baby';
-                        if (language === 'en' && hero.tool_id === 'recipes' && desc.includes('resept')) return 'Healthy and delicious recipes';
-                        return desc;
+                        if (language === 'en' && tool.id === 'photoshoot') return 'Create magical photoshoots for your baby';
+                        if (language === 'en' && tool.id === 'recipes' && tool.description?.includes('resept')) return 'Healthy and delicious recipes';
+                        return tool.description;
                       })()}
                     </p>
-                  </div>
-                  <ChevronRight className="w-6 h-6 text-white/60" />
-                </div>
-              </motion.button>);
+                  </motion.button>);
 
-          });
-        })()}
-
-        {/* Quick Access Row removed - only hero banners shown */}
-
-        {/* Tools Count Header */}
-        <div className="flex items-center justify-between mb-2.5">
-          <h2 className="text-sm font-semibold text-foreground">
-            {tr("toolshub_butun_aletler_88b643", "B\xFCt\xFCn Al\u0259tl\u0259r")}
-          </h2>
-          <span className="text-[11px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full font-medium">
-            {displayedTools.length} {tr("toolshub_alet_9a099a", "al\u0259t")}
-          </span>
-        </div>
-
-        {/* Tools Grid - 3 Columns, Compact */}
-        <div className="grid grid-cols-3 gap-2">
-          <AnimatePresence mode="popLayout">
-            {displayedTools.map((tool, index) => {
-              const Icon = tool.icon;
-              const available = isToolAvailable(tool);
-              const needsPremium = (tool.isLocked || tool.isPremium) && !isPremium;
-
-              return (
-                <motion.button
-                  key={tool.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: Math.min(index * 0.015, 0.18) }}
-                  onClick={() => tool.id === 'cakes' ? openTool('cakes') : handleToolClick(tool)}
-                  className={`bg-card rounded-xl p-2.5 text-left border border-border/40 relative overflow-hidden transition-all active:scale-95 ${!available ? 'opacity-40' : 'hover:shadow-md hover:border-primary/20'}`}>
-                  
-                  {/* Premium/Lock indicator */}
-                  {needsPremium &&
-                  <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-amber-500/15 flex items-center justify-center">
-                      <Lock className="w-2.5 h-2.5 text-amber-500" />
-                    </div>
-                  }
-                  {!needsPremium && tool.isPremium &&
-                  <div className="absolute top-1.5 right-1.5">
-                      <Crown className="w-3 h-3 text-amber-400" />
-                    </div>
-                  }
-                  
-                  {/* Icon */}
-                  <div className={`w-9 h-9 rounded-lg mb-1.5 flex items-center justify-center ${
-                  needsPremium ?
-                  'bg-gradient-to-br from-amber-500/15 to-orange-500/15' :
-                  'bg-gradient-to-br from-primary/10 to-primary/20'}`
-                  }>
-                    <Icon className={`w-[18px] h-[18px] ${needsPremium ? 'text-amber-500' : 'text-primary'}`} />
-                  </div>
-                  
-                  <h3 className="font-semibold text-foreground text-[12px] leading-tight mb-0.5 pr-4 line-clamp-2">{tool.name}</h3>
-                  <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2">
-                    {(() => {
-                      if (language === 'en' && tool.id === 'photoshoot') return 'Create magical photoshoots for your baby';
-                      if (language === 'en' && tool.id === 'recipes' && tool.description?.includes('resept')) return 'Healthy and delicious recipes';
-                      return tool.description;
-                    })()}
-                  </p>
-                </motion.button>);
-
-            })}
-          </AnimatePresence>
-        </div>
+              })}
+            </AnimatePresence>
+          </div>
+        </section>
 
         {/* Empty State */}
         {displayedTools.length === 0 &&
         <motion.div
-          className="text-center py-16"
+          className="a-card a-section"
+          style={{ textAlign: 'center', padding: '36px 18px' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}>
           
-            <div className="w-20 h-20 rounded-3xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
-              <Search className="w-10 h-10 text-muted-foreground/50" />
-            </div>
-            <p className="font-semibold text-foreground mb-1">{tr("toolshub_alet_tapilmadi_f358cb", "Alət tapılmadı")}</p>
-            <p className="text-sm text-muted-foreground">
+            <Search size={36} style={{ color: 'var(--a-ink-faint)', margin: '0 auto 10px' }} />
+            <p className="a-list-title" style={{ marginBottom: 3 }}>{tr("toolshub_alet_tapilmadi_f358cb", "Alət tapılmadı")}</p>
+            <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>
               {searchQuery ? `"${searchQuery}" ${tr("toolshub_no_matching_tools", "ilə uyğun alət yoxdur")}` : tr("toolshub_bu_kateqoriyada_alet_yoxdur_6c04fc", "Bu kateqoriyada al\u0259t yoxdur")}
             </p>
             <motion.button
             onClick={() => {setSearchQuery('');}}
-            className="mt-4 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium"
+            className="a-btn-soft"
+            style={{ marginTop: 14 }}
             whileTap={{ scale: 0.95 }}>
               {tr("toolshub_hamisini_goster_b13d82", "Ham\u0131s\u0131n\u0131 g\xF6st\u0259r")}
             
@@ -535,7 +587,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         }
 
         {/* Bottom Banner */}
-        <BannerSlot placement="tools_bottom" onNavigate={() => {}} onToolOpen={openTool} className="mt-6" />
+        <BannerSlot placement="tools_bottom" onNavigate={() => {}} onToolOpen={gatedOpenTool} className="mt-6" />
       </div>
 
       {/* Premium Modal */}

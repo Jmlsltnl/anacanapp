@@ -40,6 +40,18 @@ initFacebookEvents();
 // Initialize native features when app starts
 initializeNativeFeatures().catch(console.error);
 
+// Native app hissi: tətbiq versiyasında text seçimi deaktiv edilir
+// (index.css-dəki body.native-app qaydaları; input/textarea istisnadır)
+try {
+  const cap = (window as any)?.Capacitor;
+  if (typeof cap?.isNativePlatform === 'function' && cap.isNativePlatform()) {
+    document.body.classList.add('native-app');
+  }
+} catch {/* boş */}
+
+// Android hardware geri düyməsi (əvvəllər handler yox idi → tətbiq bağlanırdı)
+import('./lib/backButton').then((m) => m.initBackButtonHandler()).catch(console.error);
+
 async function restorePreferences() {
   try {
     const { value: storedLang } = await Preferences.get({ key: 'anacan_app_language' });

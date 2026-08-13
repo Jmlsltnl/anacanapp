@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
+import TrackerAIInsight, { useBabyInsight } from '@/components/baby/TrackerAIInsight';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Droplets, Moon, Utensils, Activity, Plus, TrendingUp, Heart, Sparkles,
   Bell, ChevronRight, Flame, Target, Calendar, Zap, Sun, Cloud, Wind,
   ThermometerSun, Pill, Baby, Footprints, Scale, Clock, Star, Award,
-  MessageCircle, Check, Lightbulb, BookOpen, PartyPopper, RefreshCw, ChevronUp, ChevronDown } from
+  MessageCircle, Check, Lightbulb, BookOpen, PartyPopper, RefreshCw, ChevronUp, ChevronDown, FileText } from
 'lucide-react';
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 import { useUserStore } from '@/store/userStore';
@@ -40,20 +42,21 @@ import { formatDateAz } from '@/lib/date-utils';
 import { getPregnancyDay, getDaysUntilDue, getDaysElapsed, getPregnancyProgress, getTrimester } from '@/lib/pregnancy-utils';
 import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
 import SleepHistoryPanel from '@/components/baby/SleepHistoryPanel';
-import QuickActionsBar from '@/components/mommy/QuickActionsBar';
 import QuickStatsWidget from '@/components/mommy/QuickStatsWidget';
+import PremiumBlurGate from '@/components/premium/PremiumBlurGate';
 import GrowthTrackerWidget from '@/components/mommy/GrowthTrackerWidget';
 import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
 import BabyCrisisWidget from '@/components/mommy/BabyCrisisWidget';
 import ChildSelector from '@/components/mommy/ChildSelector';
 import TeethingWidget from '@/components/mommy/TeethingWidget';
-import MommyHero from '@/components/mommy/hero/MommyHero';
 import BannerSlot from '@/components/banners/BannerSlot';
 import DailySummaryAutoSync from '@/components/partner/DailySummaryAutoSync';
+import PartnerCareCard from '@/components/partner/v2/PartnerCareCard';
+import RedFlagBanner from '@/components/dashboard/RedFlagBanner';
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
+import WinBackCard from '@/components/WinBackCard';
 import FlowDashboard from '@/components/flow/FlowDashboard';
 import BirthOnboardingModal from '@/components/BirthOnboardingModal';
-import DashboardPremiumBanner from '@/components/DashboardPremiumBanner';
 import PregnancyDayNavigator from '@/components/bump/PregnancyDayNavigator';
 import WaterWidget from '@/components/dashboard/WaterWidget';
 
@@ -323,44 +326,49 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
   };
 
   return (
-    <div className="space-y-2">
-      {/* Baby Development Hero Section - Trimester colored */}
-      <motion.div
-        className={`relative overflow-hidden bg-gradient-to-br ${trimesterColors.bg} rounded-2xl p-4 shadow-card ${trimesterColors.border}`}
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}>
-        
-        <div className={`absolute -top-12 -right-12 w-36 h-36 rounded-full ${trimesterColors.accent} blur-2xl`} />
-        <div className={`absolute bottom-0 left-0 w-24 h-24 rounded-full ${trimesterColors.accent} blur-xl opacity-50`} />
-        
-        <div className="relative z-10 flex flex-col items-center">
-          {/* Day Navigator */}
-          <div className="w-full mb-3">
-            <PregnancyDayNavigator
-              currentActualDay={actualCurrentDay}
-              selectedDay={pregnancyDay}
-              onDayChange={navigateToDay}
-              isPremium={isPremium} />
-            
-          </div>
+    <div>
+      {/* Qırmızı bayraq: bu günkü BP ≥140/90 → avtomatik xəbərdarlıq */}
+      <RedFlagBanner onOpenTool={onNavigateToTool} />
 
-          {/* Viewing past/future day indicator */}
-          {!isViewingCurrentDay &&
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-2 px-3 py-1 rounded-full bg-muted border border-border">
-            
-              <span className="text-xs font-medium text-foreground">
-                {pregnancyDay < actualCurrentDay ? tr("dashboard_kecmis_a3b2bf", "\u23EE\uFE0F Ke\xE7mi\u015F") : tr("dashboard_gelecek_8dc8dc", "\u23ED\uFE0F G\u0259l\u0259c\u0259k")} {tr("dashboard_gune_baxirsiniz_165efc", "g\xFCn\u0259 bax\u0131rs\u0131n\u0131z")}
-              </span>
-            </motion.div>
-          }
+      {/* Editorial hero (anacan-demo pregnancy design) */}
+      <section className="a-hero-min a-fade-in">
+        {/* Day Navigator — functional, allows viewing past/future days */}
+        <div className="w-full mb-2" style={{ textAlign: 'initial' }}>
+          <PregnancyDayNavigator
+            currentActualDay={actualCurrentDay}
+            selectedDay={pregnancyDay}
+            onDayChange={navigateToDay}
+            isPremium={isPremium} />
+          
+        </div>
 
-          {/* Fetus Image with subtle motion */}
-          <motion.div
-            className="w-[178px] h-[178px] mb-3 relative"
+        {/* Viewing past/future day indicator */}
+        {!isViewingCurrentDay &&
+        <motion.span
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="a-tag on"
+          style={{ cursor: 'default', marginBottom: 12 }}>
+          
+            {pregnancyDay < actualCurrentDay ? tr("dashboard_kecmis_a3b2bf", "\u23EE\uFE0F Ke\xE7mi\u015F") : tr("dashboard_gelecek_8dc8dc", "\u23ED\uFE0F G\u0259l\u0259c\u0259k")} {tr("dashboard_gune_baxirsiniz_165efc", "g\xFCn\u0259 bax\u0131rs\u0131n\u0131z")}
+          </motion.span>
+        }
+
+        <p className="a-hero-eyebrow">
+          {selectedWeek}{tr("dashboard_hefte_5af01f", ". h\u0259ft\u0259,")} <strong>{selectedDayInWeek}{tr("dashboard_gun_a4ba4e", ". g\xFCn \u2022")}</strong> {selectedTrimester === 1 ? tr("dashboard_1_trimester", "1-ci Trimester") :
+          selectedTrimester === 2 ? tr("dashboard_2_trimester", "2-ci Trimester") :
+          tr("dashboard_3_trimester", "3-cü Trimester")}
+        </p>
+
+        {/* Fetus illustration with heart badge */}
+        <div className="a-egg-wrap" style={{ width: 156, margin: '10px auto 14px' }}>
+          <span className="a-egg-heart">
+            <span style={{ fontSize: 13 }}>💗</span>
+          </span>
+          <motion.img
+            src={FETUS_IMAGES[Math.min(Math.ceil(selectedWeek / 4.4), 9)] || FETUS_IMAGES[1]}
+            alt={`${selectedWeek} ${tr("dashboard_week_baby", "həftəlik körpə")}`}
+            style={{ width: 156, height: 156, objectFit: 'contain', filter: 'drop-shadow(0 18px 22px rgba(217, 108, 74, 0.3))' }}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{
               scale: 1,
@@ -371,146 +379,121 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
               scale: { delay: 0.2, type: "spring" },
               opacity: { delay: 0.2 },
               y: { duration: 4, repeat: Infinity, ease: "easeInOut" }
-            }}>
-            
-            <img
-              src={FETUS_IMAGES[Math.min(Math.ceil(selectedWeek / 4.4), 9)] || FETUS_IMAGES[1]}
-              alt={`${selectedWeek} ${tr("dashboard_week_baby", "həftəlik körpə")}`}
-              className="w-full h-full object-contain drop-shadow-lg" />
-            
-          </motion.div>
+            }} />
           
-          {/* Main Text - "Anacan hazırda meyvə boydayam" */}
-          <div className="text-center">
-            <p className="text-lg font-bold text-foreground mb-1">
-              {tr("dashboard_anacan_hazirda_cfaa50", "Anacan, hazırda")} <span className={trimesterColors.text}>{weekData.fruit}</span>{language === 'az' ? ' boydayam' : ''}
-            </p>
-            <p className="text-xs text-muted-foreground font-medium">
-              {selectedWeek}{tr("dashboard_hefte_5af01f", ". h\u0259ft\u0259,")} {selectedDayInWeek}{tr("dashboard_gun_a4ba4e", ". g\xFCn \u2022")} <span className={`font-semibold ${trimesterColors.text}`}>
-                {selectedTrimester === 1 ? tr("dashboard_1_trimester", "1-ci Trimester") : 
-                 selectedTrimester === 2 ? tr("dashboard_2_trimester", "2-ci Trimester") :
-                 tr("dashboard_3_trimester", "3-cü Trimester")}
-              </span>
-            </p>
-            <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
-              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
-                {pregnancyDay}{tr("dashboard_gun_d96b5d", ". g\xFCn")}
-              </span>
-              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
-                {weekData.lengthCm} {tr("dashboard_sm", "sm")}
-              </span>
-              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
-                {weekData.weightG} {tr("dashboard_qr", "qr")}
-              </span>
-              <span className={`text-xs font-semibold ${trimesterColors.badge} px-2 py-0.5 rounded-full`}>
-                {daysLeft} {tr("dashboard_gun_qaldi_993281", "g\xFCn qald\u0131")}
-              </span>
-            </div>
-          </div>
+        </div>
 
-          {/* Progress Bar */}
-          <div className="w-full mt-3 space-y-1">
-            <div className="flex justify-between text-[10px] text-muted-foreground">
-              <span>{tr("dashboard_baslangic_e9d2d5", "Başlanğıc")}</span>
-              <span className={`${trimesterColors.text} font-semibold`}>{Math.round(progressPercent)}%</span>
-              <span>{tr("dashboard_dogus_6b7bfd", "Doğuş")}</span>
-            </div>
-            <div className={`h-2 ${trimesterColors.accent} rounded-full overflow-hidden`}>
-              <motion.div
-                className={`h-full ${trimesterColors.progress} rounded-full`}
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPercent}%` }}
-                transition={{ duration: 1, delay: 0.3 }} />
-              
-            </div>
+        <h1 className="a-hero-headline a-heading">
+          {tr("dashboard_anacan_hazirda_cfaa50", "Anacan, hazırda")} <em>{weekData.fruit}</em>{language === 'az' ? ' boydayam' : ''}
+        </h1>
+
+        <div className="a-tag-row" style={{ justifyContent: 'center', marginTop: 18, marginBottom: 0 }}>
+          <span className="a-tag" style={{ cursor: 'default' }}>{pregnancyDay}{tr("dashboard_gun_d96b5d", ". g\xFCn")}</span>
+          <span className="a-tag" style={{ cursor: 'default' }}>{weekData.lengthCm} {tr("dashboard_sm", "sm")}</span>
+          <span className="a-tag" style={{ cursor: 'default' }}>{weekData.weightG} {tr("dashboard_qr", "qr")}</span>
+          <span className="a-tag" style={{ cursor: 'default' }}>{daysLeft} {tr("dashboard_gun_qaldi_993281", "g\xFCn qald\u0131")}</span>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="a-pbar">
+          <div className="a-pbar-track">
+            <motion.div
+              className="a-pbar-fill"
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPercent}%` }}
+              transition={{ duration: 1, delay: 0.3 }} />
+            
+            <span className="a-pbar-pct" style={{ left: `${Math.min(94, Math.max(6, progressPercent))}%` }}>
+              {Math.round(progressPercent)}%
+            </span>
+          </div>
+          <div className="a-pbar-labels">
+            <span>{tr("dashboard_baslangic_e9d2d5", "Başlanğıc")}</span>
+            <span>{tr("dashboard_dogus_6b7bfd", "Doğuş")}</span>
           </div>
         </div>
-      </motion.div>
+      </section>
 
       {/* Trimester Tips Section */}
       {dynamicTrimesterTips.length > 0 &&
-      <motion.div
-        className={`relative overflow-hidden ${trimesterColors.accent} rounded-xl p-3 ${trimesterColors.border}`}
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.15 }}>
-        
-          <div className="absolute -right-6 -top-6 text-7xl opacity-10">{trimesterInfo.emoji}</div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-2">
-              <div className={`w-7 h-7 rounded-full ${trimesterColors.accent} flex items-center justify-center`}>
-                <span className="text-lg">{trimesterInfo.emoji}</span>
-              </div>
-              <h3 className={`text-sm font-bold ${trimesterColors.text}`}>{trimesterInfo.title}</h3>
-            </div>
-            <div className="space-y-1.5">
-              {dynamicTrimesterTips.map((tip, index) =>
-            <motion.div
-              key={tip.id}
-              className="flex items-start gap-2 bg-card/50 rounded-lg p-2"
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2 + index * 0.05 }}>
-              
-                  <span className="text-sm flex-shrink-0">{tip.icon}</span>
-                  <p className="text-xs text-foreground/90 leading-relaxed">{tip.tip_text}</p>
-                </motion.div>
-            )}
-            </div>
+      <section className="a-section">
+          <div className="a-section-head" style={{ justifyContent: 'center' }}>
+            <h2 className="a-section-title a-heading" style={{ textAlign: 'center' }}>
+              {trimesterInfo.emoji} {trimesterInfo.title} {trimesterInfo.emoji}
+            </h2>
           </div>
-        </motion.div>
+          <div className="a-list-card a-fade-in">
+            {dynamicTrimesterTips.map((tip, index) =>
+          <motion.div
+            key={tip.id}
+            className="a-list-row"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.15 + index * 0.05 }}>
+            
+                <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', fontSize: 17 }}>{tip.icon}</span>
+                <p className="a-list-title" style={{ fontWeight: 600, whiteSpace: 'normal', lineHeight: 1.5 }}>{tip.tip_text}</p>
+              </motion.div>
+          )}
+          </div>
+        </section>
       }
 
-      {/* Stats Grid - Show kick counter only after week 16 */}
-      <div className={`grid ${selectedWeek >= 16 ? 'grid-cols-3' : 'grid-cols-2'} gap-1.5`}>
-        <motion.div
-          className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}>
-          
-          <Calendar className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
-          <p className="text-lg font-black text-foreground">{daysLeft}</p>
-          <p className="text-[9px] text-muted-foreground">{tr("dashboard_gun_qaldi_993281", "gün qaldı")}</p>
-        </motion.div>
+      {/* Stats trio - Show kick counter only after week 16 */}
+      <section className="a-section">
+        <div className="a-trio" style={{ gridTemplateColumns: selectedWeek >= 16 ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)' }}>
+          <motion.div
+            className="a-trio-item"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}>
+            
+            <span className="a-trio-icon" style={{ background: 'var(--a-grad-yellow)', color: 'var(--a-warn-ink)' }}>
+              <Calendar size={17} strokeWidth={2} />
+            </span>
+            <p className="a-trio-value">{daysLeft}</p>
+            <p className="a-trio-label">{tr("dashboard_gun_qaldi_993281", "gün qaldı")}</p>
+          </motion.div>
 
-        {/* Only show kick counter after week 16 */}
-        {selectedWeek >= 16 &&
-        <motion.button
-          onClick={addKick}
-          className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.25 }}
-          whileTap={{ scale: 0.95 }}>
-          
-            <Footprints className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
-            <p className="text-lg font-black text-foreground">{kickCount}</p>
-            <p className="text-[9px] text-muted-foreground">{tr("dashboard_tepik_6483fe", "təpik")}</p>
-          </motion.button>
-        }
+          {/* Only show kick counter after week 16 */}
+          {selectedWeek >= 16 &&
+          <motion.button
+            onClick={addKick}
+            className="a-trio-item"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.25 }}
+            whileTap={{ scale: 0.92 }}>
+            
+              <span className="a-trio-icon" style={{ background: 'var(--a-grad-pink)', color: 'var(--a-berry-ink)' }}>
+                <Footprints size={17} strokeWidth={2} />
+              </span>
+              <p className="a-trio-value">{kickCount}</p>
+              <p className="a-trio-label">{tr("dashboard_tepik_6483fe", "təpik")}</p>
+            </motion.button>
+          }
 
-        <motion.div
-          className={`${trimesterColors.accent} rounded-xl p-2.5 shadow-card ${trimesterColors.border} text-center`}
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}>
-          
-          <Scale className={`w-4 h-4 ${trimesterColors.icon} mx-auto mb-0.5`} />
-          <p className="text-lg font-black text-foreground">+{weightGain}</p>
-          <p className="text-[9px] text-muted-foreground">{tr("dashboard_kq_ceki_b42b8d", "kq çəki")}</p>
-        </motion.div>
-      </div>
+          <motion.div
+            className="a-trio-item"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}>
+            
+            <span className="a-trio-icon" style={{ background: 'var(--a-grad-blue)', color: 'var(--a-blue-ink)' }}>
+              <Scale size={17} strokeWidth={2} />
+            </span>
+            <p className="a-trio-value">+{weightGain}</p>
+            <p className="a-trio-label">{tr("dashboard_kq_ceki_b42b8d", "kq çəki")}</p>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Baby Development - Static Icons */}
-      <motion.div
-        className="bg-primary/5 dark:bg-primary/10 rounded-xl p-3 shadow-card border border-primary/20"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.25 }}>
-        
-        <h3 className="text-sm font-bold text-foreground mb-2">{tr("dashboard_korpenin_inkisafi_269d83", "Körpənin inkişafı")}</h3>
-        <div className="flex justify-around">
+      <section className="a-section">
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading">{tr("dashboard_korpenin_inkisafi_269d83", "Körpənin inkişafı")}</h2>
+        </div>
+        <div className="a-trio" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
           {[
           { icon: '👀', label: tr("dashboard_goz_fbc05e", 'Göz'), active: weeklyDevelopment.eyes },
           { icon: '👂', label: tr("dashboard_qulaq_93ab", 'Qulaq'), active: weeklyDevelopment.ears },
@@ -520,202 +503,253 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
           map((item, index) =>
           <motion.div
             key={item.label}
-            className="text-center"
+            className="a-trio-item"
+            style={{ padding: '12px 2px', opacity: item.active ? 1 : 0.45 }}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.3 + index * 0.1 }}>
+            transition={{ delay: 0.3 + index * 0.08 }}>
             
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-lg mb-0.5 ${
-            item.active ? 'bg-primary/20' : 'bg-muted opacity-40'}`
-            }>
+              <span className="a-trio-icon" style={{ background: item.active ? 'var(--a-peach-1)' : 'var(--a-surface-soft)', fontSize: 18 }}>
                 {item.icon}
-              </div>
-              <span className={`text-[10px] ${item.active ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
-                {item.label}
               </span>
+              <p className="a-trio-label" style={item.active ? { color: 'var(--a-ink)' } : undefined}>
+                {item.label}
+              </p>
             </motion.div>
           )}
         </div>
-      </motion.div>
+      </section>
 
       {/* Daily Content Cards - Separated */}
       {dayContent &&
-      <div className="space-y-1.5">
-          {/* Baby Message Card */}
+      <>
+          {/* Baby Message Card — CTA banner with organic shapes */}
           {dayContent.baby_message &&
-        <motion.div
-          className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}>
-          
-              <div className="absolute -right-4 -top-4 text-6xl opacity-10">💬</div>
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-                  <span className="text-sm">👶</span>
-                </div>
-                <div>
-                <p className="text-xs text-primary font-bold uppercase tracking-wider">{tr("dashboard_korpeden_mesaj_89353a", "Körpədən Mesaj")}</p>
-                  <p className="text-[10px] text-muted-foreground">{tr("dashboard_gun_18b2f4", "G\xFCn")} {pregnancyDay} / 280</p>
-                </div>
+        <section className="a-section">
+            <motion.div
+            className="a-cta a-fade-in"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}>
+            
+              <span className="a-cta-shape" style={{ width: 140, height: 140, top: -50, right: -40 }} />
+              <span className="a-cta-shape" style={{ width: 90, height: 90, bottom: -30, left: -20 }} />
+              <div className="a-cta-top">
+                <span className="a-cta-badge">
+                  {tr("dashboard_gun_18b2f4", "G\xFCn")} {pregnancyDay} / 280 · {tr("dashboard_korpeden_mesaj_89353a", "Körpədən Mesaj")}
+                </span>
+                <span className="a-cta-deco">
+                  <Baby size={18} strokeWidth={2} />
+                </span>
               </div>
-              <p className="text-foreground font-medium text-sm leading-relaxed">
+              <p className="a-cta-text" style={{ position: 'relative', marginTop: 14, fontSize: 13.5, fontWeight: 500, color: 'var(--a-ink)' }}>
                 {dayContent.baby_message}
               </p>
             </motion.div>
+          </section>
         }
 
           {/* Body Changes Card */}
           {dayContent.body_changes &&
-        <motion.div
-          className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.35 }}>
-          
-              <div className="absolute -right-4 -top-4 text-6xl opacity-10">🤰</div>
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-                  <span className="text-sm">🤰</span>
-                </div>
-                <p className="text-xs text-primary font-bold uppercase tracking-wider">{tr("dashboard_bedendeki_deyisiklikler_7a5c81", "Bədəndəki Dəyişikliklər")}</p>
+        <section className="a-section">
+            <motion.div
+            className="a-card a-fade-in"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.35 }}>
+            
+              <div className="a-card-head" style={{ marginBottom: 10 }}>
+                <h3 className="a-card-title a-heading" style={{ fontSize: 15 }}>
+                  🤰 {tr("dashboard_bedendeki_deyisiklikler_7a5c81", "Bədəndəki Dəyişikliklər")}
+                </h3>
               </div>
-              <p className="text-sm text-foreground/90 leading-relaxed">
+              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.65, color: 'var(--a-ink-soft)' }}>
                 {dayContent.body_changes}
               </p>
             </motion.div>
+          </section>
         }
 
           {/* Baby Development Card */}
           {dayContent.baby_development &&
-        <motion.div
-          className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}>
-          
-              <div className="absolute -right-4 -top-4 text-6xl opacity-10">🌱</div>
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-                  <span className="text-sm">🌱</span>
-                </div>
-                <p className="text-xs text-primary font-bold uppercase tracking-wider">{tr("dashboard_korpenin_inkisafi_485a30", "Körpənin İnkişafı")}</p>
+        <section className="a-section">
+            <motion.div
+            className="a-card a-fade-in"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}>
+            
+              <div className="a-card-head" style={{ marginBottom: 10 }}>
+                <h3 className="a-card-title a-heading" style={{ fontSize: 15 }}>
+                  🌱 {tr("dashboard_korpenin_inkisafi_485a30", "Körpənin İnkişafı")}
+                </h3>
               </div>
-              <p className="text-sm text-foreground/90 leading-relaxed">
+              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.65, color: 'var(--a-ink-soft)' }}>
                 {dayContent.baby_development}
               </p>
             </motion.div>
+          </section>
         }
 
           {/* Daily Tip Card */}
           {dayContent.daily_tip &&
-        <motion.div
-          className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.45 }}>
-          
-              <div className="absolute -right-4 -top-4 text-6xl opacity-10">💡</div>
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-                  <span className="text-sm">💡</span>
-                </div>
-                <p className="text-xs text-primary font-bold uppercase tracking-wider">{tr("dashboard_gunun_tovsiyesi_b3a563", "Günün Tövsiyəsi")}</p>
+        <section className="a-section">
+            <motion.div
+            className="a-card a-fade-in"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.45 }}>
+            
+              <div className="a-card-head" style={{ marginBottom: 10 }}>
+                <h3 className="a-card-title a-heading" style={{ fontSize: 15 }}>
+                  💡 {tr("dashboard_gunun_tovsiyesi_b3a563", "Günün Tövsiyəsi")}
+                </h3>
               </div>
-              <p className="text-sm text-foreground/90 leading-relaxed">
+              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.65, color: 'var(--a-ink-soft)' }}>
                 {dayContent.daily_tip}
               </p>
             </motion.div>
+          </section>
         }
-        </div>
+        </>
       }
 
       {/* Weekly Tip from Database */}
       {currentWeekTip &&
-      <motion.div
-        className="bg-primary/5 dark:bg-primary/10 rounded-xl p-3 border border-primary/20"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5 }}>
-        
-          <div className="flex items-center gap-1.5 mb-1.5">
-            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-              <Lightbulb className="w-3 h-3 text-primary" />
+      <section className="a-section">
+          <motion.div
+          className="a-card a-fade-in"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}>
+          
+            <div className="a-today-info-head" style={{ marginBottom: 10 }}>
+              <span className="a-today-info-icon" style={{ width: 38, height: 38, borderRadius: 12 }}>
+                <Lightbulb size={17} strokeWidth={2} />
+              </span>
+              <div>
+                <p className="a-today-info-eyebrow">{tr("dashboard_hefte_3aa886", "H\u0259ft\u0259")} {selectedWeek} {tr("dashboard_tovsiyesi_6412b4", "T\xF6vsiy\u0259si")}</p>
+                <p className="a-today-info-meta">{currentWeekTip.title}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-[10px] text-primary font-bold uppercase tracking-wider">{tr("dashboard_hefte_3aa886", "H\u0259ft\u0259")} {selectedWeek} {tr("dashboard_tovsiyesi_6412b4", "T\xF6vsiy\u0259si")}</p>
-              <h4 className="font-bold text-foreground text-sm">{currentWeekTip.title}</h4>
-            </div>
-          </div>
-          <p className="text-xs text-foreground/80 leading-relaxed">{currentWeekTip.content}</p>
-        </motion.div>
+            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.65, color: 'var(--a-ink-soft)' }}>{currentWeekTip.content}</p>
+          </motion.div>
+        </section>
       }
 
-      {/* Water Tracking Widget (Moved below messages) */}
-      <motion.div
-        className="mb-4"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.55 }}
-      >
-        <WaterWidget />
-      </motion.div>
-
-      {/* Quick Actions Grid */}
-      <div className="grid grid-cols-3 gap-1.5">
-        <QuickActionButton
-          icon={Pill}
-          label="Vitamin"
-          color="bg-primary/10 dark:bg-primary/20 text-primary"
-          onClick={() => {
-            if (onNavigateToTool) onNavigateToTool('vitaminTracker');
-          }} />
-        
-        <QuickActionButton
-          icon={Activity}
-          label={tr("dashboard_mesq_046a80", "Məşq")}
-          color="bg-primary/10 dark:bg-primary/20 text-primary"
-          onClick={() => {
-            if (onNavigateToTool) onNavigateToTool('safetyLookup');
-          }} />
-        
-        <QuickActionButton
-          icon={Heart}
-          label={tr("dashboard_ehval_0457f9", "Əhval")}
-          color="bg-primary/10 dark:bg-primary/20 text-primary"
-          value={currentMood ? getMoodEmoji(currentMood) : undefined}
-          onClick={() => {
-            if (onNavigateToTool) onNavigateToTool('mood-diary');
-          }} />
-        
-      </div>
-
-
-      {/* "I Gave Birth" Button - Shown from week 38 */}
-      {showBirthButton &&
-      <motion.button
-        onClick={() => setShowBirthModal(true)}
-        className="w-full p-4 rounded-2xl bg-gradient-to-r from-pink-500 via-rose-500 to-red-500 text-white shadow-lg relative overflow-hidden"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}>
-        
-          <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-          <div className="absolute -left-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-xl" />
+      {/* Water + quick logs (anacan-demo QuickLog) */}
+      <section className="a-section">
+        <motion.div
+          className="a-card a-fade-in"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.55 }}>
           
-          <div className="relative z-10 flex items-center justify-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-              <PartyPopper className="w-6 h-6" />
+          <div className="a-list-row" style={{ padding: '2px 0 16px', borderTop: 'none' }}>
+            <span className="a-list-icon" style={{ background: 'var(--a-grad-blue)', color: 'var(--a-blue-ink)' }}>
+              <Droplets size={17} strokeWidth={2} />
+            </span>
+            <div>
+              <p className="a-list-title">{tr("common_su_water", "Su")}</p>
+              <p className="a-list-sub">
+                {waterCount} / 10 {tr('waterwidget_glass_unit', 'stəkan')} · {tr('dashboard_today_label', 'Bu gün')}
+              </p>
             </div>
-            <div className="text-left">
-              <p className="font-bold text-lg">{tr("dashboard_dogum_etdim_e3eca9", "Doğum etdim! 🎉")}</p>
-              <p className="text-white/80 text-sm">{tr("dashboard_analiq_seyahetinize_baslayin_b03582", "Analıq səyahətinizə başlayın")}</p>
-            </div>
-            <ChevronRight className="w-6 h-6 ml-auto" />
+            <button
+              type="button"
+              className="a-list-trail"
+              aria-label={tr("dashboard_su_elave_edildi_7b894d", "Su əlavə edildi! 💧")}
+              onClick={addWater}
+              style={{
+                display: 'grid',
+                placeItems: 'center',
+                width: 34,
+                height: 34,
+                borderRadius: '50%',
+                background: 'var(--a-ink)',
+                color: 'var(--a-bg)',
+                border: 'none',
+                cursor: 'pointer'
+              }}>
+              
+              <Plus size={16} strokeWidth={2.6} />
+            </button>
           </div>
-        </motion.button>
+
+          <div className="a-trio">
+            <motion.button
+              className="a-trio-item"
+              style={{ boxShadow: 'none', background: 'var(--a-surface-soft)' }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => {
+                if (onNavigateToTool) onNavigateToTool('vitaminTracker');
+              }}>
+              
+              <span className="a-trio-icon" style={{ background: 'var(--a-grad-pink)', color: 'var(--a-berry-ink)' }}>
+                <Pill size={17} strokeWidth={2} />
+              </span>
+              <p className="a-trio-label">Vitamin</p>
+            </motion.button>
+            <motion.button
+              className="a-trio-item"
+              style={{ boxShadow: 'none', background: 'var(--a-surface-soft)' }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => {
+                if (onNavigateToTool) onNavigateToTool('safetyLookup');
+              }}>
+              
+              <span className="a-trio-icon" style={{ background: 'var(--a-grad-green)', color: 'var(--a-green-ink)' }}>
+                <Activity size={17} strokeWidth={2} />
+              </span>
+              <p className="a-trio-label">{tr("dashboard_mesq_046a80", "Məşq")}</p>
+            </motion.button>
+            <motion.button
+              className="a-trio-item"
+              style={{ boxShadow: 'none', background: 'var(--a-surface-soft)' }}
+              whileTap={{ scale: 0.92 }}
+              onClick={() => {
+                if (onNavigateToTool) onNavigateToTool('mood-diary');
+              }}>
+              
+              <span className="a-trio-icon" style={{ background: 'var(--a-grad-yellow)', color: 'var(--a-warn-ink)', fontSize: 17 }}>
+                {currentMood ? getMoodEmoji(currentMood) : <Heart size={17} strokeWidth={2} />}
+              </span>
+              <p className="a-trio-label">{tr("dashboard_ehval_0457f9", "Əhval")}</p>
+            </motion.button>
+          </div>
+        </motion.div>
+      </section>
+
+
+      {/* "I Gave Birth" Button - Shown from week 27+ */}
+      {showBirthButton &&
+      <section className="a-section">
+          <motion.button
+          onClick={() => setShowBirthModal(true)}
+          className="a-cta a-fade-in"
+          style={{ width: '100%', textAlign: 'left', cursor: 'pointer' }}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          whileTap={{ scale: 0.98 }}>
+          
+            <span className="a-cta-shape" style={{ width: 140, height: 140, top: -50, right: -40, background: 'var(--a-pink-1)' }} />
+            <span className="a-cta-shape" style={{ width: 90, height: 90, bottom: -30, left: -20, background: 'var(--a-pink-1)' }} />
+            <div className="a-cta-top">
+              <span className="a-cta-badge" style={{ background: 'var(--a-pink-1)', color: 'var(--a-berry-ink)' }}>
+                {tr("dashboard_hefte_3aa886", "H\u0259ft\u0259")} {selectedWeek} 🎉
+              </span>
+              <span className="a-cta-deco" style={{ background: 'var(--a-pink-1)', color: 'var(--a-berry-ink)' }}>
+                <PartyPopper size={18} strokeWidth={2} />
+              </span>
+            </div>
+            <h2 className="a-cta-title a-heading">{tr("dashboard_dogum_etdim_e3eca9", "Doğum etdim! 🎉")}</h2>
+            <p className="a-cta-text">{tr("dashboard_analiq_seyahetinize_baslayin_b03582", "Analıq səyahətinizə başlayın")}</p>
+            <span className="a-cta-btn" style={{ marginTop: 16, background: 'var(--a-pink-2)' }}>
+              {tr("dashboard_dogum_etdim_e3eca9", "Doğum etdim! 🎉").replace(' 🎉', '')} <ChevronRight size={14} />
+            </span>
+          </motion.button>
+        </section>
       }
 
       {/* Birth Onboarding Modal */}
@@ -771,7 +805,7 @@ const getBabyDailyFunFact = (ageInDays: number): string => {
   return facts[factIndex];
 };
 
-const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) => void;}) => {
+const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (tool: string) => void;onNavigate?: (screen: string) => void;}) => {
   const { toast } = useToast();
   const { language } = useUserStore();
   const { isMilestoneAchieved, toggleMilestone, getMilestoneDate, MILESTONES } = useBabyMilestones();
@@ -807,6 +841,30 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
 
   // Get today's stats from database
   const todayStats = getTodayStats();
+
+  // AI norma analizi (Yuxu/Qidalanma/Bez kartlarının altı) — 1 çağırış, 3 bölmə
+  const aiInsightStats = useMemo(() => ({
+    sleepMinutes: todayStats.sleepMinutes || Math.round((todayStats.sleepHours || 0) * 60),
+    sleepCount: todayStats.sleepLogs.length,
+    feedingCount: todayStats.feedingCount,
+    breastCount: todayStats.breastFeedingCount,
+    formulaCount: todayStats.formulaCount,
+    formulaMl: todayStats.feedingLogs.reduce((sum, l) => {
+      if (l.feed_type !== 'formula') return sum;
+      const ml = (l as any).amount_ml ?? parseInt(String(l.notes || '').match(/(\d+)\s*ml/i)?.[1] || '0', 10);
+      return sum + (Number.isFinite(ml) ? Number(ml) : 0);
+    }, 0),
+    solidCount: todayStats.solidCount,
+    diaperCount: todayStats.diaperCount,
+    wetCount: todayStats.wetCount,
+    dirtyCount: todayStats.dirtyCount,
+    mixedCount: todayStats.bothCount,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [todayLogs]);
+  const insightApi = useBabyInsight(
+    babyData ? aiInsightStats : null,
+    babyData ? { id: babyData.id, ageMonths: babyData.ageInMonths, ageDays: babyData.ageInDays, gender: babyData.gender } : null
+  );
 
   // Sleep tracking
   const sleepTimer = getActiveTimer('sleep');
@@ -1031,187 +1089,178 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
   const exactMonths = babyData.ageInMonths;
   const remainingDays = (babyData as any).ageRemainingDays ?? babyData.ageInDays % 30;
 
+  // Editorial hero headline template (anacan-demo design)
+  const heroHeadlineTpl = tr('mommy_hero_headline', '{days} gündür {name} böyüyür')
+    .replace('{days}', String(babyData.ageInDays));
+  const [heroBefore, heroAfter = ''] = heroHeadlineTpl.split('{name}');
+
   return (
-    <div className="space-y-3">
-      {/* Child Selector moved to dashboard header for compactness */}
+    <div>
+      {/* Editorial hero */}
+      <section className="a-hero-min a-fade-in">
+        <p className="a-hero-eyebrow">
+          {tr('mommy_hero_day_label', 'Gün')} <strong>{babyData.ageInDays}</strong> · {babyData.name}
+        </p>
+        <h1 className="a-hero-headline a-heading">
+          {heroBefore}<em>{babyData.name}</em>{heroAfter}
+        </h1>
+      </section>
 
-
-
-      {/* Hero + Daily Info — seamless orange→yellow gradient continuity */}
-      <div className="space-y-0">
-        {/* Premium Baby Hero Card — variant chosen via app_settings.mommy_hero_variant */}
-        <MommyHero
-          babyData={{
-            name: babyData.name,
-            ageInMonths: babyData.ageInMonths,
-            ageInDays: babyData.ageInDays
-          }}
-          exactMonths={exactMonths}
-          remainingDays={remainingDays}
-          babyIllustration={babyIllustration} />
-        
-
-        {/* Bu günün məlumatları */}
-        {dailyInfo &&
-        <motion.div
-          className="bg-gradient-to-b from-amber-50/80 to-amber-100/30 dark:from-amber-900/15 dark:to-amber-900/5 rounded-2xl p-4 border border-amber-100/40 dark:border-amber-800/30 shadow-sm"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}>
-          
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-amber-200/40 dark:border-amber-800/40">
-              <div className="w-10 h-10 rounded-xl bg-amber-100/60 dark:bg-amber-800/40 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div className="flex-1">
-                <p className="text-[10px] font-semibold text-amber-500 dark:text-amber-400 uppercase tracking-widest mb-0.5">
-                  {babyData.ageInDays}{tr("dashboard_gun_0b1035", ". G\xFCn")}
-                </p>
-                <p className="text-sm font-bold text-amber-900 dark:text-amber-100">
-                  {tr('dashboard_todays_info', 'Bu günün məlumatları')}
+      {/* Bu günün məlumatları — standalone card */}
+      {dailyInfo &&
+      <section className="a-section">
+          <div className="a-today-info a-fade-in">
+            <div className="a-today-info-head">
+              <span className="a-today-info-icon">
+                <Lightbulb size={19} strokeWidth={2} />
+              </span>
+              <div>
+                <p className="a-today-info-eyebrow">{tr('dashboard_todays_info', 'Bu günün məlumatları')}</p>
+                <p className="a-today-info-meta">
+                  {tr('mommy_hero_day_label', 'Gün')} {babyData.ageInDays} · {exactMonths} {tr('mommy_meta_months', 'ay')}, {remainingDays} {tr('mommy_meta_days', 'gün')}
                 </p>
               </div>
+              <span className="a-today-info-badge">{tr('dashboard_daily_badge', 'Gündəlik')}</span>
             </div>
-            
-            <div className="space-y-2">
+            <div className="a-today-info-text">
               {dailyInfo.info.
             split('\n').
             filter((line) => line.trim().length > 0).
             map((line, index) =>
-            <p key={index} className="text-[13px] text-amber-800 dark:text-white leading-relaxed font-medium">
-                    {line.trim()}
-                  </p>
+            <p key={index}>{line.trim()}</p>
             )
             }
             </div>
-          </motion.div>
-        }
-      </div>
-
-      {/* Anaya Mesaj */}
-      {mommyMessage &&
-      <motion.div
-        className="bg-gradient-to-br from-rose-50 via-pink-50 to-rose-50 dark:from-rose-900/20 dark:via-pink-900/15 dark:to-rose-900/20 rounded-2xl p-4 border border-rose-200 dark:border-rose-800/50 shadow-lg relative overflow-hidden"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}>
-        
-          {/* Decorative elements */}
-          <div className="absolute top-2 right-3 opacity-10 text-4xl pointer-events-none">💝</div>
-          <div className="absolute bottom-1 left-4 opacity-5 text-5xl pointer-events-none">🌸</div>
-
-          <div className="flex items-center gap-3 mb-3 pb-2.5 border-b border-rose-200/60 dark:border-rose-700/40 relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-200 to-pink-200 dark:from-rose-800/50 dark:to-pink-800/50 flex items-center justify-center shadow-sm">
-              <span className="text-lg">💌</span>
-            </div>
-            <div className="flex-1">
-              <p className="text-[10px] font-semibold text-rose-400 dark:text-rose-400 uppercase tracking-widest mb-0.5">
-                {babyData?.ageInDays}{tr("dashboard_gun_0b1035", ". G\xFCn")}
-              </p>
-              <p className="text-sm font-bold text-rose-800 dark:text-rose-100">
-                {tr('dashboard_message_for_mom', 'Anaya Mesaj')}
-              </p>
-            </div>
           </div>
-          
-          <div className="relative z-10">
-            {mommyMessage.message.
-          split('\n').
-          filter((line: string) => line.trim().length > 0).
-          map((line: string, index: number) =>
-          <p key={index} className="text-[13px] text-rose-700 dark:text-rose-200 leading-relaxed font-medium mb-1.5 last:mb-0">
-                  {line.trim()}
-                </p>
-          )
-          }
-          </div>
-        </motion.div>
+        </section>
       }
 
-
-      {illustrationTitle &&
-      <motion.div
-        className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 dark:from-primary/10 dark:via-primary/15 dark:to-primary/10 rounded-2xl p-4 border border-primary/20"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}>
-        
-          <div className="flex items-start gap-3">
-            <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 border border-primary/20">
-              <Baby className="w-6 h-6 text-primary" />
+      {/* Anaya Mesaj — CTA banner */}
+      {mommyMessage &&
+      <section className="a-section">
+          <div className="a-cta a-fade-in">
+            <div className="a-cta-top">
+              <span className="a-cta-badge">
+                {tr('mommy_hero_day_label', 'Gün')} {babyData?.ageInDays} · {tr('dashboard_message_for_mom', 'Anaya Mesaj')}
+              </span>
+              <span className="a-cta-deco">
+                <Heart size={18} strokeWidth={2} />
+              </span>
             </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-sm text-foreground">
-                {illustrationTitle}
-              </h3>
-              {illustrationDescription &&
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-3">
-                  {illustrationDescription}
-                </p>
+            <div className="a-cta-text">
+              {mommyMessage.message.
+            split('\n').
+            filter((line: string) => line.trim().length > 0).
+            map((line: string, index: number) =>
+            <p key={index} style={{ margin: index === 0 ? 0 : '8px 0 0' }}>{line.trim()}</p>
+            )
             }
             </div>
           </div>
-        </motion.div>
+        </section>
       }
 
-      {/* Water Tracking Widget */}
-      <motion.div
-        className="mb-4"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-      >
-        <WaterWidget />
-      </motion.div>
-
-      {/* Teething Widget */}
-
-      <TeethingWidget onOpen={() => onNavigateToTool?.('teething')} />
-
-      {/* Quick Actions Bar */}
-      <QuickActionsBar onNavigateToTool={onNavigateToTool} />
-
-      {/* Cakes Widget - navigate to cakes tab, hide after 12 months, hide if disabled for language */}
-      {!isToolDisabled('cakes') && babyData.ageInMonths < 12 &&
-      <motion.div
-        className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl p-4 border border-primary/20 shadow-card cursor-pointer"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.12 }}
-        whileHover={{ y: -2 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={() => onNavigateToTool?.('cakes')}>
-        
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
-              <span className="text-2xl">🎂</span>
+      {/* Month illustration info */}
+      {illustrationTitle &&
+      <section className="a-section">
+          <div className="a-card a-fade-in">
+            <div className="a-list-row" style={{ padding: 0, borderTop: 'none', alignItems: 'flex-start' }}>
+              <span className="a-list-icon" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+                <Baby size={18} strokeWidth={2} />
+              </span>
+              <div style={{ minWidth: 0 }}>
+                <p className="a-list-title">{illustrationTitle}</p>
+                {illustrationDescription &&
+              <p className="a-list-sub" style={{ whiteSpace: 'normal', lineHeight: 1.6 }}>
+                    {illustrationDescription}
+                  </p>
+              }
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-sm text-foreground">{tr("dashboard_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</h3>
-              <p className="text-[11px] text-muted-foreground mt-0.5">
-                {babyData.ageInMonths > 0 ? tr('dashboard_order_monthly_cake', '{n}-ci aylıq tortunu sifariş ver!').replace('{n}', String(babyData.ageInMonths + 1)) : tr("dashboard_korpeniz_ucun_milestone_tortla_3bcbc1", "K\xF6rp\u0259niz \xFC\xE7\xFCn milestone tortlar\u0131")}
-              </p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-primary" />
           </div>
-        </motion.div>
+        </section>
       }
+
+      {/* Weekly review — Premium (Flo-stil blur teaser) */}
+      <PremiumBlurGate
+        feature="weekly_stats"
+        title={tr('premiumgate_weekly_title', 'Həftəlik inkişaf icmalı')}
+        subtitle={tr('premiumgate_weekly_sub', 'Yuxu, qidalanma və bez statistikası — körpənizin həftəlik analizi Premium-da')}
+      >
+        <QuickStatsWidget />
+      </PremiumBlurGate>
+
+      {/* Teething — Premium */}
+      <div className="a-section">
+        <PremiumBlurGate
+          feature="teething"
+          title={tr('premiumgate_teething_title', 'Diş çıxarma izləyicisi')}
+          subtitle={tr('premiumgate_teething_sub', 'Hər dişin vaxtı, simptomlar və rahatlatma bələdçisi Premium-da')}
+          blur="sm"
+        >
+          <TeethingWidget onOpen={() => onNavigateToTool?.('teething')} />
+        </PremiumBlurGate>
+      </div>
+
+      {/* Growth — Premium */}
+      <div className="a-section">
+        <PremiumBlurGate
+          feature="growth"
+          title={tr('premiumgate_growth_title', 'Boy-çəki artım əyriləri')}
+          subtitle={tr('premiumgate_growth_sub', 'ÜST standartları ilə müqayisəli inkişaf qrafikləri Premium-da')}
+        >
+          <GrowthTrackerWidget />
+        </PremiumBlurGate>
+      </div>
+
+      {/* Cakes cross-sell — navigate to cakes tab, hide after 12 months, hide if disabled for language */}
+      {!isToolDisabled('cakes') && babyData.ageInMonths < 12 &&
+      <section className="a-section">
+          <motion.button
+          className="a-card a-fade-in"
+          style={{ width: '100%', textAlign: 'left', cursor: 'pointer', padding: '14px 18px' }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onNavigateToTool?.('cakes')}>
+          
+            <div className="a-rank-row" style={{ borderTop: 'none', padding: 0 }}>
+              <span className="a-rank-avatar" style={{ background: 'var(--a-peach-1)', fontSize: 20 }}>🎂</span>
+              <div style={{ minWidth: 0 }}>
+                <p className="a-rank-title">{tr("dashboard_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</p>
+                <p className="a-rank-sub">
+                  {babyData.ageInMonths > 0 ? tr('dashboard_order_monthly_cake', '{n}-ci aylıq tortunu sifariş ver!').replace('{n}', String(babyData.ageInMonths + 1)) : tr("dashboard_korpeniz_ucun_milestone_tortla_3bcbc1", "K\xF6rp\u0259niz \xFC\xE7\xFCn milestone tortlar\u0131")}
+                </p>
+              </div>
+              <ChevronRight className="a-list-chevron" style={{ marginLeft: 'auto' }} size={18} />
+            </div>
+          </motion.button>
+        </section>
+      }
+
+      {/* Log today — water + trackers + summary */}
+      <section className="a-section">
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading">{tr('mommy_log_today_title', 'Bu günü qeyd et')}</h2>
+          <span className="a-section-link">{tr('mommy_log_today_hint', 'Toxun və əlavə et')}</span>
+        </div>
+        <WaterWidget variant="anacan" />
+      </section>
 
       {/* Sleep Tracker */}
       <motion.div
-        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+        className="a-card a-fade-in"
+        style={{ marginTop: 10 }}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}>
         
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-              <Moon className="w-5 h-5 text-primary-foreground" />
-            </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="a-list-icon" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
+              <Moon size={17} strokeWidth={2} />
+            </span>
             <div>
-              <h3 className="font-bold text-sm text-foreground">{tr("dashboard_yuxu_izleme_adaa4f", "Yuxu İzləmə")}</h3>
-              <p className="text-xs text-muted-foreground">
+              <p className="a-list-title">{tr("dashboard_yuxu_izleme_adaa4f", "Yuxu İzləmə")}</p>
+              <p className="a-list-sub">
                 {tr('dashboard_today_label', 'Bu gün')}: {(() => {
                   const m = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);
                   const h = Math.floor(m / 60);
@@ -1226,11 +1275,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
           </div>
           <motion.button
             onClick={toggleSleep}
-            className={`px-4 py-2.5 rounded-xl font-bold text-xs ${
-            sleepTimer ?
-            'bg-primary text-primary-foreground' :
-            'bg-primary/10 text-primary'}`
-            }
+            className={sleepTimer ? 'a-btn-solid' : 'a-btn-soft'}
             whileTap={{ scale: 0.95 }}
             animate={sleepTimer ? { scale: [1, 1.05, 1] } : {}}
             transition={{ duration: 1, repeat: sleepTimer ? Infinity : 0 }}>
@@ -1241,41 +1286,43 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
         
         {sleepTimer &&
         <motion.div
-          className="bg-primary/10 rounded-xl p-3 flex items-center gap-3"
+          className="a-today-info-tip"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}>
           
-            <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
-            <span className="text-sm text-primary font-medium">
+            <span className="w-3 h-3 rounded-full animate-pulse" style={{ background: 'var(--a-peach-2)', flexShrink: 0, marginTop: 3 }} />
+            <span>
               {tr('dashboard_sleep_ongoing', 'Yuxu davam edir')}: {formatDuration(getElapsedSeconds(sleepTimer.id))}
             </span>
           </motion.div>
         }
+        <TrackerAIInsight section="sleep" api={insightApi} />
       </motion.div>
 
       {/* Feeding Tracker */}
       <motion.div
-        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+        className="a-card a-fade-in"
+        style={{ marginTop: 10 }}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.15 }}>
         
         <div className="flex items-center justify-between mb-3">
           <button
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-3 cursor-pointer"
             onClick={() => feedingSummaryRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}>
             
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-              <Baby className="w-5 h-5 text-primary-foreground" />
-            </div>
+            <span className="a-list-icon" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
+              <Baby size={17} strokeWidth={2} />
+            </span>
             <div className="text-left">
-              <h3 className="font-bold text-sm text-foreground">{tr("dashboard_qidalanmaya_nezaret_1b60b4", "Qidalanmaya nəzarət")}</h3>
-              <p className="text-xs text-muted-foreground">{tr('dashboard_today_label', 'Bu gün')}: {todayStats.feedingCount} {tr('dashboard_times_unit', 'dəfə')}</p>
+              <p className="a-list-title">{tr("dashboard_qidalanmaya_nezaret_1b60b4", "Qidalanmaya nəzarət")}</p>
+              <p className="a-list-sub">{tr('dashboard_today_label', 'Bu gün')}: {todayStats.feedingCount} {tr('dashboard_times_unit', 'dəfə')}</p>
             </div>
           </button>
           <motion.button
             onClick={() => setShowFeedingModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary font-bold text-xs"
+            className="a-btn-soft"
             whileTap={{ scale: 0.95 }}>
             {tr("dashboard_elave_et_a5fb21", "+ \u018Flav\u0259 et")}
           
@@ -1295,29 +1342,21 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
             <>
                   <motion.button
                 onClick={() => toggleFeeding('left')}
-                className={`p-3 rounded-xl flex flex-col items-center gap-1 ${
-                leftFeedTimer ?
-                'bg-pink-500 border-2 border-pink-600 text-white' :
-                'bg-pink-50 border-2 border-pink-200'}`
-                }
+                className={`a-choice pink${leftFeedTimer ? ' running' : ''}`}
                 whileTap={{ scale: 0.95 }}>
                 
                     <span className="text-2xl">🤱</span>
-                    <span className={`text-sm font-medium ${leftFeedTimer ? 'text-white' : 'text-pink-700'}`}>
+                    <span className="a-choice-label">
                       {leftFeedTimer ? formatDuration(getElapsedSeconds(leftFeedTimer.id)) : tr("dashboard_sol_sine_92503e", "Sol Sin\u0259")}
                     </span>
                   </motion.button>
                   <motion.button
                 onClick={() => toggleFeeding('right')}
-                className={`p-3 rounded-xl flex flex-col items-center gap-1 ${
-                rightFeedTimer ?
-                'bg-pink-500 border-2 border-pink-600 text-white' :
-                'bg-pink-50 border-2 border-pink-200'}`
-                }
+                className={`a-choice pink${rightFeedTimer ? ' running' : ''}`}
                 whileTap={{ scale: 0.95 }}>
                 
                     <span className="text-2xl">🤱</span>
-                    <span className={`text-sm font-medium ${rightFeedTimer ? 'text-white' : 'text-pink-700'}`}>
+                    <span className="a-choice-label">
                       {rightFeedTimer ? formatDuration(getElapsedSeconds(rightFeedTimer.id)) : tr("dashboard_sag_sine_590332", "Sa\u011F Sin\u0259")}
                     </span>
                   </motion.button>
@@ -1325,19 +1364,19 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
             }
               <motion.button
               onClick={handleFormulaClick}
-              className="p-3 rounded-xl bg-blue-50 border-2 border-blue-200 flex flex-col items-center gap-1"
+              className="a-choice blue"
               whileTap={{ scale: 0.95 }}>
               
                 <span className="text-xl">🍼</span>
-                <span className="text-xs font-medium text-blue-700">{tr("dashboard_sud_evezedicisi_4ba2dd", "Süd Əvəzedicisi")}</span>
+                <span className="a-choice-label">{tr("dashboard_sud_evezedicisi_4ba2dd", "Süd Əvəzedicisi")}</span>
               </motion.button>
               <motion.button
               onClick={() => setShowSolidFoodInput(true)}
-              className="p-3 rounded-xl bg-orange-50 border-2 border-orange-200 flex flex-col items-center gap-1"
+              className="a-choice peach"
               whileTap={{ scale: 0.95 }}>
               
                 <span className="text-xl">🥣</span>
-                <span className="text-xs font-medium text-orange-700">{tr("dashboard_elave_qida_676032", "Əlavə Qida")}</span>
+                <span className="a-choice-label">{tr("dashboard_elave_qida_676032", "Əlavə Qida")}</span>
               </motion.button>
             </motion.div>
           }
@@ -1350,18 +1389,18 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-blue-50 rounded-xl p-3 mb-2 border border-blue-200">
+            className="a-inset-panel">
             
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">🍼</span>
-                <span className="text-sm font-semibold text-blue-700">{tr("dashboard_nece_ml_c9f7a6", "Neçə ml?")}</span>
+                <span className="a-list-title">{tr("dashboard_nece_ml_c9f7a6", "Neçə ml?")}</span>
               </div>
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {formulaMLPresets.map((ml) =>
               <motion.button
                 key={ml}
                 onClick={() => addFeeding('formula', ml)}
-                className="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-700 text-xs font-bold border border-blue-200"
+                className="a-tag on"
                 whileTap={{ scale: 0.95 }}>
                 
                     {ml} ml
@@ -1374,20 +1413,20 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                 value={formulaML}
                 onChange={(e) => setFormulaML(e.target.value)}
                 placeholder={language === 'en' ? "Other (ml)" : "Digər (ml)"}
-                className="flex-1 px-3 py-1.5 rounded-lg border border-blue-200 text-sm bg-white"
+                className="a-input"
                 min="1"
                 max="500" />
               
                 <motion.button
                 onClick={submitFormula}
-                className="px-4 py-1.5 rounded-lg bg-blue-500 text-white text-xs font-bold"
+                className="a-btn-solid"
                 whileTap={{ scale: 0.95 }}>
                 
                   {tr("dashboard_qeyd_et_f12345", "Qeyd et")}
                 </motion.button>
                 <motion.button
                 onClick={() => {setShowFormulaMLInput(false);setFormulaML('');}}
-                className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs"
+                className="a-tag"
                 whileTap={{ scale: 0.95 }}>
                   {tr("dashboard_legv_f7100a", "L\u0259\u011Fv")}
                 
@@ -1404,11 +1443,11 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-orange-50 rounded-xl p-3 mb-2 border border-orange-200">
+            className="a-inset-panel">
             
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-lg">🥣</span>
-                <span className="text-sm font-semibold text-orange-700"><span className="text-sm font-semibold text-orange-700">{tr("dashboard_elave_qida_676032", "Əlavə Qida")}</span></span>
+                <span className="a-list-title">{tr("dashboard_elave_qida_676032", "Əlavə Qida")}</span>
               </div>
               <div className="flex gap-2">
                 <input
@@ -1416,20 +1455,20 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                 value={solidFoodName}
                 onChange={(e) => setSolidFoodName(e.target.value)}
                 placeholder={language === 'en' ? "e.g. pumpkin puree" : "Məs: balkabaqlı püre"}
-                className="flex-1 px-3 py-1.5 rounded-lg border border-orange-200 text-sm bg-white" />
+                className="a-input" />
               
                 <motion.button
                 onClick={() => {
                   if (solidFoodName.trim()) addFeeding('solid', undefined, solidFoodName.trim());
                 }}
-                className="px-4 py-1.5 rounded-lg bg-orange-500 text-white text-xs font-bold"
+                className="a-btn-solid"
                 whileTap={{ scale: 0.95 }}>
                 
                   {tr("dashboard_qeyd_et_f12345", "Qeyd et")}
                 </motion.button>
                 <motion.button
                 onClick={() => {setShowSolidFoodInput(false);setSolidFoodName('');}}
-                className="px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs"
+                className="a-tag"
                 whileTap={{ scale: 0.95 }}>
                   {tr("dashboard_legv_f7100a", "L\u0259\u011Fv")}
                 
@@ -1442,47 +1481,49 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
         {/* Active feeding timer indicator */}
         {(leftFeedTimer || rightFeedTimer) && !showFeedingModal &&
         <motion.div
-          className="bg-pink-50 rounded-lg p-2 flex items-center justify-between mb-2"
+          className="a-inset-panel flex items-center justify-between"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}>
           
             <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-pink-500 animate-pulse" />
-              <span className="text-sm text-pink-700 font-medium">
+              <div className="w-3 h-3 rounded-full animate-pulse" style={{ background: 'var(--a-pink-2)' }} />
+              <span className="a-list-title">
                 {leftFeedTimer ? tr('dashboard_left_breast', 'Sol sinə') : tr('dashboard_right_breast', 'Sağ sinə')}: {formatDuration(getElapsedSeconds((leftFeedTimer || rightFeedTimer)!.id))}
               </span>
             </div>
             <motion.button
             onClick={() => toggleFeeding(leftFeedTimer ? 'left' : 'right')}
-            className="px-3 py-1 bg-pink-500 text-white rounded-lg text-sm font-medium"
+            className="a-btn-solid"
             whileTap={{ scale: 0.95 }}>
             
               {tr("dashboard_bitir_btn", "Bitir")}
             </motion.button>
           </motion.div>
         }
+        <TrackerAIInsight section="feeding" api={insightApi} />
       </motion.div>
 
       {/* Diaper Tracker */}
       <motion.div
-        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+        className="a-card a-fade-in"
+        style={{ marginTop: 10 }}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}>
         
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-primary-foreground" />
-            </div>
+          <div className="flex items-center gap-3">
+            <span className="a-list-icon" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
+              <Clock size={17} strokeWidth={2} />
+            </span>
             <div>
-              <h3 className="font-bold text-sm text-foreground">{tr("dashboard_bez_deyisme_ba242a", "Bez Dəyişmə")}</h3>
-              <p className="text-xs text-muted-foreground">{tr('dashboard_today_label', 'Bu gün')}: {todayStats.diaperCount} {tr('dashboard_times_unit', 'dəfə')}</p>
+              <p className="a-list-title">{tr("dashboard_bez_deyisme_ba242a", "Bez Dəyişmə")}</p>
+              <p className="a-list-sub">{tr('dashboard_today_label', 'Bu gün')}: {todayStats.diaperCount} {tr('dashboard_times_unit', 'dəfə')}</p>
             </div>
           </div>
           <motion.button
             onClick={() => setShowDiaperModal(true)}
-            className="px-4 py-2.5 rounded-xl bg-primary/10 text-primary font-bold text-xs"
+            className="a-btn-soft"
             whileTap={{ scale: 0.95 }}>
             {tr("dashboard_elave_et_a5fb21", "+ \u018Flav\u0259 et")}
           
@@ -1499,21 +1540,21 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
             
               <motion.button
               onClick={() => addDiaper('wet')}
-              className="p-3 rounded-xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center"
+              className="a-choice blue"
               whileTap={{ scale: 0.95 }}>
               
                 <span className="text-2xl">💧</span>
               </motion.button>
               <motion.button
               onClick={() => addDiaper('dirty')}
-              className="p-3 rounded-xl bg-amber-50 border-2 border-amber-200 flex items-center justify-center"
+              className="a-choice yellow"
               whileTap={{ scale: 0.95 }}>
               
                 <span className="text-2xl">💩</span>
               </motion.button>
               <motion.button
               onClick={() => addDiaper('both')}
-              className="p-3 rounded-xl bg-purple-50 border-2 border-purple-200 flex items-center justify-center"
+              className="a-choice lav"
               whileTap={{ scale: 0.95 }}>
               
                 <span className="text-xl">💧💩</span>
@@ -1527,54 +1568,69 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
           {todayStats.diaperLogs.slice(-5).reverse().map((log) =>
           <div
             key={log.id}
-            className="flex-shrink-0 px-2 py-1.5 rounded-lg bg-muted/50 flex items-center gap-1.5">
+            className="a-tag flex-shrink-0"
+            style={{ cursor: 'default' }}>
             
-              <span className="text-lg">{getDiaperIcon(log.diaper_type || 'wet')}</span>
-              <span className="text-xs text-muted-foreground">
-                {new Date(log.start_time).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+              <span className="text-base">{getDiaperIcon(log.diaper_type || 'wet')}</span>
+              <span>
+                {new Date(log.start_time).toLocaleTimeString(getLocaleTag(), { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
           )}
         </div>
+        <TrackerAIInsight section="diaper" api={insightApi} />
       </motion.div>
 
       {/* Today's Summary */}
       <motion.div
-        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+        className="a-card a-fade-in"
+        style={{ marginTop: 10 }}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3 }}>
         
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold text-foreground">{tr("dashboard_bugunku_xulase_e1e1b3", "Bugünkü xülasə")}</h3>
-          <button
-            onClick={() => refetch()}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
-            
-            <RefreshCw className="w-3.5 h-3.5" />
-          </button>
+        <div className="a-card-head">
+          <h3 className="a-card-title a-heading">{tr("dashboard_bugunku_xulase_e1e1b3", "Bugünkü xülasə")}</h3>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {onNavigate &&
+            <button
+              onClick={() => onNavigate('doctor-report')}
+              className="a-icon-btn"
+              style={{ width: 30, height: 30 }}
+              aria-label={tr("dash_pdf_report", 'Həkim hesabatı (PDF)')}
+              title={tr("dash_pdf_report", 'Həkim hesabatı (PDF)')}>
+              <FileText size={13} />
+            </button>
+            }
+            <button
+              onClick={() => refetch()}
+              className="a-icon-btn"
+              style={{ width: 30, height: 30 }}>
+              
+              <RefreshCw size={13} />
+            </button>
+          </div>
         </div>
-        <div className="space-y-1.5">
+        <div className="a-list-card" style={{ border: '1px solid var(--a-line)', boxShadow: 'none' }}>
           {/* Sleep Summary - Expandable */}
-          <div className="bg-primary/5 rounded-2xl overflow-hidden border border-primary/20">
+          <div>
             <button
               onClick={() => setSleepExpanded(!sleepExpanded)}
-              className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors">
+              className="a-list-row w-full"
+              style={{ cursor: 'pointer', width: '100%', textAlign: 'left', background: 'none', border: 'none', borderTop: 'none' }}>
               
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Moon className="w-4 h-4 text-primary" />
-                </div>
-                <div className="text-left">
-                  <p className="text-xs font-semibold text-foreground">{tr("dashboard_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {todayStats.sleepLogs?.length || 0} {tr('dashboard_sleep_recorded', 'yuxu qeydə alınıb')}
-                  </p>
-                </div>
+              <span className="a-list-icon" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+                <Moon size={17} strokeWidth={2} />
+              </span>
+              <div>
+                <p className="a-list-title">{tr("dashboard_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
+                <p className="a-list-sub">
+                  {todayStats.sleepLogs?.length || 0} {tr('dashboard_sleep_recorded', 'yuxu qeydə alınıb')}
+                </p>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="text-right mr-2">
-                  <p className="text-xs font-bold text-primary">
+              <span className="a-list-trail" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span>
+                  <p className="a-list-value">
                     {(() => {
                       const totalMin = todayStats.sleepMinutes || Math.round(todayStats.sleepHours * 60);
                       const h = Math.floor(totalMin / 60);
@@ -1585,14 +1641,14 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                       return `${h} ${tr("dashboard_hour", "saat")} ${m} ${tr("dashboard_min", "dəq")}`;
                     })()}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">{tr("dashboard_bu_gun_7d7f30", "bu gün")}</p>
-                </div>
+                  <p className="a-list-time">{tr("dashboard_bu_gun_7d7f30", "bu gün")}</p>
+                </span>
                 {sleepExpanded ?
-                <ChevronUp className="w-4 h-4 text-muted-foreground" /> :
+                <ChevronUp size={15} className="a-list-chevron" /> :
 
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                <ChevronDown size={15} className="a-list-chevron" />
                 }
-              </div>
+              </span>
             </button>
             <AnimatePresence>
               {sleepExpanded &&
@@ -1603,7 +1659,7 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden">
                 
-                  <div className="px-3 pb-3 space-y-1.5">
+                  <div className="px-4 pb-3 space-y-1.5">
                     {todayStats.sleepLogs && todayStats.sleepLogs.length > 0 ?
                   [...todayStats.sleepLogs].reverse().map((log) => {
                     const start = new Date(log.start_time);
@@ -1615,24 +1671,24 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
                     const durText = dH > 0 ? `${dH}${tr("dashboard_h", "s")} ${dM}${tr("dashboard_m", "d")}` : dM > 0 ? `${dM} ${tr("dashboard_min", "dəq")} ${dS} ${tr("dashboard_sec", "san")}` : `${dS} ${tr("dashboard_sec", "san")}`;
 
                     return (
-                      <div key={log.id} className="flex items-center justify-between p-2 bg-primary/10 rounded-xl">
+                      <div key={log.id} className="flex items-center justify-between p-2 rounded-xl" style={{ background: 'var(--a-surface-soft)' }}>
                             <div className="flex items-center gap-2">
                               <span className="text-sm">😴</span>
                               <div>
-                                <p className="text-[11px] font-medium text-foreground">
-                                  {start.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
-                                  {end && ` – ${end.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}`}
+                                <p className="a-list-sub" style={{ margin: 0, color: 'var(--a-ink)' }}>
+                                  {start.toLocaleTimeString(getLocaleTag(), { hour: '2-digit', minute: '2-digit' })}
+                                  {end && ` – ${end.toLocaleTimeString(getLocaleTag(), { hour: '2-digit', minute: '2-digit' })}`}
                                 </p>
                               </div>
                             </div>
-                            <span className="text-[11px] font-semibold text-primary">
+                            <span className="a-list-value" style={{ color: 'var(--a-accent-ink)' }}>
                               {end ? durText : tr("dashboard_davam_edir_88d3a2", 'Davam edir...')}
                             </span>
                           </div>);
 
                   }) :
 
-                  <p className="text-[11px] text-muted-foreground text-center py-2">{tr("dashboard_bu_gun_yuxu_qeyde_alinmayib_8a3535", "Bu gün yuxu qeydə alınmayıb")}</p>
+                  <p className="a-list-sub text-center py-2" style={{ margin: 0 }}>{tr("dashboard_bu_gun_yuxu_qeyde_alinmayib_8a3535", "Bu gün yuxu qeydə alınmayıb")}</p>
                   }
                   </div>
                 </motion.div>
@@ -1641,137 +1697,134 @@ const MommyDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string)
           </div>
           
           {/* Enhanced Feeding History Panel */}
-          <div ref={feedingSummaryRef}>
+          <div ref={feedingSummaryRef} style={{ borderTop: '1px solid var(--a-line)', padding: '10px 12px' }}>
             <FeedingHistoryPanel />
           </div>
-          <div className="bg-primary/5 rounded-2xl overflow-hidden border border-primary/20">
-            <button
-              onClick={() => setShowDiaperModal(true)}
-              className="w-full p-3 flex items-center justify-between hover:bg-primary/10 transition-colors">
-              
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-primary" />
-                </div>
-                <div className="text-left">
-                  <p className="text-xs font-semibold text-foreground">{tr("dashboard_bez_deyisme_647cbc", "Bez dəyişmə")}</p>
-                  <p className="text-[10px] text-muted-foreground">
-                    💧{todayStats.wetCount} 💩{todayStats.dirtyCount} 💧💩{todayStats.bothCount}
-                  </p>
-                </div>
-              </div>
-              <div className="text-right mr-2">
-                <p className="text-xs font-bold text-primary">{todayStats.diaperCount} {tr("dashboard_defe_420246", "d\u0259f\u0259")}</p>
-                <p className="text-[10px] text-muted-foreground">{tr("dashboard_bu_gun_7d7f30", "bu gün")}</p>
-              </div>
-            </button>
-          </div>
+          <button
+            onClick={() => setShowDiaperModal(true)}
+            className="a-list-row w-full"
+            style={{ cursor: 'pointer', width: '100%', textAlign: 'left', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', borderTop: '1px solid var(--a-line)' }}>
+            
+            <span className="a-list-icon" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+              <Clock size={17} strokeWidth={2} />
+            </span>
+            <div>
+              <p className="a-list-title">{tr("dashboard_bez_deyisme_647cbc", "Bez dəyişmə")}</p>
+              <p className="a-list-sub">
+                💧{todayStats.wetCount} 💩{todayStats.dirtyCount} 💧💩{todayStats.bothCount}
+              </p>
+            </div>
+            <span className="a-list-trail">
+              <p className="a-list-value" style={{ color: 'var(--a-accent-ink)' }}>{todayStats.diaperCount} {tr("dashboard_defe_420246", "d\u0259f\u0259")}</p>
+              <p className="a-list-time">{tr("dashboard_bu_gun_7d7f30", "bu gün")}</p>
+            </span>
+          </button>
         </div>
       </motion.div>
-
-      {/* Weekly Stats Overview */}
-      <QuickStatsWidget />
-
-      {/* Growth Tracker */}
-      <GrowthTrackerWidget />
 
       {/* Milestones with Carousel */}
-      <motion.div
-        className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.25 }}>
-        
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold text-foreground">{tr("dashboard_inkisaf_merheleleri_d6d887", "İnkişaf mərhələləri")}</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-primary font-bold">
-              {allMilestones.filter((m) => m.achieved).length}/{allMilestones.length}
-            </span>
-            {/* Carousel navigation */}
-            {hasMoreMilestones &&
-            <div className="flex gap-1">
-                <motion.button
-                onClick={() => setMilestonePageIndex((p) => Math.max(0, p - 1))}
-                disabled={milestonePageIndex === 0}
-                className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
-                whileTap={{ scale: 0.9 }}>
-                
-                  <ChevronRight className="w-3 h-3 rotate-180" />
-                </motion.button>
-                <motion.button
-                onClick={() => setMilestonePageIndex((p) => Math.min(totalMilestonePages - 1, p + 1))}
-                disabled={milestonePageIndex === totalMilestonePages - 1}
-                className="w-6 h-6 rounded-full bg-muted flex items-center justify-center disabled:opacity-40"
-                whileTap={{ scale: 0.9 }}>
-                
-                  <ChevronRight className="w-3 h-3" />
-                </motion.button>
-              </div>
-            }
-          </div>
+      <section className="a-section">
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading">{tr("dashboard_inkisaf_merheleleri_d6d887", "İnkişaf mərhələləri")}</h2>
+          <span className="a-section-link">
+            {allMilestones.filter((m) => m.achieved).length}/{allMilestones.length}
+          </span>
         </div>
-        
-        {/* Page indicator */}
-        {hasMoreMilestones &&
-        <div className="flex justify-center gap-1 mb-3">
-            {Array.from({ length: totalMilestonePages }).map((_, i) =>
-          <div
-            key={i}
-            className={`h-1.5 rounded-full transition-all ${
-            i === milestonePageIndex ? 'w-4 bg-primary' : 'w-1.5 bg-muted'}`
-            } />
+        <motion.div
+          className="a-card a-fade-in"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.25 }}>
+          
+          {/* Carousel navigation + page indicator */}
+          {hasMoreMilestones &&
+          <div className="flex items-center justify-between mb-3">
+              <motion.button
+              onClick={() => setMilestonePageIndex((p) => Math.max(0, p - 1))}
+              disabled={milestonePageIndex === 0}
+              className="a-icon-btn"
+              style={{ width: 30, height: 30 }}
+              whileTap={{ scale: 0.9 }}>
+              
+                <ChevronRight size={15} className="rotate-180" />
+              </motion.button>
+              <div className="flex gap-1.5">
+                {Array.from({ length: totalMilestonePages }).map((_, i) =>
+              <span
+                key={i}
+                style={{
+                  width: i === milestonePageIndex ? 16 : 6,
+                  height: 6,
+                  borderRadius: 999,
+                  background: i === milestonePageIndex ? 'var(--a-peach-2)' : 'var(--a-line-strong)',
+                  transition: 'all 150ms ease'
+                }} />
 
-          )}
-          </div>
-        }
-        
-        <div className="flex justify-between overflow-hidden">
-          {displayMilestones.map((milestone, index) =>
-          <motion.button
-            key={milestone.id}
-            onClick={() => handleMilestoneClick(milestone.id)}
-            className="text-center flex-1"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.05 + index * 0.05 }}
-            whileTap={{ scale: 0.9 }}>
-            
-              <div className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center text-lg mb-1 relative ${
-            milestone.achieved ?
-            'bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg' :
-            'bg-muted opacity-60'}`
-            }>
-                {milestone.emoji}
-                {milestone.achieved &&
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                    <Check className="w-2.5 h-2.5 text-white" />
-                  </div>
-              }
+              )}
               </div>
-              <span className={`text-[10px] line-clamp-1 ${
-            milestone.achieved ? 'text-foreground font-medium' : 'text-muted-foreground'}`
-            }>
-                {milestone.label}
-              </span>
-            </motion.button>
-          )}
-        </div>
-      </motion.div>
+              <motion.button
+              onClick={() => setMilestonePageIndex((p) => Math.min(totalMilestonePages - 1, p + 1))}
+              disabled={milestonePageIndex === totalMilestonePages - 1}
+              className="a-icon-btn"
+              style={{ width: 30, height: 30 }}
+              whileTap={{ scale: 0.9 }}>
+              
+                <ChevronRight size={15} />
+              </motion.button>
+            </div>
+          }
+          
+          <div className="flex justify-between overflow-hidden">
+            {displayMilestones.map((milestone, index) =>
+            <motion.button
+              key={milestone.id}
+              onClick={() => handleMilestoneClick(milestone.id)}
+              className="text-center flex-1"
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.05 + index * 0.05 }}
+              whileTap={{ scale: 0.9 }}>
+              
+                <div
+                className="w-10 h-10 mx-auto rounded-full flex items-center justify-center text-lg mb-1 relative"
+                style={milestone.achieved ?
+                { background: 'var(--a-grad-peach)', boxShadow: '0 8px 16px -8px rgba(255, 157, 99, 0.8)' } :
+                { background: 'var(--a-surface-soft)', opacity: 0.65 }}>
+                  {milestone.emoji}
+                  {milestone.achieved &&
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: 'var(--a-green-2)' }}>
+                      <Check className="w-2.5 h-2.5 text-white" />
+                    </div>
+                }
+                </div>
+                <span
+                className="text-[10px] line-clamp-1"
+                style={{ color: milestone.achieved ? 'var(--a-ink)' : 'var(--a-ink-soft)', fontWeight: milestone.achieved ? 700 : 500 }}>
+                  {milestone.label}
+                </span>
+              </motion.button>
+            )}
+          </div>
+        </motion.div>
+      </section>
 
       {/* Baby Crisis Calendar Widget - hide after week 75 (last crisis ends) */}
       {Math.floor(babyData.ageInDays / 7) <= 75 &&
-      <BabyCrisisWidget
-        babyAgeWeeks={Math.floor(babyData.ageInDays / 7)}
-        babyName={babyData.name} />
-
+      <div className="a-section">
+          <BabyCrisisWidget
+          babyAgeWeeks={Math.floor(babyData.ageInDays / 7)}
+          babyName={babyData.name} />
+        </div>
       }
 
 
 
 
       {/* Development Tips - Dynamic based on age */}
-      <DevelopmentTipsWidget />
+      <div className="a-section">
+        <DevelopmentTipsWidget />
+      </div>
     </div>);
 
 };
@@ -1801,6 +1854,102 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
 
   const hasPartner = !!profile?.linked_partner_id;
 
+  // ——— Anacan redesign (github.com/Jmlsltnl/anacan-demo-app): mommy + bump + flow home ———
+  if (lifeStage === 'mommy' || lifeStage === 'bump' || lifeStage === 'flow') {
+    return (
+      <div className="a-scope a-dash pb-6">
+        {/* Watercolor sky behind topbar + hero */}
+        <div className="a-sky" aria-hidden>
+          <span className="a-cloud c1" />
+          <span className="a-cloud c2" />
+          <span className="a-cloud c3" />
+          <span className="a-cloud c4" />
+          <span className="a-cloud c5" />
+          <span className="a-cloud c6 deep" />
+          <span className="a-cloud c7 deep" />
+        </div>
+        <div className="a-shell">
+          {/* Top bar */}
+          <motion.header
+            className="a-topbar"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}>
+            
+            <div>
+              <p className="a-eyebrow">{getGreeting()}</p>
+              <p className="a-wordmark">{name || tr("dashboard_xanim_39ff6a", "Xan\u0131m")} 👋</p>
+            </div>
+            <div className="a-topbar-actions">
+              {lifeStage === 'mommy' ?
+              <ChildSelector compact /> :
+
+              <button
+                type="button"
+                className="a-icon-btn"
+                onClick={onOpenChat}
+                aria-label={tr("bottomnav_mesajlar", "Mesajlar")}
+                style={{ cursor: 'pointer' }}>
+                
+                  <MessageCircle size={16} strokeWidth={2} />
+                  {totalUnread > 0 &&
+                <span
+                  style={{
+                    position: 'absolute',
+                    top: -4,
+                    right: -4,
+                    minWidth: 15,
+                    height: 15,
+                    padding: '0 4px',
+                    borderRadius: 999,
+                    background: '#e05555',
+                    color: '#fff',
+                    fontSize: 8.5,
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                  
+                      {totalUnread > 9 ? '9+' : totalUnread}
+                    </span>
+                }
+                </button>
+              }
+            </div>
+          </motion.header>
+
+          {/* Top Banner Slot */}
+          <BannerSlot placement="home_top" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mb-2" />
+
+          {lifeStage === 'mommy' && <MommyDashboard onNavigateToTool={onNavigateToTool} onNavigate={onNavigate} />}
+          {lifeStage === 'bump' && <BumpDashboard onNavigateToTool={onNavigateToTool} />}
+          {lifeStage === 'flow' && <FlowDashboard />}
+
+          {/* Daily summary auto-syncs to partner in background */}
+          {lifeStage === 'bump' && profile?.linked_partner_id && <DailySummaryAutoSync />}
+
+          {/* Partnyorum kartı — sevgi statistikası, təşəkkür, SOS/Doğuş siqnalı */}
+          {profile?.linked_partner_id &&
+          <PartnerCareCard lifeStage={lifeStage} onOpenSharing={onNavigate ? () => onNavigate('partner-sharing') : undefined} />
+          }
+
+          {/* Recent Blog Posts */}
+          {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage={lifeStage} variant="anacan" />}
+
+          {/* Win-back: yalnız ləğv etmiş/bitmiş istifadəçilərə */}
+          <WinBackCard variant="banner" />
+
+
+          {/* Bottom Banner Slot */}
+          <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-2" />
+
+          {/* Small medical disclaimer — Google Play Health Content policy */}
+          <MedicalDisclaimer variant="anacan" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pb-20 pt-2 px-3">
       {/* Header */}
@@ -1814,9 +1963,6 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
           <h1 className="text-lg font-black text-foreground">{name || tr("dashboard_xanim_39ff6a", "Xan\u0131m")} 👋</h1>
         </div>
         <div className="flex items-center gap-2">
-          {lifeStage === 'mommy' ?
-          <ChildSelector compact /> :
-
           <motion.button
             onClick={onOpenChat}
             className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center relative"
@@ -1834,7 +1980,6 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
                 </motion.span>
             }
             </motion.button>
-          }
           {/* Notification bell temporarily disabled */}
         </div>
 
@@ -1843,18 +1988,12 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
       {/* Top Banner Slot */}
       <BannerSlot placement="home_top" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mb-2" />
 
-      {lifeStage === 'flow' && <FlowDashboard />}
-      {lifeStage === 'bump' && <BumpDashboard onNavigateToTool={onNavigateToTool} />}
-      {lifeStage === 'mommy' && <MommyDashboard onNavigateToTool={onNavigateToTool} />}
-
-      {/* Daily summary auto-syncs to partner in background — manual widget removed */}
-      {lifeStage === 'bump' && profile?.linked_partner_id && <DailySummaryAutoSync />}
-
       {/* Recent Blog Posts - filtered by life stage (partner uses bump stage content) */}
-      {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage={lifeStage === 'partner' ? 'bump' : lifeStage} />}
+      {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage="bump" />}
 
-      {/* Dashboard Premium Paywall Banner */}
-      <DashboardPremiumBanner />
+      {/* Win-back: yalnız ləğv etmiş/bitmiş istifadəçilərə */}
+      <WinBackCard variant="banner" />
+
 
       {/* Bottom Banner Slot */}
       <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-2" />

@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import {
@@ -7,15 +7,11 @@ import {
   Droplets,
   Heart,
   Activity,
-  Smile,
-  Frown,
-  Meh,
   RefreshCw } from
 'lucide-react';
 import { useDailySummary, DailySummary } from '@/hooks/useDailySummary';
 import { format, isToday, isYesterday } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
-import { Badge } from '@/components/ui/badge';
 import { SYMPTOMS } from '@/types/anacan';
 
 interface DailySummaryScreenProps {
@@ -26,9 +22,9 @@ const DailySummaryScreen: React.FC<DailySummaryScreenProps> = ({ onBack }) => {
   const { summaries, loading } = useDailySummary();
 
   const getMoodEmoji = (mood: number | null) => {
-    if (!mood) return '❓';
-    const emojis = ['😢', '😔', '😐', '🙂', '😊'];
-    return emojis[mood - 1] || '❓';
+    if (!mood) return 'â“';
+    const emojis = ['ðŸ˜¢', 'ðŸ˜”', 'ðŸ˜', 'ðŸ™‚', 'ðŸ˜Š'];
+    return emojis[mood - 1] || 'â“';
   };
 
   const getMoodLabel = (mood: number | null) => {
@@ -51,50 +47,54 @@ const DailySummaryScreen: React.FC<DailySummaryScreenProps> = ({ onBack }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <RefreshCw className="w-8 h-8 animate-spin text-primary" />
+      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+        <RefreshCw className="w-8 h-8 animate-spin" style={{ color: 'var(--a-blue-2)' }} />
       </div>);
 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b border-border/50">
-        <div className="flex items-center justify-between p-4">
-          <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-muted">
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-lg font-bold">{tr("dailysummaryscreen_gundelik_xulase_3d07a5", "Gündəlik Xülasə")}</h1>
-          <div className="w-10" />
-        </div>
+    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
+              <ArrowLeft size={16} strokeWidth={2} />
+            </motion.button>
+            <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("dailysummaryscreen_gundelik_xulase_3d07a5", "GÃ¼ndÉ™lik XÃ¼lasÉ™")}</p>
+          </div>
+        </header>
+
+        {summaries.length === 0 ?
+        <div className="a-card" style={{ textAlign: 'center', padding: '38px 18px' }}>
+            <div className="mx-auto mb-4 flex items-center justify-center"
+          style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--a-surface-soft)' }}>
+              <Calendar size={26} style={{ color: 'var(--a-ink-faint)' }} />
+            </div>
+            <h3 className="a-list-title" style={{ marginBottom: 4 }}>
+              {tr("dailysummaryscreen_helelik_xulase_yoxdur_f1d180", "H\u0259l\u0259lik x\xFClas\u0259 yoxdur")}
+            </h3>
+            <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>
+              {tr("dailysummaryscreen_partnyorunuz_gundelik_melumatl_0be3a8", "Partnyorunuz g\xFCnd\u0259lik m\u0259lumatlar\u0131n\u0131 qeyd etdikd\u0259 burada x\xFClas\u0259 g\xF6r\u0259c\u0259ksiniz")}
+            </p>
+          </div> :
+
+        <div className="space-y-3.5">
+            {summaries.map((summary, index) =>
+          <SummaryCard
+            key={summary.id}
+            summary={summary}
+            formatDate={formatDate}
+            getMoodEmoji={getMoodEmoji}
+            getMoodLabel={getMoodLabel}
+            getSymptomLabel={getSymptomLabel}
+            index={index} />
+
+          )}
+          </div>
+        }
       </div>
-
-      {summaries.length === 0 ?
-      <div className="flex flex-col items-center justify-center py-20 text-center px-4">
-          <Calendar className="w-16 h-16 text-muted-foreground/30 mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            {tr("dailysummaryscreen_helelik_xulase_yoxdur_f1d180", "H\u0259l\u0259lik x\xFClas\u0259 yoxdur")}
-          </h3>
-          <p className="text-muted-foreground text-sm max-w-xs">
-            {tr("dailysummaryscreen_partnyorunuz_gundelik_melumatl_0be3a8", "Partnyorunuz g\xFCnd\u0259lik m\u0259lumatlar\u0131n\u0131 qeyd etdikd\u0259 burada x\xFClas\u0259 g\xF6r\u0259c\u0259ksiniz")}
-          </p>
-        </div> :
-
-      <div className="p-4 space-y-4">
-          {summaries.map((summary, index) =>
-        <SummaryCard
-          key={summary.id}
-          summary={summary}
-          formatDate={formatDate}
-          getMoodEmoji={getMoodEmoji}
-          getMoodLabel={getMoodLabel}
-          getSymptomLabel={getSymptomLabel}
-          index={index} />
-
-        )}
-        </div>
-      }
     </div>);
 
 };
@@ -123,20 +123,22 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className={`rounded-2xl border overflow-hidden ${
-      isRecent ?
-      'bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20' :
-      'bg-card border-border'}`
-      }>
-      
+      className="overflow-hidden"
+      style={{
+        background: 'var(--a-surface)',
+        borderRadius: 'var(--a-radius-md)',
+        boxShadow: 'var(--a-card-shadow)',
+        border: isRecent ? '1.5px solid var(--a-blue-2)' : '1.5px solid transparent'
+      }}>
+
       {/* Date header */}
-      <div className={`px-4 py-3 border-b ${isRecent ? 'border-primary/10' : 'border-border'}`}>
+      <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--a-line)' }}>
         <div className="flex items-center justify-between">
-          <span className="font-semibold">{formatDate(summary.summary_date)}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--a-ink)' }}>{formatDate(summary.summary_date)}</span>
           {isRecent &&
-          <Badge className="bg-primary/20 text-primary border-0">
+          <span style={{ background: 'var(--a-blue-1)', color: 'var(--a-blue-ink)', borderRadius: 999, padding: '3px 10px', fontSize: 10.5, fontWeight: 800 }}>
               {tr("dailysummaryscreen_en_son_473654", "\u018Fn son")}
-            </Badge>
+            </span>
           }
         </div>
       </div>
@@ -145,57 +147,59 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
       <div className="p-4 space-y-4">
         {/* Mood */}
         <div className="flex items-center gap-4">
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${
-          summary.mood && summary.mood >= 4 ?
-          'bg-green-100 dark:bg-green-900/30' :
-          summary.mood && summary.mood <= 2 ?
-          'bg-red-100 dark:bg-red-900/30' :
-          'bg-muted'}`
-          }>
+          <div className="w-12 h-12 flex items-center justify-center text-2xl shrink-0"
+          style={{
+            borderRadius: 14,
+            background: summary.mood && summary.mood >= 4 ?
+            'var(--a-green-1)' :
+            summary.mood && summary.mood <= 2 ?
+            'var(--a-pink-1)' :
+            'var(--a-surface-soft)'
+          }}>
             {getMoodEmoji(summary.mood)}
           </div>
           <div>
-            <div className="text-sm text-muted-foreground">{tr("dailysummaryscreen_ehval_0457f9", "Əhval")}</div>
-            <div className="font-medium">{getMoodLabel(summary.mood)}</div>
+            <div style={{ fontSize: 12, color: 'var(--a-ink-soft)' }}>{tr("dailysummaryscreen_ehval_0457f9", "Æhval")}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--a-ink)' }}>{getMoodLabel(summary.mood)}</div>
           </div>
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 text-center">
-            <Droplets className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-            <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+        <div className="grid grid-cols-3 gap-2.5">
+          <div className="text-center" style={{ background: 'var(--a-blue-1)', borderRadius: 14, padding: 12 }}>
+            <Droplets size={18} className="mx-auto mb-1" style={{ color: 'var(--a-blue-ink)' }} />
+            <div style={{ fontSize: 16, fontWeight: 800, color: '#153e57' }}>
               {summary.water_intake}ml
             </div>
-            <div className="text-xs text-muted-foreground">{tr("untranslated_su_yvcozn", "Su")}</div>
+            <div style={{ fontSize: 10.5, color: 'var(--a-blue-ink)' }}>{tr("untranslated_su_yvcozn", "Su")}</div>
           </div>
 
-          <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-3 text-center">
-            <Heart className="w-5 h-5 text-pink-500 mx-auto mb-1" />
-            <div className="text-lg font-bold text-pink-600 dark:text-pink-400">
+          <div className="text-center" style={{ background: 'var(--a-pink-1)', borderRadius: 14, padding: 12 }}>
+            <Heart size={18} className="mx-auto mb-1" style={{ color: 'var(--a-pink-ink)' }} />
+            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--a-alert-ink)' }}>
               {summary.kick_count}
             </div>
-            <div className="text-xs text-muted-foreground">{tr("dailysummaryscreen_tepik_9a873a", "Təpik")}</div>
+            <div style={{ fontSize: 10.5, color: 'var(--a-pink-ink)' }}>{tr("dailysummaryscreen_tepik_9a873a", "TÉ™pik")}</div>
           </div>
 
-          <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3 text-center">
-            <Activity className="w-5 h-5 text-purple-500 mx-auto mb-1" />
-            <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+          <div className="text-center" style={{ background: 'var(--a-lav-1)', borderRadius: 14, padding: 12 }}>
+            <Activity size={18} className="mx-auto mb-1" style={{ color: 'var(--a-lav-ink)' }} />
+            <div style={{ fontSize: 16, fontWeight: 800, color: '#3c2e5c' }}>
               {summary.contraction_count}
             </div>
-            <div className="text-xs text-muted-foreground">{tr("dailysummaryscreen_sanci_350c2d", "Sancı")}</div>
+            <div style={{ fontSize: 10.5, color: 'var(--a-lav-ink)' }}>{tr("dailysummaryscreen_sanci_350c2d", "SancÄ±")}</div>
           </div>
         </div>
 
         {/* Symptoms */}
         {summary.symptoms && summary.symptoms.length > 0 &&
         <div>
-            <div className="text-sm text-muted-foreground mb-2">{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</div>
+            <div style={{ fontSize: 12, color: 'var(--a-ink-soft)', marginBottom: 8 }}>{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</div>
             <div className="flex flex-wrap gap-2">
               {summary.symptoms.map((symptom) =>
-            <Badge key={symptom} variant="secondary">
+            <span key={symptom} className="a-tag" style={{ cursor: 'default' }}>
                   {getSymptomLabel(symptom)}
-                </Badge>
+                </span>
             )}
             </div>
           </div>
@@ -204,8 +208,8 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
         {/* Notes */}
         {summary.notes &&
         <div>
-            <div className="text-sm text-muted-foreground mb-1">{tr("dailysummaryscreen_qeydler_a7a98b", "Qeydlər")}</div>
-            <p className="text-sm">{summary.notes}</p>
+            <div style={{ fontSize: 12, color: 'var(--a-ink-soft)', marginBottom: 4 }}>{tr("dailysummaryscreen_qeydler_a7a98b", "QeydlÉ™r")}</div>
+            <p style={{ fontSize: 13, color: 'var(--a-body-text)' }}>{summary.notes}</p>
           </div>
         }
       </div>

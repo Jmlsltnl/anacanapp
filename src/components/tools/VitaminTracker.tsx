@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Plus, Pill, Check, Clock, Bell, BellOff, Trash2, X, ChevronDown } from 'lucide-react';
+import { Plus, Pill, Check, Clock, Bell, BellOff, Trash2, X, ChevronDown } from 'lucide-react';
+import { ToolPage, ToolHeader, ToolEmpty } from './anacan/ToolKit';
 import { useVitaminSchedules, VitaminSchedule } from '@/hooks/useVitaminSchedules';
 import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/native';
@@ -156,84 +157,74 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3">
-            <button onClick={onBack} className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Pill className="w-5 h-5 text-primary" />
-                {tr("vitamintracker_vitamin_izleyicisi_049643", "Vitamin İzləyicisi")}
-              </h1>
-            </div>
-            <button onClick={() => setShowAddModal(true)} className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Plus className="w-5 h-5 text-primary" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-4 py-4 space-y-4 pb-32">
-        <MedicalDisclaimer variant="compact" />
-        {/* Progress Card */}
-        <motion.div
-          className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-lg"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}>
+    <ToolPage className="pb-32">
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={<>{tr("vitamintracker_bugunku_qebul_ae152d", "Bugünkü qəbul")}: {takenCount}/{totalCount}</>}
+        title={tr("vitamintracker_vitamin_izleyicisi_049643", "Vitamin İzləyicisi")}
+        actions={
+        <motion.button
+          onClick={() => setShowAddModal(true)}
+          className="a-icon-btn"
+          style={{ background: 'var(--a-peach-2)', color: '#fff', border: 'none' }}
+          whileTap={{ scale: 0.9 }}>
           
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <p className="text-white/70 text-sm">{tr("vitamintracker_bugunku_qebul_ae152d", "Bugünkü qəbul")}</p>
-              <p className="text-3xl font-bold">{takenCount}/{totalCount}</p>
-            </div>
-            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
-              <Pill className="w-8 h-8" />
-            </div>
-          </div>
-          <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-white rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5 }} />
-            
-          </div>
-          {totalCount > 0 && takenCount === totalCount &&
-          <p className="text-sm text-white/80 mt-2 font-medium">{tr("vitamintracker_butun_vitaminler_qebul_edildi_87d9d1", "🎉 Bütün vitaminlər qəbul edildi!")}</p>
-          }
-        </motion.div>
+            <Plus size={17} strokeWidth={2.4} />
+          </motion.button>
+        } />
 
-        {/* Vitamin List */}
+      <MedicalDisclaimer variant="compact" />
+
+      {/* Progress Card */}
+      <motion.div
+        className="a-cta a-fade-in"
+        style={{ background: 'var(--a-grad-green)', marginTop: 12 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}>
+        
+        <span className="a-cta-shape" style={{ width: 110, height: 110, top: -40, right: -30, background: 'rgba(255,255,255,0.35)' }} />
+        <div className="a-cta-top">
+          <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: '#14532d' }}>
+            💊 {tr("vitamintracker_bugunku_qebul_ae152d", "Bugünkü qəbul")}
+          </span>
+          <span className="a-cta-deco" style={{ background: 'var(--a-chip-overlay)', color: '#14532d' }}>
+            <Pill size={18} strokeWidth={2} />
+          </span>
+        </div>
+        <h2 className="a-cta-title a-heading" style={{ color: '#14532d', fontSize: 28, margin: '12px 0 10px' }}>{takenCount}/{totalCount}</h2>
+        <div className="relative" style={{ height: 8, borderRadius: 999, background: 'rgba(255,255,255,0.4)', overflow: 'hidden' }}>
+          <motion.div
+            style={{ height: '100%', borderRadius: 999, background: 'var(--a-green-ink)' }}
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.5 }} />
+          
+        </div>
+        {totalCount > 0 && takenCount === totalCount &&
+        <p className="a-cta-text" style={{ position: 'relative', marginTop: 10, color: 'rgba(20, 83, 45, 0.85)', fontWeight: 600 }}>{tr("vitamintracker_butun_vitaminler_qebul_edildi_87d9d1", "🎉 Bütün vitaminlər qəbul edildi!")}</p>
+        }
+      </motion.div>
+
+      {/* Vitamin List */}
+      <div style={{ marginTop: 12 }}>
         {isLoading ?
-        <div className="space-y-3">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[1, 2, 3].map((i) =>
-          <div key={i} className="h-20 bg-muted/50 rounded-2xl animate-pulse" />
+          <div key={i} className="a-card animate-pulse" style={{ height: 76 }} />
           )}
           </div> :
         activeSchedules.length === 0 ?
-        <motion.div
-          className="text-center py-16"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}>
-          
-            <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <Pill className="w-10 h-10 text-primary/50" />
-            </div>
-            <p className="font-semibold text-foreground mb-1">{tr("vitamintracker_vitamin_elave_edin_3a46b1", "Vitamin əlavə edin")}</p>
-            <p className="text-sm text-muted-foreground mb-4">{tr("vitamintracker_gundelik_vitamin_qebulunuzu_izleyin_f8d5c5", "Gündəlik vitamin qəbulunuzu izləyin")}</p>
-            <button
-            onClick={() => setShowAddModal(true)}
-            className="px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold">
+        <ToolEmpty
+          icon={<Pill size={26} style={{ color: 'var(--a-peach-2)' }} />}
+          title={tr("vitamintracker_vitamin_elave_edin_3a46b1", "Vitamin əlavə edin")}
+          text={tr("vitamintracker_gundelik_vitamin_qebulunuzu_izleyin_f8d5c5", "Gündəlik vitamin qəbulunuzu izləyin")}
+          action={
+          <button onClick={() => setShowAddModal(true)} className="a-cta-btn">
               {tr("vitamintracker_vitamin_elave_et_287d28", "+ Vitamin \u0259lav\u0259 et")}
-            
-          </button>
-          </motion.div> :
+            </button>
+          } /> :
 
-        <div className="space-y-2.5">
+        <div className="a-list-card">
             {activeSchedules.map((schedule, idx) => {
             const taken = isVitaminTakenToday(schedule.id);
             return (
@@ -241,60 +232,61 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                 key={schedule.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                className={`relative bg-card border rounded-2xl p-4 transition-all ${taken ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-border/50'}`}>
+                transition={{ delay: Math.min(idx * 0.05, 0.3) }}
+                className="a-list-row"
+                style={taken ? { background: 'var(--a-green-1)' } : undefined}>
                 
-                  <div className="flex items-center gap-3">
-                    {/* Check button */}
-                    <motion.button
-                    onClick={() => handleToggleTaken(schedule)}
-                    className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
-                    taken ?
-                    'bg-emerald-500 shadow-lg shadow-emerald-500/30' :
-                    'bg-muted/60 border-2 border-dashed border-muted-foreground/20'}`
-                    }
-                    whileTap={{ scale: 0.85 }}>
-                    
-                      {taken ?
-                    <Check className="w-5 h-5 text-white" /> :
+                  {/* Check button */}
+                  <motion.button
+                  onClick={() => handleToggleTaken(schedule)}
+                  className="flex items-center justify-center flex-shrink-0"
+                  style={{
+                    width: 42, height: 42, borderRadius: 13, cursor: 'pointer',
+                    ...(taken ?
+                    { background: 'var(--a-green-2)', border: 'none', boxShadow: '0 8px 16px -8px rgba(99, 189, 139, 0.8)' } :
+                    { background: 'var(--a-surface-soft)', border: '2px dashed var(--a-line-strong)' })
+                  }}
+                  whileTap={{ scale: 0.85 }}>
+                  
+                    {taken ?
+                  <Check size={18} strokeWidth={2.5} style={{ color: '#fff' }} /> :
 
-                    <span className="text-xl">{schedule.icon_emoji}</span>
-                    }
-                    </motion.button>
+                  <span className="text-xl">{schedule.icon_emoji}</span>
+                  }
+                  </motion.button>
 
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-semibold text-sm ${taken ? 'text-emerald-600 dark:text-emerald-400 line-through' : 'text-foreground'}`}>
-                        {getTranslatedVitaminName(schedule.vitamin_name)}
-                      </p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <Clock className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">{formatTime(schedule.scheduled_time)}</span>
-                        {schedule.notification_enabled &&
-                      <Bell className="w-3 h-3 text-primary/60" />
-                      }
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-1">
-                      <button
-                      onClick={() => handleToggleNotification(schedule)}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted/60">
-                      
-                        {schedule.notification_enabled ?
-                      <Bell className="w-4 h-4 text-primary" /> :
-
-                      <BellOff className="w-4 h-4" />
-                      }
-                      </button>
-                      <button
-                      onClick={() => handleDelete(schedule.id)}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="a-list-title" style={taken ? { color: 'var(--a-green-ink)', textDecoration: 'line-through' } : undefined}>
+                      {getTranslatedVitaminName(schedule.vitamin_name)}
+                    </p>
+                    <p className="a-list-sub" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <Clock size={11} />
+                      {formatTime(schedule.scheduled_time)}
+                      {schedule.notification_enabled && <Bell size={11} style={{ color: 'var(--a-peach-2)' }} />}
+                    </p>
                   </div>
+
+                  {/* Actions */}
+                  <span className="a-list-trail" style={{ display: 'flex', gap: 6 }}>
+                    <button
+                    onClick={() => handleToggleNotification(schedule)}
+                    className="a-icon-btn"
+                    style={{ width: 30, height: 30 }}>
+                    
+                      {schedule.notification_enabled ?
+                    <Bell size={13} style={{ color: 'var(--a-peach-2)' }} /> :
+
+                    <BellOff size={13} />
+                    }
+                    </button>
+                    <button
+                    onClick={() => handleDelete(schedule.id)}
+                    className="a-icon-btn"
+                    style={{ width: 30, height: 30, background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)', border: 'none' }}>
+                      <Trash2 size={13} strokeWidth={2} />
+                    </button>
+                  </span>
                 </motion.div>);
             })}
           </div>
@@ -311,16 +303,17 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
           
             <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddModal(false)} />
             <motion.div
-            className="relative w-full max-w-lg bg-card rounded-3xl overflow-hidden flex flex-col max-h-[85vh] shadow-xl"
+            className="a-scope relative w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh]"
+            style={{ background: 'var(--a-surface)', borderRadius: 'var(--a-radius-lg)', boxShadow: 'var(--a-card-shadow)' }}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}>
             
-              <div className="p-5 pb-0 flex items-center justify-between border-b border-border/50 pb-4">
-                <h2 className="text-lg font-bold text-foreground">{tr("vitamintracker_vitamin_elave_et_ba4a9c", "Vitamin Əlavə Et")}</h2>
-                <button onClick={() => setShowAddModal(false)} className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center">
-                  <X className="w-4 h-4" />
+              <div className="p-5 flex items-center justify-between" style={{ borderBottom: '1px solid var(--a-line)' }}>
+                <h2 className="a-card-title a-heading" style={{ fontSize: 16 }}>{tr("vitamintracker_vitamin_elave_et_ba4a9c", "Vitamin Əlavə Et")}</h2>
+                <button onClick={() => setShowAddModal(false)} className="a-icon-btn" style={{ width: 32, height: 32 }}>
+                  <X size={15} />
                 </button>
               </div>
 
@@ -329,10 +322,11 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                 <div>
                   <button
                   onClick={() => setShowPresets(!showPresets)}
-                  className="flex items-center gap-2 text-sm font-medium text-primary mb-2">
+                  className="a-section-link mb-2"
+                  style={{ color: 'var(--a-accent-ink)' }}>
                   
                     <span>{tr("vitamintracker_hazir_vitaminler_73ff90", "Hazır vitaminlər")}</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${showPresets ? 'rotate-180' : ''}`} />
+                    <ChevronDown size={14} className={`transition-transform ${showPresets ? 'rotate-180' : ''}`} />
                   </button>
                   <AnimatePresence>
                     {showPresets &&
@@ -342,7 +336,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden">
                     
-                        <div className="flex flex-wrap gap-2 mb-3">
+                        <div className="a-tag-row" style={{ marginBottom: 8, marginTop: 6 }}>
                           {dynamicPresets.map((preset) =>
                       <button
                         key={preset.name}
@@ -350,7 +344,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                           setNewVitamin((prev) => ({ ...prev, name: preset.name, emoji: preset.emoji }));
                           setShowPresets(false);
                         }}
-                        className="px-3 py-1.5 rounded-full bg-muted/60 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors">
+                        className="a-tag">
                         
                               {preset.emoji} {preset.name}
                             </button>
@@ -363,7 +357,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
 
                 {/* Name */}
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1 block">{tr("vitamintracker_vitamin_adi_15e0a6", "Vitamin adı")}</label>
+                  <label className="a-stat-tile-label" style={{ display: 'block', marginBottom: 6 }}>{tr("vitamintracker_vitamin_adi_15e0a6", "Vitamin adı")}</label>
                   <div className="flex gap-2">
                     <button
                     onClick={() => {
@@ -371,7 +365,8 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                       const idx = emojis.indexOf(newVitamin.emoji);
                       setNewVitamin((prev) => ({ ...prev, emoji: emojis[(idx + 1) % emojis.length] }));
                     }}
-                    className="w-11 h-11 rounded-xl bg-muted/60 flex items-center justify-center text-xl flex-shrink-0">
+                    className="a-icon-btn flex-shrink-0"
+                    style={{ width: 44, height: 44, fontSize: 20 }}>
                     
                       {newVitamin.emoji}
                     </button>
@@ -379,35 +374,32 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                     value={newVitamin.name}
                     onChange={(e) => setNewVitamin((prev) => ({ ...prev, name: e.target.value }))}
                     placeholder={tr("vitamintracker_mes_folat_d_vitamini_6e4ad1", "Məs: Folat, D vitamini...")}
-                    className="flex-1 h-11 px-3 rounded-xl bg-muted/60 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20" />
+                    className="a-input flex-1" />
                   
                   </div>
                 </div>
 
                 {/* Time */}
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1 block">{tr("vitamintracker_qebul_saati_b569b1", "Qəbul saatı")}</label>
+                  <label className="a-stat-tile-label" style={{ display: 'block', marginBottom: 6 }}>{tr("vitamintracker_qebul_saati_b569b1", "Qəbul saatı")}</label>
                   <input
                   type="time"
                   value={newVitamin.time}
                   onChange={(e) => setNewVitamin((prev) => ({ ...prev, time: e.target.value }))}
-                  className="w-full h-11 px-3 rounded-xl bg-muted/60 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary/20" />
+                  className="a-input w-full" />
                 
                 </div>
 
                 {/* Days */}
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-2 block">{tr("vitamintracker_qebul_gunleri_5262ae", "Qəbul günləri")}</label>
-                  <div className="flex gap-1.5">
+                  <label className="a-stat-tile-label" style={{ display: 'block', marginBottom: 8 }}>{tr("vitamintracker_qebul_gunleri_5262ae", "Qəbul günləri")}</label>
+                  <div className="flex gap-1.5 justify-between">
                     {getDayLabels(language).map((label, idx) =>
                   <button
                     key={idx}
                     onClick={() => toggleDay(idx)}
-                    className={`flex-1 h-9 rounded-lg text-xs font-semibold transition-all ${
-                    newVitamin.days.includes(idx) ?
-                    'bg-primary text-primary-foreground' :
-                    'bg-muted/60 text-muted-foreground'}`
-                    }>
+                    className={`a-cal-day-circle${newVitamin.days.includes(idx) ? ' selected' : ''}`}
+                    style={{ cursor: 'pointer', border: 'none', fontSize: 10 }}>
                     
                         {label}
                       </button>
@@ -416,29 +408,35 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                 </div>
 
                 {/* Notification */}
-                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-xl">
+                <div className="a-stat-tile" style={{ justifyContent: 'space-between' }}>
                   <div className="flex items-center gap-2">
-                    <Bell className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium text-foreground">{tr("vitamintracker_xatirlatma_bildirisi_8da2b8", "Xatırlatma bildirişi")}</span>
+                    <Bell size={15} style={{ color: 'var(--a-peach-2)' }} />
+                    <span className="a-list-title" style={{ fontSize: 12.5 }}>{tr("vitamintracker_xatirlatma_bildirisi_8da2b8", "Xatırlatma bildirişi")}</span>
                   </div>
                   <button
                   onClick={() => setNewVitamin((prev) => ({ ...prev, notification: !prev.notification }))}
-                  className={`w-11 h-6 rounded-full transition-all ${newVitamin.notification ? 'bg-primary' : 'bg-muted'}`}>
+                  style={{ width: 44, height: 25, borderRadius: 999, border: 'none', cursor: 'pointer', transition: 'background 150ms ease', background: newVitamin.notification ? 'var(--a-peach-2)' : 'var(--a-line-strong)', position: 'relative' }}>
                   
-                    <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${newVitamin.notification ? 'translate-x-5.5' : 'translate-x-0.5'}`} />
+                    <div
+                    style={{
+                      position: 'absolute', top: 3, width: 19, height: 19, borderRadius: 999, background: '#fff',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)', transition: 'left 150ms ease',
+                      left: newVitamin.notification ? 22 : 3
+                    }} />
                   </button>
                 </div>
-                <p className="text-[10px] text-muted-foreground -mt-2 ml-1">
+                <p className="a-list-time" style={{ marginTop: -8, marginLeft: 4 }}>
                   {tr("vitamintracker_qebul_vaxtindan_5_deqiqe_evvel_023b26", "Q\u0259bul vaxt\u0131ndan 5 d\u0259qiq\u0259 \u0259vv\u0259l bildiri\u015F g\xF6nd\u0259ril\u0259c\u0259k")}
                 </p>
               </div>
 
               {/* Submit */}
-              <div className="p-5 pt-4 border-t border-border/50 bg-card rounded-b-3xl">
+              <div className="p-5 pt-4" style={{ borderTop: '1px solid var(--a-line)' }}>
                 <button
                 onClick={handleAdd}
                 disabled={addSchedule.isPending}
-                className="w-full h-12 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50">
+                className="a-btn-solid w-full"
+                style={{ justifyContent: 'center', padding: '13px 18px', opacity: addSchedule.isPending ? 0.5 : 1 }}>
                 
                   {addSchedule.isPending ? tr("vitamintracker_elave_edilir_3c28b4", "Əlavə edilir...") : tr("vitamintracker_vitamin_elave_et_ba4a9c", "Vitamin Əlavə Et")}
                 </button>
@@ -447,7 +445,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
           </motion.div>
         }
       </AnimatePresence>
-    </div>);
+    </ToolPage>);
 
 };
 

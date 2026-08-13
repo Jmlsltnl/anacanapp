@@ -258,6 +258,10 @@ serve(async (req) => {
       console.log(`Baby calculations: Sun=${babySun.signAz}, Moon=${babyMoon.signAz}, Rising=${babyRising?.signAz || 'N/A'}`);
     }
 
+    const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH' };
+    const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish' };
+    const outLang = OUT_LANG[language];
+
     // Build comprehensive AI prompt with accurate calculations
     const prompt = `Sən peşəkar astroloq və doğum xəritəsi mütəxəssisisən. Ailənin tam astroloji analizini Azərbaycan dilində hazırla.
 
@@ -336,7 +340,7 @@ ${dadSun ? `[Ana (${momSun.signAz}) və ata (${dadSun.signAz}) arasındakı kosm
 [3 rəqəm, bürclərin numeroloji dəyərlərinə əsasən]
 
 ## QEYDLƏR:
-- ${language === 'en' ? 'Write all SECTION CONTENT in ENGLISH. Keep the Azerbaijani section header keys (### ÜMUMI_UYĞUNLUQ_BALI, ### AÇAR_SÖZLƏR, ### ANA_ANALİZİ, etc.) EXACTLY as shown so the parser can read them. Only the body text under each header should be in English.' : 'Cavabı YALNIZ Azərbaycan dilində yaz'}
+- ${outLang ? `Write all SECTION CONTENT in ${outLang}. Keep the Azerbaijani section header keys (### ÜMUMI_UYĞUNLUQ_BALI, ### AÇAR_SÖZLƏR, ### ANA_ANALİZİ, etc.) EXACTLY as shown so the parser can read them. Only the body text under each header should be in ${OUT_LANG_NAME[language]}.` : 'Cavabı YALNIZ Azərbaycan dilində yaz'}
 - Pozitiv, dəstəkləyici və konstruktiv ton saxla
 - Dərəcələr mühümdür - 0-10° bürcün başlanğıcı, 20-30° bürcün sonu
 - Ay bürcü emosional xarakter üçün çox vacibdir

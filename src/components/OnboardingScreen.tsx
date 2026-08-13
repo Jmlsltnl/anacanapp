@@ -59,12 +59,12 @@ const OnboardingScreen = () => {
     const getStageText = (s: any, field: string) => {
       if (language === 'en' && s[field + '_en']) return s[field + '_en'];
       if (language === 'ru' && s[field + '_ru']) return s[field + '_ru'];
-      
+
       const fallback = getFallbackStages().find(fb => fb.stage_id === s.stage_id);
       if (fallback) {
         return fallback[`${field}_az` as keyof typeof fallback] || s[field + '_az'] || s[field];
       }
-      
+
       return s[field + '_az'] || s[field];
     };
 
@@ -98,12 +98,12 @@ const OnboardingScreen = () => {
     const getOptionLabel = (m: any) => {
       if (language === 'en' && m.label_en) return m.label_en;
       if (language === 'ru' && m.label_ru) return m.label_ru;
-      
+
       const fallback = getFallbackMultiples().find(fb => fb.option_id === m.option_id);
       if (fallback) {
         return fallback.label_az || m.label_az || m.label;
       }
-      
+
       return m.label_az || m.label;
     };
 
@@ -154,24 +154,24 @@ const OnboardingScreen = () => {
             if (error) {
               toast({
                 title: tr("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
-                description: tr("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi'),
+                description: tr("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi') + ((error as any)?.message ? ` (${String((error as any).message).slice(0, 140)})` : ''),
                 variant: 'destructive'
               });
               setIsSaving(false);
               return;
             }
 
-            // Also add child to user_children table
+            // Also add child to user_children table (idempotent — retry dublikat yaratmır)
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-              await supabase.from('user_children').insert({
+              await supabase.from('user_children').upsert({
                 user_id: user.id,
                 name: babyName,
                 birth_date: dateInput,
                 gender: babyGender,
                 avatar_emoji: babyGender === 'boy' ? '👦' : '👧',
                 sort_order: 0
-              });
+              }, { onConflict: 'user_id,name,birth_date', ignoreDuplicates: true });
             }
 
             // Update local store
@@ -207,7 +207,7 @@ const OnboardingScreen = () => {
             if (error) {
               toast({
                 title: tr("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
-                description: tr("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi'),
+                description: tr("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi') + ((error as any)?.message ? ` (${String((error as any).message).slice(0, 140)})` : ''),
                 variant: 'destructive'
               });
               setIsSaving(false);
@@ -243,7 +243,7 @@ const OnboardingScreen = () => {
             if (error) {
               toast({
                 title: tr("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
-                description: tr("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi'),
+                description: tr("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi') + ((error as any)?.message ? ` (${String((error as any).message).slice(0, 140)})` : ''),
                 variant: 'destructive'
               });
               setIsSaving(false);
@@ -301,47 +301,61 @@ const OnboardingScreen = () => {
     animate: { opacity: 1, y: 0 }
   };
 
+  const stepperBtnStyle: React.CSSProperties = {
+    width: 48, height: 48, borderRadius: 14,
+    background: 'var(--a-surface)', border: '1px solid var(--a-btn-border)',
+    boxShadow: '0 6px 14px -8px rgba(217, 108, 74, 0.35)',
+    color: 'var(--a-ink)', fontSize: 20, fontWeight: 700,
+    display: 'flex', alignItems: 'center', justifyContent: 'center'
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-background safe-top safe-bottom overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-1/4 -left-20 w-48 h-48 rounded-full bg-accent/5 blur-3xl" />
+    <div className="a-scope min-h-screen flex flex-col safe-top safe-bottom overflow-hidden" style={{ background: 'var(--a-bg)' }}>
+      {/* Watercolor sky */}
+      <div className="a-sky" aria-hidden>
+        <span className="a-cloud c1" />
+        <span className="a-cloud c2" />
+        <span className="a-cloud c3" />
+        <span className="a-cloud c4" />
       </div>
 
       {/* Header */}
-      <div className="relative px-5 py-5 flex items-center justify-between">
+      <div className="relative px-5 py-5 flex items-center justify-between z-10">
         {step > 0 ?
         <motion.button
           onClick={handleBack}
-          className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center"
+          className="a-icon-btn"
+          style={{ width: 44, height: 44 }}
           whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}>
-          
-            <ArrowLeft className="w-5 h-5 text-foreground" />
+          whileTap={{ scale: 0.95 }}
+          aria-label={tr("common_geri", "Geri")}>
+
+            <ArrowLeft size={18} strokeWidth={2} />
           </motion.button> :
 
-        <div className="w-12" />
+        <div className="w-11" />
         }
-        
+
         {/* Progress indicators */}
         <div className="flex gap-2">
           {[0, 1].map((i) =>
           <motion.div
             key={i}
-            className={`h-2 rounded-full transition-all duration-500 ${
-            i <= step ? 'bg-primary w-8' : 'bg-muted w-2'}`
-            }
+            className="h-2 rounded-full transition-all duration-500"
+            style={{
+              width: i <= step ? 32 : 8,
+              background: i <= step ? 'var(--a-peach-2)' : 'var(--a-chip-overlay)'
+            }}
             layout />
 
           )}
         </div>
-        
-        <div className="w-12" />
+
+        <div className="w-11" />
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-5 py-4 relative overflow-y-auto">
+      <div className="flex-1 px-5 py-4 relative overflow-y-auto z-10">
         <AnimatePresence mode="wait">
           {step === 0 &&
           <motion.div
@@ -350,35 +364,36 @@ const OnboardingScreen = () => {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="h-full flex flex-col">
-            
+            className="h-full flex flex-col max-w-md mx-auto w-full">
+
               {/* Header Content */}
               <motion.div
               className="text-center mb-8"
               variants={staggerChildren}
               initial="initial"
               animate="animate">
-              
+
                 <motion.div variants={childVariants} className="flex justify-center mb-4">
-                  <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center shadow-button">
-                    <Sparkles className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 flex items-center justify-center"
+                style={{ borderRadius: 20, background: 'var(--a-grad-peach)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.5)' }}>
+                    <Sparkles size={30} style={{ color: 'var(--a-accent-ink)' }} />
                   </div>
                 </motion.div>
-                <motion.h1 variants={childVariants} className="text-3xl font-black text-foreground">
-                  {tr("onboardingscreen_xos_geldiniz_078b52", "Xo\u015F g\u0259ldiniz!")} 
+                <motion.h1 variants={childVariants} style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--a-ink)' }}>
+                  {tr("onboardingscreen_xos_geldiniz_078b52", "Xo\u015F g\u0259ldiniz!")}
                 </motion.h1>
-                <motion.p variants={childVariants} className="text-muted-foreground mt-2 text-lg">
+                <motion.p variants={childVariants} style={{ fontSize: 16, color: 'var(--a-on-bg-soft)', marginTop: 6 }}>
                   {tr("onboardingscreen_hansi_merheledesiniz_4bc6be", "Hans\u0131 m\u0259rh\u0259l\u0259d\u0259siniz?")}
                 </motion.p>
               </motion.div>
 
               {/* Stage Selection */}
               <motion.div
-              className="space-y-4 flex-1"
+              className="space-y-3.5 flex-1"
               variants={staggerChildren}
               initial="initial"
               animate="animate">
-              
+
                 {stages.map((stage, index) => {
                 const Icon = stage.icon;
                 const isSelected = selectedStage === stage.id;
@@ -388,14 +403,21 @@ const OnboardingScreen = () => {
                     key={stage.id}
                     variants={childVariants}
                     onClick={() => handleStageSelect(stage.id)}
-                    className={`w-full p-5 rounded-3xl text-left transition-all duration-300 relative overflow-hidden ${
+                    className={`w-full text-left transition-all duration-300 relative overflow-hidden ${
                     isSelected ?
-                    `bg-gradient-to-r ${stage.bgGradient} text-white shadow-elevated` :
-                    'bg-card border-2 border-border hover:border-primary/20 hover:shadow-card'}`
+                    `bg-gradient-to-r ${stage.bgGradient} text-white` :
+                    ''}`
                     }
+                    style={{
+                      padding: 18,
+                      borderRadius: 24,
+                      background: isSelected ? undefined : 'var(--a-surface)',
+                      border: isSelected ? '2px solid transparent' : '2px solid transparent',
+                      boxShadow: isSelected ? '0 20px 40px -16px rgba(0,0,0,0.25)' : 'var(--a-card-shadow)'
+                    }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}>
-                    
+
                       {isSelected &&
                     <motion.div
                       className="absolute inset-0 bg-white/10"
@@ -404,18 +426,17 @@ const OnboardingScreen = () => {
                       transition={{ duration: 1, repeat: Infinity, repeatDelay: 1 }} />
 
                     }
-                      
+
                       <div className="flex items-center gap-4 relative z-10">
-                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl ${
-                      isSelected ? 'bg-white/20' : 'bg-muted'}`
-                      }>
+                        <div className="w-14 h-14 flex items-center justify-center text-3xl shrink-0"
+                      style={{ borderRadius: 18, background: isSelected ? 'rgba(255,255,255,0.22)' : 'var(--a-surface-soft)' }}>
                           {stage.emoji}
                         </div>
-                        <div className="flex-1">
-                          <h3 className={`font-bold text-lg ${isSelected ? 'text-white' : 'text-foreground'}`}>
+                        <div className="flex-1 min-w-0">
+                          <h3 style={{ fontSize: 16.5, fontWeight: 800, letterSpacing: '-0.01em', color: isSelected ? '#ffffff' : 'var(--a-ink)' }}>
                             {stage.title}
                           </h3>
-                          <p className={`text-sm mt-0.5 ${isSelected ? 'text-white/80' : 'text-muted-foreground'}`}>
+                          <p style={{ fontSize: 12.5, marginTop: 2, color: isSelected ? 'rgba(255,255,255,0.85)' : 'var(--a-ink-soft)' }}>
                             {stage.description}
                           </p>
                         </div>
@@ -423,9 +444,10 @@ const OnboardingScreen = () => {
                       <motion.div
                         initial={{ scale: 0, rotate: -180 }}
                         animate={{ scale: 1, rotate: 0 }}
-                        className="w-10 h-10 rounded-xl bg-white/25 flex items-center justify-center">
-                        
-                            <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                        className="w-9 h-9 flex items-center justify-center shrink-0"
+                        style={{ borderRadius: 12, background: 'rgba(255,255,255,0.28)' }}>
+
+                            <Check className="w-5 h-5 text-white" strokeWidth={3} />
                           </motion.div>
                       }
                       </div>
@@ -443,25 +465,26 @@ const OnboardingScreen = () => {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="h-full flex flex-col">
-            
+            className="h-full flex flex-col max-w-md mx-auto w-full">
+
               <motion.div
               className="text-center mb-6"
               variants={staggerChildren}
               initial="initial"
               animate="animate">
-              
+
                 <motion.div variants={childVariants} className="flex justify-center mb-4">
                   <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${
-                stages.find((s) => s.id === selectedStage)?.bgGradient} flex items-center justify-center text-3xl shadow-button`
-                }>
+                stages.find((s) => s.id === selectedStage)?.bgGradient} flex items-center justify-center text-3xl`
+                }
+                style={{ boxShadow: '0 14px 28px -12px rgba(0,0,0,0.3)' }}>
                     {stages.find((s) => s.id === selectedStage)?.emoji}
                   </div>
                 </motion.div>
-                <motion.h1 variants={childVariants} className="text-2xl font-black text-foreground">
+                <motion.h1 variants={childVariants} style={{ fontSize: 23, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--a-ink)' }}>
                   {selectedStage === 'mommy' ? tr("onboardingscreen_korpeniz_haqqinda_dc65a9", "K\xF6rp\u0259niz haqq\u0131nda") : selectedStage === 'bump' ? tr("onboardingscreen_hamilelik_melumatlari_12e64d", "Hamil\u0259lik m\u0259lumatlar\u0131") : tr("onboardingscreen_son_dovr_tarixi_4dc91e", "Son d\xF6vr tarixi")}
                 </motion.h1>
-                <motion.p variants={childVariants} className="text-muted-foreground mt-2">
+                <motion.p variants={childVariants} style={{ fontSize: 13.5, color: 'var(--a-on-bg-soft)', marginTop: 6 }}>
                   {selectedStage === 'mommy' ? tr("onboardingscreen_korpenizin_melumatlarini_daxil_6e20d3", "K\xF6rp\u0259nizin m\u0259lumatlar\u0131n\u0131 daxil edin") :
 
                 selectedStage === 'bump' ? tr("onboardingscreen_hamilelik_melumatlarinizi_daxi_c132dd", "Hamil\u0259lik m\u0259lumatlar\u0131n\u0131z\u0131 daxil edin") : tr("onboardingscreen_son_dovrunuz_ne_vaxt_basladi_9bc1c3", "Son d\xF6vr\xFCn\xFCz n\u0259 vaxt ba\u015Flad\u0131?")
@@ -476,11 +499,11 @@ const OnboardingScreen = () => {
               variants={staggerChildren}
               initial="initial"
               animate="animate">
-              
+
                 {/* Multiples selection for bump and mommy stages */}
                 {(selectedStage === 'bump' || selectedStage === 'mommy') &&
               <motion.div variants={childVariants}>
-                    <label className="text-xs font-bold text-foreground mb-2 flex items-center gap-1.5">
+                    <label className="mb-2 flex items-center gap-1.5" style={{ fontSize: 12, fontWeight: 700, color: 'var(--a-ink)' }}>
                       <Users className="w-3.5 h-3.5" />
                       {tr("onboardingscreen_usaq_sayi_04c015", "Uşaq sayı")}
                     </label>
@@ -489,16 +512,21 @@ const OnboardingScreen = () => {
                   <motion.button
                     key={option.id}
                     onClick={() => handleMultiplesSelect(option.id as any, option.babyCount)}
-                    className={`p-2.5 rounded-xl font-bold transition-all flex flex-col items-center gap-1 ${
-                    multiplesType === option.id ?
-                    'bg-primary text-primary-foreground shadow-sm' :
-                    'bg-muted text-muted-foreground hover:bg-muted/80'}`
-                    }
+                    className="flex flex-col items-center gap-1 transition-all"
+                    style={{
+                      padding: '10px 8px',
+                      borderRadius: 14,
+                      fontWeight: 700,
+                      background: multiplesType === option.id ? 'var(--a-peach-1)' : 'var(--a-surface)',
+                      color: multiplesType === option.id ? 'var(--a-accent-ink)' : 'var(--a-ink-soft)',
+                      border: multiplesType === option.id ? '1.5px solid var(--a-peach-2)' : '1.5px solid transparent',
+                      boxShadow: multiplesType === option.id ? 'none' : 'var(--a-card-shadow)'
+                    }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}>
-                    
+
                           <span className="text-xl">{option.emoji}</span>
-                          <span className="text-xs">{option.label}</span>
+                          <span style={{ fontSize: 11.5 }}>{option.label}</span>
                         </motion.button>
                   )}
                     </div>
@@ -508,7 +536,7 @@ const OnboardingScreen = () => {
                 {selectedStage === 'mommy' &&
               <>
                     <motion.div variants={childVariants}>
-                      <label className="text-xs font-bold text-foreground mb-2 block">
+                      <label className="mb-2 block" style={{ fontSize: 12, fontWeight: 700, color: 'var(--a-ink)' }}>
                         {babyCount > 1 ? tr("onboardingscreen_korpelerinizin_adlari_vergulle_96665e", "Körpələrinizin adları (vergüllə ayırın)") : tr("onboardingscreen_korpenizin_adi_10b2c3", "Körpənizin adı")}
                       </label>
                       <Input
@@ -516,30 +544,35 @@ const OnboardingScreen = () => {
                     placeholder={babyCount > 1 ? tr("onboardingscreen_eli_veli_e76548", "Əli, Vəli") : tr("common_ad_placeholder", "Ad")}
                     value={babyName}
                     onChange={(e) => setBabyName(e.target.value)}
-                    className="h-11 rounded-xl bg-muted/50 border border-transparent focus:border-primary/30 text-sm px-4" />
-                  
+                    className="h-11 rounded-xl border border-transparent text-sm px-4 bg-[var(--a-surface)] text-[var(--a-ink)] focus:border-[var(--a-peach-2)] focus-visible:ring-0"
+                    style={{ boxShadow: 'var(--a-card-shadow)' }} />
+
                     </motion.div>
 
                     <motion.div variants={childVariants}>
-                      <label className="text-xs font-bold text-foreground mb-2 block">{tr("untranslated_cinsi_az7fty", "Cinsi")}</label>
+                      <label className="mb-2 block" style={{ fontSize: 12, fontWeight: 700, color: 'var(--a-ink)' }}>{tr("untranslated_cinsi_az7fty", "Cinsi")}</label>
                       <div className="flex gap-2">
                         {[
-                    { id: 'boy', label: tr("onboardingscreen_oglan_e9715e", 'Oğlan'), emoji: '👦', gradient: 'from-blue-500 to-indigo-600' },
-                    { id: 'girl', label: tr("onboardingscreen_qiz_79bf6b", 'Qız'), emoji: '👧', gradient: 'from-pink-500 to-rose-600' }].
+                    { id: 'boy', label: tr("onboardingscreen_oglan_e9715e", 'Oğlan'), emoji: '👦', bg: 'var(--a-blue-2)' },
+                    { id: 'girl', label: tr("onboardingscreen_qiz_79bf6b", 'Qız'), emoji: '👧', bg: 'var(--a-pink-2)' }].
                     map((g) =>
                     <motion.button
                       key={g.id}
                       onClick={() => setBabyGender(g.id as 'boy' | 'girl')}
-                      className={`flex-1 p-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
-                      babyGender === g.id ?
-                      `bg-gradient-to-r ${g.gradient} text-white shadow-sm` :
-                      'bg-muted text-muted-foreground hover:bg-muted/80'}`
-                      }
+                      className="flex-1 flex items-center justify-center gap-2 transition-all"
+                      style={{
+                        padding: 13,
+                        borderRadius: 14,
+                        fontWeight: 700,
+                        background: babyGender === g.id ? g.bg : 'var(--a-surface)',
+                        color: babyGender === g.id ? '#ffffff' : 'var(--a-ink-soft)',
+                        boxShadow: babyGender === g.id ? '0 10px 20px -10px rgba(0,0,0,0.3)' : 'var(--a-card-shadow)'
+                      }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}>
-                      
+
                             <span className="text-xl">{g.emoji}</span>
-                            <span className="text-sm">{g.label}</span>
+                            <span style={{ fontSize: 13 }}>{g.label}</span>
                           </motion.button>
                     )}
                       </div>
@@ -551,7 +584,7 @@ const OnboardingScreen = () => {
                 {selectedStage === 'flow' &&
               <>
                     <motion.div variants={childVariants}>
-                      <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                      <label className="mb-3 flex items-center gap-2" style={{ fontSize: 13, fontWeight: 700, color: 'var(--a-ink)' }}>
                         <Calendar className="w-4 h-4" />
                         {tr("onboardingscreen_tsikl_uzunlugu_gun_642d20", "Tsikl uzunlu\u011Fu (g\xFCn)")}
                       </label>
@@ -559,31 +592,31 @@ const OnboardingScreen = () => {
                         <motion.button
                       type="button"
                       onClick={() => setCycleLength(Math.max(10, cycleLength - 1))}
-                      className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                      style={stepperBtnStyle}
                       whileTap={{ scale: 0.95 }}>
-                      
+
                           -
                         </motion.button>
-                        <div className="flex-1 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
-                          <span className="text-2xl font-bold text-foreground">{cycleLength}</span>
-                          <span className="text-muted-foreground ml-2">{tr("onboardingscreen_gun_54e78d", "gün")}</span>
+                        <div className="flex-1 h-14 flex items-center justify-center" style={{ borderRadius: 18, background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)' }}>
+                          <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--a-ink)' }}>{cycleLength}</span>
+                          <span className="ml-2" style={{ color: 'var(--a-ink-soft)' }}>{tr("onboardingscreen_gun_54e78d", "gün")}</span>
                         </div>
                         <motion.button
                       type="button"
                       onClick={() => setCycleLength(Math.min(50, cycleLength + 1))}
-                      className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                      style={stepperBtnStyle}
                       whileTap={{ scale: 0.95 }}>
-                      
+
                           +
                         </motion.button>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                      <p className="mt-2 text-center" style={{ fontSize: 11.5, color: 'var(--a-on-bg-soft)' }}>
                         {tr("onboardingscreen_araliq_10_50_gun_normal_21_35__e2832f", "Aral\u0131q: 10-50 g\xFCn (normal: 21-35 g\xFCn)")}
                       </p>
                     </motion.div>
 
                     <motion.div variants={childVariants}>
-                      <label className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+                      <label className="mb-3 flex items-center gap-2" style={{ fontSize: 13, fontWeight: 700, color: 'var(--a-ink)' }}>
                         <Droplets className="w-4 h-4" />
                         {tr("onboardingscreen_period_uzunlugu_gun_a77b92", "Period uzunlu\u011Fu (g\xFCn)")}
                       </label>
@@ -591,25 +624,25 @@ const OnboardingScreen = () => {
                         <motion.button
                       type="button"
                       onClick={() => setPeriodLength(Math.max(2, periodLength - 1))}
-                      className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                      style={stepperBtnStyle}
                       whileTap={{ scale: 0.95 }}>
-                      
+
                           -
                         </motion.button>
-                        <div className="flex-1 h-14 rounded-2xl bg-muted/50 flex items-center justify-center">
-                          <span className="text-2xl font-bold text-foreground">{periodLength}</span>
-                          <span className="text-muted-foreground ml-2">{tr("onboardingscreen_gun_54e78d", "gün")}</span>
+                        <div className="flex-1 h-14 flex items-center justify-center" style={{ borderRadius: 18, background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)' }}>
+                          <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--a-ink)' }}>{periodLength}</span>
+                          <span className="ml-2" style={{ color: 'var(--a-ink-soft)' }}>{tr("onboardingscreen_gun_54e78d", "gün")}</span>
                         </div>
                         <motion.button
                       type="button"
                       onClick={() => setPeriodLength(Math.min(10, periodLength + 1))}
-                      className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold"
+                      style={stepperBtnStyle}
                       whileTap={{ scale: 0.95 }}>
-                      
+
                           +
                         </motion.button>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                      <p className="mt-2 text-center" style={{ fontSize: 11.5, color: 'var(--a-on-bg-soft)' }}>
                         {tr("onboardingscreen_normal_araliq_3_7_gun_167ed7", "Normal aral\u0131q: 3-7 g\xFCn")}
                       </p>
                     </motion.div>
@@ -617,16 +650,17 @@ const OnboardingScreen = () => {
               }
 
                 <motion.div variants={childVariants}>
-                  <label className="text-sm font-bold text-foreground mb-3 block">
+                  <label className="mb-3 block" style={{ fontSize: 13, fontWeight: 700, color: 'var(--a-ink)' }}>
                     {selectedStage === 'mommy' ? tr("onboardingscreen_dogum_tarixi_d96907", "Do\u011Fum tarixi") : selectedStage === 'bump' ? tr("onboardingscreen_son_menstruasiya_tarixi_9f3b8a", "Son menstruasiya tarixi") : tr("onboardingscreen_son_dovr_tarixi_4dc91e", "Son d\xF6vr tarixi")}
                   </label>
                   <Input
                   type="date"
                   value={dateInput}
                   onChange={(e) => setDateInput(e.target.value)}
-                  className="h-14 rounded-2xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-lg px-5"
+                  className="h-14 rounded-2xl border-2 border-transparent text-lg px-5 bg-[var(--a-surface)] text-[var(--a-ink)] focus:border-[var(--a-peach-2)] focus-visible:ring-0"
+                  style={{ boxShadow: 'var(--a-card-shadow)' }}
                   max={new Date().toISOString().split('T')[0]} />
-                
+
                 </motion.div>
               </motion.div>
             </motion.div>
@@ -635,7 +669,7 @@ const OnboardingScreen = () => {
       </div>
 
       {/* Footer */}
-      <div className="px-5 pb-8 pt-4">
+      <div className="px-5 pb-8 pt-4 relative z-10 max-w-md mx-auto w-full">
         <Button
           onClick={handleNext}
           disabled={
@@ -644,8 +678,9 @@ const OnboardingScreen = () => {
           step === 1 && !dateInput ||
           step === 1 && selectedStage === 'mommy' && (!babyName || !babyGender)
           }
-          className="w-full h-16 rounded-2xl gradient-primary text-white font-bold text-lg shadow-button hover:shadow-glow transition-all duration-300 disabled:opacity-50 disabled:shadow-none">
-          
+          className="w-full h-14 rounded-full text-white font-bold text-lg border-0 transition-all duration-300 disabled:opacity-50 disabled:shadow-none hover:opacity-95"
+          style={{ background: 'var(--a-peach-2)', boxShadow: '0 18px 36px -12px rgba(217, 108, 74, 0.6)' }}>
+
           <span className="flex items-center gap-2">
             {isSaving ?
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> :
@@ -655,7 +690,7 @@ const OnboardingScreen = () => {
                 <motion.div
                 animate={{ x: [0, 5, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}>
-                
+
                   <ArrowRight className="w-6 h-6" />
                 </motion.div>
               </>

@@ -63,6 +63,7 @@ import AdminEpoint from './admin/AdminEpoint';
 import AdminForceUpdate from './admin/AdminForceUpdate';
 import AdminLanguages from './admin/AdminLanguages';
 import AdminTranslations from './admin/AdminTranslations';
+import AdminContentTranslations from './admin/AdminContentTranslations';
 import AdminDeeplinks from './admin/AdminDeeplinks';
 import AdminCrashReports from './admin/AdminCrashReports';
 import AdminPartnerVenues from './admin/AdminPartnerVenues';
@@ -205,6 +206,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminLanguages />;
       case 'translations':
         return <AdminTranslations />;
+      case 'content-i18n':
+        return <AdminContentTranslations />;
       case 'deeplinks':
         return <AdminDeeplinks />;
       case 'crash-reports':

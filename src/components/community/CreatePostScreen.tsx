@@ -1,11 +1,9 @@
 import { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArrowLeft, Image, Video, Send, Loader2, Play, Smile, Hash, AtSign, EyeOff, X } from 'lucide-react';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
 import { CommunityGroup, useCreatePost } from '@/hooks/useCommunity';
-import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
@@ -172,140 +170,154 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
   const canSubmit = (content.trim() || mediaFiles.length > 0) && !isUploading && !createPost.isPending;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/70 backdrop-blur-3xl border-b border-border/10">
-        <div className="flex items-center justify-between px-4 py-3">
-          <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted/40 flex items-center justify-center" whileTap={{ scale: 0.9 }}>
-            <ArrowLeft className="w-4 h-4 text-foreground" />
-          </motion.button>
-          <h1 className="text-[15px] font-black text-foreground">{tr("createpostscreen_yeni_paylasim_4f5b15", "Yeni Paylaşım")}</h1>
-          <Button
-            onClick={handleSubmit}
-            disabled={!canSubmit}
-            size="sm"
-            className="h-8 px-4 rounded-full gradient-primary text-[12px] font-bold shadow-sm shadow-primary/20 disabled:opacity-40">
-            
-            {isUploading || createPost.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <><Send className="w-3.5 h-3.5 mr-1" />{tr("createpostscreen_paylas_b4be3b", "Paylaş")}</>}
-          </Button>
-        </div>
-      </div>
+    <div className="a-scope min-h-screen flex flex-col" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-shell flex-1 flex flex-col">
+        {/* Top bar */}
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
+              <ArrowLeft size={16} strokeWidth={2} />
+            </motion.button>
+            <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("createpostscreen_yeni_paylasim_4f5b15", "Yeni Paylaşım")}</p>
+          </div>
+          <div className="a-topbar-actions">
+            <motion.button
+              onClick={handleSubmit}
+              disabled={!canSubmit}
+              className="a-btn-solid disabled:opacity-40"
+              whileTap={canSubmit ? { scale: 0.95 } : undefined}>
+              {isUploading || createPost.isPending ?
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> :
+              <><Send size={13} />{tr("createpostscreen_paylas_b4be3b", "Paylaş")}</>}
+            </motion.button>
+          </div>
+        </header>
 
-      {/* Content */}
-      <div className="flex-1 px-4 py-4 space-y-4 pb-32">
-        {/* Group Selector removed as per request */}
+        {/* Content */}
+        <div className="flex-1 space-y-4 pb-32">
+          {/* Content textarea — white card */}
+          <div className="relative">
+            <div className="a-card" style={{ padding: 6 }}>
+              <Textarea
+                ref={textareaRef}
+                value={content}
+                onChange={handleContentChange}
+                placeholder={tr("createpostscreen_ne_dusunursunuz_474859", "Nə düşünürsünüz? ✨")}
+                className="min-h-[180px] resize-none border-0 bg-transparent shadow-none focus-visible:ring-0 pr-12 leading-relaxed"
+                style={{ fontSize: 14, color: 'var(--a-ink)' }}
+                autoFocus />
 
-        {/* Content textarea */}
-        <div className="relative">
-          <Textarea
-            ref={textareaRef}
-            value={content}
-            onChange={handleContentChange}
-            placeholder={tr("createpostscreen_ne_dusunursunuz_474859", "Nə düşünürsünüz? ✨")}
-            className="min-h-[180px] rounded-2xl resize-none text-[14px] bg-muted/8 border-border/10 focus:border-primary/20 pr-12 leading-relaxed"
-            autoFocus />
-          
-          <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
-            <PopoverTrigger asChild>
-              <button type="button" className="absolute right-3 top-3 w-8 h-8 rounded-full bg-muted/30 hover:bg-muted/50 flex items-center justify-center transition-colors">
-                <Smile className="w-4 h-4 text-muted-foreground/50" />
+              <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+                <PopoverTrigger asChild>
+                  <button type="button" className="absolute right-4 top-4 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                  style={{ background: 'var(--a-surface-soft)' }} aria-label="Emoji">
+                    <Smile size={16} style={{ color: 'var(--a-ink-soft)' }} />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 border-0" align="end" side="top">
+                  <EmojiPicker onEmojiClick={handleEmojiSelect} theme={theme === 'dark' ? Theme.DARK : Theme.LIGHT} width={300} height={350} searchPlaceholder={tr("community_emoji_axtar_placeholder_f123bc", "Emoji axtar...")} previewConfig={{ showPreview: false }} />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {showSuggestions && suggestions.length > 0 &&
+            <div className="absolute left-0 right-0 top-full mt-1 z-50 overflow-hidden"
+            style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', borderRadius: 18, boxShadow: 'var(--a-card-shadow)' }}>
+                {suggestions.map((suggestion, index) =>
+              <button key={`${suggestion.type}-${suggestion.value}-${index}`} onClick={() => applySuggestion(suggestion)}
+              className="w-full px-4 py-2.5 flex items-center gap-3 text-left transition-colors"
+              style={{ borderBottom: index < suggestions.length - 1 ? '1px solid var(--a-line)' : 'none' }}>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center overflow-hidden shrink-0" style={{ background: 'var(--a-peach-1)' }}>
+                      {suggestion.type === 'user' && suggestion.avatar ?
+                  <img src={suggestion.avatar} alt="" className="w-full h-full object-cover" /> :
+                  suggestion.type === 'user' ?
+                  <AtSign size={13} style={{ color: 'var(--a-accent-ink)' }} /> :
+
+                  <Hash size={13} style={{ color: 'var(--a-accent-ink)' }} />
+                  }
+                    </div>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--a-ink)' }}>{suggestion.type === 'hashtag' ? '#' : '@'}{suggestion.value}</span>
+                  </button>
+              )}
+              </div>
+            }
+          </div>
+
+          {/* Quick Hashtags */}
+          <div className="flex flex-wrap gap-1.5">
+            {POPULAR_HASHTAGS.slice(0, 6).map((tag) =>
+            <button key={tag} onClick={() => setContent((prev) => prev + (prev ? ' ' : '') + `#${tag}`)} className="a-tag">
+                #{tag}
               </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 border-0" align="end" side="top">
-              <EmojiPicker onEmojiClick={handleEmojiSelect} theme={theme === 'dark' ? Theme.DARK : Theme.LIGHT} width={300} height={350} searchPlaceholder={tr("community_emoji_axtar_placeholder_f123bc", "Emoji axtar...")} previewConfig={{ showPreview: false }} />
-            </PopoverContent>
-          </Popover>
+            )}
+          </div>
 
-          {showSuggestions && suggestions.length > 0 &&
-          <div className="absolute left-0 right-0 top-full mt-1 bg-popover border border-border/15 rounded-2xl shadow-lg z-50 overflow-hidden">
-              {suggestions.map((suggestion, index) =>
-            <button key={`${suggestion.type}-${suggestion.value}-${index}`} onClick={() => applySuggestion(suggestion)}
-            className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left">
-                  <div className="w-7 h-7 rounded-full bg-primary/8 flex items-center justify-center overflow-hidden">
-                    {suggestion.type === 'user' && suggestion.avatar ?
-                <img src={suggestion.avatar} alt="" className="w-full h-full object-cover" /> :
-                suggestion.type === 'user' ?
-                <AtSign className="w-3.5 h-3.5 text-primary" /> :
+          {/* Media Previews */}
+          {mediaPreviews.length > 0 &&
+          <div className="grid grid-cols-2 gap-2">
+              {mediaPreviews.map((preview, index) =>
+            <div key={index} className="relative aspect-square overflow-hidden" style={{ borderRadius: 18, background: 'var(--a-surface-soft)' }}>
+                  {preview.type === 'video' ?
+              <div className="relative w-full h-full">
+                      <video src={preview.url} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"><Play className="w-5 h-5 ml-0.5" style={{ color: 'var(--a-ink)' }} /></div>
+                      </div>
+                    </div> :
 
-                <Hash className="w-3.5 h-3.5 text-primary" />
-                }
-                  </div>
-                  <span className="font-medium text-[12px]">{suggestion.type === 'hashtag' ? '#' : '@'}{suggestion.value}</span>
-                </button>
+              <img src={preview.url} alt="" className="w-full h-full object-cover" />
+              }
+                  <button onClick={() => removeMedia(index)} className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
+                    <X className="w-3 h-3 text-white" />
+                  </button>
+                </div>
             )}
             </div>
           }
-        </div>
 
-        {/* Quick Hashtags */}
-        <div className="flex flex-wrap gap-1.5">
-          {POPULAR_HASHTAGS.slice(0, 6).map((tag) =>
-          <button key={tag} onClick={() => setContent((prev) => prev + (prev ? ' ' : '') + `#${tag}`)}
-          className="px-2.5 py-1 rounded-full bg-muted/15 text-[10px] font-bold text-muted-foreground/50 hover:bg-primary/8 hover:text-primary transition-colors">
-              #{tag}
+          <input ref={imageInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFileSelect(e, 'image')} />
+          <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={(e) => handleFileSelect(e, 'video')} />
+
+          {/* Media Actions */}
+          <div className="flex items-center gap-3">
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr("createpostscreen_elave_et_81035a", "Əlavə et:")}</span>
+            <button onClick={() => imageInputRef.current?.click()} disabled={mediaFiles.length >= 4 || isUploading}
+            className="a-icon-btn disabled:opacity-40" style={{ width: 40, height: 40 }} aria-label={tr("directmessagescreen_sekil_43e2e3", "Şəkil")}>
+              <Image size={17} style={{ color: 'var(--a-accent-ink)' }} />
             </button>
-          )}
-        </div>
-
-        {/* Media Previews */}
-        {mediaPreviews.length > 0 &&
-        <div className="grid grid-cols-2 gap-2">
-            {mediaPreviews.map((preview, index) =>
-          <div key={index} className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
-                {preview.type === 'video' ?
-            <div className="relative w-full h-full">
-                    <video src={preview.url} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                      <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"><Play className="w-5 h-5 text-foreground ml-0.5" /></div>
-                    </div>
-                  </div> :
-
-            <img src={preview.url} alt="" className="w-full h-full object-cover" />
-            }
-                <button onClick={() => removeMedia(index)} className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
-                  <X className="w-3 h-3 text-white" />
-                </button>
-              </div>
-          )}
+            <button onClick={() => videoInputRef.current?.click()} disabled={mediaFiles.length >= 4 || isUploading}
+            className="a-icon-btn disabled:opacity-40" style={{ width: 40, height: 40 }} aria-label="Video">
+              <Video size={17} style={{ color: 'var(--a-blue-ink)' }} />
+            </button>
+            {mediaFiles.length > 0 && <span className="ml-auto" style={{ fontSize: 10, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{mediaFiles.length}/4</span>}
           </div>
-        }
 
-        <input ref={imageInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFileSelect(e, 'image')} />
-        <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={(e) => handleFileSelect(e, 'video')} />
+          {/* Anonymous Toggle */}
+          <button
+            type="button"
+            onClick={() => setIsAnonymous(!isAnonymous)}
+            className="w-full flex items-center gap-3 transition-all"
+            style={{
+              background: 'var(--a-surface)',
+              borderRadius: 'var(--a-radius-md)',
+              padding: '14px 16px',
+              boxShadow: 'var(--a-card-shadow)',
+              border: isAnonymous ? '1.5px solid var(--a-lav-2)' : '1.5px solid transparent'
+            }}>
 
-        {/* Media Actions */}
-        <div className="flex items-center gap-3">
-          <span className="text-[11px] text-muted-foreground/40 font-medium">{tr("createpostscreen_elave_et_81035a", "Əlavə et:")}</span>
-          <button onClick={() => imageInputRef.current?.click()} disabled={mediaFiles.length >= 4 || isUploading}
-          className="w-10 h-10 rounded-full bg-primary/6 flex items-center justify-center disabled:opacity-40 transition-colors active:bg-primary/12">
-            <Image className="w-4.5 h-4.5 text-primary/60" />
+            <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+            style={{ background: isAnonymous ? 'var(--a-lav-1)' : 'var(--a-surface-soft)' }}>
+              <EyeOff size={16} style={{ color: isAnonymous ? 'var(--a-lav-ink)' : 'var(--a-ink-soft)' }} />
+            </div>
+            <div className="flex-1 text-left">
+              <p style={{ fontSize: 12.5, fontWeight: 700, color: isAnonymous ? 'var(--a-lav-ink)' : 'var(--a-ink)' }}>{tr("createpostscreen_anonim_paylas_6074c9", "Anonim paylaş")}</p>
+              <p style={{ fontSize: 10.5, color: 'var(--a-ink-soft)' }}>{tr("createpostscreen_adiniz_ve_sekliniz_gizledilir_6fc767", "Adınız və şəkliniz gizlədilir")}</p>
+            </div>
+            <div className="w-10 h-6 rounded-full transition-colors shrink-0" style={{ background: isAnonymous ? 'var(--a-lav-2)' : 'var(--a-line-strong)' }}>
+              <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'ml-[18px]' : 'ml-0.5'}`} />
+            </div>
           </button>
-          <button onClick={() => videoInputRef.current?.click()} disabled={mediaFiles.length >= 4 || isUploading}
-          className="w-10 h-10 rounded-full bg-blue-500/6 flex items-center justify-center disabled:opacity-40 transition-colors active:bg-blue-500/12">
-            <Video className="w-4.5 h-4.5 text-blue-500/60" />
-          </button>
-          {mediaFiles.length > 0 && <span className="text-[10px] text-muted-foreground/35 font-medium ml-auto">{mediaFiles.length}/4</span>}
         </div>
-
-        {/* Anonymous Toggle */}
-        <button
-          type="button"
-          onClick={() => setIsAnonymous(!isAnonymous)}
-          className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all ${
-          isAnonymous ? 'bg-primary/8 border border-primary/20' : 'bg-muted/10 border border-border/10'}`
-          }>
-          
-          <div className={`w-9 h-9 rounded-full flex items-center justify-center ${isAnonymous ? 'bg-primary text-primary-foreground' : 'bg-muted/40 text-muted-foreground/50'}`}>
-            <EyeOff className="w-4 h-4" />
-          </div>
-          <div className="flex-1 text-left">
-            <p className={`text-[12px] font-bold ${isAnonymous ? 'text-primary' : 'text-foreground'}`}>{tr("createpostscreen_anonim_paylas_6074c9", "Anonim paylaş")}</p>
-            <p className="text-[10px] text-muted-foreground/40">{tr("createpostscreen_adiniz_ve_sekliniz_gizledilir_6fc767", "Adınız və şəkliniz gizlədilir")}</p>
-          </div>
-          <div className={`w-10 h-6 rounded-full transition-colors ${isAnonymous ? 'bg-primary' : 'bg-border/50'}`}>
-            <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'ml-[18px]' : 'ml-0.5'}`} />
-          </div>
-        </button>
       </div>
     </div>);
 

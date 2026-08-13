@@ -70,6 +70,13 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
     return Math.min(100, (currentWeekInCrisis / totalWeeks) * 100);
   };
 
+  // anacan-demo rank-tag class per severity
+  const severityTagClass = (severity: string) => {
+    if (severity === 'intense') return 'intensive';
+    if (severity === 'medium') return 'medium';
+    return 'mild';
+  };
+
   return (
     <>
       <motion.div
@@ -77,49 +84,59 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.35 }}
       >
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading">{tr("babycrisiswidget_kriz_teqvimi_aa2ea5", "Kriz Təqvimi")}</h2>
+          <span className="a-section-link">
+            {isInCrisis
+              ? tr('babycrisiswidget_active_crisis', 'Aktiv Kriz Dövrü')
+              : upcomingCrises.length > 0
+                ? tr('babycrisiswidget_next_week', 'Növbəti: {n}. həftə').replace('{n}', String(upcomingCrises[0].week_start))
+                : tr('babycrisiswidget_no_upcoming', 'Yaxınlaşan kriz yoxdur')}
+          </span>
+        </div>
         {isInCrisis ? (
           // Active Crisis Alert Card
           <motion.div
-            className={`rounded-2xl p-4 shadow-card border ${getSeverityConfig(currentCrisis.severity).borderColor} ${getSeverityConfig(currentCrisis.severity).bgColor}`}
+            className="a-card a-fade-in"
+            style={{ cursor: 'pointer' }}
             onClick={openFullCalendar}
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <motion.div 
-                  className={`w-10 h-10 rounded-xl bg-gradient-to-br ${getSeverityConfig(currentCrisis.severity).color} flex items-center justify-center text-xl`}
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  {currentCrisis.emoji}
-                </motion.div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <AlertTriangle className={`w-3.5 h-3.5 ${getSeverityConfig(currentCrisis.severity).textColor}`} />
-                    <span className={`text-xs font-bold uppercase tracking-wide ${getSeverityConfig(currentCrisis.severity).textColor}`}>
-                      {tr('babycrisiswidget_active_crisis','Aktiv Kriz Dövrü')}
-                    </span>
-                  </div>
-                  <h3 className="font-bold text-foreground mt-0.5">
-                    {currentCrisis.title || currentCrisis.title}
-                  </h3>
-                </div>
+            <div className="a-rank-row" style={{ borderTop: 'none', padding: '0 0 4px' }}>
+              <motion.span
+                className="a-rank-avatar"
+                style={{ background: 'var(--a-peach-1)', fontSize: 20 }}
+                animate={{ scale: [1, 1.08, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                {currentCrisis.emoji}
+              </motion.span>
+              <div style={{ minWidth: 0 }}>
+                <p className="a-today-info-eyebrow" style={{ display: 'flex', alignItems: 'center', gap: 5, margin: 0 }}>
+                  <AlertTriangle size={11} style={{ color: 'var(--a-peach-2)' }} />
+                  {tr('babycrisiswidget_active_crisis', 'Aktiv Kriz Dövrü')}
+                </p>
+                <p className="a-rank-title" style={{ marginTop: 3 }}>
+                  {currentCrisis.title || currentCrisis.title}
+                </p>
               </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              <span className={`a-rank-tag ${severityTagClass(currentCrisis.severity)}`}>
+                {getSeverityConfig(currentCrisis.severity).label}
+              </span>
             </div>
 
             {/* Progress bar */}
-            <div className="mb-3">
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="text-muted-foreground">
-                  {tr('babycrisiswidget_weeks_range','Həftə {s}-{e}').replace('{s}',String(currentCrisis.week_start)).replace('{e}',String(currentCrisis.week_end))}
+            <div style={{ margin: '10px 0 12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+                <span className="a-list-sub" style={{ margin: 0 }}>
+                  {tr('babycrisiswidget_weeks_range', 'Həftə {s}-{e}').replace('{s}', String(currentCrisis.week_start)).replace('{e}', String(currentCrisis.week_end))}
                 </span>
-                <span className={`font-medium ${getSeverityConfig(currentCrisis.severity).textColor}`}>
-                  {Math.round(getProgressInCrisis())}{tr('babycrisiswidget_pct_done','% keçdi')}
+                <span className="a-list-value" style={{ color: 'var(--a-accent-ink)' }}>
+                  {Math.round(getProgressInCrisis())}{tr('babycrisiswidget_pct_done', '% keçdi')}
                 </span>
               </div>
-              <div className="h-2 bg-white/50 dark:bg-black/20 rounded-full overflow-hidden">
+              <div className="a-inline-bar" style={{ marginTop: 0 }}>
                 <motion.div
-                  className={`h-full bg-gradient-to-r ${getSeverityConfig(currentCrisis.severity).color} rounded-full`}
+                  className="a-inline-bar-fill"
                   initial={{ width: 0 }}
                   animate={{ width: `${getProgressInCrisis()}%` }}
                   transition={{ duration: 1, ease: 'easeOut' }}
@@ -127,23 +144,20 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
               </div>
             </div>
 
-            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+            <p className="a-cta-text" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {currentCrisis.description}
             </p>
 
             {/* Quick symptoms */}
             {currentCrisis.symptoms && currentCrisis.symptoms.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-3">
+              <div className="a-tag-row" style={{ marginTop: 12, marginBottom: 0 }}>
                 {currentCrisis.symptoms.slice(0, 3).map((symptom, i) => (
-                  <span 
-                    key={i}
-                    className="px-2 py-1 rounded-full bg-white/60 dark:bg-black/20 text-[10px] font-medium text-foreground"
-                  >
+                  <span key={i} className="a-tag" style={{ cursor: 'default' }}>
                     {symptom}
                   </span>
                 ))}
                 {currentCrisis.symptoms.length > 3 && (
-                  <span className="px-2 py-1 text-[10px] text-muted-foreground">
+                  <span className="a-tag" style={{ cursor: 'default', background: 'transparent' }}>
                     +{currentCrisis.symptoms.length - 3}
                   </span>
                 )}
@@ -153,48 +167,39 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
         ) : (
           // No Active Crisis - Show Calendar Preview
           <motion.div
-            className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+            className="a-card a-fade-in"
+            style={{ padding: '6px 18px', cursor: 'pointer' }}
             onClick={openFullCalendar}
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-sm text-foreground">{tr("babycrisiswidget_kriz_teqvimi_aa2ea5", "Kriz Təqvimi")}</h3>
-                  <p className="text-xs text-muted-foreground">
-                    {upcomingCrises.length > 0 
-                      ? tr('babycrisiswidget_next_week','Növbəti: {n}. həftə').replace('{n}',String(upcomingCrises[0].week_start))
-                      : tr('babycrisiswidget_no_upcoming','Yaxınlaşan kriz yoxdur')}
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-
-            {/* Upcoming crises preview */}
-            {upcomingCrises.length > 0 && (
-              <div className="space-y-2">
-                {upcomingCrises.map((crisis, index) => (
-                  <div 
-                    key={crisis.id}
-                    className={`flex items-center gap-3 p-2 rounded-xl ${getSeverityConfig(crisis.severity).bgColor}`}
-                  >
-                    <span className="text-xl">{crisis.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-foreground truncate">
-                        {crisis.title}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground">
-                        {tr('babycrisiswidget_weeks_range','Həftə {s}-{e}').replace('{s}',String(crisis.week_start)).replace('{e}',String(crisis.week_end))} • {crisis.week_start - babyAgeWeeks} {tr('babycrisiswidget_week_unit_later','həftə sonra')}
-                      </p>
-                    </div>
-                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${getSeverityConfig(crisis.severity).bgColor} ${getSeverityConfig(crisis.severity).textColor}`}>
-                      {getSeverityConfig(crisis.severity).label}
-                    </span>
+            {upcomingCrises.length > 0 ? (
+              upcomingCrises.map((crisis) => (
+                <div key={crisis.id} className="a-rank-row">
+                  <span className="a-rank-avatar" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+                    <Calendar size={17} strokeWidth={2} />
+                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <p className="a-rank-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {crisis.emoji} {crisis.title}
+                    </p>
+                    <p className="a-rank-sub">
+                      {tr('babycrisiswidget_weeks_range', 'Həftə {s}-{e}').replace('{s}', String(crisis.week_start)).replace('{e}', String(crisis.week_end))} · {crisis.week_start - babyAgeWeeks} {tr('babycrisiswidget_week_unit_later', 'həftə sonra')}
+                    </p>
                   </div>
-                ))}
+                  <span className={`a-rank-tag ${severityTagClass(crisis.severity)}`}>
+                    {getSeverityConfig(crisis.severity).label}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="a-rank-row">
+                <span className="a-rank-avatar" style={{ background: 'var(--a-green-1)', color: 'var(--a-green-2)' }}>
+                  <Calendar size={17} strokeWidth={2} />
+                </span>
+                <div>
+                  <p className="a-rank-title">{tr("babycrisiswidget_kriz_teqvimi_aa2ea5", "Kriz Təqvimi")}</p>
+                  <p className="a-rank-sub">{tr('babycrisiswidget_no_upcoming', 'Yaxınlaşan kriz yoxdur')}</p>
+                </div>
+                <ChevronRight className="a-list-chevron" style={{ marginLeft: 'auto' }} size={16} />
               </div>
             )}
           </motion.div>

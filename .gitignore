@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Local AI credentials (never commit)
+.env.azure
+scripts/content-i18n/.env.azure
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

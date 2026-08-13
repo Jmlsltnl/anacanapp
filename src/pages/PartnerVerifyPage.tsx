@@ -77,73 +77,83 @@ export default function PartnerVerifyPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--a-peach-2)' }} />
       </div>);
 
   }
 
   if (verified) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-green-500 text-white p-6 text-center">
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 text-center"
+      style={{ background: 'linear-gradient(160deg, #63bd8b 0%, #4aa876 100%)', color: '#ffffff' }}>
         <CheckCircle2 className="w-24 h-24 mb-4" strokeWidth={2.5} />
-        <h1 className="text-4xl font-black mb-2">{tr("partnerverifypage_tesdi_qlendi_7e7c87", "T\u018FSD\u0130QL\u018FND\u0130")}</h1>
-        <p className="text-2xl font-bold mb-1">{verified.discount_label}</p>
-        <p className="text-lg opacity-90 mb-6">{verified.venue_name}</p>
-        <div className="bg-white/20 backdrop-blur rounded-2xl px-6 py-4 mb-3">
-          <p className="text-sm opacity-80 mb-1">{tr("partnerverifypage_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}</p>
-          <p className="text-xl font-bold">{verified.user_name}</p>
+        <h1 style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 8 }}>{tr("partnerverifypage_tesdi_qlendi_7e7c87", "T\u018FSD\u0130QL\u018FND\u0130")}</h1>
+        <p style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{verified.discount_label}</p>
+        <p style={{ fontSize: 17, opacity: 0.9, marginBottom: 24 }}>{verified.venue_name}</p>
+        <div className="backdrop-blur rounded-3xl px-6 py-4 mb-3" style={{ background: 'rgba(255,255,255,0.22)' }}>
+          <p style={{ fontSize: 12.5, opacity: 0.85, marginBottom: 4 }}>{tr("partnerverifypage_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}</p>
+          <p style={{ fontSize: 19, fontWeight: 800 }}>{verified.user_name}</p>
           {verified.is_premium &&
-          <div className="inline-flex items-center gap-1 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full mt-2">
+          <div className="inline-flex items-center gap-1 mt-2"
+          style={{ background: '#ffc94d', color: '#5a3d00', fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 999 }}>
               <Sparkles className="w-3 h-3" /> PREMIUM
             </div>
           }
         </div>
-        <p className="text-xs opacity-70 mt-4">{tr("untranslated_anacan_partnyor_sistemi_xadwvm", "Anacan Partnyor Sistemi")}</p>
+        <p style={{ fontSize: 10.5, opacity: 0.75, marginTop: 16 }}>{tr("untranslated_anacan_partnyor_sistemi_xadwvm", "Anacan Partnyor Sistemi")}</p>
       </div>);
 
   }
 
   if (status?.status === 'expired' || error === tr("partnerverifypage_qr_in_muddeti_bitib_fc3d41", "QR-\u0131n m\xFCdd\u0259ti bitib")) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-destructive text-white p-6 text-center">
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 text-center"
+      style={{ background: 'linear-gradient(160deg, #e0526e 0%, var(--a-pink-ink) 100%)', color: '#ffffff' }}>
         <XCircle className="w-20 h-20 mb-4" />
-        <h1 className="text-3xl font-bold">{tr("partnerverifypage_muddeti_bitib_68fc0e", "M\xFCdd\u0259ti bitib")}</h1>
-        <p className="opacity-90 mt-2">{tr("partnerverifypage_musteri_tetbiqinde_yeni_qr_yar_32bfe8", "M\xFC\u015Ft\u0259ri t\u0259tbiqind\u0259 yeni QR yaratmal\u0131d\u0131r.")}</p>
+        <h1 style={{ fontSize: 28, fontWeight: 800 }}>{tr("partnerverifypage_muddeti_bitib_68fc0e", "M\xFCdd\u0259ti bitib")}</h1>
+        <p style={{ opacity: 0.9, marginTop: 8 }}>{tr("partnerverifypage_musteri_tetbiqinde_yeni_qr_yar_32bfe8", "M\xFC\u015Ft\u0259ri t\u0259tbiqind\u0259 yeni QR yaratmal\u0131d\u0131r.")}</p>
       </div>);
 
   }
 
   if (status?.status === 'cancelled') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-muted p-6 text-center">
-        <XCircle className="w-20 h-20 mb-4 text-muted-foreground" />
-        <h1 className="text-2xl font-bold">{tr("partnerverifypage_legv_edilib_24db12", "L\u0259\u011Fv edilib")}</h1>
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 text-center" style={{ background: 'var(--a-bg)' }}>
+        <XCircle className="w-20 h-20 mb-4" style={{ color: 'var(--a-ink-faint)' }} />
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--a-ink)' }}>{tr("partnerverifypage_legv_edilib_24db12", "L\u0259\u011Fv edilib")}</h1>
       </div>);
 
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
-      <div className="w-full max-w-md bg-card border border-border rounded-3xl p-6 shadow-lg">
+    <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 relative" style={{ background: 'var(--a-bg)' }}>
+      {/* Watercolor sky */}
+      <div className="a-sky" aria-hidden>
+        <span className="a-cloud c1" />
+        <span className="a-cloud c2" />
+        <span className="a-cloud c3" />
+      </div>
+
+      <div className="a-card w-full max-w-md relative z-10" style={{ padding: 24 }}>
         <div className="flex flex-col items-center text-center mb-6">
           {status?.venue_logo_url ?
-          <img src={status.venue_logo_url} alt="" className="w-20 h-20 rounded-2xl object-cover border-2 border-border" /> :
+          <img src={status.venue_logo_url} alt="" className="w-20 h-20 object-cover" style={{ borderRadius: 20, border: '2px solid var(--a-line-strong)' }} /> :
 
-          <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Sparkles className="w-10 h-10 text-primary" />
+          <div className="w-20 h-20 flex items-center justify-center" style={{ borderRadius: 20, background: 'var(--a-peach-1)' }}>
+              <Sparkles size={36} style={{ color: 'var(--a-accent-ink)' }} />
             </div>
           }
-          <h1 className="text-xl font-bold mt-3">{status?.venue_name}</h1>
-          <p className="text-sm text-muted-foreground">{status?.discount_label}</p>
-          <div className="mt-3 bg-muted rounded-xl px-4 py-2 text-sm">
+          <h1 className="mt-3" style={{ fontSize: 19, fontWeight: 800, color: 'var(--a-ink)' }}>{status?.venue_name}</h1>
+          <p style={{ fontSize: 13, color: 'var(--a-ink-soft)' }}>{status?.discount_label}</p>
+          <div className="mt-3" style={{ background: 'var(--a-surface-soft)', borderRadius: 14, padding: '8px 16px', fontSize: 13, color: 'var(--a-ink)' }}>
             {tr("partnerverifypage_musteri_f512e9", "M\xFC\u015Ft\u0259ri:")} <strong>{status?.user_name}</strong>
-            {status?.is_premium && <span className="ml-2 text-amber-600">★ Premium</span>}
+            {status?.is_premium && <span className="ml-2" style={{ color: 'var(--a-yellow-ink)' }}>★ Premium</span>}
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          <label className="block text-sm font-medium text-foreground flex items-center gap-1">
+          <label className="flex items-center gap-1" style={{ fontSize: 13, fontWeight: 600, color: 'var(--a-ink)' }}>
             <Shield className="w-4 h-4" /> {tr("partnerverifypage_mekan_pin_kodu_138eb6", "M\u0259kan PIN kodu")}
           </label>
           <input
@@ -153,21 +163,23 @@ export default function PartnerVerifyPage() {
             value={pin}
             onChange={(e) => setPin(e.target.value)}
             placeholder="••••"
-            className="w-full h-14 text-center text-2xl tracking-widest font-bold border-2 border-input rounded-xl bg-background focus:border-primary focus:outline-none"
+            className="w-full h-14 text-center text-2xl tracking-widest font-bold focus:outline-none"
+            style={{ borderRadius: 16, border: '2px solid var(--a-line-strong)', background: 'var(--a-surface)', color: 'var(--a-ink)' }}
             maxLength={12} />
-          
-          {error && <p className="text-sm text-destructive text-center">{error}</p>}
+
+          {error && <p className="text-center" style={{ fontSize: 13, color: 'var(--a-alert-ink)' }}>{error}</p>}
           <button
             type="submit"
             disabled={submitting || !pin}
-            className="w-full h-12 bg-primary text-primary-foreground font-bold rounded-xl disabled:opacity-50 flex items-center justify-center gap-2">
-            
+            className="w-full h-12 text-white font-bold rounded-full disabled:opacity-50 flex items-center justify-center gap-2 hover:opacity-95 transition-opacity"
+            style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}>
+
             {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
             {tr("partnerverifypage_tesdiqle_4ffd4c", "T\u0259sdiql\u0259")}
           </button>
         </form>
 
-        <p className="text-[10px] text-muted-foreground text-center mt-4">{tr("untranslated_anacan_partnyor_endirim_sistem_qfwnst", "Anacan Partnyor Endirim Sistemi")}</p>
+        <p className="text-center mt-4" style={{ fontSize: 10, color: 'var(--a-ink-faint)' }}>{tr("untranslated_anacan_partnyor_endirim_sistem_qfwnst", "Anacan Partnyor Endirim Sistemi")}</p>
       </div>
     </div>);
 

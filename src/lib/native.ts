@@ -155,6 +155,9 @@ export const pushNotifications = {
   }
 };
 
+// Single stable id for the daily water reminder
+const WATER_NOTIFICATION_ID = 101;
+
 // Local Notifications
 export const localNotifications = {
   checkPermissions: async () => {
@@ -171,7 +174,7 @@ export const localNotifications = {
     id: number;
     title: string;
     body: string;
-    schedule?: {at: Date;};
+    schedule?: {at?: Date;on?: {hour: number;minute: number;};repeats?: boolean;};
   }[]) => {
     if (!isNative) {
       console.log('Local notification scheduled (web mode):', notifications);
@@ -195,29 +198,32 @@ export const localNotifications = {
     });
   },
 
-  // Schedule water reminder
-  scheduleWaterReminder: async () => {
-    const now = new Date();
-    const reminders = [];
-
-    // Schedule reminders every 2 hours from 8am to 8pm
-    for (let hour = 8; hour <= 20; hour += 2) {
-      const reminderTime = new Date(now);
-      reminderTime.setHours(hour, 0, 0, 0);
-
-      if (reminderTime > now) {
-        reminders.push({
-          id: 100 + hour,
-          title: tr("native_su_icmek_vaxti_cecdf9", "Su içmək vaxtı! 💧"),
-          body: tr("native_saglamliginiz_ucun_su_icmeyi_u_cdc36d", "Sa\u011Flaml\u0131\u011F\u0131n\u0131z \xFC\xE7\xFCn su i\xE7m\u0259yi unutmay\u0131n."),
-          schedule: { at: reminderTime }
-        });
+  // Cancel every pending water reminder (current id + the legacy every-2-hours ids 108..120)
+  cancelWaterReminders: async () => {
+    if (!isNative) return;
+    try {
+      const waterIds = [WATER_NOTIFICATION_ID, 108, 110, 112, 114, 116, 118, 120];
+      const pending = await LocalNotifications.getPending();
+      const toCancel = pending.notifications.filter((n) => waterIds.includes(n.id));
+      if (toCancel.length > 0) {
+        await LocalNotifications.cancel({ notifications: toCancel.map((n) => ({ id: n.id })) });
       }
+    } catch (e) {
+      console.warn('cancelWaterReminders failed:', e);
     }
+  },
 
-    if (reminders.length > 0) {
-      await localNotifications.schedule(reminders);
-    }
+  // Schedule the water reminder — exactly ONE notification per day at 10:00
+  // (repeats daily). Any legacy every-2-hours reminders are cancelled first.
+  scheduleWaterReminder: async () => {
+    await localNotifications.cancelWaterReminders();
+
+    await localNotifications.schedule([{
+      id: WATER_NOTIFICATION_ID,
+      title: tr("notifications_water_daily_title", "Su vaxtı! 💧"),
+      body: tr("notifications_water_daily_body", "Gündə ən azı 8 stəkan su içməyi unutmayın."),
+      schedule: { on: { hour: 10, minute: 0 }, repeats: true }
+    }]);
   },
 
   // Schedule pill reminder
@@ -474,8 +480,17 @@ export const initializeNativeFeatures = async () => {
   await pushNotifications.register();
   pushNotifications.addListeners();
 
-  // Schedule default reminders
-  await localNotifications.scheduleWaterReminder();
+  // Schedule default reminders — respect the user's persisted toggle
+  // (useNotificationSettings mirrors `water_reminder` into localStorage).
+  let waterEnabled = true;
+  try {
+    waterEnabled = localStorage.getItem('anacan_water_reminder_enabled') !== 'false';
+  } catch {
+    // ignore storage errors
+  }
+  if (waterEnabled) {
+    await localNotifications.scheduleWaterReminder();
+  }
 
   console.log('Native features initialized');
 };

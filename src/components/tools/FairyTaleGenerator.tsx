@@ -1,20 +1,17 @@
-import { useState } from 'react';
-import { ArrowLeft, Sparkles, BookOpen, Heart, Trash2, Loader2, Wand2, Clock, Star, BookOpenCheck, Globe, X, Baby, PenLine, ListChecks } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, CSSProperties, ReactNode } from 'react';
+import { Sparkles, Heart, Trash2, Loader2, Wand2, Clock, BookOpenCheck, Globe, X, Baby, PenLine, ListChecks } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFairyTales, useFairyTaleThemes, useGenerateFairyTale, useToggleFavorite, useDeleteFairyTale, useIncrementPlayCount, FairyTale } from '@/hooks/useFairyTales';
 import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import MarkdownContent from '@/components/MarkdownContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { useSubscription } from '@/hooks/useSubscription';
+import PremiumModal from '@/components/PremiumModal';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr, getPersistedLanguage } from "@/lib/tr";
 
 interface FairyTaleGeneratorProps {
@@ -81,6 +78,10 @@ const LANGUAGES = [
   { code: 'tr', label: tr("fairytalegenerator_turkce_299adc", 'Türkçe'), flag: 'tr' }];
 
 
+// Shared select-pill styles (lav accent)
+const pillOn: CSSProperties = { background: 'var(--a-lav-2)', color: '#fff', border: '1px solid transparent', cursor: 'pointer' };
+const pillOff: CSSProperties = { background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)', border: '1px solid transparent', cursor: 'pointer' };
+
 const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   useScreenAnalytics('FairyTaleGenerator', 'Tools');
   const [selectedTale, setSelectedTale] = useState<FairyTale | null>(null);
@@ -107,8 +108,16 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   const toggleFavorite = useToggleFavorite();
   const deleteTale = useDeleteFairyTale();
   const incrementPlayCount = useIncrementPlayCount();
+  const { checkAndConsume } = useSubscription();
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const handleGenerate = async () => {
+    // Gündəlik pulsuz limit (premium → limitsiz)
+    const { allowed } = await checkAndConsume('fairy_tale');
+    if (!allowed) {
+      setShowPremiumModal(true);
+      return;
+    }
     if (createMode === 'direct') {
       if (!customPrompt.trim()) {
         toast.error(tr("fairytalegenerator_nagil_tesviri_yazilmalidir_24773e", "Na\u011F\u0131l t\u0259sviri yaz\u0131lmal\u0131d\u0131r"));
@@ -172,230 +181,203 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
     return Math.ceil(words / 150);
   };
 
-  return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
+  const tabTriggerClass =
+  "rounded-full py-1.5 text-[11.5px] font-bold border-0 shadow-none data-[state=active]:shadow-none data-[state=active]:bg-[var(--a-lav-1)] data-[state=active]:text-[var(--a-lav-ink)] text-[var(--a-ink-soft)]";
 
-              <ArrowLeft className="h-5 w-5 text-foreground" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Wand2 className="h-5 w-5 text-purple-500" />
-                {tr("fairytalegenerator_agilli_nagillar_3f1901", "A\u011F\u0131ll\u0131 Na\u011F\u0131llar")}
-              </h1>
+  const fieldLabel = (text: string, icon?: ReactNode) =>
+  <p className="font-bold text-sm flex items-center gap-2 a-heading" style={{ margin: 0, color: 'var(--a-ink)' }}>
+      {icon}{text}
+    </p>;
+
+  return (
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={tr("fairytalegenerator_usaginizin_adi_ile_sehrli_bir_hekaye_7896ac", "Uşağınızın adı ilə sehrli bir hekayə")}
+        title={tr("fairytalegenerator_agilli_nagillar_3f1901", "A\u011F\u0131ll\u0131 Na\u011F\u0131llar")} />
+
+      {/* Create Button - Hero Card */}
+      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+        <div
+          className="a-card mb-4 overflow-hidden cursor-pointer relative"
+          style={{ background: 'var(--a-grad-lav)', border: 'none', padding: 24 }}
+          onClick={() => setShowCreate(true)}>
+
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(8)].map((_, i) =>
+              <motion.div
+                key={i}
+                className="absolute"
+                style={{ left: `${10 + i * 12}%`, top: `${20 + i % 3 * 25}%`, opacity: 0.35 }}
+                animate={{ opacity: [0.2, 0.7, 0.2], scale: [1, 1.3, 1] }}
+                transition={{ duration: 2 + i * 0.3, repeat: Infinity, delay: i * 0.2 }}>
+
+                ✨
+              </motion.div>
+            )}
+          </div>
+          <div className="relative z-10 flex items-center gap-4">
+            <motion.div
+              className="p-4 rounded-2xl"
+              style={{ background: 'rgba(255,255,255,0.35)' }}
+              animate={{ rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 4, repeat: Infinity }}>
+
+              <Sparkles className="h-10 w-10" style={{ color: '#3c2e5c' }} />
+            </motion.div>
+            <div>
+              <h2 className="text-2xl font-bold mb-1 a-heading" style={{ margin: '0 0 4px', color: '#3c2e5c' }}>{tr("fairytalegenerator_yeni_nagil_yarat_081219", "Yeni Nağıl Yarat")}</h2>
+              <p className="text-sm" style={{ margin: 0, color: '#3c2e5c', opacity: 0.8 }}>{tr("fairytalegenerator_usaginizin_adi_ile_sehrli_bir_hekaye_7896ac", "Uşağınızın adı ilə sehrli bir hekayə")}</p>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="p-4">
-        {/* Create Button - Hero Card */}
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Card
-            className="mb-6 overflow-hidden cursor-pointer border-0 shadow-xl"
-            onClick={() => setShowCreate(true)}>
-
-            <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white p-6 relative overflow-hidden">
-              <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {[...Array(8)].map((_, i) =>
-                  <motion.div
-                    key={i}
-                    className="absolute text-white/20"
-                    style={{ left: `${10 + i * 12}%`, top: `${20 + i % 3 * 25}%` }}
-                    animate={{ opacity: [0.2, 0.8, 0.2], scale: [1, 1.3, 1] }}
-                    transition={{ duration: 2 + i * 0.3, repeat: Infinity, delay: i * 0.2 }}>
-
-                    ✨
-                  </motion.div>
-                )}
-              </div>
-              <div className="relative z-10 flex items-center gap-4">
-                <motion.div
-                  className="p-4 bg-white/20 rounded-2xl backdrop-blur-sm"
-                  animate={{ rotate: [0, 5, -5, 0] }}
-                  transition={{ duration: 4, repeat: Infinity }}>
-
-                  <Sparkles className="h-10 w-10" />
-                </motion.div>
-                <div>
-                  <h2 className="text-2xl font-bold mb-1">{tr("fairytalegenerator_yeni_nagil_yarat_081219", "Yeni Nağıl Yarat")}</h2>
-                  <p className="text-sm text-white/90">{tr("fairytalegenerator_usaginizin_adi_ile_sehrli_bir_hekaye_7896ac", "Uşağınızın adı ilə sehrli bir hekayə")}</p>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </motion.div>
-
-        {/* Stats */}
-        {tales.length > 0 &&
-          <div className="grid grid-cols-3 gap-3 mb-6">
-            <Card className="text-center p-3">
-              <p className="text-2xl font-bold text-primary">{tales.length}</p>
-              <p className="text-xs text-muted-foreground">{tr("fairytalegenerator_nagil_1f5665", "Nağıl")}</p>
-            </Card>
-            <Card className="text-center p-3">
-              <p className="text-2xl font-bold text-red-500">{favoriteTales.length}</p>
-              <p className="text-xs text-muted-foreground">{tr("fairytalegenerator_sevimli_3c7a2d", "Sevimli")}</p>
-            </Card>
-            <Card className="text-center p-3">
-              <p className="text-2xl font-bold text-amber-500">
-                {tales.reduce((sum, t) => sum + (t.play_count || 0), 0)}
-              </p>
-              <p className="text-xs text-muted-foreground">{tr("untranslated_oxunub_u7g1tz", "Oxunub")}</p>
-            </Card>
+      {/* Stats */}
+      {tales.length > 0 &&
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-lav-1)' }}>
+            <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#3c2e5c' }}>{tales.length}</p>
+            <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-lav-ink)', opacity: 0.8 }}>{tr("fairytalegenerator_nagil_1f5665", "Nağıl")}</p>
           </div>
-        }
+          <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-pink-1)' }}>
+            <p className="a-heading" style={{ margin: 0, fontSize: 22, color: 'var(--a-alert-ink)' }}>{favoriteTales.length}</p>
+            <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-berry-ink)', opacity: 0.9 }}>{tr("fairytalegenerator_sevimli_3c7a2d", "Sevimli")}</p>
+          </div>
+          <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-yellow-1)' }}>
+            <p className="a-heading" style={{ margin: 0, fontSize: 22, color: 'var(--a-warn-ink)' }}>
+              {tales.reduce((sum, t) => sum + (t.play_count || 0), 0)}
+            </p>
+            <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-warn-ink)', opacity: 0.8 }}>{tr("untranslated_oxunub_u7g1tz", "Oxunub")}</p>
+          </div>
+        </div>
+      }
 
-        {/* Tales Library */}
-        <Tabs defaultValue="all">
-          <TabsList className="w-full mb-4">
-            <TabsTrigger value="all" className="flex-1">{tr("fairytalegenerator_hamisi_3ff72c", "Ham\u0131s\u0131 (")}{tales.length})</TabsTrigger>
-            <TabsTrigger value="favorites" className="flex-1">
-              <Heart className="h-4 w-4 mr-1" />
-              ({favoriteTales.length})
-            </TabsTrigger>
-          </TabsList>
+      {/* Tales Library */}
+      <Tabs defaultValue="all">
+        <TabsList className="w-full grid grid-cols-2 h-auto rounded-full p-[3px] border-0 mb-4" style={{ background: 'var(--a-surface-soft)' }}>
+          <TabsTrigger value="all" className={tabTriggerClass}>{tr("fairytalegenerator_hamisi_3ff72c", "Ham\u0131s\u0131 (")}{tales.length})</TabsTrigger>
+          <TabsTrigger value="favorites" className={tabTriggerClass}>
+            <Heart className="h-3.5 w-3.5 mr-1" />
+            ({favoriteTales.length})
+          </TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="all" className="space-y-3">
-            {isLoading ?
-              <div className="text-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-2" />
-                <p className="text-muted-foreground">{tr("fairytalegenerator_nagillar_yuklenir_44f0f1", "Nağıllar yüklənir...")}</p>
-              </div> :
-              tales.length === 0 ?
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-12">
+        <TabsContent value="all" className="space-y-3">
+          {isLoading ?
+            <div className="a-card text-center" style={{ padding: '34px 18px' }}>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" style={{ color: 'var(--a-lav-2)' }} />
+              <p className="a-list-sub" style={{ margin: 0 }}>{tr("fairytalegenerator_nagillar_yuklenir_44f0f1", "Nağıllar yüklənir...")}</p>
+            </div> :
+            tales.length === 0 ?
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="a-card text-center"
+                style={{ padding: '34px 18px' }}>
 
-                  <div className="text-6xl mb-4">📚</div>
-                  <h3 className="font-semibold mb-2">{tr("fairytalegenerator_hele_nagil_yoxdur_f0166c", "Hələ nağıl yoxdur")}</h3>
-                  <p className="text-muted-foreground text-sm mb-4">{tr("fairytalegenerator_ilk_sehrli_nagilinizi_yaradin_efa8d2", "İlk sehrli nağılınızı yaradın!")}</p>
-                  <Button onClick={() => setShowCreate(true)} className="bg-gradient-to-r from-indigo-500 to-purple-500">
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    {tr("fairytalegenerator_nagil_yarat_11707d", "Na\u011F\u0131l Yarat")}
-                  </Button>
-                </motion.div> :
+                <div className="text-6xl mb-4">📚</div>
+                <h3 className="a-list-title mb-2" style={{ margin: '0 0 8px' }}>{tr("fairytalegenerator_hele_nagil_yoxdur_f0166c", "Hələ nağıl yoxdur")}</h3>
+                <p className="a-list-sub mb-4" style={{ margin: '0 0 16px', whiteSpace: 'normal' }}>{tr("fairytalegenerator_ilk_sehrli_nagilinizi_yaradin_efa8d2", "İlk sehrli nağılınızı yaradın!")}</p>
+                <button onClick={() => setShowCreate(true)} className="a-cta-btn mx-auto" style={{ background: 'var(--a-lav-2)', color: '#fff' }}>
+                  <Sparkles size={15} strokeWidth={2.2} />
+                  {tr("fairytalegenerator_nagil_yarat_11707d", "Na\u011F\u0131l Yarat")}
+                </button>
+              </motion.div> :
 
+              <div className="a-list-card">
                 <AnimatePresence>
                   {tales.map((tale, index) =>
-                    <motion.div
+                    <motion.button
                       key={tale.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}>
+                      transition={{ delay: Math.min(index * 0.05, 0.3) }}
+                      className="a-list-row w-full text-left"
+                      style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}
+                      onClick={() => setSelectedTale(tale)}>
 
-                      <Card
-                        className="cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden group"
-                        onClick={() => setSelectedTale(tale)}>
-
-                        <CardContent className="p-0">
-                          <div className="flex">
-                            <div className="w-2 bg-gradient-to-b from-indigo-500 to-purple-500" />
-                            <div className="flex-1 p-4">
-                              <div className="flex items-start gap-3">
-                                <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 text-2xl group-hover:scale-110 transition-transform">
-                                  {themes.find((t) => t.name === tale.theme)?.emoji || '📖'}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2">
-                                    <h3 className="font-semibold truncate">{tale.title}</h3>
-                                    {tale.is_favorite &&
-                                      <Heart className="h-4 w-4 text-red-500 fill-current shrink-0" />
-                                    }
-                                  </div>
-                                  <p className="text-sm text-muted-foreground">{tale.child_name} {tr("fairytalegenerator_ucun_yazildi_a6b83f", "\xFC\xE7\xFCn yaz\u0131ld\u0131")}</p>
-                                  <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                                    <span className="flex items-center gap-1">
-                                      <Clock className="h-3 w-3" />{getReadingTime(tale.content)} {tr("fairytalegenerator_deq_780a5c", "d\u0259q")}
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                      <BookOpenCheck className="h-3 w-3" />{tale.play_count || 0}×
-                                    </span>
-                                    <span>{format(new Date(tale.created_at), 'd MMM', { locale: getCurrentDateLocale() })}</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
+                      <span className="a-list-icon" style={{ background: 'var(--a-grad-lav)', fontSize: 18 }}>
+                        {themes.find((t) => t.name === tale.theme)?.emoji || '📖'}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="a-list-title truncate">{tale.title}</p>
+                          {tale.is_favorite &&
+                            <Heart className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--a-pink-2)', fill: 'var(--a-pink-2)' }} />
+                          }
+                        </div>
+                        <p className="a-list-sub" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {tale.child_name} {tr("fairytalegenerator_ucun_yazildi_a6b83f", "\xFC\xE7\xFCn yaz\u0131ld\u0131")} · <Clock className="h-3 w-3 inline" /> {getReadingTime(tale.content)} {tr("fairytalegenerator_deq_780a5c", "d\u0259q")} · <BookOpenCheck className="h-3 w-3 inline" /> {tale.play_count || 0}×
+                        </p>
+                      </div>
+                      <span className="a-list-trail">
+                        <p className="a-list-time">{format(new Date(tale.created_at), 'd MMM', { locale: getCurrentDateLocale() })}</p>
+                      </span>
+                    </motion.button>
                   )}
                 </AnimatePresence>
-            }
-          </TabsContent>
+              </div>
+          }
+        </TabsContent>
 
-          <TabsContent value="favorites" className="space-y-3">
-            {favoriteTales.length === 0 ?
-              <div className="text-center py-12">
-                <Heart className="h-12 w-12 mx-auto mb-2 text-muted-foreground/50" />
-                <p className="text-muted-foreground">{tr("fairytalegenerator_sevimli_nagil_yoxdur_756411", "Sevimli nağıl yoxdur")}</p>
-                <p className="text-xs text-muted-foreground mt-1">{tr("fairytalegenerator_nagillari_oxuyarken_vurun_2acb44", "Nağılları oxuyarkən ❤️ vurun")}</p>
-              </div> :
+        <TabsContent value="favorites" className="space-y-3">
+          {favoriteTales.length === 0 ?
+            <div className="a-card text-center" style={{ padding: '34px 18px' }}>
+              <Heart className="h-12 w-12 mx-auto mb-2" style={{ color: 'var(--a-ink-faint)' }} />
+              <p className="a-list-title" style={{ margin: 0 }}>{tr("fairytalegenerator_sevimli_nagil_yoxdur_756411", "Sevimli nağıl yoxdur")}</p>
+              <p className="a-list-sub mt-1" style={{ margin: '4px 0 0', whiteSpace: 'normal' }}>{tr("fairytalegenerator_nagillari_oxuyarken_vurun_2acb44", "Nağılları oxuyarkən ❤️ vurun")}</p>
+            </div> :
 
-              favoriteTales.map((tale) =>
-                <Card
+            <div className="a-list-card">
+              {favoriteTales.map((tale) =>
+                <button
                   key={tale.id}
-                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  className="a-list-row w-full text-left"
+                  style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}
                   onClick={() => setSelectedTale(tale)}>
 
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="p-3 rounded-xl bg-gradient-to-br from-red-100 to-pink-100 dark:from-red-900/30 dark:to-pink-900/30 text-2xl">
-                        {themes.find((t) => t.name === tale.theme)?.emoji || '📖'}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{tale.title}</h3>
-                        <p className="text-sm text-muted-foreground">{tale.child_name} {tr("fairytalegenerator_ucun_0b2db5", "\xFC\xE7\xFCn")}</p>
-                      </div>
-                      <Heart className="h-5 w-5 text-red-500 fill-current" />
-                    </div>
-                  </CardContent>
-                </Card>
-              )
-            }
-          </TabsContent>
-        </Tabs>
-      </div>
+                  <span className="a-list-icon" style={{ background: 'var(--a-grad-pink)', fontSize: 18 }}>
+                    {themes.find((t) => t.name === tale.theme)?.emoji || '📖'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="a-list-title truncate">{tale.title}</p>
+                    <p className="a-list-sub">{tale.child_name} {tr("fairytalegenerator_ucun_0b2db5", "\xFC\xE7\xFCn")}</p>
+                  </div>
+                  <Heart className="h-5 w-5 shrink-0" style={{ color: 'var(--a-pink-2)', fill: 'var(--a-pink-2)' }} />
+                </button>
+              )}
+            </div>
+          }
+        </TabsContent>
+      </Tabs>
 
       {/* Create Modal - Multi-step wizard */}
       <Dialog open={showCreate} onOpenChange={(open) => !open && resetCreate()}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className="a-scope max-w-md max-h-[85vh] overflow-y-auto rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Wand2 className="h-5 w-5 text-purple-500" />
+            <DialogTitle className="flex items-center gap-2 a-heading" style={{ color: 'var(--a-ink)' }}>
+              <Wand2 className="h-5 w-5" style={{ color: 'var(--a-lav-2)' }} />
               {tr("fairytalegenerator_yeni_nagil_yarat_081219", "Yeni Na\u011F\u0131l Yarat")}
             </DialogTitle>
           </DialogHeader>
 
           {/* Mode Toggle */}
-          <div className="flex gap-2 mb-4">
+          <div className="a-tabs w-full mb-2" style={{ display: 'flex' }}>
             <button
               onClick={() => setCreateMode('wizard')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${createMode === 'wizard' ?
-                'bg-primary text-primary-foreground shadow-md' :
-                'bg-muted hover:bg-muted/80 text-muted-foreground'}`
-              }>
+              className={`a-tab flex-1 ${createMode === 'wizard' ? 'active' : ''}`}
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
 
-              <ListChecks className="h-4 w-4" />
+              <ListChecks className="h-3.5 w-3.5" />
               {tr("fairytalegenerator_secimle_9ee0cf", "Se\xE7iml\u0259")}
             </button>
             <button
               onClick={() => setCreateMode('direct')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-all ${createMode === 'direct' ?
-                'bg-primary text-primary-foreground shadow-md' :
-                'bg-muted hover:bg-muted/80 text-muted-foreground'}`
-              }>
+              className={`a-tab flex-1 ${createMode === 'direct' ? 'active' : ''}`}
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
 
-              <PenLine className="h-4 w-4" />
+              <PenLine className="h-3.5 w-3.5" />
               {tr("fairytalegenerator_serbest_yaz_4498e0", "S\u0259rb\u0259st yaz")}
             </button>
           </div>
@@ -409,9 +391,10 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               className="space-y-4">
 
               <div>
-                <Label className="text-base font-semibold">{tr("fairytalegenerator_usagin_adi_80632b", "Uşağın adı")}</Label>
-                <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_isteye_bagli_nagilda_istifade_olunacaq_2d77bd", "İstəyə bağlı - nağılda istifadə olunacaq")}</p>
-                <Input
+                {fieldLabel(tr("fairytalegenerator_usagin_adi_80632b", "Uşağın adı"))}
+                <p className="a-list-sub mb-2" style={{ margin: '2px 0 8px' }}>{tr("fairytalegenerator_isteye_bagli_nagilda_istifade_olunacaq_2d77bd", "İstəyə bağlı - nağılda istifadə olunacaq")}</p>
+                <input
+                  className="a-input w-full"
                   value={directChildName}
                   onChange={(e) => setDirectChildName(e.target.value)}
                   placeholder={getPersistedLanguage() === 'en' ? "For example: , Liam..." : "Məsələn: Aysel, Murad..."} />
@@ -419,31 +402,30 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               </div>
 
               <div>
-                <Label className="text-base font-semibold">{tr("fairytalegenerator_nagil_tesviri_4aad0a", "Nağıl təsviri *")}</Label>
-                <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_nagilin_nece_olmasini_istediyinizi_yazin_1a89d4", "Nağılın necə olmasını istədiyinizi yazın")}</p>
-                <Textarea
+                {fieldLabel(tr("fairytalegenerator_nagil_tesviri_4aad0a", "Nağıl təsviri *"))}
+                <p className="a-list-sub mb-2" style={{ margin: '2px 0 8px' }}>{tr("fairytalegenerator_nagilin_nece_olmasini_istediyinizi_yazin_1a89d4", "Nağılın necə olmasını istədiyinizi yazın")}</p>
+                <textarea
+                  className="a-input w-full resize-none"
+                  style={{ height: 'auto', minHeight: 96, fontFamily: 'inherit' }}
                   value={customPrompt}
                   onChange={(e) => setCustomPrompt(e.target.value)}
                   placeholder={tr("fairytalegenerator_meselen_1_yasina_hazirlasan_balaca_aslan_e692b9", "Məsələn: 1 yaşına hazırlaşan balaca aslan haqqında nağıl yaz, meşədə dostları ilə ad günü keçirsin...")}
-                  rows={4}
-                  className="resize-none" />
+                  rows={4} />
 
               </div>
 
               {/* Language & Age */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-sm font-medium">{tr("untranslated_dil_g90qr5", "Dil")}</Label>
+                  {fieldLabel(tr("untranslated_dil_g90qr5", "Dil"))}
                   <div className="grid grid-cols-2 gap-1 mt-1">
                     {LANGUAGES.map((lang) =>
                       <button
                         key={lang.code}
                         type="button"
                         onClick={() => setDirectLanguage(lang.code)}
-                        className={`p-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1 ${directLanguage === lang.code ?
-                          'bg-primary text-primary-foreground' :
-                          'bg-muted hover:bg-muted/80'}`
-                        }>
+                        className="p-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1"
+                        style={directLanguage === lang.code ? pillOn : pillOff}>
 
                         <img src={`https://flagcdn.com/w40/${lang.flag}.png`} alt={lang.code} className="w-5 h-auto rounded-sm shadow-sm" />
                         {lang.label}
@@ -452,17 +434,15 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium">{tr("fairytalegenerator_yas_95595b", "Yaş")}</Label>
+                  {fieldLabel(tr("fairytalegenerator_yas_95595b", "Yaş"))}
                   <div className="grid grid-cols-2 gap-1 mt-1">
                     {AGE_RANGES.map((age) =>
                       <button
                         key={age.value}
                         type="button"
                         onClick={() => setDirectAgeRange(age.value)}
-                        className={`p-1.5 rounded-lg text-xs text-center transition-all ${directAgeRange === age.value ?
-                          'bg-primary text-primary-foreground' :
-                          'bg-muted hover:bg-muted/80'}`
-                        }>
+                        className="p-1.5 rounded-lg text-xs text-center transition-all font-semibold"
+                        style={directAgeRange === age.value ? pillOn : pillOff}>
 
                         {age.emoji} {age.label}
                       </button>
@@ -471,29 +451,32 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 </div>
               </div>
 
-              <Button
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600"
+              <button
+                className="a-cta-btn w-full"
+                style={{ justifyContent: 'center', height: 46, background: 'var(--a-lav-2)', color: '#fff', opacity: generateTale.isPending || !customPrompt.trim() ? 0.6 : 1 }}
                 onClick={handleGenerate}
                 disabled={generateTale.isPending || !customPrompt.trim()}>
 
                 {generateTale.isPending ?
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     {tr("fairytalegenerator_sehr_hazirlanir_04519a", "Sehr haz\u0131rlan\u0131r...")}
                   </> :
 
                   <>
-                    <Sparkles className="h-4 w-4 mr-2" />
+                    <Sparkles size={15} strokeWidth={2.2} />
                     {tr("fairytalegenerator_nagil_yarat_11707d", "Na\u011F\u0131l Yarat")}
                   </>
                 }
-              </Button>
+              </button>
             </motion.div>) : (
 
             /* Wizard Mode */
             <>
-              <Progress value={createStep / 5 * 100} className="mb-4" />
-              <p className="text-xs text-muted-foreground text-center mb-4">
+              <div className="h-2 rounded-full overflow-hidden mb-1" style={{ background: 'var(--a-line-strong)' }}>
+                <div className="h-full rounded-full transition-all" style={{ width: `${createStep / 5 * 100}%`, background: 'var(--a-grad-lav)' }} />
+              </div>
+              <p className="a-list-sub text-center mb-2" style={{ margin: '0 0 8px' }}>
                 {tr("fairytalegenerator_addim_9346cd", "Add\u0131m")} {createStep} / 5
               </p>
               <AnimatePresence mode="wait">
@@ -506,36 +489,32 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     className="space-y-4">
 
                     <div>
-                      <Label className="text-base font-semibold">{tr("fairytalegenerator_usagin_adi_163b8d", "Uşağın adı *")}</Label>
-                      <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_nagilda_esas_qehreman_kimi_olacaq_25a4c8", "Nağılda əsas qəhrəman kimi olacaq")}</p>
-                      <Input
+                      {fieldLabel(tr("fairytalegenerator_usagin_adi_163b8d", "Uşağın adı *"))}
+                      <p className="a-list-sub mb-2" style={{ margin: '2px 0 8px' }}>{tr("fairytalegenerator_nagilda_esas_qehreman_kimi_olacaq_25a4c8", "Nağılda əsas qəhrəman kimi olacaq")}</p>
+                      <input
+                        className="a-input w-full text-lg"
                         value={formData.child_name}
                         onChange={(e) => setFormData({ ...formData, child_name: e.target.value })}
                         placeholder={getPersistedLanguage() === 'en' ? "For example: Alice, Liam, Olivia..." : "Məsələn: Aysel, Murad, Ləman..."}
-                        className="text-lg"
                         autoFocus />
 
                     </div>
 
                     {/* Age Range */}
                     <div>
-                      <Label className="text-base font-semibold flex items-center gap-2">
-                        <Baby className="h-4 w-4" /> {tr("fairytalegenerator_yas_qrupu_54b8f9", "Ya\u015F qrupu")}
-                      </Label>
-                      <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_nagilin_cetinlik_seviyyesi_49f08d", "Nağılın çətinlik səviyyəsi")}</p>
+                      {fieldLabel(tr("fairytalegenerator_yas_qrupu_54b8f9", "Ya\u015F qrupu"), <Baby className="h-4 w-4" />)}
+                      <p className="a-list-sub mb-2" style={{ margin: '2px 0 8px' }}>{tr("fairytalegenerator_nagilin_cetinlik_seviyyesi_49f08d", "Nağılın çətinlik səviyyəsi")}</p>
                       <div className="grid grid-cols-4 gap-2">
                         {AGE_RANGES.map((age) =>
                           <button
                             key={age.value}
                             type="button"
                             onClick={() => setFormData({ ...formData, age_range: age.value })}
-                            className={`p-2 rounded-xl text-center transition-all ${formData.age_range === age.value ?
-                              'bg-primary text-primary-foreground shadow-md' :
-                              'bg-muted hover:bg-muted/80'}`
-                            }>
+                            className="p-2 rounded-xl text-center transition-all"
+                            style={formData.age_range === age.value ? pillOn : pillOff}>
 
                             <span className="text-lg block">{age.emoji}</span>
-                            <span className="text-xs font-medium">{age.label}</span>
+                            <span className="text-xs font-semibold">{age.label}</span>
                           </button>
                         )}
                       </div>
@@ -543,19 +522,15 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
 
                     {/* Language Selection */}
                     <div>
-                      <Label className="text-base font-semibold flex items-center gap-2">
-                        <Globe className="h-4 w-4" /> {tr("fairytalegenerator_nagilin_dili_04ad3e", "Na\u011F\u0131l\u0131n dili")}
-                      </Label>
+                      {fieldLabel(tr("fairytalegenerator_nagilin_dili_04ad3e", "Na\u011F\u0131l\u0131n dili"), <Globe className="h-4 w-4" />)}
                       <div className="grid grid-cols-2 gap-2 mt-2">
                         {LANGUAGES.map((lang) =>
                           <button
                             key={lang.code}
                             type="button"
                             onClick={() => setFormData({ ...formData, language: lang.code })}
-                            className={`p-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${formData.language === lang.code ?
-                              'bg-primary text-primary-foreground shadow-md' :
-                              'bg-muted hover:bg-muted/80'}`
-                            }>
+                            className="p-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
+                            style={formData.language === lang.code ? pillOn : pillOff}>
 
                             <img src={`https://flagcdn.com/w40/${lang.flag}.png`} alt={lang.code} className="w-6 h-auto rounded-sm shadow-sm" />
                             {lang.label}
@@ -564,7 +539,11 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                       </div>
                     </div>
 
-                    <Button className="w-full" onClick={() => setCreateStep(2)} disabled={!formData.child_name.trim()}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
+                    <button
+                      className="a-cta-btn w-full"
+                      style={{ justifyContent: 'center', height: 44, background: 'var(--a-lav-2)', color: '#fff', opacity: !formData.child_name.trim() ? 0.5 : 1 }}
+                      onClick={() => setCreateStep(2)}
+                      disabled={!formData.child_name.trim()}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</button>
                   </motion.div>
                 }
 
@@ -578,8 +557,8 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     className="space-y-4">
 
                     <div>
-                      <Label className="text-base font-semibold">{tr("fairytalegenerator_nagilin_movzusu_f10323", "Nağılın mövzusu *")}</Label>
-                      <p className="text-xs text-muted-foreground mb-3">{tr("fairytalegenerator_hansi_dunyada_macera_olsun_e7e752", "Hansı dünyada macəra olsun?")}</p>
+                      {fieldLabel(tr("fairytalegenerator_nagilin_movzusu_f10323", "Nağılın mövzusu *"))}
+                      <p className="a-list-sub mb-3" style={{ margin: '2px 0 12px' }}>{tr("fairytalegenerator_hansi_dunyada_macera_olsun_e7e752", "Hansı dünyada macəra olsun?")}</p>
                       <div className="grid grid-cols-3 gap-3">
                         {themes.map((theme) =>
                           <motion.button
@@ -588,13 +567,13 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                             onClick={() => setFormData({ ...formData, theme: theme.name })}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className={`p-4 rounded-xl text-center transition-all ${formData.theme === theme.name ?
-                              'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg' :
-                              'bg-muted hover:bg-muted/80'}`
-                            }>
+                            className="p-4 rounded-xl text-center transition-all"
+                            style={formData.theme === theme.name ?
+                            { background: 'var(--a-grad-lav)', color: '#3c2e5c', boxShadow: 'var(--a-card-shadow)', cursor: 'pointer', border: 'none' } :
+                            pillOff}>
 
                             <span className="text-3xl block mb-1">{theme.emoji}</span>
-                            <span className="text-xs font-medium">{theme.name}</span>
+                            <span className="text-xs font-semibold">{theme.name}</span>
                           </motion.button>
                         )}
                       </div>
@@ -602,18 +581,16 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
 
                     {/* Story Style */}
                     <div>
-                      <Label className="text-base font-semibold">{tr("fairytalegenerator_nagilin_uslubu_9f0076", "Nağılın üslubu")}</Label>
-                      <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_hansi_terzde_yazilsin_43fa45", "Hansı tərzdə yazılsın?")}</p>
+                      {fieldLabel(tr("fairytalegenerator_nagilin_uslubu_9f0076", "Nağılın üslubu"))}
+                      <p className="a-list-sub mb-2" style={{ margin: '2px 0 8px' }}>{tr("fairytalegenerator_hansi_terzde_yazilsin_43fa45", "Hansı tərzdə yazılsın?")}</p>
                       <div className="flex flex-wrap gap-2">
                         {STORY_STYLES.map((style) =>
                           <button
                             key={style.value}
                             type="button"
                             onClick={() => setFormData({ ...formData, story_style: style.value })}
-                            className={`px-3 py-1.5 rounded-full text-sm transition-all ${formData.story_style === style.value ?
-                              'bg-primary text-primary-foreground' :
-                              'bg-muted hover:bg-muted/80'}`
-                            }>
+                            className="px-3 py-1.5 rounded-full text-sm transition-all font-semibold"
+                            style={formData.story_style === style.value ? pillOn : pillOff}>
 
                             {style.emoji} {style.label}
                           </button>
@@ -622,8 +599,12 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => setCreateStep(1)}>{tr("common_geri", "Geri")}</Button>
-                      <Button className="flex-1" onClick={() => setCreateStep(3)} disabled={!formData.theme}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
+                      <button className="a-btn-soft" style={{ height: 44, padding: '0 18px' }} onClick={() => setCreateStep(1)}>{tr("common_geri", "Geri")}</button>
+                      <button
+                        className="a-cta-btn flex-1"
+                        style={{ justifyContent: 'center', height: 44, background: 'var(--a-lav-2)', color: '#fff', opacity: !formData.theme ? 0.5 : 1 }}
+                        onClick={() => setCreateStep(3)}
+                        disabled={!formData.theme}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</button>
                     </div>
                   </motion.div>
                 }
@@ -638,24 +619,23 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     className="space-y-4">
 
                     <div>
-                      <Label className="text-base font-semibold">{tr("fairytalegenerator_komekci_qehreman_077b6f", "Köməkçi qəhrəman")}</Label>
-                      <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_isteye_bagli_usagin_dostu_f51381", "İstəyə bağlı - uşağın dostu")}</p>
+                      {fieldLabel(tr("fairytalegenerator_komekci_qehreman_077b6f", "Köməkçi qəhrəman"))}
+                      <p className="a-list-sub mb-2" style={{ margin: '2px 0 8px' }}>{tr("fairytalegenerator_isteye_bagli_usagin_dostu_f51381", "İstəyə bağlı - uşağın dostu")}</p>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {HERO_SUGGESTIONS.map((hero) =>
                           <button
                             key={hero.label}
                             type="button"
                             onClick={() => setFormData({ ...formData, hero: hero.label })}
-                            className={`px-3 py-1.5 rounded-full text-sm transition-all ${formData.hero === hero.label ?
-                              'bg-primary text-primary-foreground' :
-                              'bg-muted hover:bg-muted/80'}`
-                            }>
+                            className="px-3 py-1.5 rounded-full text-sm transition-all font-semibold"
+                            style={formData.hero === hero.label ? pillOn : pillOff}>
 
                             {hero.emoji} {hero.label}
                           </button>
                         )}
                       </div>
-                      <Input
+                      <input
+                        className="a-input w-full"
                         value={formData.hero}
                         onChange={(e) => setFormData({ ...formData, hero: e.target.value })}
                         placeholder={tr("fairytalegenerator_ve_ya_ozunuz_yazin_cb37bc", "Və ya özünüz yazın...")} />
@@ -663,8 +643,11 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => setCreateStep(2)}>{tr("common_geri", "Geri")}</Button>
-                      <Button className="flex-1" onClick={() => setCreateStep(4)}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
+                      <button className="a-btn-soft" style={{ height: 44, padding: '0 18px' }} onClick={() => setCreateStep(2)}>{tr("common_geri", "Geri")}</button>
+                      <button
+                        className="a-cta-btn flex-1"
+                        style={{ justifyContent: 'center', height: 44, background: 'var(--a-lav-2)', color: '#fff' }}
+                        onClick={() => setCreateStep(4)}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</button>
                     </div>
                   </motion.div>
                 }
@@ -679,18 +662,16 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     className="space-y-4">
 
                     <div>
-                      <Label className="text-base font-semibold">{tr("fairytalegenerator_terbiyevi_mesaj_6bdeb6", "Tərbiyəvi mesaj")}</Label>
-                      <p className="text-xs text-muted-foreground mb-2">{tr("fairytalegenerator_nagilin_sonunda_hansi_ders_olsun_4d833e", "Nağılın sonunda hansı dərs olsun?")}</p>
+                      {fieldLabel(tr("fairytalegenerator_terbiyevi_mesaj_6bdeb6", "Tərbiyəvi mesaj"))}
+                      <p className="a-list-sub mb-2" style={{ margin: '2px 0 8px' }}>{tr("fairytalegenerator_nagilin_sonunda_hansi_ders_olsun_4d833e", "Nağılın sonunda hansı dərs olsun?")}</p>
                       <div className="grid grid-cols-2 gap-2">
                         {MORAL_LESSONS.map((lesson) =>
                           <button
                             key={lesson.value}
                             type="button"
                             onClick={() => setFormData({ ...formData, moral_lesson: lesson.value })}
-                            className={`p-2 rounded-lg text-left text-sm transition-all ${formData.moral_lesson === lesson.value ?
-                              'bg-primary text-primary-foreground' :
-                              'bg-muted hover:bg-muted/80'}`
-                            }>
+                            className="p-2 rounded-lg text-left text-sm transition-all font-semibold"
+                            style={formData.moral_lesson === lesson.value ? pillOn : pillOff}>
 
                             {lesson.emoji} {lesson.label}
                           </button>
@@ -699,8 +680,11 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => setCreateStep(3)}>{tr("common_geri", "Geri")}</Button>
-                      <Button className="flex-1" onClick={() => setCreateStep(5)}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button>
+                      <button className="a-btn-soft" style={{ height: 44, padding: '0 18px' }} onClick={() => setCreateStep(3)}>{tr("common_geri", "Geri")}</button>
+                      <button
+                        className="a-cta-btn flex-1"
+                        style={{ justifyContent: 'center', height: 44, background: 'var(--a-lav-2)', color: '#fff' }}
+                        onClick={() => setCreateStep(5)}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</button>
                     </div>
                   </motion.div>
                 }
@@ -714,68 +698,69 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-4">
 
-                    <div className="bg-muted/50 rounded-xl p-4 space-y-2">
-                      <h3 className="font-semibold text-sm mb-3">{tr("fairytalegenerator_nagil_xulasesi_07d402", "📋 Nağıl xülasəsi")}</h3>
+                    <div className="rounded-2xl p-4 space-y-2" style={{ background: 'var(--a-surface-soft)' }}>
+                      <h3 className="font-bold text-sm mb-3 a-heading" style={{ margin: '0 0 12px', color: 'var(--a-ink)' }}>{tr("fairytalegenerator_nagil_xulasesi_07d402", "📋 Nağıl xülasəsi")}</h3>
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
-                          <span className="text-muted-foreground">{tr("fairytalegenerator_usaq_b70dbc", "Uşaq:")}</span>
-                          <p className="font-medium">{formData.child_name}</p>
+                          <span style={{ color: 'var(--a-ink-soft)' }}>{tr("fairytalegenerator_usaq_b70dbc", "Uşaq:")}</span>
+                          <p className="font-semibold" style={{ margin: 0, color: 'var(--a-ink)' }}>{formData.child_name}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{tr("fairytalegenerator_yas_8ef26c", "Yaş:")}</span>
-                          <p className="font-medium">{AGE_RANGES.find((a) => a.value === formData.age_range)?.label}</p>
+                          <span style={{ color: 'var(--a-ink-soft)' }}>{tr("fairytalegenerator_yas_8ef26c", "Yaş:")}</span>
+                          <p className="font-semibold" style={{ margin: 0, color: 'var(--a-ink)' }}>{AGE_RANGES.find((a) => a.value === formData.age_range)?.label}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{tr("fairytalegenerator_movzu_5a3526", "Mövzu:")}</span>
-                          <p className="font-medium">{themes.find((t) => t.name === formData.theme)?.name || formData.theme}</p>
+                          <span style={{ color: 'var(--a-ink-soft)' }}>{tr("fairytalegenerator_movzu_5a3526", "Mövzu:")}</span>
+                          <p className="font-semibold" style={{ margin: 0, color: 'var(--a-ink)' }}>{themes.find((t) => t.name === formData.theme)?.name || formData.theme}</p>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{tr("untranslated_dil_rfnolb", "Dil:")}</span>
-                          <p className="font-medium flex items-center gap-2">
+                          <span style={{ color: 'var(--a-ink-soft)' }}>{tr("untranslated_dil_rfnolb", "Dil:")}</span>
+                          <p className="font-semibold flex items-center gap-2" style={{ margin: 0, color: 'var(--a-ink)' }}>
                             <img src={`https://flagcdn.com/w40/${LANGUAGES.find((l) => l.code === formData.language)?.flag}.png`} alt="" className="w-5 h-auto rounded-sm shadow-sm" />
                             {LANGUAGES.find((l) => l.code === formData.language)?.label}
                           </p>
                         </div>
                         {formData.hero &&
                           <div>
-                            <span className="text-muted-foreground">{tr("fairytalegenerator_qehreman_aea468", "Qəhrəman:")}</span>
-                            <p className="font-medium">{formData.hero}</p>
+                            <span style={{ color: 'var(--a-ink-soft)' }}>{tr("fairytalegenerator_qehreman_aea468", "Qəhrəman:")}</span>
+                            <p className="font-semibold" style={{ margin: 0, color: 'var(--a-ink)' }}>{formData.hero}</p>
                           </div>
                         }
                         {formData.moral_lesson &&
                           <div>
-                            <span className="text-muted-foreground">{tr("untranslated_mesaj_x98xat", "Mesaj:")}</span>
-                            <p className="font-medium">{MORAL_LESSONS.find((m) => m.value === formData.moral_lesson)?.label}</p>
+                            <span style={{ color: 'var(--a-ink-soft)' }}>{tr("untranslated_mesaj_x98xat", "Mesaj:")}</span>
+                            <p className="font-semibold" style={{ margin: 0, color: 'var(--a-ink)' }}>{MORAL_LESSONS.find((m) => m.value === formData.moral_lesson)?.label}</p>
                           </div>
                         }
                         {formData.story_style &&
                           <div>
-                            <span className="text-muted-foreground">{tr("fairytalegenerator_uslub_b96040", "Üslub:")}</span>
-                            <p className="font-medium">{STORY_STYLES.find((s) => s.value === formData.story_style)?.label}</p>
+                            <span style={{ color: 'var(--a-ink-soft)' }}>{tr("fairytalegenerator_uslub_b96040", "Üslub:")}</span>
+                            <p className="font-semibold" style={{ margin: 0, color: 'var(--a-ink)' }}>{STORY_STYLES.find((s) => s.value === formData.story_style)?.label}</p>
                           </div>
                         }
                       </div>
                     </div>
 
                     <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => setCreateStep(4)}>{tr("common_geri", "Geri")}</Button>
-                      <Button
-                        className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600"
+                      <button className="a-btn-soft" style={{ height: 44, padding: '0 18px' }} onClick={() => setCreateStep(4)}>{tr("common_geri", "Geri")}</button>
+                      <button
+                        className="a-cta-btn flex-1"
+                        style={{ justifyContent: 'center', height: 44, background: 'var(--a-lav-2)', color: '#fff', opacity: generateTale.isPending ? 0.6 : 1 }}
                         onClick={handleGenerate}
                         disabled={generateTale.isPending}>
 
                         {generateTale.isPending ?
                           <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            <Loader2 className="h-4 w-4 animate-spin" />
                             {tr("fairytalegenerator_sehr_hazirlanir_04519a", "Sehr haz\u0131rlan\u0131r...")}
                           </> :
 
                           <>
-                            <Sparkles className="h-4 w-4 mr-2" />
+                            <Sparkles size={15} strokeWidth={2.2} />
                             {tr("fairytalegenerator_nagil_yarat_11707d", "Na\u011F\u0131l Yarat")}
                           </>
                         }
-                      </Button>
+                      </button>
                     </div>
                   </motion.div>
                 }
@@ -789,17 +774,18 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
       <Dialog open={!!selectedTale} onOpenChange={(open) => {
         if (!open) setSelectedTale(null);
       }}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-0">
+        <DialogContent className="a-scope max-w-md max-h-[90vh] overflow-y-auto p-0 rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           {selectedTale &&
             <>
               {/* Header with gradient */}
-              <div className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white p-6 sticky top-0 z-20 isolate">
+              <div className="p-6 sticky top-0 z-20 isolate" style={{ background: 'var(--a-grad-lav)' }}>
                 {/* Close button */}
                 <button
                   onClick={() => setSelectedTale(null)}
-                  className="absolute top-3 right-3 z-30 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors">
+                  className="absolute top-3 right-3 z-30 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                  style={{ background: 'rgba(255,255,255,0.35)' }}>
 
-                  <X className="h-5 w-5 text-white" />
+                  <X className="h-5 w-5" style={{ color: '#3c2e5c' }} />
                 </button>
 
                 <div className="flex items-center gap-3 mb-4 relative z-20 pr-8">
@@ -807,12 +793,12 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     {themes.find((t) => t.name === selectedTale.theme)?.emoji || '📖'}
                   </div>
                   <div>
-                    <h2 className="font-bold text-lg">{selectedTale.title}</h2>
-                    <p className="text-sm text-white/80">{selectedTale.child_name} {tr("fairytalegenerator_ucun_0b2db5", "\xFC\xE7\xFCn")}</p>
+                    <h2 className="font-bold text-lg a-heading" style={{ margin: 0, color: '#3c2e5c' }}>{selectedTale.title}</h2>
+                    <p className="text-sm" style={{ margin: 0, color: '#3c2e5c', opacity: 0.8 }}>{selectedTale.child_name} {tr("fairytalegenerator_ucun_0b2db5", "\xFC\xE7\xFCn")}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-white/80">
+                <div className="flex items-center gap-2 text-sm" style={{ color: '#3c2e5c', opacity: 0.8 }}>
                   <Clock className="h-4 w-4" />
                   <span>{getReadingTime(selectedTale.content)} {tr("fairytalegenerator_deqiqelik_oxu_1896a5", "d\u0259qiq\u0259lik oxu")}</span>
                   <span className="mx-2">•</span>
@@ -821,45 +807,51 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               </div>
 
               <div className="p-6 space-y-4">
-                <div className="prose prose-sm dark:prose-invert max-w-none leading-relaxed">
+                <div className="prose prose-sm dark:prose-invert max-w-none leading-relaxed" style={{ color: 'var(--a-body-text)' }}>
                   <MarkdownContent content={selectedTale.content} />
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex gap-2 pt-4 border-t sticky bottom-0 bg-background pb-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
+                <div className="flex gap-2 pt-4 sticky bottom-0 pb-2" style={{ borderTop: '1px solid var(--a-line)', background: 'var(--a-surface)' }}>
+                  <button
+                    className="a-icon-btn"
+                    style={{ width: 40, height: 40 }}
                     onClick={() => {
                       toggleFavorite.mutate({ id: selectedTale.id, isFavorite: !selectedTale.is_favorite });
                       setSelectedTale({ ...selectedTale, is_favorite: !selectedTale.is_favorite });
                     }}>
 
-                    <Heart className={`h-4 w-4 ${selectedTale.is_favorite ? 'fill-red-500 text-white' : ''}`} />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    <Heart
+                      className="h-4 w-4"
+                      style={selectedTale.is_favorite ? { fill: 'var(--a-pink-2)', color: 'var(--a-pink-2)' } : undefined} />
+                  </button>
+                  <button
+                    className="a-icon-btn"
+                    style={{ width: 40, height: 40 }}
                     onClick={() => {
                       deleteTale.mutate(selectedTale.id);
                       setSelectedTale(null);
                     }}>
 
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                    <Trash2 className="h-4 w-4" style={{ color: 'var(--a-pink-ink)' }} />
+                  </button>
                   <div className="flex-1" />
-                  <Button variant="outline" onClick={() => setSelectedTale(null)}>
-                    <X className="h-4 w-4 mr-1" />
+                  <button className="a-btn-soft" style={{ height: 40, padding: '0 16px' }} onClick={() => setSelectedTale(null)}>
+                    <X size={13} strokeWidth={2.2} />
                     {tr("fairytalegenerator_bagla_84bdc9", "Ba\u011Fla")}
-                  </Button>
+                  </button>
                 </div>
               </div>
             </>
           }
         </DialogContent>
       </Dialog>
-    </div>);
+
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="fairy_tale" />
+    </ToolPage>);
 
 };
 

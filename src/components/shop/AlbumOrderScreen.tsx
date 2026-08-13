@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ShoppingBag, Loader2, Upload, Check, User, MapPin, FileText, CreditCard, Tag, Package, Info, icons } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Loader2, Upload, Check, User, MapPin, FileText, CreditCard, Tag, Package, Info } from 'lucide-react';
+import { getDynamicIcon } from '@/lib/dynamicIcon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,6 +33,11 @@ const albumInfo = {
     features: [tr("albumorderscreen_12_ayliq_xatireler_961b3a", "12 ayl\u0131q xatir\u0259l\u0259r"), tr("albumorderscreen_premium_cap_keyfiyyeti_be5e01", "Premium \xE7ap keyfiyy\u0259ti"), tr("albumorderscreen_hessas_reng_tesviri_d6afd5", "H\u0259ssas r\u0259ng t\u0259sviri"), tr("albumorderscreen_xususi_qablasdirma_5e15a5", "X\xFCsusi qabla\u015Fd\u0131rma")]
   }
 };
+
+// Form input stili
+const inputStyle: React.CSSProperties = { background: 'var(--a-surface)', borderColor: 'var(--a-line-strong)', color: 'var(--a-ink)' };
+const labelStyle: React.CSSProperties = { fontSize: 11.5, fontWeight: 600, color: 'var(--a-ink-soft)' };
+const sectionTitleStyle: React.CSSProperties = { fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' };
 
 const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
   const { user } = useAuth();
@@ -100,44 +106,45 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }} className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-          <Check className="w-10 h-10 text-green-600" />
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 text-center" style={{ background: 'var(--a-bg)' }}>
+        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }}
+        className="w-20 h-20 rounded-full flex items-center justify-center mb-4" style={{ background: 'var(--a-green-1)' }}>
+          <Check size={38} style={{ color: 'var(--a-green-ink)' }} strokeWidth={2.5} />
         </motion.div>
-        <h2 className="text-xl font-bold mb-2">{tr("albumorderscreen_sifarisiniz_qebul_edildi_8a131d", "Sifarişiniz qəbul edildi! 🎉")}</h2>
-        <p className="text-muted-foreground mb-1 text-sm">{tr("albumorderscreen_sifaris_nomreniz_tezlikle_gonderilecek_9398b5", "Sifariş nömrəniz tezliklə göndəriləcək.")}</p>
-        <p className="text-muted-foreground mb-6 text-xs">{tr("albumorderscreen_elaqe_saxlanilacaq_ve_qiymet_barede_melu_0b90e4", "Əlaqə saxlanılacaq və qiymət barədə məlumat veriləcək.")}</p>
-        <Button onClick={onBack} className="rounded-xl px-8">{tr("albumorderscreen_geri_qayit_ff66c2", "Geri qayıt")}</Button>
+        <h2 className="mb-2" style={{ fontSize: 19, fontWeight: 800, color: 'var(--a-ink)' }}>{tr("albumorderscreen_sifarisiniz_qebul_edildi_8a131d", "Sifarişiniz qəbul edildi! 🎉")}</h2>
+        <p className="mb-1" style={{ fontSize: 13, color: 'var(--a-ink-soft)' }}>{tr("albumorderscreen_sifaris_nomreniz_tezlikle_gonderilecek_9398b5", "Sifariş nömrəniz tezliklə göndəriləcək.")}</p>
+        <p className="mb-6" style={{ fontSize: 11.5, color: 'var(--a-ink-faint)' }}>{tr("albumorderscreen_elaqe_saxlanilacaq_ve_qiymet_barede_melu_0b90e4", "Əlaqə saxlanılacaq və qiymət barədə məlumat veriləcək.")}</p>
+        <Button onClick={onBack} className="rounded-full px-8 text-white border-0 hover:opacity-95" style={{ background: 'var(--a-peach-2)' }}>{tr("albumorderscreen_geri_qayit_ff66c2", "Geri qayıt")}</Button>
       </div>);
 
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="a-scope min-h-screen pb-28" style={{ background: 'var(--a-bg)' }}>
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 py-3 safe-area-top flex items-center gap-3">
-          <motion.button onClick={onBack} className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center" whileTap={{ scale: 0.95 }}>
-            <ArrowLeft className="w-5 h-5" />
+      <div className="sticky top-0 z-20" style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
+        <div className="px-4 py-2.5 safe-area-top flex items-center gap-3">
+          <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
+            <ArrowLeft size={16} strokeWidth={2} />
           </motion.button>
-          <h1 className="text-lg font-bold flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-primary" />
+          <h1 className="flex items-center gap-2" style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>
+            <ShoppingBag size={18} style={{ color: 'var(--a-accent-ink)' }} />
             {tr("albumorderscreen_fiziki_albom_sifarisi_c27c8a", "Fiziki Albom Sifari\u015Fi")}
           </h1>
         </div>
       </div>
 
-      <div className="px-4 pt-4 space-y-4">
+      <div className="px-4 pt-4 space-y-4 max-w-md mx-auto">
         {/* Album Info Card */}
-        <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl p-4 border border-primary/20">
+        <div style={{ background: 'var(--a-surface)', borderRadius: 'var(--a-radius-md)', padding: 16, boxShadow: 'var(--a-card-shadow)', border: '1.5px solid var(--a-peach-1)' }}>
           <div className="flex items-start gap-3">
             <span className="text-3xl">{info.emoji}</span>
             <div className="flex-1">
-              <p className="text-sm font-bold mb-1">{info.title}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">{info.description}</p>
+              <p style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--a-ink)', marginBottom: 4 }}>{info.title}</p>
+              <p className="leading-relaxed" style={{ fontSize: 11.5, color: 'var(--a-ink-soft)' }}>{info.description}</p>
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {info.features.map((f, i) =>
-                <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                <span key={i} style={{ fontSize: 10, padding: '3px 9px', borderRadius: 999, background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', fontWeight: 600 }}>
                     ✓ {f}
                   </span>
                 )}
@@ -147,59 +154,59 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
         </div>
 
         {/* Info Note */}
-        <div className="flex items-start gap-2 p-3 rounded-xl bg-muted/50 border border-border/50">
-          <Info className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
+        <div className="flex items-start gap-2" style={{ padding: 13, borderRadius: 14, background: 'var(--a-disclaimer-bg)', border: '1px solid var(--a-disclaimer-border)' }}>
+          <Info size={15} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--a-disclaimer-strong)' }} />
+          <p className="leading-relaxed" style={{ fontSize: 11, color: 'var(--a-disclaimer-ink)' }}>
             {tr("albumorderscreen_qiymet_albom_novu_ve_sehife_sa_1b53a3", "Qiym\u0259t albom n\xF6v\xFC v\u0259 s\u0259hif\u0259 say\u0131na g\xF6r\u0259 d\u0259yi\u015Fir. Sifari\u015Fd\u0259n sonra sizinl\u0259 \u0259laq\u0259 saxlan\u0131lacaq v\u0259 d\u0259qiq qiym\u0259t bildirilic\u0259k.")}
           </p>
         </div>
 
         {/* Contact Info */}
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold flex items-center gap-2">
-            <User className="w-4 h-4 text-primary" />
+        <div className="a-card space-y-3">
+          <h2 className="flex items-center gap-2" style={sectionTitleStyle}>
+            <User size={15} style={{ color: 'var(--a-accent-ink)' }} />
             {tr("albumorderscreen_elaqe_melumatlari_8a7aae", "\u018Flaq\u0259 M\u0259lumatlar\u0131")}
           </h2>
           <div>
-            <Label className="text-xs text-muted-foreground">{tr("untranslated_ad_soyad_lm5srh", "Ad, Soyad *")}</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={tr("albumorderscreen_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} className="rounded-xl mt-1 h-11" />
+            <Label style={labelStyle}>{tr("untranslated_ad_soyad_lm5srh", "Ad, Soyad *")}</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={tr("albumorderscreen_adinizi_daxil_edin_bd2b57", "Adınızı daxil edin")} className="rounded-xl mt-1 h-11" style={inputStyle} />
           </div>
           <div>
-            <Label className="text-xs text-muted-foreground">{tr("albumorderscreen_telefon_nomresi_b26dbc", "Telefon nömrəsi *")}</Label>
-            <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+994 50 123 45 67" className="rounded-xl mt-1 h-11" />
+            <Label style={labelStyle}>{tr("albumorderscreen_telefon_nomresi_b26dbc", "Telefon nömrəsi *")}</Label>
+            <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+994 50 123 45 67" className="rounded-xl mt-1 h-11" style={inputStyle} />
           </div>
         </div>
 
         {/* Delivery Address */}
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-primary" />
+        <div className="a-card space-y-3">
+          <h2 className="flex items-center gap-2" style={sectionTitleStyle}>
+            <MapPin size={15} style={{ color: 'var(--a-accent-ink)' }} />
             {tr("albumorderscreen_catdirilma_unvani_10ea11", "\xC7atd\u0131r\u0131lma \xDCnvan\u0131")}
           </h2>
           <div>
-            <Label className="text-xs text-muted-foreground">{tr("albumorderscreen_seher_5f373c", "Şəhər")}</Label>
-            <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder={tr("albumorderscreen_seher_5f373c", "Şəhər")} className="rounded-xl mt-1 h-11" />
+            <Label style={labelStyle}>{tr("albumorderscreen_seher_5f373c", "Şəhər")}</Label>
+            <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder={tr("albumorderscreen_seher_5f373c", "Şəhər")} className="rounded-xl mt-1 h-11" style={inputStyle} />
           </div>
           <div>
-            <Label className="text-xs text-muted-foreground">{tr("albumorderscreen_unvan_kuce_bina_menzil_9cfd36", "Ünvan (küçə, bina, mənzil) *")}</Label>
-            <Textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder={tr("albumorderscreen_tam_unvaninizi_yazin_0106c0", "Tam ünvanınızı yazın")} className="rounded-xl mt-1" rows={2} />
+            <Label style={labelStyle}>{tr("albumorderscreen_unvan_kuce_bina_menzil_9cfd36", "Ünvan (küçə, bina, mənzil) *")}</Label>
+            <Textarea value={address} onChange={(e) => setAddress(e.target.value)} placeholder={tr("albumorderscreen_tam_unvaninizi_yazin_0106c0", "Tam ünvanınızı yazın")} className="rounded-xl mt-1" style={inputStyle} rows={2} />
           </div>
         </div>
 
         {/* Notes */}
-        <div className="space-y-2">
-          <h2 className="text-sm font-semibold flex items-center gap-2">
-            <FileText className="w-4 h-4 text-primary" />
+        <div className="a-card space-y-2">
+          <h2 className="flex items-center gap-2" style={sectionTitleStyle}>
+            <FileText size={15} style={{ color: 'var(--a-accent-ink)' }} />
             {tr("albumorderscreen_elave_qeydler_49e1f1", "\u018Flav\u0259 Qeydl\u0259r")}
           </h2>
-          <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={tr("albumorderscreen_xususi_istekler_mesaj_ve_s_isteye_bagli_ba89dd", "Xüsusi istəklər, mesaj və s. (istəyə bağlı)")} className="rounded-xl" rows={2} />
+          <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={tr("albumorderscreen_xususi_istekler_mesaj_ve_s_isteye_bagli_ba89dd", "Xüsusi istəklər, mesaj və s. (istəyə bağlı)")} className="rounded-xl" style={inputStyle} rows={2} />
         </div>
 
         {/* Payment Methods */}
         {activePaymentMethods.length > 0 &&
-        <div className="space-y-2">
-            <h2 className="text-sm font-semibold flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-primary" />
+        <div className="a-card space-y-2">
+            <h2 className="flex items-center gap-2" style={sectionTitleStyle}>
+              <CreditCard size={15} style={{ color: 'var(--a-accent-ink)' }} />
               {tr("albumorderscreen_odenis_usulu_1ce843", "\xD6d\u0259ni\u015F \xDCsulu")}
             </h2>
             <div className="space-y-2">
@@ -207,21 +214,25 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
             <button
               key={m.id}
               onClick={() => setPaymentMethod(m.method_key)}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left ${
-              paymentMethod === m.method_key ? 'border-primary bg-primary/5' : 'border-border/50 bg-card'}`
-              }>
-              
+              className="w-full flex items-center gap-3 transition-all text-left"
+              style={{
+                padding: 13,
+                borderRadius: 16,
+                background: paymentMethod === m.method_key ? 'var(--a-peach-1)' : 'var(--a-surface-soft)',
+                border: paymentMethod === m.method_key ? '2px solid var(--a-peach-2)' : '2px solid transparent'
+              }}>
+
                   {(() => {
-                const IconComp = m.icon && icons[m.icon as keyof typeof icons];
-                return IconComp ? <IconComp className="w-5 h-5 text-primary" /> : <CreditCard className="w-5 h-5 text-primary" />;
+                const IconComp = getDynamicIcon(m.icon, CreditCard);
+                return <IconComp size={19} style={{ color: 'var(--a-accent-ink)' }} />;
               })()}
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{m.label}</p>
-                    {m.description && <p className="text-[11px] text-muted-foreground">{m.description}</p>}
+                    <p style={{ fontSize: 13, fontWeight: 600, color: paymentMethod === m.method_key ? 'var(--a-accent-ink)' : 'var(--a-ink)' }}>{m.label}</p>
+                    {m.description && <p style={{ fontSize: 11, color: 'var(--a-ink-soft)' }}>{m.description}</p>}
                   </div>
                   {paymentMethod === m.method_key &&
-              <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                      <Check className="w-3 h-3 text-primary-foreground" />
+              <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'var(--a-peach-2)' }}>
+                      <Check className="w-3 h-3 text-white" strokeWidth={3} />
                     </div>
               }
                 </button>
@@ -233,18 +244,19 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
         {/* Proof upload - only for card transfer */}
         {paymentMethod === 'c2c_transfer' &&
         <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground">{tr("albumorderscreen_odenis_subutu_sekil_pdf_4e1fa5", "Ödəniş sübutu (şəkil/PDF)")}</Label>
-            <label className="flex items-center gap-3 p-3 rounded-xl border-2 border-dashed border-border/60 cursor-pointer hover:border-primary/40 transition-all bg-card">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Upload className="w-4 h-4 text-primary" />
+            <Label style={labelStyle}>{tr("albumorderscreen_odenis_subutu_sekil_pdf_4e1fa5", "Ödəniş sübutu (şəkil/PDF)")}</Label>
+            <label className="flex items-center gap-3 cursor-pointer transition-all"
+          style={{ padding: 13, borderRadius: 16, border: '2px dashed var(--a-line-strong)', background: 'var(--a-surface)' }}>
+              <div className="w-10 h-10 flex items-center justify-center flex-shrink-0" style={{ borderRadius: 12, background: 'var(--a-peach-1)' }}>
+                <Upload size={16} style={{ color: 'var(--a-accent-ink)' }} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{proofFile ? proofFile.name : tr("albumorderscreen_fayl_secin_6b7641", "Fayl se\xE7in")}</p>
-                <p className="text-[10px] text-muted-foreground">{tr("albumorderscreen_jpg_png_ve_ya_pdf_db04d6", "JPG, PNG və ya PDF")}</p>
+                <p className="truncate" style={{ fontSize: 13, fontWeight: 600, color: 'var(--a-ink)' }}>{proofFile ? proofFile.name : tr("albumorderscreen_fayl_secin_6b7641", "Fayl se\xE7in")}</p>
+                <p style={{ fontSize: 10, color: 'var(--a-ink-soft)' }}>{tr("albumorderscreen_jpg_png_ve_ya_pdf_db04d6", "JPG, PNG və ya PDF")}</p>
               </div>
               {proofFile &&
-            <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-                  <Check className="w-3 h-3 text-white" />
+            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'var(--a-green-2)' }}>
+                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
                 </div>
             }
               <input type="file" accept="image/*,application/pdf" className="hidden" onChange={(e) => setProofFile(e.target.files?.[0] || null)} />
@@ -253,9 +265,9 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
         }
 
         {/* Coupon Code */}
-        <div className="space-y-2">
-          <h2 className="text-sm font-semibold flex items-center gap-2">
-            <Tag className="w-4 h-4 text-primary" />
+        <div className="a-card space-y-2">
+          <h2 className="flex items-center gap-2" style={sectionTitleStyle}>
+            <Tag size={15} style={{ color: 'var(--a-accent-ink)' }} />
             Kupon Kodu
           </h2>
           <CouponInput
@@ -265,28 +277,30 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
             onRemove={removeCoupon}
             appliedCoupon={appliedCoupon}
             validating={validating} />
-          
+
         </div>
 
         {/* Delivery Info */}
-        <div className="bg-muted/50 rounded-xl p-3 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <Package className="w-5 h-5 text-primary" />
+        <div className="flex items-center gap-3" style={{ background: 'var(--a-blue-1)', borderRadius: 16, padding: 13 }}>
+          <div className="w-10 h-10 flex items-center justify-center flex-shrink-0" style={{ borderRadius: 12, background: 'var(--a-chip-overlay)' }}>
+            <Package size={19} style={{ color: 'var(--a-blue-ink)' }} />
           </div>
           <div>
-            <p className="font-medium text-sm">{tr("albumorderscreen_catdirilma_e955cf", "Çatdırılma")}</p>
-            <p className="text-[11px] text-muted-foreground">{tr("albumorderscreen_baki_daxili_pulsuz_catdirilma_regionlar__2851a6", "Bakı daxili pulsuz çatdırılma. Regionlar üçün əlavə haqqı bildiriləcək.")}</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#153e57' }}>{tr("albumorderscreen_catdirilma_e955cf", "Çatdırılma")}</p>
+            <p style={{ fontSize: 11, color: 'var(--a-blue-ink)' }}>{tr("albumorderscreen_baki_daxili_pulsuz_catdirilma_regionlar__2851a6", "Bakı daxili pulsuz çatdırılma. Regionlar üçün əlavə haqqı bildiriləcək.")}</p>
           </div>
         </div>
       </div>
 
       {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border p-4 safe-bottom">
+      <div className="fixed bottom-0 left-0 right-0 p-4 safe-bottom"
+      style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', borderTop: '1px solid var(--a-line)' }}>
         <Button
           onClick={handleSubmit}
           disabled={submitting || !name.trim() || !phone.trim() || !address.trim()}
-          className="w-full h-12 rounded-2xl text-base font-bold">
-          
+          className="w-full h-12 rounded-full text-base font-bold text-white border-0 max-w-md mx-auto flex hover:opacity-95"
+          style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}>
+
           {submitting ?
           <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{tr("albumorderscreen_gonderilir_1d548c", "Göndərilir...")}</> : tr("albumorderscreen_sifarisi_gonder_41d5a1", "Sifari\u015Fi G\xF6nd\u0259r")
 

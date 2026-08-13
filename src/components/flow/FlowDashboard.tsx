@@ -5,8 +5,7 @@ import { Droplets, Heart, Sparkles, AlertCircle, Plus, Calendar as CalendarIcon,
 import { getTranslatedTip } from '@/lib/tip-translations';
 import { useUserStore } from '@/store/userStore';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
-import { format, addDays, differenceInDays } from 'date-fns';
-import { az } from 'date-fns/locale';
+import { format, differenceInDays } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { Calendar } from '@/components/ui/calendar';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -38,11 +37,19 @@ import DailyStoryCards from './DailyStoryCards';
 import PartnerFlowStatusCard from './PartnerFlowStatusCard';
 import WaterWidget from '@/components/dashboard/WaterWidget';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
+import { useCycleHistory } from '@/hooks/useCycleHistory';
+import { computeAdaptiveCycleStats, refineOvulation } from '@/lib/cycle-predictions';
+import { useFlowDailyLogs } from '@/hooks/useFlowDailyLogs';
+import PremiumGate from '@/components/premium/PremiumGate';
 const FlowDashboard = () => {
   const { getCycleData, cycleLength, periodLength, setLastPeriodDate, language } = useUserStore();
   const cycleData = getCycleData();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // Adaptiv proqnoz statistikası (cycle_history-dən öyrənir)
+  const { data: cycleHistoryData = [] } = useCycleHistory();
+  const adaptiveStats = computeAdaptiveCycleStats(cycleHistoryData, cycleLength || 28, periodLength || 5);
 
   const [selectedCategory, setSelectedCategory] = useState<TipCategory | 'all'>('all');
   const [showPeriodConfirm, setShowPeriodConfirm] = useState(false);
@@ -111,6 +118,11 @@ const FlowDashboard = () => {
       toast.success(tr("flowdashboard_period_baslangici_qeyd_edildi_6961a5", "Period ba\u015Flan\u011F\u0131c\u0131 qeyd edildi! \uD83E\uDE78"), {
         description: format(selectedDay, 'd MMMM yyyy', { locale: getCurrentDateLocale() })
       });
+
+      // Health inteqrasiyası aktivdirsə → Apple Health / Health Connect-ə yaz (arxa planda)
+      import('@/lib/healthCycle').then((m) =>
+      m.writePeriodToHealth(selectedDay, periodLength || 5)
+      ).catch(() => {});
     } catch (error) {
       console.error('Error marking period:', error);
       toast.error(tr("flowdashboard_xeta_bas_verdi_yeniden_cehd_ed_816221", "X\u0259ta ba\u015F verdi, yenid\u0259n c\u0259hd edin"));
@@ -200,7 +212,12 @@ const FlowDashboard = () => {
     if (language === 'en') {
       return defaultEn;
     }
-    return dbValue || tr(trKey, defaultAz);
+    // Admin DB dəyəri AZ mətnidir — yalnız AZ dilində üstünlük verilir;
+    // ru/tr-də tr() tərcüməsi işləsin (əvvəllər AZ mətni bütün dilləri üstələyirdi)
+    if (language === 'az') {
+      return dbValue || tr(trKey, defaultAz);
+    }
+    return tr(trKey, defaultAz);
   };
 
   const labelNextPeriod = getDynamicLabel(upcomingLabels?.flow_label_next_period, "Növbəti Period", "flowdashboard_novbeti_period_b29c4a", "Upcoming Period");
@@ -221,8 +238,12 @@ const FlowDashboard = () => {
   // Calculate next period and fertile window
   const nextPeriodDate = getNextPeriodDate(lastPeriodDate, cycleLength);
   const fertileWindowData = getFertileWindow(lastPeriodDate, cycleLength);
-  const fertileStart = fertileWindowData.start;
-  const fertileEnd = fertileWindowData.end;
+
+  // Flow P1: OPK testi + servikal maye ilə ovulyasiyanı dəqiqləşdir
+  const { data: recentDailyLogs = [] } = useFlowDailyLogs();
+  const refinedOvulation = refineOvulation(recentDailyLogs, lastPeriodDate, fertileWindowData.ovulationDate);
+  const fertileStart = refinedOvulation.fertileWindowStart;
+  const fertileEnd = refinedOvulation.fertileWindowEnd;
 
   // Fetch tips for current phase
   const { data: tips = [], isLoading: tipsLoading } = usePhaseTips(currentPhase);
@@ -265,7 +286,7 @@ const FlowDashboard = () => {
   };
 
   return (
-    <div className="space-y-5">
+    <div>
       {/* Partner's flow status (only renders if user is partner viewing flow woman) */}
       <PartnerFlowStatusCard />
 
@@ -275,133 +296,152 @@ const FlowDashboard = () => {
       {/* Daily Story Cards — phase-personalized */}
       <DailyStoryCards />
 
-      {/* Current Phase Hero Card */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="relative overflow-hidden rounded-3xl p-5"
-        style={{ backgroundColor: PHASE_INFO[currentPhase].color }}>
-        
-        <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-white/10 -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-white/10 translate-y-1/2 -translate-x-1/2" />
+      {/* Currently — phase status card (anacan-demo PeriodStatus) */}
+      <section className="a-section">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="a-card a-fade-in">
+          
+          <div className="a-card-head">
+            <h3 className="a-card-title a-heading">{tr("flowdashboard_hal_hazirda_b78349", "Hal-hazırda")}</h3>
+            <span
+              className="a-tag"
+              style={{
+                cursor: 'default',
+                border: 'none',
+                background: `${PHASE_INFO[currentPhase].color}22`,
+                color: PHASE_INFO[currentPhase].color,
+                fontWeight: 700
+              }}>
+              
+              {PHASE_INFO[currentPhase].emoji} {PHASE_INFO[currentPhase].labelAz}
+            </span>
+          </div>
 
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-white/70 text-sm font-medium mb-1">{tr("flowdashboard_hal_hazirda_b78349", "Hal-hazırda")}</p>
-              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                <span className="text-3xl">{PHASE_INFO[currentPhase].emoji}</span>
-                {PHASE_INFO[currentPhase].labelAz}
-              </h2>
+          <div className="a-ring-hero">
+            <div
+              className="a-ring"
+              style={{
+                '--pct': Math.min(100, Math.round(currentDay / (cycleLength || 28) * 100)),
+                background: `conic-gradient(${PHASE_INFO[currentPhase].color} calc(var(--pct) * 1%), var(--a-line) 0)`
+              } as React.CSSProperties}>
+              
+              <div className="a-ring-inner">
+                <b>{currentDay}</b>
+                <span>{tr("flowdashboard_tsikl_gunu_b9e250", "Tsikl günü")}</span>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-white/70 text-xs">{tr("flowdashboard_tsikl_gunu_b9e250", "Tsikl günü")}</p>
-              <p className="text-4xl font-bold text-white">{currentDay}</p>
+            <div className="a-trio" style={{ gridTemplateColumns: 'repeat(3, 1fr)', flex: 1, gap: 6 }}>
+              <div className="a-trio-item" style={{ padding: '10px 4px', border: 'none', boxShadow: 'none', background: 'var(--a-surface-soft)' }}>
+                <p className="a-trio-value">{daysUntilPeriod > 0 ? daysUntilPeriod : 0}</p>
+                <p className="a-trio-label">{tr("flowdashboard_gun_qaldi_993281", "gün qaldı")}</p>
+              </div>
+              <div className="a-trio-item" style={{ padding: '10px 4px', border: 'none', boxShadow: 'none', background: 'var(--a-surface-soft)' }}>
+                <p className="a-trio-value">{cycleLength}</p>
+                <p className="a-trio-label">{tr("flowdashboard_gun_tsikl_bb0ab6", "gün tsikl")}</p>
+              </div>
+              <div className="a-trio-item" style={{ padding: '10px 4px', border: 'none', boxShadow: 'none', background: 'var(--a-surface-soft)' }}>
+                <p className="a-trio-value">{periodLength}</p>
+                <p className="a-trio-label">{tr("flowdashboard_gun_period_957849", "gün period")}</p>
+              </div>
             </div>
           </div>
 
           {/* Phase Progress */}
-          <div className="bg-white/20 rounded-full h-2 mb-4">
+          <div className="a-inline-bar" style={{ marginTop: 16 }}>
             <motion.div
-              className="bg-white rounded-full h-2"
+              className="a-inline-bar-fill"
+              style={{ background: PHASE_INFO[currentPhase].color }}
               initial={{ width: 0 }}
               animate={{ width: `${getPhaseProgress()}%` }}
               transition={{ duration: 0.8 }} />
             
           </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-white/15 rounded-xl p-3 text-center">
-              <Droplets className="w-5 h-5 text-white mx-auto mb-1" />
-              <p className="text-white text-lg font-bold">{daysUntilPeriod > 0 ? daysUntilPeriod : 0}</p>
-              <p className="text-white/70 text-[10px]">{tr("flowdashboard_gun_qaldi_993281", "gün qaldı")}</p>
-            </div>
-            <div className="bg-white/15 rounded-xl p-3 text-center">
-              <CalendarIcon className="w-5 h-5 text-white mx-auto mb-1" />
-              <p className="text-white text-lg font-bold">{cycleLength}</p>
-              <p className="text-white/70 text-[10px]">{tr("flowdashboard_gun_tsikl_bb0ab6", "gün tsikl")}</p>
-            </div>
-            <div className="bg-white/15 rounded-xl p-3 text-center">
-              <Heart className="w-5 h-5 text-white mx-auto mb-1" />
-              <p className="text-white text-lg font-bold">{periodLength}</p>
-              <p className="text-white/70 text-[10px]">{tr("flowdashboard_gun_period_957849", "gün period")}</p>
-            </div>
+          {/* Adaptiv proqnoz etibarı */}
+          <div className="flex items-center gap-2 mt-3" style={{ padding: '9px 12px', borderRadius: 13, background: 'var(--a-surface-soft)' }}>
+            <span
+              className="w-2 h-2 rounded-full shrink-0"
+              style={{
+                background: adaptiveStats.confidence === 'high' ? '#63bd8b' :
+                adaptiveStats.confidence === 'medium' ? '#ffc94d' :
+                'var(--a-ink-faint)'
+              }} />
+            <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--a-ink-soft)', lineHeight: 1.4 }}>
+              {adaptiveStats.basedOnCycles >= 2 ?
+              tr("flowdashboard_adaptiv_proqnoz", "Proqnoz son {n} tsiklə əsasən öyrənir · dəqiqlik ±{sd} gün").
+              replace('{n}', String(adaptiveStats.basedOnCycles)).
+              replace('{sd}', String(Math.max(1, Math.round(adaptiveStats.stdDev)))) :
+              tr("flowdashboard_proqnoz_deqiqlesir", "Proqnoz dəqiqləşir — period günlərini qeyd etməyə davam edin 📈")}
+            </p>
           </div>
 
           {/* Period Action Buttons */}
           <div className="mt-4 flex gap-2">
-            <motion.div className="flex-1" whileTap={{ scale: 0.97 }}>
-              <Button
-                onClick={() => setShowPeriodConfirm(true)}
-                className="w-full bg-white/20 hover:bg-white/30 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
-                variant="outline">
-                
-                <CircleDot className="w-5 h-5" />
-                {tr("flowdashboard_periodum_basladi_86bd73", "Periodum ba\u015Flad\u0131")}
-              </Button>
-            </motion.div>
+            <motion.button
+              onClick={() => setShowPeriodConfirm(true)}
+              className="a-cta-btn"
+              style={{ flex: 1, justifyContent: 'center', background: 'var(--a-ink)', color: 'var(--a-bg)', height: 46 }}
+              whileTap={{ scale: 0.97 }}>
+              
+              <CircleDot size={16} strokeWidth={2.2} />
+              {tr("flowdashboard_periodum_basladi_86bd73", "Periodum ba\u015Flad\u0131")}
+            </motion.button>
             {currentPhase === 'menstrual' &&
-            <motion.div className="flex-1" whileTap={{ scale: 0.97 }}>
-                <Button
-                onClick={() => setShowPeriodEndConfirm(true)}
-                className="w-full bg-white/30 hover:bg-white/40 backdrop-blur text-white border-0 rounded-xl h-12 text-sm font-bold gap-2"
-                variant="outline">
-                
-                  {tr("flowdashboard_periodum_bitdi_c1b3ea", "✅ Periodum bitdi")}
-                </Button>
-              </motion.div>
+            <motion.button
+              onClick={() => setShowPeriodEndConfirm(true)}
+              className="a-cta-btn"
+              style={{ flex: 1, justifyContent: 'center', background: 'var(--a-grad-pink)', color: 'var(--a-alert-ink)', height: 46 }}
+              whileTap={{ scale: 0.97 }}>
+              
+                {tr("flowdashboard_periodum_bitdi_c1b3ea", "✅ Periodum bitdi")}
+              </motion.button>
             }
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </section>
 
       {/* Water Tracking Widget */}
-      <div className="mb-4 mt-2">
-        <WaterWidget />
+      <div className="a-section">
+        <WaterWidget variant="anacan" />
       </div>
 
       {/* Interactive Period Calendar (Apple Health style) */}
-      <FlowPeriodCalendar />
+      <div className="a-section">
+        <FlowPeriodCalendar />
+      </div>
 
-      {/* Phase Tips Section */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="bg-card rounded-2xl p-4 border border-border">
-        
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Sparkles className="w-5 h-5" style={{ color: PHASE_INFO[currentPhase].color }} />
-            {tr("flowdashboard_bu_faza_ucun_meslehetler_14b952", "Bu Faza \xDC\xE7\xFCn M\u0259sl\u0259h\u0259tl\u0259r")}
-          </h3>
+      {/* Phase Tips Section (anacan-demo PhaseTips) */}
+      <section className="a-section">
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading">{tr("flowdashboard_bu_faza_ucun_meslehetler_14b952", "Bu Faza \xDC\xE7\xFCn M\u0259sl\u0259h\u0259tl\u0259r")}</h2>
           <span
-            className="text-xs font-medium px-2 py-1 rounded-full"
+            className="a-tag"
             style={{
-              backgroundColor: `${PHASE_INFO[currentPhase].color}20`,
-              color: PHASE_INFO[currentPhase].color
+              cursor: 'default',
+              border: 'none',
+              background: `${PHASE_INFO[currentPhase].color}22`,
+              color: PHASE_INFO[currentPhase].color,
+              fontWeight: 700
             }}>
             
-            {PHASE_INFO[currentPhase].labelAz}
+            {PHASE_INFO[currentPhase].emoji} {PHASE_INFO[currentPhase].labelAz}
           </span>
         </div>
 
         {/* Category Filter */}
-        <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+        <div className="a-tabs hide-scrollbar" style={{ display: 'flex', overflowX: 'auto', width: '100%', marginBottom: 14 }}>
           {categories.map((cat) => {
             const Icon = categoryIcons[cat];
             return (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
-                selectedCategory === cat ?
-                'bg-primary text-primary-foreground' :
-                'bg-muted text-muted-foreground hover:bg-muted/80'}`
-                }>
+                className={`a-tab${selectedCategory === cat ? ' active' : ''}`}
+                style={{ whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                 
-                <Icon className="w-4 h-4" />
+                <Icon size={13} strokeWidth={2.2} />
                 {cat === 'all' ? tr("flowdashboard_hamisi_c73c4d", "Ham\u0131s\u0131") : CATEGORY_INFO[cat].labelAz}
               </button>);
 
@@ -410,11 +450,11 @@ const FlowDashboard = () => {
 
         {/* Tips List */}
         {tipsLoading ?
-        <div className="flex justify-center py-8">
-            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <div className="a-card" style={{ display: 'flex', justifyContent: 'center', padding: '28px 0' }}>
+            <div className="w-6 h-6 rounded-full animate-spin" style={{ border: '2px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
           </div> :
 
-        <div className="space-y-3">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <AnimatePresence mode="popLayout">
               {filteredTips.slice(0, 5).map((tip, index) =>
             <motion.div
@@ -423,186 +463,256 @@ const FlowDashboard = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-muted/50 rounded-xl p-4">
+              className="a-card">
               
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">{tip.emoji}</span>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="font-semibold text-foreground text-sm">
-                          {language === 'en' ? (tip.title_en || tip.title) : getTranslatedTip(tip.title_az || tip.title, language)}
-                        </h4>
-                        <span
-                      className="text-[10px] px-1.5 py-0.5 rounded-full"
-                      style={{
-                        backgroundColor: `${PHASE_INFO[currentPhase].color}15`,
-                        color: PHASE_INFO[currentPhase].color
-                      }}>
-                      
-                          {CATEGORY_INFO[tip.category].labelAz}
-                        </span>
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        {language === 'en' ? (tip.content_en || tip.content) : getTranslatedTip(tip.content_az || tip.content, language)}
+                  <div className="a-list-row" style={{ padding: 0 }}>
+                    <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', fontSize: 18 }}>
+                      {tip.emoji}
+                    </span>
+                    <div style={{ minWidth: 0 }}>
+                      <p className="a-list-title">
+                        {language === 'en' ?
+                    tip.title_en || tip.title :
+                    language === 'ru' ?
+                    tip.title_ru || getTranslatedTip(tip.title_az || tip.title, language) :
+                    language === 'tr' ?
+                    tip.title_tr || getTranslatedTip(tip.title_az || tip.title, language) :
+                    tip.title_az || tip.title}
                       </p>
+                      <span className="a-list-value" style={{ color: PHASE_INFO[currentPhase].color }}>
+                        {CATEGORY_INFO[tip.category].labelAz}
+                      </span>
                     </div>
                   </div>
+                  <p style={{ margin: '10px 0 0', fontSize: 12, lineHeight: 1.55, color: 'var(--a-ink-soft)' }}>
+                    {language === 'en' ?
+                tip.content_en || tip.content :
+                language === 'ru' ?
+                tip.content_ru || getTranslatedTip(tip.content_az || tip.content, language) :
+                language === 'tr' ?
+                tip.content_tr || getTranslatedTip(tip.content_az || tip.content, language) :
+                tip.content_az || tip.content}
+                  </p>
                 </motion.div>
             )}
             </AnimatePresence>
 
             {filteredTips.length === 0 &&
-          <div className="text-center py-8">
-                <p className="text-muted-foreground text-sm">{tr("flowdashboard_bu_kateqoriyada_meslehet_yoxdur_2e13ec", "Bu kateqoriyada məsləhət yoxdur")}</p>
+          <div className="a-card" style={{ textAlign: 'center', padding: '28px 18px' }}>
+                <p className="a-list-sub" style={{ margin: 0 }}>{tr("flowdashboard_bu_kateqoriyada_meslehet_yoxdur_2e13ec", "Bu kateqoriyada məsləhət yoxdur")}</p>
               </div>
           }
           </div>
         }
-      </motion.div>
+      </section>
 
-      {/* Upcoming Events */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="bg-card rounded-2xl p-4 border border-border">
-        
-        <h3 className="font-bold text-foreground flex items-center gap-2 mb-4">
-          <TrendingUp className="w-5 h-5 text-primary" />
-          {tr("flowdashboard_qarsidan_gelenler_dc6614", "Qar\u015F\u0131dan G\u0259l\u0259nl\u0259r")}
-        </h3>
-
-        <div className="space-y-3">
+      {/* Upcoming Events (anacan-demo Upcoming list) */}
+      <section className="a-section">
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading">{tr("flowdashboard_qarsidan_gelenler_dc6614", "Qar\u015F\u0131dan G\u0259l\u0259nl\u0259r")}</h2>
+        </div>
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="a-list-card a-fade-in">
+          
           {/* Next Period */}
-          <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 rounded-xl p-3">
-            <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center">
-              <Droplets className="w-5 h-5 text-red-500" />
+          <div className="a-list-row">
+            <span className="a-list-icon" style={{ background: 'var(--a-grad-pink)', color: 'var(--a-berry-ink)' }}>
+              <Droplets size={17} strokeWidth={2} />
+            </span>
+            <div>
+              <p className="a-list-title">{labelNextPeriod}</p>
+              <p className="a-list-sub">{format(nextPeriodDate, 'd MMMM', { locale: getCurrentDateLocale() })}</p>
             </div>
-            <div className="flex-1">
-              <p className="font-semibold text-foreground text-sm">{labelNextPeriod}</p>
-              <p className="text-xs text-muted-foreground">
-                {format(nextPeriodDate, 'd MMMM', { locale: getCurrentDateLocale() })} • {daysUntilPeriod > 0 ? tr("flowdashboard_x_gun_qaldi", "{days} gün qaldı").replace("{days}", String(daysUntilPeriod)) : tr("flowdashboard_bu_gun_786fd4", "Bu g\xFCn")}
+            <span className="a-list-trail">
+              <p className="a-list-value">
+                {daysUntilPeriod > 0 ? tr("flowdashboard_x_gun_qaldi", "{days} gün qaldı").replace("{days}", String(daysUntilPeriod)) : tr("flowdashboard_bu_gun_786fd4", "Bu g\xFCn")}
               </p>
-            </div>
+            </span>
           </div>
 
           {/* Fertile Window */}
-          <div className="flex items-center gap-3 bg-pink-50 dark:bg-pink-900/20 rounded-xl p-3">
-            <div className="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/40 flex items-center justify-center">
-              <Heart className="w-5 h-5 text-pink-500" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold text-foreground text-sm">{labelFertileWindow}</p>
-              <p className="text-xs text-muted-foreground">
-                {format(fertileStart, 'd MMMM', { locale: getCurrentDateLocale() })} - {format(fertileEnd, 'd MMMM', { locale: getCurrentDateLocale() })}
+          <div className="a-list-row">
+            <span className="a-list-icon" style={{ background: 'var(--a-grad-green)', color: 'var(--a-green-ink)' }}>
+              <Heart size={17} strokeWidth={2} />
+            </span>
+            <div>
+              <p className="a-list-title">{labelFertileWindow}</p>
+              <p className="a-list-sub">
+                {format(fertileStart, 'd MMMM', { locale: getCurrentDateLocale() })} – {format(fertileEnd, 'd MMMM', { locale: getCurrentDateLocale() })}
               </p>
             </div>
+            {refinedOvulation.confirmed &&
+            <span className="a-list-trail">
+                <span className="a-rank-tag" style={{ background: 'var(--a-green-1)', color: 'var(--a-green-ink)', whiteSpace: 'nowrap' }}>
+                  {refinedOvulation.source === 'mucus' ?
+                tr("flowdashboard_maye_tesdiqli", "💧 Maye təsdiqli") :
+                tr("flowdashboard_test_tesdiqli", "✓ Test təsdiqli")}
+                </span>
+              </span>
+            }
           </div>
 
           {/* Ovulation */}
-          <div className="flex items-center gap-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl p-3">
-            <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-purple-500" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold text-foreground text-sm">{labelOvulationDay}</p>
-              <p className="text-xs text-muted-foreground">
-                {format(addDays(lastPeriodDate, 14), 'd MMMM', { locale: getCurrentDateLocale() })}
+          <div className="a-list-row">
+            <span className="a-list-icon" style={{ background: 'var(--a-grad-yellow)', color: 'var(--a-warn-ink)' }}>
+              <Sparkles size={17} strokeWidth={2} />
+            </span>
+            <div>
+              <p className="a-list-title">{labelOvulationDay}</p>
+              <p className="a-list-sub">
+                {format(refinedOvulation.ovulationDate, 'd MMMM', { locale: getCurrentDateLocale() })}
               </p>
             </div>
+            {refinedOvulation.confirmed &&
+            <span className="a-list-trail">
+                <span className="a-rank-tag" style={{ background: 'var(--a-yellow-1)', color: 'var(--a-warn-ink)', whiteSpace: 'nowrap' }}>
+                  {refinedOvulation.source === 'opk_peak' ?
+                tr("flowdashboard_pik_lh", "🌟 Pik LH") :
+                refinedOvulation.source === 'opk_positive' ?
+                tr("flowdashboard_lh_yukselisi", "➕ LH yüksəlişi") :
+                tr("flowdashboard_maye_siqnali", "💧 Maye siqnalı")}
+                </span>
+              </span>
+            }
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </section>
 
-      {/* Daily Logger */}
+      {/* Daily Logger — PREMIUM (freemium siyasəti) */}
       <motion.div
+        className="a-section"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}>
         
-        <FlowDailyLogger compact />
+        <PremiumGate
+          title={tr("flowdailylogger_gundelik_qeyd_32e154", "Gündəlik Qeyd")}
+          description={tr("pgate_flow_logger", "Əhval, simptom, qanaxma və fertillik qeydləri — proqnozlar bunlarla dəqiqləşir")}
+          emoji="📝" feature="flow_daily_logger">
+          <FlowDailyLogger compact />
+        </PremiumGate>
       </motion.div>
 
-      {/* Mood Chart */}
+      {/* Mood Chart — PREMIUM */}
       <motion.div
+        className="a-section"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}>
         
-        <FlowMoodChart />
+        <PremiumGate
+          title={tr("pgate_mood_chart_title", "Əhval qrafiki")}
+          description={tr("pgate_mood_chart", "30 günlük əhval, enerji və ağrı analizi")}
+          emoji="📊" feature="flow_mood_chart">
+          <FlowMoodChart />
+        </PremiumGate>
       </motion.div>
 
-      {/* Cycle Stats */}
+      {/* Cycle Stats — PREMIUM */}
       <motion.div
+        className="a-section"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.6 }}>
         
-        <FlowCycleStats />
+        <PremiumGate
+          title={tr("pgate_cycle_stats_title", "Tsikl statistikası")}
+          description={tr("pgate_cycle_stats", "Tsikl tarixçəniz və dəqiqlik göstəriciləri")}
+          emoji="📈" feature="flow_cycle_stats">
+          <FlowCycleStats />
+        </PremiumGate>
       </motion.div>
 
-      {/* Cycle Trend Chart + Anomaly Detection */}
-      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.65 }}>
-        <CycleTrendChart />
+      {/* Cycle Trend Chart — PREMIUM · Anomaly banner FREE (xəbərdarlıq) */}
+      <motion.div className="a-section" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.65 }}>
+        <PremiumGate
+          title={tr("pgate_trend_title", "Tsikl trendi")}
+          description={tr("pgate_trend", "Son tsikllərin müqayisəli trend qrafiki")}
+          emoji="📉" feature="flow_trend_chart">
+          <CycleTrendChart />
+        </PremiumGate>
       </motion.div>
       <CycleAnomalyBanner />
 
-      {/* Symptom Pattern Analysis (Premium) */}
-      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.68 }}>
-        <SymptomPatternReport />
+      {/* Symptom Pattern Analysis — PREMIUM */}
+      <motion.div className="a-section" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.68 }}>
+        <PremiumGate
+          title={tr("pgate_symptom_title", "Simptom analizi")}
+          description={tr("pgate_symptom", "Fazalara görə simptom nümunələriniz")}
+          emoji="🧠" feature="flow_symptom_report">
+          <SymptomPatternReport />
+        </PremiumGate>
       </motion.div>
 
-      {/* Pill / Contraception Reminder */}
-      <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
-        <PillReminderCard />
+      {/* Pill + Reminders — PREMIUM (tək gate altında) */}
+      <motion.div className="a-section" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }}>
+        <PremiumGate
+          title={tr("pgate_reminders_title", "Xatırladıcılar")}
+          description={tr("pgate_reminders", "Period, PMS, dərman və su xatırladıcıları")}
+          emoji="🔔" feature="flow_reminders">
+          <div className="space-y-3">
+            <PillReminderCard />
+            <FlowRemindersCard />
+          </div>
+        </PremiumGate>
       </motion.div>
 
-      {/* Reminders */}
+      {/* Daily Insights (anacan-demo quick stats) */}
       <motion.div
+        className="a-section a-grid-2"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.72 }}>
+        transition={{ delay: 0.8 }}>
         
-        <FlowRemindersCard />
-      </motion.div>
-
-      {/* Daily Insights */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.8 }}
-        className="grid grid-cols-2 gap-3">
-        
-        <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-2xl p-4 border border-orange-100 dark:border-orange-800/30">
-          <Flame className="w-6 h-6 text-orange-500 mb-2" />
-          <p className="font-bold text-foreground text-lg">
-            {currentPhase === 'follicular' || currentPhase === 'ovulation' ? tr("flowdashboard_yuksek_492584", "Y\xFCks\u0259k") : tr("common_normal", "Normal")}
-          </p>
-          <p className="text-xs text-muted-foreground">{tr("flowdashboard_enerji_seviyyesi_961691", "Enerji Səviyyəsi")}</p>
+        <div className="a-stat-tile">
+          <span className="a-stat-tile-icon" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
+            <Flame size={15} color="var(--a-peach-2)" />
+          </span>
+          <div>
+            <p className="a-stat-tile-label">{tr("flowdashboard_enerji_seviyyesi_961691", "Enerji Səviyyəsi")}</p>
+            <p className="a-stat-tile-value">
+              {currentPhase === 'follicular' || currentPhase === 'ovulation' ? tr("flowdashboard_yuksek_492584", "Y\xFCks\u0259k") : tr("common_normal", "Normal")}
+            </p>
+          </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 rounded-2xl p-4 border border-blue-100 dark:border-blue-800/30">
-          <Moon className="w-6 h-6 text-blue-500 mb-2" />
-          <p className="font-bold text-foreground text-lg">
-            {currentPhase === 'luteal' ? `8-9 ${tr("common_hours", 'saat')}` : `7-8 ${tr("common_hours", 'saat')}`}
-          </p>
-          <p className="text-xs text-muted-foreground">{tr("flowdashboard_tovsiye_edilen_yuxu_e219dd", "Tövsiyə Edilən Yuxu")}</p>
+        <div className="a-stat-tile">
+          <span className="a-stat-tile-icon" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
+            <Moon size={15} color="var(--a-peach-2)" />
+          </span>
+          <div>
+            <p className="a-stat-tile-label">{tr("flowdashboard_tovsiye_edilen_yuxu_e219dd", "Tövsiyə Edilən Yuxu")}</p>
+            <p className="a-stat-tile-value">
+              {currentPhase === 'luteal' ? `8-9 ${tr("common_hours", 'saat')}` : `7-8 ${tr("common_hours", 'saat')}`}
+            </p>
+          </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-4 border border-green-100 dark:border-green-800/30">
-          <Apple className="w-6 h-6 text-green-500 mb-2" />
-          <p className="font-bold text-foreground text-lg">
-            {currentPhase === 'menstrual' ? tr("flowdashboard_demir_30bf6c", "D\u0259mir") : currentPhase === 'luteal' ? tr("flowdashboard_maqnezium_f7238a", "Maqnezium") : tr("flowdashboard_protein_a47bc2", "Protein")}
-          </p>
-          <p className="text-xs text-muted-foreground">{tr("untranslated_fokus_qida_lyi3h2", "Fokus Qida")}</p>
+        <div className="a-stat-tile">
+          <span className="a-stat-tile-icon" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
+            <Apple size={15} color="var(--a-peach-2)" />
+          </span>
+          <div>
+            <p className="a-stat-tile-label">{tr("untranslated_fokus_qida_lyi3h2", "Fokus Qida")}</p>
+            <p className="a-stat-tile-value">
+              {currentPhase === 'menstrual' ? tr("flowdashboard_demir_30bf6c", "D\u0259mir") : currentPhase === 'luteal' ? tr("flowdashboard_maqnezium_f7238a", "Maqnezium") : tr("flowdashboard_protein_a47bc2", "Protein")}
+            </p>
+          </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-2xl p-4 border border-purple-100 dark:border-purple-800/30">
-          <Dumbbell className="w-6 h-6 text-purple-500 mb-2" />
-          <p className="font-bold text-foreground text-lg">
-            {currentPhase === 'menstrual' ? tr("flowdashboard_yungul_2a8010", "Y\xFCng\xFCl") : currentPhase === 'ovulation' ? tr("flowdashboard_intensiv_f123bc", "İntensiv") : tr("common_orta", "Orta")}
-          </p>
-          <p className="text-xs text-muted-foreground">{tr("flowdashboard_mesq_intensivliyi_f59d1b", "Məşq İntensivliyi")}</p>
+        <div className="a-stat-tile">
+          <span className="a-stat-tile-icon" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
+            <Dumbbell size={15} color="var(--a-peach-2)" />
+          </span>
+          <div>
+            <p className="a-stat-tile-label">{tr("flowdashboard_mesq_intensivliyi_f59d1b", "Məşq İntensivliyi")}</p>
+            <p className="a-stat-tile-value">
+              {currentPhase === 'menstrual' ? tr("flowdashboard_yungul_2a8010", "Y\xFCng\xFCl") : currentPhase === 'ovulation' ? tr("flowdashboard_intensiv_f123bc", "İntensiv") : tr("common_orta", "Orta")}
+            </p>
+          </div>
         </div>
       </motion.div>
 

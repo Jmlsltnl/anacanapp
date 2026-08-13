@@ -67,16 +67,25 @@ Deno.serve(async (req) => {
     }
     const weatherData = await weatherResponse.json();
 
+    // Per-language config: geocoding locale, "unknown city" fallback, AI output language
+    const LANG_CONF: Record<string, { geo: string; unknown: string; outLang: string }> = {
+      az: { geo: 'az', unknown: 'Naməlum', outLang: '' },
+      en: { geo: 'en', unknown: 'Unknown', outLang: 'ENGLISH' },
+      ru: { geo: 'ru', unknown: 'Неизвестно', outLang: 'RUSSIAN' },
+      tr: { geo: 'tr', unknown: 'Bilinmiyor', outLang: 'TURKISH' },
+    };
+    const langConf = LANG_CONF[language] ?? LANG_CONF.az;
+
     // Get city name from reverse geocoding
-    const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=${language === 'en' ? 'en' : 'az'}`;
-    let cityName = language === 'en' ? 'Unknown' : 'Naməlum';
+    const geoUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=${langConf.geo}`;
+    let cityName = langConf.unknown;
     try {
       const geoResponse = await fetch(geoUrl, {
         headers: { 'User-Agent': 'AnacanApp/1.0' }
       });
       if (geoResponse.ok) {
         const geoData = await geoResponse.json();
-        cityName = geoData.address?.city || geoData.address?.town || geoData.address?.state || (language === 'en' ? 'Unknown' : 'Naməlum');
+        cityName = geoData.address?.city || geoData.address?.town || geoData.address?.state || langConf.unknown;
       }
     } catch {
       console.log('Geocoding failed, using default');
@@ -193,7 +202,7 @@ CAVAB FORMATI (STRICT JSON):
   "outdoorAdvice": "Bayırda gəzmə tövsiyəsi",
   "safeToGoOut": true,
   "alertLevel": "safe|caution|warning|danger"
-}${language === 'en' ? '\n\nIMPORTANT: Write ALL output text fields (weatherDescription, clothingAdvice, clothingItems, indoorClothingAdvice, indoorClothingItems, roomTemperatureAdvice, warnings, pollenWarning, uvWarning, outdoorAdvice) in ENGLISH. Keep JSON keys, numeric values and enum values exactly as shown.' : ''}`;
+}${langConf.outLang ? `\n\nIMPORTANT: Write ALL output text fields (weatherDescription, clothingAdvice, clothingItems, indoorClothingAdvice, indoorClothingItems, roomTemperatureAdvice, warnings, pollenWarning, uvWarning, outdoorAdvice) in ${langConf.outLang}. Keep JSON keys, numeric values and enum values exactly as shown.` : ''}`;
 
     const models = ['gemini-2.5-flash-lite', 'gemini-2.5-flash'];
     let geminiResponse: Response | null = null;
@@ -232,23 +241,66 @@ CAVAB FORMATI (STRICT JSON):
       advice.windSpeed = current.wind_speed_10m;
       advice.uvIndex = current.uv_index;
     } catch {
+      const FALLBACK_TEXTS: Record<string, {
+        weatherDescription: string; clothingAdvice: string; clothingItems: string[];
+        indoorClothingAdvice: string; indoorClothingItems: string[];
+        roomTemperatureAdvice: string; outdoorAdvice: string;
+      }> = {
+        az: {
+          weatherDescription: 'Hava məlumatı alındı',
+          clothingAdvice: 'Körpəni hava şəraitinə uyğun geyindirin.',
+          clothingItems: ['Rahat geyim', 'Papaq', 'Əlcək'],
+          indoorClothingAdvice: 'Evdə rahat pambıq geyim geyindirin.',
+          indoorClothingItems: ['Pambıq bodi', 'Corab'],
+          roomTemperatureAdvice: 'Otaq temperaturunu 20-22°C arasında saxlayın.',
+          outdoorAdvice: 'Hava şəraitini izləyin',
+        },
+        en: {
+          weatherDescription: 'Weather data received',
+          clothingAdvice: 'Dress your baby appropriately for the weather.',
+          clothingItems: ['Comfortable clothes', 'Hat', 'Mittens'],
+          indoorClothingAdvice: 'Dress your baby in comfortable cotton clothes at home.',
+          indoorClothingItems: ['Cotton bodysuit', 'Socks'],
+          roomTemperatureAdvice: 'Keep the room temperature between 20-22°C.',
+          outdoorAdvice: 'Monitor the weather conditions',
+        },
+        ru: {
+          weatherDescription: 'Данные о погоде получены',
+          clothingAdvice: 'Одевайте малыша по погоде.',
+          clothingItems: ['Удобная одежда', 'Шапочка', 'Варежки'],
+          indoorClothingAdvice: 'Дома одевайте малыша в удобную хлопковую одежду.',
+          indoorClothingItems: ['Хлопковый боди', 'Носочки'],
+          roomTemperatureAdvice: 'Поддерживайте температуру в комнате 20-22°C.',
+          outdoorAdvice: 'Следите за погодными условиями',
+        },
+        tr: {
+          weatherDescription: 'Hava durumu bilgisi alındı',
+          clothingAdvice: 'Bebeğinizi hava koşullarına uygun giydirin.',
+          clothingItems: ['Rahat giysi', 'Şapka', 'Eldiven'],
+          indoorClothingAdvice: 'Evde rahat pamuklu giysiler giydirin.',
+          indoorClothingItems: ['Pamuklu body', 'Çorap'],
+          roomTemperatureAdvice: 'Oda sıcaklığını 20-22°C arasında tutun.',
+          outdoorAdvice: 'Hava koşullarını takip edin',
+        },
+      };
+      const fb = FALLBACK_TEXTS[language] ?? FALLBACK_TEXTS.az;
       advice = {
         temperature: current.temperature_2m,
         feelsLike: current.apparent_temperature,
         humidity: current.relative_humidity_2m,
         windSpeed: current.wind_speed_10m,
         uvIndex: current.uv_index,
-        weatherDescription: 'Hava məlumatı alındı',
-        clothingAdvice: 'Körpəni hava şəraitinə uyğun geyindirin.',
-        clothingItems: ['Rahat geyim', 'Papaq', 'Əlcək'],
-        indoorClothingAdvice: 'Evdə rahat pambıq geyim geyindirin.',
-        indoorClothingItems: ['Pambıq bodi', 'Corab'],
+        weatherDescription: fb.weatherDescription,
+        clothingAdvice: fb.clothingAdvice,
+        clothingItems: fb.clothingItems,
+        indoorClothingAdvice: fb.indoorClothingAdvice,
+        indoorClothingItems: fb.indoorClothingItems,
         idealRoomTemperature: '20-22°C',
-        roomTemperatureAdvice: 'Otaq temperaturunu 20-22°C arasında saxlayın.',
+        roomTemperatureAdvice: fb.roomTemperatureAdvice,
         warnings: [],
         pollenWarning: null,
         uvWarning: null,
-        outdoorAdvice: 'Hava şəraitini izləyin',
+        outdoorAdvice: fb.outdoorAdvice,
         safeToGoOut: true,
         alertLevel: 'safe'
       };

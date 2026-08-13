@@ -1,19 +1,15 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Check, Calendar, Sparkles, AlertCircle, Heart, Info, X, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { motion } from 'framer-motion';
+import { Check, Calendar, Sparkles, AlertCircle, Heart, Info, X } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import { DatePickerWheel } from '@/components/ui/date-picker-wheel';
 import { useTeething, BabyTooth } from '@/hooks/useTeething';
 import { useChildren } from '@/hooks/useChildren';
 import ChildSelector from '@/components/mommy/ChildSelector';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { ToolPage, ToolHeader, ToolLoading } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
 
 interface TeethingTrackerProps {
@@ -22,7 +18,7 @@ interface TeethingTrackerProps {
 
 const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
   useScreenAnalytics('TeethingTracker', 'Tools');
-  const { selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
+  const { selectedChild, hasChildren, getChildAge } = useChildren();
   const {
     teeth,
     tips,
@@ -73,12 +69,13 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
     setShowToothModal(false);
   };
 
-  const getSeverityColor = (severity: string) => {
+  // Severity → anacan palette
+  const getSeverityStyle = (severity: string) => {
     switch (severity) {
-      case 'mild':return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
-      case 'moderate':return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
-      case 'severe':return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-      default:return 'bg-muted text-muted-foreground';
+      case 'mild':return { background: 'var(--a-green-1)', color: 'var(--a-green-ink)' };
+      case 'moderate':return { background: 'var(--a-yellow-1)', color: 'var(--a-warn-ink)' };
+      case 'severe':return { background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)' };
+      default:return { background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' };
     }
   };
 
@@ -93,6 +90,9 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
     }
   };
 
+  const tabTriggerClass =
+  "rounded-full py-1.5 text-[11.5px] font-bold border-0 shadow-none data-[state=active]:shadow-none data-[state=active]:bg-[var(--a-peach-1)] data-[state=active]:text-[var(--a-accent-ink)] text-[var(--a-ink-soft)]";
+
   const renderToothDiagram = (teethList: BabyTooth[], position: 'upper' | 'lower') => {
     // Arrange teeth in dental arch order
     const sortedTeeth = [...teethList].sort((a, b) => {
@@ -102,30 +102,21 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
       return order.indexOf(a.tooth_code) - order.indexOf(b.tooth_code);
     });
 
-    // Get tooth dimensions and styles based on type
-    const getToothStyle = (tooth: BabyTooth, emerged: boolean) => {
+    // Tooth size by type (a-palette colors applied inline)
+    const getToothSize = (tooth: BabyTooth) => {
       const isMolar = tooth.tooth_type === 'molar';
       const isCanine = tooth.tooth_type === 'canine';
-
-      const baseSize = isMolar ? 'w-8 h-10' : isCanine ? 'w-6 h-9' : 'w-6 h-8';
-      const baseColor = emerged ?
-      'bg-gradient-to-b from-pink-300 to-pink-400 dark:from-pink-400 dark:to-pink-500 shadow-md shadow-pink-300/50 dark:shadow-pink-500/30' :
-      'bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700';
-
-      return { baseSize, baseColor, isMolar, isCanine };
+      return isMolar ? 'w-8 h-10' : isCanine ? 'w-6 h-9' : 'w-6 h-8';
     };
 
     return (
-      <div className={`flex justify-center items-end gap-1 ${position === 'lower' ? 'items-start' : 'items-end'}`}>
+      <div className={`flex justify-center gap-1 ${position === 'lower' ? 'items-start' : 'items-end'}`}>
         {sortedTeeth.map((tooth, index) => {
           const emerged = isToothEmerged(tooth.id);
-          const { baseSize, baseColor, isMolar, isCanine } = getToothStyle(tooth, emerged);
+          const baseSize = getToothSize(tooth);
 
           // Create arch effect with different heights
           const archOffset = Math.abs(index - 4.5);
-          const archMargin = position === 'upper' ?
-          `mt-${Math.floor(archOffset * 0.5)}` :
-          `mb-${Math.floor(archOffset * 0.5)}`;
 
           return (
             <motion.button
@@ -133,22 +124,29 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               whileHover={{ scale: 1.1, y: position === 'upper' ? 2 : -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => handleToothClick(tooth)}
-              className={`relative transition-all duration-200 ${baseSize} ${baseColor} ${
-              position === 'upper' ? 'rounded-t-lg rounded-b-[40%]' : 'rounded-b-lg rounded-t-[40%]'} border-2 ${
-              emerged ? 'border-pink-200 dark:border-pink-300' : 'border-gray-300 dark:border-gray-500'}`}
+              className={`relative transition-all duration-200 ${baseSize} ${
+              position === 'upper' ? 'rounded-t-lg rounded-b-[40%]' : 'rounded-b-lg rounded-t-[40%]'}`}
               style={{
                 marginTop: position === 'upper' ? `${archOffset * 2}px` : 0,
-                marginBottom: position === 'lower' ? `${archOffset * 2}px` : 0
+                marginBottom: position === 'lower' ? `${archOffset * 2}px` : 0,
+                background: emerged ?
+                'linear-gradient(180deg, var(--a-pink-1), var(--a-pink-2))' :
+                'linear-gradient(180deg, var(--a-surface-soft), var(--a-line-strong))',
+                border: emerged ? '2px solid var(--a-pink-1)' : '2px solid var(--a-line-strong)',
+                boxShadow: emerged ? '0 4px 10px -4px rgba(255, 138, 164, 0.6)' : 'none',
+                cursor: 'pointer'
               }}>
               
               {/* Tooth shine effect */}
               <div className={`absolute inset-0 ${position === 'upper' ? 'rounded-t-lg rounded-b-[40%]' : 'rounded-b-lg rounded-t-[40%]'} overflow-hidden`}>
-                <div className="absolute top-0 left-0 w-1/3 h-full bg-white/30 dark:bg-white/20" />
+                <div className="absolute top-0 left-0 w-1/3 h-full" style={{ background: 'rgba(255,255,255,0.35)' }} />
               </div>
               
               {/* Root indication for emerged teeth */}
               {emerged &&
-              <div className={`absolute ${position === 'upper' ? '-bottom-1' : '-top-1'} left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-pink-200 dark:bg-pink-300`} />
+              <div
+                className={`absolute ${position === 'upper' ? '-bottom-1' : '-top-1'} left-1/2 -translate-x-1/2 w-2 h-2 rounded-full`}
+                style={{ background: 'var(--a-pink-1)' }} />
               }
               
               {/* Check mark for emerged */}
@@ -156,18 +154,12 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className={`absolute ${position === 'upper' ? '-top-2' : '-bottom-2'} -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center shadow-sm z-10`}>
+                className={`absolute ${position === 'upper' ? '-top-2' : '-bottom-2'} -right-1 w-4 h-4 rounded-full flex items-center justify-center shadow-sm z-10`}
+                style={{ background: 'var(--a-green-2)' }}>
                 
                   <Check className="w-2.5 h-2.5 text-white" />
                 </motion.div>
               }
-              
-              {/* Tooth label on hover - using tooltip behavior */}
-              <div className={`absolute ${position === 'upper' ? 'top-full mt-1' : 'bottom-full mb-1'} left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none`}>
-                <span className="text-[8px] whitespace-nowrap bg-foreground/80 text-background px-1 py-0.5 rounded">
-                  {tr("tooth_name_" + tooth.tooth_code, tooth.name)}
-                </span>
-              </div>
             </motion.button>);
 
         })}
@@ -176,127 +168,117 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>);
-
+    return <ToolLoading />;
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={onBack}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-lg font-semibold">{tr("teethingtracker_dis_cixarma_izleyicisi_109c3d", "Diş Çıxarma İzləyicisi")}</h1>
-              <p className="text-xs text-muted-foreground">
-                {selectedChild?.name || tr("teethingtracker_korpenizin_383c3e", "K\xF6rp\u0259nizin")} {tr("teethingtracker_dislerini_izleyin_4ea678", "di\u015Fl\u0259rini izl\u0259yin")}
-              </p>
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={selectedChild ? `${selectedChild.name}${childAge ? ' · ' + childAge.displayText : ''}` : tr("teethingtracker_korpenizin_383c3e", "K\xF6rp\u0259nizin")}
+        title={tr("teethingtracker_dis_cixarma_izleyicisi_109c3d", "Diş Çıxarma İzləyicisi")}
+        actions={hasChildren ? <ChildSelector compact /> : undefined} />
+
+      <div className="space-y-3">
+        {/* Progress Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="a-card">
+          
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="a-list-icon" style={{ background: 'var(--a-grad-pink)' }}>
+                <Sparkles size={17} strokeWidth={2.2} style={{ color: 'var(--a-alert-ink)' }} />
+              </span>
+              <div>
+                <p className="a-list-sub" style={{ margin: 0 }}>{tr("teethingtracker_cixan_disler_ab71e7", "Çıxan Dişlər")}</p>
+                <p className="a-heading" style={{ margin: 0, fontSize: 20 }}>{emergedCount} <span style={{ fontSize: 13, color: 'var(--a-ink-soft)' }}>/ {totalTeeth}</span></p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="a-heading" style={{ margin: 0, fontSize: 20, color: 'var(--a-berry-ink)' }}>{Math.round(progress)}%</p>
+              <p className="a-list-sub" style={{ margin: 0 }}>{tr("teethingtracker_tamamlandi_d6728f", "tamamlandı")}</p>
             </div>
           </div>
-          {hasChildren && <ChildSelector compact />}
-        </div>
-      </div>
-
-      <div className="p-3 space-y-3">
-        {/* Child Info Banner */}
-        {selectedChild &&
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 p-2 rounded-lg bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20">
-          
-            <span className="text-lg">{selectedChild.avatar_emoji}</span>
-            <div>
-              <p className="font-medium text-xs">{selectedChild.name}</p>
-              <p className="text-[10px] text-muted-foreground">{childAge?.displayText}</p>
+          <div className="a-pbar" style={{ marginTop: 12 }}>
+            <div className="a-pbar-track">
+              <div className="a-pbar-fill" style={{ width: `${Math.max(2, Math.min(100, progress))}%`, background: 'var(--a-grad-pink)' }} />
             </div>
-          </motion.div>
-        }
-        {/* Progress Card */}
-        <Card className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-950/20 dark:to-rose-950/20 border-pink-200/50">
-          <CardContent className="p-3">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-pink-500" />
-                </div>
-                <div>
-                  <p className="text-xs font-medium">{tr("teethingtracker_cixan_disler_ab71e7", "Çıxan Dişlər")}</p>
-                  <p className="text-lg font-bold text-pink-600">{emergedCount} / {totalTeeth}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-xl font-bold text-pink-600">{Math.round(progress)}%</p>
-                <p className="text-[10px] text-muted-foreground">{tr("teethingtracker_tamamlandi_d6728f", "tamamlandı")}</p>
-              </div>
-            </div>
-            <Progress value={progress} className="h-1.5" />
-          </CardContent>
-        </Card>
+          </div>
+        </motion.div>
 
         {/* Teeth Diagram */}
-        <Card>
-          <CardHeader className="pb-1 pt-3">
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Heart className="w-3.5 h-3.5 text-rose-500" />
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="a-card">
+          
+          <div className="a-card-head" style={{ marginBottom: 4 }}>
+            <p className="a-card-title a-heading" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Heart size={14} style={{ color: 'var(--a-pink-2)' }} />
               {tr("teethingtracker_dis_diaqrami_a219c2", "Di\u015F Diaqram\u0131")}
-            </CardTitle>
-            <p className="text-[11px] text-muted-foreground">{tr("teethingtracker_dise_toxunaraq_qeyd_edin_65aadb", "Dişə toxunaraq qeyd edin")}</p>
-          </CardHeader>
-          <CardContent className="space-y-2 pb-3">
-            {/* Upper Jaw */}
-            <div className="space-y-1">
-              <p className="text-[10px] text-center text-muted-foreground font-medium">{tr("teethingtracker_yuxari_cene_589483", "Yuxarı Çənə")}</p>
-              <div className="bg-gradient-to-b from-rose-100/80 via-rose-50/50 to-transparent dark:from-rose-900/30 dark:via-rose-950/20 rounded-t-[80px] p-3 pt-5 border-x-2 border-t-2 border-rose-200/50 dark:border-rose-800/30">
-                {renderToothDiagram(upperTeeth, 'upper')}
-              </div>
-            </div>
+            </p>
+          </div>
+          <p className="a-list-sub" style={{ margin: '0 0 10px' }}>{tr("teethingtracker_dise_toxunaraq_qeyd_edin_65aadb", "Dişə toxunaraq qeyd edin")}</p>
 
-            {/* Divider - Gum Line */}
-            <div className="relative py-1">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-rose-300 to-transparent dark:via-rose-600 rounded-full" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-background px-2.5 py-0.5 text-[10px] font-medium text-rose-500 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-full">
-                  {tr("teethingtracker_dis_eti_xetti_22266e", "Di\u015F \u0259ti x\u0259tti")}
-                </span>
-              </div>
+          {/* Upper Jaw */}
+          <div className="space-y-1">
+            <p className="a-eyebrow text-center" style={{ marginBottom: 4 }}>{tr("teethingtracker_yuxari_cene_589483", "Yuxarı Çənə")}</p>
+            <div
+              className="rounded-t-[80px] p-3 pt-5"
+              style={{ background: 'linear-gradient(180deg, var(--a-pink-1), transparent)' }}>
+              {renderToothDiagram(upperTeeth, 'upper')}
             </div>
+          </div>
 
-            {/* Lower Jaw */}
-            <div className="space-y-1">
-              <div className="bg-gradient-to-t from-rose-100/80 via-rose-50/50 to-transparent dark:from-rose-900/30 dark:via-rose-950/20 rounded-b-[80px] p-3 pb-5 border-x-2 border-b-2 border-rose-200/50 dark:border-rose-800/30">
-                {renderToothDiagram(lowerTeeth, 'lower')}
-              </div>
-              <p className="text-[10px] text-center text-muted-foreground font-medium">{tr("teethingtracker_asagi_cene_78719d", "Aşağı Çənə")}</p>
+          {/* Divider - Gum Line */}
+          <div className="relative py-1">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full h-0.5 rounded-full" style={{ background: 'linear-gradient(90deg, transparent, var(--a-pink-2), transparent)' }} />
             </div>
+            <div className="relative flex justify-center">
+              <span
+                className="px-2.5 py-0.5 text-[10px] font-bold rounded-full"
+                style={{ background: 'var(--a-surface)', color: 'var(--a-pink-ink)', border: '1px solid var(--a-pink-1)' }}>
+                {tr("teethingtracker_dis_eti_xetti_22266e", "Di\u015F \u0259ti x\u0259tti")}
+              </span>
+            </div>
+          </div>
 
-            {/* Legend */}
-            <div className="flex justify-center gap-6 pt-2 border-t border-border/50">
-              <div className="flex items-center gap-1.5">
-                <div className="w-4 h-5 rounded-t-md rounded-b-[30%] bg-gradient-to-b from-pink-300 to-pink-400 border-2 border-pink-200 shadow-sm" />
-                <span className="text-[11px] font-medium">{tr("teethingtracker_cixib_f2099b", "Çıxıb")}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-4 h-5 rounded-t-md rounded-b-[30%] bg-gradient-to-b from-gray-200 to-gray-300 border-2 border-gray-300" />
-                <span className="text-[11px] font-medium">{tr("teethingtracker_cixmayib_d90dc0", "Çıxmayıb")}</span>
-              </div>
+          {/* Lower Jaw */}
+          <div className="space-y-1">
+            <div
+              className="rounded-b-[80px] p-3 pb-5"
+              style={{ background: 'linear-gradient(0deg, var(--a-pink-1), transparent)' }}>
+              {renderToothDiagram(lowerTeeth, 'lower')}
             </div>
-          </CardContent>
-        </Card>
+            <p className="a-eyebrow text-center" style={{ marginTop: 4 }}>{tr("teethingtracker_asagi_cene_78719d", "Aşağı Çənə")}</p>
+          </div>
+
+          {/* Legend */}
+          <div className="flex justify-center gap-6 pt-3 mt-2" style={{ borderTop: '1px solid var(--a-line)' }}>
+            <div className="flex items-center gap-1.5">
+              <div
+                className="w-4 h-5 rounded-t-md rounded-b-[30%]"
+                style={{ background: 'linear-gradient(180deg, var(--a-pink-1), var(--a-pink-2))', border: '2px solid var(--a-pink-1)' }} />
+              <span className="text-[11px] font-semibold" style={{ color: 'var(--a-ink)' }}>{tr("teethingtracker_cixib_f2099b", "Çıxıb")}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div
+                className="w-4 h-5 rounded-t-md rounded-b-[30%]"
+                style={{ background: 'linear-gradient(180deg, var(--a-surface-soft), var(--a-line-strong))', border: '2px solid var(--a-line-strong)' }} />
+              <span className="text-[11px] font-semibold" style={{ color: 'var(--a-ink)' }}>{tr("teethingtracker_cixmayib_d90dc0", "Çıxmayıb")}</span>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Tabs for Tips and Symptoms */}
         <Tabs defaultValue="tips" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="tips">{tr("teethingtracker_qulluq_meslehetleri_1be08c", "Qulluq Məsləhətləri")}</TabsTrigger>
-            <TabsTrigger value="symptoms">{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</TabsTrigger>
+          <TabsList className="w-full grid grid-cols-2 h-auto rounded-full p-[3px] border-0" style={{ background: 'var(--a-surface-soft)' }}>
+            <TabsTrigger value="tips" className={tabTriggerClass}>{tr("teethingtracker_qulluq_meslehetleri_1be08c", "Qulluq Məsləhətləri")}</TabsTrigger>
+            <TabsTrigger value="symptoms" className={tabTriggerClass}>{tr("untranslated_simptomlar_xhm7bx", "Simptomlar")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="tips" className="space-y-3 mt-4">
@@ -304,26 +286,25 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
             <motion.div
               key={tip.id}
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}>
+              animate={{ opacity: 1, y: 0 }}
+              className="a-card">
               
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex gap-3">
-                      <div className="text-2xl">{tip.emoji || '💡'}</div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-sm">{tip.title}</h3>
-                          <Badge variant="outline" className="text-[10px]">
-                            {getCategoryLabel(tip.category)}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {tip.content}
-                        </p>
-                      </div>
+                <div className="flex gap-3">
+                  <span className="a-list-icon" style={{ background: 'var(--a-grad-peach)', fontSize: 18, flexShrink: 0 }}>
+                    {tip.emoji || '💡'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <p className="a-list-title" style={{ margin: 0 }}>{tip.title}</p>
+                      <span className="a-rank-tag" style={{ margin: 0, background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+                        {getCategoryLabel(tip.category)}
+                      </span>
                     </div>
-                  </CardContent>
-                </Card>
+                    <p className="a-cta-text" style={{ margin: 0 }}>
+                      {tip.content}
+                    </p>
+                  </div>
+                </div>
               </motion.div>
             )}
           </TabsContent>
@@ -333,35 +314,37 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
             <motion.div
               key={symptom.id}
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}>
+              animate={{ opacity: 1, y: 0 }}
+              className="a-card">
               
-                <Card>
-                  <CardContent className="p-4">
-                    <div className="flex gap-3">
-                      <div className="text-2xl">{symptom.emoji || '⚠️'}</div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-sm">{symptom.name}</h3>
-                          <Badge className={getSeverityColor(symptom.severity)}>
-                            {symptom.severity === 'mild' ? tr("teethingtracker_yungul_2a8010", "Y\xFCng\xFCl") : symptom.severity === 'moderate' ? tr("teethingtracker_severity_orta", 'Orta') : tr("teethingtracker_severity_ciddi", 'Ciddi')}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          {symptom.description}
-                        </p>
-                        {symptom.relief_tips && symptom.relief_tips.length > 0 &&
-                        <div className="flex flex-wrap gap-1">
-                            {symptom.relief_tips.map((tip, i) =>
-                            <Badge key={i} variant="secondary" className="text-[10px]">
-                                {tip}
-                              </Badge>
-                            )}
-                          </div>
-                        }
-                      </div>
+                <div className="flex gap-3">
+                  <span className="a-list-icon" style={{ background: 'var(--a-grad-yellow)', fontSize: 18, flexShrink: 0 }}>
+                    {symptom.emoji || '⚠️'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <p className="a-list-title" style={{ margin: 0 }}>{symptom.name}</p>
+                      <span className="a-rank-tag" style={{ margin: 0, ...getSeverityStyle(symptom.severity) }}>
+                        {symptom.severity === 'mild' ? tr("teethingtracker_yungul_2a8010", "Y\xFCng\xFCl") : symptom.severity === 'moderate' ? tr("teethingtracker_severity_orta", 'Orta') : tr("teethingtracker_severity_ciddi", 'Ciddi')}
+                      </span>
                     </div>
-                  </CardContent>
-                </Card>
+                    <p className="a-cta-text" style={{ margin: '0 0 8px' }}>
+                      {symptom.description}
+                    </p>
+                    {symptom.relief_tips && symptom.relief_tips.length > 0 &&
+                    <div className="flex flex-wrap gap-1">
+                        {symptom.relief_tips.map((tip, i) =>
+                      <span
+                        key={i}
+                        className="a-rank-tag"
+                        style={{ margin: 0, background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
+                            {tip}
+                          </span>
+                      )}
+                      </div>
+                    }
+                  </div>
+                </div>
               </motion.div>
             )}
           </TabsContent>
@@ -370,12 +353,12 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
 
       {/* Tooth Detail Modal */}
       <Dialog open={showToothModal} onOpenChange={setShowToothModal}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="a-scope max-w-sm rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-rose-500" />
-              </div>
+            <DialogTitle className="flex items-center gap-2 a-heading" style={{ color: 'var(--a-ink)' }}>
+              <span className="a-list-icon" style={{ width: 34, height: 34, borderRadius: 11, background: 'var(--a-grad-pink)' }}>
+                <Sparkles size={15} strokeWidth={2.2} style={{ color: 'var(--a-alert-ink)' }} />
+              </span>
               {selectedTooth ? tr("tooth_name_" + selectedTooth.tooth_code, selectedTooth.name) : ''}
             </DialogTitle>
           </DialogHeader>
@@ -384,15 +367,15 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
           <div className="space-y-4">
               {/* Tooth Info */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-muted/50 rounded-lg p-3 text-center">
-                  <p className="text-xs text-muted-foreground">{tr("teethingtracker_tipik_cixma_yasi_1c2740", "Tipik çıxma yaşı")}</p>
-                  <p className="font-medium">
+                <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-surface-soft)' }}>
+                  <p className="a-list-sub" style={{ margin: '0 0 2px' }}>{tr("teethingtracker_tipik_cixma_yasi_1c2740", "Tipik çıxma yaşı")}</p>
+                  <p className="a-list-title" style={{ margin: 0 }}>
                     {selectedTooth.typical_emergence_months_min}-{selectedTooth.typical_emergence_months_max} {tr("time_months", "ay")}
                   </p>
                 </div>
-                <div className="bg-muted/50 rounded-lg p-3 text-center">
-                  <p className="text-xs text-muted-foreground">{tr("teethingtracker_dis_novu_07a451", "Diş növü")}</p>
-                  <p className="font-medium">
+                <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-surface-soft)' }}>
+                  <p className="a-list-sub" style={{ margin: '0 0 2px' }}>{tr("teethingtracker_dis_novu_07a451", "Diş növü")}</p>
+                  <p className="a-list-title" style={{ margin: 0 }}>
                     {selectedTooth.tooth_type === 'incisor' ? tr("teethingtracker_kesici_569ec2", "K\u0259sici") :
                   selectedTooth.tooth_type === 'canine' ? tr("teethingtracker_kopek_disi_a7a461", "K\xF6p\u0259k di\u015Fi") : tr("teethingtracker_azi_disi_fcdef9", "Az\u0131 di\u015Fi")}
                   </p>
@@ -400,23 +383,21 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               </div>
 
               {/* Current Status */}
-              <div className={`rounded-lg p-3 ${
-            isToothEmerged(selectedTooth.id) ?
-            'bg-green-50 dark:bg-green-950/30' :
-            'bg-amber-50 dark:bg-amber-950/30'}`
-            }>
+              <div
+              className="rounded-2xl p-3"
+              style={{ background: isToothEmerged(selectedTooth.id) ? 'var(--a-green-1)' : 'var(--a-yellow-1)' }}>
                 <div className="flex items-center gap-2">
                   {isToothEmerged(selectedTooth.id) ?
                 <>
-                      <Check className="w-4 h-4 text-green-600" />
-                      <span className="text-sm font-medium text-green-700 dark:text-green-400">
+                      <Check className="w-4 h-4" style={{ color: 'var(--a-green-ink)' }} />
+                      <span className="text-sm font-semibold" style={{ color: 'var(--a-green-ink)' }}>
                         {tr("teethingtracker_bu_dis_cixib_543f0e", "Bu di\u015F \xE7\u0131x\u0131b")}
                       </span>
                     </> :
 
                 <>
-                      <AlertCircle className="w-4 h-4 text-amber-600" />
-                      <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                      <AlertCircle className="w-4 h-4" style={{ color: 'var(--a-warn-ink)' }} />
+                      <span className="text-sm font-semibold" style={{ color: 'var(--a-warn-ink)' }}>
                         {tr("teethingtracker_bu_dis_hele_cixmayib_df0465", "Bu di\u015F h\u0259l\u0259 \xE7\u0131xmay\u0131b")}
                       </span>
                     </>
@@ -426,8 +407,8 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
 
               {/* Date Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
+                <label className="text-sm font-semibold flex items-center gap-2" style={{ color: 'var(--a-ink)' }}>
+                  <Calendar className="w-4 h-4" style={{ color: 'var(--a-ink-soft)' }} />
                   {tr("teethingtracker_cixma_tarixi_3c7ae9", "Çıxma tarixi")}
                 </label>
                 <DatePickerWheel
@@ -440,44 +421,46 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
 
               {/* Notes */}
               <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <Info className="w-4 h-4" />
+                <label className="text-sm font-semibold flex items-center gap-2" style={{ color: 'var(--a-ink)' }}>
+                  <Info className="w-4 h-4" style={{ color: 'var(--a-ink-soft)' }} />
                   {tr("teethingtracker_qeydler_isteye_bagli_958966", "Qeydl\u0259r (ist\u0259y\u0259 ba\u011Fl\u0131)")}
                 </label>
                 <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={tr("teethingtracker_her_hansi_qeyd_elave_edin_9c35e2", "Hər hansı qeyd əlavə edin...")}
-                rows={2} />
+                rows={2}
+                className="a-input"
+                style={{ height: 'auto', minHeight: 64 }} />
               
               </div>
 
               {/* Action Button */}
-              <Button
+              <button
               onClick={handleToggleTooth}
-              className={`w-full ${
-              isToothEmerged(selectedTooth.id) ?
-              'bg-red-500 hover:bg-red-600' :
-              'bg-green-500 hover:bg-green-600'}`
-              }>
+              className="a-cta-btn w-full"
+              style={{
+                justifyContent: 'center', height: 46,
+                background: isToothEmerged(selectedTooth.id) ? 'var(--a-pink-2)' : 'var(--a-green-2)'
+              }}>
               
                 {isToothEmerged(selectedTooth.id) ?
               <>
-                    <X className="w-4 h-4 mr-2" />
+                    <X size={15} strokeWidth={2.2} />
                     {tr("teethingtracker_cixib_isaresini_sil_abec15", "\xC7\u0131x\u0131b i\u015Far\u0259sini sil")}
                   </> :
 
               <>
-                    <Check className="w-4 h-4 mr-2" />
+                    <Check size={15} strokeWidth={2.2} />
                     {tr("teethingtracker_cixib_olaraq_isarele_678f2e", "\xC7\u0131x\u0131b olaraq i\u015Far\u0259l\u0259")}
                   </>
               }
-              </Button>
+              </button>
             </div>
           }
         </DialogContent>
       </Dialog>
-    </div>);
+    </ToolPage>);
 
 };
 

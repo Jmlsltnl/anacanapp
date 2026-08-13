@@ -20,15 +20,23 @@ const ForceUpdateScreen = ({ title, message, androidUrl, iosUrl }: ForceUpdateSc
 
   return (
     <motion.div
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background px-6"
+      className="a-scope fixed inset-0 z-[9999] flex flex-col items-center justify-center px-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       style={{
+        background: 'var(--a-bg)',
         paddingTop: 'env(safe-area-inset-top)',
         paddingBottom: 'env(safe-area-inset-bottom)'
       }}>
-      
-      <div className="flex flex-col items-center text-center max-w-sm">
+
+      {/* Watercolor sky */}
+      <div className="a-sky" aria-hidden>
+        <span className="a-cloud c1" />
+        <span className="a-cloud c2" />
+        <span className="a-cloud c3" />
+      </div>
+
+      <div className="flex flex-col items-center text-center max-w-sm relative z-10">
         <motion.img
           src={logoImage}
           alt="Anacan"
@@ -36,32 +44,35 @@ const ForceUpdateScreen = ({ title, message, androidUrl, iosUrl }: ForceUpdateSc
           initial={{ scale: 0.8 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 200 }} />
-        
+
 
         <motion.div
-          className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6"
+          className="w-16 h-16 rounded-full flex items-center justify-center mb-6"
+          style={{ background: 'var(--a-peach-1)' }}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}>
-          
-          <ArrowUpCircle className="w-8 h-8 text-primary" />
+
+          <ArrowUpCircle size={30} style={{ color: 'var(--a-accent-ink)' }} />
         </motion.div>
 
         <motion.h1
-          className="text-2xl font-bold text-foreground mb-3"
+          className="mb-3"
+          style={{ fontSize: 23, fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--a-ink)' }}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}>
-          
+
           {title}
         </motion.h1>
 
         <motion.p
-          className="text-muted-foreground text-sm leading-relaxed mb-8"
+          className="leading-relaxed mb-8"
+          style={{ fontSize: 13.5, color: 'var(--a-body-text)' }}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}>
-          
+
           {message}
         </motion.p>
 
@@ -70,8 +81,10 @@ const ForceUpdateScreen = ({ title, message, androidUrl, iosUrl }: ForceUpdateSc
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}>
-          
-          <Button onClick={handleUpdate} size="lg" className="w-full rounded-2xl text-base font-semibold h-14">
+
+          <Button onClick={handleUpdate} size="lg"
+          className="w-full rounded-full text-base font-semibold h-14 text-white border-0 hover:opacity-95"
+          style={{ background: 'var(--a-peach-2)', boxShadow: '0 16px 32px -12px rgba(217, 108, 74, 0.6)' }}>
             <Shield className="w-5 h-5 mr-2" />
             {tr("forceupdatescreen_tetbiqi_yenile_18f4f3", "T\u0259tbiqi yenil\u0259")}
           </Button>

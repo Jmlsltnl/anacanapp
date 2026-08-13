@@ -23,12 +23,28 @@ export const getSystemPrompt = (
   cycleDay?: number,
   language: string = "az",
 ) => {
-  const isEn = language === "en";
+  // en/ru/tr share the English prompt body; `replyRule` + the langInstruction in index.ts
+  // enforce the actual response language (reliable for LLMs), so ru/tr users get ru/tr answers.
+  const isEn = language !== "az";
+  const REPLY_LANG: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish" };
+  const replyRule = language === "az"
+    ? "YALNIZ Azərbaycan dilində cavab ver"
+    : `Reply ONLY in ${REPLY_LANG[language] ?? "English"}`;
+
+  // Verbatim disclaimer quote must be in the user's language (the model copies it as-is)
+  const WARN_TEXT: Record<string, string> = {
+    az: "⚠️ Bu məlumat ümumi xarakterlidir. Hər hansı müalicə və ya dərman qəbulu üçün mütləq həkimlə məsləhətləşin.",
+    en: "⚠️ This information is of a general nature. Always consult a doctor before taking any treatment or medication.",
+    ru: "⚠️ Эта информация носит общий характер. Перед любым лечением или приёмом лекарств обязательно проконсультируйтесь с врачом.",
+    tr: "⚠️ Bu bilgiler genel niteliktedir. Herhangi bir tedavi veya ilaç kullanımından önce mutlaka doktora danışın.",
+  };
+  const warnText = WARN_TEXT[language] ?? WARN_TEXT.en;
+
   const disclaimerRule = isEn
     ? `
 📛 MEDICAL WARNING RULES:
 - Add the following warning ONLY at the END of the response when discussing specific medical advice, drug name, dosage, treatment method or diagnosis:
-  "⚠️ This information is of a general nature. Always consult a doctor before taking any treatment or medication."
+  "${warnText}"
 - DO NOT ADD this warning for general advice, nutrition tips, emotional support, baby care, and daily tips.
 - That is, do not show it in every answer, ONLY when writing on a medical/drug topic.`
     : `
@@ -38,8 +54,9 @@ export const getSystemPrompt = (
 - Ümumi məsləhətlər, qidalanma tövsiyələri, emosional dəstək, körpə baxımı və gündəlik məsləhətlər üçün bu xəbərdarlığı ƏLAVƏ ETMƏ.
 - Yəni hər cavabda deyil, YALNIZ tibbi/dərman mövsuzunda yazanda göstər.`;
 
-  // Add current date dynamically
-  const currentDateEn = new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+  // Add current date dynamically (locale matches the user's language)
+  const dateLocale = language === "ru" ? "ru-RU" : language === "tr" ? "tr-TR" : "en-US";
+  const currentDateEn = new Date().toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
   const currentDateAz = new Date().toLocaleDateString("az-AZ", { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
   const dateContext = isEn ? `\nToday's Date: ${currentDateEn}\n` : `\nBugünkü tarix: ${currentDateAz}\n`;
 
@@ -94,7 +111,7 @@ YOUR CHARACTER AND BEHAVIOR:
 ${userContext}
 
 📌 RULES:
-- Reply ONLY in English
+- ${replyRule}
 - Speak to a man like a man - do not be formal, use "you" (informal/direct)
 - Use emojis, but not excessively
 - Give practical, concrete advice
@@ -159,7 +176,7 @@ YOUR CHARACTER AND BEHAVIOR:
 ${userContext}
 
 📌 RULES:
-- Reply ONLY in English
+- ${replyRule}
 - ALWAYS speak in a polite, professional, and respectful tone. Do not use informal pronouns or addressing style
 - Do not use emojis or use them very sparingly (0-1 emoji per response)
 - STRICTLY DO NOT USE: informal addressing or sweet/overly familiar terms (e.g. "dear", "honey", "friend", "sweetie", "sis" or similar).

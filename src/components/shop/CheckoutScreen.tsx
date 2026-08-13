@@ -17,6 +17,9 @@ interface CheckoutScreenProps {
   initialDiscount?: number;
 }
 
+const inputStyle: React.CSSProperties = { background: 'var(--a-surface)', borderColor: 'var(--a-line-strong)', color: 'var(--a-ink)' };
+const sectionTitleStyle: React.CSSProperties = { fontSize: 14, fontWeight: 700, color: 'var(--a-ink)' };
+
 const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount }: CheckoutScreenProps) => {
   const { items, totalPrice, createOrder } = useCart();
   const { couponCode, setCouponCode, appliedCoupon, validating, validateCoupon, removeCoupon, recordUsage } = useCouponValidator('shop');
@@ -70,49 +73,51 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="min-h-screen bg-background">
-      
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3">
+      className="a-scope min-h-screen"
+      style={{ background: 'var(--a-bg)' }}>
+
+      <div className="sticky top-0 z-10 px-4 py-2.5"
+      style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
         <div className="flex items-center gap-3">
-          <button onClick={onBack} className="p-2 rounded-full hover:bg-muted">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <h1 className="text-lg font-bold">{tr("checkoutscreen_sifarisi_tamamla_a8b546", "Sifarişi Tamamla")}</h1>
+          <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
+            <ArrowLeft size={16} strokeWidth={2} />
+          </motion.button>
+          <h1 style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>{tr("checkoutscreen_sifarisi_tamamla_a8b546", "Sifarişi Tamamla")}</h1>
         </div>
       </div>
 
 
 
-      <form onSubmit={handleSubmit} className="p-4 space-y-5 pb-32">
-        <div className="space-y-3">
-          <h2 className="text-base font-semibold flex items-center gap-2">
-            <User className="w-4 h-4 text-primary" />
+      <form onSubmit={handleSubmit} className="p-4 space-y-4 pb-32 max-w-md mx-auto">
+        <div className="a-card space-y-3">
+          <h2 className="flex items-center gap-2" style={sectionTitleStyle}>
+            <User size={15} style={{ color: 'var(--a-accent-ink)' }} />
             {tr("checkoutscreen_elaqe_melumatlari_8a7aae", "\u018Flaq\u0259 M\u0259lumatlar\u0131")}
           </h2>
-          <Input placeholder={tr("checkout_full_name", 'Ad Soyad')} value={formData.name} onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))} className="h-11" />
-          <Input placeholder={tr("checkout_phone_placeholder", 'Telefon (+994 XX XXX XX XX)')} value={formData.phone} onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))} className="h-11" />
+          <Input placeholder={tr("checkout_full_name", 'Ad Soyad')} value={formData.name} onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))} className="h-11 rounded-xl" style={inputStyle} />
+          <Input placeholder={tr("checkout_phone_placeholder", 'Telefon (+994 XX XXX XX XX)')} value={formData.phone} onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))} className="h-11 rounded-xl" style={inputStyle} />
         </div>
 
-        <div className="space-y-3">
-          <h2 className="text-base font-semibold flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-primary" />
+        <div className="a-card space-y-3">
+          <h2 className="flex items-center gap-2" style={sectionTitleStyle}>
+            <MapPin size={15} style={{ color: 'var(--a-accent-ink)' }} />
             {tr("checkoutscreen_catdirilma_unvani_10ea11", "\xC7atd\u0131r\u0131lma \xDCnvan\u0131")}
           </h2>
-          <Input placeholder={tr("checkoutscreen_seher_5f373c", "Şəhər")} value={formData.city} onChange={(e) => setFormData((prev) => ({ ...prev, city: e.target.value }))} className="h-11" />
-          <Textarea placeholder={tr("checkoutscreen_unvan_kuce_bina_menzil_ad3ef6", "Ünvan (küçə, bina, mənzil)")} value={formData.address} onChange={(e) => setFormData((prev) => ({ ...prev, address: e.target.value }))} rows={2} />
+          <Input placeholder={tr("checkoutscreen_seher_5f373c", "Şəhər")} value={formData.city} onChange={(e) => setFormData((prev) => ({ ...prev, city: e.target.value }))} className="h-11 rounded-xl" style={inputStyle} />
+          <Textarea placeholder={tr("checkoutscreen_unvan_kuce_bina_menzil_ad3ef6", "Ünvan (küçə, bina, mənzil)")} value={formData.address} onChange={(e) => setFormData((prev) => ({ ...prev, address: e.target.value }))} rows={2} className="rounded-xl" style={inputStyle} />
         </div>
 
-        <div className="space-y-3">
-          <h2 className="text-base font-semibold flex items-center gap-2">
-            <Truck className="w-4 h-4 text-primary" />
+        <div className="a-card space-y-3">
+          <h2 className="flex items-center gap-2" style={sectionTitleStyle}>
+            <Truck size={15} style={{ color: 'var(--a-accent-ink)' }} />
             {tr("checkoutscreen_elave_qeydler_49e1f1", "Əlavə Qeydlər")}
           </h2>
-          <Textarea placeholder={tr("checkoutscreen_kuryere_mesaj_isteye_bagli_56df8d", "Kuryerə mesaj (istəyə bağlı)")} value={formData.notes} onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))} rows={2} />
+          <Textarea placeholder={tr("checkoutscreen_kuryere_mesaj_isteye_bagli_56df8d", "Kuryerə mesaj (istəyə bağlı)")} value={formData.notes} onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))} rows={2} className="rounded-xl" style={inputStyle} />
         </div>
 
         {/* Coupon */}
-        <div className="space-y-2">
-          <h2 className="text-base font-semibold flex items-center gap-2">
+        <div className="a-card space-y-2">
+          <h2 className="flex items-center gap-2" style={sectionTitleStyle}>
             {tr("checkout_coupon_code_label", 'Kupon Kodu')}
           </h2>
           <CouponInput
@@ -122,43 +127,46 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
             onRemove={removeCoupon}
             appliedCoupon={appliedCoupon}
             validating={validating} />
-          
+
         </div>
 
         {/* Order Summary */}
-        <div className="bg-card rounded-xl p-4 border border-border space-y-2">
-          <h2 className="font-semibold text-sm">{tr("checkoutscreen_sifaris_xulasesi_14a242", "Sifariş Xülasəsi")}</h2>
+        <div className="a-card space-y-2">
+          <h2 style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{tr("checkoutscreen_sifaris_xulasesi_14a242", "Sifariş Xülasəsi")}</h2>
           {items.map((item) =>
-          <div key={item.id} className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{item.product?.name} x{item.quantity}</span>
-              <span>{((item.product?.price || 0) * item.quantity).toFixed(2)} ₼</span>
+          <div key={item.id} className="flex justify-between" style={{ fontSize: 13 }}>
+              <span style={{ color: 'var(--a-ink-soft)' }}>{item.product?.name} x{item.quantity}</span>
+              <span style={{ color: 'var(--a-ink)', fontWeight: 600 }}>{((item.product?.price || 0) * item.quantity).toFixed(2)} ₼</span>
             </div>
           )}
           {discountAmount > 0 &&
-          <div className="flex justify-between text-sm text-green-600">
+          <div className="flex justify-between" style={{ fontSize: 13, color: 'var(--a-green-ink)', fontWeight: 600 }}>
               <span>{tr("untranslated_kupon_endirimi_itwejz", "Kupon endirimi")}</span>
               <span>-{discountAmount.toFixed(2)} ₼</span>
             </div>
           }
-          <div className="border-t border-border pt-2 flex justify-between font-bold">
-            <span>{tr("checkoutscreen_cemi_fbbec6", "Cəmi:")}</span>
-            <span className="text-primary">{finalPrice.toFixed(2)} ₼</span>
+          <div className="flex justify-between pt-2" style={{ borderTop: '1px solid var(--a-line)', fontWeight: 800 }}>
+            <span style={{ color: 'var(--a-ink)' }}>{tr("checkoutscreen_cemi_fbbec6", "Cəmi:")}</span>
+            <span style={{ color: 'var(--a-accent-ink)' }}>{finalPrice.toFixed(2)} ₼</span>
           </div>
         </div>
 
-        <div className="bg-muted/50 rounded-xl p-3 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-            <CreditCard className="w-5 h-5 text-primary" />
+        <div className="flex items-center gap-3" style={{ background: 'var(--a-green-1)', borderRadius: 16, padding: 13 }}>
+          <div className="w-10 h-10 flex items-center justify-center shrink-0" style={{ borderRadius: 12, background: 'var(--a-chip-overlay)' }}>
+            <CreditCard size={19} style={{ color: 'var(--a-green-ink)' }} />
           </div>
           <div>
-            <p className="font-medium text-sm">{tr("checkoutscreen_qapida_odenis_312926", "Qapıda Ödəniş")}</p>
-            <p className="text-xs text-muted-foreground">{tr("checkoutscreen_nagd_ve_ya_kartla_c4ddd7", "Nağd və ya kartla")}</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#14532d' }}>{tr("checkoutscreen_qapida_odenis_312926", "Qapıda Ödəniş")}</p>
+            <p style={{ fontSize: 11.5, color: 'var(--a-green-ink)' }}>{tr("checkoutscreen_nagd_ve_ya_kartla_c4ddd7", "Nağd və ya kartla")}</p>
           </div>
         </div>
       </form>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 safe-bottom">
-        <Button onClick={handleSubmit} disabled={loading} className="w-full h-12 text-base font-bold">
+      <div className="fixed bottom-0 left-0 right-0 p-4 safe-bottom"
+      style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', borderTop: '1px solid var(--a-line)' }}>
+        <Button onClick={handleSubmit} disabled={loading}
+        className="w-full h-12 text-base font-bold rounded-full text-white border-0 max-w-md mx-auto flex hover:opacity-95"
+        style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}>
           {loading ?
           <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{tr("checkoutscreen_gozleyin_9c465b", "Gözləyin...")}</> :
 

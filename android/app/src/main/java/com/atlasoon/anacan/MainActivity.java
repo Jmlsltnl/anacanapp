@@ -14,6 +14,13 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void load() {
         disableProblematicAndroidPlugins();
+        // Lokal plugin: menstruasiya → Health Connect yazısı
+        registerPlugin(HealthCyclePlugin.class);
+        // Lokal plugin: Facebook App Events (köhnə plugin crash-lərinə görə
+        // söndürülüb — bu minimal versiya load()-da heç nə etmir)
+        registerPlugin(FbEventsPlugin.class);
+        // Lokal plugin: süd vermə/yuxu taymerləri — kilid ekranı bildirişi (LiveActivity)
+        registerPlugin(TimerWidgetPlugin.class);
         super.load();
     }
 

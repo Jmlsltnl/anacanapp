@@ -11,7 +11,12 @@ const fallbackTargets = {
   flow: { water_glasses: 8 }
 };
 
-export default function WaterWidget() {
+interface WaterWidgetProps {
+  /** 'anacan' renders the redesigned (anacan-demo) progress-ring card */
+  variant?: 'default' | 'anacan';
+}
+
+export default function WaterWidget({ variant = 'default' }: WaterWidgetProps) {
   const { todayLog, updateWaterIntake } = useDailyLogs();
   const { lifeStage } = useUserStore();
   
@@ -20,6 +25,48 @@ export default function WaterWidget() {
   const target = fallbackTargets[stage as keyof typeof fallbackTargets]?.water_glasses || 8;
   
   const percentage = Math.min((waterGlasses / target) * 100, 100);
+
+  if (variant === 'anacan') {
+    return (
+      <div className="a-card a-fade-in">
+        <div className="a-card-head">
+          <h3 className="a-card-title a-heading">{tr("common_su_water", "Su")}</h3>
+          <span className="a-section-link" style={{ color: 'var(--a-ink-soft)' }}>
+            {waterGlasses}/{target} {tr('waterwidget_glass_unit', 'stəkan')}
+          </span>
+        </div>
+        <div className="a-ring-hero">
+          <div className="a-ring" style={{ '--pct': percentage } as React.CSSProperties}>
+            <div className="a-ring-inner">
+              <b>{Math.round(percentage)}%</b>
+              <span>{tr('mommy_daily_goal', 'günlük hədəf')}</span>
+            </div>
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p className="a-list-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Droplets size={14} style={{ color: 'var(--a-blue-2)' }} />
+              {waterGlasses} / {target} {tr('waterwidget_glass_unit', 'stəkan')}
+            </p>
+            <p className="a-list-sub" style={{ whiteSpace: 'normal', marginTop: 4 }}>
+              {tr('waterwidget_hint', 'Ana üçün su balansı süd istehsalına dəstəkdir')}
+            </p>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                updateWaterIntake(1);
+              }}
+              className="a-btn-soft"
+              style={{ marginTop: 10 }}
+            >
+              <Plus size={14} strokeWidth={2.5} />
+              {tr('waterwidget_add_glass', '1 stəkan əlavə et')}
+            </motion.button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-cyan-50/80 border border-cyan-100/50 rounded-xl p-3 text-cyan-800 shadow-sm relative overflow-hidden h-full flex flex-col justify-between min-h-[80px]">

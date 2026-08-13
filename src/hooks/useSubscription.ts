@@ -2,6 +2,10 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useAppSetting } from './useAppSettings';
+import { readCache, writeCache } from '@/lib/offlineCache';
+
+const SUBSCRIPTION_CACHE = 'subscription';
+const HOUSEHOLD_PREMIUM_CACHE = 'household_premium';
 
 interface Subscription {
   id: string;
@@ -13,10 +17,16 @@ interface Subscription {
   updated_at?: string;
 }
 
+/** Gündəlik say limiti olan feature-lər (usage_tracking.feature_type) */
+export type DailyFeature =
+  'ai_chat' | 'cry_translator' | 'poop_scanner' | 'fairy_tale' | 'horoscope' | 'baby_insight';
+
+type UsageFeatureType = 'white_noise' | 'baby_photoshoot' | DailyFeature;
+
 interface UsageTracking {
   id: string;
   user_id: string;
-  feature_type: 'white_noise' | 'baby_photoshoot';
+  feature_type: UsageFeatureType;
   usage_date: string;
   usage_count: number;
   usage_seconds: number;
@@ -31,6 +41,16 @@ const DEFAULT_FREE_LIMITS = {
   cry_translator_count_per_day: 3,
   poop_scanner_count_per_day: 3,
   horoscope_count_per_day: 2,
+  baby_insight_count_per_day: 2,
+};
+
+const DAILY_LIMIT_KEYS: Record<DailyFeature, keyof typeof DEFAULT_FREE_LIMITS> = {
+  ai_chat: 'ai_chat_count_per_day',
+  cry_translator: 'cry_translator_count_per_day',
+  poop_scanner: 'poop_scanner_count_per_day',
+  fairy_tale: 'fairy_tale_count_per_day',
+  horoscope: 'horoscope_count_per_day',
+  baby_insight: 'baby_insight_count_per_day',
 };
 
 export function useSubscription() {
@@ -38,6 +58,7 @@ export function useSubscription() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [usage, setUsage] = useState<UsageTracking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [householdPremium, setHouseholdPremium] = useState(false);
 
   // Read free limits from DB (app_settings -> free_limits)
   const dbFreeLimits = useAppSetting('free_limits');
@@ -64,6 +85,7 @@ export function useSubscription() {
 
       if (subData) {
         setSubscription(subData as Subscription);
+        writeCache(SUBSCRIPTION_CACHE, user.id, subData);
       } else {
         const { data: newSub } = await supabase
           .from('subscriptions')
@@ -92,6 +114,9 @@ export function useSubscription() {
       }
     } catch (error) {
       console.error('Error fetching subscription:', error);
+      // Offline → son bilinən abunə vəziyyəti (expires_at yoxlaması ownPremium-da qalır)
+      const cached = readCache<Subscription>(SUBSCRIPTION_CACHE, user.id);
+      if (cached) setSubscription(cached);
     } finally {
       setLoading(false);
     }
@@ -101,23 +126,123 @@ export function useSubscription() {
     fetchSubscription();
   }, [fetchSubscription]);
 
-  // Premium if active subscription OR cancelled but not yet expired OR profile flag
-  const isPremium = 
-    (subscription?.plan_type === 'premium' || subscription?.plan_type === 'premium_plus') &&
-    (subscription?.status === 'active' || 
-      (subscription?.status === 'cancelled' && subscription?.expires_at && new Date(subscription.expires_at) > new Date())
-    ) ||
-    profile?.is_premium === true;
+  // Household premium: linked partnyorun abunəsi hər iki tərəfi açır.
+  // RPC mövcud deyilsə (migration tətbiq olunmayıbsa) səssizcə false qalır.
+  useEffect(() => {
+    let cancelled = false;
+    const checkHousehold = async () => {
+      if (!user || !profile?.linked_partner_id) {
+        setHouseholdPremium(false);
+        return;
+      }
+      try {
+        const { data, error } = await (supabase.rpc as any)('get_linked_partner_premium');
+        if (!cancelled) {
+          if (error) {
+            // RPC xətası (offline/migration yoxdur) → son bilinən dəyər
+            setHouseholdPremium(readCache<boolean>(HOUSEHOLD_PREMIUM_CACHE, user.id) === true);
+          } else {
+            setHouseholdPremium(data === true);
+            writeCache(HOUSEHOLD_PREMIUM_CACHE, user.id, data === true);
+          }
+        }
+      } catch {
+        // Şəbəkə xətası → son bilinən dəyər (yoxdursa false)
+        if (!cancelled) setHouseholdPremium(readCache<boolean>(HOUSEHOLD_PREMIUM_CACHE, user.id) === true);
+      }
+    };
+    checkHousehold();
+    return () => {cancelled = true;};
+  }, [user, profile?.linked_partner_id]);
+
+  // Müddət yoxlaması: expires_at/premium_until KEÇMİŞDƏDİRSƏ premium sayılmır.
+  // (Əvvəllər 'active' status və is_premium flag-ı tarixsiz yoxlanılırdı →
+  // heç bir cron/webhook olmadığı üçün premium praktikada HEÇ VAXT bitmirdi.)
+  const notExpired = (until?: string | null) => !until || new Date(until) > new Date();
+
+  const ownPremium =
+  (subscription?.plan_type === 'premium' || subscription?.plan_type === 'premium_plus') &&
+  (subscription?.status === 'active' || subscription?.status === 'cancelled') &&
+  notExpired(subscription?.expires_at) ||
+  profile?.is_premium === true && notExpired((profile as any)?.premium_until);
+
+  // Household: linked partnyorun premiumu da sayılır
+  const isPremium = ownPremium || householdPremium;
 
   const isCancelled = subscription?.status === 'cancelled';
-  const cancelledButActive = isCancelled && isPremium;
+  const cancelledButActive = isCancelled && ownPremium;
 
   const getUsageForFeature = useCallback(
-    (featureType: 'white_noise' | 'baby_photoshoot'): UsageTracking | undefined => {
+    (featureType: UsageFeatureType): UsageTracking | undefined => {
       return usage.find(u => u.feature_type === featureType);
     },
     [usage]
   );
+
+  /**
+   * Gündəlik say limiti: yoxla və İSTİFADƏ ET (premium → limitsiz).
+   * usage_tracking-də (user_id, feature_type, usage_date) UNIQUE olduğundan
+   * upsert təhlükəsizdir. İcazə yoxdursa sayğac artırılmır.
+   */
+  const checkAndConsume = useCallback(async (
+    feature: DailyFeature
+  ): Promise<{ allowed: boolean; remaining: number; limit: number }> => {
+    const limit = Number(freeLimits[DAILY_LIMIT_KEYS[feature]] ?? 0);
+    if (isPremium) return { allowed: true, remaining: Infinity, limit };
+    if (!user) return { allowed: false, remaining: 0, limit };
+
+    const today = new Date().toISOString().split('T')[0];
+    try {
+      const { data: row } = await supabase
+        .from('usage_tracking')
+        .select('id, usage_count')
+        .eq('user_id', user.id)
+        .eq('feature_type', feature)
+        .eq('usage_date', today)
+        .maybeSingle();
+
+      const used = row?.usage_count || 0;
+      if (used >= limit) return { allowed: false, remaining: 0, limit };
+
+      if (row) {
+        await supabase.from('usage_tracking').update({ usage_count: used + 1 }).eq('id', row.id);
+      } else {
+        await supabase.from('usage_tracking').upsert({
+          user_id: user.id,
+          feature_type: feature,
+          usage_date: today,
+          usage_count: 1,
+        }, { onConflict: 'user_id,feature_type,usage_date' });
+      }
+      return { allowed: true, remaining: Math.max(0, limit - used - 1), limit };
+    } catch (e) {
+      // Şəbəkə xətasında istifadəçini bloklamırıq (limit "best effort"-dur)
+      console.error('checkAndConsume failed:', e);
+      return { allowed: true, remaining: 0, limit };
+    }
+  }, [isPremium, user, freeLimits]);
+
+  /** Gündəlik limitdən nə qədər qalıb — YALNIZ oxuyur (UI sayğacları üçün). */
+  const peekRemainingDaily = useCallback(async (
+    feature: DailyFeature
+  ): Promise<{ remaining: number; limit: number }> => {
+    const limit = Number(freeLimits[DAILY_LIMIT_KEYS[feature]] ?? 0);
+    if (isPremium) return { remaining: Infinity, limit };
+    if (!user) return { remaining: 0, limit };
+    const today = new Date().toISOString().split('T')[0];
+    try {
+      const { data: row } = await supabase
+        .from('usage_tracking')
+        .select('usage_count')
+        .eq('user_id', user.id)
+        .eq('feature_type', feature)
+        .eq('usage_date', today)
+        .maybeSingle();
+      return { remaining: Math.max(0, limit - (row?.usage_count || 0)), limit };
+    } catch {
+      return { remaining: limit, limit };
+    }
+  }, [isPremium, user, freeLimits]);
 
   const canUseWhiteNoise = useCallback((): { allowed: boolean; remainingSeconds: number } => {
     if (isPremium) {
@@ -217,20 +342,24 @@ export function useSubscription() {
   const upgradeToPremium = () => {
     return {
       showUpgradeModal: true,
-      monthlyPrice: 9.99,
-      yearlyPrice: 79.99,
+      monthlyPrice: 3.99,
+      yearlyPrice: 29.99,
     };
   };
 
   return {
     subscription,
     isPremium,
+    ownPremium,
+    householdPremium,
     isCancelled,
     cancelledButActive,
     loading,
     canUseWhiteNoise,
     canUseBabyPhotoshoot,
     trackWhiteNoiseUsage,
+    checkAndConsume,
+    peekRemainingDaily,
     cancelSubscription,
     restoreSubscription,
     upgradeToPremium,

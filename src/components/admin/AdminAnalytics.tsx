@@ -175,8 +175,8 @@ const AdminAnalytics = () => {
     let mrr = 0;
     activeSubs.forEach(sub => {
       const plan = premiumPlans.find(p => p.id === sub.plan_id || p.name === sub.plan_type);
-      // Fallback estimate if plan not found (e.g. 4.99 AZN)
-      mrr += plan ? (plan.price_monthly || 4.99) : 4.99; 
+      // Fallback estimate if plan not found ($3.99/ay — pricing_2026)
+      mrr += plan ? (plan.price_monthly || 3.99) : 3.99; 
     });
 
     // ARPU (Average Revenue Per User)

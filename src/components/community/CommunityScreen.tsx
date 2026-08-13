@@ -98,83 +98,106 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   }
 
   return (
-    <div ref={ref} className="min-h-screen pb-24 bg-background community-native-text">
-      {/* Header */}
-      <div className="bg-card border-b border-border/60 shadow-sm">
-        <div className="px-5 pt-4 pb-2">
-          <div className="flex items-center gap-3 mb-3">
+    <div ref={ref} className="a-scope pb-8 community-native-text" style={{ background: 'var(--a-bg)', minHeight: '100%' }}>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {onBack &&
-            <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center active:bg-muted/80 transition-colors" whileTap={{ scale: 0.9 }}>
-                <ArrowLeft className="w-4 h-4 text-foreground" />
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
+                <ArrowLeft size={16} strokeWidth={2} />
               </motion.button>
             }
-            <div className="flex-1">
-              <h1 className="text-[26px] font-black text-foreground tracking-tight leading-none">{tr("communityscreen_cemiyyet_2dc44d", "Cəmiyyət")}</h1>
-              <p className="text-[13px] text-muted-foreground mt-1 font-medium">{headerText}</p>
+            <div>
+              <p className="a-eyebrow">{headerText}</p>
+              <p className="a-wordmark" style={{ fontSize: 18 }}>{tr("communityscreen_cemiyyet_2dc44d", "Cəmiyyət")}</p>
             </div>
+          </div>
+          <div className="a-topbar-actions">
             <motion.button
               onClick={() => setShowConversations(true)}
-              className="relative w-9 h-9 rounded-full bg-muted flex items-center justify-center"
+              className="a-icon-btn"
+              aria-label={tr("bottomnav_mesajlar", "Mesajlar")}
               whileTap={{ scale: 0.9 }}>
               
-              <MessageCircle className="w-4 h-4 text-foreground" />
+              <MessageCircle size={16} strokeWidth={2} />
               {totalUnread > 0 &&
-              <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 rounded-full bg-primary text-primary-foreground text-[9px] font-bold flex items-center justify-center min-w-[18px] h-[18px]">
+              <span
+                style={{
+                  position: 'absolute',
+                  top: -4,
+                  right: -4,
+                  minWidth: 15,
+                  height: 15,
+                  padding: '0 4px',
+                  borderRadius: 999,
+                  background: '#e05555',
+                  color: '#fff',
+                  fontSize: 8.5,
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                
                   {totalUnread > 9 ? '9+' : totalUnread}
                 </span>
               }
             </motion.button>
           </div>
+        </header>
 
-          <motion.div className="relative" animate={{ scale: searchFocused ? 1.01 : 1 }} transition={{ duration: 0.2 }}>
-            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors duration-300 ${searchFocused ? 'text-primary' : 'text-muted-foreground/70'}`} />
+        {/* Search */}
+        <motion.div animate={{ scale: searchFocused ? 1.01 : 1 }} transition={{ duration: 0.2 }}>
+          <div className="a-search">
+            <Search size={15} strokeWidth={2} color={searchFocused ? 'var(--a-peach-2)' : 'var(--a-ink-faint)'} />
             <input
               type="text"
               placeholder={tr("untranslated_axtar_92w4nn", "Axtar...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setSearchFocused(true)}
-              onBlur={() => setSearchFocused(false)}
-              className={`w-full h-9 pl-9 pr-8 rounded-xl text-[14px] font-medium outline-none transition-all duration-300 placeholder:text-muted-foreground/60 ${
-              searchFocused ? 'bg-background border border-primary/30 shadow-[0_0_0_3px_hsl(var(--primary)/0.08)]' : 'bg-muted/60 border border-border/40'}`
-              } />
+              onBlur={() => setSearchFocused(false)} />
             
             <AnimatePresence>
               {searchQuery &&
-              <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-muted flex items-center justify-center">
-                  <X className="w-2.5 h-2.5 text-muted-foreground" />
+              <motion.button
+                initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
+                onClick={() => setSearchQuery('')}
+                style={{ width: 20, height: 20, borderRadius: 999, background: 'var(--a-surface-soft)', display: 'grid', placeItems: 'center', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+                  <X size={11} style={{ color: 'var(--a-ink-soft)' }} />
                 </motion.button>
               }
             </AnimatePresence>
-          </motion.div>
+          </div>
+        </motion.div>
 
-          <BannerSlot placement="community_top" className="mt-2" />
+        <BannerSlot placement="community_top" className="mt-3" />
+
+        {/* Stories */}
+        <div style={{ marginTop: 14 }}>
+          <StoriesBar groupId={null} />
         </div>
-      </div>
 
-      <div className="px-5 pt-2 pb-1">
-        <StoriesBar groupId={null} />
-      </div>
-
-      {/* Facebook-style post input - compact */}
-      <div className="bg-card border-b border-border/30 px-4 py-2.5">
+        {/* Composer prompt (anacan-demo) */}
         <motion.button
           onClick={() => setShowCreatePost(true)}
-          className="w-full flex items-center gap-2.5 active:bg-muted/30 transition-colors rounded-lg"
+          className="a-composer"
+          style={{ marginTop: 12 }}
           whileTap={{ scale: 0.98 }}>
           
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/15 to-accent/10 flex items-center justify-center flex-shrink-0">
-            <Pen className="w-3.5 h-3.5 text-primary" />
-          </div>
-          <span className="text-[14px] text-muted-foreground/70 font-medium">{tr("communityscreen_ne_dusunursunuz_0378b3", "Nə düşünürsünüz?")}</span>
+          <span className="a-composer-avatar">🙂</span>
+          <span className="a-composer-text">{tr("communityscreen_ne_dusunursunuz_0378b3", "Nə düşünürsünüz?")}</span>
+          <span className="a-cta-btn" style={{ padding: '9px 14px', fontSize: 11.5 }}>
+            <Sparkles size={12} /> {tr("storiesbar_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+          </span>
         </motion.button>
-      </div>
 
-      <div className="pt-0">
-        <GroupFeed group={null} onBack={() => {}} onCreatePost={() => setShowCreatePost(true)} isEmbedded onUserClick={handleUserClick} externalSearchQuery={searchQuery} />
+        {/* Feed */}
+        <div style={{ marginTop: 16 }}>
+          <GroupFeed group={null} onBack={() => {}} onCreatePost={() => setShowCreatePost(true)} isEmbedded onUserClick={handleUserClick} externalSearchQuery={searchQuery} />
+        </div>
       </div>
-
     </div>);
 
 });

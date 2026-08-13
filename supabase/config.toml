@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.expire-partner-links]
 verify_jwt = false
+
+[functions.baby-insight]
+verify_jwt = false

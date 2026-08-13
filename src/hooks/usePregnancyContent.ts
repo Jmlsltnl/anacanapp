@@ -9,10 +9,19 @@ const TRANSLATABLE_FIELDS = [
   'baby_size_fruit',
   'body_changes',
   'daily_tip',
+  'doctor_visit_tip',
+  'emotional_tip',
   'exercise_tip',
   'mother_tips',
   'mother_warnings',
   'nutrition_tip',
+  'partner_tip',
+  // text[] sahələr — _ru/_tr sütunları da text[] tiplidir, birbaşa əvəzlənir
+  'foods_to_avoid',
+  'mother_symptoms',
+  'recommended_exercises',
+  'recommended_foods',
+  'tests_to_do',
 ] as const;
 
 function applyLanguage<T extends Record<string, any> | null>(row: T, lang: string): T {

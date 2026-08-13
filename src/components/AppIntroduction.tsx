@@ -53,7 +53,7 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
     const getSlideText = (field: string) => {
       if (language === 'en' && s[field + '_en']) return s[field + '_en'];
       if (language === 'ru' && s[field + '_ru']) return s[field + '_ru'];
-      
+
       const fallback = getFallbackSlides().find(fb => fb.id === s.id);
       if (fallback) {
         return fallback[field as keyof typeof fallback] || s[field + '_az'] || s[field];
@@ -98,33 +98,43 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
 
   return (
     <div
-      className="fixed inset-0 bg-background z-50 flex flex-col overflow-hidden"
-      style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      
+      className="a-scope fixed inset-0 z-50 flex flex-col overflow-hidden"
+      style={{ background: 'var(--a-bg)', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+
+      {/* Watercolor sky */}
+      <div className="a-sky" aria-hidden>
+        <span className="a-cloud c1" />
+        <span className="a-cloud c2" />
+        <span className="a-cloud c3" />
+        <span className="a-cloud c4" />
+        <span className="a-cloud c5" />
+      </div>
+
+      {/* DB-driven soft decor blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           key={`decor-1-${currentSlide}`}
           initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 0.5, scale: 1 }}
+          animate={{ opacity: 0.35, scale: 1 }}
           transition={{ duration: 0.8 }}
           className={`absolute -top-32 -right-32 w-80 h-80 rounded-full ${slide.bg_decor || 'bg-pink-100 dark:bg-pink-900/20'} blur-3xl`} />
-        
+
         <motion.div
           key={`decor-2-${currentSlide}`}
           initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 0.3, scale: 1 }}
+          animate={{ opacity: 0.25, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className={`absolute -bottom-40 -left-40 w-96 h-96 rounded-full ${slide.bg_decor || 'bg-pink-100 dark:bg-pink-900/20'} blur-3xl`} />
-        
+
       </div>
 
-      <div className="flex justify-end p-4">
-        <Button variant="ghost" size="sm" onClick={skip} className="text-muted-foreground hover:text-foreground">
+      <div className="flex justify-end p-4 relative z-10">
+        <Button variant="ghost" size="sm" onClick={skip} className="hover:bg-transparent" style={{ color: 'var(--a-on-bg-soft)', fontWeight: 700 }}>
           {tr("appintroduction_kec_19bd66", "Ke\xE7")}
         </Button>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-8">
+      <div className="flex-1 flex flex-col items-center justify-center px-8 relative z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -133,23 +143,24 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
             exit={{ opacity: 0, y: -30 }}
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
             className="flex flex-col items-center text-center">
-            
+
             <motion.div
               initial={{ scale: 0.5, rotate: -15 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
               className={`relative w-32 h-32 rounded-full bg-gradient-to-br ${slide.gradient} flex items-center justify-center mb-8 shadow-xl`}>
-              
+
               <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${slide.gradient} blur-xl opacity-50`} />
               <motion.div
                 animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 className={`absolute inset-0 rounded-full bg-gradient-to-br ${slide.gradient}`} />
-              
+
               <SlideIcon className="w-14 h-14 text-white relative z-10" strokeWidth={1.5} />
             </motion.div>
 
-            <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-3xl font-bold text-foreground mb-2">
+            <motion.h1 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="mb-2" style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--a-ink)' }}>
               {slide.title}
             </motion.h1>
 
@@ -158,38 +169,41 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
               {slide.subtitle}
             </motion.div>
 
-            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="text-muted-foreground text-lg leading-relaxed max-w-sm">
+            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+            className="leading-relaxed max-w-sm" style={{ fontSize: 16, color: 'var(--a-body-text)' }}>
               {slide.description}
             </motion.p>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6 relative z-10">
         <div className="flex justify-center gap-2">
           {slides.map((_, index) =>
           <motion.button
             key={index}
             onClick={() => {handleHaptic();setCurrentSlide(index);}}
             className={`h-2 rounded-full transition-all duration-300 ${
-            index === currentSlide ? `w-8 bg-gradient-to-r ${slide.gradient}` : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'}`
+            index === currentSlide ? `w-8 bg-gradient-to-r ${slide.gradient}` : 'w-2'}`
             }
+            style={index === currentSlide ? undefined : { background: 'rgba(255,255,255,0.7)' }}
             whileTap={{ scale: 0.9 }} />
 
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 max-w-md mx-auto">
           {currentSlide > 0 &&
-          <Button variant="outline" size="lg" onClick={goToPrev} className="h-14 px-6 rounded-2xl border-2">
+          <Button variant="outline" size="lg" onClick={goToPrev} className="h-14 px-6 rounded-full border-0"
+          style={{ background: 'var(--a-surface)', color: 'var(--a-ink)', boxShadow: 'var(--a-card-shadow)' }}>
               <ChevronLeft className="w-5 h-5" />
             </Button>
           }
           <Button
             size="lg"
             onClick={goToNext}
-            className={`flex-1 h-14 rounded-2xl bg-gradient-to-r ${slide.gradient} text-white font-semibold text-base shadow-lg hover:shadow-xl transition-shadow border-0`}>
-            
+            className={`flex-1 h-14 rounded-full bg-gradient-to-r ${slide.gradient} text-white font-semibold text-base shadow-lg hover:shadow-xl transition-shadow border-0`}>
+
             {currentSlide === slides.length - 1 ?
             <>{tr("appintroduction_basla_4820bc", "Başla")}<Sparkles className="w-5 h-5 ml-2" /></> :
 

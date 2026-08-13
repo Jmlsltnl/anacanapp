@@ -1,20 +1,20 @@
-import { useState, useEffect, useRef, forwardRef, useMemo } from 'react';
+import { useState, useEffect, useRef, forwardRef, useMemo, CSSProperties } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, Camera, Sparkles, Download, Trash2,
-  Image as ImageIcon, Loader2, Share2, Upload, X,
-  Palette, Shirt, Eye, Scissors, Crown, Lock } from
+  Camera, Sparkles, Loader2, Upload, X,
+  Palette, Shirt, Eye, Scissors, Crown, Lock,
+  Image as ImageIcon } from
 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { PremiumModal } from '@/components/PremiumModal';
 import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
 import { useUserStore } from '@/store/userStore';
 import {
@@ -69,6 +69,10 @@ const fallbackHairStyles = [
 { style_id: 'wavy', style_name: 'Wavy', style_name_az: tr("babyphotoshoot_dalgali_bc8abd", "Dal\u011Fal\u0131"), emoji: '🌊' }];
 
 
+// Shared select-pill styles (peach accent)
+const optionOn: CSSProperties = { background: 'var(--a-peach-2)', color: '#fff', cursor: 'pointer', boxShadow: '0 8px 18px -8px rgba(255, 157, 99, 0.8)' };
+const optionOff: CSSProperties = { background: 'var(--a-surface-soft)', color: 'var(--a-ink)', cursor: 'pointer' };
+
 const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack }, ref) => {
   useScrollToTop();
   useScreenAnalytics('BabyPhotoshoot', 'Tools');
@@ -122,7 +126,6 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
           category: cat,
           premium: false, // Can add is_premium to DB if needed
           emoji: bg.theme_emoji || '🎨',
-          color: 'from-gray-200 to-gray-300',
           description: bg.prompt_template || ''
         });
       });
@@ -131,7 +134,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     return []; // Will use fallback in render
   }, [dbBackgrounds, language]);
 
-  // Map Tailwind gradient classes to actual CSS hex colors for inline styles
+  // Map Tailwind gradient classes (stored in DB) to actual CSS hex colors for inline styles
   const gradientToHex: Record<string, [string, string]> = {
     'from-gray-300 to-gray-400': ['#d1d5db', '#9ca3af'],
     'from-blue-400 to-blue-600': ['#60a5fa', '#2563eb'],
@@ -151,7 +154,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     'from-amber-800 to-red-900': ['#92400e', '#7f1d1d']
   };
 
-  const getGradientStyle = (hexValue: string): React.CSSProperties => {
+  const getGradientStyle = (hexValue: string): CSSProperties => {
     const colors = gradientToHex[hexValue];
     if (colors) {
       return { background: `linear-gradient(to right, ${colors[0]}, ${colors[1]})` };
@@ -424,39 +427,6 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     }
   };
 
-  const handleDownload = async (url: string) => {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = `baby-photo-${Date.now()}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      toast({
-        title: tr("babyphotoshoot_yuklendi_1691f7", 'Yükləndi! 📥'),
-        description: tr("babyphotoshoot_sekil_muveffeqiyyetle_endirildi_c853ad", 'Şəkil müvəffəqiyyətlə endirildi')
-      });
-    } catch (error) {
-      toast({
-        title: tr("babyphotoshoot_xeta_3cdbb6", 'Xəta'),
-        description: tr("babyphotoshoot_foto_yuklene_bilmedi_3d96c3", 'Foto yüklənə bilmədi'),
-        variant: 'destructive'
-      });
-    }
-  };
-
-  const handleShare = async (url: string) => {
-    const { nativeShare } = await import('@/lib/native');
-    await nativeShare({
-      title: tr("babyphotoshoot_korpe_fotosessiyasi_546576", 'Körpə Fotosessiyası'),
-      text: tr("babyphotoshoot_anacan_tetbiqinde_yaradilmis_korpe_fotos_d73b4f", "Anacan tətbiqində yaradılmış körpə fotosu"),
-      url: url
-    });
-  };
-
   const nextStep = () => {
     setStep((prev) => Math.min(prev + 1, 2));
     window.scrollTo({ top: 0 });
@@ -477,11 +447,22 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     }
   };
 
-  const groupedBackgrounds = currentBackgrounds.reduce<Record<string, Array<{id: string;name: string;category: string;premium: boolean;emoji: string;color: string;description: string;}>>>((acc, bg) => {
+  const groupedBackgrounds = currentBackgrounds.reduce<Record<string, Array<{id: string;name: string;category: string;premium: boolean;emoji: string;description: string;}>>>((acc, bg) => {
     if (!acc[bg.category]) acc[bg.category] = [];
     acc[bg.category].push(bg);
     return acc;
   }, {});
+
+  const sectionHead = (icon: React.ReactNode, title: string, sub?: string) =>
+  <div className="flex items-center gap-2 mb-3">
+      <span className="a-list-icon" style={{ width: 34, height: 34, borderRadius: 11, background: 'var(--a-surface-soft)' }}>
+        {icon}
+      </span>
+      <div>
+        <h2 className="a-list-title" style={{ margin: 0 }}>{title}</h2>
+        {sub && <p className="a-list-sub" style={{ margin: 0 }}>{sub}</p>}
+      </div>
+    </div>;
 
   const renderStepContent = () => {
     switch (step) {
@@ -494,16 +475,12 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             className="space-y-3">
             
             {/* Image Upload */}
-            <div className="bg-card rounded-2xl p-4 shadow-elevated">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Upload className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <h2 className="font-semibold text-sm text-foreground">{tr("babyphotoshoot_korpenin_seklini_yukleyin_b1c595", "Körpənin Şəklini Yükləyin")}</h2>
-                  <p className="text-[10px] text-muted-foreground">{tr("babyphotoshoot_uzu_aydin_gorunen_foto_secin_9b42f9", "Üzü aydın görünən foto seçin")}</p>
-                </div>
-              </div>
+            <div className="a-card">
+              {sectionHead(
+                <Upload size={15} strokeWidth={2.2} style={{ color: 'var(--a-peach-2)' }} />,
+                tr("babyphotoshoot_korpenin_seklini_yukleyin_b1c595", "Körpənin Şəklini Yükləyin"),
+                tr("babyphotoshoot_uzu_aydin_gorunen_foto_secin_9b42f9", "Üzü aydın görünən foto seçin")
+              )}
 
               <input
                 ref={fileInputRef}
@@ -522,7 +499,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                 
                   <motion.button
                   onClick={handleRemoveImage}
-                  className="absolute top-3 right-3 w-10 h-10 bg-red-500 rounded-full flex items-center justify-center shadow-lg"
+                  className="absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+                  style={{ background: 'var(--a-pink-2)' }}
                   whileTap={{ scale: 0.9 }}>
                   
                     <X className="w-5 h-5 text-white" />
@@ -531,40 +509,40 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
               <motion.button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full h-44 border-2 border-dashed border-primary/30 rounded-2xl flex flex-col items-center justify-center gap-3 hover:border-primary/50 hover:bg-primary/5 transition-all"
+                className="w-full h-44 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all"
+                style={{ border: '2px dashed var(--a-peach-2)', background: 'var(--a-surface-soft)', cursor: 'pointer' }}
                 whileTap={{ scale: 0.98 }}>
                 
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                      <Camera className="w-6 h-6 text-primary" />
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: 'var(--a-grad-peach)' }}>
+                      <Camera className="w-6 h-6" style={{ color: 'var(--a-accent-ink)' }} />
                   </div>
                   <div className="text-center">
-                    <p className="font-bold text-foreground">{tr("babyphotoshoot_sekil_secin_e3e1f3", "Şəkil seçin")}</p>
-                    <p className="text-sm text-muted-foreground mt-1">{tr("untranslated_maksimum_5mb_86tog9", "Maksimum 5MB")}</p>
+                    <p className="font-bold" style={{ margin: 0, color: 'var(--a-ink)' }}>{tr("babyphotoshoot_sekil_secin_e3e1f3", "Şəkil seçin")}</p>
+                    <p className="text-sm mt-1" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{tr("untranslated_maksimum_5mb_86tog9", "Maksimum 5MB")}</p>
                   </div>
                 </motion.button>
               }
             </div>
 
             {/* Gender Selection */}
-            <div className="bg-card rounded-2xl p-4 shadow-elevated">
-              <h2 className="font-semibold text-sm text-foreground mb-3">{tr("babyphotoshoot_cinsiyyet_secin_186992", "Cinsiyyət Seçin")}</h2>
+            <div className="a-card">
+              <h2 className="a-list-title mb-3" style={{ margin: '0 0 12px' }}>{tr("babyphotoshoot_cinsiyyet_secin_186992", "Cinsiyyət Seçin")}</h2>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                { id: 'boy', name: tr("babyphotoshoot_oglan_e9715e", "Oğlan"), emoji: '👦', color: 'from-blue-400 to-blue-600' },
-                { id: 'girl', name: tr("babyphotoshoot_qiz_79bf6b", "Qız"), emoji: '👧', color: 'from-pink-400 to-rose-500' }].
+                { id: 'boy', name: tr("babyphotoshoot_oglan_e9715e", "Oğlan"), emoji: '👦', grad: 'var(--a-grad-blue)', ink: '#153e57' },
+                { id: 'girl', name: tr("babyphotoshoot_qiz_79bf6b", "Qız"), emoji: '👧', grad: 'var(--a-grad-pink)', ink: 'var(--a-alert-ink)' }].
                 map((option) =>
                 <motion.button
                   key={option.id}
                   onClick={() => setCustomization((prev) => ({ ...prev, gender: option.id as any, background: '', outfit: 'keep' }))}
-                  className={`p-3 rounded-xl flex flex-col items-center gap-1.5 transition-all ${
-                  customization.gender === option.id ?
-                  `bg-gradient-to-br ${option.color} text-white shadow-lg scale-105` :
-                  'bg-muted hover:bg-muted/80'}`
-                  }
+                  className="p-3 rounded-xl flex flex-col items-center gap-1.5 transition-all"
+                  style={customization.gender === option.id ?
+                  { background: option.grad, color: option.ink, boxShadow: 'var(--a-card-shadow)', transform: 'scale(1.03)', cursor: 'pointer' } :
+                  optionOff}
                   whileTap={{ scale: 0.95 }}>
                   
                     <span className="text-3xl">{option.emoji}</span>
-                    <span className="font-semibold text-sm">{option.name}</span>
+                    <span className="font-bold text-sm">{option.name}</span>
                   </motion.button>
                 )}
               </div>
@@ -572,13 +550,13 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
             {/* Free tier info */}
             {!isPremium &&
-            <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 flex items-start gap-2">
-                <Crown className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <div className="rounded-2xl p-3 flex items-start gap-2" style={{ background: 'var(--a-yellow-1)' }}>
+                <Crown className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: 'var(--a-warn-ink)' }} />
                 <div>
-                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                  <p className="text-sm font-bold" style={{ margin: 0, color: 'var(--a-warn-ink)' }}>
                     {tr("babyphotoshoot_pulsuz_ilk_foto_3c7a2d", "Pulsuz: ilk")} {freeLimits.baby_photoshoot_count} {tr("babyphotoshoot_foto_suffix_3c7a2d", "foto")}
                   </p>
-                  <p className="text-xs text-amber-600 dark:text-amber-300 mt-1">
+                  <p className="text-xs mt-1" style={{ margin: 0, color: 'var(--a-warn-ink)', opacity: 0.85 }}>
                     {tr("babyphotoshoot_limitsiz_foto_ucun_premium_a_k_965e5c", "Limitsiz foto \xFC\xE7\xFCn Premium-a ke\xE7in")}
                   </p>
                 </div>
@@ -596,30 +574,25 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             className="space-y-3">
             
             {/* Image Style Selection */}
-            <div className="bg-card rounded-2xl p-4 shadow-elevated">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-purple-500" />
-                </div>
-                <div>
-                  <h2 className="font-semibold text-sm text-foreground">{tr("babyphotoshoot_sekil_novu_c47221", "Şəkil Növü")}</h2>
-                  <p className="text-[10px] text-muted-foreground">{tr("babyphotoshoot_foto_stilini_secin_e2d6a1", "Foto stilini seçin")}</p>
-                </div>
-              </div>
+            <div className="a-card">
+              {sectionHead(
+                <Sparkles size={15} strokeWidth={2.2} style={{ color: 'var(--a-lav-2)' }} />,
+                tr("babyphotoshoot_sekil_novu_c47221", "Şəkil Növü"),
+                tr("babyphotoshoot_foto_stilini_secin_e2d6a1", "Foto stilini seçin")
+              )}
               <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
                 {imageStyleOptions.map((style) =>
                 <motion.button
                   key={style.id}
                   onClick={() => setCustomization((prev) => ({ ...prev, imageStyle: style.id }))}
-                  className={`p-3 rounded-xl flex flex-col items-center gap-1.5 transition-all ${
-                  customization.imageStyle === style.id ?
-                  'bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg scale-105' :
-                  'bg-muted hover:bg-muted/80'}`
-                  }
+                  className="p-3 rounded-xl flex flex-col items-center gap-1.5 transition-all"
+                  style={customization.imageStyle === style.id ?
+                  { background: 'var(--a-grad-lav)', color: '#3c2e5c', boxShadow: 'var(--a-card-shadow)', transform: 'scale(1.03)', cursor: 'pointer' } :
+                  optionOff}
                   whileTap={{ scale: 0.95 }}>
                   
                     <span className="text-xl sm:text-2xl">{style.emoji}</span>
-                    <span className="text-[9px] sm:text-[10px] font-medium text-center leading-tight">{style.name}</span>
+                    <span className="text-[9px] sm:text-[10px] font-semibold text-center leading-tight">{style.name}</span>
                   </motion.button>
                 )}
               </div>
@@ -627,8 +600,8 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
             {/* Background Selection by Category */}
             {Object.entries(groupedBackgrounds).map(([category, backgrounds]) =>
-            <div key={category} className="bg-card rounded-2xl p-4 shadow-elevated">
-                <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
+            <div key={category} className="a-card">
+                <h3 className="a-list-title mb-3 flex items-center gap-2" style={{ margin: '0 0 12px' }}>
                   {category === 'Realist' && '📷'}
                   {category === 'Estetik' && '✨'}
                   {category === 'Fantaziya' && '🎭'}
@@ -645,20 +618,19 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                 <motion.button
                   key={bg.id}
                   onClick={() => handleSelectBackground(bg.id, bg.premium)}
-                  className={`relative p-2 rounded-xl flex flex-col items-center gap-0.5 transition-all min-w-0 ${
-                  customization.background === bg.id ?
-                  `bg-gradient-to-br ${bg.color} text-white shadow-lg scale-105` :
-                  'bg-muted hover:bg-muted/80'}`
-                  }
+                  className="relative p-2 rounded-xl flex flex-col items-center gap-0.5 transition-all min-w-0"
+                  style={customization.background === bg.id ?
+                  { background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)', boxShadow: 'var(--a-card-shadow)', transform: 'scale(1.03)', cursor: 'pointer' } :
+                  optionOff}
                   whileTap={{ scale: 0.95 }}>
                   
                       {bg.premium && !isPremium &&
-                  <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-amber-400 rounded-full flex items-center justify-center">
-                          <Lock className="w-2.5 h-2.5 text-white" />
+                  <div className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: 'var(--a-yellow-2)' }}>
+                          <Lock className="w-2.5 h-2.5" style={{ color: '#5a3d00' }} />
                         </div>
                   }
                       <span className="text-lg sm:text-xl">{bg.emoji}</span>
-                      <span className="text-[8px] sm:text-[9px] font-medium text-center leading-tight truncate w-full">{bg.name}</span>
+                      <span className="text-[8px] sm:text-[9px] font-semibold text-center leading-tight truncate w-full">{bg.name}</span>
                     </motion.button>
                 )}
                 </div>
@@ -673,108 +645,106 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="space-y-4">
+            className="space-y-3">
             
             {/* Eye Color */}
-            <div className="bg-card rounded-3xl p-4 shadow-elevated">
+            <div className="a-card">
               <div className="flex items-center gap-2 mb-3">
-                <Eye className="w-5 h-5 text-blue-500" />
-                <h2 className="font-bold text-foreground text-sm">{tr("babyphotoshoot_goz_rengi_8fe8d7", "Göz Rəngi")}</h2>
+                <Eye className="w-5 h-5" style={{ color: 'var(--a-blue-2)' }} />
+                <h2 className="a-list-title" style={{ margin: 0 }}>{tr("babyphotoshoot_goz_rengi_8fe8d7", "Göz Rəngi")}</h2>
               </div>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {eyeColorOptions.map((option) =>
                 <motion.button
                   key={option.id}
                   onClick={() => setCustomization((prev) => ({ ...prev, eyeColor: option.id }))}
-                  className={`flex-shrink-0 p-2 rounded-xl flex flex-col items-center gap-1 transition-all ${
-                  customization.eyeColor === option.id ?
-                  'ring-2 ring-primary ring-offset-2 scale-105' :
-                  ''}`
-                  }
+                  className="flex-shrink-0 p-2 rounded-xl flex flex-col items-center gap-1 transition-all"
+                  style={{ cursor: 'pointer' }}
                   whileTap={{ scale: 0.95 }}>
                   
-                    <div className="w-8 h-8 rounded-full" style={getGradientStyle(option.hexValue)} />
-                    <span className="text-[9px] font-medium text-foreground">{option.name}</span>
+                    <div
+                    className="w-8 h-8 rounded-full"
+                    style={{
+                      ...getGradientStyle(option.hexValue),
+                      ...(customization.eyeColor === option.id ? { boxShadow: '0 0 0 2px var(--a-surface), 0 0 0 4px var(--a-peach-2)' } : {})
+                    }} />
+                    <span className="text-[9px] font-semibold" style={{ color: 'var(--a-ink)' }}>{option.name}</span>
                   </motion.button>
                 )}
               </div>
             </div>
 
             {/* Hair Color */}
-            <div className="bg-card rounded-3xl p-4 shadow-elevated">
+            <div className="a-card">
               <div className="flex items-center gap-2 mb-3">
-                <Palette className="w-5 h-5 text-amber-500" />
-                <h2 className="font-bold text-foreground text-sm">{tr("babyphotoshoot_sac_rengi_68dd12", "Saç Rəngi")}</h2>
+                <Palette className="w-5 h-5" style={{ color: 'var(--a-yellow-2)' }} />
+                <h2 className="a-list-title" style={{ margin: 0 }}>{tr("babyphotoshoot_sac_rengi_68dd12", "Saç Rəngi")}</h2>
               </div>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {hairColorOptions.map((option) =>
                 <motion.button
                   key={option.id}
                   onClick={() => setCustomization((prev) => ({ ...prev, hairColor: option.id }))}
-                  className={`flex-shrink-0 p-2 rounded-xl flex flex-col items-center gap-1 transition-all ${
-                  customization.hairColor === option.id ?
-                  'ring-2 ring-primary ring-offset-2 scale-105' :
-                  ''}`
-                  }
+                  className="flex-shrink-0 p-2 rounded-xl flex flex-col items-center gap-1 transition-all"
+                  style={{ cursor: 'pointer' }}
                   whileTap={{ scale: 0.95 }}>
                   
-                    <div className="w-8 h-8 rounded-full" style={getGradientStyle(option.hexValue)} />
-                    <span className="text-[9px] font-medium text-foreground">{option.name}</span>
+                    <div
+                    className="w-8 h-8 rounded-full"
+                    style={{
+                      ...getGradientStyle(option.hexValue),
+                      ...(customization.hairColor === option.id ? { boxShadow: '0 0 0 2px var(--a-surface), 0 0 0 4px var(--a-peach-2)' } : {})
+                    }} />
+                    <span className="text-[9px] font-semibold" style={{ color: 'var(--a-ink)' }}>{option.name}</span>
                   </motion.button>
                 )}
               </div>
             </div>
 
             {/* Hair Style */}
-            <div className="bg-card rounded-3xl p-4 shadow-elevated">
+            <div className="a-card">
               <div className="flex items-center gap-2 mb-3">
-                <Scissors className="w-5 h-5 text-purple-500" />
-                <h2 className="font-bold text-foreground text-sm">{tr("babyphotoshoot_sac_formasi_5d3388", "Saç Forması")}</h2>
+                <Scissors className="w-5 h-5" style={{ color: 'var(--a-lav-2)' }} />
+                <h2 className="a-list-title" style={{ margin: 0 }}>{tr("babyphotoshoot_sac_formasi_5d3388", "Saç Forması")}</h2>
               </div>
               <div className="flex gap-1.5 overflow-x-auto pb-1">
                 {hairStyleOptions.map((option) =>
                 <motion.button
                   key={option.id}
                   onClick={() => setCustomization((prev) => ({ ...prev, hairStyle: option.id }))}
-                  className={`flex-shrink-0 p-2 rounded-xl flex flex-col items-center gap-0.5 transition-all min-w-[52px] ${
-                  customization.hairStyle === option.id ?
-                  'bg-primary text-primary-foreground shadow-lg' :
-                  'bg-muted hover:bg-muted/80'}`
-                  }
+                  className="flex-shrink-0 p-2 rounded-xl flex flex-col items-center gap-0.5 transition-all min-w-[52px]"
+                  style={customization.hairStyle === option.id ? optionOn : optionOff}
                   whileTap={{ scale: 0.95 }}>
                   
                     <span className="text-lg">{option.emoji}</span>
-                    <span className="text-[8px] font-medium truncate w-full text-center">{option.name}</span>
+                    <span className="text-[8px] font-semibold truncate w-full text-center">{option.name}</span>
                   </motion.button>
                 )}
               </div>
             </div>
 
             {/* Outfit */}
-            <div className="bg-card rounded-3xl p-4 shadow-elevated">
+            <div className="a-card">
               <div className="flex items-center gap-2 mb-3">
-                <Shirt className="w-5 h-5 text-rose-500" />
-                <h2 className="font-bold text-foreground text-sm">{tr("untranslated_geyim_hftttf", "Geyim")}</h2>
+                <Shirt className="w-5 h-5" style={{ color: 'var(--a-pink-2)' }} />
+                <h2 className="a-list-title" style={{ margin: 0 }}>{tr("untranslated_geyim_hftttf", "Geyim")}</h2>
               </div>
               <div className="grid grid-cols-5 sm:grid-cols-6 gap-1.5">
                 {currentOutfits.map((outfit) =>
                 <motion.button
                   key={outfit.id}
                   onClick={() => handleSelectOutfit(outfit.id, outfit.premium)}
-                  className={`relative p-2 rounded-xl flex flex-col items-center gap-0.5 transition-all min-w-0 ${
-                  customization.outfit === outfit.id ?
-                  'bg-primary text-primary-foreground shadow-lg' :
-                  'bg-muted hover:bg-muted/80'}`
-                  }
+                  className="relative p-2 rounded-xl flex flex-col items-center gap-0.5 transition-all min-w-0"
+                  style={customization.outfit === outfit.id ? optionOn : optionOff}
                   whileTap={{ scale: 0.95 }}>
                   
                     {outfit.premium && !isPremium &&
-                  <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 bg-amber-400 rounded-full flex items-center justify-center">
-                        <Lock className="w-2 h-2 text-white" />
+                  <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ background: 'var(--a-yellow-2)' }}>
+                        <Lock className="w-2 h-2" style={{ color: '#5a3d00' }} />
                       </div>
                   }
                     <span className="text-lg">{outfit.emoji}</span>
-                    <span className="text-[7px] sm:text-[8px] font-medium leading-tight text-center truncate w-full">{outfit.name}</span>
+                    <span className="text-[7px] sm:text-[8px] font-semibold leading-tight text-center truncate w-full">{outfit.name}</span>
                   </motion.button>
                 )}
               </div>
@@ -794,27 +764,27 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
     animate={{ opacity: 1, y: 0 }}
     className="mt-6">
     
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-bold text-foreground flex items-center gap-2">
-          <ImageIcon className="w-5 h-5 text-muted-foreground" />
+      <div className="a-section-head">
+        <h2 className="a-section-title a-heading" style={{ fontSize: 15 }}>
           {tr("babyphotoshoot_foto_qalereyasi_0ec00d", "Foto Qalereyas\u0131")}
         </h2>
-        {photos.length > 0 &&
-      <span className="text-sm text-muted-foreground">{photos.length} {tr("babyphotoshoot_foto_suffix_3c7a2d", "foto")}</span>
+        {photos.length > 0 ?
+      <span className="a-section-link">{photos.length} {tr("babyphotoshoot_foto_suffix_3c7a2d", "foto")}</span> :
+      <ImageIcon size={15} style={{ color: 'var(--a-on-bg-soft)' }} />
       }
       </div>
 
       {loadingPhotos ?
     <div className="flex justify-center py-8">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--a-peach-2)' }} />
         </div> :
     photos.length === 0 ?
-    <div className="bg-muted/50 rounded-3xl p-6 text-center">
-          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-            <Camera className="w-7 h-7 text-primary" />
+    <div className="a-card text-center" style={{ padding: '26px 18px' }}>
+          <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--a-grad-peach)' }}>
+            <Camera className="w-7 h-7" style={{ color: 'var(--a-accent-ink)' }} />
           </div>
-          <h3 className="font-bold text-foreground mb-1 text-sm">{tr("babyphotoshoot_hele_foto_yoxdur_3ce618", "Hələ foto yoxdur")}</h3>
-          <p className="text-muted-foreground text-xs">
+          <h3 className="a-list-title mb-1" style={{ margin: '0 0 4px' }}>{tr("babyphotoshoot_hele_foto_yoxdur_3ce618", "Hələ foto yoxdur")}</h3>
+          <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>
             {tr("babyphotoshoot_sekil_yukleyin_ve_foto_yaradin_7b1eb6", "\u015E\u0259kil y\xFCkl\u0259yin v\u0259 foto yarad\u0131n!")}
           </p>
         </div> :
@@ -825,8 +795,9 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
         key={photo.id}
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: index * 0.03 }}
-        className="relative aspect-square rounded-2xl overflow-hidden shadow-card cursor-pointer group"
+        transition={{ delay: Math.min(index * 0.03, 0.3) }}
+        className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer group"
+        style={{ boxShadow: 'var(--a-card-shadow)' }}
         onClick={() => {
           setGalleryIndex(index);
           setGalleryOpen(true);
@@ -848,116 +819,106 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
   const stepTitles = [tr("babyphotoshoot_sekil_43e2e3", "Şəkil"), tr("babyphotoshoot_fon_e484a2", "Fon"), tr("babyphotoshoot_detallar_8614ad", "Detallar")];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <div className="gradient-primary px-3 pt-2 pb-4 rounded-b-[1.5rem] flex-shrink-0">
-        <div className="flex items-center gap-3 mb-3">
-          <motion.button
-            onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}>
-            
-            <ArrowLeft className="w-4 h-4 text-white" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-white">{tr("babyphotoshoot_korpe_fotosessiyasi_546576", "Körpə Fotosessiyası")}</h1>
-            <p className="text-white/70 text-xs">{tr("babyphotoshoot_ai_ile_sehrli_fotolar_0fce8f", "AI ilə sehrli fotolar")}</p>
-          </div>
-        </div>
+    <div ref={ref}>
+      <ToolPage className="pb-40">
+        <ToolHeader
+          onBack={onBack}
+          eyebrow={tr("babyphotoshoot_ai_ile_sehrli_fotolar_0fce8f", "AI ilə sehrli fotolar")}
+          title={tr("babyphotoshoot_korpe_fotosessiyasi_546576", "Körpə Fotosessiyası")} />
 
         {/* Step Indicator */}
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-4 mb-4">
           {stepTitles.map((title, index) =>
           <motion.button
             key={index}
             onClick={() => setStep(index)}
-            className={`flex flex-col items-center gap-0.5 ${
-            step === index ? 'opacity-100' : 'opacity-50'}`
-            }>
+            className="flex flex-col items-center gap-0.5"
+            style={{ opacity: step === index ? 1 : 0.6, cursor: 'pointer' }}>
             
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${
-            step === index ?
-            'bg-white text-primary' :
-            step > index ?
-            'bg-white/40 text-white' :
-            'bg-white/20 text-white/60'}`
-            }>
+              <div
+              className="w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs"
+              style={
+              step === index ?
+              { background: 'var(--a-peach-2)', color: '#fff' } :
+              step > index ?
+              { background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' } :
+              { background: 'var(--a-surface)', color: 'var(--a-ink-soft)', border: '1px solid var(--a-line)' }}>
                 {index + 1}
               </div>
-              <span className="text-[9px] text-white font-medium">{title}</span>
+              <span className="text-[9px] font-semibold" style={{ color: 'var(--a-on-bg)' }}>{title}</span>
             </motion.button>
           )}
         </div>
-      </div>
 
-      {/* Content - Scrollable with space for fixed buttons */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 pb-36">
+        {/* Content */}
         <AnimatePresence mode="wait">
           {renderStepContent()}
         </AnimatePresence>
         
         {/* Gallery always visible at bottom */}
         {renderGallery()}
-      </div>
 
-      {/* Fixed Bottom Buttons - positioned above BottomNav */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-40 px-5 py-4 bg-background border-t border-border"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}>
-        
-        <div className="flex gap-3">
-          {step > 0 &&
-          <Button
-            variant="outline"
-            onClick={prevStep}
-            className="flex-1 h-14 rounded-2xl">
-            {tr("common_geri", "Geri")}
-          </Button>
-          }
-          {step < 2 ?
-          <Button
-            onClick={nextStep}
-            disabled={!canProceed()}
-            className="flex-1 h-14 rounded-2xl gradient-primary text-white font-bold">{tr("untranslated_davam_et_rchhd5", "Davam et")}</Button> :
-
-          <Button
-            onClick={handleGenerate}
-            disabled={isGenerating || !customization.background || !sourceImage}
-            className="flex-1 h-14 rounded-2xl gradient-primary text-white font-bold text-lg shadow-button">
-            
-              {isGenerating ?
-            <div className="flex items-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>{tr("babyphotoshoot_yaradilir_9bb5ed", "Yaradılır...")}</span>
-                </div> :
-
-            <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  <span>{tr("babyphotoshoot_sekil_yarat_6d7c0c", "Şəkil Yarat")}</span>
-                </div>
+        {/* Fixed Bottom Buttons - positioned above BottomNav */}
+        <div
+          className="fixed bottom-0 left-0 right-0 z-40 px-5 py-4"
+          style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid var(--a-line)', paddingBottom: 'calc(env(safe-area-inset-bottom) + 80px)' }}>
+          
+          <div className="flex gap-3">
+            {step > 0 &&
+            <button
+              onClick={prevStep}
+              className="a-btn-soft flex-1"
+              style={{ justifyContent: 'center', height: 52 }}>
+              {tr("common_geri", "Geri")}
+            </button>
             }
-            </Button>
-          }
+            {step < 2 ?
+            <button
+              onClick={nextStep}
+              disabled={!canProceed()}
+              className="a-cta-btn flex-1"
+              style={{ justifyContent: 'center', height: 52, opacity: !canProceed() ? 0.5 : 1 }}>{tr("untranslated_davam_et_rchhd5", "Davam et")}</button> :
+
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating || !customization.background || !sourceImage}
+              className="a-cta-btn flex-1"
+              style={{ justifyContent: 'center', height: 52, fontSize: 14, opacity: isGenerating || !customization.background || !sourceImage ? 0.6 : 1 }}>
+              
+                {isGenerating ?
+              <div className="flex items-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>{tr("babyphotoshoot_yaradilir_9bb5ed", "Yaradılır...")}</span>
+                  </div> :
+
+              <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" />
+                    <span>{tr("babyphotoshoot_sekil_yarat_6d7c0c", "Şəkil Yarat")}</span>
+                  </div>
+              }
+              </button>
+            }
+          </div>
         </div>
-      </div>
 
-      {/* Photo Gallery Viewer */}
-      <PhotoGalleryViewer
-        photos={photos}
-        initialIndex={galleryIndex}
-        isOpen={galleryOpen}
-        onClose={() => setGalleryOpen(false)}
-        onDelete={async (photoId) => {
-          await handleDeletePhoto(photoId);
-        }} />
-      
+        {/* Photo Gallery Viewer */}
+        <PhotoGalleryViewer
+          photos={photos}
+          initialIndex={galleryIndex}
+          isOpen={galleryOpen}
+          onClose={() => setGalleryOpen(false)}
+          onDelete={async (photoId) => {
+            await handleDeletePhoto(photoId);
+          }} />
+        
 
-      {/* Premium Modal */}
-      <PremiumModal
-        isOpen={showPremiumModal}
-        onClose={() => setShowPremiumModal(false)}
-        feature={premiumFeature} />
-      
+        {/* Premium Modal */}
+        <PremiumModal
+          isOpen={showPremiumModal}
+          onClose={() => setShowPremiumModal(false)}
+          feature={premiumFeature} />
+        
+      </ToolPage>
     </div>);
 
 });

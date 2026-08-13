@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Crown, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import PremiumModal from '@/components/PremiumModal';
 import { tr } from "@/lib/tr";
 
 interface PregnancyDayNavigatorProps {
@@ -20,6 +21,7 @@ const PregnancyDayNavigator = ({
   maxDays = 280
 }: PregnancyDayNavigatorProps) => {
   const FREE_RANGE = 3; // Free users can go ±3 days
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   // Calculate navigation limits
   const getNavigationLimits = useCallback(() => {
@@ -41,12 +43,17 @@ const PregnancyDayNavigator = ({
   const goBack = () => {
     if (canGoBack) {
       onDayChange(selectedDay - 1);
+    } else if (!isPremium && selectedDay > 1) {
+      // Pulsuz limitə çatıb — paywall aç (əvvəllər ölü nöqtə idi)
+      setShowPremiumModal(true);
     }
   };
 
   const goForward = () => {
     if (canGoForward) {
       onDayChange(selectedDay + 1);
+    } else if (!isPremium && selectedDay < maxDays) {
+      setShowPremiumModal(true);
     }
   };
 
@@ -67,7 +74,7 @@ const PregnancyDayNavigator = ({
       {/* Back button */}
       <motion.button
         onClick={goBack}
-        disabled={!canGoBack}
+        disabled={!canGoBack && (isPremium || selectedDay <= 1)}
         className={cn(
           "w-9 h-9 rounded-full flex items-center justify-center transition-all border",
           canGoBack ?
@@ -101,21 +108,23 @@ const PregnancyDayNavigator = ({
         
         {/* Premium indicator for limit reached */}
         {!isPremium && (selectedDay === limits.min || selectedDay === limits.max) && !isViewingCurrentDay &&
-        <motion.div
+        <motion.button
+          onClick={() => setShowPremiumModal(true)}
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-1 mt-1">
+          className="flex items-center gap-1 mt-1"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
           
             <Crown className="w-3 h-3 text-primary" />
             <span className="text-[10px] text-primary font-medium">{tr("pregnancydaynavigator_premium_ile_daha_cox_2aae14", "Premium ilə daha çox")}</span>
-          </motion.div>
+          </motion.button>
         }
       </div>
 
       {/* Forward button */}
       <motion.button
         onClick={goForward}
-        disabled={!canGoForward}
+        disabled={!canGoForward && (isPremium || selectedDay >= maxDays)}
         className={cn(
           "w-9 h-9 rounded-full flex items-center justify-center transition-all border",
           canGoForward ?
@@ -143,6 +152,11 @@ const PregnancyDayNavigator = ({
           </motion.button>
         }
       </AnimatePresence>
+
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="pregnancy_days" />
     </div>);
 
 };

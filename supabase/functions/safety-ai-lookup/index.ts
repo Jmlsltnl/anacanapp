@@ -12,6 +12,7 @@ const corsHeaders = {
 interface SafetyRequest {
   query: string;
   category?: string;
+  language?: string;
   userContext?: {
     lifeStage?: string;
     pregnancyWeek?: number;
@@ -25,10 +26,14 @@ interface SafetyRequest {
 interface SafetyResult {
   name: string;
   name_az: string;
+  name_ru?: string;
+  name_tr?: string;
   category: string;
   safety_level: 'safe' | 'warning' | 'danger';
   description: string;
   description_az: string;
+  description_ru?: string;
+  description_tr?: string;
 }
 
 Deno.serve(async (req) => {
@@ -49,7 +54,7 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const { query, category, userContext } = await req.json() as SafetyRequest;
+    const { query, category, userContext, language = 'az' } = await req.json() as SafetyRequest;
 
     if (!query || query.trim().length < 2) {
       throw new Error('Query is required');
@@ -102,14 +107,20 @@ QAYDALAR:
    - medicine: dərmanlar, vitaminlər
    - beauty: kosmetika, gözəllik prosedurları (epilyasiya, manikür, saç boyası və s.)
 
+4. Ad və izahatı 4 dildə ver (eyni məzmun, hər dildə təbii tərcümə). Rus dilində "вы" formasında, türk dilində "siz" formasında yaz.
+
 JSON formatı:
 {
   "name": "English name",
   "name_az": "Azərbaycan dilində ad",
+  "name_ru": "Название на русском",
+  "name_tr": "Türkçe ad",
   "category": "${categoryList}",
   "safety_level": "safe|warning|danger",
   "description": "Short English description about safety during pregnancy",
-  "description_az": "Hamiləlik dövründə təhlükəsizlik haqqında qısa Azərbaycan dilində izahat${userContext?.pregnancyWeek ? ` (${userContext.pregnancyWeek}. həftəyə uyğun)` : ''}${userContext?.babyAgeMonths !== undefined ? ' (əmizdirən analar üçün)' : ''}"
+  "description_az": "Hamiləlik dövründə təhlükəsizlik haqqında qısa Azərbaycan dilində izahat${userContext?.pregnancyWeek ? ` (${userContext.pregnancyWeek}. həftəyə uyğun)` : ''}${userContext?.babyAgeMonths !== undefined ? ' (əmizdirən analar üçün)' : ''}",
+  "description_ru": "Краткое описание безопасности при беременности на русском (eyni məzmun)",
+  "description_tr": "Hamilelik döneminde güvenlik hakkında kısa Türkçe açıklama (eyni məzmun)"
 }
 
 NÜMUNƏLƏR:
@@ -175,16 +186,32 @@ NÜMUNƏLƏR:
       }
     }
 
-    // Insert into database
+    // Overlay the requested language onto name/description so the client can
+    // display the result directly (same fallback chain as mapRowTranslation).
+    const localizeItem = <T extends Record<string, unknown>>(row: T): T => {
+      const pick = (field: string) =>
+        (row[`${field}_${language}`] as string | undefined) ||
+        (row[field] as string | undefined) ||
+        (row[`${field}_az`] as string | undefined) || '';
+      return { ...row, name: pick('name'), description: pick('description') };
+    };
+
+    // Insert into database (all language columns so every user benefits)
     const { data: insertedItem, error: insertError } = await supabase
       .from('safety_items')
       .insert({
         name: safetyData.name,
         name_az: safetyData.name_az,
+        name_en: safetyData.name,
+        name_ru: safetyData.name_ru || null,
+        name_tr: safetyData.name_tr || null,
         category: safetyData.category,
         safety_level: safetyData.safety_level,
         description: safetyData.description,
         description_az: safetyData.description_az,
+        description_en: safetyData.description,
+        description_ru: safetyData.description_ru || null,
+        description_tr: safetyData.description_tr || null,
         is_active: true,
       })
       .select()
@@ -196,7 +223,7 @@ NÜMUNƏLƏR:
       return new Response(
         JSON.stringify({ 
           success: true,
-          item: safetyData,
+          item: localizeItem(safetyData as unknown as Record<string, unknown>),
           inserted: false 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -206,7 +233,7 @@ NÜMUNƏLƏR:
     return new Response(
       JSON.stringify({ 
         success: true,
-        item: insertedItem,
+        item: localizeItem(insertedItem),
         inserted: true 
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

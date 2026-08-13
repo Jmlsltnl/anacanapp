@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useChildStore } from '@/store/childStore';
@@ -17,11 +17,14 @@ export interface Child {
   created_at: string;
 }
 
+// MODUL-səviyyəli guard: useChildren bir neçə komponentdə paralel işləyir —
+// per-instans ref yarışa səbəb olub eyni uşağı təkrar yaradırdı
+const seedAttemptedUsers = new Set<string>();
+
 export const useChildren = () => {
   const { user } = useAuth();
   const [children, setChildren] = useState<Child[]>([]);
   const [loading, setLoading] = useState(true);
-  const didAttemptSeedRef = useRef(false);
   
   // Use Zustand store for global selectedChildId
   const { selectedChildId, setSelectedChildId } = useChildStore();
@@ -54,8 +57,9 @@ export const useChildren = () => {
 
       // Backfill: if this user has baby fields on profile (from onboarding) but no user_children rows yet,
       // create the first child automatically so Profile/Tools can show it.
-      if (rows.length === 0 && !didAttemptSeedRef.current) {
-        didAttemptSeedRef.current = true;
+      // Guard modul-səviyyəlidir + upsert ignoreDuplicates → paralel instansiyalar dublikat yarada bilməz.
+      if (rows.length === 0 && !seedAttemptedUsers.has(user.id)) {
+        seedAttemptedUsers.add(user.id);
 
         const { data: profileRow, error: profileError } = await supabase
           .from('profiles')
@@ -71,9 +75,9 @@ export const useChildren = () => {
 
           const avatarEmoji = normalizedGender === 'girl' ? '👧' : '👦';
 
-          const { data: inserted, error: insertError } = await supabase
+          const { error: insertError } = await supabase
             .from('user_children')
-            .insert({
+            .upsert({
               user_id: user.id,
               name: profileRow.baby_name,
               birth_date: profileRow.baby_birth_date,
@@ -81,20 +85,27 @@ export const useChildren = () => {
               avatar_emoji: avatarEmoji,
               is_active: true,
               sort_order: 0,
-            })
-            .select('*')
-            .maybeSingle();
-
-          if (!insertError && inserted) {
-            const insertedChild = inserted as Child;
-            setChildren([insertedChild]);
-            setSelectedChildId(insertedChild.id);
-            setLoading(false);
-            return;
-          }
+            }, { onConflict: 'user_id,name,birth_date', ignoreDuplicates: true });
 
           if (insertError) {
             console.error('Error seeding first child from profile:', insertError);
+          } else {
+            // Yenidən oxu — istər biz yaratmışıq, istər paralel instansiya
+            const { data: reread } = await supabase
+              .from('user_children')
+              .select('*')
+              .eq('user_id', user.id)
+              .eq('is_active', true)
+              .order('sort_order');
+            const seededRows = (reread || []) as Child[];
+            if (seededRows.length > 0) {
+              setChildren(seededRows);
+              if (!seededRows.some(c => c.id === selectedChildId)) {
+                setSelectedChildId(seededRows[0].id);
+              }
+              setLoading(false);
+              return;
+            }
           }
         } else if (profileError) {
           console.error('Error fetching profile for child seeding:', profileError);

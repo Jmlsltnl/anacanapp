@@ -1,8 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Moon, Baby, Volume2, Square, Clock, X, VolumeX } from 'lucide-react';
+import { App as CapApp } from '@capacitor/app';
 import { useTimerStore, type TimerType } from '@/store/timerStore';
 import { useWhiteNoiseStore } from '@/store/whiteNoiseStore';
+import { useBabyLogs } from '@/hooks/useBabyLogs';
+import { isNative } from '@/lib/native';
+import { processPendingStops, onNativeTimerStopped } from '@/lib/live-timer';
+import type { PendingTimerStop } from '@/plugins/LiveActivityPlugin';
 import { tr } from "@/lib/tr";
 
 const timerConfig: Record<TimerType, {icon: typeof Moon;color: string;label: string;}> = {
@@ -23,12 +28,76 @@ const formatTime = (totalSeconds: number) => {
 const FloatingTimerWidget = () => {
   const { activeTimers, stopTimer, getElapsedSeconds } = useTimerStore();
   const whiteNoise = useWhiteNoiseStore();
+  const { addLog } = useBabyLogs();
   const [expanded, setExpanded] = useState(false);
   const [, setTick] = useState(0);
 
   const hasTimers = activeTimers.length > 0;
   const hasWhiteNoise = whiteNoise.isPlaying;
   const hasAnything = hasTimers || hasWhiteNoise;
+
+  // Dayandırılan yuxu/əmizdirmə sessiyasını baby_logs-a yaz
+  const saveTimerLog = useCallback(async (opts: {
+    type: string; feedType?: 'left' | 'right' | null; startTime: number; endTime: number;
+  }) => {
+    if (opts.type !== 'sleep' && opts.type !== 'feeding') return;
+    if (opts.endTime - opts.startTime < 3000) return; // <3s — təsadüfi toxunuş
+    await addLog({
+      log_type: opts.type as 'sleep' | 'feeding',
+      feed_type: opts.type === 'feeding' && opts.feedType
+        ? (opts.feedType === 'left' ? 'breast_left' : 'breast_right')
+        : undefined,
+      start_time: new Date(opts.startTime).toISOString(),
+      end_time: new Date(opts.endTime).toISOString(),
+    } as any);
+  }, [addLog]);
+
+  // Panel düyməsindən dayandırma — artıq sessiyanı da saxlayır (əvvəl itirdi!)
+  const handleStop = useCallback(async (timerId: string) => {
+    const timer = activeTimers.find((t) => t.id === timerId);
+    const result = stopTimer(timerId);
+    if (timer && result) {
+      await saveTimerLog({
+        type: timer.type,
+        feedType: timer.feedType,
+        startTime: Date.now() - result.durationSeconds * 1000,
+        endTime: Date.now(),
+      });
+    }
+  }, [activeTimers, stopTimer, saveTimerLog]);
+
+  // Kilid ekranı widget-indən / bildirişdən dayandırılanları emal et
+  const processingRef = useRef(false);
+  const handlePending = useCallback(async () => {
+    if (processingRef.current) return;
+    processingRef.current = true;
+    try {
+      await processPendingStops(async (stop: PendingTimerStop) => {
+        // Store-da hələ aktivdirsə çıxar (bildiriş onsuz da bağlanıb)
+        const { activeTimers: current, stopTimer: stopInStore } = useTimerStore.getState();
+        if (current.some((t) => t.id === stop.id)) stopInStore(stop.id);
+        await saveTimerLog({
+          type: stop.type,
+          feedType: (stop.feedType as 'left' | 'right') || null,
+          startTime: stop.startTime,
+          endTime: stop.stoppedAt,
+        });
+      });
+    } finally {
+      processingRef.current = false;
+    }
+  }, [saveTimerLog]);
+
+  useEffect(() => {
+    if (!isNative) return;
+    handlePending(); // ilk açılışda gözləyənləri yoxla
+    const offEvent = onNativeTimerStopped(handlePending);
+    let appListener: { remove: () => void } | null = null;
+    CapApp.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) handlePending();
+    }).then((h) => { appListener = h; });
+    return () => { offEvent(); appListener?.remove(); };
+  }, [handlePending]);
 
   useEffect(() => {
     if (!hasAnything) return;
@@ -58,7 +127,7 @@ const FloatingTimerWidget = () => {
         onClick={() => setExpanded(true)}
         whileTap={{ scale: 0.9 }}
         className="fixed right-3 z-[55] flex items-center gap-1.5 rounded-full shadow-lg border border-border/60 bg-card/95 backdrop-blur-xl px-2.5 py-1.5"
-        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.5rem)' }}>
+        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.75rem)' }}>
         
           <div className="relative">
             <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
@@ -93,7 +162,7 @@ const FloatingTimerWidget = () => {
         exit={{ x: 60, opacity: 0 }}
         transition={{ type: 'spring', damping: 22, stiffness: 300 }}
         className="fixed right-3 z-[55] w-52"
-        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.5rem)' }}>
+        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.75rem)' }}>
         
           <div className="bg-card/95 backdrop-blur-xl rounded-2xl shadow-lg border border-border/60 overflow-hidden">
             <div className="flex items-center justify-between px-3 pt-2 pb-1">
@@ -152,7 +221,7 @@ const FloatingTimerWidget = () => {
                       </p>
                     </div>
                     <motion.button
-                    onClick={() => stopTimer(timer.id)}
+                    onClick={() => handleStop(timer.id)}
                     whileTap={{ scale: 0.85 }}
                     className="w-6 h-6 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
                     

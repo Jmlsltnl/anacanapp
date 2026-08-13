@@ -1,19 +1,16 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import {
-  ArrowLeft, Heart, Star, ShoppingBag, Search, Filter, Package } from
+  Heart, Star, ShoppingBag, Search, Package } from
 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useUserStore } from '@/store/userStore';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useAffiliateProducts, useSavedProducts, AffiliateProduct } from '@/hooks/useAffiliateProducts';
 import AffiliateProductCard from './affiliate/AffiliateProductCard';
 import AffiliateProductDetail from './affiliate/AffiliateProductDetail';
 import SavedProductsList from './affiliate/SavedProductsList';
+import { ToolPage, ToolHeader, ToolEmpty } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
 
 interface AffiliateProductsProps {
@@ -80,96 +77,84 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
 
   if (!isEnabled) {
     return (
-      <div className="min-h-screen bg-background pb-24">
-        <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3">
-          <div className="flex items-center gap-3 relative z-20">
-            <Button variant="ghost" size="icon" onClick={onBack} className="relative z-30">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <h1 className="text-lg font-bold">{tr("affiliateproducts_tovsiyye_olunan_mehsullar_db580f", "Tövsiyyə olunan məhsullar")}</h1>
-          </div>
+      <ToolPage>
+        <ToolHeader
+          onBack={onBack}
+          title={tr("affiliateproducts_tovsiyye_olunan_mehsullar_db580f", "Tövsiyyə olunan məhsullar")} />
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <ToolEmpty
+            icon={<Package size={28} style={{ color: 'var(--a-ink-soft)' }} />}
+            title={tr("affiliateproducts_tezlikle_125239", "Tezliklə")}
+            text={tr("affiliateproducts_sizin_ucun_secilmis_mehsullar__85a358", "Sizin \xFC\xE7\xFCn se\xE7ilmi\u015F m\u0259hsullar tezlikl\u0259 burada olacaq")}
+            className="w-full" />
         </div>
-        <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-          <Package className="w-16 h-16 text-muted-foreground mb-4" />
-          <p className="text-lg font-medium mb-2">{tr("affiliateproducts_tezlikle_125239", "Tezliklə")}</p>
-          <p className="text-sm text-muted-foreground text-center">
-            {tr("affiliateproducts_sizin_ucun_secilmis_mehsullar__85a358", "Sizin \xFC\xE7\xFCn se\xE7ilmi\u015F m\u0259hsullar tezlikl\u0259 burada olacaq")}
-          </p>
-        </div>
-      </div>);
+      </ToolPage>);
 
   }
 
   return (
-    <div className="min-h-screen bg-background pb-4">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3">
-        <div className="flex items-center justify-between mb-3 relative z-20">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={onBack} className="relative z-30">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-lg font-bold">{tr("affiliateproducts_tovsiyye_olunan_mehsullar_db580f", "Tövsiyyə olunan məhsullar")}</h1>
-              <p className="text-xs text-muted-foreground">{tr("affiliateproducts_sizin_ucun_secdiklerimiz_e5dde6", "Sizin üçün seçdiklərimiz")}</p>
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-xl relative z-30"
-            onClick={() => setShowSaved(true)}>
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={tr("affiliateproducts_sizin_ucun_secdiklerimiz_e5dde6", "Sizin üçün seçdiklərimiz")}
+        title={tr("affiliateproducts_tovsiyye_olunan_mehsullar_db580f", "Tövsiyyə olunan məhsullar")}
+        actions={
+        <button
+          className="a-btn-soft relative"
+          style={{ height: 38, padding: '0 14px', fontSize: 11.5 }}
+          onClick={() => setShowSaved(true)}>
             
-            <Heart className="w-4 h-4 mr-1" />
+            <Heart size={13} strokeWidth={2.2} />
             {tr("affiliateproducts_saxlanilmis_a1090d", "Saxlan\u0131lm\u0131\u015F")}
             {savedProducts.length > 0 &&
-            <Badge className="absolute -top-2 -right-2 w-5 h-5 p-0 flex items-center justify-center text-[10px] bg-red-500 text-white border-0">
+          <span
+            className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center text-[10px] rounded-full font-bold"
+            style={{ background: 'var(--a-pink-2)', color: '#fff' }}>
                 {savedProducts.length}
-              </Badge>
-            }
-          </Button>
-        </div>
+              </span>
+          }
+          </button>
+        } />
 
-        {/* Search */}
-        <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder={tr("affiliateproducts_mehsul_axtar_580a05", "Məhsul axtar...")}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full h-10 pl-9 pr-3 rounded-xl bg-muted/50 border-2 border-transparent focus:border-primary/30 text-sm transition-all outline-none" />
-          
-        </div>
+      {/* Search */}
+      <div className="a-search mb-3">
+        <Search size={16} style={{ color: 'var(--a-ink-faint)', flexShrink: 0 }} />
+        <input
+          type="text"
+          placeholder={tr("affiliateproducts_mehsul_axtar_580a05", "Məhsul axtar...")}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)} />
+        
+      </div>
 
-        {/* Category Tabs */}
-        <div className="overflow-x-auto -mx-4 px-4 scrollbar-hide">
-          <div className="flex gap-2 min-w-max pb-1">
-            {categories.map((cat) =>
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
-              activeCategory === cat ?
-              'bg-primary text-primary-foreground' :
-              'bg-muted/50 text-muted-foreground hover:bg-muted'}`
-              }>
-              
-                {cat === 'all' ? tr("affiliateproducts_hamisi_c73c4d", "Ham\u0131s\u0131") : categoryLabels[cat] || cat}
-              </button>
-            )}
-          </div>
+      {/* Category Tabs */}
+      <div className="overflow-x-auto scrollbar-hide mb-2">
+        <div className="flex gap-2 min-w-max pb-1">
+          {categories.map((cat) =>
+          <button
+            key={cat}
+            onClick={() => setActiveCategory(cat)}
+            className="px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors"
+            style={activeCategory === cat ?
+            { background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', border: '1px solid transparent', cursor: 'pointer' } :
+            { background: 'var(--a-surface)', color: 'var(--a-ink-soft)', border: '1px solid var(--a-line)', cursor: 'pointer' }}>
+            
+              {cat === 'all' ? tr("affiliateproducts_hamisi_c73c4d", "Ham\u0131s\u0131") : categoryLabels[cat] || cat}
+            </button>
+          )}
         </div>
       </div>
 
       {/* Featured Products */}
       {featuredProducts.length > 0 && activeCategory === 'all' && !searchQuery &&
-      <div className="px-4 py-4">
-          <h2 className="font-semibold text-sm mb-3 flex items-center gap-2">
-            <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-            {tr("affiliateproducts_en_cox_tovsiyye_olunanlar_4493f0", "\u018Fn \xE7ox t\xF6vsiyy\u0259 olunanlar")}
-          </h2>
-          <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4">
+      <div className="py-2">
+          <div className="a-section-head">
+            <h2 className="a-section-title a-heading" style={{ fontSize: 15 }}>
+              {tr("affiliateproducts_en_cox_tovsiyye_olunanlar_4493f0", "\u018Fn \xE7ox t\xF6vsiyy\u0259 olunanlar")}
+            </h2>
+            <Star size={15} className="fill-current" style={{ color: 'var(--a-yellow-2)' }} />
+          </div>
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-2">
             {featuredProducts.map((product, index) =>
           <AffiliateProductCard
             key={product.id}
@@ -184,28 +169,30 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
       }
 
       {/* All Products */}
-      <div className="px-4 py-4">
-        <h2 className="font-semibold text-sm mb-3">
-          {searchQuery ? tr("affiliateproducts_search_results", "Axtarış nəticələri") : tr("affiliateproducts_butun_mehsullar_c7373f", "B\xFCt\xFCn m\u0259hsullar")}
-          <span className="text-muted-foreground font-normal ml-2">({filteredProducts.length})</span>
-        </h2>
+      <div className="py-2">
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading" style={{ fontSize: 15 }}>
+            {searchQuery ? tr("affiliateproducts_search_results", "Axtarış nəticələri") : tr("affiliateproducts_butun_mehsullar_c7373f", "B\xFCt\xFCn m\u0259hsullar")}
+          </h2>
+          <span className="a-section-link">({filteredProducts.length})</span>
+        </div>
         
         {isLoading ?
         <div className="grid grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) =>
-            <div key={i} className="bg-card rounded-xl overflow-hidden border border-border/50">
-                <Skeleton className="aspect-square w-full" />
+            <div key={i} className="a-card overflow-hidden animate-pulse" style={{ padding: 0 }}>
+                <div className="aspect-square w-full" style={{ background: 'var(--a-surface-soft)' }} />
                 <div className="p-3 space-y-2">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
+                  <div className="h-4 w-3/4 rounded" style={{ background: 'var(--a-surface-soft)' }} />
+                  <div className="h-3 w-1/2 rounded" style={{ background: 'var(--a-surface-soft)' }} />
                 </div>
               </div>
           )}
           </div> :
         filteredProducts.length === 0 ?
-        <div className="text-center py-12">
-            <ShoppingBag className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">{tr("affiliateproducts_hec_bir_mehsul_tapilmadi_7ded0c", "Heç bir məhsul tapılmadı")}</p>
+        <div className="a-card text-center" style={{ padding: '34px 18px' }}>
+            <ShoppingBag className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--a-ink-faint)' }} />
+            <p className="a-list-sub" style={{ margin: 0 }}>{tr("affiliateproducts_hec_bir_mehsul_tapilmadi_7ded0c", "Heç bir məhsul tapılmadı")}</p>
           </div> :
 
         <div className="grid grid-cols-2 gap-3">
@@ -222,14 +209,14 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
       </div>
 
       {/* Disclaimer */}
-      <div className="px-4 mt-2 mb-4">
-        <div className="bg-muted/30 rounded-xl p-3 text-center">
-          <p className="text-[10px] text-muted-foreground">
+      <div className="mt-2 mb-4">
+        <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-disclaimer-bg)', border: '1px solid var(--a-disclaimer-border)' }}>
+          <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-disclaimer-ink)' }}>
             {tr("affiliateproducts_bu_sehifedeki_linkler_affiliat_76280f", "Bu s\u0259hif\u0259d\u0259ki linkl\u0259r affiliate linkl\u0259rdir. Al\u0131\u015F-veri\u015F etdikd\u0259 biz ki\xE7ik komissiya qazana bil\u0259rik.")}
           </p>
         </div>
       </div>
-    </div>);
+    </ToolPage>);
 
 };
 

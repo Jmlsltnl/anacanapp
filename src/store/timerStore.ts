@@ -1,7 +1,8 @@
 // Persistent Timer Store - keeps timers running across page navigation
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { showTimerNotification, clearTimerNotification, clearAllTimerNotifications } from '@/utils/timerNotifications';
+import { clearAllTimerNotifications } from '@/utils/timerNotifications';
+import { startNativeTimer, stopNativeTimer } from '@/lib/live-timer';
 
 export type TimerType = 'sleep' | 'feeding' | 'diaper' | 'white-noise';
 
@@ -42,8 +43,8 @@ export const useTimerStore = create<TimerState>()(
           activeTimers: [...state.activeTimers, timer]
         }));
         
-        // Show persistent notification
-        showTimerNotification(id, type, label, feedType);
+        // Kilid ekranı: iOS Live Activity / Android FGS bildirişi (fallback: lokal bildiriş)
+        startNativeTimer(timer);
         
         return id;
       },
@@ -58,8 +59,8 @@ export const useTimerStore = create<TimerState>()(
           activeTimers: state.activeTimers.filter(t => t.id !== id)
         }));
         
-        // Clear notification
-        clearTimerNotification(id);
+        // Kilid ekranı aktivliyini/bildirişini dayandır
+        stopNativeTimer(id);
         
         return { durationSeconds };
       },
@@ -82,6 +83,7 @@ export const useTimerStore = create<TimerState>()(
       },
       
       clearAllTimers: () => {
+        get().activeTimers.forEach((t) => stopNativeTimer(t.id));
         clearAllTimerNotifications();
         set({ activeTimers: [] });
       },

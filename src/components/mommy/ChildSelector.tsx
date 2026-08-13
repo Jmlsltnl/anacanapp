@@ -170,13 +170,18 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
           onClick={() => setShowDropdown(!showDropdown)}
           className={`flex items-center gap-2 ${
           compact ?
-          'px-3 py-1.5 rounded-full bg-muted/50' :
+          'px-3 py-1.5 rounded-xl' :
           'px-4 py-2 rounded-2xl bg-card border shadow-sm'}`
           }
+          style={compact ? {
+            background: 'var(--a-surface)',
+            border: '1px solid var(--a-btn-border)',
+            boxShadow: '0 6px 14px -8px rgba(217, 108, 74, 0.35)'
+          } : undefined}
           whileTap={{ scale: 0.98 }}>
           
           <span className="text-lg">{selectedChild?.avatar_emoji || '👶'}</span>
-          <span className={`font-medium ${compact ? 'text-sm' : ''}`}>
+          <span className={`font-medium ${compact ? 'text-sm' : ''}`} style={compact ? { color: 'var(--a-ink)' } : undefined}>
             {selectedChild?.name || tr("childselector_usaq_sec_bbe44f", "Uşaq seç")}
           </span>
           {children.length > 1 &&

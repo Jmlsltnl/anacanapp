@@ -1,8 +1,5 @@
-import { motion } from 'framer-motion';
 import { tr } from '@/lib/tr';
-import { Baby, Moon, Clock, TrendingUp, Droplets, Activity } from 'lucide-react';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
-import { useChildren } from '@/hooks/useChildren';
 
 interface DayStats {
   date: string;
@@ -11,9 +8,12 @@ interface DayStats {
   diaperCount: number;
 }
 
+/**
+ * Weekly review — redesigned to the anacan-demo list card with
+ * per-day mini-dot sparklines. Data source (baby_logs) unchanged.
+ */
 const QuickStatsWidget = () => {
   const { logs } = useBabyLogs();
-  const { selectedChild } = useChildren();
 
   // Calculate last 7 days stats
   const getWeeklyStats = (): DayStats[] => {
@@ -56,60 +56,65 @@ const QuickStatsWidget = () => {
   const avgSleep = weeklyStats.reduce((sum, d) => sum + d.sleepHours, 0) / 7;
   const avgDiaper = weeklyStats.reduce((sum, d) => sum + d.diaperCount, 0) / 7;
 
-  // Get today vs average
-  const today = weeklyStats[6];
-  const feedingTrend = today.feedingCount >= avgFeeding;
-  const sleepTrend = today.sleepHours >= avgSleep;
-
-  const getDayLabel = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const days = ['B', 'B.e', tr("quickstatswidget_c_a_28099e", "\xC7.a"), tr("quickstatswidget_c_b70344", "\xC7"), 'C.a', 'C', tr("quickstatswidget_s_b97106", "\u015E")];
-    return days[date.getDay()];
-  };
+  const rows = [
+    {
+      key: 'feeding',
+      icon: '🍽️',
+      label: tr("quickstatswidget_ort_qidalanma", "Ort. qidalanma"),
+      value: avgFeeding.toFixed(1),
+      data: weeklyStats.map((d) => d.feedingCount)
+    },
+    {
+      key: 'sleep',
+      icon: '🌙',
+      label: tr("quickstatswidget_ort_yuxu_s", "Ort. yuxu (s)"),
+      value: avgSleep.toFixed(1),
+      data: weeklyStats.map((d) => d.sleepHours)
+    },
+    {
+      key: 'diaper',
+      icon: '🧷',
+      label: tr("quickstatswidget_ort_bez", "Ort. bez"),
+      value: avgDiaper.toFixed(1),
+      data: weeklyStats.map((d) => d.diaperCount)
+    }
+  ];
 
   return (
-    <motion.div
-      className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.15 }}>
-      
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-600 flex items-center justify-center">
-            <Activity className="w-4 h-4 text-white" />
-          </div>
-          <h3 className="font-bold text-sm text-foreground">{tr("quickstatswidget_heftelik_baxis_625baf", "Həftəlik Baxış")}</h3>
-        </div>
+    <section className="a-section">
+      <div className="a-section-head">
+        <h2 className="a-section-title a-heading">{tr("quickstatswidget_heftelik_baxis_625baf", "Həftəlik Baxış")}</h2>
       </div>
-      
-      {/* Mini Stats Grid */}
-      <div className="grid grid-cols-3 gap-2 mb-3">
-        <div className="bg-amber-50 dark:bg-amber-500/15 rounded-xl p-2.5 text-center">
-          <Baby className="w-4 h-4 mx-auto mb-1 text-amber-600 dark:text-amber-400" />
-          <p className="text-lg font-black text-amber-700 dark:text-amber-300">
-            {avgFeeding.toFixed(1)}
-          </p>
-          <p className="text-[9px] text-amber-600/70 dark:text-amber-400/70">{tr("quickstatswidget_ort_qidalanma", "Ort. qidalanma")}</p>
-        </div>
-        <div className="bg-violet-50 dark:bg-violet-500/15 rounded-xl p-2.5 text-center">
-          <Moon className="w-4 h-4 mx-auto mb-1 text-violet-600 dark:text-violet-400" />
-          <p className="text-lg font-black text-violet-700 dark:text-violet-300">
-            {avgSleep.toFixed(1)}
-          </p>
-          <p className="text-[9px] text-violet-600/70 dark:text-violet-400/70">{tr("quickstatswidget_ort_yuxu_s", "Ort. yuxu (s)")}</p>
-        </div>
-        <div className="bg-emerald-50 dark:bg-emerald-500/15 rounded-xl p-2.5 text-center">
-          <Clock className="w-4 h-4 mx-auto mb-1 text-emerald-600 dark:text-emerald-400" />
-          <p className="text-lg font-black text-emerald-700 dark:text-emerald-300">
-            {avgDiaper.toFixed(1)}
-          </p>
-          <p className="text-[9px] text-emerald-600/70 dark:text-emerald-400/70">{tr("quickstatswidget_ort_bez", "Ort. bez")}</p>
-        </div>
+      <div className="a-list-card a-fade-in">
+        {rows.map((row) => {
+          const max = Math.max(...row.data, 1);
+          return (
+            <div key={row.key} className="a-list-row">
+              <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', fontSize: 17 }}>
+                {row.icon}
+              </span>
+              <div>
+                <p className="a-list-title">{row.label}</p>
+                <p className="a-list-sub">{tr('mommy_this_week', 'Bu həftə')}</p>
+              </div>
+              <span className="a-list-trail" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span className="a-mini-dots">
+                  {row.data.map((v, i) => (
+                    <span
+                      key={i}
+                      className={i === row.data.length - 1 && v > 0 ? 'peak' : ''}
+                      style={{ height: 4 + Math.round((v / max) * 13) }}
+                    />
+                  ))}
+                </span>
+                <p className="a-list-value">{row.value}</p>
+              </span>
+            </div>
+          );
+        })}
       </div>
-      
-    </motion.div>);
-
+    </section>
+  );
 };
 
 export default QuickStatsWidget;

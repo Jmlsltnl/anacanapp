@@ -10,7 +10,16 @@ export const REVENUECAT_ENABLED = true;
 
 // Bundle marker — cihazda hansı web bundle-ın işlədiyini yoxlamaq üçün.
 // RevenueCat Debug səhifəsində görünür. Hər kritik fix-də artırılır.
-export const RC_BUILD_MARKER = '2026-06-11-android-paywall-enabled';
+export const RC_BUILD_MARKER = '2026-08-12-pricing-v2';
+
+// ── Versiyalı offering strategiyası ──────────────────────────────
+// Yeni qiymətlər ($3.99 ay / $29.99 il, aylıqda trial YOX) yalnız YENİ
+// build-lərdə görünsün deyə, bu build offerings.all-dan aşağıdakı ID-li
+// offering-i götürür. Köhnə build-lər offerings.current-i oxumağa davam
+// edir → onlarda nə qiymət, nə trial dəyişir.
+// RC Dashboard-da: "pricing_2026" adlı offering yaradın (yeni məhsullarla);
+// "current" offering-ə TOXUNMAYIN. Bu ID tapılmasa, current-ə düşürük.
+export const RC_OFFERING_ID = 'pricing_2026';
 
 // RevenueCat Configuration
 // NOTE: RevenueCat requires PLATFORM-SPECIFIC public API keys (Android & iOS).
@@ -120,9 +129,11 @@ export async function checkEntitlement(): Promise<{
   expiresAt: string | null;
   productId: string | null;
   willRenew: boolean;
+  /** RevenueCat periodType: 'TRIAL' | 'INTRO' | 'NORMAL' (NORMAL = real ödənişli) */
+  periodType: string | null;
 }> {
   if (!REVENUECAT_ENABLED || !hasRevenueCatPlugin()) {
-    return { isPro: false, expiresAt: null, productId: null, willRenew: false };
+    return { isPro: false, expiresAt: null, productId: null, willRenew: false, periodType: null };
   }
 
   try {
@@ -136,13 +147,14 @@ export async function checkEntitlement(): Promise<{
         expiresAt: entitlement.expirationDate || null,
         productId: entitlement.productIdentifier || null,
         willRenew: entitlement.willRenew ?? false,
+        periodType: (entitlement as any).periodType || null,
       };
     }
 
-    return { isPro: false, expiresAt: null, productId: null, willRenew: false };
+    return { isPro: false, expiresAt: null, productId: null, willRenew: false, periodType: null };
   } catch (err) {
     console.error('RevenueCat entitlement check error:', err);
-    return { isPro: false, expiresAt: null, productId: null, willRenew: false };
+    return { isPro: false, expiresAt: null, productId: null, willRenew: false, periodType: null };
   }
 }
 

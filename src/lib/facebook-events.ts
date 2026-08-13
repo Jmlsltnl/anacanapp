@@ -6,27 +6,39 @@
  * Web-də heç nə etmir — Meta web pikseli ayrıca quraşdırılmalıdır.
  */
 
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 
 // IMPORTANT: Capacitor plugin proxies can be treated as thenables if they cross
 // async/promise boundaries. Keep plugin lookup synchronous and only await real
 // native method calls like `logEvent()` or `setAdvertiserTrackingEnabled()`.
-// NOTE: We lazy-require the plugin so that any module-load error on Android
+// NOTE: We lazy-require the plugin so that any module-load error
 // (missing native class, SDK init issue) cannot crash the JS bundle.
 let fbPlugin: any | null = null;
 let pluginLookupAttempted = false;
 let initialized = false;
 const isAndroid = Capacitor.getPlatform() === 'android';
+const isIos = Capacitor.getPlatform() === 'ios';
 
 const getPlugin = (): any | null => {
   if (!Capacitor.isNativePlatform()) return null;
-  if (isAndroid) return null;
   if (fbPlugin) return fbPlugin;
   if (pluginLookupAttempted) return null;
   pluginLookupAttempted = true;
+
+  // Android: lokal FbEvents plugini (köhnə "capacitor-facebook-events"
+  // Android-də crash-lərə görə söndürülüb → eventlər tam itirdi; bu, fix-dir)
+  if (isAndroid) {
+    try {
+      fbPlugin = registerPlugin<any>('FbEvents');
+      return fbPlugin;
+    } catch (e) {
+      console.warn('[fb-events] android plugin not available:', e);
+      return null;
+    }
+  }
+
+  // iOS: mövcud capacitor-facebook-events plugini (işləyir)
   try {
-    // Dynamic require avoids top-level import crashes on platforms where the
-    // native bridge isn't ready yet.
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const mod = require('capacitor-facebook-events');
     fbPlugin = mod?.FacebookEvents ?? null;
@@ -60,6 +72,8 @@ const EVENT_MAP: Record<string, string> = {
   sign_up: 'fb_mobile_complete_registration',
   login: 'fb_mobile_login',
   premium_subscribed: 'Subscribe',
+  premium_trial_started: 'StartTrial',
+  purchase: 'fb_mobile_purchase',
   premium_paywall_shown: 'fb_mobile_initiated_checkout',
   premium_paywall_clicked: 'fb_mobile_add_payment_info',
   premium_cancelled: 'CancelSubscription',
@@ -104,10 +118,13 @@ export const logFacebookEvent = async (eventName: string, params?: Record<string
     const fbEvent = EVENT_MAP[eventName] || eventName;
     const cleaned = cleanParams(params);
 
-    // Purchase üçün _valueToSum və fb_currency vacibdir
-    if (eventName === 'premium_subscribed' && params?.price && !cleaned._valueToSum) {
-      cleaned._valueToSum = Number(params.price);
-      cleaned.fb_currency = params.currency || 'USD';
+    // Purchase/Subscribe/StartTrial üçün _valueToSum və fb_currency vacibdir
+    // (Meta value-based optimization yalnız bununla işləyir)
+    const monetary = params?.price ?? params?.value;
+    if (['premium_subscribed', 'purchase', 'premium_trial_started'].includes(eventName) &&
+    monetary && !cleaned._valueToSum) {
+      cleaned._valueToSum = Number(monetary);
+      cleaned.fb_currency = params?.currency || 'USD';
     }
 
     await p.logEvent({ event: fbEvent, params: cleaned });
@@ -123,11 +140,13 @@ export const initFacebookEvents = () => {
   if (initialized) return;
   initialized = true;
   if (!Capacitor.isNativePlatform()) return;
-  if (isAndroid) return;
   // Defer plugin lookup + ATT prompt so it doesn't block app boot or race the
   // native bridge. Apple recommends asking AFTER the app is visible.
   setTimeout(async () => {
     try { getPlugin(); } catch { /* silent */ }
+
+    // ATT yalnız iOS anlayışıdır — Android-də advertiser ID manifest ilə idarə olunur
+    if (!isIos) return;
     try {
       const { AppTrackingTransparency } = await import('capacitor-plugin-app-tracking-transparency');
       const status = await AppTrackingTransparency.getStatus();

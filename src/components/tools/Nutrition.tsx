@@ -2,7 +2,7 @@ import { useState, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Utensils, Apple, Coffee, Droplets, Droplet,
-  Plus, Star, X, Check, Trash2, Leaf, Heart } from
+  Plus, Star, X, Check, Trash2, Heart } from
 'lucide-react';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useMealLogs } from '@/hooks/useMealLogs';
@@ -11,10 +11,9 @@ import { useCommonFoods } from '@/hooks/useDynamicConfig';
 import { useMealTypes, useNutritionTargets } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import VitaminsTab from './VitaminsTab';
+import { ToolPage, ToolHeader, ToolLoading } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
 
 interface NutritionProps {
@@ -180,11 +179,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   const loading = logsLoading || tipsLoading || mealLoading;
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>);
-
+    return <ToolLoading />;
   }
 
   // Meal detail view
@@ -194,212 +189,195 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
     const mealCalories = stats.mealCalories[selectedMeal as keyof typeof stats.mealCalories] || 0;
 
     return (
-      <div ref={ref} className="min-h-screen bg-gradient-to-b from-primary/5 dark:from-primary/10 to-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
-        <div className="gradient-primary px-3 pt-3 pb-4">
-          <div className="flex items-center gap-3 mb-3">
-            <motion.button
-              onClick={() => setSelectedMeal(null)}
-              className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <ArrowLeft className="w-4 h-4 text-white" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-white">{mealInfo?.name}</h1>
-              <p className="text-white/80 text-xs">{mealInfo?.time}</p>
-            </div>
-            <div className="text-3xl">{mealInfo?.emoji}</div>
-          </div>
+      <div ref={ref}>
+        <ToolPage>
+          <ToolHeader
+            onBack={() => setSelectedMeal(null)}
+            eyebrow={mealInfo?.time}
+            title={mealInfo?.name || ''}
+            actions={<span style={{ fontSize: 26 }}>{mealInfo?.emoji}</span>} />
 
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="text-white/70 text-xs">{tr("nutrition_bu_yemek_be47dc", "Bu yemək")}</p>
-                <p className="text-xl font-black text-white">{mealCalories} kcal</p>
-              </div>
-              <div className="text-white/70 text-xs">
-                {mealLogs.length} {language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : 'qida'}
+          <div className="space-y-3">
+            {/* Meal summary */}
+            <div className="a-cta" style={{ marginTop: 0 }}>
+              <div className="flex justify-between items-center w-full">
+                <div>
+                  <p className="a-eyebrow" style={{ marginBottom: 2 }}>{tr("nutrition_bu_yemek_be47dc", "Bu yemək")}</p>
+                  <p className="a-heading" style={{ margin: 0, fontSize: 24 }}>{mealCalories} <span style={{ fontSize: 13, fontWeight: 700 }}>kcal</span></p>
+                </div>
+                <span className="a-tag" style={{ cursor: 'default' }}>
+                  {mealLogs.length} {language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : 'qida'}
+                </span>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="px-3 -mt-3 space-y-3">
-          {/* Added foods */}
-          {mealLogs.length > 0 && (
-            <div className="bg-card rounded-xl p-3 shadow-card border border-border/50">
-              <h3 className="font-semibold mb-2 text-sm">{tr("nutrition_elave_edilen_qidalar_c604e8", "Əlavə edilən qidalar")}</h3>
-              <div className="space-y-1.5">
-                {mealLogs.map((log) => (
-                  <motion.div
-                    key={log.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
-                    
-                    <div>
-                      <p className="font-medium text-sm">{log.food_name}</p>
-                      <p className="text-xs text-muted-foreground">{log.calories} kcal</p>
-                    </div>
-                    <motion.button
-                      onClick={() => handleDeleteMeal(log.id)}
-                      className="w-7 h-7 rounded-full bg-destructive/10 flex items-center justify-center"
-                      whileTap={{ scale: 0.9 }}>
+            {/* Added foods */}
+            {mealLogs.length > 0 && (
+              <div className="a-card">
+                <h3 className="a-card-title a-heading" style={{ marginBottom: 10 }}>{tr("nutrition_elave_edilen_qidalar_c604e8", "Əlavə edilən qidalar")}</h3>
+                <div className="space-y-1.5">
+                  {mealLogs.map((log) => (
+                    <motion.div
+                      key={log.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="flex items-center justify-between p-2.5 rounded-xl"
+                      style={{ background: 'var(--a-surface-soft)' }}>
                       
-                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
-                    </motion.button>
-                  </motion.div>
-                ))}
+                      <div>
+                        <p className="a-list-title" style={{ margin: 0 }}>{log.food_name}</p>
+                        <p className="a-list-sub" style={{ margin: 0 }}>{log.calories} kcal</p>
+                      </div>
+                      <motion.button
+                        onClick={() => handleDeleteMeal(log.id)}
+                        className="w-7 h-7 rounded-full flex items-center justify-center"
+                        style={{ background: 'var(--a-pink-1)' }}
+                        whileTap={{ scale: 0.9 }}>
+                        
+                        <Trash2 className="w-3.5 h-3.5" style={{ color: 'var(--a-pink-ink)' }} />
+                      </motion.button>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Quick add foods */}
+            <div className="a-card">
+              <h3 className="a-card-title a-heading" style={{ marginBottom: 10 }}>{tr("nutrition_tez_elave_et_5c2127", "Tez əlavə et")}</h3>
+              <div className="grid grid-cols-4 gap-1.5">
+                {commonFoods.map((food, index) =>
+                <motion.button
+                  key={food.name}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: Math.min(index * 0.02, 0.3) }}
+                  onClick={() => handleAddFood(food)}
+                  className="rounded-xl p-2 text-center transition-colors"
+                  style={{ background: 'var(--a-surface-soft)', border: '1px solid var(--a-line)', cursor: 'pointer' }}
+                  whileTap={{ scale: 0.95 }}>
+                  
+                    <div className="text-xl mb-0.5">{food.emoji}</div>
+                    <p className="text-[9px] font-semibold truncate" style={{ margin: 0, color: 'var(--a-ink)' }}>{food.name}</p>
+                    <p className="text-[8px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{food.calories}</p>
+                  </motion.button>
+                )}
               </div>
             </div>
-          )}
 
-          {/* Quick add foods */}
-          <div className="bg-card rounded-xl p-3 shadow-card border border-border/50">
-            <h3 className="font-semibold mb-2 text-sm">{tr("nutrition_tez_elave_et_5c2127", "Tez əlavə et")}</h3>
-            <div className="grid grid-cols-4 gap-1.5">
-              {commonFoods.map((food, index) =>
-              <motion.button
-                key={food.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.02 }}
-                onClick={() => handleAddFood(food)}
-                className="bg-muted/50 hover:bg-primary/10 rounded-lg p-2 text-center transition-colors"
-                whileTap={{ scale: 0.95 }}>
-                
-                  <div className="text-xl mb-0.5">{food.emoji}</div>
-                  <p className="text-[9px] font-medium truncate">{food.name}</p>
-                  <p className="text-[8px] text-muted-foreground">{food.calories}</p>
-                </motion.button>
-              )}
-            </div>
+            {/* Custom add */}
+            <motion.button
+              onClick={() => setShowAddModal(true)}
+              className="w-full rounded-2xl p-3 flex items-center justify-center gap-2 text-sm font-bold"
+              style={{ background: 'var(--a-surface)', border: '1.5px dashed var(--a-peach-2)', color: 'var(--a-accent-ink)', cursor: 'pointer' }}
+              whileTap={{ scale: 0.98 }}>
+              
+              <Plus className="w-4 h-4" />
+              <span>{tr("nutrition_xususi_qida_elave_et_2a3838", "Xüsusi qida əlavə et")}</span>
+            </motion.button>
           </div>
 
-          {/* Custom add */}
-          <motion.button
-            onClick={() => setShowAddModal(true)}
-            className="w-full bg-card rounded-xl p-3 shadow-card border border-dashed border-primary/30 flex items-center justify-center gap-2 text-primary text-sm"
-            whileTap={{ scale: 0.98 }}>
-            
-            <Plus className="w-4 h-4" />
-            <span className="font-medium">{tr("nutrition_xususi_qida_elave_et_2a3838", "Xüsusi qida əlavə et")}</span>
-          </motion.button>
-        </div>
-
-        {/* Custom food modal */}
-        <AnimatePresence>
-          {showAddModal &&
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-end"
-            onClick={() => setShowAddModal(false)}>
-            
-              <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              className="w-full bg-card rounded-t-2xl p-4"
-              style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 100px)' }}
-              onClick={(e) => e.stopPropagation()}>
+          {/* Custom food modal */}
+          <AnimatePresence>
+            {showAddModal &&
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50 flex items-end"
+              onClick={() => setShowAddModal(false)}>
               
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-base font-bold">{tr("nutrition_xususi_qida_elave_et_2a3838", "Xüsusi qida əlavə et")}</h2>
-                  <button onClick={() => setShowAddModal(false)}>
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
+                <motion.div
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                className="w-full rounded-t-[26px] p-4"
+                style={{ background: 'var(--a-surface)', paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 100px)' }}
+                onClick={(e) => e.stopPropagation()}>
+                
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="a-heading" style={{ margin: 0, fontSize: 16, color: 'var(--a-ink)' }}>{tr("nutrition_xususi_qida_elave_et_2a3838", "Xüsusi qida əlavə et")}</h2>
+                    <button className="a-icon-btn" onClick={() => setShowAddModal(false)} aria-label="Close">
+                      <X size={15} />
+                    </button>
+                  </div>
 
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-xs text-muted-foreground mb-1 block">{tr("nutrition_qida_adi_d6a129", "Qida adı")}</label>
-                    <Input
-                    value={customFood.name}
-                    onChange={(e) => setCustomFood({ ...customFood, name: e.target.value })}
-                    placeholder={language === 'en' ? "e.g. Salad" : "məs. Plov"}
-                    className="h-9 text-sm" />
-                  
+                  <div className="space-y-3">
+                    <div>
+                      <label className="a-list-sub mb-1 block" style={{ margin: '0 0 4px' }}>{tr("nutrition_qida_adi_d6a129", "Qida adı")}</label>
+                      <input
+                      className="a-input w-full"
+                      value={customFood.name}
+                      onChange={(e) => setCustomFood({ ...customFood, name: e.target.value })}
+                      placeholder={language === 'en' ? "e.g. Salad" : "məs. Plov"} />
+                    
+                    </div>
+                    <div>
+                      <label className="a-list-sub mb-1 block" style={{ margin: '0 0 4px' }}>{tr("untranslated_kalori_y6oaf2", "Kalori")}</label>
+                      <input
+                      className="a-input w-full"
+                      type="number"
+                      value={customFood.calories}
+                      onChange={(e) => setCustomFood({ ...customFood, calories: e.target.value })}
+                      placeholder={language === 'en' ? "e.g. 350" : "məs. 350"} />
+                    
+                    </div>
+                    <button
+                    onClick={handleAddCustomFood}
+                    className="a-cta-btn w-full"
+                    style={{ justifyContent: 'center', height: 46, opacity: !customFood.name || !customFood.calories ? 0.5 : 1 }}
+                    disabled={!customFood.name || !customFood.calories}>
+                    
+                      <Check size={15} strokeWidth={2.2} />
+                      {tr("nutrition_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+                    </button>
                   </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground mb-1 block">{tr("untranslated_kalori_y6oaf2", "Kalori")}</label>
-                    <Input
-                    type="number"
-                    value={customFood.calories}
-                    onChange={(e) => setCustomFood({ ...customFood, calories: e.target.value })}
-                    placeholder={language === 'en' ? "e.g. 350" : "məs. 350"}
-                    className="h-9 text-sm" />
-                  
-                  </div>
-                  <Button
-                  onClick={handleAddCustomFood}
-                  className="w-full h-10"
-                  disabled={!customFood.name || !customFood.calories}>
-                  
-                    <Check className="w-4 h-4 mr-2" />
-                    {tr("nutrition_elave_et_6e1b9b", "\u018Flav\u0259 et")}
-                  </Button>
-                </div>
+                </motion.div>
               </motion.div>
-            </motion.div>
-          }
-        </AnimatePresence>
+            }
+          </AnimatePresence>
+        </ToolPage>
       </div>);
 
   }
 
   return (
-    <div ref={ref} className="min-h-screen bg-background" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)' }}>
-      {/* Minimalist Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
+    <div ref={ref}>
+      <ToolPage>
+        <ToolHeader
+          onBack={onBack}
+          eyebrow={targets.description || tr("nutrition_saglam_qidalanma_ucun_tovsiyel_7cb135", "Sa\u011Flam qidalanma \xFC\xE7\xFCn t\xF6vsiy\u0259l\u0259r")}
+          title={tr("nutrition_qidalanma_title", 'Qidalanma')} />
+
+        {/* Stats Card */}
+        <div className="a-cta" style={{ marginTop: 0 }}>
+          <div className="w-full">
+            <div className="flex justify-between items-center mb-3">
+              <div>
+                <p className="a-eyebrow" style={{ marginBottom: 2 }}>{tr("nutrition_bugunku_kalori_33554f", "Bugünkü kalori")}</p>
+                <p className="a-heading" style={{ margin: 0, fontSize: 24 }}>
+                  {todayCalories} <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--a-ink-soft)' }}>/ {targets.calories}</span>
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'var(--a-surface-soft)' }}>
+                <span className="text-2xl">🍽️</span>
+              </div>
+            </div>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--a-line-strong)' }}>
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: 'var(--a-peach-2)' }}
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(todayCalories / targets.calories * 100, 100)}%` }}
+                transition={{ duration: 1, ease: "easeOut" }} />
               
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Utensils className="w-5 h-5 text-primary" />
-                {tr("nutrition_qidalanma_title", 'Qidalanma')}
-              </h1>
             </div>
+            <p className="text-xs mt-2 text-center font-semibold" style={{ margin: '8px 0 0', color: 'var(--a-ink-soft)' }}>{stats.totalMeals} {tr("nutrition_yemek_qeyd_edildi_1d4996", "yem\u0259k qeyd edildi")}</p>
           </div>
         </div>
-      </div>
 
-      {/* Stats Card */}
-      <div className="px-4 pt-4">
-        <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-2xl p-4 text-white">
-          <div className="flex justify-between items-center mb-3">
-            <div>
-              <p className="text-white/70 text-xs font-medium">{tr("nutrition_bugunku_kalori_33554f", "Bugünkü kalori")}</p>
-              <p className="text-2xl font-bold">
-                {todayCalories} <span className="text-sm font-normal">/ {targets.calories}</span>
-              </p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-              <span className="text-2xl">🍽️</span>
-            </div>
-          </div>
-          <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-white rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${Math.min(todayCalories / targets.calories * 100, 100)}%` }}
-              transition={{ duration: 1, ease: "easeOut" }} />
-            
-          </div>
-          <p className="text-white/60 text-xs mt-2 text-center">{stats.totalMeals} {tr("nutrition_yemek_qeyd_edildi_1d4996", "yem\u0259k qeyd edildi")}</p>
-        </div>
-      </div>
-
-      <div className="px-3 -mt-3">
-        <div className="bg-card rounded-xl p-1 flex gap-0.5 shadow-lg">
+        {/* Tabs */}
+        <div className="a-tabs w-full mt-3" style={{ display: 'flex' }}>
           {[
           { id: 'log', label: tr("nutrition_yemek_b1fd56", 'Yemək') },
           { id: 'vitamins', label: tr("nutrition_vitaminler_e49129", 'Vitaminlər') },
@@ -408,184 +386,186 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${
-            activeTab === tab.id ?
-            'bg-primary text-white shadow-md' :
-            'text-muted-foreground'}`
-            }>
+            className={`a-tab flex-1 ${activeTab === tab.id ? 'active' : ''}`}>
             
               {tab.label}
             </button>
           )}
         </div>
-      </div>
 
-      <div className="px-3 mt-3">
-        <AnimatePresence mode="wait">
-          {activeTab === 'log' &&
-          <motion.div
-            key="log"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="space-y-2">
-            
-              <h2 className="font-bold text-sm">{tr("nutrition_bugunku_yemekler_25c273", "Bugünkü yeməklər")}</h2>
-              {mealTypes.map((meal, index) => {
-              const mealLogs = getMealsByType(meal.id);
-              const mealCalories = stats.mealCalories[meal.id as keyof typeof stats.mealCalories] || 0;
-
-              return (
-                <motion.button
-                  key={meal.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  onClick={() => setSelectedMeal(meal.id)}
-                  className="w-full bg-card rounded-xl p-3 flex items-center gap-3 shadow-card border border-border/50">
-                  
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl">
-                      {meal.emoji}
-                    </div>
-                    <div className="flex-1 text-left">
-                      <h3 className="font-semibold text-sm">{meal.name}</h3>
-                      <p className="text-xs text-muted-foreground">
-                        {mealLogs.length > 0 ?
-                      `${mealLogs.length} ${language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : 'qida'} • ${mealCalories} kcal` :
-                      meal.time
-                      }
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {mealLogs.length > 0 ?
-                    <div className="w-7 h-7 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                          <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
-                        </div> :
-
-                    <Plus className="w-4 h-4 text-primary" />
-                    }
-                    </div>
-                  </motion.button>);
-
-            })}
-            </motion.div>
-          }
-
-          {activeTab === 'tips' &&
-          <motion.div
-            key="tips"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="space-y-3">
-            
-              <div className="flex items-center gap-2 mb-1">
-                <Star className="w-4 h-4 text-amber-500" />
-                <h2 className="font-bold text-sm">{tr("nutrition_tovsiye_olunan_qidalar_5d52f5", "Tövsiyə olunan qidalar")}</h2>
-              </div>
-              <p className="text-xs text-muted-foreground mb-2">
-                {lifeStage === 'bump' ? tr("nutrition_hamilelik_dovrunde_faydali_qid_4fb245", "Hamil\u0259lik d\xF6vr\xFCnd\u0259 faydal\u0131 qidalar") :
-              lifeStage === 'mommy' ? tr("nutrition_emizdirme_dovrunde_faydali_qid_38d382", "\u018Fmizdirm\u0259 d\xF6vr\xFCnd\u0259 faydal\u0131 qidalar") : tr("nutrition_saglam_qidalanma_ucun_tovsiyel_7cb135", "Sa\u011Flam qidalanma \xFC\xE7\xFCn t\xF6vsiy\u0259l\u0259r")
-              }
-              </p>
+        <div className="mt-3">
+          <AnimatePresence mode="wait">
+            {activeTab === 'log' &&
+            <motion.div
+              key="log"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}>
               
-              {nutritionTips.length === 0 ?
-            <div className="text-center py-8">
-                  <div className="text-4xl mb-3">🥗</div>
-                  <p className="text-muted-foreground text-sm">{tr("nutrition_tovsiye_tapilmadi_facebb", "Tövsiyə tapılmadı")}</p>
-                </div> :
-
-            <div className="grid grid-cols-2 gap-2">
-                  {nutritionTips.map((tip, index) =>
-              <motion.div
-                key={tip.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.03 }}
-                className="bg-card rounded-xl p-3 shadow-card border border-border/50">
-                
-                      <div className="text-2xl mb-2">{tip.emoji || '🍎'}</div>
-                      <h3 className="font-bold mb-0.5 text-sm">{tip.title}</h3>
-                      <p className="text-[10px] text-muted-foreground mb-1">{tip.calories || 0} kcal</p>
-                      <div className="flex flex-wrap gap-0.5">
-                        {(tip.benefits || []).slice(0, 2).map((benefit) =>
-                  <span
-                    key={benefit}
-                    className="text-[8px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-                    
-                            {benefit}
-                          </span>
-                  )}
-                      </div>
-                    </motion.div>
-              )}
+                <div className="a-section-head">
+                  <h2 className="a-section-title a-heading" style={{ fontSize: 15 }}>{tr("nutrition_bugunku_yemekler_25c273", "Bugünkü yeməklər")}</h2>
                 </div>
+                <div className="a-list-card pb-4">
+                  {mealTypes.map((meal, index) => {
+                  const mealLogs = getMealsByType(meal.id);
+                  const mealCalories = stats.mealCalories[meal.id as keyof typeof stats.mealCalories] || 0;
+
+                  return (
+                    <motion.button
+                      key={meal.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      onClick={() => setSelectedMeal(meal.id)}
+                      className="a-list-row w-full text-left"
+                      style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}>
+                      
+                        <span className="a-list-icon" style={{ background: 'var(--a-grad-peach)', fontSize: 18 }}>
+                          {meal.emoji}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="a-list-title">{meal.name}</p>
+                          <p className="a-list-sub">
+                            {mealLogs.length > 0 ?
+                          `${mealLogs.length} ${language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : 'qida'} • ${mealCalories} kcal` :
+                          meal.time
+                          }
+                          </p>
+                        </div>
+                        <span className="a-list-trail">
+                          {mealLogs.length > 0 ?
+                        <span className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: 'var(--a-green-1)', display: 'inline-flex' }}>
+                              <Check className="w-3.5 h-3.5" style={{ color: 'var(--a-green-ink)' }} />
+                            </span> :
+
+                        <Plus className="w-4 h-4" style={{ color: 'var(--a-peach-2)' }} />
+                        }
+                        </span>
+                      </motion.button>);
+
+                })}
+                </div>
+              </motion.div>
             }
-            </motion.div>
-          }
 
-          {activeTab === 'vitamins' &&
-          <VitaminsTab />
-          }
-
-          {activeTab === 'water' &&
-          <motion.div
-            key="water"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="space-y-3">
-            
-              <div className="bg-card rounded-2xl p-4 shadow-card border border-border/50 text-center">
-                <Droplets className="w-10 h-10 text-blue-500 mx-auto mb-3" />
-                <h2 className="text-3xl font-black text-foreground mb-1">
-                  {waterGlasses} / {targets.water}
-                </h2>
-                <p className="text-muted-foreground text-sm mb-4">{tr("nutrition_stekan_su_icdiniz_a26973", "stəkan su içdiniz")}</p>
-                
-                <div className="flex flex-wrap justify-center gap-1.5 mb-4">
-                  {Array.from({ length: Math.max(targets.water, waterGlasses) }).map((_, i) =>
-                <motion.div
-                  key={i}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: i * 0.03 }}
-                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all ${
-                  i < waterGlasses ?
-                  'bg-blue-500 text-white shadow-md shadow-blue-500/30' :
-                  'bg-blue-50 dark:bg-blue-900/20 text-blue-200 dark:text-blue-800 border border-blue-100 dark:border-blue-800/50'}`
-                  }>
-                  
-                      <Droplet className={`w-5 h-5 ${i < waterGlasses ? 'fill-current' : 'fill-none stroke-current stroke-2'}`} />
-                    </motion.div>
-                )}
+            {activeTab === 'tips' &&
+            <motion.div
+              key="tips"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="space-y-3">
+              
+                <div className="flex items-center gap-2 mb-1">
+                  <Star className="w-4 h-4" style={{ color: 'var(--a-yellow-2)' }} />
+                  <h2 className="font-bold text-sm a-heading" style={{ margin: 0, color: 'var(--a-on-bg)' }}>{tr("nutrition_tovsiye_olunan_qidalar_5d52f5", "Tövsiyə olunan qidalar")}</h2>
                 </div>
-
-                <motion.button
-                onClick={addWater}
-                className="w-full gradient-primary text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-elevated text-sm"
-                whileTap={{ scale: 0.98 }}
-                disabled={waterGlasses >= 12}>
-                
-                  <Plus className="w-4 h-4" />
-                  {tr("nutrition_su_elave_et_6ae5c0", "Su \u0259lav\u0259 et")}
-                </motion.button>
-              </div>
-
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 border border-blue-100 dark:border-blue-800">
-                <h3 className="font-bold text-blue-800 dark:text-blue-300 mb-1 text-sm">{tr("nutrition_meslehet_f594cf", "💡 Məsləhət")}</h3>
-                <p className="text-xs text-blue-700 dark:text-blue-400">
-                  {lifeStage === 'bump' ? tr("nutrition_hamilelik_zamani_gunde_en_azi__d70ce9", "Hamil\u0259lik zaman\u0131 g\xFCnd\u0259 \u0259n az\u0131 10 st\u0259kan su i\xE7m\u0259k t\xF6vsiy\u0259 olunur. Yet\u0259rli su i\xE7m\u0259k k\xF6rp\u0259nin inki\u015Faf\u0131na k\xF6m\u0259k edir.") :
-
-                lifeStage === 'mommy' ? tr("nutrition_emizdirme_dovrunde_gunde_12_st_a765d7", "\u018Fmizdirm\u0259 d\xF6vr\xFCnd\u0259 g\xFCnd\u0259 12 st\u0259kan su i\xE7m\u0259k t\xF6vsiy\u0259 olunur. Bu s\xFCd istehsal\u0131na k\xF6m\u0259k edir.") : tr("nutrition_gunde_en_azi_8_stekan_su_icmek_c12741", "G\xFCnd\u0259 \u0259n az\u0131 8 st\u0259kan su i\xE7m\u0259k b\u0259d\u0259ni sa\u011Flam saxlay\u0131r.")
-
+                <p className="text-xs mb-2" style={{ margin: 0, color: 'var(--a-on-bg-soft)' }}>
+                  {lifeStage === 'bump' ? tr("nutrition_hamilelik_dovrunde_faydali_qid_4fb245", "Hamil\u0259lik d\xF6vr\xFCnd\u0259 faydal\u0131 qidalar") :
+                lifeStage === 'mommy' ? tr("nutrition_emizdirme_dovrunde_faydali_qid_38d382", "\u018Fmizdirm\u0259 d\xF6vr\xFCnd\u0259 faydal\u0131 qidalar") : tr("nutrition_saglam_qidalanma_ucun_tovsiyel_7cb135", "Sa\u011Flam qidalanma \xFC\xE7\xFCn t\xF6vsiy\u0259l\u0259r")
                 }
                 </p>
-              </div>
-            </motion.div>
-          }
-        </AnimatePresence>
-      </div>
+                
+                {nutritionTips.length === 0 ?
+              <div className="a-card text-center" style={{ padding: '30px 18px' }}>
+                    <div className="text-4xl mb-3">🥗</div>
+                    <p className="a-list-sub" style={{ margin: 0 }}>{tr("nutrition_tovsiye_tapilmadi_facebb", "Tövsiyə tapılmadı")}</p>
+                  </div> :
+
+              <div className="grid grid-cols-2 gap-2">
+                    {nutritionTips.map((tip, index) =>
+                <motion.div
+                  key={tip.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: Math.min(index * 0.03, 0.3) }}
+                  className="a-card"
+                  style={{ padding: 14 }}>
+                  
+                        <div className="text-2xl mb-2">{tip.emoji || '🍎'}</div>
+                        <h3 className="a-list-title mb-0.5" style={{ margin: 0 }}>{tip.title}</h3>
+                        <p className="a-list-sub mb-1" style={{ margin: '0 0 6px' }}>{tip.calories || 0} kcal</p>
+                        <div className="flex flex-wrap gap-0.5">
+                          {(tip.benefits || []).slice(0, 2).map((benefit) =>
+                    <span
+                      key={benefit}
+                      className="text-[8px] px-1.5 py-0.5 rounded-full font-semibold"
+                      style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+                      
+                              {benefit}
+                            </span>
+                    )}
+                        </div>
+                      </motion.div>
+                )}
+                  </div>
+              }
+              </motion.div>
+            }
+
+            {activeTab === 'vitamins' &&
+            <VitaminsTab />
+            }
+
+            {activeTab === 'water' &&
+            <motion.div
+              key="water"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="space-y-3">
+              
+                <div className="a-card text-center">
+                  <Droplets className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--a-blue-2)' }} />
+                  <h2 className="a-heading" style={{ margin: '0 0 4px', fontSize: 28 }}>
+                    {waterGlasses} / {targets.water}
+                  </h2>
+                  <p className="a-list-sub mb-4" style={{ margin: '0 0 16px' }}>{tr("nutrition_stekan_su_icdiniz_a26973", "stəkan su içdiniz")}</p>
+                  
+                  <div className="flex flex-wrap justify-center gap-1.5 mb-4">
+                    {Array.from({ length: Math.max(targets.water, waterGlasses) }).map((_, i) =>
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: i * 0.03 }}
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all"
+                    style={i < waterGlasses ?
+                    { background: 'var(--a-blue-2)', color: '#fff', boxShadow: '0 6px 14px -6px rgba(99, 172, 223, 0.7)' } :
+                    { background: 'var(--a-blue-1)', color: 'var(--a-blue-2)', opacity: 0.7 }}>
+                    
+                        <Droplet className={`w-5 h-5 ${i < waterGlasses ? 'fill-current' : 'fill-none stroke-current stroke-2'}`} />
+                      </motion.div>
+                  )}
+                  </div>
+
+                  <motion.button
+                  onClick={addWater}
+                  className="a-cta-btn w-full"
+                  style={{ justifyContent: 'center', height: 46, opacity: waterGlasses >= 12 ? 0.5 : 1 }}
+                  whileTap={{ scale: 0.98 }}
+                  disabled={waterGlasses >= 12}>
+                  
+                    <Plus size={15} strokeWidth={2.2} />
+                    {tr("nutrition_su_elave_et_6ae5c0", "Su \u0259lav\u0259 et")}
+                  </motion.button>
+                </div>
+
+                <div className="rounded-2xl p-3" style={{ background: 'var(--a-blue-1)' }}>
+                  <h3 className="font-bold mb-1 text-sm" style={{ margin: '0 0 4px', color: '#153e57' }}>{tr("nutrition_meslehet_f594cf", "💡 Məsləhət")}</h3>
+                  <p className="text-xs" style={{ margin: 0, color: 'var(--a-blue-ink)' }}>
+                    {lifeStage === 'bump' ? tr("nutrition_hamilelik_zamani_gunde_en_azi__d70ce9", "Hamil\u0259lik zaman\u0131 g\xFCnd\u0259 \u0259n az\u0131 10 st\u0259kan su i\xE7m\u0259k t\xF6vsiy\u0259 olunur. Yet\u0259rli su i\xE7m\u0259k k\xF6rp\u0259nin inki\u015Faf\u0131na k\xF6m\u0259k edir.") :
+
+                  lifeStage === 'mommy' ? tr("nutrition_emizdirme_dovrunde_gunde_12_st_a765d7", "\u018Fmizdirm\u0259 d\xF6vr\xFCnd\u0259 g\xFCnd\u0259 12 st\u0259kan su i\xE7m\u0259k t\xF6vsiy\u0259 olunur. Bu s\xFCd istehsal\u0131na k\xF6m\u0259k edir.") : tr("nutrition_gunde_en_azi_8_stekan_su_icmek_c12741", "G\xFCnd\u0259 \u0259n az\u0131 8 st\u0259kan su i\xE7m\u0259k b\u0259d\u0259ni sa\u011Flam saxlay\u0131r.")
+
+                  }
+                  </p>
+                </div>
+              </motion.div>
+            }
+          </AnimatePresence>
+        </div>
+      </ToolPage>
     </div>);
 
 });

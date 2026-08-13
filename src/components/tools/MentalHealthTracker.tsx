@@ -1,15 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Heart, Phone, AlertTriangle, CheckCircle, ChevronRight, Brain, Wind, Smile, ChevronLeft, ExternalLink, Sparkles, Activity, Calendar } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-// Note: RadioGroup removed - using custom button-based selection for better UX
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Phone, AlertTriangle, CheckCircle, ChevronRight, Brain, Wind, Smile, ChevronLeft, ExternalLink, Sparkles, Activity, Calendar } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import {
   useMoodCheckins,
   useTodayMoodCheckin,
@@ -33,10 +28,27 @@ import { getCurrentDateLocale } from '@/lib/date-utils';
 import { toast } from 'sonner';
 import { tr } from "@/lib/tr";
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 
 interface MentalHealthTrackerProps {
   onBack: () => void;
 }
+
+// Fallback mood colors mapped to the anacan palette
+const FALLBACK_MOOD_COLORS: Record<number, {color: string;soft: string;}> = {
+  1: { color: '#ff8aa4', soft: 'var(--a-pink-1)' },
+  2: { color: 'var(--a-peach-2)', soft: 'var(--a-peach-1)' },
+  3: { color: '#ffc94d', soft: 'var(--a-yellow-1)' },
+  4: { color: '#8fd19e', soft: 'var(--a-green-1)' },
+  5: { color: '#63bd8b', soft: 'var(--a-green-1)' }
+};
+
+// Risk level → anacan palette
+const riskStyles: Record<string, {bg: string;ink: string;}> = {
+  high: { bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' },
+  moderate: { bg: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)' },
+  low: { bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' }
+};
 
 const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   useScrollToTop();
@@ -62,29 +74,23 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
     return FALLBACK_EPDS_QUESTIONS;
   }, [epdsQuestionsDB]);
 
-  // Use DB data or fallback
+  // Use DB data (color preserved as inline value) or fallback
   const MOOD_LEVELS = useMemo(() => {
     if (moodLevelsDB.length > 0) {
       return moodLevelsDB.map((m) => ({
         value: m.mood_value,
         emoji: m.emoji,
         label: m.label,
-        gradient: `from-[${m.color}] to-[${m.color}]`,
-        bg: `bg-[${m.color}]/10`
+        color: m.color || FALLBACK_MOOD_COLORS[m.mood_value]?.color || 'var(--a-peach-2)',
+        soft: m.color ? `${m.color}1f` : FALLBACK_MOOD_COLORS[m.mood_value]?.soft || 'var(--a-surface-soft)'
       }));
     }
     return FALLBACK_MOOD_LEVELS.map((m) => ({
       value: m.mood_value,
       emoji: m.emoji,
       label: m.label,
-      gradient: m.mood_value === 1 ? 'from-red-500 to-rose-600' :
-      m.mood_value === 2 ? 'from-orange-500 to-amber-600' :
-      m.mood_value === 3 ? 'from-yellow-500 to-amber-500' :
-      m.mood_value === 4 ? 'from-lime-500 to-green-500' : 'from-emerald-500 to-teal-500',
-      bg: m.mood_value === 1 ? 'bg-red-100 dark:bg-red-900/30' :
-      m.mood_value === 2 ? 'bg-orange-100 dark:bg-orange-900/30' :
-      m.mood_value === 3 ? 'bg-yellow-100 dark:bg-yellow-900/30' :
-      m.mood_value === 4 ? 'bg-lime-100 dark:bg-lime-900/30' : 'bg-emerald-100 dark:bg-emerald-900/30'
+      color: FALLBACK_MOOD_COLORS[m.mood_value]?.color || 'var(--a-peach-2)',
+      soft: FALLBACK_MOOD_COLORS[m.mood_value]?.soft || 'var(--a-surface-soft)'
     }));
   }, [moodLevelsDB]);
 
@@ -205,13 +211,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
     setBreathingCount(0);
   };
 
-  const getRiskColor = (level: string) => {
-    switch (level) {
-      case 'high':return 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800';
-      case 'moderate':return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-800';
-      default:return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800';
-    }
-  };
+  const getRiskStyle = (level: string) => riskStyles[level] || riskStyles.low;
 
   const getRiskLabel = (level: string) => {
     switch (level) {
@@ -235,89 +235,76 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   const otherResources = resources.filter((r) => !r.is_emergency);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Brain className="w-5 h-5 text-teal-500" />
-                {tr("mentalhealthtracker_mental_saglamliq_68e65e", "Mental Sa\u011Flaml\u0131q")}
-              </h1>
-            </div>
-          </div>
-        </div>
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={tr("mentalhealthtracker_rahatlama_ve_stress_azaltma_1a97bc", "Rahatlama və stress azaltma")}
+        title={tr("mentalhealthtracker_mental_saglamliq_68e65e", "Mental Sa\u011Flaml\u0131q")} />
+
+      <MedicalDisclaimer variant="anacan" className="mb-4" />
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <motion.div
+          className="rounded-2xl p-3 text-center"
+          style={{ background: 'var(--a-green-1)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}>
+          
+          <Smile className="w-5 h-5 mx-auto mb-1" style={{ color: 'var(--a-green-ink)' }} />
+          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#14532d' }}>{moodCheckins.length}</p>
+          <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-green-ink)', opacity: 0.8 }}>{tr("untranslated_qeyd_z0999u", "Qeyd")}</p>
+        </motion.div>
+        <motion.div
+          className="rounded-2xl p-3 text-center"
+          style={{ background: 'var(--a-blue-1)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}>
+          
+          <Activity className="w-5 h-5 mx-auto mb-1" style={{ color: 'var(--a-blue-ink)' }} />
+          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#153e57' }}>{moodTrend ? moodTrend.toFixed(1) : '—'}</p>
+          <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-blue-ink)', opacity: 0.8 }}>{tr("untranslated_ortalama_qxgps6", "Ortalama")}</p>
+        </motion.div>
+        <motion.div
+          className="rounded-2xl p-3 text-center"
+          style={{ background: 'var(--a-lav-1)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}>
+          
+          <Calendar className="w-5 h-5 mx-auto mb-1" style={{ color: 'var(--a-lav-ink)' }} />
+          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#3c2e5c' }}>{epdsAssessments.length}</p>
+          <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-lav-ink)', opacity: 0.8 }}>EPDS</p>
+        </motion.div>
       </div>
 
-      <div className="px-4 pt-4">
-        <MedicalDisclaimer variant="compact" className="mb-4" />
-        {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <motion.div
-            className="bg-teal-50 dark:bg-teal-500/10 rounded-2xl p-3 text-center border border-teal-100 dark:border-teal-500/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}>
-            
-            <Smile className="w-5 h-5 mx-auto mb-1 text-teal-500" />
-            <p className="text-2xl font-black text-teal-600 dark:text-teal-400">{moodCheckins.length}</p>
-            <p className="text-xs text-teal-600/70 dark:text-teal-400/70 font-medium">{tr("untranslated_qeyd_z0999u", "Qeyd")}</p>
-          </motion.div>
-          <motion.div
-            className="bg-cyan-50 dark:bg-cyan-500/10 rounded-2xl p-3 text-center border border-cyan-100 dark:border-cyan-500/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}>
-            
-            <Activity className="w-5 h-5 mx-auto mb-1 text-cyan-500" />
-            <p className="text-2xl font-black text-cyan-600 dark:text-cyan-400">{moodTrend ? moodTrend.toFixed(1) : '—'}</p>
-            <p className="text-xs text-cyan-600/70 dark:text-cyan-400/70 font-medium">{tr("untranslated_ortalama_qxgps6", "Ortalama")}</p>
-          </motion.div>
-          <motion.div
-            className="bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl p-3 text-center border border-emerald-100 dark:border-emerald-500/20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}>
-            
-            <Calendar className="w-5 h-5 mx-auto mb-1 text-emerald-500" />
-            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{epdsAssessments.length}</p>
-            <p className="text-xs text-emerald-600/70 dark:text-emerald-400/70 font-medium">EPDS</p>
-          </motion.div>
-        </div>
-      </div>
-
-      <div className="px-4 space-y-4">
+      <div className="space-y-4">
         {/* EPDS Alert */}
         {shouldShowEPDSPrompt && !epdsAssessments.length &&
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800">
+          className="a-card"
+          style={{ background: 'var(--a-yellow-1)', border: 'none' }}>
           
             <div className="flex items-start gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg">
-                <AlertTriangle className="w-6 h-6 text-white" />
-              </div>
+              <span className="a-list-icon" style={{ background: 'var(--a-grad-yellow)', flexShrink: 0 }}>
+                <AlertTriangle size={17} strokeWidth={2.2} style={{ color: 'var(--a-warn-ink)' }} />
+              </span>
               <div className="flex-1">
-                <h3 className="font-bold text-amber-800 dark:text-amber-200">{tr("mentalhealthtracker_sizinle_danisaq_a4ad3a", "Sizinlə danışaq?")}</h3>
-                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                <h3 className="a-list-title" style={{ margin: 0, color: 'var(--a-warn-ink)' }}>{tr("mentalhealthtracker_sizinle_danisaq_a4ad3a", "Sizinlə danışaq?")}</h3>
+                <p className="text-sm mt-1" style={{ margin: 0, color: 'var(--a-warn-ink)', opacity: 0.85 }}>
                   {tr("mentalhealthtracker_qisa_sorgu_ile_veziyyeti_qiyme_97ab4c", "Q\u0131sa sor\u011Fu il\u0259 v\u0259ziyy\u0259ti qiym\u0259tl\u0259ndir\u0259k?")}
                 </p>
-                <Button
-                size="sm"
-                className="mt-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 border-0"
+                <button
+                className="a-cta-btn mt-3"
+                style={{ height: 38, padding: '0 16px', fontSize: 11.5 }}
                 onClick={() => setShowEPDS(true)}>
                   {tr("mentalhealthtracker_sorguya_basla_0563f3", "Sor\u011Fuya ba\u015Fla")}
                 
-              </Button>
+              </button>
               </div>
             </div>
           </motion.div>
@@ -325,12 +312,13 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
 
         {/* Today's Check-in */}
         <motion.div
-          className="bg-card rounded-3xl shadow-lg border border-border/50 overflow-hidden"
+          className="a-card overflow-hidden"
+          style={{ padding: 0 }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}>
           
-          <div className="bg-gradient-to-r from-teal-500 to-cyan-500 p-4">
-            <h3 className="font-bold text-white flex items-center gap-2">
+          <div className="p-4" style={{ background: 'var(--a-grad-green)' }}>
+            <h3 className="font-bold flex items-center gap-2 a-heading" style={{ margin: 0, color: '#14532d' }}>
               <Smile className="w-5 h-5" />
               {tr("mentalhealthtracker_bu_gun_necesen_26ad26", "Bu g\xFCn nec\u0259s\u0259n?")}
             </h3>
@@ -349,10 +337,10 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 
                   {MOOD_LEVELS.find((m) => m.value === todayCheckin.mood_level)?.emoji}
                 </motion.div>
-                <p className="text-lg font-medium text-foreground">
-                  {tr("mentalhealthtracker_bu_gun_ozunuzu_24fed0", "Bu g\xFCn \xF6z\xFCn\xFCz\xFC")} <span className="text-primary font-bold">{MOOD_LEVELS.find((m) => m.value === todayCheckin.mood_level)?.label.toLowerCase()}</span> hiss edirsiniz
+                <p className="text-lg font-medium" style={{ margin: 0, color: 'var(--a-ink)' }}>
+                  {tr("mentalhealthtracker_bu_gun_ozunuzu_24fed0", "Bu g\xFCn \xF6z\xFCn\xFCz\xFC")} <span className="font-bold" style={{ color: 'var(--a-accent-ink)' }}>{MOOD_LEVELS.find((m) => m.value === todayCheckin.mood_level)?.label.toLowerCase()}</span> hiss edirsiniz
                 </p>
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="a-list-sub mt-2" style={{ margin: '8px 0 0' }}>
                   {tr("mentalhealthtracker_qeyd_etdiyiniz_ucun_tesekkurle_52b458", "\u2728 Qeyd etdiyiniz \xFC\xE7\xFCn t\u0259\u015F\u0259kk\xFCrl\u0259r!")}
                 </p>
               </motion.div> :
@@ -367,11 +355,12 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                   transition={{ delay: index * 0.1 }}
                   onClick={() => handleMoodSelect(mood.value)}
                   disabled={addMoodCheckin.isPending}
-                  className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all hover:scale-110 ${mood.bg}`}
+                  className="flex flex-col items-center gap-2 p-3 rounded-2xl transition-all hover:scale-110"
+                  style={{ background: mood.soft, cursor: 'pointer' }}
                   whileTap={{ scale: 0.95 }}>
                   
                       <span className="text-3xl">{mood.emoji}</span>
-                      <span className="text-[10px] font-bold">{mood.label}</span>
+                      <span className="text-[10px] font-bold" style={{ color: 'var(--a-ink)' }}>{mood.label}</span>
                     </motion.button>
                 )}
                 </div>
@@ -380,7 +369,8 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder={tr("mentalhealthtracker_i_steyirsinizse_qisa_qeyd_elave_edin_9043bb", "İstəyirsinizsə, qısa qeyd əlavə edin...")}
-                  className="h-16 resize-none rounded-2xl border-2" />
+                  className="a-input h-16 resize-none"
+                  style={{ height: 64, width: '100%' }} />
                 
                 </div>
               </div>
@@ -391,13 +381,13 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
         {/* Weekly Mood Chart */}
         {moodCheckins.length > 0 &&
         <motion.div
-          className="bg-card rounded-3xl p-5 shadow-lg border border-border/50"
+          className="a-card"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}>
           
-            <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-teal-500" />
+            <h3 className="font-bold mb-4 flex items-center gap-2 a-heading" style={{ margin: '0 0 16px', color: 'var(--a-ink)' }}>
+              <Activity className="w-5 h-5" style={{ color: 'var(--a-green-2)' }} />
               {tr("mentalhealthtracker_son_7_gun_1d4103", "Son 7 G\xFCn")}
             </h3>
             <div className="flex items-end justify-between h-28 gap-2">
@@ -407,27 +397,27 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
               className="flex-1 flex flex-col items-center gap-1"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}>
+              transition={{ delay: i * 0.05 }}
+              style={{ height: '100%', justifyContent: 'flex-end' }}>
               
                   <div
-                className={`w-full rounded-xl transition-all ${
-                day.mood > 0 ?
-                `bg-gradient-to-t ${MOOD_LEVELS[day.mood - 1]?.gradient}` :
-                'bg-muted'}`
-                }
-                style={{ height: day.mood > 0 ? `${day.mood / 5 * 100}%` : '15%' }} />
+                className="w-full rounded-xl transition-all"
+                style={{
+                  height: day.mood > 0 ? `${day.mood / 5 * 100}%` : '15%',
+                  background: day.mood > 0 ? MOOD_LEVELS.find((m) => m.value === day.mood)?.color || 'var(--a-peach-2)' : 'var(--a-line-strong)'
+                }} />
               
-                  <span className="text-[10px] text-muted-foreground font-medium">{day.day}</span>
+                  <span className="text-[10px] font-semibold" style={{ color: 'var(--a-ink-soft)' }}>{day.day}</span>
                 </motion.div>
             )}
             </div>
             {moodTrend !== null &&
-          <div className="mt-4 p-4 rounded-2xl bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border border-teal-200 dark:border-teal-800">
+          <div className="mt-4 p-4 rounded-2xl" style={{ background: 'var(--a-green-1)' }}>
                 <div className="flex items-center justify-center gap-3 mb-2">
                   <span className="text-3xl">{MOOD_LEVELS.find((m) => m.value === Math.round(moodTrend))?.emoji}</span>
-                  <span className="font-bold text-lg text-foreground">Ortalama: {moodTrend.toFixed(1)}/5</span>
+                  <span className="font-bold text-lg" style={{ color: '#14532d' }}>Ortalama: {moodTrend.toFixed(1)}/5</span>
                 </div>
-                <p className="text-xs text-muted-foreground text-center">
+                <p className="text-xs text-center" style={{ margin: 0, color: 'var(--a-green-ink)' }}>
                   {moodTrend >= 4 ? tr("mentalhealthtracker_ela_gedir_ozunuze_qaygi_goster_f76926", "\uD83C\uDF1F \u018Fla gedir! \xD6z\xFCn\xFCz\u0259 qay\u011F\u0131 g\xF6st\u0259rm\u0259y\u0259 davam edin.") :
               moodTrend >= 3 ? tr("mentalhealthtracker_yaxsi_gedir_ozunuze_vaxt_ayiri_a89726", "\uD83D\uDCAA Yax\u015F\u0131 gedir. \xD6z\xFCn\xFCz\u0259 vaxt ay\u0131r\u0131n.") : tr("mentalhealthtracker_biraz_cetin_dovr_kecirirsiniz__85fe81", "\uD83D\uDC9D Biraz \xE7\u0259tin d\xF6vr ke\xE7irirsiniz. Yard\u0131m ist\u0259m\u0259kd\u0259n \xE7\u0259kinm\u0259yin.")
               }
@@ -442,31 +432,33 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           {/* Breathing Exercise */}
           <motion.button
             onClick={() => setShowBreathing(true)}
-            className="bg-card rounded-2xl p-4 shadow-sm border border-border/50 text-left hover:shadow-md transition-shadow"
+            className="a-card text-left"
+            style={{ cursor: 'pointer' }}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             whileTap={{ scale: 0.98 }}>
             
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center mb-3 shadow-lg">
-              <Wind className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="font-bold text-foreground">{tr("mentalhealthtracker_nefes_mesqi_8d98bb", "Nəfəs Məşqi")}</h3>
-            <p className="text-xs text-muted-foreground mt-1">{tr("mentalhealthtracker_rahatlama_ve_stress_azaltma_1a97bc", "Rahatlama və stress azaltma")}</p>
+            <span className="a-list-icon mb-3" style={{ background: 'var(--a-grad-blue)', marginBottom: 12 }}>
+              <Wind size={17} strokeWidth={2.2} style={{ color: '#153e57' }} />
+            </span>
+            <h3 className="a-list-title" style={{ margin: 0 }}>{tr("mentalhealthtracker_nefes_mesqi_8d98bb", "Nəfəs Məşqi")}</h3>
+            <p className="a-list-sub mt-1" style={{ margin: '4px 0 0', whiteSpace: 'normal' }}>{tr("mentalhealthtracker_rahatlama_ve_stress_azaltma_1a97bc", "Rahatlama və stress azaltma")}</p>
           </motion.button>
 
           {/* EPDS Assessment */}
           <motion.button
             onClick={() => setShowEPDS(true)}
-            className="bg-card rounded-2xl p-4 shadow-sm border border-border/50 text-left hover:shadow-md transition-shadow"
+            className="a-card text-left"
+            style={{ cursor: 'pointer' }}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             whileTap={{ scale: 0.98 }}>
             
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center mb-3 shadow-lg">
-              <Brain className="w-6 h-6 text-white" />
-            </div>
-            <h3 className="font-bold text-foreground">{tr("mentalhealthtracker_epds_testi_3c7a2d", "EPDS Testi")}</h3>
-            <p className="text-xs text-muted-foreground mt-1">{tr("mentalhealthtracker_depressiya_riski_qiymetlendirme_2729fe", "Depressiya riski qiymətləndirmə")}</p>
+            <span className="a-list-icon mb-3" style={{ background: 'var(--a-grad-green)', marginBottom: 12 }}>
+              <Brain size={17} strokeWidth={2.2} style={{ color: '#14532d' }} />
+            </span>
+            <h3 className="a-list-title" style={{ margin: 0 }}>{tr("mentalhealthtracker_epds_testi_3c7a2d", "EPDS Testi")}</h3>
+            <p className="a-list-sub mt-1" style={{ margin: '4px 0 0', whiteSpace: 'normal' }}>{tr("mentalhealthtracker_depressiya_riski_qiymetlendirme_2729fe", "Depressiya riski qiymətləndirmə")}</p>
           </motion.button>
         </div>
 
@@ -477,34 +469,35 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}>
           
-            <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-teal-500" />
-              {tr("mentalhealthtracker_kecmis_neticeler_072044", "Ke\xE7mi\u015F N\u0259tic\u0259l\u0259r")}
-            </h3>
-            <div className="space-y-2">
+            <div className="a-section-head">
+              <h3 className="a-section-title a-heading" style={{ fontSize: 15 }}>
+                {tr("mentalhealthtracker_kecmis_neticeler_072044", "Ke\xE7mi\u015F N\u0259tic\u0259l\u0259r")}
+              </h3>
+              <Sparkles size={15} style={{ color: 'var(--a-green-2)' }} />
+            </div>
+            <div className="a-list-card">
               {epdsAssessments.slice(0, 3).map((assessment, index) =>
             <motion.button
               key={assessment.id}
               onClick={() => setShowResult(assessment)}
-              className="w-full bg-card rounded-2xl p-4 shadow-sm border border-border/50 flex items-center justify-between hover:shadow-md transition-shadow"
+              className="a-list-row w-full text-left"
+              style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}>
               
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
-                      <Brain className="w-5 h-5 text-teal-600" />
-                    </div>
-                    <div className="text-left">
-                      <p className="font-medium text-foreground">
-                        {format(new Date(assessment.completed_at), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
-                      </p>
-                      <p className="text-xs text-muted-foreground">Bal: {assessment.total_score}/30</p>
-                    </div>
+                  <span className="a-list-icon" style={{ background: 'var(--a-green-1)' }}>
+                    <Brain size={17} strokeWidth={2.2} style={{ color: 'var(--a-green-ink)' }} />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="a-list-title">
+                      {format(new Date(assessment.completed_at), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
+                    </p>
+                    <p className="a-list-sub">Bal: {assessment.total_score}/30</p>
                   </div>
-                  <Badge className={`${getRiskColor(assessment.risk_level)} border`}>
+                  <span className="a-rank-tag" style={{ margin: 0, background: getRiskStyle(assessment.risk_level).bg, color: getRiskStyle(assessment.risk_level).ink }}>
                     {getRiskLabel(assessment.risk_level)}
-                  </Badge>
+                  </span>
                 </motion.button>
             )}
             </div>
@@ -518,25 +511,28 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}>
           
-            <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
-              <Phone className="w-5 h-5 text-red-500" />
-              {tr("mentalhealthtracker_tecili_yardim_283100", "T\u0259cili Yard\u0131m")}
-            </h3>
+            <div className="a-section-head">
+              <h3 className="a-section-title a-heading" style={{ fontSize: 15 }}>
+                {tr("mentalhealthtracker_tecili_yardim_283100", "T\u0259cili Yard\u0131m")}
+              </h3>
+              <Phone size={15} style={{ color: 'var(--a-pink-2)' }} />
+            </div>
             <div className="space-y-2">
               {emergencyResources.map((resource) =>
-            <div key={resource.id} className="bg-red-50 dark:bg-red-900/20 rounded-2xl p-4 border border-red-200 dark:border-red-800">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-bold text-red-700 dark:text-red-300">{resource.name}</p>
-                      <p className="text-xs text-red-600 dark:text-red-400">{resource.description}</p>
+            <div key={resource.id} className="rounded-2xl p-4" style={{ background: 'var(--a-alert-bg)' }}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-bold" style={{ margin: 0, color: 'var(--a-alert-ink)' }}>{resource.name}</p>
+                      <p className="text-xs" style={{ margin: 0, color: 'var(--a-alert-soft)' }}>{resource.description}</p>
                     </div>
                     {resource.phone &&
-                <Button size="sm" className="bg-gradient-to-r from-red-500 to-rose-600 border-0" asChild>
-                        <a href={`tel:${resource.phone}`}>
-                          <Phone className="w-4 h-4 mr-1" />
-                          {resource.phone}
-                        </a>
-                      </Button>
+                <a
+                  href={`tel:${resource.phone}`}
+                  className="a-cta-btn flex-shrink-0"
+                  style={{ height: 38, padding: '0 14px', fontSize: 11.5, background: 'var(--a-pink-2)', color: '#fff', textDecoration: 'none' }}>
+                        <Phone size={13} strokeWidth={2.2} />
+                        {resource.phone}
+                      </a>
                 }
                   </div>
                 </div>
@@ -552,28 +548,34 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}>
           
-            <h3 className="font-bold text-foreground mb-3">{tr("mentalhealthtracker_destek_resurslari_345241", "Dəstək Resursları")}</h3>
-            <div className="space-y-2">
+            <div className="a-section-head">
+              <h3 className="a-section-title a-heading" style={{ fontSize: 15 }}>{tr("mentalhealthtracker_destek_resurslari_345241", "Dəstək Resursları")}</h3>
+            </div>
+            <div className="space-y-2 pb-4">
               {otherResources.map((resource) =>
-            <div key={resource.id} className="bg-card rounded-2xl p-4 shadow-sm border border-border/50">
-                  <p className="font-bold text-foreground">{resource.name}</p>
-                  <p className="text-xs text-muted-foreground">{resource.description}</p>
+            <div key={resource.id} className="a-card">
+                  <p className="a-list-title" style={{ margin: 0 }}>{resource.name}</p>
+                  <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>{resource.description}</p>
                   <div className="flex gap-2 mt-3">
                     {resource.phone &&
-                <Button size="sm" variant="outline" className="rounded-xl" asChild>
-                        <a href={`tel:${resource.phone}`}>
-                          <Phone className="w-3.5 h-3.5 mr-1" />
-                          {tr("mentalhealthtracker_zeng_et_15094d", "Zəng et")}
-                        </a>
-                      </Button>
+                <a
+                  href={`tel:${resource.phone}`}
+                  className="a-btn-soft"
+                  style={{ height: 36, padding: '0 14px', fontSize: 11.5, textDecoration: 'none' }}>
+                        <Phone size={13} strokeWidth={2.2} />
+                        {tr("mentalhealthtracker_zeng_et_15094d", "Zəng et")}
+                      </a>
                 }
                     {resource.website &&
-                <Button size="sm" variant="outline" className="rounded-xl" asChild>
-                        <a href={resource.website} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-3.5 h-3.5 mr-1" />
-                          {tr("mentalhealthtracker_sayt_3c7a2d", "Sayt")}
-                        </a>
-                      </Button>
+                <a
+                  href={resource.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="a-btn-soft"
+                  style={{ height: 36, padding: '0 14px', fontSize: 11.5, textDecoration: 'none' }}>
+                        <ExternalLink size={13} strokeWidth={2.2} />
+                        {tr("mentalhealthtracker_sayt_3c7a2d", "Sayt")}
+                      </a>
                 }
                   </div>
                 </div>
@@ -585,10 +587,10 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
 
       {/* Breathing Exercise Modal */}
       <Dialog open={showBreathing} onOpenChange={setShowBreathing}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="a-scope max-w-md rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Wind className="w-5 h-5 text-cyan-500" />
+            <DialogTitle className="flex items-center gap-2 a-heading" style={{ color: 'var(--a-ink)' }}>
+              <Wind className="w-5 h-5" style={{ color: 'var(--a-blue-2)' }} />
               {tr("mentalhealthtracker_nefes_mesqi_8d98bb", "Nəfəs Məşqi")}
             </DialogTitle>
           </DialogHeader>
@@ -600,33 +602,33 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 <motion.button
                   key={i}
                   onClick={() => setSelectedExercise(ex)}
-                  className={`w-full p-4 rounded-2xl text-left transition-all flex items-center gap-3 ${
-                  selectedExercise.name === ex.name ?
-                  'bg-teal-100 dark:bg-teal-900/30 border-2 border-teal-500' :
-                  'bg-muted hover:bg-muted/80 border-2 border-transparent'}`
-                  }
+                  className="w-full p-4 rounded-2xl text-left transition-all flex items-center gap-3"
+                  style={selectedExercise.name === ex.name ?
+                  { background: 'var(--a-green-1)', border: '2px solid var(--a-green-2)', cursor: 'pointer' } :
+                  { background: 'var(--a-surface-soft)', border: '2px solid transparent', cursor: 'pointer' }}
                   whileTap={{ scale: 0.98 }}>
                   
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-teal-500 flex items-center justify-center text-2xl">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'var(--a-grad-blue)' }}>
                         {ex.emoji}
                       </div>
-                      <div className="flex-1">
-                        <p className="font-bold text-foreground">{ex.name}</p>
-                        <p className="text-xs text-muted-foreground">{ex.description}</p>
-                        <p className="text-xs mt-1 text-teal-600 dark:text-teal-400 font-medium">
+                      <div className="flex-1 min-w-0">
+                        <p className="a-list-title" style={{ margin: 0 }}>{ex.name}</p>
+                        <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>{ex.description}</p>
+                        <p className="text-xs mt-1 font-semibold" style={{ margin: '4px 0 0', color: 'var(--a-green-ink)' }}>
                           {tr("mentalhealthtracker_nefes_al_56f3c5", "Nəfəs al:")} {ex.inhale}s • Saxla: {ex.hold}s • Burax: {ex.exhale}s
                         </p>
                       </div>
                     </motion.button>
                 )}
                 </div>
-                <Button
-                className="w-full h-12 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-600 border-0"
+                <button
+                className="a-cta-btn w-full"
+                style={{ justifyContent: 'center', height: 48, background: 'var(--a-green-2)' }}
                 onClick={startBreathing}>
                 
-                  <Wind className="w-5 h-5 mr-2" />
+                  <Wind size={16} strokeWidth={2.2} />
                   {tr("mentalhealthtracker_basla_4820bc", "Başla")}
-                </Button>
+                </button>
               </> :
 
             <div className="text-center py-8">
@@ -634,7 +636,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 className="w-44 h-44 mx-auto rounded-full flex items-center justify-center shadow-xl"
                 animate={{
                   scale: breathingPhase === 'inhale' ? 1.4 : breathingPhase === 'exhale' ? 1 : 1.4,
-                  backgroundColor: breathingPhase === 'inhale' ? '#14b8a6' : breathingPhase === 'hold' ? '#0891b2' : '#10b981'
+                  backgroundColor: breathingPhase === 'inhale' ? '#63bd8b' : breathingPhase === 'hold' ? '#63acdf' : 'var(--a-peach-2)'
                 }}
                 transition={{
                   duration: breathingPhase === 'inhale' ? selectedExercise.inhale :
@@ -647,12 +649,12 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                   breathingPhase === 'hold' ? tr("mentalhealthtracker_saxla_3c7a2d", "Saxla") : tr("mentalhealthtracker_burax_3c7a2d", "Burax")}
                   </span>
                 </motion.div>
-                <p className="mt-8 text-xl font-bold text-foreground">
+                <p className="mt-8 text-xl font-bold" style={{ color: 'var(--a-ink)' }}>
                   {tr("mentalhealthtracker_dovre_a52cde", "Dövrə:")} {breathingCount + 1} / 4
                 </p>
-                <Button variant="outline" className="mt-4 rounded-xl" onClick={() => setBreathingPhase('idle')}>
+                <button className="a-btn-soft mt-4" style={{ height: 40, padding: '0 18px' }} onClick={() => setBreathingPhase('idle')}>
                   {tr("mentalhealthtracker_dayandir_b2ea06", "Dayandır")}
-                </Button>
+                </button>
               </div>
             }
           </div>
@@ -661,10 +663,10 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
 
       {/* EPDS Quiz Modal */}
       <Dialog open={showEPDS} onOpenChange={setShowEPDS}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+        <DialogContent className="a-scope max-w-md max-h-[85vh] overflow-y-auto rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Brain className="w-5 h-5 text-teal-500" />
+            <DialogTitle className="flex items-center gap-2 a-heading" style={{ color: 'var(--a-ink)' }}>
+              <Brain className="w-5 h-5" style={{ color: 'var(--a-green-2)' }} />
               {tr("mentalhealthtracker_epds_sorgusu_564f52", "EPDS Sorğusu")}
             </DialogTitle>
           </DialogHeader>
@@ -673,13 +675,12 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
               {EPDS_QUESTIONS.map((_, i) =>
               <div
                 key={i}
-                className={`h-1.5 flex-1 rounded-full transition-all ${
-                i <= currentQuestion ? 'bg-gradient-to-r from-teal-500 to-cyan-500' : 'bg-muted'}`
-                } />
+                className="h-1.5 flex-1 rounded-full transition-all"
+                style={{ background: i <= currentQuestion ? 'var(--a-green-2)' : 'var(--a-line-strong)' }} />
 
               )}
             </div>
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="a-list-sub text-center" style={{ margin: 0 }}>
               Sual {currentQuestion + 1} / {EPDS_QUESTIONS.length}
             </p>
             
@@ -691,7 +692,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}>
                 
-                  <p className="font-bold mb-4 text-lg text-foreground">{EPDS_QUESTIONS[currentQuestion].question}</p>
+                  <p className="font-bold mb-4 text-lg a-heading" style={{ color: 'var(--a-ink)' }}>{EPDS_QUESTIONS[currentQuestion].question}</p>
                   <div className="space-y-2">
                     {EPDS_QUESTIONS[currentQuestion].options.map((option) => {
                     const isSelected = epdsAnswers[EPDS_QUESTIONS[currentQuestion].id] === option.value;
@@ -699,20 +700,19 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                       <motion.button
                         key={option.value}
                         type="button"
-                        className={`w-full flex items-center space-x-3 p-4 rounded-2xl transition-all text-left border-2
-                            ${isSelected ?
-                        'bg-teal-100 dark:bg-teal-900/30 border-teal-500' :
-                        'bg-muted/50 hover:bg-muted border-transparent'}`
-                        }
+                        className="w-full flex items-center space-x-3 p-4 rounded-2xl transition-all text-left"
+                        style={isSelected ?
+                        { background: 'var(--a-green-1)', border: '2px solid var(--a-green-2)', cursor: 'pointer' } :
+                        { background: 'var(--a-surface-soft)', border: '2px solid transparent', cursor: 'pointer' }}
                         onClick={() => handleEPDSAnswer(EPDS_QUESTIONS[currentQuestion].id, option.value)}
                         whileTap={{ scale: 0.98 }}>
                         
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        isSelected ? 'border-teal-500 bg-teal-500' : 'border-muted-foreground/30'}`
-                        }>
+                          <div
+                          className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ border: isSelected ? '2px solid var(--a-green-2)' : '2px solid var(--a-line-strong)', background: isSelected ? 'var(--a-green-2)' : 'transparent' }}>
                             {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
                           </div>
-                          <span className="flex-1 font-medium">{option.label}</span>
+                          <span className="flex-1 font-medium text-sm" style={{ color: 'var(--a-ink)' }}>{option.label}</span>
                         </motion.button>);
 
                   })}
@@ -722,33 +722,35 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
             </AnimatePresence>
 
             <div className="flex gap-2 pt-4">
-              <Button
-                variant="outline"
-                className="rounded-xl"
+              <button
+                className="a-btn-soft"
+                style={{ height: 44, padding: '0 16px', opacity: currentQuestion === 0 ? 0.45 : 1 }}
                 onClick={goToPrevQuestion}
                 disabled={currentQuestion === 0}>
                 
-                <ChevronLeft className="w-4 h-4 mr-1" />
+                <ChevronLeft size={14} strokeWidth={2.2} />
                 {tr("common_back", "Geri")}
-              </Button>
+              </button>
               
               {currentQuestion < EPDS_QUESTIONS.length - 1 ?
-              <Button
-                className="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 border-0"
+              <button
+                className="a-cta-btn flex-1"
+                style={{ justifyContent: 'center', height: 44, background: 'var(--a-green-2)', opacity: epdsAnswers[EPDS_QUESTIONS[currentQuestion].id] === undefined ? 0.5 : 1 }}
                 onClick={goToNextQuestion}
                 disabled={epdsAnswers[EPDS_QUESTIONS[currentQuestion].id] === undefined}>
                   {tr("mentalhealthtracker_novbeti_6e8661", "Növbəti")}
                   
-                <ChevronRight className="w-4 h-4 ml-1" />
-                </Button> :
+                <ChevronRight size={14} strokeWidth={2.2} />
+                </button> :
 
-              <Button
-                className="flex-1 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-600 border-0"
+              <button
+                className="a-cta-btn flex-1"
+                style={{ justifyContent: 'center', height: 44, background: 'var(--a-green-2)', opacity: submitEPDS.isPending || Object.keys(epdsAnswers).length < EPDS_QUESTIONS.length ? 0.5 : 1 }}
                 onClick={handleSubmitEPDS}
                 disabled={submitEPDS.isPending || Object.keys(epdsAnswers).length < EPDS_QUESTIONS.length}>
                   {tr("mentalhealthtracker_neticeni_gor_d2fef0", "Nəticəni Gör")}
                 
-              </Button>
+              </button>
               }
             </div>
           </div>
@@ -757,42 +759,47 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
 
       {/* Result Modal */}
       <Dialog open={!!showResult} onOpenChange={() => setShowResult(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="a-scope max-w-md rounded-[26px]" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
           {showResult &&
           <>
               <DialogHeader>
-                <DialogTitle className="text-center">{tr("mentalhealthtracker_neticeniz_d14591", "Nəticəniz")}</DialogTitle>
+                <DialogTitle className="text-center a-heading" style={{ color: 'var(--a-ink)' }}>{tr("mentalhealthtracker_neticeniz_d14591", "Nəticəniz")}</DialogTitle>
               </DialogHeader>
               <div className="space-y-6 text-center">
                 <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className={`inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-lg font-bold ${getRiskColor(showResult.risk_level)} border`}>
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl text-lg font-bold"
+                style={{ background: getRiskStyle(showResult.risk_level).bg, color: getRiskStyle(showResult.risk_level).ink }}>
                 
                   {showResult.risk_level === 'low' ? <CheckCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
                   {getRiskLabel(showResult.risk_level)}
                 </motion.div>
                 
                 <div>
-                  <p className="text-6xl font-black text-foreground">{showResult.total_score}</p>
-                  <p className="text-muted-foreground">/ 30 bal</p>
+                  <p className="a-heading" style={{ margin: 0, fontSize: 52, color: 'var(--a-ink)' }}>{showResult.total_score}</p>
+                  <p style={{ margin: 0, color: 'var(--a-ink-soft)' }}>/ 30 bal</p>
                 </div>
 
-                <p className="text-sm bg-muted p-4 rounded-2xl">{showResult.recommendation}</p>
+                <p className="text-sm p-4 rounded-2xl" style={{ margin: 0, background: 'var(--a-surface-soft)', color: 'var(--a-body-text)' }}>{showResult.recommendation}</p>
 
                 {showResult.risk_level === 'high' && emergencyResources.length > 0 &&
-              <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl border border-red-200 dark:border-red-800">
-                    <p className="text-sm font-bold text-red-700 dark:text-red-300 mb-3">
+              <div className="p-4 rounded-2xl" style={{ background: 'var(--a-alert-bg)' }}>
+                    <p className="text-sm font-bold mb-3" style={{ margin: '0 0 12px', color: 'var(--a-alert-ink)' }}>
                       {tr("mentalhealthtracker_zehmet_olmasa_mutexessisle_ela_07b456", "🆘 Zəhmət olmasa mütəxəssislə əlaqə saxlayın:")}
                     </p>
-                    {emergencyResources.map((r) =>
-                <Button key={r.id} className="w-full bg-gradient-to-r from-red-500 to-rose-600 border-0" asChild>
-                        <a href={`tel:${r.phone}`}>
-                          <Phone className="w-4 h-4 mr-2" />
+                    <div className="space-y-2">
+                      {emergencyResources.map((r) =>
+                  <a
+                    key={r.id}
+                    href={`tel:${r.phone}`}
+                    className="a-cta-btn w-full"
+                    style={{ justifyContent: 'center', height: 44, background: 'var(--a-pink-2)', color: '#fff', textDecoration: 'none' }}>
+                          <Phone size={15} strokeWidth={2.2} />
                           {r.name}: {r.phone}
                         </a>
-                      </Button>
-                )}
+                  )}
+                    </div>
                   </div>
               }
               </div>
@@ -800,7 +807,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           }
         </DialogContent>
       </Dialog>
-    </div>);
+    </ToolPage>);
 
 };
 

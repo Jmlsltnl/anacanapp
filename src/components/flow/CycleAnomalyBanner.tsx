@@ -37,7 +37,7 @@ const CycleAnomalyBanner = () => {
   if (anomalies.length === 0) return null;
 
   return (
-    <div className="space-y-2">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
       {anomalies.map((a, i) => {
         const isWarn = a.severity === 'warn';
         const Icon = isWarn ? AlertTriangle : Info;
@@ -46,23 +46,15 @@ const CycleAnomalyBanner = () => {
             key={i}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`rounded-2xl p-3 border ${
-            isWarn ?
-            'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800' :
-            'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'}`
-            }>
+            className="a-card">
             
-            <div className="flex items-start gap-2">
-              <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isWarn ? 'text-amber-600' : 'text-blue-600'}`} />
-              <div className="flex-1">
-                <p className={`text-sm font-semibold ${isWarn ? 'text-amber-900 dark:text-amber-200' : 'text-blue-900 dark:text-blue-200'}`}>
-                  {a.title}
-                </p>
-                <p className={`text-xs mt-0.5 ${isWarn ? 'text-amber-800 dark:text-amber-300' : 'text-blue-800 dark:text-blue-300'}`}>
-                  {a.message}
-                </p>
-              </div>
+            <div className="a-list-row" style={{ padding: 0 }}>
+              <span className="a-list-icon" style={isWarn ? { background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)' } : { background: 'var(--a-blue-1)', color: 'var(--a-blue-ink)' }}>
+                <Icon size={16} strokeWidth={2} />
+              </span>
+              <p className="a-list-title">{a.title}</p>
             </div>
+            <p style={{ margin: '10px 0 0', fontSize: 12, lineHeight: 1.55, color: 'var(--a-ink-soft)' }}>{a.message}</p>
           </motion.div>);
 
       })}

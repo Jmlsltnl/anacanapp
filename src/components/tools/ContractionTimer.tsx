@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, forwardRef } from 'react';
 import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Play, Square, Timer, AlertCircle, Trash2 } from 'lucide-react';
+import { Play, Square, AlertCircle, Trash2 } from 'lucide-react';
 import { useContractions } from '@/hooks/useContractions';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { hapticFeedback } from '@/lib/native';
 import { formatDateAz, formatTimeAz } from '@/lib/date-utils';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 
 interface ContractionTimerProps {
   onBack: () => void;
@@ -69,184 +70,169 @@ const ContractionTimer = forwardRef<HTMLDivElement, ContractionTimerProps>(({ on
   const stats = getStats();
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Minimalist Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Timer className="w-5 h-5 text-primary" />
-                {tr("contractiontimer_sanci_olcen_67d681", "Sancı Ölçən")}
-              </h1>
-            </div>
-            {contractions.length > 0 &&
-            <motion.button
-              onClick={clearAll}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-                <Trash2 className="w-5 h-5 text-foreground" />
-              </motion.button>
-            }
-          </div>
-        </div>
-      </div>
-
-      <div className="px-3 pt-2">
-        {/* 5-1-1 Alert */}
-        <AnimatePresence>
-          {stats.is511 &&
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-red-100 dark:bg-red-950/50 border-2 border-red-200 dark:border-red-800 rounded-xl p-2.5 mb-2 flex items-center gap-2">
-            
-              <div className="w-8 h-8 rounded-lg bg-red-500 flex items-center justify-center">
-                <AlertCircle className="w-4 h-4 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-red-700 dark:text-red-400 text-xs">{tr("contractiontimer_xestexanaya_getme_vaxti_780dba", "Xəstəxanaya getmə vaxtı!")}</h3>
-                <p className="text-[10px] text-red-600 dark:text-red-300">{tr("contractiontimer_5_1_1_qaydasi_sancilar_5_deqiqeden_bir_1_c1c5ce", "5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir")}</p>
-              </div>
-            </motion.div>
-          }
-        </AnimatePresence>
-
-        {/* Main Timer Card */}
-        <motion.div
-          className="bg-card rounded-2xl p-3 shadow-elevated border border-border/50 mb-3"
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}>
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={tr("contractiontimer_5_1_1_qaydasi_a3c5d3", "5-1-1 Qaydas\u0131")}
+        title={tr("contractiontimer_sanci_olcen_67d681", "Sancı Ölçən")}
+        actions={contractions.length > 0 &&
+        <motion.button
+          onClick={clearAll}
+          className="a-icon-btn"
+          style={{ background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)', border: 'none' }}
+          whileTap={{ scale: 0.9 }}>
           
-          {/* Timer Display */}
-          <div className="text-center mb-4">
-            <p className="text-muted-foreground text-xs font-medium mb-0.5">
-              {isActive ? tr("contractiontimer_sanci_muddeti_0d04f4", "Sanc\u0131 m\xFCdd\u0259ti") : tr("contractiontimer_hazir_3ae38e", "Haz\u0131r")}
+            <Trash2 size={15} strokeWidth={2} />
+          </motion.button>
+        } />
+
+      {/* 5-1-1 Alert */}
+      <AnimatePresence>
+        {stats.is511 &&
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="a-alert-card mb-3">
+          
+            <span className="a-alert-eyebrow">
+              <AlertCircle size={13} strokeWidth={2.3} /> {tr("contractiontimer_xestexanaya_getme_vaxti_780dba", "Xəstəxanaya getmə vaxtı!")}
+            </span>
+            <p className="a-alert-text" style={{ marginBottom: 0 }}>
+              {tr("contractiontimer_5_1_1_qaydasi_sancilar_5_deqiqeden_bir_1_c1c5ce", "5-1-1 qaydası: Sancılar 5 dəqiqədən bir, 1 dəqiqə davam edir")}
             </p>
-            <motion.p
-              className={`text-5xl font-black font-mono ${isActive ? 'text-primary' : 'text-foreground'}`}
-              animate={isActive ? { scale: [1, 1.02, 1] } : {}}
-              transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}>
-              
-              {formatTime(currentDuration)}
-            </motion.p>
-          </div>
-
-          {/* Control Button */}
-          {!isActive ?
-          <motion.button
-            onClick={handleStart}
-            className="w-full h-12 rounded-xl gradient-primary text-white font-bold flex items-center justify-center gap-2 shadow-button"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}>
-            
-              <Play className="w-4 h-4" />
-              {tr("contractiontimer_sanci_basladi_d99102", "Sanc\u0131 ba\u015Flad\u0131")}
-            </motion.button> :
-
-          <motion.button
-            onClick={handleStop}
-            className="w-full h-12 rounded-xl bg-red-500 text-white font-bold flex items-center justify-center gap-2 shadow-lg"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            animate={{ scale: [1, 1.02, 1] }}
-            transition={{ duration: 0.5, repeat: Infinity }}>
-            
-              <Square className="w-4 h-4" />
-              {tr("contractiontimer_sanci_bitdi_c1b3e1", "Sanc\u0131 bitdi")}
-            </motion.button>
-          }
-        </motion.div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <motion.div
-            className="bg-card rounded-xl p-3 shadow-card border border-border/50"
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}>
-            
-            <p className="text-xs text-muted-foreground mb-0.5">{tr("contractiontimer_ort_muddet_b77c4e", "Ort. Müddət")}</p>
-            <p className="text-xl font-black text-foreground">{formatTime(stats.avgDuration)}</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">{tr("contractiontimer_hedef_1_deq_6ce02e", "Hədəf: ~1 dəq")}</p>
           </motion.div>
+        }
+      </AnimatePresence>
 
-          <motion.div
-            className="bg-card rounded-xl p-3 shadow-card border border-border/50"
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}>
+      {/* Main Timer Card */}
+      <motion.div
+        className="a-card a-fade-in"
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}>
+        
+        {/* Timer Display */}
+        <div className="text-center mb-4">
+          <p className="a-today-info-eyebrow" style={{ marginBottom: 2 }}>
+            {isActive ? tr("contractiontimer_sanci_muddeti_0d04f4", "Sanc\u0131 m\xFCdd\u0259ti") : tr("contractiontimer_hazir_3ae38e", "Haz\u0131r")}
+          </p>
+          <motion.p
+            className="font-mono a-heading"
+            style={{ margin: 0, fontSize: 44, fontWeight: 800, color: isActive ? 'var(--a-peach-2)' : 'var(--a-ink)' }}
+            animate={isActive ? { scale: [1, 1.02, 1] } : {}}
+            transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}>
             
-            <p className="text-xs text-muted-foreground mb-0.5">{tr("contractiontimer_ort_araliq_711af3", "Ort. Aralıq")}</p>
-            <p className="text-xl font-black text-foreground">{formatTime(stats.avgInterval)}</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">{tr("contractiontimer_hedef_5_deq_b2dc81", "Hədəf: ~5 dəq")}</p>
-          </motion.div>
+            {formatTime(currentDuration)}
+          </motion.p>
         </div>
 
-        {/* 5-1-1 Rule Info */}
-        <motion.div
-          className="bg-primary/5 dark:bg-primary/10 rounded-xl p-3 mb-4 border border-primary/20"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3 }}>
+        {/* Control Button */}
+        {!isActive ?
+        <motion.button
+          onClick={handleStart}
+          className="a-cta-btn w-full"
+          style={{ justifyContent: 'center', height: 48 }}
+          whileTap={{ scale: 0.98 }}>
           
-          <h3 className="font-bold text-foreground mb-1.5 flex items-center gap-2 text-sm">
-            <Timer className="w-4 h-4 text-primary" />
-            {tr("contractiontimer_5_1_1_qaydasi_a3c5d3", "5-1-1 Qaydas\u0131")}
-          </h3>
-          <p className="text-xs text-muted-foreground">
-            {tr("contractiontimer_sancilar_9b16c7", "Sancılar")} <strong className="text-foreground">{tr("contractiontimer_5_deqiqe_ad05bb", "5 dəqiqə")}</strong> {tr("contractiontimer_araliginda_24710a", "aralığında,")} <strong className="text-foreground">{tr("contractiontimer_1_deqiqe_a187ac", "1 dəqiqə")}</strong> {tr("contractiontimer_davam_ederse_ve_bu_7029f5", "davam edərsə və bu")} <strong className="text-foreground">{tr("contractiontimer_1_saat_hardcoded", "1 saat")}</strong> {tr("contractiontimer_boyunca_davam_ederse_xestexana_2b067a", "boyunca davam edərsə, xəstəxanaya getmə vaxtıdır.")}
-          </p>
+            <Play size={15} strokeWidth={2.2} />
+            {tr("contractiontimer_sanci_basladi_d99102", "Sanc\u0131 ba\u015Flad\u0131")}
+          </motion.button> :
+
+        <motion.button
+          onClick={handleStop}
+          className="a-cta-btn w-full"
+          style={{ justifyContent: 'center', height: 48, background: 'var(--a-pink-2)' }}
+          whileTap={{ scale: 0.98 }}
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 0.5, repeat: Infinity }}>
+          
+            <Square size={15} strokeWidth={2.2} />
+            {tr("contractiontimer_sanci_bitdi_c1b3e1", "Sanc\u0131 bitdi")}
+          </motion.button>
+        }
+      </motion.div>
+
+      {/* Stats */}
+      <div className="a-grid-2" style={{ marginTop: 12 }}>
+        <motion.div
+          className="a-stat-tile"
+          style={{ background: 'var(--a-blue-1)' }}
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}>
+          
+          <div>
+            <p className="a-stat-tile-label" style={{ color: 'var(--a-blue-ink)' }}>{tr("contractiontimer_ort_muddet_b77c4e", "Ort. Müddət")}</p>
+            <p className="a-stat-tile-value">{formatTime(stats.avgDuration)}</p>
+            <p className="a-stat-tile-label">{tr("contractiontimer_hedef_1_deq_6ce02e", "Hədəf: ~1 dəq")}</p>
+          </div>
         </motion.div>
 
-        {/* Contractions List */}
-        {contractions.length > 0 &&
-        <div>
-            <h3 className="font-bold text-foreground mb-3 text-sm">{tr("contractiontimer_sancilar_6f1b69", "Sanc\u0131lar (")}{contractions.length})</h3>
-            <div className="space-y-2 pb-6">
-              {contractions.slice(0, 10).map((contraction, index) =>
-            <motion.div
-              key={contraction.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-card rounded-xl p-3 shadow-card border border-border/50">
-              
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <span className="text-sm font-bold text-primary">{contractions.length - index}</span>
-                      </div>
-                      <div>
-                        <p className="font-bold text-foreground text-sm">{formatTime(contraction.duration_seconds)} {tr("contractiontimer_muddet_a5b45d", "m\xFCdd\u0259t")}</p>
-                        <p className="text-[10px] text-muted-foreground">
-                          {formatDateAz(contraction.start_time)}, {formatTimeAz(contraction.start_time)}
-                        </p>
-                      </div>
-                    </div>
-                    {contraction.interval_seconds &&
-                      <div className="text-right">
-                        <p className="text-xs font-bold text-muted-foreground">{formatTime(contraction.interval_seconds)}</p>
-                        <p className="text-[10px] text-muted-foreground">{tr("contractiontimer_araliq_05bea1", "aralıq")}</p>
-                      </div>
-                    }
-                  </div>
-                </motion.div>
-            )}
-            </div>
+        <motion.div
+          className="a-stat-tile"
+          style={{ background: 'var(--a-lav-1)' }}
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}>
+          
+          <div>
+            <p className="a-stat-tile-label" style={{ color: 'var(--a-lav-ink)' }}>{tr("contractiontimer_ort_araliq_711af3", "Ort. Aralıq")}</p>
+            <p className="a-stat-tile-value">{formatTime(stats.avgInterval)}</p>
+            <p className="a-stat-tile-label">{tr("contractiontimer_hedef_5_deq_b2dc81", "Hədəf: ~5 dəq")}</p>
           </div>
-        }
+        </motion.div>
       </div>
-    </div>);
+
+      {/* 5-1-1 Rule Info */}
+      <motion.div
+        className="a-today-info-tip"
+        style={{ marginTop: 12 }}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}>
+        
+        <span style={{ fontSize: 15, lineHeight: 1 }}>💡</span>
+        <span>
+          <strong>{tr("contractiontimer_5_1_1_qaydasi_a3c5d3", "5-1-1 Qaydas\u0131")}:</strong> {tr("contractiontimer_sancilar_9b16c7", "Sancılar")} <strong>{tr("contractiontimer_5_deqiqe_ad05bb", "5 dəqiqə")}</strong> {tr("contractiontimer_araliginda_24710a", "aralığında,")} <strong>{tr("contractiontimer_1_deqiqe_a187ac", "1 dəqiqə")}</strong> {tr("contractiontimer_davam_ederse_ve_bu_7029f5", "davam edərsə və bu")} <strong>{tr("contractiontimer_1_saat_hardcoded", "1 saat")}</strong> {tr("contractiontimer_boyunca_davam_ederse_xestexana_2b067a", "boyunca davam edərsə, xəstəxanaya getmə vaxtıdır.")}
+        </span>
+      </motion.div>
+
+      {/* Contractions List */}
+      {contractions.length > 0 &&
+      <section className="a-section pb-6">
+          <div className="a-section-head">
+            <h2 className="a-section-title a-heading" style={{ fontSize: 15 }}>{tr("contractiontimer_sancilar_6f1b69", "Sanc\u0131lar (")}{contractions.length})</h2>
+          </div>
+          <div className="a-list-card">
+            {contractions.slice(0, 10).map((contraction, index) =>
+          <motion.div
+            key={contraction.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: Math.min(index * 0.05, 0.3) }}
+            className="a-list-row">
+            
+                <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', fontSize: 12, fontWeight: 800, color: 'var(--a-ink-soft)' }}>
+                  #{contractions.length - index}
+                </span>
+                <div>
+                  <p className="a-list-title">{formatTime(contraction.duration_seconds)} {tr("contractiontimer_muddet_a5b45d", "m\xFCdd\u0259t")}</p>
+                  <p className="a-list-sub">
+                    {formatDateAz(contraction.start_time)}, {formatTimeAz(contraction.start_time)}
+                  </p>
+                </div>
+                {contraction.interval_seconds &&
+            <span className="a-list-trail">
+                    <p className="a-list-value font-mono">{formatTime(contraction.interval_seconds)}</p>
+                    <p className="a-list-time">{tr("contractiontimer_araliq_05bea1", "aralıq")}</p>
+                  </span>
+            }
+              </motion.div>
+          )}
+          </div>
+        </section>
+      }
+    </ToolPage>);
 
 });
 

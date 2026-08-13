@@ -1,11 +1,11 @@
 import { useState, forwardRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Check, Info, AlertTriangle, Star, ChevronDown, Package, Baby, FileText } from 'lucide-react';
+import { Check, Info, ChevronDown, Package, Baby, FileText } from 'lucide-react';
 import { useHospitalBag } from '@/hooks/useHospitalBag';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
-import { Progress } from '@/components/ui/progress';
-import { tr, mapRowsTranslation } from "@/lib/tr";
+import { ToolPage, ToolHeader, ToolLoading } from './anacan/ToolKit';
+import { tr } from "@/lib/tr";
 import { useUserStore } from '@/store/userStore';
 
 interface HospitalBagProps {
@@ -13,15 +13,16 @@ interface HospitalBagProps {
 }
 
 const categoryConfig = {
-  documents: { label: tr("hospitalbag_senedler_d60b5e", 'Sənədlər'), emoji: '📄', icon: FileText, color: 'from-amber-500 to-orange-500' },
-  mom: { label: tr("hospitalbag_ana_ucun_8f885e", 'Ana üçün'), emoji: '👩', icon: Package, color: 'from-pink-500 to-rose-500' },
-  baby: { label: tr("hospitalbag_korpe_ucun_27c058", 'Körpə üçün'), emoji: '👶', icon: Baby, color: 'from-blue-500 to-cyan-500' },
+  documents: { label: tr("hospitalbag_senedler_d60b5e", 'Sənədlər'), emoji: '📄', icon: FileText },
+  mom: { label: tr("hospitalbag_ana_ucun_8f885e", 'Ana üçün'), emoji: '👩', icon: Package },
+  baby: { label: tr("hospitalbag_korpe_ucun_27c058", 'Körpə üçün'), emoji: '👶', icon: Baby },
 };
 
+// Priority → anacan palette
 const priorityConfig = {
-  1: { label: tr("hospitalbag_cox_vacib_c4e66f", 'Çox Vacib'), color: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400', dot: '🔴' },
-  2: { label: tr("hospitalbag_priority_orta", 'Orta'), color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400', dot: '🟡' },
-  3: { label: tr("hospitalbag_i_steye_bagli_43582b", 'İstəyə bağlı'), color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400', dot: '🟢' },
+  1: { label: tr("hospitalbag_cox_vacib_c4e66f", 'Çox Vacib'), bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)', dot: '🔴' },
+  2: { label: tr("hospitalbag_priority_orta", 'Orta'), bg: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)', dot: '🟡' },
+  3: { label: tr("hospitalbag_i_steye_bagli_43582b", 'İstəyə bağlı'), bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)', dot: '🟢' },
 };
 
 const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, ref) => {
@@ -63,11 +64,7 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
   }, [activeCategory, sortedItems]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return <ToolLoading />;
   }
 
   const renderItem = (item: typeof items[0], index: number) => {
@@ -81,16 +78,15 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
         key={item.id}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.02, duration: 0.25 }}
+        transition={{ delay: Math.min(index * 0.02, 0.3), duration: 0.25 }}
         layout
-        className={`rounded-xl overflow-hidden transition-all ${
-          item.is_checked
-            ? 'bg-primary/5 border border-primary/20'
-            : 'bg-card border border-border/50'
-        }`}
+        className="rounded-2xl overflow-hidden transition-all"
+        style={item.is_checked ?
+        { background: 'var(--a-green-1)', border: '1px solid transparent' } :
+        { background: 'var(--a-surface)', border: '1px solid var(--a-line)', boxShadow: 'var(--a-card-shadow)' }}
       >
         <div 
-          className="p-3 flex items-center gap-3 cursor-pointer active:bg-muted/50 transition-colors"
+          className="p-3 flex items-center gap-3 cursor-pointer transition-colors"
           onClick={() => {
             if (hasNotes) {
               setExpandedItem(isExpanded ? null : item.item_id);
@@ -104,33 +100,34 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
               e.stopPropagation();
               toggleItem(item.item_id);
             }}
-            className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all flex-shrink-0 ${
-              item.is_checked 
-                ? 'bg-primary shadow-sm' 
-                : 'border-2 border-muted-foreground/30'
-            }`}
+            className="w-6 h-6 rounded-lg flex items-center justify-center transition-all flex-shrink-0"
+            style={item.is_checked ?
+            { background: 'var(--a-green-2)', border: 'none', cursor: 'pointer' } :
+            { background: 'none', border: '2px solid var(--a-line-strong)', cursor: 'pointer' }}
             whileTap={{ scale: 0.85 }}
             animate={item.is_checked ? { scale: [1, 1.15, 1] } : {}}
             transition={{ duration: 0.2 }}
           >
-            {item.is_checked && <Check className="w-3.5 h-3.5 text-primary-foreground" />}
+            {item.is_checked && <Check className="w-3.5 h-3.5 text-white" />}
           </motion.button>
           
           <div className="flex-1 min-w-0">
-            <span className={`font-medium text-sm transition-all block ${
-              item.is_checked ? 'text-muted-foreground line-through' : 'text-foreground'
-            }`}>
+            <span
+              className={`font-semibold text-sm transition-all block ${item.is_checked ? 'line-through' : ''}`}
+              style={{ color: item.is_checked ? 'var(--a-green-ink)' : 'var(--a-ink)' }}>
               {item.item_name}
             </span>
             {hasNotes && !isExpanded && (
-              <p className="text-xs text-muted-foreground/70 truncate mt-0.5">
+              <p className="text-xs truncate mt-0.5" style={{ margin: '2px 0 0', color: 'var(--a-ink-soft)', opacity: 0.8 }}>
                 {item.notes}
               </p>
             )}
           </div>
 
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${pConfig?.color}`}>
+            <span
+              className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+              style={{ background: item.is_checked ? 'var(--a-chip-overlay)' : pConfig?.bg, color: pConfig?.ink }}>
               {pConfig?.dot}
             </span>
             {hasNotes && (
@@ -138,7 +135,7 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
                 animate={{ rotate: isExpanded ? 180 : 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/50" />
+                <ChevronDown className="w-3.5 h-3.5" style={{ color: 'var(--a-ink-faint)' }} />
               </motion.div>
             )}
           </div>
@@ -154,9 +151,9 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
               className="overflow-hidden"
             >
               <div className="px-3 pb-3 pt-0">
-                <div className="flex items-start gap-2 bg-muted/50 rounded-lg p-2.5">
-                  <Info className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-muted-foreground leading-relaxed">
+                <div className="flex items-start gap-2 rounded-xl p-2.5" style={{ background: item.is_checked ? 'rgba(255,255,255,0.5)' : 'var(--a-surface-soft)' }}>
+                  <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: 'var(--a-peach-2)' }} />
+                  <p className="text-xs leading-relaxed" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>
                     {item.notes}
                   </p>
                 </div>
@@ -175,10 +172,12 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
 
     return (
       <div key={catKey} className="mb-4">
-        <div className="flex items-center gap-2 mb-2 px-1">
-          <span className="text-base">{config.emoji}</span>
-          <span className="text-sm font-semibold text-foreground">{config.label}</span>
-          <span className="text-xs text-muted-foreground ml-auto">
+        <div className="a-section-head">
+          <span className="a-section-title a-heading" style={{ fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span className="text-base">{config.emoji}</span>
+            {config.label}
+          </span>
+          <span className="a-section-link">
             {checkedInCat}/{catItems.length}
           </span>
         </div>
@@ -190,36 +189,33 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="flex items-center gap-3 px-4 py-3">
-          <motion.button
-            onClick={onBack}
-            className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold">{tr("hospitalbag_xestexana_cantasi_045078", "Xəstəxana Çantası")}</h1>
-          </div>
-          <div className="text-right">
-            <span className="text-sm font-bold text-primary">{checkedCount}/{totalCount}</span>
-          </div>
-        </div>
+    <div ref={ref}>
+      <ToolPage>
+        <ToolHeader
+          onBack={onBack}
+          eyebrow={tr("hospitalbag_36_ci_hefteden_hazir_olmalidir_7990d9", "36-cı həftədən hazır olmalıdır")}
+          title={tr("hospitalbag_xestexana_cantasi_045078", "Xəstəxana Çantası")}
+          actions={
+          <span className="a-rank-tag" style={{ margin: 0, background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+              {checkedCount}/{totalCount}
+            </span>
+          } />
 
         {/* Progress */}
-        <div className="px-4 pb-3">
-          <Progress value={progress} className="h-2" />
-          <div className="flex justify-between mt-1">
-            <span className="text-[10px] text-muted-foreground">{tr("hospitalbag_36_ci_hefteden_hazir_olmalidir_7990d9", "36-cı həftədən hazır olmalıdır")}</span>
-            <span className="text-[10px] font-medium text-primary">{progress.toFixed(0)}%</span>
+        <div className="a-card mb-3" style={{ padding: '14px 16px' }}>
+          <div className="a-pbar" style={{ marginTop: 0 }}>
+            <div className="a-pbar-track">
+              <div className="a-pbar-fill" style={{ width: `${Math.max(2, Math.min(100, progress))}%` }} />
+            </div>
+          </div>
+          <div className="flex justify-between mt-2">
+            <span className="text-[10px] font-semibold" style={{ color: 'var(--a-ink-soft)' }}>{tr("hospitalbag_36_ci_hefteden_hazir_olmalidir_7990d9", "36-cı həftədən hazır olmalıdır")}</span>
+            <span className="text-[10px] font-bold" style={{ color: 'var(--a-accent-ink)' }}>{progress.toFixed(0)}%</span>
           </div>
         </div>
 
         {/* Category Tabs */}
-        <div className="flex gap-1.5 px-4 pb-3 overflow-x-auto hide-scrollbar">
+        <div className="flex gap-1.5 pb-3 overflow-x-auto hide-scrollbar">
           {categories.map((cat) => {
             const catCount = cat.id === 'all' 
               ? items.length 
@@ -232,11 +228,10 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                  activeCategory === cat.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground'
-                }`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all"
+                style={activeCategory === cat.id ?
+                { background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', border: '1px solid transparent', cursor: 'pointer' } :
+                { background: 'var(--a-surface)', color: 'var(--a-ink-soft)', border: '1px solid var(--a-line)', cursor: 'pointer' }}
               >
                 <span>{cat.emoji}</span>
                 {cat.label}
@@ -245,13 +240,11 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
             );
           })}
         </div>
-      </div>
 
-      <div className="px-3 pt-3">
         {/* Priority Legend */}
         <div className="flex gap-3 mb-3 px-1">
           {Object.entries(priorityConfig).map(([key, config]) => (
-            <span key={key} className="text-[10px] text-muted-foreground flex items-center gap-1">
+            <span key={key} className="text-[10px] flex items-center gap-1 font-semibold" style={{ color: 'var(--a-on-bg-soft)' }}>
               {config.dot} {config.label}
             </span>
           ))}
@@ -273,14 +266,15 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 text-center text-white mt-4"
+            className="rounded-[26px] p-4 text-center mt-4"
+            style={{ background: 'var(--a-grad-green)', boxShadow: 'var(--a-card-shadow)' }}
           >
             <div className="text-4xl mb-2">🎉</div>
-            <h3 className="text-lg font-bold">{tr("hospitalbag_tebrik_edirik_ba71c0", "Təbrik edirik!")}</h3>
-            <p className="text-white/80 mt-1 text-sm">{tr("hospitalbag_cantaniz_hazirdir_xosbext_dogus_279a30", "Çantanız hazırdır. Xoşbəxt doğuş!")}</p>
+            <h3 className="text-lg font-bold a-heading" style={{ margin: 0, color: '#14532d' }}>{tr("hospitalbag_tebrik_edirik_ba71c0", "Təbrik edirik!")}</h3>
+            <p className="mt-1 text-sm" style={{ margin: '4px 0 0', color: '#14532d', opacity: 0.85 }}>{tr("hospitalbag_cantaniz_hazirdir_xosbext_dogus_279a30", "Çantanız hazırdır. Xoşbəxt doğuş!")}</p>
           </motion.div>
         )}
-      </div>
+      </ToolPage>
     </div>
   );
 });

@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, Star, Share2, Sparkles, Users, Moon, Sun, Compass, Flame, Droplets, Wind, Mountain, Clock, Calendar as CalendarIcon, Loader2, Heart, Zap, Shield, Book, Palette, Hash, Check, Baby, User } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
+import { ArrowLeft, ArrowRight, Star, Share2, Sparkles, Users, Moon, Sun, Compass, Flame, Droplets, Wind, Mountain, Clock, Calendar as CalendarIcon, Loader2, Heart, Zap, Book, Palette, Hash, Check, Baby, User } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { DatePickerWheel } from '@/components/ui/date-picker-wheel';
+import { useSubscription } from '@/hooks/useSubscription';
+import PremiumModal from '@/components/PremiumModal';
 import { useZodiacSigns, useSaveHoroscopeReading, ZodiacSign } from '@/hooks/useHoroscope';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,9 +13,9 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { cn } from '@/lib/utils';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr, getPersistedLanguage } from "@/lib/tr";
-import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 
 interface HoroscopeCompatibilityProps {
   onBack: () => void;
@@ -68,13 +66,6 @@ const ELEMENT_ICONS: Record<string, any> = {
   earth: Mountain
 };
 
-const ELEMENT_COLORS: Record<string, string> = {
-  fire: 'from-red-500 to-orange-500',
-  water: 'from-blue-500 to-cyan-500',
-  air: 'from-purple-500 to-pink-500',
-  earth: 'from-green-600 to-emerald-500'
-};
-
 const ELEMENT_NAMES: Record<string, string> = {
   fire: tr("horoscope_element_fire", "Od"),
   water: tr("horoscope_element_water", "Su"),
@@ -86,8 +77,8 @@ const LOADING_STEPS = [
 { icon: Star, text: tr("horoscope_reading_stars", "Ulduzlar oxunur..."), color: 'text-yellow-500' },
 { icon: Moon, text: tr("horoscopecompatibility_ay_fazasi_hesablanir_63cb3c", "Ay fazası hesablanır..."), color: 'text-blue-400' },
 { icon: Sun, text: tr("horoscopecompatibility_gunes_movqeyi_teyin_edilir_bfba89", "Günəş mövqeyi təyin edilir..."), color: 'text-orange-500' },
-{ icon: Compass, text: tr("horoscopecompatibility_yukselen_burc_axtarilir_f2408d", "Yüksələn bürc axtarılır..."), color: 'text-purple-500' },
-{ icon: Heart, text: tr("horoscopecompatibility_uygunluq_analiz_edilir_bca7bd", "Uyğunluq analiz edilir..."), color: 'text-pink-500' },
+{ icon: Compass, text: tr("horoscopecompatibility_yukselen_burc_axtarilir_f2408d", "Yüksələn bürc axtarılır..."), color: 'text-purple-400' },
+{ icon: Heart, text: tr("horoscopecompatibility_uygunluq_analiz_edilir_bca7bd", "Uyğunluq analiz edilir..."), color: 'text-pink-400' },
 { icon: Sparkles, text: tr("horoscopecompatibility_kosmik_tovsiyeler_hazirlanir_25cfbf", "Kosmik tövsiyələr hazırlanır..."), color: 'text-cyan-400' }];
 
 
@@ -100,6 +91,14 @@ const STEPS = [
 { id: 2, title: tr("common_ata", 'Ata'), icon: User, emoji: '👨' },
 { id: 3, title: tr("horoscopecompatibility_korpe_fa2b51", 'Körpə'), icon: Baby, emoji: '👶' }];
 
+
+// Score → anacan palette
+const getScoreStyle = (score: number) => {
+  if (score >= 80) return { grad: 'var(--a-grad-green)', ink: '#14532d' };
+  if (score >= 60) return { grad: 'var(--a-grad-yellow)', ink: 'var(--a-warn-ink)' };
+  if (score >= 40) return { grad: 'var(--a-grad-peach)', ink: 'var(--a-accent-ink)' };
+  return { grad: 'var(--a-grad-pink)', ink: 'var(--a-alert-ink)' };
+};
 
 const HoroscopeCompatibility = ({ onBack }: HoroscopeCompatibilityProps) => {
   useScreenAnalytics('HoroscopeCompatibility', 'Tools');
@@ -131,6 +130,8 @@ const HoroscopeCompatibility = ({ onBack }: HoroscopeCompatibilityProps) => {
 
   const { data: zodiacSigns = [] } = useZodiacSigns();
   const saveReading = useSaveHoroscopeReading();
+  const { checkAndConsume } = useSubscription();
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const getZodiacForDate = (date: Date | undefined) => {
     if (!date || zodiacSigns.length === 0) return null;
@@ -146,6 +147,13 @@ const HoroscopeCompatibility = ({ onBack }: HoroscopeCompatibilityProps) => {
   const handleAnalyze = async () => {
     if (!momData.birthDate) {
       toast.error(tr("horoscopecompatibility_ananin_dogum_tarixini_daxil_ed_d186ab", "Anan\u0131n do\u011Fum tarixini daxil edin"));
+      return;
+    }
+
+    // Gündəlik pulsuz limit (premium → limitsiz)
+    const { allowed } = await checkAndConsume('horoscope');
+    if (!allowed) {
+      setShowPremiumModal(true);
       return;
     }
 
@@ -222,13 +230,6 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
     await nativeShare({ text });
   };
 
-  const getScoreGradient = (score: number) => {
-    if (score >= 80) return 'from-green-500 to-emerald-500';
-    if (score >= 60) return 'from-amber-500 to-yellow-500';
-    if (score >= 40) return 'from-orange-500 to-red-400';
-    return 'from-red-500 to-red-600';
-  };
-
   const getScoreMessage = (score: number) => {
     if (score >= 90) return tr("horoscopecompatibility_mukemmel_kosmik_harmoniya_d98359", "\uD83D\uDCAB M\xFCk\u0259mm\u0259l kosmik harmoniya!");
     if (score >= 80) return tr("horoscopecompatibility_ela_uygunluq_3b4329", "\uD83C\uDF1F \u018Fla uy\u011Funluq!");
@@ -288,20 +289,20 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
             exit={{ opacity: 0, x: -20 }}
             className="space-y-4">
             
-            <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/50 border">
+            <div className="a-card flex items-center justify-between" style={{ padding: '14px 16px' }}>
               <div className="flex items-center gap-3">
                 <span className="text-2xl">🤰</span>
-                <span className="font-medium">{tr("horoscopecompatibility_korpe_hele_dogulmayib_b729e6", "Körpə hələ doğulmayıb")}</span>
+                <span className="a-list-title" style={{ margin: 0 }}>{tr("horoscopecompatibility_korpe_hele_dogulmayib_b729e6", "Körpə hələ doğulmayıb")}</span>
               </div>
               <Switch checked={isBabyExpected} onCheckedChange={setIsBabyExpected} />
             </div>
 
             {isBabyExpected ?
-            <div className="space-y-3 p-4 rounded-2xl bg-gradient-to-br from-pink-500/10 to-purple-500/10 border border-pink-500/20">
-                <Label className="text-base font-semibold flex items-center gap-2">
+            <div className="a-card space-y-3" style={{ background: 'var(--a-pink-1)', border: 'none' }}>
+                <p className="font-bold flex items-center gap-2" style={{ margin: 0, color: 'var(--a-berry-ink)' }}>
                   <CalendarIcon className="h-4 w-4" />
                   {tr("horoscopecompatibility_gozlenilen_dogum_tarixi_a01877", "G\xF6zl\u0259nil\u0259n Do\u011Fum Tarixi")}
-                </Label>
+                </p>
                 <DatePickerWheel
                 value={expectedDueDate}
                 onChange={setExpectedDueDate}
@@ -330,69 +331,81 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
 
   // If we have results, show the results view
   if (analysisResult) {
+    const scoreStyle = getScoreStyle(analysisResult.analysis.overallScore);
     return (
-      <div className="min-h-screen bg-background pb-24">
+      <ToolPage>
         {/* Result Header */}
-        <div className={`bg-gradient-to-br ${getScoreGradient(analysisResult.analysis.overallScore)} text-white px-6 pb-4`}>
-          <button onClick={() => setAnalysisResult(null)} className="p-2 hover:bg-white/20 rounded-full mb-4">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          
-          <div className="text-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', delay: 0.2 }}
-              className="text-7xl font-bold mb-2">
-              
-              {analysisResult.analysis.overallScore}%
-            </motion.div>
-            <p className="text-xl font-semibold">{getScoreMessage(analysisResult.analysis.overallScore)}</p>
-            
-            <div className="flex justify-center gap-2 mt-4 flex-wrap">
-              {analysisResult.analysis.keywords.map((keyword, i) =>
-              <motion.span
-                key={i}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 + i * 0.1 }}
-                className="bg-white/20 px-4 py-1.5 rounded-full text-sm font-medium">
-                
-                  {keyword}
-                </motion.span>
-              )}
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <motion.button onClick={() => setAnalysisResult(null)} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label="Back">
+              <ArrowLeft size={16} strokeWidth={2} />
+            </motion.button>
+            <div style={{ minWidth: 0 }}>
+              <p className="a-eyebrow">{tr("horoscopecompatibility_ulduz_fali_344189", "Ulduz Fal\u0131")}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("horoscopecompatibility_neticeniz_d14591", "Nəticəniz")}</p>
             </div>
           </div>
-        </div>
+        </header>
 
-        <div className="p-4 space-y-4">
-          <div className="rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/40 px-3 py-2">
-            <p className="text-[11px] text-purple-800 dark:text-purple-200 leading-relaxed">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="a-card text-center mb-3"
+          style={{ background: scoreStyle.grad, border: 'none', padding: '26px 18px' }}>
+          
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', delay: 0.2 }}
+            className="a-heading"
+            style={{ fontSize: 56, color: scoreStyle.ink }}>
+            
+            {analysisResult.analysis.overallScore}%
+          </motion.div>
+          <p className="text-xl font-bold a-heading" style={{ margin: 0, color: scoreStyle.ink }}>{getScoreMessage(analysisResult.analysis.overallScore)}</p>
+          
+          <div className="flex justify-center gap-2 mt-4 flex-wrap">
+            {analysisResult.analysis.keywords.map((keyword, i) =>
+            <motion.span
+              key={i}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 + i * 0.1 }}
+              className="px-4 py-1.5 rounded-full text-sm font-semibold"
+              style={{ background: 'var(--a-chip-overlay)', color: scoreStyle.ink }}>
+              
+                {keyword}
+              </motion.span>
+            )}
+          </div>
+        </motion.div>
+
+        <div className="space-y-3">
+          <div className="rounded-2xl px-3 py-2" style={{ background: 'var(--a-lav-1)' }}>
+            <p className="text-[11px] leading-relaxed" style={{ margin: 0, color: 'var(--a-lav-ink)' }}>
               ✨ {tr('horoscope_entertainment_disclaimer', 'Ulduz falı yalnız əyləncə məqsədi daşıyır. Tibbi, psixoloji və ya valideynlik qərarları üçün ixtisaslı mütəxəssisə (həkim/psixoloq) müraciət edin.')}
             </p>
           </div>
+
           {/* Birth Charts */}
+          <div className="a-card space-y-4">
+            <h3 className="a-card-title a-heading flex items-center gap-2" style={{ margin: 0 }}>
+              <Sun className="h-5 w-5" style={{ color: 'var(--a-yellow-2)' }} />
+              {tr("horoscopecompatibility_dogum_xeriteleri_c9a3ce", "Do\u011Fum X\u0259rit\u0259l\u0259ri")}
+            </h3>
+            
+            <BirthChartCard chart={analysisResult.charts.mom} label={tr("common_ana", "Ana")} emoji="👩" />
+            {analysisResult.charts.dad &&
+            <BirthChartCard chart={analysisResult.charts.dad} label={tr("common_ata", "Ata")} emoji="👨" />
+            }
+            {analysisResult.charts.baby &&
+            <BirthChartCard
+              chart={analysisResult.charts.baby}
+              label={analysisResult.charts.baby.isExpected ? tr("horoscopecompatibility_gozlenilen_korpe_62132c", "G\xF6zl\u0259nil\u0259n K\xF6rp\u0259") : tr("horoscopecompatibility_korpe_fa2b51", "K\xF6rp\u0259")}
+              emoji="👶" />
 
-          <Card>
-            <CardContent className="p-4 space-y-4">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <Sun className="h-5 w-5 text-amber-500" />
-                {tr("horoscopecompatibility_dogum_xeriteleri_c9a3ce", "Do\u011Fum X\u0259rit\u0259l\u0259ri")}
-              </h3>
-              
-              <BirthChartCard chart={analysisResult.charts.mom} label={tr("common_ana", "Ana")} emoji="👩" />
-              {analysisResult.charts.dad &&
-              <BirthChartCard chart={analysisResult.charts.dad} label={tr("common_ata", "Ata")} emoji="👨" />
-              }
-              {analysisResult.charts.baby &&
-              <BirthChartCard
-                chart={analysisResult.charts.baby}
-                label={analysisResult.charts.baby.isExpected ? tr("horoscopecompatibility_gozlenilen_korpe_62132c", "G\xF6zl\u0259nil\u0259n K\xF6rp\u0259") : tr("horoscopecompatibility_korpe_fa2b51", "K\xF6rp\u0259")}
-                emoji="👶" />
-
-              }
-            </CardContent>
-          </Card>
+            }
+          </div>
 
           {/* Analysis Sections */}
           {analysisResult.analysis.momAnalysis &&
@@ -400,7 +413,8 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
             title={tr("horoscope_ana_analizi", "Ana Analizi")}
             emoji="👩"
             content={analysisResult.analysis.momAnalysis}
-            color="from-pink-500/10 to-rose-500/10" />
+            bg="var(--a-pink-1)"
+            ink="var(--a-berry-ink)" />
 
           }
 
@@ -409,7 +423,8 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
             title={tr("horoscope_ata_analizi", "Ata Analizi")}
             emoji="👨"
             content={analysisResult.analysis.dadAnalysis}
-            color="from-blue-500/10 to-indigo-500/10" />
+            bg="var(--a-blue-1)"
+            ink="var(--a-blue-ink)" />
 
           }
 
@@ -418,160 +433,140 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
             title={analysisResult.charts.baby.isExpected ? tr("horoscopecompatibility_korpe_proqnozu_3079df", "K\xF6rp\u0259 Proqnozu") : tr("horoscopecompatibility_korpe_analizi_f790ae", "K\xF6rp\u0259 Analizi")}
             emoji="👶"
             content={analysisResult.analysis.babyAnalysis}
-            color="from-amber-500/10 to-yellow-500/10" />
+            bg="var(--a-yellow-1)"
+            ink="var(--a-warn-ink)" />
 
           }
 
           {analysisResult.analysis.familyDynamics &&
           <AnalysisCard
             title={tr("horoscopecompatibility_aile_dinamikasi_ee22f4", "Ailə Dinamikası")}
-            icon={<Users className="h-5 w-5 text-purple-500" />}
+            icon={<Users className="h-5 w-5" />}
             content={analysisResult.analysis.familyDynamics}
-            color="from-purple-500/10 to-pink-500/10" />
+            bg="var(--a-lav-1)"
+            ink="var(--a-lav-ink)" />
 
           }
 
           {analysisResult.analysis.momBabyConnection && analysisResult.charts.baby &&
           <AnalysisCard
             title={tr("horoscopecompatibility_ana_korpe_kosmik_bagi_deb848", "Ana-Körpə Kosmik Bağı")}
-            icon={<Heart className="h-5 w-5 text-pink-500" />}
+            icon={<Heart className="h-5 w-5" />}
             content={analysisResult.analysis.momBabyConnection}
-            color="from-pink-500/10 to-red-500/10" />
+            bg="var(--a-pink-1)"
+            ink="var(--a-berry-ink)" />
 
           }
 
           {analysisResult.analysis.parentCompatibility && analysisResult.charts.dad &&
           <AnalysisCard
             title={tr("horoscopecompatibility_valideynler_uygunlugu_27180e", "Valideynlər Uyğunluğu")}
-            icon={<Zap className="h-5 w-5 text-amber-500" />}
+            icon={<Zap className="h-5 w-5" />}
             content={analysisResult.analysis.parentCompatibility}
-            color="from-amber-500/10 to-orange-500/10" />
+            bg="var(--a-peach-1)"
+            ink="var(--a-accent-ink)" />
 
           }
 
           {/* Recommendations */}
           {analysisResult.analysis.recommendations.length > 0 &&
-          <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-pink-500/5">
-              <CardContent className="p-4">
-                <h3 className="font-semibold flex items-center gap-2 mb-3">
-                  <Book className="h-5 w-5 text-purple-500" />
-                  {tr("horoscopecompatibility_kosmik_tovsiyeler_d95708", "Kosmik T\xF6vsiy\u0259l\u0259r")}
-                </h3>
-                <ul className="space-y-3">
-                  {analysisResult.analysis.recommendations.map((rec, i) =>
-                <motion.li
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="flex items-start gap-3 text-sm">
-                  
-                      <span className="w-6 h-6 rounded-full bg-purple-500/20 text-purple-600 flex items-center justify-center text-xs font-bold shrink-0">
-                        {i + 1}
-                      </span>
-                      {rec}
-                    </motion.li>
-                )}
-                </ul>
-              </CardContent>
-            </Card>
+          <div className="a-card">
+              <h3 className="a-card-title a-heading flex items-center gap-2 mb-3" style={{ margin: '0 0 12px' }}>
+                <Book className="h-5 w-5" style={{ color: 'var(--a-lav-2)' }} />
+                {tr("horoscopecompatibility_kosmik_tovsiyeler_d95708", "Kosmik T\xF6vsiy\u0259l\u0259r")}
+              </h3>
+              <ul className="space-y-3" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+                {analysisResult.analysis.recommendations.map((rec, i) =>
+              <motion.li
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="flex items-start gap-3 text-sm"
+                style={{ color: 'var(--a-body-text)' }}>
+                
+                    <span
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                  style={{ background: 'var(--a-lav-1)', color: 'var(--a-lav-ink)' }}>
+                      {i + 1}
+                    </span>
+                    {rec}
+                  </motion.li>
+              )}
+              </ul>
+            </div>
           }
 
           {/* Lucky Items */}
           <div className="grid grid-cols-3 gap-3">
             {analysisResult.analysis.luckyColors.length > 0 &&
-            <Card className="bg-gradient-to-br from-pink-500/10 to-rose-500/10">
-                <CardContent className="p-3 text-center">
-                  <Palette className="h-6 w-6 mx-auto text-pink-500 mb-2" />
-                  <p className="text-xs text-muted-foreground mb-1">{tr("horoscopecompatibility_ugurlu_rengler_e52ad0", "Uğurlu rənglər")}</p>
-                  <p className="text-xs font-semibold">{analysisResult.analysis.luckyColors.join(', ')}</p>
-                </CardContent>
-              </Card>
+            <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-pink-1)' }}>
+                <Palette className="h-6 w-6 mx-auto mb-2" style={{ color: 'var(--a-berry-ink)' }} />
+                <p className="text-xs mb-1" style={{ margin: '0 0 4px', color: 'var(--a-berry-ink)', opacity: 0.8 }}>{tr("horoscopecompatibility_ugurlu_rengler_e52ad0", "Uğurlu rənglər")}</p>
+                <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-alert-ink)' }}>{analysisResult.analysis.luckyColors.join(', ')}</p>
+              </div>
             }
             {analysisResult.analysis.luckyDays.length > 0 &&
-            <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10">
-                <CardContent className="p-3 text-center">
-                  <CalendarIcon className="h-6 w-6 mx-auto text-blue-500 mb-2" />
-                  <p className="text-xs text-muted-foreground mb-1">{tr("horoscopecompatibility_ugurlu_gunler_6caab8", "Uğurlu günlər")}</p>
-                  <p className="text-xs font-semibold">{analysisResult.analysis.luckyDays.join(', ')}</p>
-                </CardContent>
-              </Card>
+            <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-blue-1)' }}>
+                <CalendarIcon className="h-6 w-6 mx-auto mb-2" style={{ color: 'var(--a-blue-ink)' }} />
+                <p className="text-xs mb-1" style={{ margin: '0 0 4px', color: 'var(--a-blue-ink)', opacity: 0.8 }}>{tr("horoscopecompatibility_ugurlu_gunler_6caab8", "Uğurlu günlər")}</p>
+                <p className="text-xs font-bold" style={{ margin: 0, color: '#153e57' }}>{analysisResult.analysis.luckyDays.join(', ')}</p>
+              </div>
             }
             {analysisResult.analysis.luckyNumbers.length > 0 &&
-            <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10">
-                <CardContent className="p-3 text-center">
-                  <Hash className="h-6 w-6 mx-auto text-green-500 mb-2" />
-                  <p className="text-xs text-muted-foreground mb-1">{tr("horoscopecompatibility_xosbext_reqemler_4d0da9", "Xoşbəxt rəqəmlər")}</p>
-                  <p className="text-xs font-semibold">{analysisResult.analysis.luckyNumbers.join(', ')}</p>
-                </CardContent>
-              </Card>
+            <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-green-1)' }}>
+                <Hash className="h-6 w-6 mx-auto mb-2" style={{ color: 'var(--a-green-ink)' }} />
+                <p className="text-xs mb-1" style={{ margin: '0 0 4px', color: 'var(--a-green-ink)', opacity: 0.8 }}>{tr("horoscopecompatibility_xosbext_reqemler_4d0da9", "Xoşbəxt rəqəmlər")}</p>
+                <p className="text-xs font-bold" style={{ margin: 0, color: '#14532d' }}>{analysisResult.analysis.luckyNumbers.join(', ')}</p>
+              </div>
             }
           </div>
 
           {/* Share Button */}
-          <Button variant="outline" className="w-full h-12" onClick={handleShare}>
-            <Share2 className="h-4 w-4 mr-2" />
+          <button className="a-btn-soft w-full" style={{ justifyContent: 'center', height: 48 }} onClick={handleShare}>
+            <Share2 size={15} strokeWidth={2.2} />
             {tr("horoscopecompatibility_neticeni_paylas_28650c", "N\u0259tic\u0259ni Payla\u015F")}
-          </Button>
+          </button>
         </div>
-      </div>);
+      </ToolPage>);
 
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3 mb-3">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <ArrowLeft className="h-5 w-5 text-foreground" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-purple-500" />
-                {tr("horoscopecompatibility_ulduz_fali_344189", "Ulduz Fal\u0131")}
-              </h1>
-            </div>
-          </div>
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={tr("horoscopecompatibility_aile_dinamikasi_ee22f4", "Ailə Dinamikası")}
+        title={tr("horoscopecompatibility_ulduz_fali_344189", "Ulduz Fal\u0131")} />
 
-          {/* Step Indicators */}
-          <div className="flex items-center gap-2">
-            {STEPS.map((step, idx) =>
-            <motion.button
-              key={step.id}
-              onClick={() => step.id <= currentStep && setCurrentStep(step.id)}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium transition-all",
-                currentStep === step.id ?
-                "bg-primary text-primary-foreground" :
-                currentStep > step.id ?
-                "bg-primary/20 text-primary" :
-                "bg-muted text-muted-foreground"
-              )}
-              whileTap={{ scale: 0.98 }}>
-              
-                {currentStep > step.id ?
-              <Check className="h-3 w-3" /> :
+      {/* Step Indicators */}
+      <div className="flex items-center gap-2 mb-4">
+        {STEPS.map((step) =>
+        <motion.button
+          key={step.id}
+          onClick={() => step.id <= currentStep && setCurrentStep(step.id)}
+          className="flex-1 flex items-center justify-center gap-2 py-2 rounded-full text-xs font-bold transition-all"
+          style={
+          currentStep === step.id ?
+          { background: 'var(--a-lav-2)', color: '#fff', cursor: 'pointer' } :
+          currentStep > step.id ?
+          { background: 'var(--a-lav-1)', color: 'var(--a-lav-ink)', cursor: 'pointer' } :
+          { background: 'var(--a-surface)', color: 'var(--a-ink-soft)', border: '1px solid var(--a-line)' }}
+          whileTap={{ scale: 0.98 }}>
+          
+            {currentStep > step.id ?
+          <Check className="h-3 w-3" /> :
 
-              <span>{step.emoji}</span>
-              }
-                {step.title}
-              </motion.button>
-            )}
-          </div>
-        </div>
+          <span>{step.emoji}</span>
+          }
+            {step.title}
+          </motion.button>
+        )}
       </div>
 
-
-
-      <div className="p-4 space-y-4">
-        <div className="rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/40 px-3 py-2">
-          <p className="text-[11px] text-purple-800 dark:text-purple-200 leading-relaxed">
+      <div className="space-y-4">
+        <div className="rounded-2xl px-3 py-2" style={{ background: 'var(--a-lav-1)' }}>
+          <p className="text-[11px] leading-relaxed" style={{ margin: 0, color: 'var(--a-lav-ink)' }}>
             ✨ {tr('horoscope_entertainment_disclaimer', 'Ulduz falı yalnız əyləncə məqsədi daşıyır. Tibbi, psixoloji və ya valideynlik qərarları üçün ixtisaslı mütəxəssisə (həkim/psixoloq) müraciət edin.')}
           </p>
         </div>
@@ -582,65 +577,65 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
         </AnimatePresence>
 
         {/* Navigation Buttons */}
-        <div className="flex gap-3 pt-4">
+        <div className="flex gap-3 pt-2">
           {currentStep > 1 &&
-          <Button
-            variant="outline"
+          <button
             onClick={() => setCurrentStep(currentStep - 1)}
-            className="flex-1 h-12">
+            className="a-btn-soft flex-1"
+            style={{ justifyContent: 'center', height: 48 }}>
             
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft size={15} strokeWidth={2.2} />
               {tr("horoscope_back", "Geri")}
-            </Button>
+            </button>
           }
           
           {currentStep < 3 ?
-          <Button
+          <button
             onClick={() => setCurrentStep(currentStep + 1)}
-            className="flex-1 h-12 bg-gradient-to-r from-indigo-600 to-purple-600"
+            className="a-cta-btn flex-1"
+            style={{ justifyContent: 'center', height: 48, background: 'var(--a-lav-2)', color: '#fff', opacity: currentStep === 1 && !momData.birthDate ? 0.5 : 1 }}
             disabled={currentStep === 1 && !momData.birthDate}>
               {tr("horoscopecompatibility_novbeti_6e8661", "N\xF6vb\u0259ti")}
               
-            <ArrowRight className="h-4 w-4 ml-2" />
-            </Button> :
+            <ArrowRight size={15} strokeWidth={2.2} />
+            </button> :
 
-          <Button
+          <button
             onClick={handleAnalyze}
             disabled={!momData.birthDate || isAnalyzing}
-            className="flex-1 h-12 bg-gradient-to-r from-purple-600 to-pink-500">
-{isAnalyzing ?
-            <Loader2 className="h-5 w-5 animate-spin mr-2" /> :
+            className="a-cta-btn flex-1"
+            style={{ justifyContent: 'center', height: 48, background: 'var(--a-lav-2)', color: '#fff', opacity: !momData.birthDate || isAnalyzing ? 0.6 : 1 }}>
+              {isAnalyzing ?
+            <Loader2 className="h-5 w-5 animate-spin" /> :
 
-            <Sparkles className="h-5 w-5 mr-2" />
+            <Sparkles size={16} strokeWidth={2.2} />
             }
               {tr("horoscope_analyze_now", "Analiz Et")}
-            </Button>
+            </button>
           }
         </div>
 
         {/* Zodiac Grid */}
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold mb-3 flex items-center gap-2">
-              <Star className="h-4 w-4 text-amber-500" />
-              {tr("horoscopecompatibility_burcler_bb45a3", "B\xFCrcl\u0259r")}
-            </h3>
-            <div className="grid grid-cols-6 gap-2">
-              {zodiacSigns.map((sign) => {
-                const ElementIcon = sign.element ? ELEMENT_ICONS[sign.element] : Star;
-                return (
-                  <div
-                    key={sign.id}
-                    className="text-center p-2 rounded-xl bg-muted/50 hover:bg-muted transition-colors">
-                    
-                    <span className="text-xl block">{sign.symbol}</span>
-                    <p className="text-[10px] mt-1 text-muted-foreground">{sign.name}</p>
-                  </div>);
+        <div className="a-card">
+          <h3 className="a-card-title a-heading mb-3 flex items-center gap-2" style={{ margin: '0 0 12px' }}>
+            <Star className="h-4 w-4" style={{ color: 'var(--a-yellow-2)' }} />
+            {tr("horoscopecompatibility_burcler_bb45a3", "B\xFCrcl\u0259r")}
+          </h3>
+          <div className="grid grid-cols-6 gap-2">
+            {zodiacSigns.map((sign) => {
+              return (
+                <div
+                  key={sign.id}
+                  className="text-center p-2 rounded-xl transition-colors"
+                  style={{ background: 'var(--a-surface-soft)' }}>
+                  
+                  <span className="text-xl block">{sign.symbol}</span>
+                  <p className="text-[10px] mt-1" style={{ margin: '4px 0 0', color: 'var(--a-ink-soft)' }}>{sign.name}</p>
+                </div>);
 
-              })}
-            </div>
-          </CardContent>
-        </Card>
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Loading Overlay */}
@@ -650,7 +645,8 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center">
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: 'linear-gradient(135deg, #2a1d4d 0%, #3c2e5c 50%, #4a2331 100%)' }}>
           
             <div className="absolute inset-0 overflow-hidden">
               {[...Array(50)].map((_, i) =>
@@ -733,7 +729,12 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
           </motion.div>
         }
       </AnimatePresence>
-    </div>);
+
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="horoscope" />
+    </ToolPage>);
 
 };
 
@@ -769,23 +770,23 @@ const PersonInput = ({
   const selectedSign = getZodiacForDate(data.birthDate);
 
   return (
-    <div className="space-y-4 p-4 rounded-2xl bg-gradient-to-br from-muted/50 to-muted border">
+    <div className="a-card space-y-4">
       <div className="flex items-center justify-between">
-        <Label className="text-base font-semibold flex items-center gap-2">
+        <p className="font-bold flex items-center gap-2 a-heading" style={{ margin: 0, color: 'var(--a-ink)' }}>
           <span className="text-2xl">{emoji}</span>
           {label}
-        </Label>
+        </p>
         {isOptional &&
-        <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">{tr("horoscopecompatibility_ixtiyari_4d9763", "İxtiyari")}</span>
+        <span className="a-rank-tag" style={{ margin: 0, background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>{tr("horoscopecompatibility_ixtiyari_4d9763", "İxtiyari")}</span>
         }
       </div>
 
       {/* Date Picker */}
       <div className="space-y-2">
-        <Label className="text-sm text-muted-foreground flex items-center gap-1">
+        <p className="a-list-sub flex items-center gap-1" style={{ margin: 0 }}>
           <CalendarIcon className="h-3 w-3" />
-          {tr("horoscopecompatibility_dogum_tarixi_d96907", "Do\u011Fum tarixi")} {isRequired && <span className="text-destructive">*</span>}
-        </Label>
+          {tr("horoscopecompatibility_dogum_tarixi_d96907", "Do\u011Fum tarixi")} {isRequired && <span style={{ color: 'var(--a-pink-2)' }}>*</span>}
+        </p>
         <DatePickerWheel
           value={data.birthDate}
           onChange={(date) => setData({ ...data, birthDate: date })}
@@ -797,12 +798,12 @@ const PersonInput = ({
       {/* Birth Time Toggle */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label className="text-sm text-muted-foreground flex items-center gap-1">
+          <p className="a-list-sub flex items-center gap-1" style={{ margin: 0 }}>
             <Clock className="h-3 w-3" />
             {tr("horoscopecompatibility_dogum_saati_6ecf09", "Do\u011Fum saat\u0131")}
-          </Label>
+          </p>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">{tr("horoscopecompatibility_bilirem_fa9716", "Bilirəm")}</span>
+            <span className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>{tr("horoscopecompatibility_bilirem_fa9716", "Bilirəm")}</span>
             <Switch
               checked={data.hasBirthTime}
               onCheckedChange={(checked) => setData({ ...data, hasBirthTime: checked, birthTime: checked ? '12:00' : '' })} />
@@ -821,7 +822,7 @@ const PersonInput = ({
               value={data.birthTime}
               onValueChange={(value) => setData({ ...data, birthTime: value })}>
               
-                <SelectTrigger className="w-full h-12 rounded-xl">
+                <SelectTrigger className="w-full h-12 rounded-xl" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line-strong)', color: 'var(--a-ink)' }}>
                   <SelectValue placeholder={tr("horoscopecompatibility_saat_secin_c24ec4", "Saat seçin")} />
                 </SelectTrigger>
                 <SelectContent className="max-h-60">
@@ -830,7 +831,7 @@ const PersonInput = ({
                 )}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+              <p className="text-xs mt-2 flex items-center gap-1" style={{ margin: '8px 0 0', color: 'var(--a-ink-soft)' }}>
                 <Compass className="h-3 w-3" />
                 {tr("horoscopecompatibility_yukselen_burcun_hesablanmasi_u_94af5d", "Y\xFCks\u0259l\u0259n b\xFCrc\xFCn hesablanmas\u0131 \xFC\xE7\xFCn laz\u0131md\u0131r")}
               </p>
@@ -844,12 +845,13 @@ const PersonInput = ({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="flex items-center gap-3 p-3 rounded-xl bg-background border">
+        className="flex items-center gap-3 p-3 rounded-xl"
+        style={{ background: 'var(--a-surface-soft)' }}>
         
           <span className="text-3xl">{selectedSign.symbol}</span>
           <div className="flex-1">
-            <p className="font-semibold">{selectedSign.name}</p>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <p className="a-list-title" style={{ margin: 0 }}>{selectedSign.name}</p>
+            <p className="a-list-sub flex items-center gap-1" style={{ margin: 0 }}>
               {selectedSign.element && ELEMENT_ICONS[selectedSign.element] &&
             <>
                   {(() => {
@@ -863,8 +865,8 @@ const PersonInput = ({
           </div>
           {data.hasBirthTime &&
         <div className="text-right">
-              <p className="text-xs text-muted-foreground">{tr("horoscopecompatibility_yukselen_b35c71", "Yüksələn")}</p>
-              <p className="text-xs font-medium text-purple-500">{tr("untranslated_hesablanacaq_w6pf63", "Hesablanacaq ↗")}</p>
+              <p className="text-xs" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{tr("horoscopecompatibility_yukselen_b35c71", "Yüksələn")}</p>
+              <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-lav-2)' }}>{tr("untranslated_hesablanacaq_w6pf63", "Hesablanacaq ↗")}</p>
             </div>
         }
         </motion.div>
@@ -875,51 +877,50 @@ const PersonInput = ({
 
 // Birth Chart Card Component
 const BirthChartCard = ({ chart, label, emoji }: {chart: ChartData;label: string;emoji: string;}) =>
-<div className="p-4 rounded-xl bg-muted/50 border">
+<div className="p-4 rounded-2xl" style={{ background: 'var(--a-surface-soft)' }}>
     <div className="flex items-center gap-2 mb-3">
       <span className="text-xl">{emoji}</span>
-      <span className="font-semibold">{label}</span>
+      <span className="a-list-title" style={{ margin: 0 }}>{label}</span>
       {chart.isExpected &&
-    <span className="text-xs bg-purple-500/20 text-purple-600 px-2 py-0.5 rounded-full ml-auto">
+    <span className="a-rank-tag ml-auto" style={{ margin: '0 0 0 auto', background: 'var(--a-lav-1)', color: 'var(--a-lav-ink)' }}>
           {tr("horoscopecompatibility_gozlenilen_4885bf", "G\xF6zl\u0259nil\u0259n")}
         </span>
     }
     </div>
     
     <div className="grid grid-cols-3 gap-2">
-      <div className="text-center p-3 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
-        <Sun className="h-4 w-4 mx-auto text-yellow-500 mb-1" />
+      <div className="text-center p-3 rounded-xl" style={{ background: 'var(--a-yellow-1)' }}>
+        <Sun className="h-4 w-4 mx-auto mb-1" style={{ color: 'var(--a-warn-ink)' }} />
         <span className="text-2xl block">{chart.sun.symbol}</span>
-        <p className="text-xs font-medium mt-1">{chart.sun.signAz}</p>
-        <p className="text-[10px] text-muted-foreground">{tr("horoscopecompatibility_gunes_b7b2ab", "Günəş")}</p>
+        <p className="text-xs font-bold mt-1" style={{ margin: '4px 0 0', color: 'var(--a-warn-ink)' }}>{chart.sun.signAz}</p>
+        <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-warn-ink)', opacity: 0.75 }}>{tr("horoscopecompatibility_gunes_b7b2ab", "Günəş")}</p>
       </div>
 
-      <div className="text-center p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30">
-        <Moon className="h-4 w-4 mx-auto text-blue-400 mb-1" />
+      <div className="text-center p-3 rounded-xl" style={{ background: 'var(--a-blue-1)' }}>
+        <Moon className="h-4 w-4 mx-auto mb-1" style={{ color: 'var(--a-blue-ink)' }} />
         <span className="text-2xl block">{chart.moon.symbol}</span>
-        <p className="text-xs font-medium mt-1">{chart.moon.signAz}</p>
-        <p className="text-[10px] text-muted-foreground">{tr("untranslated_ay_m6wwbp", "Ay")}</p>
+        <p className="text-xs font-bold mt-1" style={{ margin: '4px 0 0', color: 'var(--a-blue-ink)' }}>{chart.moon.signAz}</p>
+        <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-blue-ink)', opacity: 0.75 }}>{tr("untranslated_ay_m6wwbp", "Ay")}</p>
       </div>
 
-      <div className={cn(
-      "text-center p-3 rounded-xl border",
-      chart.rising ?
-      "bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500/30" :
-      "bg-muted/50 border-dashed"
-    )}>
-        <Compass className={cn("h-4 w-4 mx-auto mb-1", chart.rising ? "text-purple-500" : "text-muted-foreground")} />
+      <div
+      className="text-center p-3 rounded-xl"
+      style={chart.rising ?
+      { background: 'var(--a-lav-1)' } :
+      { background: 'var(--a-surface)', border: '1px dashed var(--a-line-strong)' }}>
+        <Compass className="h-4 w-4 mx-auto mb-1" style={{ color: chart.rising ? 'var(--a-lav-ink)' : 'var(--a-ink-faint)' }} />
         {chart.rising ?
       <>
             <span className="text-2xl block">{chart.rising.symbol}</span>
-            <p className="text-xs font-medium mt-1">{chart.rising.signAz}</p>
+            <p className="text-xs font-bold mt-1" style={{ margin: '4px 0 0', color: 'var(--a-lav-ink)' }}>{chart.rising.signAz}</p>
           </> :
 
       <>
-            <span className="text-lg block text-muted-foreground">?</span>
-            <p className="text-xs text-muted-foreground mt-1">{tr("untranslated_bilinmir_iqd3o8", "Bilinmir")}</p>
+            <span className="text-lg block" style={{ color: 'var(--a-ink-faint)' }}>?</span>
+            <p className="text-xs mt-1" style={{ margin: '4px 0 0', color: 'var(--a-ink-soft)' }}>{tr("untranslated_bilinmir_iqd3o8", "Bilinmir")}</p>
           </>
       }
-        <p className="text-[10px] text-muted-foreground">{tr("horoscopecompatibility_yukselen_b35c71", "Yüksələn")}</p>
+        <p className="text-[10px]" style={{ margin: 0, color: chart.rising ? 'var(--a-lav-ink)' : 'var(--a-ink-soft)', opacity: 0.75 }}>{tr("horoscopecompatibility_yukselen_b35c71", "Yüksələn")}</p>
       </div>
     </div>
   </div>;
@@ -931,24 +932,24 @@ const AnalysisCard = ({
   emoji,
   icon,
   content,
-  color
+  bg,
+  ink
 
 
 
 
 
 
-}: {title: string;emoji?: string;icon?: React.ReactNode;content: string;color: string;}) =>
-<Card className={`bg-gradient-to-br ${color} border-0`}>
-    <CardContent className="p-4">
-      <h3 className="font-semibold flex items-center gap-2 mb-2">
-        {emoji && <span className="text-xl">{emoji}</span>}
-        {icon}
-        {title}
-      </h3>
-      <p className="text-sm text-muted-foreground leading-relaxed">{content}</p>
-    </CardContent>
-  </Card>;
+
+}: {title: string;emoji?: string;icon?: React.ReactNode;content: string;bg: string;ink: string;}) =>
+<div className="a-card" style={{ background: bg, border: 'none' }}>
+    <h3 className="font-bold flex items-center gap-2 mb-2 a-heading" style={{ margin: '0 0 8px', color: ink }}>
+      {emoji && <span className="text-xl">{emoji}</span>}
+      {icon}
+      {title}
+    </h3>
+    <p className="text-sm leading-relaxed" style={{ margin: 0, color: ink, opacity: 0.85 }}>{content}</p>
+  </div>;
 
 
 export default HoroscopeCompatibility;

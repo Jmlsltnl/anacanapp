@@ -1,15 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, CSSProperties } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Mic, Square, AlertCircle, CheckCircle, Clock, Loader2, History, Info, AlertTriangle, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Mic, Square, AlertCircle, CheckCircle, Clock, Loader2, History, Info, AlertTriangle, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useSubscription } from '@/hooks/useSubscription';
+import PremiumModal from '@/components/PremiumModal';
 import { requestMicrophonePermission } from '@/lib/permissions';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr, getPersistedLanguage } from "@/lib/tr";
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 
 interface CryTranslatorProps {
   onBack: () => void;
@@ -26,17 +28,18 @@ interface CryAnalysis {
 
 type AnalysisStage = 'idle' | 'recording' | 'processing' | 'analyzing' | 'complete' | 'no_cry' | 'false_positive' | 'error';
 
-const cryTypeLabels: Record<string, {label: string;emoji: string;color: string;}> = {
-  hungry: { label: tr("crytranslator_ac_baba8d", 'Ac'), emoji: '🍼', color: 'from-orange-500 to-amber-500' },
-  tired: { label: tr("crytranslator_yuxulu_90ba1f", 'Yuxulu'), emoji: '😴', color: 'from-indigo-500 to-purple-500' },
-  pain: { label: tr("crytranslator_agri_76d612", 'Ağrı'), emoji: '😢', color: 'from-red-500 to-rose-500' },
-  discomfort: { label: tr("crytranslator_narahatliq_33f05c", 'Narahatlıq'), emoji: '😣', color: 'from-yellow-500 to-orange-500' },
-  colic: { label: tr("crytranslator_kolik_29d81f", 'Kolik'), emoji: '😫', color: 'from-purple-500 to-pink-500' },
-  attention: { label: tr("crytranslator_diqqet_isteyir_d50473", 'Diqqət istəyir'), emoji: '🤗', color: 'from-blue-500 to-cyan-500' },
-  overstimulated: { label: tr("crytranslator_hedden_artiq_yorulub_7849bb", 'Həddən artıq yorulub'), emoji: '🥱', color: 'from-gray-500 to-slate-500' },
-  sick: { label: tr("crytranslator_xestelik_7c06be", 'Xəstəlik'), emoji: '🤒', color: 'from-rose-600 to-red-600' },
-  no_cry_detected: { label: tr("crytranslator_aglama_askarlanmadi_15a23e", 'Ağlama aşkarlanmadı'), emoji: '🔇', color: 'from-gray-400 to-gray-500' },
-  false_positive: { label: tr("crytranslator_saxta_ses_3db067", 'Saxta səs'), emoji: '📺', color: 'from-amber-400 to-orange-500' }
+// Cry type → anacan palette (gradient + ink)
+const cryTypeLabels: Record<string, {label: string;emoji: string;grad: string;ink: string;}> = {
+  hungry: { label: tr("crytranslator_ac_baba8d", 'Ac'), emoji: '🍼', grad: 'var(--a-grad-peach)', ink: 'var(--a-accent-ink)' },
+  tired: { label: tr("crytranslator_yuxulu_90ba1f", 'Yuxulu'), emoji: '😴', grad: 'var(--a-grad-lav)', ink: 'var(--a-lav-ink)' },
+  pain: { label: tr("crytranslator_agri_76d612", 'Ağrı'), emoji: '😢', grad: 'var(--a-grad-pink)', ink: 'var(--a-alert-ink)' },
+  discomfort: { label: tr("crytranslator_narahatliq_33f05c", 'Narahatlıq'), emoji: '😣', grad: 'var(--a-grad-yellow)', ink: 'var(--a-warn-ink)' },
+  colic: { label: tr("crytranslator_kolik_29d81f", 'Kolik'), emoji: '😫', grad: 'var(--a-grad-lav)', ink: '#3c2e5c' },
+  attention: { label: tr("crytranslator_diqqet_isteyir_d50473", 'Diqqət istəyir'), emoji: '🤗', grad: 'var(--a-grad-blue)', ink: 'var(--a-blue-ink)' },
+  overstimulated: { label: tr("crytranslator_hedden_artiq_yorulub_7849bb", 'Həddən artıq yorulub'), emoji: '🥱', grad: 'linear-gradient(135deg, var(--a-surface-soft), var(--a-line-strong))', ink: 'var(--a-ink-soft)' },
+  sick: { label: tr("crytranslator_xestelik_7c06be", 'Xəstəlik'), emoji: '🤒', grad: 'var(--a-grad-pink)', ink: 'var(--a-alert-ink)' },
+  no_cry_detected: { label: tr("crytranslator_aglama_askarlanmadi_15a23e", 'Ağlama aşkarlanmadı'), emoji: '🔇', grad: 'linear-gradient(135deg, var(--a-surface-soft), var(--a-line-strong))', ink: 'var(--a-ink-soft)' },
+  false_positive: { label: tr("crytranslator_saxta_ses_3db067", 'Saxta səs'), emoji: '📺', grad: 'var(--a-grad-yellow)', ink: 'var(--a-warn-ink)' }
 };
 
 const stageMessages: Record<AnalysisStage, string> = {
@@ -67,6 +70,8 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
   const audioContextRef = useRef<AudioContext | null>(null);
 
   const { toast } = useToast();
+  const { checkAndConsume } = useSubscription();
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const { profile } = useAuth();
 
   const isRecording = stage === 'recording';
@@ -206,6 +211,13 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
   };
 
   const analyzeAudio = async (audioBlob: Blob) => {
+    // Gündəlik pulsuz limit (premium → limitsiz)
+    const { allowed } = await checkAndConsume('cry_translator');
+    if (!allowed) {
+      setStage('idle');
+      setShowPremiumModal(true);
+      return;
+    }
     setStage('analyzing');
 
     try {
@@ -279,9 +291,9 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case 'high':return 'bg-red-500';
-      case 'medium':return 'bg-amber-500';
-      default:return 'bg-green-500';
+      case 'high':return 'var(--a-pink-2)';
+      case 'medium':return 'var(--a-yellow-2)';
+      default:return 'var(--a-green-2)';
     }
   };
 
@@ -290,127 +302,116 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
   const renderButtonContent = () => {
     switch (stage) {
       case 'processing':
-        return (
-          <div className="flex flex-col items-center">
-            <Loader2 className="w-12 h-12 text-white animate-spin" />
-          </div>);
-
       case 'analyzing':
-        return (
-          <div className="flex flex-col items-center">
-            <Loader2 className="w-12 h-12 text-white animate-spin" />
-          </div>);
-
+        return <Loader2 className="w-12 h-12 animate-spin" style={{ color: '#fff' }} />;
       case 'recording':
-        return <Square className="w-10 h-10 text-white" />;
+        return <Square className="w-10 h-10" style={{ color: '#fff' }} />;
       default:
-        return <Mic className="w-12 h-12 text-white" />;
+        return <Mic className="w-12 h-12" style={{ color: 'var(--a-accent-ink)' }} />;
     }
   };
 
-  const getButtonClass = () => {
-    if (stage === 'recording') return 'bg-red-500 shadow-lg shadow-red-500/30';
-    if (isProcessing) return 'bg-primary/70 cursor-not-allowed';
-    return 'bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30';
+  const getButtonStyle = (): CSSProperties => {
+    if (stage === 'recording') {
+      return { background: 'var(--a-pink-2)', boxShadow: '0 14px 30px -12px rgba(255, 138, 164, 0.7)' };
+    }
+    if (isProcessing) {
+      return { background: 'var(--a-peach-2)', opacity: 0.75, cursor: 'not-allowed', boxShadow: 'none' };
+    }
+    return { background: 'var(--a-grad-cta)', border: '1px solid var(--a-btn-border)', boxShadow: 'var(--a-card-shadow)' };
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 pb-2">
-        <div className="flex items-center gap-3 relative z-20">
-          <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0 relative z-30">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold">{tr("adminanalytics_aglama_analizi_0713b3", "Ağlama Analizi")}</h1>
-            <p className="text-xs text-muted-foreground">{tr("crytranslator_ai_ile_korpe_aglamasini_analiz_edin_e2e23c", "AI ilə körpə ağlamasını analiz edin")}</p>
-          </div>
-          <Button variant="ghost" size="icon" onClick={() => setShowHistory(!showHistory)} className="relative z-30">
-            <History className="w-5 h-5" />
-          </Button>
-        </div>
-      </div>
+    <ToolPage>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={tr("crytranslator_ai_ile_korpe_aglamasini_analiz_edin_e2e23c", "AI ilə körpə ağlamasını analiz edin")}
+        title={tr("adminanalytics_aglama_analizi_0713b3", "Ağlama Analizi")}
+        actions={
+        <button className="a-icon-btn" onClick={() => setShowHistory(!showHistory)} aria-label="History">
+            <History size={16} strokeWidth={2} />
+          </button>
+        } />
 
-      <div className="p-4 space-y-4">
-        <MedicalDisclaimer variant="compact" />
+      <div className="space-y-3">
+        <MedicalDisclaimer variant="anacan" />
+
         {/* Info Card */}
-        <Card className="border-primary/20 bg-primary/5">
-          <CardContent className="p-3">
-            <div className="flex items-start gap-2">
-              <Info className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-              <p className="text-xs text-muted-foreground">
-                {tr("crytranslator_korpeniz_aglayanda_3_10_saniye_1b26e1", "K\xF6rp\u0259niz a\u011Flayanda 3-10 saniy\u0259 s\u0259s yaz\u0131n. AI a\u011Flaman\u0131n s\u0259b\u0259bini analiz ed\u0259c\u0259k.")}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="a-card" style={{ padding: '12px 14px' }}>
+          <div className="flex items-start gap-2">
+            <Info className="w-4 h-4 mt-0.5 shrink-0" style={{ color: 'var(--a-peach-2)' }} />
+            <p className="a-cta-text" style={{ margin: 0 }}>
+              {tr("crytranslator_korpeniz_aglayanda_3_10_saniye_1b26e1", "K\xF6rp\u0259niz a\u011Flayanda 3-10 saniy\u0259 s\u0259s yaz\u0131n. AI a\u011Flaman\u0131n s\u0259b\u0259bini analiz ed\u0259c\u0259k.")}
+            </p>
+          </div>
+        </div>
 
         {/* Recording Section */}
-        <Card className="overflow-hidden">
-          <CardContent className="p-6">
-            <div className="flex flex-col items-center">
-              {/* Recording Button */}
-              <motion.button
-                onClick={isRecording ? stopRecording : isProcessing ? undefined : startRecording}
-                disabled={isProcessing}
-                className={`relative w-32 h-32 rounded-full flex items-center justify-center transition-all ${getButtonClass()}`}
-                whileTap={isProcessing ? {} : { scale: 0.95 }}
-                animate={isRecording ? { scale: [1, 1.05, 1] } : {}}
-                transition={{ repeat: isRecording ? Infinity : 0, duration: 1 }}>
-                
-                {/* Audio level ring */}
-                {isRecording &&
-                <motion.div
-                  className="absolute inset-0 rounded-full border-4 border-white/30"
-                  animate={{ scale: 1 + audioLevel * 0.3, opacity: 0.5 + audioLevel * 0.5 }} />
-
-                }
-                
-                {renderButtonContent()}
-              </motion.button>
-
-              {/* Timer */}
-              <div className="mt-4 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-muted-foreground" />
-                <span className="text-2xl font-mono font-bold">
-                  {String(Math.floor(recordingTime / 60)).padStart(2, '0')}:
-                  {String(recordingTime % 60).padStart(2, '0')}
-                </span>
-                <span className="text-xs text-muted-foreground">/10s</span>
-              </div>
-
-              {/* Status Message */}
-              <div className="mt-2 flex items-center gap-2">
-                {isProcessing && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
-                <p className="text-sm text-muted-foreground">
-                  {stageMessages[stage]}
-                </p>
-              </div>
-
-              {/* Progress bar for recording */}
+        <div className="a-card" style={{ padding: 24 }}>
+          <div className="flex flex-col items-center">
+            {/* Recording Button */}
+            <motion.button
+              onClick={isRecording ? stopRecording : isProcessing ? undefined : startRecording}
+              disabled={isProcessing}
+              className="relative w-32 h-32 rounded-full flex items-center justify-center transition-all"
+              style={getButtonStyle()}
+              whileTap={isProcessing ? {} : { scale: 0.95 }}
+              animate={isRecording ? { scale: [1, 1.05, 1] } : {}}
+              transition={{ repeat: isRecording ? Infinity : 0, duration: 1 }}>
+              
+              {/* Audio level ring */}
               {isRecording &&
-              <div className="w-full mt-4 h-2 bg-muted rounded-full overflow-hidden">
-                  <motion.div
-                  className="h-full bg-red-500"
-                  initial={{ width: '0%' }}
-                  animate={{ width: `${recordingTime / 10 * 100}%` }}
-                  transition={{ duration: 0.5 }} />
-                
-                </div>
-              }
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{ border: '4px solid rgba(255,255,255,0.35)' }}
+                animate={{ scale: 1 + audioLevel * 0.3, opacity: 0.5 + audioLevel * 0.5 }} />
 
-              {/* Processing stages indicator */}
-              {isProcessing &&
-              <div className="w-full mt-4 flex justify-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${stage === 'processing' ? 'bg-primary animate-pulse' : 'bg-primary'}`} />
-                  <div className={`w-3 h-3 rounded-full ${stage === 'analyzing' ? 'bg-primary animate-pulse' : 'bg-muted'}`} />
-                  <div className="w-3 h-3 rounded-full bg-muted" />
-                </div>
               }
+              
+              {renderButtonContent()}
+            </motion.button>
+
+            {/* Timer */}
+            <div className="mt-4 flex items-center gap-2">
+              <Clock className="w-4 h-4" style={{ color: 'var(--a-ink-soft)' }} />
+              <span className="text-2xl font-mono font-bold" style={{ color: 'var(--a-ink)' }}>
+                {String(Math.floor(recordingTime / 60)).padStart(2, '0')}:
+                {String(recordingTime % 60).padStart(2, '0')}
+              </span>
+              <span className="text-xs" style={{ color: 'var(--a-ink-soft)' }}>/10s</span>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Status Message */}
+            <div className="mt-2 flex items-center gap-2">
+              {isProcessing && <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--a-peach-2)' }} />}
+              <p className="text-sm font-semibold" style={{ color: 'var(--a-ink-soft)' }}>
+                {stageMessages[stage]}
+              </p>
+            </div>
+
+            {/* Progress bar for recording */}
+            {isRecording &&
+            <div className="w-full mt-4 h-2 rounded-full overflow-hidden" style={{ background: 'var(--a-line-strong)' }}>
+                <motion.div
+                className="h-full rounded-full"
+                style={{ background: 'var(--a-pink-2)' }}
+                initial={{ width: '0%' }}
+                animate={{ width: `${recordingTime / 10 * 100}%` }}
+                transition={{ duration: 0.5 }} />
+              
+              </div>
+            }
+
+            {/* Processing stages indicator */}
+            {isProcessing &&
+            <div className="w-full mt-4 flex justify-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${stage === 'processing' ? 'animate-pulse' : ''}`} style={{ background: 'var(--a-peach-2)' }} />
+                <div className={`w-3 h-3 rounded-full ${stage === 'analyzing' ? 'animate-pulse' : ''}`} style={{ background: stage === 'analyzing' ? 'var(--a-peach-2)' : 'var(--a-line-strong)' }} />
+                <div className="w-3 h-3 rounded-full" style={{ background: 'var(--a-line-strong)' }} />
+              </div>
+            }
+          </div>
+        </div>
 
         {/* No Cry Detected Card */}
         <AnimatePresence>
@@ -420,38 +421,38 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}>
             
-              <Card className="overflow-hidden border-amber-500/30">
-                <div className="h-2 bg-gradient-to-r from-gray-400 to-gray-500" />
-                <CardContent className="p-4 space-y-4">
+              <div className="a-card overflow-hidden" style={{ padding: 0 }}>
+                <div style={{ height: 8, background: cryTypeLabels.no_cry_detected.grad }} />
+                <div className="p-4 space-y-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-3xl">
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl" style={{ background: cryTypeLabels.no_cry_detected.grad }}>
                       🔇
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold">{tr("crytranslator_aglama_askarlanmadi_15a23e", "Ağlama aşkarlanmadı")}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <h3 className="a-heading" style={{ margin: 0, fontSize: 19 }}>{tr("crytranslator_aglama_askarlanmadi_15a23e", "Ağlama aşkarlanmadı")}</h3>
+                      <p className="a-list-sub mt-1" style={{ margin: 0, whiteSpace: 'normal' }}>
                         {tr("crytranslator_ortamda_korpe_aglamasi_esidilm_6b36d5", "Ortamda k\xF6rp\u0259 a\u011Flamas\u0131 e\u015Fidilm\u0259di")}
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-3 bg-muted/50 rounded-xl">
-                    <p className="text-sm">{analysis.explanation}</p>
+                  <div className="p-3 rounded-xl" style={{ background: 'var(--a-surface-soft)' }}>
+                    <p className="a-cta-text" style={{ margin: 0 }}>{analysis.explanation}</p>
                   </div>
 
-                  <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                    <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-                    <p className="text-sm text-amber-600 dark:text-amber-400">
+                  <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: 'var(--a-yellow-1)' }}>
+                    <AlertTriangle className="w-5 h-5 shrink-0" style={{ color: 'var(--a-warn-ink)' }} />
+                    <p className="text-sm" style={{ margin: 0, color: 'var(--a-warn-ink)' }}>
                       {tr("crytranslator_korpeniz_agladigi_zaman_yenide_e6c4db", "K\xF6rp\u0259niz a\u011Flad\u0131\u011F\u0131 zaman yenid\u0259n c\u0259hd edin. M\xFCmk\xFCn q\u0259d\u0259r yax\u0131ndan v\u0259 ayd\u0131n s\u0259s yaz\u0131n.")}
                     </p>
                   </div>
 
-                  <Button onClick={resetAnalysis} className="w-full">
-                    <Mic className="w-4 h-4 mr-2" />
+                  <button onClick={resetAnalysis} className="a-cta-btn w-full" style={{ justifyContent: 'center', height: 44 }}>
+                    <Mic size={15} strokeWidth={2.2} />
                     {tr("crytranslator_yeniden_cehd_et_d273ac", "Yenid\u0259n c\u0259hd et")}
-                  </Button>
-                </CardContent>
-              </Card>
+                  </button>
+                </div>
+              </div>
             </motion.div>
           }
         </AnimatePresence>
@@ -464,38 +465,38 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}>
             
-              <Card className="overflow-hidden border-orange-500/30">
-                <div className="h-2 bg-gradient-to-r from-amber-400 to-orange-500" />
-                <CardContent className="p-4 space-y-4">
+              <div className="a-card overflow-hidden" style={{ padding: 0 }}>
+                <div style={{ height: 8, background: cryTypeLabels.false_positive.grad }} />
+                <div className="p-4 space-y-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-3xl">
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl" style={{ background: cryTypeLabels.false_positive.grad }}>
                       📺
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold">{tr("crytranslator_saxta_ses_askarlandi_d6f6bf", "Saxta səs aşkarlandı")}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <h3 className="a-heading" style={{ margin: 0, fontSize: 19 }}>{tr("crytranslator_saxta_ses_askarlandi_d6f6bf", "Saxta səs aşkarlandı")}</h3>
+                      <p className="a-list-sub mt-1" style={{ margin: 0, whiteSpace: 'normal' }}>
                         {tr("crytranslator_bu_ses_heqiqi_korpe_aglamasi_d_ea2e8c", "Bu s\u0259s h\u0259qiqi k\xF6rp\u0259 a\u011Flamas\u0131 deyil")}
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-3 bg-muted/50 rounded-xl">
-                    <p className="text-sm">{analysis.explanation}</p>
+                  <div className="p-3 rounded-xl" style={{ background: 'var(--a-surface-soft)' }}>
+                    <p className="a-cta-text" style={{ margin: 0 }}>{analysis.explanation}</p>
                   </div>
 
-                  <div className="flex items-start gap-2 p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                    <XCircle className="w-5 h-5 text-orange-500 shrink-0" />
-                    <p className="text-sm text-orange-600 dark:text-orange-400">
+                  <div className="flex items-start gap-2 p-3 rounded-xl" style={{ background: 'var(--a-yellow-1)' }}>
+                    <XCircle className="w-5 h-5 shrink-0" style={{ color: 'var(--a-warn-ink)' }} />
+                    <p className="text-sm" style={{ margin: 0, color: 'var(--a-warn-ink)' }}>
                       {tr("crytranslator_tv_telefon_ve_ya_imitasiya_ses_1867b6", "TV, telefon v\u0259 ya imitasiya s\u0259sl\u0259ri a\u015Fkarland\u0131. H\u0259qiqi k\xF6rp\u0259 a\u011Flamas\u0131 il\u0259 yenid\u0259n c\u0259hd edin.")}
                     </p>
                   </div>
 
-                  <Button onClick={resetAnalysis} className="w-full">
-                    <Mic className="w-4 h-4 mr-2" />
+                  <button onClick={resetAnalysis} className="a-cta-btn w-full" style={{ justifyContent: 'center', height: 44 }}>
+                    <Mic size={15} strokeWidth={2.2} />
                     {tr("crytranslator_yeniden_cehd_et_d273ac", "Yenid\u0259n c\u0259hd et")}
-                  </Button>
-                </CardContent>
-              </Card>
+                  </button>
+                </div>
+              </div>
             </motion.div>
           }
         </AnimatePresence>
@@ -508,19 +509,19 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}>
             
-              <Card className="overflow-hidden">
-                <div className={`h-2 bg-gradient-to-r ${cryInfo.color}`} />
-                <CardContent className="p-4 space-y-4">
+              <div className="a-card overflow-hidden" style={{ padding: 0 }}>
+                <div style={{ height: 8, background: cryInfo.grad }} />
+                <div className="p-4 space-y-4">
                   {/* Main Result */}
                   <div className="flex items-center gap-4">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${cryInfo.color} flex items-center justify-center text-3xl`}>
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl" style={{ background: cryInfo.grad }}>
                       {cryInfo.emoji}
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold">{cryInfo.label}</h3>
+                      <h3 className="a-heading" style={{ margin: 0, fontSize: 19, color: cryInfo.ink }}>{cryInfo.label}</h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <div className={`w-2 h-2 rounded-full ${getUrgencyColor(analysis.urgency)}`} />
-                        <span className="text-sm text-muted-foreground">
+                        <div className="w-2 h-2 rounded-full" style={{ background: getUrgencyColor(analysis.urgency) }} />
+                        <span className="a-list-sub" style={{ margin: 0 }}>
                           {analysis.confidence}{tr("crytranslator_eminlik_5cf4fa", "% \u0259minlik")}
                         </span>
                       </div>
@@ -528,78 +529,83 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
                   </div>
 
                   {/* Explanation */}
-                  <div className="p-3 bg-muted/50 rounded-xl">
-                    <p className="text-sm">{analysis.explanation}</p>
+                  <div className="p-3 rounded-xl" style={{ background: 'var(--a-surface-soft)' }}>
+                    <p className="a-cta-text" style={{ margin: 0 }}>{analysis.explanation}</p>
                   </div>
 
                   {/* Recommendations */}
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-primary" />
+                    <h4 className="text-sm font-bold flex items-center gap-2" style={{ color: 'var(--a-ink)' }}>
+                      <CheckCircle className="w-4 h-4" style={{ color: 'var(--a-green-2)' }} />
                       {tr("crytranslator_tovsiyeler_17a8f7", "T\xF6vsiy\u0259l\u0259r")}
                     </h4>
                     {analysis.recommendations.map((rec, idx) =>
-                  <div key={idx} className="flex items-start gap-2 p-2 bg-primary/5 rounded-lg">
-                        <span className="w-5 h-5 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center shrink-0">
+                  <div key={idx} className="flex items-start gap-2 p-2.5 rounded-xl" style={{ background: 'var(--a-surface-soft)' }}>
+                        <span
+                      className="w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center shrink-0"
+                      style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
                           {idx + 1}
                         </span>
-                        <p className="text-sm">{rec}</p>
+                        <p className="a-cta-text" style={{ margin: 0 }}>{rec}</p>
                       </div>
                   )}
                   </div>
 
                   {/* Urgency Warning */}
                   {analysis.urgency === 'high' &&
-                <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                      <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
-                      <p className="text-sm text-red-600 dark:text-red-400">
+                <div className="a-alert-card" style={{ margin: 0 }}>
+                      <AlertCircle className="w-5 h-5 shrink-0" style={{ color: 'var(--a-alert-ink)' }} />
+                      <p className="text-sm" style={{ margin: 0, color: 'var(--a-alert-ink)' }}>
                         {tr("crytranslator_diqqet_bu_simptomlar_ciddi_ola_805dc6", "Diqq\u0259t! Bu simptomlar ciddi ola bil\u0259r. H\u0259kim\u0259 m\xFCraci\u0259t etm\u0259yi d\xFC\u015F\xFCn\xFCn.")}
                       </p>
                     </div>
                 }
 
-                  <Button onClick={resetAnalysis} variant="outline" className="w-full">
-                    <Mic className="w-4 h-4 mr-2" />
+                  <button onClick={resetAnalysis} className="a-btn-soft w-full" style={{ justifyContent: 'center', height: 44 }}>
+                    <Mic size={15} strokeWidth={2.2} />
                     {tr("crytranslator_yeni_analiz_3c7a2d", "Yeni analiz")}
-                  </Button>
-                </CardContent>
-              </Card>
+                  </button>
+                </div>
+              </div>
             </motion.div>
           }
         </AnimatePresence>
 
         {/* History */}
         {showHistory && history.length > 0 &&
-        <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <History className="w-4 h-4" />
-                {tr("crytranslator_son_analizler_76b144", "Son analizl\u0259r")}
-              </h3>
-              <div className="space-y-2">
-                {history.map((item) => {
-                const info = cryTypeLabels[item.cry_type] || cryTypeLabels.attention;
-                return (
-                  <div key={item.id} className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
-                      <span className="text-xl">{info.emoji}</span>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{info.label}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(item.created_at).toLocaleDateString('az-AZ')}
-                        </p>
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {item.confidence_score}%
-                      </span>
-                    </div>);
+        <div className="a-card">
+            <h3 className="a-card-title a-heading mb-3 flex items-center gap-2">
+              <History className="w-4 h-4" style={{ color: 'var(--a-peach-2)' }} />
+              {tr("crytranslator_son_analizler_76b144", "Son analizl\u0259r")}
+            </h3>
+            <div className="space-y-2">
+              {history.map((item) => {
+              const info = cryTypeLabels[item.cry_type] || cryTypeLabels.attention;
+              return (
+                <div key={item.id} className="flex items-center gap-3 p-2.5 rounded-xl" style={{ background: 'var(--a-surface-soft)' }}>
+                    <span className="a-list-icon" style={{ width: 36, height: 36, borderRadius: 12, background: info.grad, fontSize: 16 }}>{info.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="a-list-title" style={{ margin: 0 }}>{info.label}</p>
+                      <p className="a-list-sub" style={{ margin: 0 }}>
+                        {new Date(item.created_at).toLocaleDateString(getLocaleTag())}
+                      </p>
+                    </div>
+                    <span className="a-list-time">
+                      {item.confidence_score}%
+                    </span>
+                  </div>);
 
-              })}
-              </div>
-            </CardContent>
-          </Card>
+            })}
+            </div>
+          </div>
         }
       </div>
-    </div>);
+
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        feature="cry_translator" />
+    </ToolPage>);
 
 };
 

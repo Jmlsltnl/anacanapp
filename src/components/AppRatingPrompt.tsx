@@ -1,7 +1,7 @@
 import { tr } from "@/lib/tr";import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, X, Clock } from 'lucide-react';
-import { useAppRating, openAppStore } from '@/hooks/useAppRating';
+import { useAppRating, openAppStore, requestNativeReview } from '@/hooks/useAppRating';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/native';
 
@@ -19,7 +19,10 @@ const AppRatingPrompt = () => {
     await hapticFeedback.medium();
     await recordAction('rated');
     if (selectedStars === 5) {
-      openAppStore();
+      // Əvvəlcə rəsmi native in-app review dialoqu (tətbiqdən çıxmadan);
+      // mümkün olmasa store linkinə fallback.
+      const shown = await requestNativeReview();
+      if (!shown) openAppStore();
     }
   };
 
@@ -121,7 +124,7 @@ const AppRatingPrompt = () => {
             className="w-full h-10 text-muted-foreground hover:text-foreground">
             
               <Clock className="w-4 h-4 mr-2" />
-              Daha sonra
+              {tr("appratingprompt_daha_sonra", "Daha sonra")}
             </Button>
 
             {/* Never option */}

@@ -69,14 +69,13 @@ const DailyStoryCards = () => {
 
   return (
     <>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
-        <div className="flex items-center justify-between px-1">
-          <h3 className="font-bold text-foreground text-sm">{tr("dailystorycards_bu_gun_ucun_def36c", "Bu G\xFCn \xDC\xE7\xFCn")}</h3>
-          <span className="text-xs text-muted-foreground">{format(today, 'd MMM')}</span>
+      <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="a-section">
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading">{tr("dailystorycards_bu_gun_ucun_def36c", "Bu G\xFCn \xDC\xE7\xFCn")}</h2>
+          <span className="a-section-link">{format(today, 'd MMM')}</span>
         </div>
-        <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory scrollbar-none">
+        <div className="a-hscroll hide-scrollbar">
           {cards.map((card, idx) => {
-            const gradient = card.phase ? PHASE_GRADIENT[card.phase] || 'from-primary to-primary-foreground' : 'from-orange-400 to-pink-500';
             return (
               <motion.button
                 key={card.id}
@@ -85,16 +84,18 @@ const DailyStoryCards = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.04 }}
-                className={`flex-shrink-0 w-36 h-48 rounded-2xl p-3 text-left snap-center bg-gradient-to-br ${gradient} text-white shadow-md`}>
+                className="a-hscroll-card">
                 
-                <div className="text-3xl mb-2">{card.emoji || '✨'}</div>
-                <p className="font-bold text-sm leading-tight mb-1 line-clamp-2">{getCardTitle(card, language)}</p>
-                <p className="text-[10px] text-white/80 line-clamp-3">{getCardContent(card, language)}</p>
+                <span className="a-list-icon" style={{ background: 'var(--a-grad-pink)', fontSize: 18 }}>
+                  {card.emoji || '✨'}
+                </span>
+                <p className="a-hscroll-title">{getCardTitle(card, language)}</p>
+                <p className="a-hscroll-text">{getCardContent(card, language)}</p>
               </motion.button>);
 
           })}
         </div>
-      </motion.div>
+      </motion.section>
 
       {typeof document !== 'undefined' && createPortal(
         <AnimatePresence>

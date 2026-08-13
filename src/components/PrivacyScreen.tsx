@@ -1,8 +1,8 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  ArrowLeft, Shield, Lock, Eye, EyeOff, Trash2,
-  Download, UserX, AlertTriangle, Check } from
+  ArrowLeft, Shield, Lock, Eye, Trash2,
+  Download, UserX, AlertTriangle } from
 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
@@ -11,11 +11,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
+import { usePrivacyPreferences, type PrivacyPrefs } from '@/hooks/usePrivacyPreferences';
 import { tr } from "@/lib/tr";
 
 interface PrivacyScreenProps {
   onBack: () => void;
 }
+
+const SWITCH_CLS = "data-[state=checked]:bg-[var(--a-peach-2)]";
 
 const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
   useScrollToTop();
@@ -25,22 +28,20 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const [privacySettings, setPrivacySettings] = useState({
-    profileVisible: true,
-    showInCommunity: true,
-    allowMessages: true,
-    shareAnalytics: false
-  });
+  // DB-persist privacy ayarlarÄ± (É™vvÉ™llÉ™r yalnÄ±z local state idi)
+  const { prefs, updatePref, loading: prefsLoading } = usePrivacyPreferences();
 
-  const handleToggle = (key: keyof typeof privacySettings) => {
-    setPrivacySettings((prev) => ({ ...prev, [key]: !prev[key] }));
-    toast({ title: tr("privacyscreen_ayar_yenilendi_f0f876", 'Ayar yeniləndi') });
+  const handleToggle = async (key: keyof PrivacyPrefs, value: boolean) => {
+    const ok = await updatePref(key, value);
+    toast(ok ?
+    { title: tr("privacyscreen_ayar_yenilendi_f0f876", 'Ayar yenilÉ™ndi') } :
+    { title: tr("privacyscreen_xeta_3cdbb6", 'XÉ™ta'), description: tr('privacy_save_failed', 'Yadda saxlanÄ±lmadÄ± â€” yenidÉ™n cÉ™hd edin.'), variant: 'destructive' });
   };
 
   const handleExportData = async () => {
     if (!user) return;
 
-    toast({ title: tr("privacyscreen_melumatlar_hazirlanir_482381", 'Məlumatlar hazırlanır...'), description: tr("privacyscreen_bu_bir_nece_saniye_ceke_biler_49b373", 'Bu bir neçə saniyə çəkə bilər.') });
+    toast({ title: tr("privacyscreen_melumatlar_hazirlanir_482381", 'MÉ™lumatlar hazÄ±rlanÄ±r...'), description: tr("privacyscreen_bu_bir_nece_saniye_ceke_biler_49b373", 'Bu bir neÃ§É™ saniyÉ™ Ã§É™kÉ™ bilÉ™r.') });
 
     try {
       // Fetch user data
@@ -65,9 +66,9 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
       a.click();
       URL.revokeObjectURL(url);
 
-      toast({ title: tr("privacyscreen_melumatlar_yuklendi_f04800", 'Məlumatlar yükləndi!') });
+      toast({ title: tr("privacyscreen_melumatlar_yuklendi_f04800", 'MÉ™lumatlar yÃ¼klÉ™ndi!') });
     } catch (error: any) {
-      toast({ title: tr("privacyscreen_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
+      toast({ title: tr("privacyscreen_xeta_3cdbb6", 'XÉ™ta'), description: error.message, variant: 'destructive' });
     }
   };
 
@@ -85,183 +86,190 @@ const PrivacyScreen = ({ onBack }: PrivacyScreenProps) => {
       // Sign out
       await signOut();
 
-      toast({ title: 'Hesab silindi', description: tr("privacyscreen_melumatlariniz_birdefelik_silindi_8f69e7", 'Məlumatlarınız birdəfəlik silindi.') });
+      toast({ title: 'Hesab silindi', description: tr("privacyscreen_melumatlariniz_birdefelik_silindi_8f69e7", 'MÉ™lumatlarÄ±nÄ±z birdÉ™fÉ™lik silindi.') });
     } catch (error: any) {
-      toast({ title: tr("privacyscreen_xeta_3cdbb6", 'Xəta'), description: error.message, variant: 'destructive' });
+      toast({ title: tr("privacyscreen_xeta_3cdbb6", 'XÉ™ta'), description: error.message, variant: 'destructive' });
     } finally {
       setDeleting(false);
       setShowDeleteDialog(false);
     }
   };
 
+  // Palitra tint-lÉ™ri hÉ™r sÄ±ra Ã¼Ã§Ã¼n
   const privacyOptions = [
   {
     icon: Eye,
-    title: tr("privacyscreen_profil_gorunurluyu_deeea5", 'Profil görünürlüyü'),
-    description: tr("privacyscreen_diger_istifadeciler_profilinizi_gore_bil_f3544c", 'Digər istifadəçilər profilinizi görə bilər'),
-    key: 'profileVisible' as const
+    title: tr("privacyscreen_profil_gorunurluyu_deeea5", 'Profil gÃ¶rÃ¼nÃ¼rlÃ¼yÃ¼'),
+    description: tr("privacyscreen_diger_istifadeciler_profilinizi_gore_bil_f3544c", 'DigÉ™r istifadÉ™Ã§ilÉ™r profilinizi gÃ¶rÉ™ bilÉ™r'),
+    key: 'privacy_profile_visible' as const,
+    bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)'
   },
   {
     icon: UserX,
-    title: tr("privacyscreen_cemiyyetde_goster_3e9674", 'Cəmiyyətdə göstər'),
-    description: tr("privacyscreen_post_ve_story_leriniz_digerlerine_gorunu_cf12e6", 'Post və story-ləriniz digərlərinə görünür'),
-    key: 'showInCommunity' as const
+    title: tr("privacyscreen_cemiyyetde_goster_3e9674", 'CÉ™miyyÉ™tdÉ™ gÃ¶stÉ™r'),
+    description: tr("privacyscreen_post_ve_story_leriniz_digerlerine_gorunu_cf12e6", 'Post vÉ™ story-lÉ™riniz digÉ™rlÉ™rinÉ™ gÃ¶rÃ¼nÃ¼r'),
+    key: 'privacy_show_in_community' as const,
+    bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)'
   },
   {
     icon: Lock,
-    title: tr("privacyscreen_mesajlara_icaze_ver_99d96f", 'Mesajlara icazə ver'),
-    description: tr("privacyscreen_diger_istifadeciler_size_mesaj_gondere_b_c1b1fc", 'Digər istifadəçilər sizə mesaj göndərə bilər'),
-    key: 'allowMessages' as const
+    title: tr("privacyscreen_mesajlara_icaze_ver_99d96f", 'Mesajlara icazÉ™ ver'),
+    description: tr("privacyscreen_diger_istifadeciler_size_mesaj_gondere_b_c1b1fc", 'DigÉ™r istifadÉ™Ã§ilÉ™r sizÉ™ mesaj gÃ¶ndÉ™rÉ™ bilÉ™r'),
+    key: 'privacy_allow_messages' as const,
+    bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)'
   },
   {
     icon: Shield,
-    title: tr("privacyscreen_analitik_melumat_paylas_7971ff", 'Analitik məlumat paylaş'),
-    description: tr("privacyscreen_anonim_istifade_melumatlarini_paylasin_835e3a", 'Anonim istifadə məlumatlarını paylaşın'),
-    key: 'shareAnalytics' as const
+    title: tr("privacyscreen_analitik_melumat_paylas_7971ff", 'Analitik mÉ™lumat paylaÅŸ'),
+    description: tr("privacyscreen_anonim_istifade_melumatlarini_paylasin_835e3a", 'Anonim istifadÉ™ mÉ™lumatlarÄ±nÄ± paylaÅŸÄ±n'),
+    key: 'privacy_share_analytics' as const,
+    bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)'
   }];
 
 
   return (
-    <div className="min-h-screen bg-background pb-28 overflow-y-auto">
-      {/* Header with safe area */}
-      <div className="gradient-primary px-5 pb-6" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
-        <div className="flex items-center gap-3 mb-4">
-          <motion.button
-            onClick={onBack}
-            className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}>
-            
-            <ArrowLeft className="w-5 h-5 text-white" />
-          </motion.button>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">{tr("privacyscreen_gizlilik_tehlukesizlik_67bec6", "Gizlilik & Təhlükəsizlik")}</h1>
-            <p className="text-white/80 text-sm">{tr("privacyscreen_melumatlarinizi_idare_edin_efbcdb", "Məlumatlarınızı idarə edin")}</p>
+    <div className="a-scope safe-top min-h-screen pb-28 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
+              <ArrowLeft size={16} strokeWidth={2} />
+            </motion.button>
+            <div>
+              <p className="a-eyebrow">{tr("privacyscreen_melumatlarinizi_idare_edin_efbcdb", "MÉ™lumatlarÄ±nÄ±zÄ± idarÉ™ edin")}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("privacyscreen_gizlilik_tehlukesizlik_67bec6", "Gizlilik & TÉ™hlÃ¼kÉ™sizlik")}</p>
+            </div>
           </div>
+        </header>
+
+        <div className="space-y-3.5">
+          {/* Privacy Settings */}
+          <motion.div
+            className="a-card"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}>
+
+            <h3 className="a-card-title flex items-center gap-2" style={{ marginBottom: 12 }}>
+              <Lock size={16} style={{ color: 'var(--a-accent-ink)' }} />
+              {tr("privacyscreen_gizlilik_ayarlari_4055d3", "Gizlilik Ayarlar\u0131")}
+            </h3>
+
+            <div className="space-y-1">
+              {privacyOptions.map((option, index) => {
+                const Icon = option.icon;
+                return (
+                  <div key={index} className="flex items-center justify-between gap-3" style={{ padding: '10px 4px' }}>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 flex items-center justify-center shrink-0" style={{ borderRadius: 13, background: option.bg }}>
+                        <Icon size={17} style={{ color: option.ink }} />
+                      </div>
+                      <div className="min-w-0">
+                        <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--a-ink)' }}>{option.title}</p>
+                        <p style={{ fontSize: 11, color: 'var(--a-ink-soft)', marginTop: 1 }}>{option.description}</p>
+                      </div>
+                    </div>
+                    <Switch
+                      className={SWITCH_CLS}
+                      checked={prefs[option.key]}
+                      disabled={prefsLoading}
+                      onCheckedChange={(checked) => handleToggle(option.key, checked)} />
+
+                  </div>);
+
+              })}
+            </div>
+          </motion.div>
+
+          {/* Data Management */}
+          <motion.div
+            className="a-card"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}>
+
+            <h3 className="a-card-title flex items-center gap-2" style={{ marginBottom: 12 }}>
+              <Shield size={16} style={{ color: 'var(--a-accent-ink)' }} />
+              {tr("privacyscreen_melumat_i_dareetmesi_19f40f", "M\u0259lumat \u0130dar\u0259etm\u0259si")}
+            </h3>
+
+            <div className="space-y-2.5">
+              <motion.button
+                onClick={handleExportData}
+                className="w-full flex items-center gap-4 text-left transition-colors"
+                style={{ padding: 14, borderRadius: 16, background: 'var(--a-surface-soft)' }}
+                whileTap={{ scale: 0.98 }}>
+
+                <div className="w-10 h-10 flex items-center justify-center shrink-0" style={{ borderRadius: 13, background: 'var(--a-green-1)' }}>
+                  <Download size={17} style={{ color: 'var(--a-green-ink)' }} />
+                </div>
+                <div className="flex-1">
+                  <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{tr("privacyscreen_melumatlari_yukle_5cee89", "MÉ™lumatlarÄ± YÃ¼klÉ™")}</p>
+                  <p style={{ fontSize: 11, color: 'var(--a-ink-soft)' }}>{tr("privacyscreen_butun_melumatlarinizi_json_formatinda_yu_0c02e5", "BÃ¼tÃ¼n mÉ™lumatlarÄ±nÄ±zÄ± JSON formatÄ±nda yÃ¼klÉ™yin")}</p>
+                </div>
+              </motion.button>
+
+              <motion.button
+                onClick={() => setShowDeleteDialog(true)}
+                className="w-full flex items-center gap-4 text-left transition-colors"
+                style={{ padding: 14, borderRadius: 16, background: 'var(--a-alert-bg)' }}
+                whileTap={{ scale: 0.98 }}>
+
+                <div className="w-10 h-10 flex items-center justify-center shrink-0" style={{ borderRadius: 13, background: 'var(--a-chip-overlay)' }}>
+                  <Trash2 size={17} style={{ color: 'var(--a-alert-ink)' }} />
+                </div>
+                <div className="flex-1">
+                  <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-alert-ink)' }}>{tr("privacyscreen_hesabi_sil_6abf24", "HesabÄ± Sil")}</p>
+                  <p style={{ fontSize: 11, color: 'var(--a-alert-soft)' }}>{tr("privacyscreen_butun_melumatlarinizi_birdefelik_silin_41a068", "BÃ¼tÃ¼n mÉ™lumatlarÄ±nÄ±zÄ± birdÉ™fÉ™lik silin")}</p>
+                </div>
+              </motion.button>
+            </div>
+          </motion.div>
+
+          {/* Privacy Policy Link */}
+          <motion.div
+            style={{ background: 'var(--a-disclaimer-bg)', border: '1px solid var(--a-disclaimer-border)', borderRadius: 'var(--a-radius-md)', padding: 16 }}
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}>
+
+            <p className="text-center" style={{ fontSize: 12.5, color: 'var(--a-disclaimer-ink)' }}>
+              {tr("privacyscreen_gizlilik_siyasetimiz_ve_istifa_8c585b", "Gizlilik siyas\u0259timiz v\u0259 istifad\u0259 \u015F\u0259rtl\u0259rimiz haqq\u0131nda \u0259trafl\u0131 m\u0259lumat \xFC\xE7\xFCn")}{' '}
+              <a href="#" style={{ color: 'var(--a-disclaimer-strong)', fontWeight: 700 }}>{tr("privacyscreen_buraya_klikleyin_c20d44", "buraya kliklÉ™yin")}</a>.
+            </p>
+          </motion.div>
         </div>
-      </div>
-
-      <div className="px-5 py-4 space-y-6 -mt-4">
-        {/* Privacy Settings */}
-        <motion.div
-          className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}>
-          
-          <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-            <Lock className="w-5 h-5 text-primary" />
-            {tr("privacyscreen_gizlilik_ayarlari_4055d3", "Gizlilik Ayarlar\u0131")}
-          </h3>
-          
-          <div className="space-y-4">
-            {privacyOptions.map((option, index) => {
-              const Icon = option.icon;
-              return (
-                <div key={index} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground text-sm">{option.title}</p>
-                      <p className="text-xs text-muted-foreground">{option.description}</p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={privacySettings[option.key]}
-                    onCheckedChange={() => handleToggle(option.key)} />
-                  
-                </div>);
-
-            })}
-          </div>
-        </motion.div>
-
-        {/* Data Management */}
-        <motion.div
-          className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}>
-          
-          <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
-            <Shield className="w-5 h-5 text-primary" />
-            {tr("privacyscreen_melumat_i_dareetmesi_19f40f", "M\u0259lumat \u0130dar\u0259etm\u0259si")}
-          </h3>
-          
-          <div className="space-y-3">
-            <motion.button
-              onClick={handleExportData}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors"
-              whileTap={{ scale: 0.98 }}>
-              
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                <Download className="w-5 h-5 text-emerald-600" />
-              </div>
-              <div className="flex-1 text-left">
-                <p className="font-medium text-foreground">{tr("privacyscreen_melumatlari_yukle_5cee89", "Məlumatları Yüklə")}</p>
-                <p className="text-xs text-muted-foreground">{tr("privacyscreen_butun_melumatlarinizi_json_formatinda_yu_0c02e5", "Bütün məlumatlarınızı JSON formatında yükləyin")}</p>
-              </div>
-            </motion.button>
-
-            <motion.button
-              onClick={() => setShowDeleteDialog(true)}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border border-destructive/30 bg-destructive/5 hover:bg-destructive/10 transition-colors"
-              whileTap={{ scale: 0.98 }}>
-              
-              <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
-                <Trash2 className="w-5 h-5 text-destructive" />
-              </div>
-              <div className="flex-1 text-left">
-                <p className="font-medium text-destructive">{tr("privacyscreen_hesabi_sil_6abf24", "Hesabı Sil")}</p>
-                <p className="text-xs text-muted-foreground">{tr("privacyscreen_butun_melumatlarinizi_birdefelik_silin_41a068", "Bütün məlumatlarınızı birdəfəlik silin")}</p>
-              </div>
-            </motion.button>
-          </div>
-        </motion.div>
-
-        {/* Privacy Policy Link */}
-        <motion.div
-          className="bg-muted/50 rounded-2xl p-4"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}>
-          
-          <p className="text-sm text-muted-foreground text-center">
-            {tr("privacyscreen_gizlilik_siyasetimiz_ve_istifa_8c585b", "Gizlilik siyas\u0259timiz v\u0259 istifad\u0259 \u015F\u0259rtl\u0259rimiz haqq\u0131nda \u0259trafl\u0131 m\u0259lumat \xFC\xE7\xFCn")}{' '}
-            <a href="#" className="text-primary font-medium">{tr("privacyscreen_buraya_klikleyin_c20d44", "buraya klikləyin")}</a>.
-          </p>
-        </motion.div>
       </div>
 
       {/* Delete Account Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
+        <DialogContent className="a-scope rounded-[22px]">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive">
+            <DialogTitle className="flex items-center gap-2" style={{ color: 'var(--a-alert-ink)' }}>
               <AlertTriangle className="w-5 h-5" />
               {tr("privacyscreen_hesabi_silmek_6d444c", "Hesab\u0131 Silm\u0259k")}
             </DialogTitle>
             <DialogDescription className="text-left">
               {tr("privacyscreen_bu_emeliyyat_geri_qaytarila_bi_fdaca8", "Bu \u0259m\u0259liyyat geri qaytar\u0131la bilm\u0259z. B\xFCt\xFCn m\u0259lumatlar\u0131n\u0131z, o c\xFCml\u0259d\u0259n:")}
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>{tr("privacyscreen_profil_melumatlari_82c76c", "Profil məlumatları")}</li>
-                <li>{tr("privacyscreen_gundelik_qeydler_285ea0", "Gündəlik qeydlər")}</li>
-                <li>{tr("privacyscreen_gorusler_a729f1", "Görüşlər")}</li>
-                <li>{tr("privacyscreen_bildirisler_54eb88", "Bildirişlər")}</li>
+                <li>{tr("privacyscreen_profil_melumatlari_82c76c", "Profil mÉ™lumatlarÄ±")}</li>
+                <li>{tr("privacyscreen_gundelik_qeydler_285ea0", "GÃ¼ndÉ™lik qeydlÉ™r")}</li>
+                <li>{tr("privacyscreen_gorusler_a729f1", "GÃ¶rÃ¼ÅŸlÉ™r")}</li>
+                <li>{tr("privacyscreen_bildirisler_54eb88", "BildiriÅŸlÉ™r")}</li>
               </ul>
               {tr("privacyscreen_birdefelik_silinecek_d977cc", "bird\u0259f\u0259lik silin\u0259c\u0259k.")}
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-3 mt-4">
-            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} className="flex-1">
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} className="flex-1 rounded-full">
               {tr("privacyscreen_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button
               variant="destructive"
               onClick={handleDeleteAccount}
-              className="flex-1"
+              className="flex-1 rounded-full"
               disabled={deleting}>
-              
+
               {deleting ? 'Silinir...' : tr("privacyscreen_beli_sil_fd44c5", "B\u0259li, Sil")}
             </Button>
           </div>

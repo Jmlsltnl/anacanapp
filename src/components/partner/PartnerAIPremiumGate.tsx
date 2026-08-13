@@ -8,8 +8,8 @@ import { PremiumModal } from '@/components/PremiumModal';
 const AIChatScreen = lazy(() => import('@/components/AIChatScreen'));
 
 const fallback =
-<div className="min-h-screen flex items-center justify-center">
-    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+<div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+    <div className="w-8 h-8 rounded-full animate-spin" style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
   </div>;
 
 
@@ -28,42 +28,51 @@ const PartnerAIPremiumGate = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/50 via-orange-50/30 to-background px-5 pt-8 pb-28">
+    <div className="a-scope min-h-screen px-5 pt-8 pb-28 relative" style={{ background: 'var(--a-bg)' }}>
+      {/* Watercolor sky */}
+      <div className="a-sky" aria-hidden>
+        <span className="a-cloud c1" />
+        <span className="a-cloud c2" />
+        <span className="a-cloud c3" />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md mx-auto">
-        
+        className="max-w-md mx-auto relative z-10">
+
         <div className="flex flex-col items-center text-center mb-8">
           <div className="relative mb-5">
             <motion.div
-              className="w-24 h-24 rounded-3xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-xl shadow-amber-500/30"
+              className="w-24 h-24 flex items-center justify-center"
+              style={{ borderRadius: 28, background: 'var(--a-grad-peach)', boxShadow: '0 24px 48px -16px rgba(217, 108, 74, 0.55)' }}
               animate={{ rotate: [0, -5, 5, 0] }}
               transition={{ duration: 4, repeat: Infinity }}>
-              
-              <Crown className="w-12 h-12 text-white" />
+
+              <Crown size={44} style={{ color: 'var(--a-accent-ink)' }} />
             </motion.div>
             <motion.div
-              className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-lg"
+              className="absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)' }}
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 2, repeat: Infinity }}>
-              
-              <Sparkles className="w-4 h-4 text-amber-500" />
+
+              <Sparkles size={15} style={{ color: '#ffc94d' }} />
             </motion.div>
           </div>
-          <h1 className="text-2xl font-black text-foreground mb-2">
+          <h1 className="mb-2" style={{ fontSize: 23, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--a-ink)' }}>
             {tr("partneraipremiumgate_anacan_ai_premium_ucundur_37ae9a", "Anacan.AI Premium \xFC\xE7\xFCnd\xFCr")}
           </h1>
-          <p className="text-muted-foreground text-sm leading-relaxed">
+          <p className="leading-relaxed" style={{ fontSize: 13.5, color: 'var(--a-body-text)' }}>
             {tr("partneraipremiumgate_anacan_ai_komekcisi_ve_partnyo_b352ea", "Anacan.AI k\xF6m\u0259k\xE7isi v\u0259 partnyor funksiyalar\u0131 yaln\u0131z Premium istifad\u0259\xE7il\u0259r \xFC\xE7\xFCnd\xFCr.\n            H\u0259yat yolda\u015F\u0131n\u0131z\u0131n v\u0259 ya \xF6z hesab\u0131n\u0131z\u0131n Premium aboneliyi aktiv olduqda burada\n            ekspert m\u0259sl\u0259h\u0259tl\u0259ri ala bil\u0259rsiniz.")}
-          
+
 
           </p>
         </div>
 
-        <div className="bg-card rounded-3xl p-5 border border-border/50 shadow-card mb-5">
-          <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-500" />
+        <div className="a-card mb-5">
+          <h3 className="a-card-title flex items-center gap-2" style={{ marginBottom: 12 }}>
+            <Sparkles size={15} style={{ color: 'var(--a-yellow-ink)' }} />
             {tr("partneraipremiumgate_premium_da_ne_var_d28116", "Premium-da n\u0259 var?")}
           </h3>
           <ul className="space-y-2.5">
@@ -73,9 +82,9 @@ const PartnerAIPremiumGate = () => {
 
 
             map((item) =>
-            <li key={item} className="flex items-start gap-2 text-sm text-foreground">
-                <div className="w-5 h-5 rounded-full bg-emerald-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-3 h-3 text-emerald-600" />
+            <li key={item} className="flex items-start gap-2" style={{ fontSize: 13, color: 'var(--a-ink)' }}>
+                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'var(--a-green-1)' }}>
+                  <Check className="w-3 h-3" style={{ color: 'var(--a-green-ink)' }} strokeWidth={3} />
                 </div>
                 {item}
               </li>
@@ -85,12 +94,13 @@ const PartnerAIPremiumGate = () => {
 
         <Button
           onClick={() => setShowModal(true)}
-          className="w-full h-14 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-base shadow-lg shadow-amber-500/30">
-          
+          className="w-full h-14 rounded-full text-white font-bold text-base border-0 hover:opacity-95"
+          style={{ background: 'var(--a-peach-2)', boxShadow: '0 16px 32px -12px rgba(217, 108, 74, 0.6)' }}>
+
           <Crown className="w-5 h-5 mr-2" />
           {tr("partneraipremiumgate_premium_a_kec_9dadb6", "Premium-a ke\xE7")}
         </Button>
-        <p className="text-center text-xs text-muted-foreground mt-3">
+        <p className="text-center mt-3" style={{ fontSize: 11.5, color: 'var(--a-on-bg-soft)' }}>
           {tr("partneraipremiumgate_aboneliyi_heyat_yoldasiniz_da__8eb9a1", "Aboneliyi h\u0259yat yolda\u015F\u0131n\u0131z da \u0259ld\u0259 ed\u0259 bil\u0259r \u2014 ikiniz \xFC\xE7\xFCn d\u0259 a\xE7\u0131lacaq.")}
         </p>
       </motion.div>

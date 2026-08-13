@@ -1,5 +1,8 @@
 ext {
-    minSdkVersion = 24
+    // 26: Health Connect (connect-client) tələbi + java.time API-ları
+    // desugaring-siz təhlükəsiz olur. Android 8.0+ (2017) — 7.x cihazlar
+    // mövcud versiyada qalır, sadəcə yeni update almır.
+    minSdkVersion = 26
     compileSdkVersion = 36
     targetSdkVersion = 36
     androidxActivityVersion = '1.11.0'

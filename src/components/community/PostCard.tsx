@@ -36,19 +36,27 @@ const getMediaType = (url: string): 'image' | 'video' => {
 const UserBadge = ({ type }: {type: 'admin' | 'premium' | 'moderator' | null;}) => {
   if (!type) return null;
   const config = {
-    admin: { label: 'Admin', icon: Shield, className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white' },
-    premium: { label: 'Premium', icon: Crown, className: 'bg-gradient-to-r from-amber-400 to-amber-600 text-white' },
-    moderator: { label: 'Mod', icon: Shield, className: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' }
+    admin: { label: 'Admin', icon: Shield, className: 'admin' },
+    premium: { label: 'Premium', icon: Sparkles, className: '' },
+    moderator: { label: 'Mod', icon: Shield, className: 'moderator' }
   };
   const b = config[type];
   if (!b) return null;
   const Icon = b.icon;
   return (
-    <span className={`inline-flex items-center gap-[2px] px-1.5 py-[1px] rounded-md text-[7px] font-extrabold tracking-wider uppercase ${b.className}`}>
-      <Icon className="w-[7px] h-[7px]" />
+    <span className={`a-post-badge ${b.className}`}>
+      <Icon size={9} />
       {b.label}
     </span>);
 
+};
+
+// anacan-demo avatar gradient cycle (stable per user)
+const AVATAR_GRADS = ['var(--a-grad-peach)', 'var(--a-grad-pink)', 'var(--a-grad-lav)', 'var(--a-grad-blue)', 'var(--a-grad-green)', 'var(--a-grad-yellow)'];
+const avatarGradFor = (seed: string) => {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) & 0xffffffff;
+  return AVATAR_GRADS[Math.abs(h) % AVATAR_GRADS.length];
 };
 
 const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
@@ -74,9 +82,11 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
   const isAnonymous = (post as any).is_anonymous === true;
 
   const handleLike = useCallback(() => {
+    // Uçuşda ikinci toxunuşu udmaq — köhnə isLiked ilə yarışın (duplicate 23505) qarşısını alır
+    if (toggleLike.isPending) return;
     hapticFeedback.light();
     toggleLike.mutate({ postId: post.id, isLiked: post.is_liked || false, groupId });
-  }, [post.id, post.is_liked, groupId]);
+  }, [post.id, post.is_liked, groupId, toggleLike.isPending]);
 
   const handleDoubleTap = useCallback(() => {
     const now = Date.now();
@@ -137,61 +147,60 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
 
   return (
     <>
-      <motion.div
-        className="bg-card border-b border-border/30 overflow-hidden"
+      <motion.article
+        className="a-post a-fade-in"
         transition={{ duration: 0.1 }}>
         
         {/* Author row */}
-        <div className="px-4 pt-3.5 pb-2 flex items-center gap-3">
-          <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.9 }} disabled={isAnonymous && !isAdmin}>
-            <div className="relative">
-              <Avatar className={`w-10 h-10 ${isAnonymous && !isAdmin ? '' : 'cursor-pointer ring-2 ring-border/10 hover:ring-primary/30'} transition-all`}>
-                {isAnonymous && !isAdmin ?
-                <AvatarFallback className="bg-muted/30 text-muted-foreground/50"><EyeOff className="w-4 h-4" /></AvatarFallback> :
-                isAnonymous && isAdmin ?
-                <>
-                    <AvatarImage src={post.author?.avatar_url || undefined} />
-                    <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/10 text-primary font-black text-xs">{post.author?.name?.charAt(0) || tr("common_initial_i", "İ")}</AvatarFallback>
-                  </> :
+        <div className="a-post-head">
+          <motion.button
+            onClick={handleAvatarClick}
+            whileTap={{ scale: 0.9 }}
+            disabled={isAnonymous && !isAdmin}
+            style={{ background: 'none', border: 'none', padding: 0, cursor: isAnonymous && !isAdmin ? 'default' : 'pointer' }}>
+            
+            <span
+              className="a-post-avatar"
+              style={{ background: isAnonymous && !isAdmin ? 'linear-gradient(135deg, #d8d3c6, #b3ac9a)' : avatarGradFor(post.user_id || post.id) }}>
+              
+              {isAnonymous && !isAdmin ?
+              <EyeOff size={15} /> :
+              post.author?.avatar_url ?
+              <img src={post.author.avatar_url} alt="" /> :
 
-                <>
-                    <AvatarImage src={post.author?.avatar_url || undefined} />
-                    <AvatarFallback className="bg-gradient-to-br from-primary/15 to-accent/10 text-primary font-black text-xs">{post.author?.name?.charAt(0) || tr("common_initial_i", "İ")}</AvatarFallback>
-                  </>
-                }
-              </Avatar>
-            </div>
+              (post.author?.name?.charAt(0) || tr("common_initial_i", "İ")).toUpperCase()
+              }
+            </span>
           </motion.button>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 flex-wrap">
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div className="a-post-name-row">
               <motion.button
                 onClick={handleAvatarClick}
-                className={`font-bold text-[16px] leading-tight ${isAnonymous && !isAdmin ? 'text-muted-foreground italic' : 'text-foreground hover:text-primary'} transition-colors`}
+                className="a-post-name"
+                style={{ background: 'none', border: 'none', padding: 0, cursor: isAnonymous && !isAdmin ? 'default' : 'pointer', fontStyle: isAnonymous && !isAdmin ? 'italic' : 'normal', color: isAnonymous && !isAdmin ? 'var(--a-ink-soft)' : 'var(--a-ink)' }}
                 whileTap={{ scale: 0.98 }}
                 disabled={isAnonymous && !isAdmin}>
                 
                 {isAnonymous ?
                 isAdmin ?
-                <span className="flex items-center gap-1">
-                      <span className="text-muted-foreground italic">{tr("untranslated_anonim_89j5l6", "Anonim")}</span>
-                      <span className="text-[11px] text-primary/70 font-medium">({post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "İstifadəçi")})</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      <span style={{ fontStyle: 'italic', color: 'var(--a-ink-soft)' }}>{tr("untranslated_anonim_89j5l6", "Anonim")}</span>
+                      <span style={{ fontSize: 11, color: 'var(--a-peach-2)', fontWeight: 600 }}>({post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "İstifadəçi")})</span>
                     </span> :
                 tr("untranslated_anonim_89j5l6", "Anonim") :
                 post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "İstifadəçi")}
               </motion.button>
               {!isAnonymous && <UserBadge type={authorBadge} />}
               {isAnonymous && isAdmin && <UserBadge type={authorBadge} />}
-              <span className="text-[13px] text-muted-foreground font-medium">· {timeAgo}</span>
+              {isAnonymous && <span className="a-post-anon">({tr("untranslated_anonim_89j5l6", "Anonim")})</span>}
             </div>
-            {isAnonymous &&
-            <span className="inline-flex items-center gap-[2px] px-1 py-[1px] rounded text-[7px] font-semibold bg-muted/30 text-muted-foreground/40 mt-0.5">
-                <EyeOff className="w-[7px] h-[7px]" />{tr("untranslated_anonim_89j5l6", "Anonim")}</span>
-            }
+            <span className="a-post-time">· {timeAgo}</span>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="w-8 h-8 rounded-full hover:bg-muted/40 flex items-center justify-center transition-colors">
-                <MoreHorizontal className="w-4 h-4 text-muted-foreground/30" />
+              <button
+                style={{ width: 30, height: 30, borderRadius: 999, display: 'grid', placeItems: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--a-ink-faint)', flexShrink: 0 }}>
+                <MoreHorizontal size={16} />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="bg-popover border-border/20 z-50 rounded-xl shadow-xl min-w-[150px]">
@@ -216,29 +225,27 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
 
         {/* Content */}
         {isEditing ?
-        <div className="px-4 pb-3 space-y-2">
-            <Textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className="min-h-[70px] rounded-xl resize-none text-[13px] bg-muted/10 border-border/15" autoFocus />
+        <div className="space-y-2" style={{ paddingBottom: 4 }}>
+            <Textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className="min-h-[70px] rounded-xl resize-none text-[13px]" style={{ background: 'var(--a-surface-soft)', border: '1px solid var(--a-line-strong)', color: 'var(--a-ink)' }} autoFocus />
             <div className="flex gap-1.5 justify-end">
-              <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="rounded-lg text-[11px] h-7 px-3">{tr("postcard_legv_et_b5e49c", "Ləğv et")}</Button>
-              <Button size="sm" onClick={handleEditPost} disabled={!editContent.trim() || editPost.isPending} className="gradient-primary rounded-lg text-[11px] h-7 px-4">
+              <button onClick={() => setIsEditing(false)} className="a-tag" style={{ cursor: 'pointer' }}>{tr("postcard_legv_et_b5e49c", "Ləğv et")}</button>
+              <button onClick={handleEditPost} disabled={!editContent.trim() || editPost.isPending} className="a-btn-solid">
                 {editPost.isPending ? '...' : 'Saxla'}
-              </Button>
+              </button>
             </div>
           </div> :
 
         <div onClick={handleDoubleTap} className="relative">
-            <div className="px-4 pb-2.5">
-              <p className="text-foreground whitespace-pre-wrap text-[16px] leading-[1.6]">
-                {post.content.split(/(\s+)/).map((word, index) => {
-                if (word.startsWith('#')) return <span key={index} className="text-primary font-semibold">{word}</span>;
-                if (word.startsWith('@')) return <span key={index} className="text-blue-500 font-semibold">{word}</span>;
-                if (/^https?:\/\/\S+/.test(word)) return <a key={index} href={word} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline break-all" onClick={(e) => e.stopPropagation()}>{word}</a>;
-                return word;
-              })}
-              </p>
-            </div>
+            <p className="a-post-text">
+              {post.content.split(/(\s+)/).map((word, index) => {
+              if (word.startsWith('#')) return <span key={index} className="a-post-tag">{word}</span>;
+              if (word.startsWith('@')) return <span key={index} style={{ color: 'var(--a-blue-2)', fontWeight: 700 }}>{word}</span>;
+              if (/^https?:\/\/\S+/.test(word)) return <a key={index} href={word} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--a-blue-2)', textDecoration: 'underline', wordBreak: 'break-all' }} onClick={(e) => e.stopPropagation()}>{word}</a>;
+              return word;
+            })}
+            </p>
             {mediaItems.length > 0 &&
-          <div className="mt-1">
+          <div style={{ marginTop: 12, borderRadius: 'var(--a-radius-md)', overflow: 'hidden' }}>
                 <MediaCarousel media={mediaItems} />
               </div>
           }
@@ -252,30 +259,28 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
               transition={{ duration: 0.4, ease: 'easeOut' }}
               className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               
-                  <Heart className="w-20 h-20 text-rose-500 fill-rose-500 drop-shadow-lg" />
+                  <Heart className="w-20 h-20 drop-shadow-lg" style={{ color: '#e05575', fill: '#e05575' }} />
                 </motion.div>
             }
             </AnimatePresence>
           </div>
         }
 
-        {/* Actions - Instagram style */}
-        <div className="px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <motion.button onClick={handleLike} className="flex items-center gap-1.5" whileTap={{ scale: 0.8 }}>
-              <motion.div animate={post.is_liked ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.3 }}>
-                <Heart className={`w-[22px] h-[22px] transition-colors ${post.is_liked ? 'fill-rose-500 text-rose-500' : 'text-foreground/60'}`} />
-              </motion.div>
-              {post.likes_count > 0 && <span className={`text-[14px] font-bold ${post.is_liked ? 'text-rose-500' : 'text-foreground/70'}`}>{post.likes_count}</span>}
-            </motion.button>
-            <motion.button onClick={() => setShowComments(!showComments)} className="flex items-center gap-1.5" whileTap={{ scale: 0.8 }}>
-              <MessageCircle className={`w-[21px] h-[21px] transition-colors ${showComments ? 'text-primary' : 'text-foreground/60'}`} />
-              {post.comments_count > 0 && <span className="text-[14px] font-bold text-foreground/70">{post.comments_count}</span>}
-            </motion.button>
-            <motion.button onClick={handleShare} whileTap={{ scale: 0.8 }}>
-              <Share2 className="w-[20px] h-[20px] text-foreground/60" />
-            </motion.button>
-          </div>
+        {/* Actions (anacan-demo post footer) */}
+        <div className="a-post-footer">
+          <motion.button onClick={handleLike} className={`a-post-action${post.is_liked ? ' liked' : ''}`} whileTap={{ scale: 0.8 }}>
+            <motion.span animate={post.is_liked ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.3 }} style={{ display: 'inline-flex' }}>
+              <Heart size={15} strokeWidth={2.2} fill={post.is_liked ? 'currentColor' : 'none'} />
+            </motion.span>
+            {post.likes_count > 0 && <span>{post.likes_count}</span>}
+          </motion.button>
+          <motion.button onClick={() => setShowComments(!showComments)} className="a-post-action" style={showComments ? { color: 'var(--a-accent-ink)' } : undefined} whileTap={{ scale: 0.8 }}>
+            <MessageCircle size={15} strokeWidth={2.2} />
+            {post.comments_count > 0 && <span>{post.comments_count}</span>}
+          </motion.button>
+          <motion.button onClick={handleShare} className="a-post-action" whileTap={{ scale: 0.8 }}>
+            <Share2 size={14} strokeWidth={2.2} />
+          </motion.button>
         </div>
 
         {/* Comments section */}
@@ -286,37 +291,41 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="border-t border-border/8 overflow-hidden">
+            className="overflow-hidden"
+            style={{ borderTop: '1px solid var(--a-line)', marginTop: 12 }}>
             
-              <div className="p-4 space-y-3">
+              <div className="space-y-3" style={{ paddingTop: 12 }}>
                 <div className="flex gap-2.5">
-                  <Input
+                  <input
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder={commentAnonymous ? tr("postcard_anonim_serh_yaz_9af1ca", "Anonim \u015F\u0259rh yaz...") : tr("postcard_serh_yaz_54a89a", "Şərh yaz...")}
-                  className="flex-1 h-9 rounded-full text-[12px] bg-muted/15 border-border/10 px-4"
+                  className="a-input"
+                  style={{ borderRadius: 999 }}
                   onKeyPress={(e) => e.key === 'Enter' && handleComment()} />
                 
-                  <Button onClick={handleComment} disabled={!commentText.trim() || createComment.isPending} className="w-9 h-9 rounded-full gradient-primary p-0">
-                    <Send className="w-3.5 h-3.5 text-primary-foreground" />
-                  </Button>
+                  <button
+                  onClick={handleComment}
+                  disabled={!commentText.trim() || createComment.isPending}
+                  style={{ width: 36, height: 36, borderRadius: 999, flexShrink: 0, background: 'var(--a-ink)', color: 'var(--a-bg)', display: 'grid', placeItems: 'center', border: 'none', cursor: 'pointer', opacity: !commentText.trim() ? 0.4 : 1 }}>
+                    <Send size={14} />
+                  </button>
                 </div>
                 <button
                 type="button"
                 onClick={() => setCommentAnonymous((v) => !v)}
-                className={`flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full transition-colors ${
-                commentAnonymous ? 'bg-primary/10 text-primary' : 'bg-muted/40 text-muted-foreground'}`
-                }>
+                className={`a-tag${commentAnonymous ? ' on' : ''}`}
+                style={{ cursor: 'pointer' }}>
                 
-                  <span className={`w-3 h-3 rounded-full border ${commentAnonymous ? 'border-primary bg-primary' : 'border-muted-foreground/40'}`} />
+                  <span style={{ width: 12, height: 12, borderRadius: 999, border: commentAnonymous ? '1px solid var(--a-peach-2)' : '1px solid var(--a-ink-faint)', background: commentAnonymous ? 'var(--a-peach-2)' : 'transparent' }} />
                   {tr("postcard_anonim_olaraq_yaz_abc123", "Anonim olaraq yaz")}
                 </button>
                 {commentsLoading ?
               <div className="text-center py-4">
-                    <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+                    <div className="w-5 h-5 rounded-full animate-spin mx-auto" style={{ border: '2px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
                   </div> :
               topLevelComments.length === 0 ?
-              <p className="text-center py-5 text-[11px] text-muted-foreground/30 font-medium">{tr("postcard_hele_serh_yoxdur_89ce09", "Hələ şərh yoxdur 💭")}</p> :
+              <p className="a-list-sub text-center" style={{ padding: '16px 0', margin: 0 }}>{tr("postcard_hele_serh_yoxdur_89ce09", "Hələ şərh yoxdur 💭")}</p> :
 
               <div className="space-y-2">
                     {topLevelComments.map((comment) =>
@@ -328,7 +337,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             </motion.div>
           }
         </AnimatePresence>
-      </motion.div>
+      </motion.article>
 
       {/* Report Dialog */}
       <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>

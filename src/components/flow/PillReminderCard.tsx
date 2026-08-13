@@ -99,13 +99,15 @@ const PillReminderCard = () => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl p-4 border border-border">
+      className="a-card a-fade-in">
       
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-bold text-foreground flex items-center gap-2">
-          <Pill className="w-5 h-5 text-amber-500" />
-          {tr("pillremindercard_heb_xatirlatmasi_e3e934", "H\u0259b Xat\u0131rlatmas\u0131")}
-        </h3>
+      <div className="a-card-head" style={{ marginBottom: enabled ? 12 : 8 }}>
+        <div className="a-list-row" style={{ padding: 0, borderTop: 'none', gap: 10 }}>
+          <span className="a-list-icon" style={{ width: 34, height: 34, borderRadius: 11, background: 'var(--a-grad-yellow)', color: 'var(--a-warn-ink)' }}>
+            <Pill size={16} strokeWidth={2} />
+          </span>
+          <h3 className="a-card-title a-heading">{tr("pillremindercard_heb_xatirlatmasi_e3e934", "H\u0259b Xat\u0131rlatmas\u0131")}</h3>
+        </div>
         <Switch checked={enabled} onCheckedChange={handleToggle} disabled={save.isPending || toggle.isPending} />
       </div>
 
@@ -114,38 +116,39 @@ const PillReminderCard = () => {
           {editing ?
         <>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">{tr("pillremindercard_basliq_e1f6c5", "Ba\u015Fl\u0131q")}</label>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} className="h-9 text-sm" />
+                <label className="a-stat-tile-label" style={{ display: 'block', marginBottom: 4 }}>{tr("pillremindercard_basliq_e1f6c5", "Ba\u015Fl\u0131q")}</label>
+                <input value={title} onChange={(e) => setTitle(e.target.value)} className="a-input" style={{ width: '100%' }} />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">{tr("untranslated_vaxt_8etncj", "Vaxt")}</label>
-                <Input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="h-9 text-sm" />
+                <label className="a-stat-tile-label" style={{ display: 'block', marginBottom: 4 }}>{tr("untranslated_vaxt_8etncj", "Vaxt")}</label>
+                <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="a-input" style={{ width: '100%' }} />
               </div>
               <div className="flex gap-2">
-                <Button size="sm" onClick={handleSave} disabled={save.isPending} className="flex-1">{tr("untranslated_yadda_saxla_bpdu9v", "Yadda saxla")}</Button>
-                <Button size="sm" variant="outline" onClick={() => setEditing(false)}>{tr("pillremindercard_legv_et_b5e49c", "L\u0259\u011Fv et")}</Button>
+                <button onClick={handleSave} disabled={save.isPending} className="a-btn-solid" style={{ flex: 1, justifyContent: 'center' }}>{tr("untranslated_yadda_saxla_bpdu9v", "Yadda saxla")}</button>
+                <button onClick={() => setEditing(false)} className="a-tag" style={{ cursor: 'pointer' }}>{tr("pillremindercard_legv_et_b5e49c", "L\u0259\u011Fv et")}</button>
               </div>
             </> :
 
         <button
           onClick={() => setEditing(true)}
-          className="w-full flex items-center justify-between p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-left">
+          className="a-stat-tile"
+          style={{ width: '100%', textAlign: 'left', border: 'none', cursor: 'pointer', justifyContent: 'space-between' }}>
           
               <div>
-                <p className="text-sm font-medium text-foreground">{title}</p>
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
-                  <Clock className="w-3 h-3" />
+                <p className="a-list-title">{title}</p>
+                <p className="a-list-sub" style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <Clock size={11} />
                   {tr("pillremindercard_her_gun_f4fe36", "H\u0259r g\xFCn")} {time}
-                </div>
+                </p>
               </div>
-              <span className="text-xs text-primary font-medium">{tr("pillremindercard_redakte_d53ba7", "Redakt\u0259")}</span>
+              <span className="a-list-value" style={{ color: 'var(--a-accent-ink)' }}>{tr("pillremindercard_redakte_d53ba7", "Redakt\u0259")}</span>
             </button>
         }
         </div>
       }
 
       {!enabled &&
-      <p className="text-xs text-muted-foreground">{tr("pillremindercard_gundelik_kontrasepsiya_ve_ya_d_8f8e44", "G\xFCnd\u0259lik kontrasepsiya v\u0259 ya d\u0259rman xat\u0131rlatmas\u0131 \xFC\xE7\xFCn aktiv edin.")}</p>
+      <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>{tr("pillremindercard_gundelik_kontrasepsiya_ve_ya_d_8f8e44", "G\xFCnd\u0259lik kontrasepsiya v\u0259 ya d\u0259rman xat\u0131rlatmas\u0131 \xFC\xE7\xFCn aktiv edin.")}</p>
       }
     </motion.div>);
 

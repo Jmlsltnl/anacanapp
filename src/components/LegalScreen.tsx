@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { tr } from '@/lib/tr';
 import { ArrowLeft, FileText, Shield, Scale, AlertTriangle, CreditCard, Database, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useUserStore } from '@/store/userStore';
 import { useLegalDocuments, LegalDocument } from '@/hooks/useLegalDocuments';
@@ -21,6 +22,16 @@ const documentIcons: Record<string, any> = {
   disclaimer: AlertTriangle,
   refund_policy: CreditCard,
   data_usage: Database
+};
+
+// Palitra tint-ləri sənəd növünə görə
+const documentTints: Record<string, {bg: string;ink: string;}> = {
+  terms_of_service: { bg: 'var(--a-peach-1)', ink: 'var(--a-accent-ink)' },
+  privacy_policy: { bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' },
+  gdpr_ccpa: { bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' },
+  disclaimer: { bg: 'var(--a-yellow-1)', ink: 'var(--a-yellow-ink)' },
+  refund_policy: { bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' },
+  data_usage: { bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' }
 };
 
 const documentOrder = [
@@ -55,20 +66,21 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
 
   if (selectedDoc) {
     return (
-      <div className="flex flex-col h-full bg-background">
-        <div className="flex items-center gap-3 p-4 border-b bg-card" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
-          <Button variant="ghost" size="icon" onClick={() => setSelectedDoc(null)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-semibold">{isEn ? (selectedDoc.title || selectedDoc.title_az) : (selectedDoc.title_az || selectedDoc.title)}</h1>
+      <div className="a-scope flex flex-col h-full" style={{ background: 'var(--a-bg)' }}>
+        <div className="flex items-center gap-3 p-4"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)', background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
+          <motion.button onClick={() => setSelectedDoc(null)} className="a-icon-btn shrink-0" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
+            <ArrowLeft size={16} strokeWidth={2} />
+          </motion.button>
+          <h1 className="truncate" style={{ fontSize: 15, fontWeight: 800, color: 'var(--a-ink)' }}>{isEn ? (selectedDoc.title || selectedDoc.title_az) : (selectedDoc.title_az || selectedDoc.title)}</h1>
         </div>
 
         <ScrollArea className="flex-1 p-4">
           <div className="max-w-3xl mx-auto">
-            <div className="mb-4 text-sm text-muted-foreground">
-              Versiya: {selectedDoc.version} {tr("legalscreen_son_yenilenme_8a61f0", "| Son yenil\u0259nm\u0259:")} {new Date(selectedDoc.updated_at).toLocaleDateString('az-AZ')}
+            <div className="mb-4" style={{ fontSize: 12.5, color: 'var(--a-ink-soft)' }}>
+              Versiya: {selectedDoc.version} {tr("legalscreen_son_yenilenme_8a61f0", "| Son yenil\u0259nm\u0259:")} {new Date(selectedDoc.updated_at).toLocaleDateString(getLocaleTag())}
             </div>
-            <div className="prose prose-xs dark:prose-invert max-w-none text-sm [&_h1]:text-lg [&_h2]:text-base [&_h3]:text-sm [&_p]:text-sm [&_li]:text-sm">
+            <div className="a-card prose prose-xs dark:prose-invert max-w-none text-sm [&_h1]:text-lg [&_h2]:text-base [&_h3]:text-sm [&_p]:text-sm [&_li]:text-sm" style={{ color: 'var(--a-body-text)' }}>
               {(() => {
                 const c = isEn ? (selectedDoc.content || selectedDoc.content_az) : (selectedDoc.content_az || selectedDoc.content);
                 const isHtml = c.trim().startsWith('<') || /<[a-z][\s\S]*>/i.test(c);
@@ -82,40 +94,44 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      <div className="flex items-center gap-3 p-4 border-b bg-card" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}>
-        <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="text-lg font-semibold">{tr("legalscreen_huquqi_senedler_ca8c60", "Hüquqi Sənədlər")}</h1>
+    <div className="a-scope flex flex-col h-full" style={{ background: 'var(--a-bg)' }}>
+      <div className="flex items-center gap-3 p-4"
+      style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)', background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
+        <motion.button onClick={onBack} className="a-icon-btn shrink-0" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
+          <ArrowLeft size={16} strokeWidth={2} />
+        </motion.button>
+        <h1 style={{ fontSize: 15, fontWeight: 800, color: 'var(--a-ink)' }}>{tr("legalscreen_huquqi_senedler_ca8c60", "Hüquqi Sənədlər")}</h1>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-2">
+        <div className="p-4 space-y-2.5">
           {isLoading ?
           <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+              <div className="w-8 h-8 rounded-full animate-spin" style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
             </div> :
 
           sortedDocuments.map((doc) => {
             const Icon = documentIcons[doc.document_type] || FileText;
+            const tint = documentTints[doc.document_type] || documentTints.terms_of_service;
             return (
-              <button
+              <motion.button
                 key={doc.id}
                 onClick={() => setSelectedDoc(doc)}
-                className="w-full flex items-center gap-4 p-4 bg-card rounded-xl border hover:bg-accent/50 transition-colors text-left">
-                
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Icon className="h-5 w-5 text-primary" />
+                className="w-full flex items-center gap-4 text-left transition-colors"
+                style={{ padding: 14, borderRadius: 'var(--a-radius-md)', background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)' }}
+                whileTap={{ scale: 0.98 }}>
+
+                  <div className="flex items-center justify-center shrink-0" style={{ width: 42, height: 42, borderRadius: 14, background: tint.bg }}>
+                    <Icon size={18} style={{ color: tint.ink }} />
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium">{isEn ? (doc.title || doc.title_az) : (doc.title_az || doc.title)}</h3>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="flex-1 min-w-0">
+                    <h3 style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{isEn ? (doc.title || doc.title_az) : (doc.title_az || doc.title)}</h3>
+                    <p style={{ fontSize: 11.5, color: 'var(--a-ink-soft)', marginTop: 1 }}>
                       Versiya {doc.version}
                     </p>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                </button>);
+                  <ChevronRight size={18} style={{ color: 'var(--a-ink-faint)' }} />
+                </motion.button>);
 
           })
           }

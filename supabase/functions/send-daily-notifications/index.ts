@@ -24,6 +24,10 @@ interface ScheduledNotification {
   body: string;
   title_en: string | null;
   body_en: string | null;
+  title_ru?: string | null;
+  body_ru?: string | null;
+  title_tr?: string | null;
+  body_tr?: string | null;
   target_audience: string;
   priority: number;
 }
@@ -35,14 +39,23 @@ interface DayNotification {
   body: string;
   title_en: string | null;
   body_en: string | null;
+  title_ru?: string | null;
+  body_ru?: string | null;
+  title_tr?: string | null;
+  body_tr?: string | null;
   emoji: string;
   send_time: string;
   is_active: boolean;
 }
 
-function pickLang(value: string | null | undefined, valueEn: string | null | undefined, lang: string): string {
-  if (lang === 'en' && valueEn && valueEn.trim()) return valueEn;
-  return value || '';
+/** İstifadəçi dilinə uyğun sütunu qaytarır: field_{en|ru|tr} → base (AZ). */
+function pickLang(row: Record<string, unknown>, field: string, lang: string): string {
+  if (lang && lang !== 'az') {
+    const localized = row[`${field}_${lang}`];
+    if (typeof localized === 'string' && localized.trim()) return localized;
+  }
+  const base = row[field];
+  return typeof base === 'string' ? base : '';
 }
 
 interface DeviceToken {
@@ -362,8 +375,8 @@ Deno.serve(async (req) => {
           for (const dn of dayNotifications) {
             const dedupKey = `${user.user_id}:pregnancy_day:${dn.id}`;
             if (!alreadySent.has(dedupKey)) {
-              const localizedTitle = pickLang(dn.title, dn.title_en, user.language);
-              const localizedBody = pickLang(dn.body, dn.body_en, user.language);
+              const localizedTitle = pickLang(dn as unknown as Record<string, unknown>, 'title', user.language);
+              const localizedBody = pickLang(dn as unknown as Record<string, unknown>, 'body', user.language);
               notificationsToSend.push({
                 id: dn.id,
                 title: `${dn.emoji || ''} ${localizedTitle}`.trim(),
@@ -387,8 +400,8 @@ Deno.serve(async (req) => {
             for (const dn of dayNotifications) {
               const dedupKey = `${user.user_id}:mommy_day:${dn.id}`;
               if (!alreadySent.has(dedupKey)) {
-                const localizedTitle = pickLang(dn.title, dn.title_en, user.language);
-                const localizedBody = pickLang(dn.body, dn.body_en, user.language);
+                const localizedTitle = pickLang(dn as unknown as Record<string, unknown>, 'title', user.language);
+                const localizedBody = pickLang(dn as unknown as Record<string, unknown>, 'body', user.language);
                 notificationsToSend.push({
                   id: dn.id,
                   title: `${dn.emoji || ''} ${localizedTitle}`.trim(),
@@ -419,8 +432,8 @@ Deno.serve(async (req) => {
         if (match) {
           const dedupKey = `${user.user_id}:${scheduledSourceType}:${match.id}`;
           if (!alreadySent.has(dedupKey)) {
-            const localizedTitle = pickLang(match.title, match.title_en, user.language);
-            const localizedBody = pickLang(match.body, match.body_en, user.language);
+            const localizedTitle = pickLang(match as unknown as Record<string, unknown>, 'title', user.language);
+            const localizedBody = pickLang(match as unknown as Record<string, unknown>, 'body', user.language);
             notificationsToSend.push({ id: match.id, title: localizedTitle, body: localizedBody, type: 'scheduled', sourceType: scheduledSourceType });
           }
         }

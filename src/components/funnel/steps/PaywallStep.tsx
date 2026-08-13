@@ -1,10 +1,14 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { X, Crown } from 'lucide-react';
+import { usePaywallConfig } from '@/hooks/usePaywallConfig';
+import PaywallCore from '@/components/paywall/PaywallCore';
 import { tr } from '@/lib/tr';
-import { Button } from '@/components/ui/button';
-import { Crown, Check, Shield, X, Sparkles, Loader2 } from 'lucide-react';
-import { useInAppPurchase } from '@/hooks/useInAppPurchase';
-import { canUseNativePaywallUI, isNativePlatform } from '@/lib/revenuecat';
-import { useToast } from '@/hooks/use-toast';
+
+/**
+ * Funnel paywall addımı — tam custom Anacan paywall (a-* stil).
+ * Əvvəllər RevenueCat-in native paywall UI-sı avtomatik təqdim olunurdu —
+ * artıq YOX: offerings + custom UI + düyməyə bağlı alış (PaywallCore).
+ */
 
 interface PaywallStepProps {
   onPurchase: (planId: string) => void;
@@ -12,206 +16,58 @@ interface PaywallStepProps {
 }
 
 export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
-  const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly');
-  const { toast } = useToast();
-  const {
-    packages,
-    isLoading,
-    isPurchasing,
-    isSupported,
-    purchaseMonthly,
-    purchaseYearly,
-    showPaywall,
-    error
-  } = useInAppPurchase();
-
-  // ⚡ All paywalls must come from RevenueCat. Auto-present on native.
-  const presentedRef = useRef(false);
-  useEffect(() => {
-    if (presentedRef.current) return;
-    if (!isNativePlatform() || !isSupported || !canUseNativePaywallUI()) return;
-    presentedRef.current = true;
-    (async () => {
-      const purchased = await showPaywall();
-      if (purchased) {
-        toast({ title: tr("paywallstep_premium_aktivlesdi_67ea32", "Premium aktivləşdi 🎉"), description: tr("paywallstep_3_gunluk_pulsuz_dovrunuz_basladi_d84d42", "3 günlük pulsuz dövrünüz başladı") });
-        onPurchase(selectedPlan);
-      } else {
-        onClose();
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSupported]);
-
-  // Find packages from RevenueCat offerings
-  const monthlyPkg = useMemo(
-    () => packages.find((p) => p.packageType === 'MONTHLY' || p.identifier === '$rc_monthly' || p.product.identifier.includes('monthly')),
-    [packages]
-  );
-  const yearlyPkg = useMemo(
-    () => packages.find((p) => p.packageType === 'ANNUAL' || p.identifier === '$rc_annual' || p.product.identifier.includes('yearly') || p.product.identifier.includes('annual')),
-    [packages]
-  );
-
-  // Real prices from RevenueCat or fallback
-  const monthlyPriceNum = monthlyPkg?.product?.price ?? 5.99;
-  const yearlyPriceNum = yearlyPkg?.product?.price ?? 46.99;
-  const currency = monthlyPkg?.product?.currencyCode || yearlyPkg?.product?.currencyCode || 'USD';
-  const symbol = currency === 'AZN' ? '₼' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '';
-
-  const monthlyPriceStr = monthlyPkg?.product?.priceString || `${symbol}${monthlyPriceNum.toFixed(2)}`;
-  const yearlyPriceStr = yearlyPkg?.product?.priceString || `${symbol}${yearlyPriceNum.toFixed(2)}`;
-
-  const yearlyMonthly = +(yearlyPriceNum / 12).toFixed(2);
-  const yearlyMonthlyStr = `${symbol}${yearlyMonthly.toFixed(2)}`;
-  const savingsPercent = monthlyPriceNum > 0 ? Math.round((1 - yearlyMonthly / monthlyPriceNum) * 100) : 0;
-  const parseIsoTrialDays = (period?: string | null) => {
-    if (!period) return null;
-    const match = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?$/i.exec(period);
-    if (!match) return null;
-    return Number(match[1] || 0) * 365 + Number(match[2] || 0) * 30 + Number(match[3] || 0) * 7 + Number(match[4] || 0);
-  };
-  const monthlyTrialDays = parseIsoTrialDays(monthlyPkg?.product?.defaultOptionTrialPeriod);
-  const yearlyTrialDays = parseIsoTrialDays(yearlyPkg?.product?.defaultOptionTrialPeriod);
-  const anyTrialDays = yearlyTrialDays ?? monthlyTrialDays;
-
-  const handlePurchase = async () => {
-    // Web / non-native fallback — just continue
-    if (!isNativePlatform() || !isSupported) {
-      onPurchase(selectedPlan);
-      return;
-    }
-
-    const ok = selectedPlan === 'yearly' ? await purchaseYearly() : await purchaseMonthly();
-    if (ok) {
-      toast({ title: tr("paywallstep_premium_aktivlesdi_67ea32", "Premium aktivləşdi 🎉"), description: tr("paywallstep_3_gunluk_pulsuz_dovrunuz_basladi_d84d42", "3 günlük pulsuz dövrünüz başladı") });
-      onPurchase(selectedPlan);
-    } else if (error) {
-      toast({ title: tr("paywallstep_alis_ugursuz_ffb098", "Alış uğursuz"), description: error, variant: 'destructive' });
-    }
-  };
+  const cfg = usePaywallConfig();
 
   return (
-    <div className="flex flex-col min-h-full px-6 py-6 relative">
-      <button
-        onClick={onClose}
-        disabled={isPurchasing}
-        className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center z-10 disabled:opacity-50">
-        
-        <X className="w-4 h-4 text-muted-foreground" />
-      </button>
-
-      <div className="flex-1">
-        <div className="text-center mb-5 pt-2">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center mx-auto mb-3">
-            <Crown className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-xl font-bold text-foreground">Anacan Premium</h2>
-          <p className="text-sm text-muted-foreground mt-1">{tr("paywallstep_tam_imkanlardan_yararlanin_4b72fb", "Tam imkanlardan yararlanın")}</p>
-        </div>
-
-          {anyTrialDays &&
-        <div className="flex items-center justify-center gap-2 mb-5">
-              <div className="flex items-center gap-1.5 px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-full">
-                <Sparkles className="w-4 h-4 text-green-600 dark:text-green-400" />
-                <span className="text-sm font-bold text-green-700 dark:text-green-400">{anyTrialDays} {tr("paywallstep_gun_pulsuz_sinaq_0787ff", "G\xDCN PULSUZ SINAQ")}</span>
-              </div>
-            </div>
-        }
-
-        {isLoading && isNativePlatform() ?
-        <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-sm text-muted-foreground">{tr("paywallstep_qiymetler_yuklenir_15aa82", "Qiymətlər yüklənir...")}</span>
-          </div> :
-
-        <div className="space-y-3 mb-5">
-            <button
-            onClick={() => setSelectedPlan('yearly')}
-            disabled={isPurchasing}
-            className={`w-full p-4 rounded-2xl border-2 transition-all relative ${
-            selectedPlan === 'yearly' ? 'border-primary bg-primary/5 shadow-md' : 'border-border bg-card'}`
-            }>
-            
-            
-              {savingsPercent > 0 &&
-            <span className="absolute -top-2.5 left-4 px-2.5 py-0.5 bg-primary text-primary-foreground text-[10px] font-bold rounded-full">
-                  {tr("paywallstep_en_serfeli_056ce6", "\u018Fn s\u0259rf\u0259li \xB7")} {savingsPercent}{tr("paywallstep_qenaet_ea8b53", "% q\u0259na\u0259t")}
-                </span>
-            }
-              <div className="flex items-center justify-between">
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-foreground">{tr("paywallstep_illik_4a3cef", "İllik")}</p>
-                  <p className="text-xs text-muted-foreground">{yearlyTrialDays ? `${yearlyTrialDays} ${tr("paywall_trial_days_short", "gün pulsuz, sonra")} ${yearlyPriceStr}${tr("paywall_per_year", "/il")}` : `${yearlyPriceStr}${tr("paywall_per_year", "/il")}`}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-lg font-bold text-foreground">{yearlyMonthlyStr}</span>
-                  <span className="text-xs text-muted-foreground">{tr("paywall_per_month", "/ay")}</span>
-                </div>
-              </div>
-            </button>
-
-            <button
-            onClick={() => setSelectedPlan('monthly')}
-            disabled={isPurchasing}
-            className={`w-full p-4 rounded-2xl border-2 transition-all ${
-            selectedPlan === 'monthly' ? 'border-primary bg-primary/5 shadow-md' : 'border-border bg-card'}`
-            }>
-              <div className="flex items-center justify-between">
-                <div className="text-left">
-                  <p className="text-sm font-semibold text-foreground">{tr("paywallstep_ayliq_6f265e", "Aylıq")}</p>
-                  <p className="text-xs text-muted-foreground">{monthlyTrialDays ? `${monthlyTrialDays} ${tr("paywall_trial_days_short", "gün pulsuz, sonra")} ${monthlyPriceStr}${tr("paywall_per_month", "/ay")}` : `${monthlyPriceStr}${tr("paywall_per_month", "/ay")}`}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-lg font-bold text-foreground">{monthlyPriceStr}</span>
-                  <span className="text-xs text-muted-foreground">{tr("paywall_per_month", "/ay")}</span>
-                </div>
-              </div>
-            </button>
-          </div>
-        }
-
-        <div className="space-y-2.5 mb-5">
-
-          {[tr("paywallstep_butun_aletlere_sinirsiz_giris_2d0db2", "B\xFCt\xFCn al\u0259tl\u0259r\u0259 s\u0131n\u0131rs\u0131z giri\u015F"),
-
-          '24/7 AI Asistan', tr("paywallstep_yuxu_sesleri_meditasiya_fb635f", "Yuxu S\u0259sl\u0259ri & Meditasiya"), tr("paywallstep_ferdi_heftelik_hesabatlar_4ab67b", "F\u0259rdi h\u0259ft\u0259lik hesabatlar"), tr("paywallstep_reklamsiz_tecrube_2e4fa4", "Reklams\u0131z t\u0259cr\xFCb\u0259")].
-
-
-
-          map((b) =>
-          <div key={b} className="flex items-center gap-2.5">
-              <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-                <Check className="w-3 h-3 text-green-600" />
-              </div>
-              <span className="text-sm text-foreground">{b}</span>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 justify-center text-xs text-muted-foreground">
-          <Shield className="w-3.5 h-3.5" />
-          <span>{tr("paywallstep_istediyin_an_legv_et_zemanetli_c95beb", "İstədiyin an ləğv et · Zəmanətli")}</span>
-        </div>
+    <div className="a-scope relative flex flex-col min-h-full px-6 py-6" style={{ background: 'var(--a-bg)' }}>
+      {/* Buludlar */}
+      <div className="a-sky" aria-hidden>
+        <span className="a-cloud c1" />
+        <span className="a-cloud c2" />
+        <span className="a-cloud c3" />
       </div>
 
-      <div className="mt-5 pb-safe space-y-2">
-        <Button
-          onClick={handlePurchase}
-          disabled={isPurchasing || isLoading && isNativePlatform()}
-          className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg disabled:opacity-70">
-          
-          {isPurchasing ?
-          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{tr("untranslated_emal_edilir_hf0m1t", "Emal edilir...")}</> :
+      {/* Bağla → endirim təklifinə keçir */}
+      <button
+        onClick={onClose}
+        className="a-icon-btn absolute top-4 right-4 z-10"
+        style={{ borderRadius: 999 }}
+        aria-label={tr('pw_close', 'Bağla')}>
+        <X size={15} strokeWidth={2.2} />
+      </button>
 
-          anyTrialDays ? `${anyTrialDays} ${tr("paywall_days_free_start", "Gün Pulsuz Başla")}` : tr("paywallstep_premium_a_kec_2e8b0e", "Premium-a Ke\xE7")
-          }
-        </Button>
-        <p className="text-[11px] text-center text-muted-foreground">
-            {selectedPlan === 'yearly' ?
-          yearlyTrialDays ? `${yearlyTrialDays} ${tr("paywall_trial_days", "gün pulsuz sınayın · Sonra")} ${yearlyPriceStr}${tr("paywall_per_year", "/il")} · ${tr("paywall_cancel_anytime", "İstənilən vaxt ləğv edin")}` : `${yearlyPriceStr}${tr("paywall_per_year", "/il")} · ${tr("paywall_cancel_anytime", "İstənilən vaxt ləğv edin")}` :
-          monthlyTrialDays ? `${monthlyTrialDays} ${tr("paywall_trial_days", "gün pulsuz sınayın · Sonra")} ${monthlyPriceStr}${tr("paywall_per_month", "/ay")} · ${tr("paywall_cancel_anytime", "İstənilən vaxt ləğv edin")}` : `${monthlyPriceStr}${tr("paywall_per_month", "/ay")} · ${tr("paywall_cancel_anytime", "İstənilən vaxt ləğv edin")}`}
-        </p>
+      <div className="relative z-[1] flex-1">
+        {/* Hero */}
+        <div className="text-center mb-4 pt-2">
+          <motion.div
+            initial={{ scale: 0, rotate: -12 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', damping: 13 }}
+            className="mx-auto mb-3 grid place-items-center"
+            style={{
+              width: 60, height: 60, borderRadius: 21,
+              background: 'linear-gradient(135deg, var(--a-peach-2), #e86a4c)',
+              boxShadow: '0 16px 32px -12px rgba(217, 108, 74, 0.6)'
+            }}>
+            <Crown className="w-7 h-7 text-white" strokeWidth={2.2} />
+          </motion.div>
+          <h2 style={{ fontSize: 23, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--a-ink)', margin: 0 }}>
+            {cfg.title}
+          </h2>
+          <p style={{ fontSize: 12.5, color: 'var(--a-ink-soft)', marginTop: 3 }}>
+            {tr('pw_funnel_subtitle', 'Fərdi planınız hazırdır — tam imkanlarla başlayın')}
+          </p>
+        </div>
+
+        {/* Nüvə: planlar + alış + bərpa + legal.
+            Web-də funnel bloklanmır → davam et. */}
+        <div className="pb-safe">
+          <PaywallCore
+            feature="onboarding_funnel"
+            compact
+            onPurchased={(planId) => onPurchase(planId)}
+            onNonNativeCta={() => onPurchase('web_continue')} />
+        </div>
       </div>
     </div>);
 

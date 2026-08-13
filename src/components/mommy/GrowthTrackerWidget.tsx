@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Scale, TrendingUp, Plus, Ruler, CircleDot } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -6,7 +7,6 @@ import { hapticFeedback } from '@/lib/native';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useChildren } from '@/hooks/useChildren';
-import { differenceInMonths } from 'date-fns';
 import { tr } from "@/lib/tr";
 
 interface BabyGrowthEntry {
@@ -21,6 +21,30 @@ interface BabyGrowthEntry {
   created_at: string;
 }
 
+type MetricKey = 'weight' | 'height';
+
+/** Build an SVG line + area path from a series of values (anacan-demo chart). */
+function buildPath(values: readonly number[], width: number, height: number, pad: number) {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || 1;
+  const stepX = (width - pad * 2) / (values.length - 1);
+  const points = values.map((v, i) => {
+    const x = pad + i * stepX;
+    const y = pad + (height - pad * 2) * (1 - (v - min) / span);
+    return [x, y] as const;
+  });
+  const d = points.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+  const last = points[points.length - 1];
+  const area = `${d} L${last[0].toFixed(1)},${height - pad} L${points[0][0].toFixed(1)},${height - pad} Z`;
+  return { d, area, last };
+}
+
+/**
+ * Growth tracker — redesigned to the anacan-demo "Development tracker" card
+ * (weight/height tabs + line chart + stat tiles). Data logic unchanged:
+ * same `baby_growth` fetch/insert filtered by the selected child.
+ */
 const GrowthTrackerWidget = () => {
   const { user } = useAuth();
   const { selectedChild, getChildAge } = useChildren();
@@ -30,6 +54,7 @@ const GrowthTrackerWidget = () => {
   const [weightInput, setWeightInput] = useState('');
   const [heightInput, setHeightInput] = useState('');
   const [headInput, setHeadInput] = useState('');
+  const [metric, setMetric] = useState<MetricKey>('weight');
 
   // Check if baby is under 1 year old using selectedChild
   const showHeadCircumference = useMemo(() => {
@@ -78,9 +103,6 @@ const GrowthTrackerWidget = () => {
     : null;
   const heightChange = latestEntry && previousEntry
     ? ((latestEntry.height_cm || 0) - (previousEntry.height_cm || 0)).toFixed(1)
-    : null;
-  const headChange = latestEntry && previousEntry
-    ? ((latestEntry.head_cm || 0) - (previousEntry.head_cm || 0)).toFixed(1)
     : null;
 
   const handleAddEntry = async () => {
@@ -138,88 +160,143 @@ const GrowthTrackerWidget = () => {
     }
   };
 
+  // Chart data — chronological order, only entries with the selected metric
+  const chartEntries = useMemo(() => {
+    const chronological = [...entries].reverse();
+    return chronological.filter((e) => (metric === 'weight' ? e.weight_kg != null : e.height_cm != null));
+  }, [entries, metric]);
+
+  const chartValues = chartEntries.map((e) => (metric === 'weight' ? e.weight_kg! : e.height_cm!));
+  const unit = metric === 'weight' ? tr('growthtrackerwidget_unit_kg', 'kq') : tr('growthtrackerwidget_unit_cm', 'sm');
+  const hasChart = chartValues.length >= 2;
+
+  const width = 300;
+  const height = 116;
+  const pad = 10;
+  const chart = hasChart ? buildPath(chartValues, width, height, pad) : null;
+
+  const formatAxisDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
+  };
+
   return (
     <motion.div
-      className="bg-card rounded-2xl p-4 shadow-card border border-border/50"
+      className="a-card a-fade-in"
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.2 }}
     >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-400 to-pink-600 flex items-center justify-center">
-            <Scale className="w-4 h-4 text-white" />
-          </div>
-          <h3 className="font-bold text-sm text-foreground">{tr("growthtrackerwidget_inkisaf_izleyicisi_71039e", "İnkişaf izləyicisi")}</h3>
+      <div className="a-card-head">
+        <h3 className="a-card-title a-heading">{tr("growthtrackerwidget_inkisaf_izleyicisi_71039e", "İnkişaf izləyicisi")}</h3>
+        <div className="a-tabs">
+          <button type="button" className={`a-tab${metric === 'weight' ? ' active' : ''}`} onClick={() => setMetric('weight')}>
+            {tr("growthtrackerwidget_ceki_b10cc4", "Çəki")}
+          </button>
+          <button type="button" className={`a-tab${metric === 'height' ? ' active' : ''}`} onClick={() => setMetric('height')}>
+            {tr('growthtrackerwidget_height', 'Boy')}
+          </button>
         </div>
-        <motion.button
-          onClick={() => setShowInput(!showInput)}
-          className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"
-          whileTap={{ scale: 0.9 }}
-        >
-          <Plus className={`w-4 h-4 text-primary transition-transform ${showInput ? 'rotate-45' : ''}`} />
-        </motion.button>
       </div>
-      
-      {/* Current Stats */}
-      <div className={`grid ${showHeadCircumference ? 'grid-cols-3' : 'grid-cols-2'} gap-2 mb-3`}>
-        <div className="bg-rose-50 dark:bg-rose-500/15 rounded-xl p-3">
-          <div className="flex items-center gap-1.5 mb-1">
-            <Scale className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
-            <span className="text-[10px] text-rose-600/70 dark:text-rose-400/70">{tr("growthtrackerwidget_ceki_b10cc4", "Çəki")}</span>
+
+      {/* Line chart */}
+      {hasChart && chart ? (
+        <>
+          <div className="a-chart-wrap">
+            <span
+              className="a-chart-tooltip"
+              style={{ left: `${(chart.last[0] / width) * 100}%` }}
+            >
+              {chartValues[chartValues.length - 1]} {unit}
+            </span>
+            <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id={`a-growth-fade-${metric}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--a-chart-line)" stopOpacity="0.22" />
+                  <stop offset="100%" stopColor="var(--a-chart-line)" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              {[0.25, 0.5, 0.75].map((f) => (
+                <line
+                  key={f}
+                  x1="0"
+                  x2={width}
+                  y1={height * f}
+                  y2={height * f}
+                  stroke="var(--a-line)"
+                  strokeDasharray="3 5"
+                  strokeWidth="1"
+                />
+              ))}
+              <path d={chart.area} fill={`url(#a-growth-fade-${metric})`} />
+              <path d={chart.d} fill="none" stroke="var(--a-chart-line)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx={chart.last[0]} cy={chart.last[1]} r="4.5" fill="var(--a-surface)" stroke="var(--a-chart-line)" strokeWidth="2.5" />
+            </svg>
           </div>
-          <p className="text-lg font-black text-rose-700 dark:text-rose-300">
-            {latestEntry?.weight_kg ? `${latestEntry.weight_kg} ${tr('growthtrackerwidget_unit_kg','kq')}` : '—'}
-          </p>
-          {weightChange && parseFloat(weightChange) !== 0 && (
-            <div className="flex items-center gap-1 mt-1">
-              <TrendingUp className={`w-3 h-3 ${parseFloat(weightChange) > 0 ? 'text-green-500' : 'text-red-500 rotate-180'}`} />
-              <span className={`text-[10px] font-medium ${parseFloat(weightChange) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <div className="a-chart-axis">
+            <span>{formatAxisDate(chartEntries[0].entry_date)}</span>
+            <span>{formatAxisDate(chartEntries[chartEntries.length - 1].entry_date)}</span>
+          </div>
+        </>
+      ) : (
+        <p className="a-list-sub" style={{ whiteSpace: 'normal', textAlign: 'center', padding: '14px 0' }}>
+          {tr('mommy_growth_empty', 'Qrafik üçün ən azı 2 ölçü lazımdır')}
+        </p>
+      )}
+
+      {/* Current stats */}
+      <div className={showHeadCircumference ? 'a-grid-3' : 'a-grid-2'}>
+        <div className="a-stat-tile">
+          <span className="a-stat-tile-icon" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+            <Scale size={14} />
+          </span>
+          <div style={{ minWidth: 0 }}>
+            <p className="a-stat-tile-label">{tr("growthtrackerwidget_ceki_b10cc4", "Çəki")}</p>
+            <p className="a-stat-tile-value" style={{ fontSize: 13 }}>
+              {latestEntry?.weight_kg ? `${latestEntry.weight_kg} ${tr('growthtrackerwidget_unit_kg', 'kq')}` : '—'}
+            </p>
+            {weightChange && parseFloat(weightChange) !== 0 && (
+              <p className="a-stat-tile-label" style={{ display: 'flex', alignItems: 'center', gap: 3, color: parseFloat(weightChange) > 0 ? 'var(--a-green-2)' : 'var(--a-pink-2)' }}>
+                <TrendingUp size={10} style={{ transform: parseFloat(weightChange) > 0 ? 'none' : 'rotate(180deg)' }} />
                 {parseFloat(weightChange) > 0 ? '+' : ''}{weightChange}
-              </span>
-            </div>
-          )}
-        </div>
-        
-        <div className="bg-indigo-50 dark:bg-indigo-500/15 rounded-xl p-3">
-          <div className="flex items-center gap-1.5 mb-1">
-            <Ruler className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
-            <span className="text-[10px] text-indigo-600/70 dark:text-indigo-400/70">{tr('growthtrackerwidget_height','Boy')}</span>
+              </p>
+            )}
           </div>
-          <p className="text-lg font-black text-indigo-700 dark:text-indigo-300">
-            {latestEntry?.height_cm ? `${latestEntry.height_cm} ${tr('growthtrackerwidget_unit_cm','sm')}` : '—'}
-          </p>
-          {heightChange && parseFloat(heightChange) !== 0 && (
-            <div className="flex items-center gap-1 mt-1">
-              <TrendingUp className={`w-3 h-3 ${parseFloat(heightChange) > 0 ? 'text-green-500' : 'text-red-500 rotate-180'}`} />
-              <span className={`text-[10px] font-medium ${parseFloat(heightChange) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+        </div>
+
+        <div className="a-stat-tile">
+          <span className="a-stat-tile-icon" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+            <Ruler size={14} />
+          </span>
+          <div style={{ minWidth: 0 }}>
+            <p className="a-stat-tile-label">{tr('growthtrackerwidget_height', 'Boy')}</p>
+            <p className="a-stat-tile-value" style={{ fontSize: 13 }}>
+              {latestEntry?.height_cm ? `${latestEntry.height_cm} ${tr('growthtrackerwidget_unit_cm', 'sm')}` : '—'}
+            </p>
+            {heightChange && parseFloat(heightChange) !== 0 && (
+              <p className="a-stat-tile-label" style={{ display: 'flex', alignItems: 'center', gap: 3, color: parseFloat(heightChange) > 0 ? 'var(--a-green-2)' : 'var(--a-pink-2)' }}>
+                <TrendingUp size={10} style={{ transform: parseFloat(heightChange) > 0 ? 'none' : 'rotate(180deg)' }} />
                 {parseFloat(heightChange) > 0 ? '+' : ''}{heightChange}
-              </span>
-            </div>
-          )}
+              </p>
+            )}
+          </div>
         </div>
 
         {showHeadCircumference && (
-          <div className="bg-amber-50 dark:bg-amber-500/15 rounded-xl p-3">
-            <div className="flex items-center gap-1.5 mb-1">
-              <CircleDot className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
-              <span className="text-[10px] text-amber-600/70 dark:text-amber-400/70">{tr("growthtrackerwidget_bas_3cb8b6", "Baş")}</span>
+          <div className="a-stat-tile">
+            <span className="a-stat-tile-icon" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+              <CircleDot size={14} />
+            </span>
+            <div style={{ minWidth: 0 }}>
+              <p className="a-stat-tile-label">{tr("growthtrackerwidget_bas_3cb8b6", "Baş")}</p>
+              <p className="a-stat-tile-value" style={{ fontSize: 13 }}>
+                {latestEntry?.head_cm ? `${latestEntry.head_cm} ${tr('growthtrackerwidget_unit_cm', 'sm')}` : '—'}
+              </p>
             </div>
-            <p className="text-lg font-black text-amber-700 dark:text-amber-300">
-              {latestEntry?.head_cm ? `${latestEntry.head_cm} ${tr('growthtrackerwidget_unit_cm','sm')}` : '—'}
-            </p>
-            {headChange && parseFloat(headChange) !== 0 && (
-              <div className="flex items-center gap-1 mt-1">
-                <TrendingUp className={`w-3 h-3 ${parseFloat(headChange) > 0 ? 'text-green-500' : 'text-red-500 rotate-180'}`} />
-                <span className={`text-[10px] font-medium ${parseFloat(headChange) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {parseFloat(headChange) > 0 ? '+' : ''}{headChange}
-                </span>
-              </div>
-            )}
           </div>
         )}
       </div>
-      
+
       {/* Quick Add Input */}
       <AnimatePresence>
         {showInput && (
@@ -228,61 +305,77 @@ const GrowthTrackerWidget = () => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             className="space-y-2"
+            style={{ marginTop: 14 }}
           >
             <div className={`grid ${showHeadCircumference ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
               <div>
-                <label className="text-[10px] text-muted-foreground mb-1 block">{tr("growthtrackerwidget_ceki_kq_2f7555", "Çəki (kq)")}</label>
+                <label className="a-stat-tile-label" style={{ display: 'block', marginBottom: 4 }}>{tr("growthtrackerwidget_ceki_kq_2f7555", "Çəki (kq)")}</label>
                 <input
                   type="number"
                   step="0.1"
                   value={weightInput}
                   onChange={(e) => setWeightInput(e.target.value)}
                   placeholder="5.2"
-                  className="w-full px-3 py-2 rounded-lg bg-muted/50 border border-border text-sm"
+                  className="a-input"
+                  style={{ width: '100%' }}
                 />
               </div>
               <div>
-                <label className="text-[10px] text-muted-foreground mb-1 block">{tr('growthtrackerwidget_height_cm','Boy (sm)')}</label>
+                <label className="a-stat-tile-label" style={{ display: 'block', marginBottom: 4 }}>{tr('growthtrackerwidget_height_cm', 'Boy (sm)')}</label>
                 <input
                   type="number"
                   step="0.5"
                   value={heightInput}
                   onChange={(e) => setHeightInput(e.target.value)}
                   placeholder="58"
-                  className="w-full px-3 py-2 rounded-lg bg-muted/50 border border-border text-sm"
+                  className="a-input"
+                  style={{ width: '100%' }}
                 />
               </div>
               {showHeadCircumference && (
                 <div>
-                  <label className="text-[10px] text-muted-foreground mb-1 block">{tr("growthtrackerwidget_bas_sm_927b99", "Baş (sm)")}</label>
+                  <label className="a-stat-tile-label" style={{ display: 'block', marginBottom: 4 }}>{tr("growthtrackerwidget_bas_sm_927b99", "Baş (sm)")}</label>
                   <input
                     type="number"
                     step="0.5"
                     value={headInput}
                     onChange={(e) => setHeadInput(e.target.value)}
                     placeholder="38"
-                    className="w-full px-3 py-2 rounded-lg bg-muted/50 border border-border text-sm"
+                    className="a-input"
+                    style={{ width: '100%' }}
                   />
                 </div>
               )}
             </div>
             <motion.button
               onClick={handleAddEntry}
-              className="w-full py-2.5 bg-primary text-white rounded-xl font-bold text-sm"
+              className="a-btn-solid"
+              style={{ width: '100%', justifyContent: 'center' }}
               whileTap={{ scale: 0.98 }}
             >
-              {tr('growthtrackerwidget_save','Yadda saxla')}
+              {tr('growthtrackerwidget_save', 'Yadda saxla')}
             </motion.button>
           </motion.div>
         )}
       </AnimatePresence>
-      
-      {/* Last updated */}
-      {latestEntry && !showInput && (
-        <p className="text-[10px] text-muted-foreground text-center">
-          {tr('growthtrackerwidget_last_meas_label','Son ölçü:')} {new Date(latestEntry.entry_date).toLocaleDateString('az-AZ')}
-        </p>
-      )}
+
+      {/* Last updated + add toggle */}
+      <div className="a-teaser" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+        <span>
+          {latestEntry
+            ? <>{tr('growthtrackerwidget_last_meas_label', 'Son ölçü:')} <strong>{new Date(latestEntry.entry_date).toLocaleDateString(getLocaleTag())}</strong></>
+            : tr('mommy_growth_no_entries', 'Hələ ölçü qeyd edilməyib')}
+        </span>
+        <motion.button
+          onClick={() => setShowInput(!showInput)}
+          className="a-btn-soft"
+          style={{ flexShrink: 0 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <Plus size={13} strokeWidth={2.5} style={{ transition: 'transform 150ms ease', transform: showInput ? 'rotate(45deg)' : 'none' }} />
+          {tr("dashboard_elave_et_a5fb21", "+ \u018Flav\u0259 et").replace('+ ', '')}
+        </motion.button>
+      </div>
     </motion.div>
   );
 };

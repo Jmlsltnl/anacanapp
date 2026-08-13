@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Send, Heart, Smile } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -226,7 +227,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
 
     if (date.toDateString() === today.toDateString()) return tr("motherchatscreen_bu_gun_786fd4", "Bu g\xFCn");
     if (date.toDateString() === yesterday.toDateString()) return tr("motherchatscreen_dunen_52b701", "D\xFCn\u0259n");
-    return date.toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' });
+    return date.toLocaleDateString(getLocaleTag(), { day: 'numeric', month: 'long' });
   };
 
   // Group messages by date
@@ -243,63 +244,70 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
 
   if (!profile?.linked_partner_id) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6" style={{ background: 'var(--a-bg)' }}>
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
-          
-          <Heart className="w-10 h-10 text-muted-foreground" />
+          className="w-20 h-20 rounded-full flex items-center justify-center mb-4"
+          style={{ background: 'var(--a-pink-1)' }}>
+
+          <Heart size={36} style={{ color: 'var(--a-pink-ink)' }} />
         </motion.div>
-        <p className="text-muted-foreground text-center mb-4">
+        <p className="text-center mb-4" style={{ fontSize: 13.5, color: 'var(--a-ink-soft)' }}>
           {tr("motherchatscreen_partnyorunuz_hele_qosulmayib_8c68b2", "Partnyorunuz h\u0259l\u0259 qo\u015Fulmay\u0131b")}
         </p>
         <motion.button
           onClick={onBack}
-          className="px-6 py-3 bg-primary text-white rounded-2xl font-bold"
+          className="px-6 py-3 rounded-full text-white font-bold"
+          style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}
           whileTap={{ scale: 0.95 }}>
           {tr("motherchatscreen_geri_qayit_ff66c2", "Geri qay\u0131t")}
-        
+
         </motion.button>
       </div>);
 
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="a-scope min-h-screen flex flex-col" style={{ background: 'var(--a-bg)' }}>
       {/* Header */}
-      <div className="gradient-primary px-5 pt-4 pb-6 safe-top">
-        <div className="flex items-center gap-4">
+      <div className="px-4 pt-3 pb-2.5 safe-top"
+      style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
+        <div className="flex items-center gap-3">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}>
-            
-            <ArrowLeft className="w-5 h-5 text-white" />
+            className="a-icon-btn shrink-0"
+            whileTap={{ scale: 0.95 }}
+            aria-label={tr("common_geri", "Geri")}>
+
+            <ArrowLeft size={16} strokeWidth={2} />
           </motion.button>
-          <div className="flex items-center gap-3 flex-1">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             <motion.div
-              className="w-10 h-10 rounded-full bg-blue-400/30 flex items-center justify-center text-xl"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0"
+              style={{ background: 'var(--a-blue-1)' }}
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity }}>
-              
+
               💙
             </motion.div>
-            <div>
-              <h1 className="text-lg font-bold text-white">{partnerProfile?.name || 'Partner'}</h1>
+            <div className="min-w-0">
+              <h1 className="truncate" style={{ fontSize: 15, fontWeight: 700, color: 'var(--a-ink)' }}>{partnerProfile?.name || 'Partner'}</h1>
               <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-white/70 text-xs">Online</span>
+                <span className="a-chat-status-dot" style={{ width: 7, height: 7 }} />
+                <span style={{ fontSize: 11, color: 'var(--a-ink-soft)' }}>Online</span>
               </div>
             </div>
           </div>
           <motion.button
             onClick={sendLove}
-            className="w-10 h-10 rounded-full bg-pink-500/30 flex items-center justify-center"
+            className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+            style={{ background: 'var(--a-pink-1)' }}
             whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}>
-            
-            <Heart className="w-5 h-5 text-white fill-white" />
+            whileTap={{ scale: 0.9 }}
+            aria-label="❤️">
+
+            <Heart className="w-5 h-5" style={{ color: 'var(--a-pink-ink)', fill: 'var(--a-pink-ink)' }} />
           </motion.button>
         </div>
       </div>
@@ -309,22 +317,24 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
         {loading ?
         <div className="flex items-center justify-center h-full">
             <motion.div
-            className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full"
+            className="w-8 h-8 rounded-full"
+            style={{ border: '4px solid var(--a-peach-2)', borderTopColor: 'transparent' }}
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }} />
-          
+
           </div> :
         messages.length === 0 ?
         <div className="flex flex-col items-center justify-center h-full text-center">
             <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
-            
-              <Smile className="w-10 h-10 text-muted-foreground" />
+            className="w-20 h-20 rounded-full flex items-center justify-center mb-4"
+            style={{ background: 'var(--a-surface-soft)' }}>
+
+              <Smile size={38} style={{ color: 'var(--a-ink-faint)' }} />
             </motion.div>
-            <p className="text-muted-foreground">{tr("motherchatscreen_hele_mesaj_yoxdur_cf0b5e", "Hələ mesaj yoxdur")}</p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr("motherchatscreen_hele_mesaj_yoxdur_cf0b5e", "Hələ mesaj yoxdur")}</p>
+            <p style={{ fontSize: 12.5, color: 'var(--a-ink-faint)', marginTop: 4 }}>
               {tr("motherchatscreen_i_lk_mesaji_siz_gonderin_a2529e", "\u0130lk mesaj\u0131 siz g\xF6nd\u0259rin!")}
             </p>
           </div> :
@@ -332,7 +342,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
         groupedMessages.map((group) =>
         <div key={group.date}>
               <div className="flex items-center justify-center my-4">
-                <span className="px-3 py-1 bg-muted rounded-full text-xs text-muted-foreground">
+                <span style={{ padding: '4px 13px', background: 'var(--a-chip-overlay)', borderRadius: 999, fontSize: 11, fontWeight: 600, color: 'var(--a-ink-soft)' }}>
                   {formatDateSeparator(group.messages[0].created_at)}
                 </span>
               </div>
@@ -348,7 +358,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: msgIdx * 0.02 }}
                   className={`flex ${isMe ? 'justify-end' : 'justify-start'} mb-2`}>
-                  
+
                       <ChatMessageBubble message={msg} isMe={isMe} />
                     </motion.div>);
 
@@ -366,16 +376,17 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
         <motion.button
           key={msg}
           onClick={() => sendQuickMessage(msg)}
-          className="px-3 py-1.5 bg-muted rounded-full text-xs font-medium whitespace-nowrap"
+          className="whitespace-nowrap"
+          style={{ padding: '6px 13px', background: 'var(--a-surface)', border: '1px solid var(--a-line)', borderRadius: 999, fontSize: 11.5, fontWeight: 600, color: 'var(--a-ink)', boxShadow: '0 4px 10px -6px rgba(217, 108, 74, 0.3)' }}
           whileTap={{ scale: 0.95 }}>
-          
+
             {msg}
           </motion.button>
         )}
       </div>
 
       {/* Input */}
-      <div className="p-4 bg-card border-t border-border safe-bottom">
+      <div className="p-4 safe-bottom" style={{ borderTop: '1px solid var(--a-line)' }}>
         <div className="flex items-center gap-2">
           <ChatMediaUpload onUpload={sendMediaMessage} />
           <input
@@ -384,16 +395,19 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder={tr("motherchatscreen_mesaj_yazin_e69f84", "Mesaj yazın...")}
-            className="flex-1 h-12 px-4 rounded-2xl bg-muted text-sm outline-none border-2 border-transparent focus:border-primary/30 transition-colors" />
-          
+            className="flex-1 h-12 px-4 rounded-full outline-none transition-colors min-w-0"
+            style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', fontSize: 13, color: 'var(--a-ink)' }} />
+
           <motion.button
             onClick={sendMessage}
             disabled={!newMessage.trim()}
-            className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center disabled:opacity-50"
+            className="a-chat-send shrink-0"
+            style={{ width: 46, height: 46 }}
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}>
-            
-            <Send className="w-5 h-5" />
+            whileTap={{ scale: 0.95 }}
+            aria-label={tr("helpscreen_gonder_3f11bd", "G\xF6nd\u0259r")}>
+
+            <Send size={18} />
           </motion.button>
         </div>
       </div>

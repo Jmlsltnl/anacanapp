@@ -1,21 +1,20 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, ImagePlus, Camera, Calendar, Trash2, RefreshCw,
-  ChevronLeft, ChevronRight, X, Edit, Save, Heart, ShoppingBag } from
+  ImagePlus, Camera, Trash2, RefreshCw,
+  X, Edit, Save, Heart, ShoppingBag } from
 'lucide-react';
 import AlbumOrderScreen from '@/components/shop/AlbumOrderScreen';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
 
 interface PregnancyAlbumProps {
@@ -255,7 +254,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <ToolPage>
       <input
         ref={fileInputRef}
         type="file"
@@ -264,142 +263,134 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
         className="hidden" />
       
 
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-card border-b border-border/50 px-4 py-3">
-        <div className="flex items-center gap-3 relative z-20">
-          <Button variant="ghost" size="icon" onClick={onBack} className="relative z-30">
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold">{tr("pregnancyalbum_hamilelik_albomu_6f1559", "Hamiləlik Albomu")}</h1>
-            <p className="text-xs text-muted-foreground">{tr("pregnancyalbum_her_ay_xatire_c5bdee", "Hər ay xatirə")}</p>
-          </div>
-        </div>
-      </div>
+      <ToolHeader
+        onBack={onBack}
+        eyebrow={tr("pregnancyalbum_her_ay_xatire_c5bdee", "Hər ay xatirə")}
+        title={tr("pregnancyalbum_hamilelik_albomu_6f1559", "Hamiləlik Albomu")} />
 
       {/* Current Progress */}
-      <div className="px-4 py-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl p-4 border border-purple-500/20">
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-muted-foreground">{tr("pregnancyalbum_hal_hazirda_b78349", "Hal-hazırda")}</p>
-              <p className="text-xl font-bold">{monthLabels[currentMonth - 1]?.label || `${currentMonth}-ci ay`}</p>
-              <p className="text-xs text-muted-foreground">{currentWeek}{tr("pregnancyalbum_hefte_459cfe", ". h\u0259ft\u0259")}</p>
-            </div>
-            <div className="text-4xl">{monthLabels[currentMonth - 1]?.emoji}</div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="a-card mb-4"
+        style={{ background: 'var(--a-grad-pink)', border: 'none' }}>
+        
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-alert-ink)', opacity: 0.75 }}>{tr("pregnancyalbum_hal_hazirda_b78349", "Hal-hazırda")}</p>
+            <p className="a-heading" style={{ margin: 0, fontSize: 20, color: 'var(--a-alert-ink)' }}>{monthLabels[currentMonth - 1]?.label || `${currentMonth}-ci ay`}</p>
+            <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-alert-ink)', opacity: 0.75 }}>{currentWeek}{tr("pregnancyalbum_hefte_459cfe", ". h\u0259ft\u0259")}</p>
           </div>
-          <div className="mt-3 flex items-center gap-2">
-            <div className="flex-1 h-2 bg-background/50 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
-                initial={{ width: 0 }}
-                animate={{ width: `${currentMonth / 9 * 100}%` }} />
-              
-            </div>
-            <span className="text-xs font-medium">{Math.round(currentMonth / 9 * 100)}%</span>
+          <div className="text-4xl">{monthLabels[currentMonth - 1]?.emoji}</div>
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.45)' }}>
+            <motion.div
+              className="h-full rounded-full"
+              style={{ background: '#fff' }}
+              initial={{ width: 0 }}
+              animate={{ width: `${currentMonth / 9 * 100}%` }} />
+            
           </div>
-        </motion.div>
-      </div>
+          <span className="text-xs font-bold" style={{ color: 'var(--a-alert-ink)' }}>{Math.round(currentMonth / 9 * 100)}%</span>
+        </div>
+      </motion.div>
 
       {/* Album Grid */}
-      <div className="px-4">
-        <h2 className="font-semibold text-sm mb-3">{tr("pregnancyalbum_xatireleriniz_3e880f", "Xatirələriniz")}</h2>
-        
-        <div className="grid grid-cols-3 gap-2">
-          {monthLabels.map((month, index) => {
-            const photo = getPhotoForMonth(month.month);
-            const isPast = month.month < currentMonth;
-            const isCurrent = month.month === currentMonth;
-            const isFuture = month.month > currentMonth;
+      <div className="a-section-head">
+        <h2 className="a-section-title a-heading" style={{ fontSize: 15 }}>{tr("pregnancyalbum_xatireleriniz_3e880f", "Xatirələriniz")}</h2>
+      </div>
+      
+      <div className="grid grid-cols-3 gap-2">
+        {monthLabels.map((month, index) => {
+          const photo = getPhotoForMonth(month.month);
+          const isPast = month.month < currentMonth;
+          const isCurrent = month.month === currentMonth;
+          const isFuture = month.month > currentMonth;
 
-            return (
-              <motion.button
-                key={month.month}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                onClick={() => {
-                  if (photo) {
-                    setShowActionSheet(photo);
-                  } else if (!isFuture) {
-                    setSelectedMonth(month.month);
-                    setReplacingPhotoId(null);
-                    fileInputRef.current?.click();
-                  }
-                }}
-                disabled={isFuture && !photo}
-                className={`aspect-square rounded-2xl overflow-hidden relative ${
-                isFuture && !photo ? 'opacity-40' : ''}`
-                }>
+          return (
+            <motion.button
+              key={month.month}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.05 }}
+              onClick={() => {
+                if (photo) {
+                  setShowActionSheet(photo);
+                } else if (!isFuture) {
+                  setSelectedMonth(month.month);
+                  setReplacingPhotoId(null);
+                  fileInputRef.current?.click();
+                }
+              }}
+              disabled={isFuture && !photo}
+              className={`aspect-square rounded-2xl overflow-hidden relative ${
+              isFuture && !photo ? 'opacity-40' : ''}`
+              }
+              style={{ cursor: isFuture && !photo ? 'default' : 'pointer', background: 'none', border: 'none', padding: 0 }}>
+              
+              {photo ?
+              <>
+                  <img
+                  src={photo.photo_url}
+                  alt={month.label}
+                  className="w-full h-full object-cover" />
                 
-                {photo ?
-                <>
-                    <img
-                    src={photo.photo_url}
-                    alt={month.label}
-                    className="w-full h-full object-cover" />
-                  
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    <div className="absolute bottom-2 left-2 right-2">
-                      <Badge className="text-[10px] bg-white/20 text-white border-0">
-                        {month.label}
-                      </Badge>
-                    </div>
-                  </> :
-
-                <div className={`w-full h-full flex flex-col items-center justify-center ${
-                isCurrent ?
-                'bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/30 border-dashed' :
-                'bg-muted/50 border-2 border-border/50 border-dashed'}`
-                }>
-                    <span className="text-2xl mb-1">{month.emoji}</span>
-                    {isCurrent ?
-                  <>
-                        <ImagePlus className="w-5 h-5 text-primary mb-1" />
-                        <span className="text-[10px] text-primary font-medium">{tr("pregnancyalbum_elave_et_6e1b9b", "Əlavə et")}</span>
-                      </> :
-                  isPast ?
-                  <>
-                        <ImagePlus className="w-4 h-4 text-muted-foreground mb-1" />
-                        <span className="text-[10px] text-muted-foreground">{month.label}</span>
-                      </> :
-
-                  <span className="text-[10px] text-muted-foreground">{month.label}</span>
-                  }
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-bold inline-block" style={{ background: 'rgba(255,255,255,0.25)', color: '#fff', backdropFilter: 'blur(4px)' }}>
+                      {month.label}
+                    </span>
                   </div>
-                }
-                
-                {isCurrent && !photo &&
-                <motion.div
-                  className="absolute inset-0 border-2 border-primary rounded-2xl"
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity }} />
+                </> :
 
-                }
-              </motion.button>);
+              <div
+                className="w-full h-full flex flex-col items-center justify-center"
+                style={isCurrent ?
+                { background: 'var(--a-peach-1)', border: '2px dashed var(--a-peach-2)', borderRadius: 16 } :
+                { background: 'var(--a-surface)', border: '2px dashed var(--a-line-strong)', borderRadius: 16 }}>
+                  <span className="text-2xl mb-1">{month.emoji}</span>
+                  {isCurrent ?
+                <>
+                      <ImagePlus className="w-5 h-5 mb-1" style={{ color: 'var(--a-accent-ink)' }} />
+                      <span className="text-[10px] font-bold" style={{ color: 'var(--a-accent-ink)' }}>{tr("pregnancyalbum_elave_et_6e1b9b", "Əlavə et")}</span>
+                    </> :
+                isPast ?
+                <>
+                      <ImagePlus className="w-4 h-4 mb-1" style={{ color: 'var(--a-ink-soft)' }} />
+                      <span className="text-[10px] font-semibold" style={{ color: 'var(--a-ink-soft)' }}>{month.label}</span>
+                    </> :
 
-          })}
-        </div>
+                <span className="text-[10px] font-semibold" style={{ color: 'var(--a-ink-soft)' }}>{month.label}</span>
+                }
+                </div>
+              }
+              
+              {isCurrent && !photo &&
+              <motion.div
+                className="absolute inset-0 rounded-2xl pointer-events-none"
+                style={{ border: '2px solid var(--a-peach-2)' }}
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity }} />
+
+              }
+            </motion.button>);
+
+        })}
       </div>
 
       {/* Tips */}
-      <div className="px-4 mt-6">
-        <div className="bg-card rounded-2xl p-4 border border-border/50">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-pink-500/10 flex items-center justify-center shrink-0">
-              <Heart className="w-5 h-5 text-pink-500" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-sm mb-1">{tr("pregnancyalbum_meslehet_9a0892", "Məsləhət")}</h3>
-              <p className="text-xs text-muted-foreground">
-                {tr("pregnancyalbum_her_ay_eyni_bucaqdan_ve_eyni_p_4d07a0", "H\u0259r ay eyni bucaqdan v\u0259 eyni paltarla \u015F\u0259kil \xE7\u0259km\u0259k daha g\xF6z\u0259l albom yarad\u0131r. \n                Bel\u0259c\u0259 hamil\u0259lik boyunca d\u0259yi\u015Fiklikl\u0259ri a\xE7\u0131q \u015F\u0259kild\u0259 g\xF6r\u0259 bil\u0259rsiniz.")}
-              
-              </p>
-            </div>
+      <div className="a-card mt-4">
+        <div className="flex items-start gap-3">
+          <span className="a-list-icon" style={{ background: 'var(--a-grad-pink)', flexShrink: 0 }}>
+            <Heart size={17} strokeWidth={2.2} style={{ color: 'var(--a-alert-ink)' }} />
+          </span>
+          <div>
+            <h3 className="a-list-title mb-1" style={{ margin: '0 0 4px' }}>{tr("pregnancyalbum_meslehet_9a0892", "Məsləhət")}</h3>
+            <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>
+              {tr("pregnancyalbum_her_ay_eyni_bucaqdan_ve_eyni_p_4d07a0", "H\u0259r ay eyni bucaqdan v\u0259 eyni paltarla \u015F\u0259kil \xE7\u0259km\u0259k daha g\xF6z\u0259l albom yarad\u0131r. \n                Bel\u0259c\u0259 hamil\u0259lik boyunca d\u0259yi\u015Fiklikl\u0259ri a\xE7\u0131q \u015F\u0259kild\u0259 g\xF6r\u0259 bil\u0259rsiniz.")}
+            
+            </p>
           </div>
         </div>
       </div>
@@ -409,38 +400,39 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mx-4 mt-4 mb-4 rounded-2xl bg-gradient-to-br from-primary/15 via-primary/10 to-amber-400/15 border border-primary/30 p-4 shadow-sm">
+        className="a-cta mt-4 mb-4">
         
           <div className="flex items-start gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
-              <Heart className="w-5 h-5 text-white" />
-            </div>
+            <span className="a-list-icon" style={{ background: 'var(--a-grad-cta)', flexShrink: 0, border: '1px solid var(--a-btn-border)' }}>
+              <Heart size={17} strokeWidth={2.2} style={{ color: 'var(--a-accent-ink)' }} />
+            </span>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-foreground mb-0.5">{tr("pregnancyalbum_hamilelik_xatirelerini_elinizd_76d584", "Hamil\u0259lik xatir\u0259l\u0259rini \u0259linizd\u0259 tutun")}</h3>
-              <p className="text-[12px] text-muted-foreground leading-snug mb-3">
+              <h3 className="a-card-title a-heading" style={{ margin: '0 0 2px' }}>{tr("pregnancyalbum_hamilelik_xatirelerini_elinizd_76d584", "Hamil\u0259lik xatir\u0259l\u0259rini \u0259linizd\u0259 tutun")}</h3>
+              <p className="a-cta-text" style={{ margin: '0 0 12px' }}>
                 {tr("pregnancyalbum_9_ayin_her_anini_fiziki_albom__729db3", "9 ay\u0131n h\u0259r an\u0131n\u0131 fiziki albom kimi sifari\u015F edin. Premium ka\u011F\u0131z, h\u0259r ay \xFC\xE7\xFCn ayr\u0131ca s\u0259hif\u0259, \xF6m\xFCrl\xFCk xatir\u0259.")}
               </p>
               <div className="grid grid-cols-3 gap-2 mb-3">
-                <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
-                  <p className="text-[10px] text-muted-foreground">{tr("pregnancyalbum_sehife_fd1fa9", "S\u0259hif\u0259")}</p>
-                  <p className="text-[13px] font-bold text-foreground">9+</p>
+                <div className="rounded-xl p-2 text-center" style={{ background: 'var(--a-surface-soft)' }}>
+                  <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{tr("pregnancyalbum_sehife_fd1fa9", "S\u0259hif\u0259")}</p>
+                  <p className="text-[13px] font-bold" style={{ margin: 0, color: 'var(--a-ink)' }}>9+</p>
                 </div>
-                <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
-                  <p className="text-[10px] text-muted-foreground">Format</p>
-                  <p className="text-[13px] font-bold text-foreground">A4</p>
+                <div className="rounded-xl p-2 text-center" style={{ background: 'var(--a-surface-soft)' }}>
+                  <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>Format</p>
+                  <p className="text-[13px] font-bold" style={{ margin: 0, color: 'var(--a-ink)' }}>A4</p>
                 </div>
-                <div className="rounded-xl bg-background/60 border border-border/40 p-2 text-center">
-                  <p className="text-[10px] text-muted-foreground">{tr("pregnancyalbum_catdirilma_e955cf", "\xC7atd\u0131r\u0131lma")}</p>
-                  <p className="text-[13px] font-bold text-foreground">{tr("pregnancyalbum_3_5_gun_5d513c", "3-5 g\xFCn")}</p>
+                <div className="rounded-xl p-2 text-center" style={{ background: 'var(--a-surface-soft)' }}>
+                  <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{tr("pregnancyalbum_catdirilma_e955cf", "\xC7atd\u0131r\u0131lma")}</p>
+                  <p className="text-[13px] font-bold" style={{ margin: 0, color: 'var(--a-ink)' }}>{tr("pregnancyalbum_3_5_gun_5d513c", "3-5 g\xFCn")}</p>
                 </div>
               </div>
-              <Button
+              <button
               onClick={() => setShowOrder(true)}
-              className="w-full h-10 rounded-xl gradient-primary text-primary-foreground text-[13px] font-bold gap-1.5">
+              className="a-cta-btn w-full"
+              style={{ justifyContent: 'center', height: 44 }}>
               
-                <ShoppingBag className="w-4 h-4" />
+                <ShoppingBag size={15} strokeWidth={2.2} />
                 {tr("pregnancyalbum_fiziki_albom_sifaris_et_26f86e", "Fiziki Albom Sifari\u015F Et")}
-              </Button>
+              </button>
             </div>
           </div>
         </motion.div> :
@@ -448,25 +440,25 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mx-4 mt-4 mb-4 rounded-2xl bg-card border border-border/50 p-4">
+        className="a-card mt-4 mb-4">
         
           <div className="flex items-start gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-muted flex items-center justify-center flex-shrink-0">
-              <ShoppingBag className="w-5 h-5 text-muted-foreground" />
-            </div>
+            <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', flexShrink: 0 }}>
+              <ShoppingBag size={17} strokeWidth={2.2} style={{ color: 'var(--a-ink-soft)' }} />
+            </span>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-bold text-foreground mb-0.5">{tr("untranslated_fiziki_albom_3i3l4j", "Fiziki Albom")}</h3>
-              <p className="text-[12px] text-muted-foreground leading-snug mb-2">
+              <h3 className="a-list-title mb-0.5" style={{ margin: '0 0 2px' }}>{tr("untranslated_fiziki_albom_3i3l4j", "Fiziki Albom")}</h3>
+              <p className="a-list-sub mb-2" style={{ margin: '0 0 8px', whiteSpace: 'normal' }}>
                 {tr("pregnancyalbum_6_ci_ayi_tamamladiqdan_sonra_h_8a778c", "6-c\u0131 ay\u0131 tamamlad\u0131qdan sonra hamil\u0259lik albomunuzu fiziki kitab kimi sifari\u015F ed\u0259 bil\u0259rsiniz.")}
               </p>
               <div className="flex items-center gap-2">
-                <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--a-line-strong)' }}>
                   <div
-                  className="h-full bg-primary/60 rounded-full"
-                  style={{ width: `${Math.min(100, currentMonth / 6 * 100)}%` }} />
+                  className="h-full rounded-full"
+                  style={{ width: `${Math.min(100, currentMonth / 6 * 100)}%`, background: 'var(--a-grad-peach)' }} />
                 
                 </div>
-                <span className="text-[11px] font-semibold text-muted-foreground">{currentMonth}/6 {tr("pregnancyalbum_ay_suffix_3c7a2d", "ay")}</span>
+                <span className="text-[11px] font-bold" style={{ color: 'var(--a-ink-soft)' }}>{currentMonth}/6 {tr("pregnancyalbum_ay_suffix_3c7a2d", "ay")}</span>
               </div>
             </div>
           </div>
@@ -489,71 +481,72 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
             animate={{ y: 0 }}
             exit={{ y: 300 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="w-full max-w-md bg-card rounded-t-2xl overflow-hidden"
+            className="w-full max-w-md rounded-t-[26px] overflow-hidden"
+            style={{ background: 'var(--a-surface)' }}
             onClick={(e) => e.stopPropagation()}>
             
               {/* Photo preview */}
-              <div className="p-4 flex items-center gap-3 border-b border-border/50">
+              <div className="p-4 flex items-center gap-3" style={{ borderBottom: '1px solid var(--a-line)' }}>
                 <img
                 src={showActionSheet.photo_url}
                 alt="Preview"
                 className="w-16 h-16 rounded-xl object-cover" />
               
                 <div>
-                  <p className="font-semibold text-sm">
+                  <p className="a-list-title" style={{ margin: 0 }}>
                     {monthLabels[showActionSheet.month_number - 1]?.label}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="a-list-sub" style={{ margin: 0 }}>
                     {format(new Date(showActionSheet.photo_date), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
                   </p>
                   {showActionSheet.caption &&
-                <p className="text-xs text-muted-foreground mt-0.5">{showActionSheet.caption}</p>
+                <p className="a-list-sub mt-0.5" style={{ margin: '2px 0 0' }}>{showActionSheet.caption}</p>
                 }
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="p-4 grid grid-cols-3 gap-2">
-                <Button
-                variant="outline"
-                className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl"
+                <button
+                className="flex flex-col items-center gap-1.5 py-3 rounded-2xl"
+                style={{ background: 'var(--a-peach-1)', border: 'none', cursor: 'pointer' }}
                 onClick={() => {
                   setViewingPhoto(showActionSheet);
                   setShowActionSheet(null);
                 }}>
                 
-                  <Camera className="w-5 h-5 text-primary" />
-                  <span className="text-xs font-medium">{tr("untranslated_bax_1yplss", "Bax")}</span>
-                </Button>
+                  <Camera className="w-5 h-5" style={{ color: 'var(--a-accent-ink)' }} />
+                  <span className="text-xs font-bold" style={{ color: 'var(--a-accent-ink)' }}>{tr("untranslated_bax_1yplss", "Bax")}</span>
+                </button>
                 
-                <Button
-                variant="outline"
-                className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl"
+                <button
+                className="flex flex-col items-center gap-1.5 py-3 rounded-2xl"
+                style={{ background: 'var(--a-blue-1)', border: 'none', cursor: 'pointer' }}
                 onClick={() => handleReplace(showActionSheet)}>
                 
-                  <RefreshCw className="w-5 h-5 text-blue-500" />
-                  <span className="text-xs font-medium">{tr("pregnancyalbum_deyisdir_aca175", "Dəyişdir")}</span>
-                </Button>
+                  <RefreshCw className="w-5 h-5" style={{ color: 'var(--a-blue-ink)' }} />
+                  <span className="text-xs font-bold" style={{ color: 'var(--a-blue-ink)' }}>{tr("pregnancyalbum_deyisdir_aca175", "Dəyişdir")}</span>
+                </button>
                 
-                <Button
-                variant="outline"
-                className="flex flex-col items-center gap-1.5 h-auto py-3 rounded-xl border-destructive/30"
+                <button
+                className="flex flex-col items-center gap-1.5 py-3 rounded-2xl"
+                style={{ background: 'var(--a-pink-1)', border: 'none', cursor: 'pointer' }}
                 onClick={() => handleDelete(showActionSheet)}>
                 
-                  <Trash2 className="w-5 h-5 text-destructive" />
-                  <span className="text-xs font-medium text-destructive">{tr("untranslated_sil_zwa7lz", "Sil")}</span>
-                </Button>
+                  <Trash2 className="w-5 h-5" style={{ color: 'var(--a-pink-ink)' }} />
+                  <span className="text-xs font-bold" style={{ color: 'var(--a-pink-ink)' }}>{tr("untranslated_sil_zwa7lz", "Sil")}</span>
+                </button>
               </div>
 
               {/* Cancel */}
               <div className="px-4 pb-4">
-                <Button
-                variant="ghost"
-                className="w-full rounded-xl bg-muted"
+                <button
+                className="a-btn-soft w-full"
+                style={{ justifyContent: 'center', height: 44 }}
                 onClick={() => setShowActionSheet(null)}>
                   {tr("pregnancyalbum_legv_et_b5e49c", "L\u0259\u011Fv et")}
                 
-              </Button>
+              </button>
               </div>
               
               <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
@@ -571,41 +564,38 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 bg-black flex flex-col">
           
-            <div className="flex items-center justify-between px-4 pb-3">
-              <Button
-              variant="ghost"
-              size="icon"
+            <div className="flex items-center justify-between px-4 py-3">
+              <button
               onClick={() => {
                 setViewingPhoto(null);
                 setEditingCaption(false);
               }}
-              className="text-white hover:bg-white/20">
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white"
+              style={{ background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer' }}>
               
                 <X className="w-6 h-6" />
-              </Button>
+              </button>
               <div className="text-center text-white">
-                <p className="font-semibold">{monthLabels[viewingPhoto.month_number - 1]?.label}</p>
-                <p className="text-xs opacity-70">
+                <p className="font-semibold" style={{ margin: 0 }}>{monthLabels[viewingPhoto.month_number - 1]?.label}</p>
+                <p className="text-xs opacity-70" style={{ margin: 0 }}>
                   {format(new Date(viewingPhoto.photo_date), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:bg-white/20"
+                <button
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white"
+                style={{ background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer' }}
                 onClick={() => handleReplace(viewingPhoto)}>
                 
                   <RefreshCw className="w-5 h-5" />
-                </Button>
-                <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:bg-red-500/20 hover:text-red-400"
+                </button>
+                <button
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', color: 'var(--a-pink-2)' }}
                 onClick={() => handleDelete(viewingPhoto)}>
                 
                   <Trash2 className="w-5 h-5" />
-                </Button>
+                </button>
               </div>
             </div>
 
@@ -628,12 +618,13 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                 className="flex-1 h-10 px-3 rounded-lg bg-white/10 text-white placeholder:text-white/50 outline-none"
                 autoFocus />
               
-                  <Button
-                size="icon"
+                  <button
+                className="a-cta-btn"
+                style={{ width: 42, height: 42, padding: 0, justifyContent: 'center' }}
                 onClick={() => updateCaptionMutation.mutate({ id: viewingPhoto.id, newCaption: caption })}>
                 
                     <Save className="w-4 h-4" />
-                  </Button>
+                  </button>
                 </div> :
 
             <button
@@ -641,10 +632,11 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                 setCaption(viewingPhoto.caption || '');
                 setEditingCaption(true);
               }}
-              className="flex items-center gap-2 text-white/70 hover:text-white">
+              className="flex items-center gap-2 text-white/70 hover:text-white"
+              style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
               
                   {viewingPhoto.caption ?
-              <p className="text-sm">{viewingPhoto.caption}</p> :
+              <p className="text-sm" style={{ margin: 0 }}>{viewingPhoto.caption}</p> :
 
               <>
                       <Edit className="w-4 h-4" />
@@ -661,13 +653,13 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
       {/* Uploading Overlay */}
       {uploading &&
       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-          <div className="bg-card rounded-2xl p-6 text-center">
-            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="font-medium">{tr("pregnancyalbum_sekil_yuklenir_babf92", "Şəkil yüklənir...")}</p>
+          <div className="rounded-[26px] p-6 text-center" style={{ background: 'var(--a-surface)' }}>
+            <div className="w-12 h-12 rounded-full animate-spin mx-auto mb-3" style={{ border: '4px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
+            <p className="a-list-title" style={{ margin: 0 }}>{tr("pregnancyalbum_sekil_yuklenir_babf92", "Şəkil yüklənir...")}</p>
           </div>
         </div>
       }
-    </div>);
+    </ToolPage>);
 
 };
 

@@ -28,7 +28,6 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
   const language = useUserStore((s) => s.language);
   const MONTHS = useMemo(() => getMonthLabels(language), [language]);
 
-  useScrollToTop();
   useScreenAnalytics('Cakes', 'Shop');
   const { cakes, loading } = useCakes();
   const { totalItems } = useCakeCart();
@@ -39,6 +38,9 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
   const [showCart, setShowCart] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showOrderSuccess, setShowOrderSuccess] = useState(false);
+
+  // Tort detalı / checkout açılanda da yuxarıdan başla
+  useScrollToTop([selectedCake, showCheckout]);
 
   const filteredCakes = useMemo(() => {
     let filtered = cakes;
@@ -58,13 +60,13 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
 
   if (showOrderSuccess) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 text-center">
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--a-bg)' }}>
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }} className="text-8xl mb-6">🎂</motion.div>
-        <h2 className="text-2xl font-black text-foreground mb-2">{tr("cakesscreen_sifarisiniz_qebul_edildi_ae5b9e", "Sifarişiniz qəbul edildi!")}</h2>
-        <p className="text-muted-foreground mb-8">{tr("cakesscreen_tezlikle_sizinle_elaqe_saxlanilacaq_806311", "Tezliklə sizinlə əlaqə saxlanılacaq")}</p>
+        <h2 className="a-heading" style={{ margin: '0 0 8px', fontSize: 22, color: 'var(--a-on-bg)' }}>{tr("cakesscreen_sifarisiniz_qebul_edildi_ae5b9e", "Sifarişiniz qəbul edildi!")}</h2>
+        <p className="a-list-sub" style={{ margin: '0 0 28px', whiteSpace: 'normal' }}>{tr("cakesscreen_tezlikle_sizinle_elaqe_saxlanilacaq_806311", "Tezliklə sizinlə əlaqə saxlanılacaq")}</p>
         <button
           onClick={() => {setShowOrderSuccess(false);setShowCheckout(false);setSelectedCake(null);}}
-          className="px-8 py-3 rounded-2xl bg-primary text-primary-foreground font-bold">
+          className="a-cta-btn">
           {tr("cakesscreen_tortlara_qayit_c533c2", "Tortlara qay\u0131t")}
         
         </button>
@@ -100,98 +102,107 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--a-peach-2)' }} />
       </div>);
 
   }
 
   return (
-    <div className="min-h-screen bg-background overflow-y-auto pb-44 pt-2 px-4">
-      {/* Header */}
-      <motion.div className="flex items-center justify-between mb-5" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-        <div className="flex items-center gap-3">
+    <div className="a-scope overflow-y-auto pb-44" style={{ background: 'var(--a-bg)', minHeight: '100vh' }}>
+      <div className="a-shell">
+      {/* Top bar */}
+      <motion.header className="a-topbar" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {onBack &&
-          <button onClick={onBack} className="p-2 -ml-2 rounded-full hover:bg-muted">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
+          <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
+              <ArrowLeft size={16} strokeWidth={2} />
+            </motion.button>
           }
           <div>
-            <h1 className="text-2xl font-black text-foreground">{tr("untranslated_tortlar_go6yj8", "Tortlar 🎂")}</h1>
-            <p className="text-muted-foreground text-sm mt-0.5">{tr("cakesscreen_ayliq_milestone_tortlari_81907e", "Aylıq & Milestone tortları")}</p>
+            <p className="a-eyebrow">{tr("cakesscreen_ayliq_milestone_tortlari_81907e", "Aylıq & Milestone tortları")}</p>
+            <p className="a-wordmark" style={{ fontSize: 18 }}>{tr("untranslated_tortlar_go6yj8", "Tortlar 🎂")}</p>
           </div>
         </div>
-        <button onClick={() => setShowCart(true)} className="relative w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-          <ShoppingCart className="w-6 h-6 text-primary" />
-          {totalItems > 0 &&
-          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
-              {totalItems}
-            </span>
-          }
-        </button>
-      </motion.div>
+        <div className="a-topbar-actions">
+          <button onClick={() => setShowCart(true)} className="a-icon-btn" style={{ cursor: 'pointer' }}>
+            <ShoppingCart size={16} strokeWidth={2} />
+            {totalItems > 0 &&
+            <span
+              style={{
+                position: 'absolute', top: -4, right: -4, minWidth: 15, height: 15, padding: '0 4px',
+                borderRadius: 999, background: 'var(--a-peach-2)', color: '#fff', fontSize: 8.5, fontWeight: 800,
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                {totalItems}
+              </span>
+            }
+          </button>
+        </div>
+      </motion.header>
 
 
       {/* Filters */}
-      <motion.div className="flex gap-2 mb-5 overflow-x-auto hide-scrollbar pb-2" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
-        <button onClick={() => setActiveFilter('all')} className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${activeFilter === 'all' ? 'gradient-primary text-white shadow-button' : 'bg-card border border-border/50 text-muted-foreground'}`}>
+      <motion.div className="a-tag-row hide-scrollbar" style={{ flexWrap: 'nowrap', overflowX: 'auto', marginBottom: 0, paddingBottom: 4 }} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.15 }}>
+        <button onClick={() => setActiveFilter('all')} className={`a-tag${activeFilter === 'all' ? ' on' : ''}`} style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
           {tr("cakesscreen_hamisi_a6c712", "\u2728 Ham\u0131s\u0131")}
         </button>
         {MONTHS.map((m) =>
-        <button key={m.id} onClick={() => setActiveFilter(m.id)} className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${activeFilter === m.id ? 'gradient-primary text-white shadow-button' : 'bg-card border border-border/50 text-muted-foreground'}`}>
+        <button key={m.id} onClick={() => setActiveFilter(m.id)} className={`a-tag${activeFilter === m.id ? ' on' : ''}`} style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
             {m.emoji} {m.label}
           </button>
         )}
-        <button onClick={() => setActiveFilter('milestone')} className={`flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${activeFilter === 'milestone' ? 'gradient-primary text-white shadow-button' : 'bg-card border border-border/50 text-muted-foreground'}`}>
+        <button onClick={() => setActiveFilter('milestone')} className={`a-tag${activeFilter === 'milestone' ? ' on' : ''}`} style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
           🏆 Milestone
         </button>
       </motion.div>
 
-      {/* Banner */}
-      <motion.div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 p-4 mb-5 shadow-lg" initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 }}>
-        <div className="absolute -right-4 -bottom-4 text-7xl opacity-20">🎂</div>
+      {/* Banner (anacan-demo CTA) */}
+      <motion.div className="a-cta a-fade-in" style={{ background: 'var(--a-grad-pink)', marginTop: 14 }} initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 }}>
+        <span className="a-cta-shape" style={{ width: 120, height: 120, top: -40, right: -30, background: 'rgba(255,255,255,0.35)' }} />
         <div className="relative z-10">
-          <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-white text-[10px] font-bold mb-1.5">{tr("cakesscreen_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</span>
-          <h3 className="text-white font-black text-lg mb-0.5">{tr("cakesscreen_korpenizin_xususi_gunu_ucun_c2d99a", "Körpənizin xüsusi günü üçün!")}</h3>
-          <p className="text-white/80 text-xs">{tr("cakesscreen_her_ay_ve_milestone_ucun_unikal_dizaynla_39bdf9", "Hər ay və milestone üçün unikal dizaynlar")}</p>
+          <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-alert-ink)' }}>🎂 {tr("cakesscreen_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</span>
+          <h3 className="a-cta-title a-heading" style={{ color: 'var(--a-alert-ink)', margin: '12px 0 6px', fontSize: 18 }}>{tr("cakesscreen_korpenizin_xususi_gunu_ucun_c2d99a", "Körpənizin xüsusi günü üçün!")}</h3>
+          <p className="a-cta-text" style={{ color: 'rgba(122, 31, 52, 0.75)' }}>{tr("cakesscreen_her_ay_ve_milestone_ucun_unikal_dizaynla_39bdf9", "Hər ay və milestone üçün unikal dizaynlar")}</p>
         </div>
       </motion.div>
 
       {/* Cakes Grid */}
-      <motion.div className="grid grid-cols-2 gap-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}>
+      <motion.div className="a-tool-grid" style={{ marginTop: 14 }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}>
         {filteredCakes.map((cake, index) =>
         <motion.div
           key={cake.id}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 * index }}
-          className="bg-card rounded-2xl overflow-hidden shadow-card border border-border/50 cursor-pointer"
-          whileHover={{ y: -4 }}
+          transition={{ delay: Math.min(0.05 * index, 0.3) }}
+          className="a-tool-tile"
+          style={{ padding: 0, overflow: 'hidden' }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => setSelectedCake(cake)}>
           
             {cake.image_url ?
-          <div className="relative h-36">
+          <div className="relative" style={{ height: 132 }}>
                 <img src={cake.image_url} alt={cake.name} className="w-full h-full object-cover" />
                 {cake.category === 'milestone' && cake.milestone_label &&
-            <span className="absolute top-2 left-2 px-2 py-0.5 bg-amber-500/90 rounded-full text-[10px] font-bold text-white">{cake.milestone_label}</span>
+            <span className="a-cta-badge" style={{ position: 'absolute', top: 8, left: 8, padding: '3px 8px', fontSize: 9, background: 'var(--a-yellow-1)', color: 'var(--a-warn-ink)' }}>{cake.milestone_label}</span>
             }
                 {cake.category === 'month' && cake.month_number &&
-            <span className="absolute top-2 left-2 px-2 py-0.5 bg-primary/90 rounded-full text-[10px] font-bold text-white">{tr(`common_month_label_${cake.month_number}`, `${getOrdinal(cake.month_number!, language)} ay`)}</span>
+            <span className="a-cta-badge" style={{ position: 'absolute', top: 8, left: 8, padding: '3px 8px', fontSize: 9 }}>{tr(`common_month_label_${cake.month_number}`, `${getOrdinal(cake.month_number!, language)} ay`)}</span>
             }
               </div> :
 
-          <div className="h-36 bg-primary/5 flex items-center justify-center">
-                <CakeIcon className="w-12 h-12 text-primary/30" />
+          <div style={{ height: 132, background: 'var(--a-illus-grad)', display: 'grid', placeItems: 'center' }}>
+                <CakeIcon size={40} style={{ color: 'var(--a-peach-2)', opacity: 0.6 }} />
               </div>
           }
-            <div className="p-3">
-              <h3 className="font-bold text-foreground text-sm mb-1 line-clamp-2">{cake.name}</h3>
-              {cake.description && <p className="text-[11px] text-muted-foreground line-clamp-2 mb-2">{cake.description}</p>}
+            <div style={{ padding: 12 }}>
+              <p className="a-tool-title" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', marginBottom: 3 }}>{cake.name}</p>
+              {cake.description && <p className="a-tool-sub" style={{ marginBottom: 8 }}>{cake.description}</p>}
               <div className="flex items-center justify-between">
-                <span className="text-base font-black text-primary">{cake.price}₼</span>
-                <motion.div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-button" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                  <ShoppingBag className="w-4 h-4 text-white" />
-                </motion.div>
+                <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--a-accent-ink)' }}>{cake.price}₼</span>
+                <motion.span className="a-trio-icon" style={{ margin: 0, width: 34, height: 34, background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }} whileTap={{ scale: 0.9 }}>
+                  <ShoppingBag size={15} strokeWidth={2.2} />
+                </motion.span>
               </div>
             </div>
           </motion.div>
@@ -199,11 +210,12 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
       </motion.div>
 
       {filteredCakes.length === 0 &&
-      <motion.div className="text-center py-12" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <motion.div className="a-card a-section text-center" style={{ padding: '36px 18px' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="text-6xl mb-4">🎂</div>
-          <p className="text-muted-foreground">{tr("cakesscreen_bu_kateqoriyada_tort_tapilmadi_330a9b", "Bu kateqoriyada tort tapılmadı")}</p>
+          <p className="a-list-sub" style={{ margin: 0 }}>{tr("cakesscreen_bu_kateqoriyada_tort_tapilmadi_330a9b", "Bu kateqoriyada tort tapılmadı")}</p>
         </motion.div>
       }
+      </div>
 
       {/* Floating Cart Button - above BottomNav */}
       {totalItems > 0 &&
@@ -211,11 +223,16 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         onClick={() => setShowCart(true)}
-        className="fixed right-4 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
-        style={{ bottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
+        className="fixed right-4 z-40 w-14 h-14 rounded-full flex items-center justify-center"
+        style={{ bottom: 'calc(96px + env(safe-area-inset-bottom))', background: 'var(--a-peach-2)', color: '#fff', border: 'none', cursor: 'pointer', boxShadow: '0 14px 30px -10px rgba(255, 138, 76, 0.7)' }}>
         
-          <ShoppingCart className="w-6 h-6" />
-          <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-destructive text-destructive-foreground text-xs font-bold flex items-center justify-center">
+          <ShoppingCart size={22} strokeWidth={2.2} />
+          <span
+          style={{
+            position: 'absolute', top: -4, right: -4, width: 22, height: 22, borderRadius: 999,
+            background: 'var(--a-ink)', color: 'var(--a-bg)', fontSize: 11, fontWeight: 800,
+            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          }}>
             {totalItems}
           </span>
         </motion.button>

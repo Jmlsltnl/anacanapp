@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { motion } from 'framer-motion';
 import { Play, Pause, Download } from 'lucide-react';
 
@@ -20,7 +21,7 @@ const ChatMessageBubble = ({ message, isMe }: ChatMessageBubbleProps) => {
 
   const formatTime = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleTimeString(getLocaleTag(), { hour: '2-digit', minute: '2-digit' });
   };
 
   const formatAudioTime = (seconds: number) => {

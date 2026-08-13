@@ -124,10 +124,31 @@ export const useAppRating = (): AppRatingState => {
 
 export const openAppStore = () => {
   const platform = Capacitor.getPlatform();
-  
+
   if (platform === 'ios') {
-    window.open('https://apps.apple.com/app/id123456789', '_blank');
+    // Real App Store ID (əvvəl placeholder id123456789 idi → 404 verirdi).
+    // ?action=write-review birbaşa rəy pəncərəsini açır.
+    // Link locale-dən asılı deyil — istifadəçinin öz App Store dili açılır.
+    window.open('https://apps.apple.com/app/id6745406124?action=write-review', '_blank');
   } else if (platform === 'android') {
     window.open('https://play.google.com/store/apps/details?id=com.atlasoon.anacan', '_blank');
+  }
+};
+
+/**
+ * Rəsmi native in-app review dialoqu (SKStoreReviewController / Play In-App Review).
+ * Guideline-friendly: istifadəçi tətbiqdən çıxmadan qiymətləndirir → konversiya yüksək.
+ * OS kvota qoyur (iOS ~3 dəfə/il) — dialoq göstərilməsə də xəta atmır.
+ * true = sorğu OS-ə ötürüldü; false = plugin yoxdur/xəta → link fallback istifadə edin.
+ */
+export const requestNativeReview = async (): Promise<boolean> => {
+  if (!Capacitor.isNativePlatform()) return false;
+  try {
+    const { InAppReview } = await import('@capacitor-community/in-app-review');
+    await InAppReview.requestReview();
+    return true;
+  } catch (e) {
+    console.warn('Native in-app review unavailable:', e);
+    return false;
   }
 };

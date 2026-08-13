@@ -190,6 +190,33 @@ async function syncPeriodLogsToProfile(userId: string, queryClient: any) {
         });
     }
 
+    // ── ADAPTİV PROQNOZ: tamamlanmış tsikllərdən çəkili ortalama ilə
+    //    profiles.cycle_length-i yenilə → dashboard, təqvim, partnyor görünüşü
+    //    və server bildirişləri (send-flow-reminders) avtomatik öyrənmiş olur.
+    try {
+      const { data: allCycles } = await supabase
+        .from('cycle_history')
+        .select('*')
+        .eq('user_id', userId)
+        .order('cycle_number', { ascending: false })
+        .limit(12);
+
+      if (allCycles && allCycles.length > 0) {
+        const { computeAdaptiveCycleStats } = await import('@/lib/cycle-predictions');
+        const adaptive = computeAdaptiveCycleStats(allCycles as any, store.cycleLength || 28, periodLength);
+
+        if (adaptive.basedOnCycles >= 2 && adaptive.predictedCycleLength !== store.cycleLength) {
+          await supabase
+            .from('profiles')
+            .update({ cycle_length: adaptive.predictedCycleLength })
+            .eq('user_id', userId);
+          store.setCycleLength(adaptive.predictedCycleLength);
+        }
+      }
+    } catch (adaptErr) {
+      console.warn('Adaptive cycle length update skipped:', adaptErr);
+    }
+
     queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
   } catch (err) {
     console.error('Error syncing period logs:', err);

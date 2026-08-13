@@ -18,9 +18,9 @@ const CycleTrendChart = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-2xl p-4 border border-border animate-pulse">
-        <div className="h-6 bg-muted rounded w-1/2 mb-4" />
-        <div className="h-40 bg-muted rounded" />
+      <div className="a-card animate-pulse">
+        <div style={{ height: 24, width: '50%', borderRadius: 8, background: 'var(--a-surface-soft)', marginBottom: 14 }} />
+        <div style={{ height: 150, borderRadius: 16, background: 'var(--a-surface-soft)' }} />
       </div>);
 
   }
@@ -33,39 +33,37 @@ const CycleTrendChart = () => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl p-4 border border-border">
+      className="a-card a-fade-in">
       
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-bold text-foreground flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-indigo-500" />
-          {tr("cycletrendchart_tsikl_uzunlugu_trendi_13a67d", "Tsikl Uzunlu\u011Fu Trendi")}
-        </h3>
-        <span className="text-xs text-muted-foreground">{tr("cycletrendchart_tsikl_count", "{count} tsikl").replace("{count}", String(chartData.length))}</span>
+      <div className="a-card-head" style={{ marginBottom: 10 }}>
+        <h3 className="a-card-title a-heading">{tr("cycletrendchart_tsikl_uzunlugu_trendi_13a67d", "Tsikl Uzunlu\u011Fu Trendi")}</h3>
+        <span className="a-section-link" style={{ color: 'var(--a-ink-soft)' }}>{tr("cycletrendchart_tsikl_count", "{count} tsikl").replace("{count}", String(chartData.length))}</span>
       </div>
 
       <div className="h-44 -ml-2">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 6, right: 8, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
-            <XAxis dataKey="cycle" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-            <YAxis domain={[15, 45]} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" width={28} />
+            <CartesianGrid strokeDasharray="3 5" stroke="var(--a-line-strong)" opacity={0.6} />
+            <XAxis dataKey="cycle" tick={{ fontSize: 10, fill: 'var(--a-ink-soft)' }} stroke="var(--a-line-strong)" />
+            <YAxis domain={[15, 45]} tick={{ fontSize: 10, fill: 'var(--a-ink-soft)' }} stroke="var(--a-line-strong)" width={28} />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
+                backgroundColor: 'var(--a-surface)',
+                border: '1px solid var(--a-line-strong)',
                 borderRadius: 12,
-                fontSize: 12
+                fontSize: 12,
+                color: 'var(--a-ink)'
               }}
               formatter={(v: number) => [`${v} ${tr("common_gun", "gün")}`, tr("cycletrendchart_uzunluq_f427cd", "Uzunluq")]} />
             
-            <ReferenceLine y={stats.averageCycleLength} stroke="hsl(var(--primary))" strokeDasharray="4 4" label={{ value: `${tr("common_orta", "Orta")} ${stats.averageCycleLength}`, position: 'insideTopRight', fontSize: 10, fill: 'hsl(var(--primary))' }} />
-            <ReferenceLine y={21} stroke="hsl(var(--destructive))" strokeOpacity={0.3} strokeDasharray="2 4" />
-            <ReferenceLine y={35} stroke="hsl(var(--destructive))" strokeOpacity={0.3} strokeDasharray="2 4" />
-            <Line type="monotone" dataKey="length" stroke="hsl(var(--primary))" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
+            <ReferenceLine y={stats.averageCycleLength} stroke="var(--a-chart-line)" strokeDasharray="4 4" label={{ value: `${tr("common_orta", "Orta")} ${stats.averageCycleLength}`, position: 'insideTopRight', fontSize: 10, fill: 'var(--a-chart-line)' }} />
+            <ReferenceLine y={21} stroke="#e05575" strokeOpacity={0.35} strokeDasharray="2 4" />
+            <ReferenceLine y={35} stroke="#e05575" strokeOpacity={0.35} strokeDasharray="2 4" />
+            <Line type="monotone" dataKey="length" stroke="var(--a-chart-line)" strokeWidth={2.5} dot={{ r: 3, fill: 'var(--a-chart-line)' }} activeDot={{ r: 5 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <p className="text-[10px] text-muted-foreground text-center mt-1">
+      <p className="a-teaser" style={{ textAlign: 'center' }}>
         {tr("cycletrendchart_normal_diapazon_21_35_gun_acog_48b2bf", "Normal diapazon: 21\u201335 g\xFCn (ACOG)")}
       </p>
     </motion.div>);

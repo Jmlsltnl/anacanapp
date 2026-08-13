@@ -80,33 +80,34 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
             <div
               className={`w-[62px] h-[62px] rounded-full p-[2.5px] transition-all`}
               style={hasOwnStory ?
-              { background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(340,80%,60%))' } :
-              { background: 'hsl(var(--muted) / 0.3)' }
+              { background: 'linear-gradient(135deg, var(--a-peach-2), var(--a-pink-2), var(--a-lav-2))' } :
+              { background: 'var(--a-line-strong)' }
               }>
               
-              <div className="w-full h-full rounded-full bg-card overflow-hidden flex items-center justify-center">
+              <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center" style={{ background: 'var(--a-surface)' }}>
                 {hasOwnStory ?
                 profile?.avatar_url ?
                 <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" /> :
 
-                <span className="text-base font-black text-primary">{(profile?.name || 'S').charAt(0).toUpperCase()}</span> :
+                <span className="text-base font-black" style={{ color: 'var(--a-accent-ink)' }}>{(profile?.name || 'S').charAt(0).toUpperCase()}</span> :
 
 
-                <div className="w-full h-full rounded-full bg-gradient-to-br from-primary/5 to-accent/5 flex items-center justify-center">
-                    <Plus className="w-5 h-5 text-primary/40" />
+                <div className="w-full h-full rounded-full flex items-center justify-center" style={{ background: 'var(--a-surface-soft)' }}>
+                    <Plus className="w-5 h-5" style={{ color: 'var(--a-peach-2)' }} />
                   </div>
                 }
               </div>
             </div>
             <div
-              className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full gradient-primary flex items-center justify-center border-2 border-background shadow-sm cursor-pointer"
+              className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm cursor-pointer"
+              style={{ background: 'var(--a-peach-2)', border: '2px solid var(--a-surface)' }}
               onClick={(e) => {e.stopPropagation();setShowCreateModal(true);}}>
               
-              <Plus className="w-2.5 h-2.5 text-primary-foreground" strokeWidth={3} />
+              <Plus className="w-2.5 h-2.5 text-white" strokeWidth={3} />
             </div>
           </div>
-          <span className="text-[10px] font-bold text-muted-foreground/50 truncate w-[62px] text-center leading-tight">
-            {hasOwnStory ? 'Sizin' : tr("storiesbar_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+          <span className="text-[10px] font-bold truncate w-[62px] text-center leading-tight" style={{ color: 'var(--a-ink-soft)' }}>
+            {hasOwnStory ? tr("storiesbar_sizin", "Sizin") : tr("storiesbar_elave_et_6e1b9b", "\u018Flav\u0259 et")}
           </span>
         </motion.button>
 
@@ -122,21 +123,21 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
             className="w-[62px] h-[62px] rounded-full p-[2.5px] transition-all"
             style={{
               background: group.has_unviewed ?
-              'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(340,80%,60%))' :
-              'hsl(var(--muted) / 0.25)'
+              'linear-gradient(135deg, var(--a-peach-2), var(--a-pink-2), var(--a-lav-2))' :
+              'var(--a-line-strong)'
             }}>
             
-              <div className="w-full h-full rounded-full bg-card overflow-hidden">
+              <div className="w-full h-full rounded-full overflow-hidden" style={{ background: 'var(--a-surface)' }}>
                 {group.user_avatar ?
               <img src={group.user_avatar} alt={group.user_name} className="w-full h-full object-cover" /> :
 
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-accent/5">
-                    <span className="text-base font-black text-primary/50">{group.user_name.charAt(0).toUpperCase()}</span>
+              <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--a-surface-soft)' }}>
+                    <span className="text-base font-black" style={{ color: 'var(--a-accent-ink)' }}>{group.user_name.charAt(0).toUpperCase()}</span>
                   </div>
               }
               </div>
             </div>
-            <span className="text-[10px] font-bold text-muted-foreground/50 truncate w-[62px] text-center leading-tight">
+            <span className="text-[10px] font-bold truncate w-[62px] text-center leading-tight" style={{ color: 'var(--a-ink-soft)' }}>
               {group.user_name.split(' ')[0]}
             </span>
           </motion.button>
@@ -144,8 +145,8 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
 
         {isLoading && [1, 2, 3].map((i) =>
         <div key={i} className="flex flex-col items-center gap-1.5">
-            <div className="w-[62px] h-[62px] rounded-full bg-muted/15 animate-pulse" />
-            <div className="w-9 h-2 rounded-full bg-muted/15 animate-pulse" />
+            <div className="w-[62px] h-[62px] rounded-full animate-pulse" style={{ background: 'var(--a-surface-soft)' }} />
+            <div className="w-9 h-2 rounded-full animate-pulse" style={{ background: 'var(--a-surface-soft)' }} />
           </div>
         )}
       </div>

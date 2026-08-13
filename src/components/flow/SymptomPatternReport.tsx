@@ -66,32 +66,33 @@ const SymptomPatternReport = ({ onUpgrade }: Props) => {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800">
+        className="a-cta a-fade-in">
         
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-600" />
-            {tr("symptompatternreport_title_e8cbea", "Simptom Pattern Analizi")}
-          </h3>
-          <Lock className="w-4 h-4 text-amber-600" />
+        <div className="a-cta-top">
+          <span className="a-cta-badge">
+            <Sparkles size={12} strokeWidth={2.2} /> {tr("symptompatternreport_title_e8cbea", "Simptom Pattern Analizi")}
+          </span>
+          <span className="a-cta-deco">
+            <Lock size={16} strokeWidth={2} />
+          </span>
         </div>
-        <p className="text-xs text-muted-foreground mb-3">
+        <p className="a-cta-text" style={{ margin: '14px 0 14px' }}>
           {tr("symptompatternreport_simptomlarinizin_tsikl_merhele_e8cc92", "Simptomlar\u0131n\u0131z\u0131n tsikl m\u0259rh\u0259l\u0259l\u0259ri \xFCzr\u0259 paylanmas\u0131n\u0131 g\xF6r\xFCn. Hans\u0131 simptomun hans\u0131 fazada ba\u015F verdiyini AI il\u0259 k\u0259\u015Ff edin.")}
         </p>
-        <Button size="sm" onClick={onUpgrade} className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0">
+        <button onClick={onUpgrade} className="a-cta-btn">
           {tr("symptompatternreport_premium_a_kec_9dadb6", "Premium-a ke\xE7")}
-        </Button>
+        </button>
       </motion.div>);
 
   }
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-2xl p-4 border border-border animate-pulse">
-        <div className="h-6 bg-muted rounded w-1/2 mb-4" />
-        <div className="space-y-2">
-          <div className="h-12 bg-muted rounded" />
-          <div className="h-12 bg-muted rounded" />
+      <div className="a-card animate-pulse">
+        <div style={{ height: 24, width: '50%', borderRadius: 8, background: 'var(--a-surface-soft)', marginBottom: 14 }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ height: 48, borderRadius: 14, background: 'var(--a-surface-soft)' }} />
+          <div style={{ height: 48, borderRadius: 14, background: 'var(--a-surface-soft)' }} />
         </div>
       </div>);
 
@@ -99,12 +100,11 @@ const SymptomPatternReport = ({ onUpgrade }: Props) => {
 
   if (patterns.length === 0) {
     return (
-      <div className="bg-card rounded-2xl p-4 border border-border">
-        <h3 className="font-bold text-foreground flex items-center gap-2 mb-2">
-          <Sparkles className="w-5 h-5 text-fuchsia-500" />
-          {tr("symptompatternreport_title_e8cbea", "Simptom Pattern Analizi")}
-        </h3>
-        <p className="text-xs text-muted-foreground">
+      <div className="a-card">
+        <div className="a-card-head" style={{ marginBottom: 8 }}>
+          <h3 className="a-card-title a-heading">{tr("symptompatternreport_title_e8cbea", "Simptom Pattern Analizi")}</h3>
+        </div>
+        <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>
           {tr("symptompatternreport_hele_kifayet_qeder_data_yoxdur_8ad930", "H\u0259l\u0259 kifay\u0259t q\u0259d\u0259r data yoxdur. G\xFCnd\u0259lik simptomlar\u0131n\u0131z\u0131 qeyd edin v\u0259 1-2 tsikld\u0259n sonra burada paylanma g\xF6r\u0259c\u0259ksiniz.")}
         </p>
       </div>);
@@ -115,28 +115,33 @@ const SymptomPatternReport = ({ onUpgrade }: Props) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl p-4 border border-border">
+      className="a-card a-fade-in">
       
-      <h3 className="font-bold text-foreground flex items-center gap-2 mb-3">
-        <Sparkles className="w-5 h-5 text-fuchsia-500" />
-        {tr("symptompatternreport_title_e8cbea", "Simptom Pattern Analizi")}
-      </h3>
-      <p className="text-xs text-muted-foreground mb-3">{tr("symptompatternreport_son_90_gun_uzre_top_5_simptom__c1b6a8", "Son 90 g\xFCn \xFCzr\u0259 top 5 simptom v\u0259 dominant faza:")}</p>
+      <div className="a-card-head" style={{ marginBottom: 8 }}>
+        <h3 className="a-card-title a-heading">{tr("symptompatternreport_title_e8cbea", "Simptom Pattern Analizi")}</h3>
+        <span className="a-section-link" style={{ color: 'var(--a-ink-soft)' }}>{tr("flowmoodchart_son_90_gun", "Son 90 gün")}</span>
+      </div>
+      <p className="a-list-sub" style={{ margin: '0 0 6px', whiteSpace: 'normal' }}>{tr("symptompatternreport_son_90_gun_uzre_top_5_simptom__c1b6a8", "Son 90 g\xFCn \xFCzr\u0259 top 5 simptom v\u0259 dominant faza:")}</p>
 
-      <div className="space-y-2">
+      <div>
         {patterns.map((p) => {
           const phase = PHASE_LABEL[p.dominantPhase] || { label: p.dominantPhase, emoji: '•' };
           return (
-            <div key={p.symptom} className="flex items-center gap-3 p-3 rounded-xl bg-muted/40">
-              <span className="text-xl">{p.emoji}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{p.label}</p>
-                <p className="text-xs text-muted-foreground">
-                  {p.total} {tr("symptompatternreport_defe_05c318", "d\u0259f\u0259 \u2022")} {p.percentage}% {phase.emoji} {phase.label}
-                </p>
+            <div key={p.symptom} className="a-list-row" style={{ display: 'block', paddingLeft: 0, paddingRight: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 13 }}>
+                <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', fontSize: 17 }}>
+                  {p.emoji}
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p className="a-list-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.label}</p>
+                  <p className="a-list-sub">
+                    {p.total} {tr("symptompatternreport_defe_05c318", "d\u0259f\u0259 \u2022")} {p.percentage}% {phase.emoji} {phase.label}
+                  </p>
+                </div>
+                <span className="a-list-value">{p.percentage}%</span>
               </div>
-              <div className="w-12 h-12 rounded-full bg-fuchsia-100 dark:bg-fuchsia-900/30 flex items-center justify-center">
-                <span className="text-xs font-bold text-fuchsia-700 dark:text-fuchsia-300">{p.percentage}%</span>
+              <div className="a-inline-bar" style={{ marginLeft: 53 }}>
+                <div className="a-inline-bar-fill" style={{ width: `${p.percentage}%` }} />
               </div>
             </div>);
 

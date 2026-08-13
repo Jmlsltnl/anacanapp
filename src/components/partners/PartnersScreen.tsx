@@ -2,7 +2,6 @@ import { tr, getPersistedLanguage } from "@/lib/tr";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Search, MapPin, Sparkles, Crown, Lock, Phone, Globe, Instagram, ChevronRight } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { usePartnerCategories, usePartnerVenues, PartnerVenue } from '@/hooks/usePartnerVenues';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -47,20 +46,22 @@ export default function PartnersScreen({ onBack }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <div className="a-scope min-h-screen pb-20 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+      <div className="sticky top-0 z-10"
+      style={{ paddingTop: 'env(safe-area-inset-top)', background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
         <div className="flex items-center gap-3 p-3">
-          <button onClick={onBack} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-          <div className="flex-1">
-            <h1 className="text-base font-bold flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-primary" /> {tr("partnersscreen_partnyor_endirimleri_e44036", "Partnyor Endiriml\u0259ri")}
+          <motion.button onClick={onBack} className="a-icon-btn shrink-0" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
+            <ArrowLeft size={16} strokeWidth={2} />
+          </motion.button>
+          <div className="flex-1 min-w-0">
+            <h1 className="flex items-center gap-1.5" style={{ fontSize: 15.5, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>
+              <Sparkles size={15} style={{ color: 'var(--a-accent-ink)' }} /> {tr("partnersscreen_partnyor_endirimleri_e44036", "Partnyor Endiriml\u0259ri")}
             </h1>
-            <p className="text-[11px] text-muted-foreground">{tr("partnersscreen_spa_idman_gozellik_ve_daha_cox_24ad1f", "Spa, idman, g\xF6z\u0259llik v\u0259 daha \xE7ox")}</p>
+            <p style={{ fontSize: 11, color: 'var(--a-ink-soft)' }}>{tr("partnersscreen_spa_idman_gozellik_ve_daha_cox_24ad1f", "Spa, idman, g\xF6z\u0259llik v\u0259 daha \xE7ox")}</p>
           </div>
           {!isPremium &&
-          <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
+          <span className="flex items-center gap-1 shrink-0"
+          style={{ background: 'var(--a-yellow-1)', color: 'var(--a-yellow-ink)', fontSize: 10, fontWeight: 800, padding: '4px 10px', borderRadius: 999 }}>
               <Crown className="w-3 h-3" /> Premium
             </span>
           }
@@ -68,8 +69,10 @@ export default function PartnersScreen({ onBack }: Props) {
 
         <div className="px-3 pb-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={tr("partnersscreen_mekan_axtar_8b889d", "M\u0259kan axtar...")} className="pl-9 h-9 text-sm" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--a-ink-faint)' }} />
+            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={tr("partnersscreen_mekan_axtar_8b889d", "M\u0259kan axtar...")}
+            className="w-full h-10 pl-10 pr-4 outline-none"
+            style={{ borderRadius: 999, background: 'var(--a-surface)', border: '1px solid var(--a-line)', fontSize: 13, color: 'var(--a-ink)' }} />
           </div>
         </div>
 
@@ -85,17 +88,17 @@ export default function PartnersScreen({ onBack }: Props) {
         </div>
       </div>
 
-      <div className="p-3 space-y-3">
+      <div className="p-3 space-y-3 max-w-md mx-auto">
         {isLoading &&
           <div className="py-10 flex justify-center">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 rounded-full animate-spin" style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
           </div>
         }
 
         {!isLoading && filtered.length === 0 &&
-        <div className="py-16 text-center">
-            <MapPin className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">{tr("partnersscreen_bu_kateqoriyada_hele_partnyor__9b10b6", "Bu kateqoriyada h\u0259l\u0259 partnyor yoxdur.")}</p>
+        <div className="a-card text-center" style={{ padding: '38px 18px' }}>
+            <MapPin size={40} className="mx-auto mb-3" style={{ color: 'var(--a-ink-faint)' }} />
+            <p style={{ fontSize: 13, color: 'var(--a-ink-soft)' }}>{tr("partnersscreen_bu_kateqoriyada_hele_partnyor__9b10b6", "Bu kateqoriyada h\u0259l\u0259 partnyor yoxdur.")}</p>
           </div>
         }
 
@@ -106,36 +109,38 @@ export default function PartnersScreen({ onBack }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.03 }}
           onClick={() => setSelectedVenue(v)}
-          className="w-full bg-card border border-border rounded-2xl overflow-hidden shadow-sm text-left">
-          
+          className="w-full overflow-hidden text-left"
+          style={{ background: 'var(--a-surface)', borderRadius: 'var(--a-radius-md)', boxShadow: 'var(--a-card-shadow)' }}>
+
             {v.cover_url &&
-          <div className="h-32 bg-muted overflow-hidden">
+          <div className="h-32 overflow-hidden" style={{ background: 'var(--a-surface-soft)' }}>
                 <img src={v.cover_url} alt={v.name} className="w-full h-full object-cover" />
               </div>
           }
             <div className="p-3 flex items-start gap-3">
               {v.logo_url ?
-            <img src={v.logo_url} alt="" className="w-12 h-12 rounded-xl object-cover border border-border" /> :
+            <img src={v.logo_url} alt="" className="w-12 h-12 object-cover shrink-0" style={{ borderRadius: 14, border: '1px solid var(--a-line)' }} /> :
 
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-primary" />
+            <div className="w-12 h-12 flex items-center justify-center shrink-0" style={{ borderRadius: 14, background: 'var(--a-peach-1)' }}>
+                  <Sparkles size={19} style={{ color: 'var(--a-accent-ink)' }} />
                 </div>
             }
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
-                  <h3 className="font-bold text-sm truncate">{v.name}</h3>
-                  {v.is_featured && <span className="text-[9px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full">★</span>}
+                  <h3 className="truncate" style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{v.name}</h3>
+                  {v.is_featured && <span style={{ fontSize: 9, background: 'var(--a-yellow-1)', color: 'var(--a-yellow-ink)', padding: '2px 7px', borderRadius: 999, fontWeight: 800 }}>★</span>}
                 </div>
                 {v.address &&
-              <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1 mt-0.5">
-                    <MapPin className="w-3 h-3" /> {v.address}
+              <p className="truncate flex items-center gap-1 mt-0.5" style={{ fontSize: 11, color: 'var(--a-ink-soft)' }}>
+                    <MapPin className="w-3 h-3 shrink-0" /> {v.address}
                   </p>
               }
-                <div className="inline-flex items-center gap-1 mt-1.5 bg-primary/10 text-primary text-[11px] font-bold px-2 py-0.5 rounded-full">
+                <div className="inline-flex items-center gap-1 mt-1.5"
+              style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', fontSize: 11, fontWeight: 700, padding: '3px 9px', borderRadius: 999 }}>
                   <Sparkles className="w-3 h-3" /> {v.discount_label}
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground mt-3" />
+              <ChevronRight className="w-4 h-4 mt-3 shrink-0" style={{ color: 'var(--a-ink-faint)' }} />
             </div>
           </motion.button>
         )}
@@ -159,9 +164,16 @@ function CategoryPill({ active, onClick, label }: {active: boolean;onClick: () =
   return (
     <button
       onClick={onClick}
-      className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-      active ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`
-      }>
+      className="flex-shrink-0 transition-colors"
+      style={{
+        padding: '7px 14px',
+        borderRadius: 999,
+        fontSize: 12,
+        fontWeight: active ? 700 : 600,
+        background: active ? 'var(--a-peach-1)' : 'var(--a-surface)',
+        color: active ? 'var(--a-accent-ink)' : 'var(--a-ink-soft)',
+        border: active ? '1.5px solid var(--a-peach-2)' : '1.5px solid var(--a-line)'
+      }}>
       {label}</button>);
 
 }
@@ -169,67 +181,67 @@ function CategoryPill({ active, onClick, label }: {active: boolean;onClick: () =
 function VenueDetail({ venue, isPremium, onBack, onRedeem }: {venue: PartnerVenue;isPremium: boolean;onBack: () => void;onRedeem: () => void;}) {
   useScrollToTop();
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="a-scope min-h-screen pb-32 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
       <div className="relative">
         {venue.cover_url ?
         <img src={venue.cover_url} alt={venue.name} className="w-full h-56 object-cover" /> :
 
-        <div className="w-full h-56 bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
-            <Sparkles className="w-16 h-16 text-primary/40" />
+        <div className="w-full h-56 flex items-center justify-center" style={{ background: 'var(--a-grad-peach)' }}>
+            <Sparkles size={60} style={{ color: 'var(--a-accent-ink)', opacity: 0.5 }} />
           </div>
         }
-        <button onClick={onBack} className="absolute top-3 left-3 w-9 h-9 rounded-full bg-background/80 backdrop-blur flex items-center justify-center">
-          <ArrowLeft className="w-4 h-4" />
+        <button onClick={onBack} className="a-icon-btn absolute top-3 left-3" style={{ borderRadius: 999 }} aria-label={tr("common_geri", "Geri")}>
+          <ArrowLeft size={16} strokeWidth={2} />
         </button>
       </div>
 
-      <div className="p-4 -mt-8 relative">
-        <div className="bg-card rounded-2xl shadow-lg border border-border p-4">
+      <div className="p-4 -mt-8 relative max-w-md mx-auto">
+        <div className="a-card" style={{ padding: 16 }}>
           <div className="flex items-start gap-3">
             {venue.logo_url &&
-            <img src={venue.logo_url} alt="" className="w-14 h-14 rounded-xl object-cover border-2 border-background -mt-8" />
+            <img src={venue.logo_url} alt="" className="w-14 h-14 object-cover -mt-8" style={{ borderRadius: 16, border: '3px solid var(--a-surface)' }} />
             }
             <div className="flex-1">
-              <h1 className="text-lg font-bold">{venue.name}</h1>
+              <h1 style={{ fontSize: 17.5, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>{venue.name}</h1>
               {venue.address &&
-              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+              <p className="flex items-center gap-1 mt-1" style={{ fontSize: 11.5, color: 'var(--a-ink-soft)' }}>
                   <MapPin className="w-3 h-3" /> {venue.address}
                 </p>
               }
             </div>
           </div>
 
-          <div className="mt-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-3 border border-primary/20">
-            <p className="text-[10px] font-bold text-primary uppercase tracking-wider">{tr("partnersscreen_senin_endirimin_535d41", "S\u0259nin endirimin")}</p>
-            <p className="text-xl font-black text-primary mt-1">{venue.discount_label}</p>
-            {venue.discount_terms && <p className="text-[11px] text-muted-foreground mt-1">{venue.discount_terms}</p>}
+          <div className="mt-3" style={{ background: 'var(--a-peach-1)', borderRadius: 16, padding: 14, border: '1px solid rgba(255,157,99,0.4)' }}>
+            <p style={{ fontSize: 10, fontWeight: 800, color: 'var(--a-accent-ink)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{tr("partnersscreen_senin_endirimin_535d41", "S\u0259nin endirimin")}</p>
+            <p className="mt-1" style={{ fontSize: 21, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--a-accent-ink)' }}>{venue.discount_label}</p>
+            {venue.discount_terms && <p className="mt-1" style={{ fontSize: 11, color: 'var(--a-ink-soft)' }}>{venue.discount_terms}</p>}
           </div>
 
-          {venue.description && <p className="text-sm text-foreground/80 mt-3 leading-relaxed whitespace-pre-line">{venue.description}</p>}
+          {venue.description && <p className="mt-3 leading-relaxed whitespace-pre-line" style={{ fontSize: 13, color: 'var(--a-body-text)' }}>{venue.description}</p>}
 
           <div className="grid grid-cols-3 gap-2 mt-4">
             {venue.phone &&
-            <a href={`tel:${venue.phone}`} className="flex flex-col items-center gap-1 p-2 bg-muted rounded-xl">
-                <Phone className="w-4 h-4 text-primary" />
-                <span className="text-[10px] text-muted-foreground">{tr("partnersscreen_zeng_4cba42", "Z\u0259ng")}</span>
+            <a href={`tel:${venue.phone}`} className="flex flex-col items-center gap-1 p-2.5" style={{ background: 'var(--a-surface-soft)', borderRadius: 14 }}>
+                <Phone size={16} style={{ color: 'var(--a-accent-ink)' }} />
+                <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr("partnersscreen_zeng_4cba42", "Z\u0259ng")}</span>
               </a>
             }
             {venue.website &&
-            <a href={venue.website} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 p-2 bg-muted rounded-xl">
-                <Globe className="w-4 h-4 text-primary" />
-                <span className="text-[10px] text-muted-foreground">{tr("untranslated_veb_sayt_16w317", "Veb sayt")}</span>
+            <a href={venue.website} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 p-2.5" style={{ background: 'var(--a-surface-soft)', borderRadius: 14 }}>
+                <Globe size={16} style={{ color: 'var(--a-accent-ink)' }} />
+                <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr("untranslated_veb_sayt_16w317", "Veb sayt")}</span>
               </a>
             }
             {venue.instagram &&
-            <a href={`https://instagram.com/${venue.instagram.replace('@', '')}`} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 p-2 bg-muted rounded-xl">
-                <Instagram className="w-4 h-4 text-primary" />
-                <span className="text-[10px] text-muted-foreground">Instagram</span>
+            <a href={`https://instagram.com/${venue.instagram.replace('@', '')}`} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 p-2.5" style={{ background: 'var(--a-surface-soft)', borderRadius: 14 }}>
+                <Instagram size={16} style={{ color: 'var(--a-accent-ink)' }} />
+                <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--a-ink-soft)' }}>Instagram</span>
               </a>
             }
             {venue.latitude && venue.longitude &&
-            <a href={`https://maps.google.com/?q=${venue.latitude},${venue.longitude}`} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 p-2 bg-muted rounded-xl">
-                <MapPin className="w-4 h-4 text-primary" />
-                <span className="text-[10px] text-muted-foreground">{tr("partnersscreen_xerite_a1e08d", "X\u0259rit\u0259")}</span>
+            <a href={`https://maps.google.com/?q=${venue.latitude},${venue.longitude}`} target="_blank" rel="noreferrer" className="flex flex-col items-center gap-1 p-2.5" style={{ background: 'var(--a-surface-soft)', borderRadius: 14 }}>
+                <MapPin size={16} style={{ color: 'var(--a-accent-ink)' }} />
+                <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr("partnersscreen_xerite_a1e08d", "X\u0259rit\u0259")}</span>
               </a>
             }
           </div>
@@ -237,14 +249,17 @@ function VenueDetail({ venue, isPremium, onBack, onRedeem }: {venue: PartnerVenu
           {venue.gallery_urls && venue.gallery_urls.length > 0 &&
           <div className="mt-4 flex gap-2 overflow-x-auto scrollbar-hide">
               {venue.gallery_urls.map((g, i) =>
-            <img key={i} src={g} alt="" className="w-28 h-28 rounded-xl object-cover flex-shrink-0" />
+            <img key={i} src={g} alt="" className="w-28 h-28 object-cover flex-shrink-0" style={{ borderRadius: 14 }} />
             )}
             </div>
           }
         </div>
 
-        <div className="fixed left-0 right-0 bottom-0 p-4 bg-gradient-to-t from-background to-transparent">
-          <Button onClick={onRedeem} className="w-full h-12 text-base font-bold" size="lg">
+        <div className="fixed left-0 right-0 bottom-0 p-4"
+        style={{ background: 'linear-gradient(to top, var(--a-bg) 55%, transparent)' }}>
+          <Button onClick={onRedeem} size="lg"
+          className="w-full h-12 text-base font-bold rounded-full text-white border-0 max-w-md mx-auto flex hover:opacity-95"
+          style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}>
             {isPremium ?
             <><Sparkles className="w-5 h-5 mr-2" />{tr("untranslated_endirimi_al_qr_yarat_6yd90i", "Endirimi al — QR yarat")}</> :
 

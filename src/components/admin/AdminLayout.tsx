@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Package, Settings, BarChart3, Shield,
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart, Brain, Calculator, Calendar, Stethoscope, Tag, CreditCard, ChevronDown, LayoutDashboard, PenTool, Cog, MapPinned, DollarSign, Palette, Globe, BookOpen, Syringe } from
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart, Brain, Calculator, Calendar, Stethoscope, Tag, CreditCard, ChevronDown, LayoutDashboard, PenTool, Cog, MapPinned, DollarSign, Palette, Globe, BookOpen, Syringe, Languages } from
 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -158,7 +158,8 @@ const menuGroups: MenuGroup[] = [
   icon: Globe,
   items: [
   { id: 'languages', label: tr("adminlayout_diller_58a514", "Dillər"), icon: Globe },
-  { id: 'translations', label: tr("adminlayout_tercumeler_f31ad6", "Tərcümələr"), icon: BookOpen }]
+  { id: 'translations', label: tr("adminlayout_tercumeler_f31ad6", "Tərcümələr"), icon: BookOpen },
+  { id: 'content-i18n', label: 'Kontent Tərcüməsi (AI)', icon: Languages }]
 
 },
 {

@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Grid3X3, Film, Settings, UserPlus, UserMinus, Crown, Shield, MessageCircle } from 'lucide-react';
+﻿import { useState, useEffect, useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Grid3X3, Film, Settings, Crown, Shield, MessageCircle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import PostCard from './PostCard';
 import { CommunityPost } from '@/hooks/useCommunity';
@@ -39,12 +38,62 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
   useScrollToTop();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [stories, setStories] = useState<UserStory[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'posts' | 'stories'>('posts');
   const [isCurrentUser, setIsCurrentUser] = useState(false);
-  const [stats, setStats] = useState({ postsCount: 0, storiesCount: 0, likesCount: 0 });
+
+  // Postlar react-query-dÉ™ â€” useToggleLike-Ä±n optimistic patch-i ['user-posts']
+  // cache-ini yenilÉ™diyi Ã¼Ã§Ã¼n Ã¼rÉ™k burada da dÉ™rhal iÅŸlÉ™yir.
+  // (ÆvvÉ™llÉ™r is_liked: false hardcode idi vÉ™ local state heÃ§ vaxt yenilÉ™nmirdi.)
+  const { data: posts = [], isLoading: postsLoading } = useQuery({
+    queryKey: ['user-posts', userId],
+    queryFn: async (): Promise<CommunityPost[]> => {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+      const [{ data: cardData }, { data: postsData }] = await Promise.all([
+      (supabase as any).
+      from('public_profile_cards').
+      select('name, avatar_url, badge_type').
+      eq('user_id', userId).
+      maybeSingle(),
+      supabase.
+      from('community_posts').
+      select('*').
+      eq('user_id', userId).
+      eq('is_active', true).
+      order('created_at', { ascending: false })]
+      );
+
+      // Cari istifadÉ™Ã§inin bÉ™yÉ™ndiklÉ™ri â€” tÉ™k batch sorÄŸu
+      const likedSet = new Set<string>();
+      if (currentUser && postsData && postsData.length > 0) {
+        const { data: likeRows } = await supabase.
+        from('post_likes').
+        select('post_id').
+        eq('user_id', currentUser.id).
+        in('post_id', postsData.map((p: any) => p.id));
+        (likeRows || []).forEach((r: any) => likedSet.add(r.post_id));
+      }
+
+      return (postsData || []).map((post: any) => ({
+        ...post,
+        author: {
+          name: cardData?.name || tr("userprofilescreen_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
+          avatar_url: cardData?.avatar_url || null,
+          badge_type: cardData?.badge_type || null
+        },
+        is_liked: likedSet.has(post.id)
+      })) as CommunityPost[];
+    },
+    enabled: !!userId
+  });
+
+  const stats = useMemo(() => ({
+    postsCount: posts.length,
+    storiesCount: stories.length,
+    likesCount: posts.reduce((sum, p) => sum + (p.likes_count || 0), 0)
+  }), [posts, stories]);
 
   useEffect(() => {
     fetchUserData();
@@ -75,28 +124,6 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
         setProfile(profileData as unknown as UserProfile);
       }
 
-      // Fetch posts
-      const { data: postsData } = await supabase.
-      from('community_posts').
-      select('*').
-      eq('user_id', userId).
-      eq('is_active', true).
-      order('created_at', { ascending: false });
-
-      if (postsData && profileData) {
-        // Add author info to posts
-        const postsWithAuthor = postsData.map((post) => ({
-          ...post,
-          author: {
-            name: profileData?.name || tr("userprofilescreen_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
-            avatar_url: profileData?.avatar_url || null,
-            badge_type: profileData?.badge_type || null
-          },
-          is_liked: false
-        }));
-        setPosts(postsWithAuthor as CommunityPost[]);
-      }
-
       // Fetch stories - community_stories doesn't have is_active column
       const { data: storiesData } = await supabase.
       from('community_stories').
@@ -108,14 +135,6 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
       if (storiesData) {
         setStories(storiesData as UserStory[]);
       }
-
-      // Calculate stats
-      const totalLikes = postsData?.reduce((sum, post) => sum + (post.likes_count || 0), 0) || 0;
-      setStats({
-        postsCount: postsData?.length || 0,
-        storiesCount: storiesData?.length || 0,
-        likesCount: totalLikes
-      });
     } catch (err) {
       console.error('Error fetching user data:', err);
     } finally {
@@ -123,43 +142,51 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
     }
   };
 
+  // Palitra konvensiyasÄ±: tint fon + sabit ink
   const getBadgeLabel = (type: string | null) => {
     if (!type) return null;
     switch (type) {
-      case 'admin':return { label: 'Admin', icon: Shield, color: 'from-red-500 to-orange-500' };
-      case 'premium':return { label: 'Premium', icon: Crown, color: 'from-amber-400 to-amber-600' };
-      case 'moderator':return { label: 'Moderator', icon: Shield, color: 'from-blue-500 to-cyan-500' };
+      case 'admin':return { label: 'Admin', icon: Shield, bg: 'var(--a-pink-1)', ink: 'var(--a-alert-ink)' };
+      case 'premium':return { label: 'Premium', icon: Crown, bg: 'var(--a-yellow-1)', ink: 'var(--a-yellow-ink)' };
+      case 'moderator':return { label: 'Moderator', icon: Shield, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' };
       default:return null;
     }
   };
 
   const getLifeStageLabel = (stage: string | null) => {
     switch (stage) {
-      case 'flow':return { label: 'Flow', color: 'bg-pink-100 text-pink-700' };
-      case 'bump':return { label: tr("userprofilescreen_hamile_0080af", 'Hamilə'), color: 'bg-orange-100 text-orange-700' };
-      case 'mommy':return { label: tr("common_ana", 'Ana'), color: 'bg-purple-100 text-purple-700' };
-      case 'partner':return { label: 'Partner', color: 'bg-blue-100 text-blue-700' };
+      case 'flow':return { label: 'Flow', bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
+      case 'bump':return { label: tr("userprofilescreen_hamile_0080af", 'HamilÉ™'), bg: 'var(--a-peach-1)', ink: 'var(--a-accent-ink)' };
+      case 'mommy':return { label: tr("common_ana", 'Ana'), bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
+      case 'partner':return { label: 'Partner', bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' };
       default:return null;
     }
   };
 
-  if (loading) {
+  if (loading || postsLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+        <div className="w-8 h-8 rounded-full animate-spin"
+        style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
       </div>);
 
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-background p-5">
-        <button onClick={onBack} className="flex items-center gap-2 text-muted-foreground mb-6">
-          <ArrowLeft className="w-5 h-5" />
-          {tr("common_geri", "Geri")}
-        </button>
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">{tr("userprofilescreen_istifadeci_tapilmadi_4e2156", "İstifadəçi tapılmadı")}</p>
+      <div className="a-scope safe-top min-h-screen" style={{ background: 'var(--a-bg)' }}>
+        <div className="a-shell">
+          <header className="a-topbar">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
+                <ArrowLeft size={16} strokeWidth={2} />
+              </motion.button>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("untranslated_profil_v8b0sk", "Profil")}</p>
+            </div>
+          </header>
+          <div className="a-card" style={{ textAlign: 'center', padding: '38px 18px' }}>
+            <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("userprofilescreen_istifadeci_tapilmadi_4e2156", "Ä°stifadÉ™Ã§i tapÄ±lmadÄ±")}</p>
+          </div>
         </div>
       </div>);
 
@@ -169,133 +196,137 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
   const lifeStage = getLifeStageLabel(profile.life_stage);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50">
-        <div className="px-5 py-4 flex items-center gap-4">
-          <motion.button
-            onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}>
-            
-            <ArrowLeft className="w-5 h-5" />
-          </motion.button>
-          <h1 className="text-lg font-bold text-foreground flex-1">{tr("untranslated_profil_v8b0sk", "Profil")}</h1>
+    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-shell">
+        {/* Top bar */}
+        <header className="a-topbar">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
+              <ArrowLeft size={16} strokeWidth={2} />
+            </motion.button>
+            <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("untranslated_profil_v8b0sk", "Profil")}</p>
+          </div>
           {isCurrentUser &&
+          <div className="a-topbar-actions">
+              <motion.button className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_parametrler", "ParametrlÉ™r")}>
+                <Settings size={16} strokeWidth={2} />
+              </motion.button>
+            </div>
+          }
+        </header>
+
+        {/* Profile Card */}
+        <div className="a-card" style={{ padding: 18, marginBottom: 14 }}>
+          <div className="flex items-start gap-4">
+            <Avatar className="w-20 h-20" style={{ border: '3px solid var(--a-peach-1)' }}>
+              <AvatarImage src={profile.avatar_url || undefined} />
+              <AvatarFallback style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', fontSize: 24, fontWeight: 800 }}>
+                {profile.name?.charAt(0) || tr("common_initial_i", "Ä°")}
+              </AvatarFallback>
+            </Avatar>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>{profile.name}</h2>
+                {badge &&
+                <span className="inline-flex items-center gap-1"
+                style={{ background: badge.bg, color: badge.ink, borderRadius: 999, padding: '3px 10px', fontSize: 10.5, fontWeight: 800 }}>
+                    <badge.icon className="w-3 h-3" />
+                    {badge.label}
+                  </span>
+                }
+              </div>
+
+              {lifeStage &&
+              <span className="inline-block mt-1.5"
+              style={{ background: lifeStage.bg, color: lifeStage.ink, borderRadius: 999, padding: '3px 10px', fontSize: 10.5, fontWeight: 700 }}>
+                  {lifeStage.label}
+                </span>
+              }
+
+              <p className="mt-2" style={{ fontSize: 11, color: 'var(--a-ink-soft)' }}>
+                {formatDistanceToNow(new Date(profile.created_at), { addSuffix: true, locale: getCurrentDateLocale() })} {tr("userprofilescreen_qosuldu_78ba1a", "qo\u015Fuldu")}
+              </p>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-2.5 mt-5">
+            {[
+            { value: stats.postsCount, label: 'Post' },
+            { value: stats.storiesCount, label: 'Story' },
+            { value: stats.likesCount, label: tr("userprofilescreen_beyenme_488df4", "BÉ™yÉ™nmÉ™") }].
+            map((s) =>
+            <div key={s.label} className="text-center" style={{ background: 'var(--a-surface-soft)', borderRadius: 16, padding: '12px 8px' }}>
+                <p style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--a-ink)' }}>{s.value}</p>
+                <p style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--a-ink-soft)', marginTop: 1 }}>{s.label}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Message Button */}
+          {!isCurrentUser && onSendMessage && profile &&
           <motion.button
-            className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}>
-            
-              <Settings className="w-5 h-5" />
+            onClick={() => onSendMessage(profile.user_id, profile.name, profile.avatar_url)}
+            className="a-btn-solid w-full mt-4 justify-center"
+            style={{ height: 44, fontSize: 13 }}
+            whileTap={{ scale: 0.97 }}>
+
+              <MessageCircle size={15} />
+              {tr("userprofilescreen_mesaj_gonder_ad33c9", "Mesaj gÃ¶ndÉ™r")}
             </motion.button>
           }
         </div>
-      </div>
 
-      {/* Profile Header */}
-      <div className="px-5 py-6">
-        <div className="flex items-start gap-4">
-          <Avatar className="w-20 h-20 border-2 border-primary/20">
-            <AvatarImage src={profile.avatar_url || undefined} />
-            <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
-              {profile.name?.charAt(0) || tr("common_initial_i", "İ")}
-            </AvatarFallback>
-          </Avatar>
-
-          <div className="flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-xl font-bold text-foreground">{profile.name}</h2>
-              {badge &&
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold text-white bg-gradient-to-r ${badge.color}`}>
-                  <badge.icon className="w-3 h-3" />
-                  {badge.label}
-                </span>
-              }
-            </div>
-
-            {lifeStage &&
-            <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${lifeStage.color}`}>
-                {lifeStage.label}
-              </span>
-            }
-
-            <p className="text-xs text-muted-foreground mt-2">
-              {formatDistanceToNow(new Date(profile.created_at), { addSuffix: true, locale: getCurrentDateLocale() })} {tr("userprofilescreen_qosuldu_78ba1a", "qo\u015Fuldu")}
-            </p>
-          </div>
+        {/* Tabs */}
+        <div className="a-tabs" style={{ marginBottom: 14 }}>
+          <button onClick={() => setActiveTab('posts')} className={`a-tab ${activeTab === 'posts' ? 'active' : ''}`}>
+            <span className="inline-flex items-center gap-1.5"><Grid3X3 size={13} />{tr("userprofilescreen_postlar", "Postlar")}</span>
+          </button>
+          <button onClick={() => setActiveTab('stories')} className={`a-tab ${activeTab === 'stories' ? 'active' : ''}`}>
+            <span className="inline-flex items-center gap-1.5"><Film size={13} />{tr("userprofilescreen_story_ler_670373", "Story-lÉ™r")}</span>
+          </button>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mt-6">
-          <div className="text-center p-3 bg-muted/50 rounded-xl">
-            <p className="text-2xl font-bold text-foreground">{stats.postsCount}</p>
-            <p className="text-xs text-muted-foreground">Post</p>
-          </div>
-          <div className="text-center p-3 bg-muted/50 rounded-xl">
-            <p className="text-2xl font-bold text-foreground">{stats.storiesCount}</p>
-            <p className="text-xs text-muted-foreground">Story</p>
-          </div>
-          <div className="text-center p-3 bg-muted/50 rounded-xl">
-            <p className="text-2xl font-bold text-foreground">{stats.likesCount}</p>
-            <p className="text-xs text-muted-foreground">{tr("userprofilescreen_beyenme_488df4", "Bəyənmə")}</p>
-          </div>
-        </div>
-
-        {/* Message Button */}
-        {!isCurrentUser && onSendMessage && profile &&
-          <motion.button
-            onClick={() => onSendMessage(profile.user_id, profile.name, profile.avatar_url)}
-            className="w-full mt-4 flex items-center justify-center gap-2 h-11 rounded-xl bg-primary text-primary-foreground text-sm font-semibold"
-            whileTap={{ scale: 0.97 }}>
-            
-            <MessageCircle className="w-4 h-4" />
-            {tr("userprofilescreen_mesaj_gonder_ad33c9", "Mesaj göndər")}
-          </motion.button>
-        }
-      </div>
-
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="px-5">
-        <TabsList className="w-full grid grid-cols-2">
-          <TabsTrigger value="posts" className="flex items-center gap-2">
-            <Grid3X3 className="w-4 h-4" />
-            {tr("userprofilescreen_postlar", "Postlar")}
-          </TabsTrigger>
-          <TabsTrigger value="stories" className="flex items-center gap-2">
-            <Film className="w-4 h-4" />
-            {tr("userprofilescreen_story_ler_670373", "Story-lər")}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="posts" className="mt-4 space-y-4">
-          {posts.length === 0 ?
-          <div className="text-center py-12">
-              <Grid3X3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">{tr("userprofilescreen_hele_post_yoxdur_a26a62", "Hələ post yoxdur")}</p>
-            </div> :
+        {activeTab === 'posts' &&
+        <div className="space-y-4">
+            {posts.length === 0 ?
+          <div className="a-card" style={{ textAlign: 'center', padding: '34px 18px' }}>
+                <div className="mx-auto mb-4 flex items-center justify-center"
+            style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--a-surface-soft)' }}>
+                  <Grid3X3 size={26} style={{ color: 'var(--a-ink-faint)' }} />
+                </div>
+                <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("userprofilescreen_hele_post_yoxdur_a26a62", "HÉ™lÉ™ post yoxdur")}</p>
+              </div> :
 
           posts.map((post) =>
           <PostCard key={post.id} post={post} groupId={post.group_id} />
           )
           }
-        </TabsContent>
+          </div>
+        }
 
-        <TabsContent value="stories" className="mt-4">
-          {stories.length === 0 ?
-          <div className="text-center py-12">
-              <Film className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">{tr("userprofilescreen_hele_story_yoxdur_d7ad34", "Hələ story yoxdur")}</p>
-            </div> :
+        {activeTab === 'stories' &&
+        <div>
+            {stories.length === 0 ?
+          <div className="a-card" style={{ textAlign: 'center', padding: '34px 18px' }}>
+                <div className="mx-auto mb-4 flex items-center justify-center"
+            style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--a-surface-soft)' }}>
+                  <Film size={26} style={{ color: 'var(--a-ink-faint)' }} />
+                </div>
+                <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("userprofilescreen_hele_story_yoxdur_d7ad34", "HÉ™lÉ™ story yoxdur")}</p>
+              </div> :
 
           <div className="grid grid-cols-3 gap-2">
-              {stories.map((story) =>
+                {stories.map((story) =>
             <motion.div
               key={story.id}
-              className="relative aspect-[9/16] rounded-xl overflow-hidden bg-muted"
+              className="relative aspect-[9/16] overflow-hidden"
+              style={{ borderRadius: 16, background: 'var(--a-surface-soft)', boxShadow: 'var(--a-card-shadow)' }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}>
-              
-                  {story.media_type === 'video' ?
+
+                    {story.media_type === 'video' ?
               <video
                 src={story.media_url}
                 className="w-full h-full object-cover"
@@ -308,17 +339,18 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
                 className="w-full h-full object-cover" />
 
               }
-                  <div className="absolute bottom-2 left-2 right-2">
-                    <span className="text-xs text-white/80 bg-black/40 px-2 py-0.5 rounded-full">
-                      {formatDistanceToNow(new Date(story.created_at), { addSuffix: false, locale: getCurrentDateLocale() })}
-                    </span>
-                  </div>
-                </motion.div>
+                    <div className="absolute bottom-2 left-2 right-2">
+                      <span className="text-white/90 bg-black/40 px-2 py-0.5 rounded-full" style={{ fontSize: 10 }}>
+                        {formatDistanceToNow(new Date(story.created_at), { addSuffix: false, locale: getCurrentDateLocale() })}
+                      </span>
+                    </div>
+                  </motion.div>
             )}
-            </div>
+              </div>
           }
-        </TabsContent>
-      </Tabs>
+          </div>
+        }
+      </div>
     </div>);
 
 };

@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { tr } from '@/lib/tr';
 import { Globe, Check } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
-import { clearTranslationCache, loadTranslations } from '@/lib/i18n';
+import { clearTranslationCache, loadTranslations, fetchActiveLanguages } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 
-const LANGS = [
+// İlkin/fallback siyahı — app_languages sorğusu gələnə qədər və ya xəta halında.
+const FALLBACK_LANGS = [
 { code: 'az', label: tr("languageselector_azerbaycan_733e93", "Azərbaycan"), native: tr("languageselector_azerbaycan_733e93", "Az\u0259rbaycan") },
 { code: 'en', label: 'English', native: 'English' }];
+
 
 
 export default function LanguageSelector() {
@@ -16,10 +18,15 @@ export default function LanguageSelector() {
   const [open, setOpen] = useState(false);
   const [enabled, setEnabled] = useState(true);
   const [switching, setSwitching] = useState(false);
+  const [langs, setLangs] = useState(FALLBACK_LANGS);
 
   // Removed feature flag check so the language selector is always enabled for all users.
   useEffect(() => {
     setEnabled(true);
+    // Aktiv dillər DB-dən gəlir — ru/tr açmaq üçün app_languages.is_active=true kifayətdir.
+    fetchActiveLanguages()
+      .then((list) => setLangs(list.map((l) => ({ code: l.code, label: l.native_name, native: l.native_name }))))
+      .catch(() => {});
   }, []);
 
   const change = async (code: string) => {
@@ -45,7 +52,7 @@ export default function LanguageSelector() {
 
   if (!enabled) return null;
 
-  const current = LANGS.find((l) => l.code === language) ?? LANGS[0];
+  const current = langs.find((l) => l.code === language) ?? langs[0];
 
   return (
     <>
@@ -76,7 +83,7 @@ export default function LanguageSelector() {
           
             <h3 className="text-base font-bold text-foreground mb-3 px-1">{tr("untranslated_dil_language_7oaxzb", "Dil / Language")}</h3>
             <div className="space-y-2">
-              {LANGS.map((l) =>
+              {langs.map((l) =>
             <button
               key={l.code}
               disabled={switching}

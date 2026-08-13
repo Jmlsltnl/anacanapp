@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { mapRowsTranslation, getPersistedLanguage } from '@/lib/tr';
 
 export interface Cake {
   id: string;
@@ -54,7 +55,7 @@ export const useCakes = () => {
         .order('sort_order', { ascending: true });
 
       if (error) throw error;
-      setCakes((data || []) as unknown as Cake[]);
+      setCakes(mapRowsTranslation(data || [], getPersistedLanguage(), ['name', 'description', 'milestone_label']) as unknown as Cake[]);
     } catch (error) {
       console.error('Error fetching cakes:', error);
     } finally {

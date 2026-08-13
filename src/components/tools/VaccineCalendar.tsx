@@ -1,4 +1,5 @@
 import { tr, getPersistedLanguage } from "@/lib/tr";import { useMemo, useState } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Syringe, CheckCircle2, Clock, AlertTriangle, Ban,
@@ -30,11 +31,11 @@ interface Props {
 type TabKey = 'upcoming' | 'all' | 'done';
 
 const STATUS = {
-  done: { label: () => tr("vaccinecalendar_vuruldu", "Vuruldu"), icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', ring: 'ring-emerald-200' },
-  pending: { label: () => tr("vaccinecalendar_gozlemede_80f70e", "G\xF6zl\u0259m\u0259d\u0259"), icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', ring: 'ring-amber-200' },
-  overdue: { label: () => tr("vaccinecalendar_gecikdi", "Gecikdi"), icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50', ring: 'ring-red-200' },
-  skipped: { label: () => tr("vaccinecalendar_buraxildi_61c6a0", "Burax\u0131ld\u0131"), icon: Ban, color: 'text-muted-foreground', bg: 'bg-muted', ring: 'ring-gray-200' },
-  future: { label: () => tr("vaccinecalendar_novbede_b7ecbc", "N\xF6vb\u0259d\u0259"), icon: Clock, color: 'text-blue-600', bg: 'bg-blue-50', ring: 'ring-blue-200' }
+  done: { label: () => tr("vaccinecalendar_vuruldu", "Vuruldu"), icon: CheckCircle2, bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' },
+  pending: { label: () => tr("vaccinecalendar_gozlemede_80f70e", "G\xF6zl\u0259m\u0259d\u0259"), icon: Clock, bg: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)' },
+  overdue: { label: () => tr("vaccinecalendar_gecikdi", "Gecikdi"), icon: AlertTriangle, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' },
+  skipped: { label: () => tr("vaccinecalendar_buraxildi_61c6a0", "Burax\u0131ld\u0131"), icon: Ban, bg: 'var(--a-surface-soft)', ink: 'var(--a-ink-soft)' },
+  future: { label: () => tr("vaccinecalendar_novbede_b7ecbc", "N\xF6vb\u0259d\u0259"), icon: Clock, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' }
 } as const;
 
 type StatusKey = keyof typeof STATUS;
@@ -49,7 +50,7 @@ const dayDiffFromBirth = (birthDate: string) => {
 const formatVaccineDate = (iso: string) => {
   const d = new Date(iso);
   const lang = getPersistedLanguage();
-  const locale = lang === 'en' ? 'en-US' : 'az-AZ';
+  const locale = getLocaleTag();
   return d.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' });
 };
 
@@ -142,7 +143,9 @@ export default function VaccineCalendar({ onBack }: Props) {
   const qc = useQueryClient();
   const lang = getPersistedLanguage();
 
-  const childCountry = (selectedChild as any)?.country_code || 'AZ';
+  // Uşaq üçün ölkə seçilməyibsə, default tətbiq dilinə görə (tr→TR, ru→RU, əks halda AZ)
+  const langDefaultCountry = lang === 'tr' ? 'TR' : lang === 'ru' ? 'RU' : 'AZ';
+  const childCountry = (selectedChild as any)?.country_code || langDefaultCountry;
   const [countryCode, setCountryCode] = useState<string>(childCountry);
   const effectiveCountry = countryCode || childCountry;
 
@@ -199,8 +202,10 @@ export default function VaccineCalendar({ onBack }: Props) {
     const meta = STATUS[s];
     const Icon = meta.icon;
     return (
-      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${meta.bg} ${meta.color}`}>
-        <Icon className="w-3 h-3" />
+      <span
+        className="inline-flex items-center gap-1"
+        style={{ padding: '4px 9px', borderRadius: 999, fontSize: 10, fontWeight: 800, background: meta.bg, color: meta.ink }}>
+        <Icon size={11} strokeWidth={2.2} />
         {meta.label()}
       </span>);
 
@@ -214,29 +219,30 @@ export default function VaccineCalendar({ onBack }: Props) {
         layout
         whileTap={{ scale: 0.98 }}
         onClick={() => setDetailRow(row)}
-        className={`w-full text-left bg-card rounded-2xl border border-border p-3 shadow-sm active:shadow-none transition-all`}>
+        className="a-card w-full text-left"
+        style={{ padding: '14px 16px', cursor: 'pointer' }}>
         
         <div className="flex items-start gap-3">
-          <div
-            className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{ background: `${row.vaccine.color_hex || '#F28155'}1a`, color: row.vaccine.color_hex || '#F28155' }}>
+          <span
+            className="a-list-icon"
+            style={{ background: `${row.vaccine.color_hex || 'var(--a-peach-2)'}1f`, color: row.vaccine.color_hex || 'var(--a-peach-2)' }}>
             
-            <Syringe className="w-5 h-5" />
-          </div>
+            <Syringe size={17} strokeWidth={2} />
+          </span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <h4 className="text-[13px] font-bold text-foreground truncate">{translateVaccineLabel(row.vaccine.name, lang)}</h4>
+              <h4 className="a-list-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{translateVaccineLabel(row.vaccine.name, lang)}</h4>
               {!row.vaccine.is_mandatory &&
-              <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">{tr("vaccinecalendar_konullu_6b1c0e", "k\xF6n\xFCll\xFC")}</span>
+              <span className="a-tag" style={{ cursor: 'default', padding: '3px 8px', fontSize: 9.5 }}>{tr("vaccinecalendar_konullu_6b1c0e", "k\xF6n\xFCll\xFC")}</span>
               }
             </div>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              {translateVaccineLabel(row.age_label, lang)} • {translateVaccineLabel(row.dose_label, lang)}
+            <p className="a-list-sub">
+              {translateVaccineLabel(row.age_label, lang)} · {translateVaccineLabel(row.dose_label, lang)}
             </p>
-            <div className="flex items-center justify-between mt-1.5">
+            <div className="flex items-center justify-between" style={{ marginTop: 8 }}>
               {renderStatusBadge(status)}
               {log?.administered_at &&
-              <span className="text-[10px] text-muted-foreground">{formatVaccineDate(log.administered_at)}</span>
+              <span className="a-list-time">{formatVaccineDate(log.administered_at)}</span>
               }
             </div>
           </div>
@@ -247,34 +253,34 @@ export default function VaccineCalendar({ onBack }: Props) {
 
   if (!selectedChild) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="a-scope flex flex-col" style={{ background: 'var(--a-bg)', minHeight: '100vh' }}>
         <Header onBack={onBack} />
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
-          <Syringe className="w-12 h-12 text-muted-foreground mb-3" />
-          <h3 className="text-base font-bold text-foreground">{tr("vaccinecalendar_usaq_secilmeyib_a26423", "U\u015Faq se\xE7ilm\u0259yib")}</h3>
-          <p className="text-xs text-muted-foreground mt-1">{tr("vaccinecalendar_peyvend_teqvimini_gormek_ucun__8ce451", "Peyv\u0259nd t\u0259qvimini g\xF6rm\u0259k \xFC\xE7\xFCn \u0259vv\u0259lc\u0259 u\u015Faq profili yarad\u0131n.")}</p>
+          <Syringe size={44} style={{ color: 'var(--a-ink-faint)', marginBottom: 12 }} />
+          <h3 className="a-list-title" style={{ fontSize: 15 }}>{tr("vaccinecalendar_usaq_secilmeyib_a26423", "U\u015Faq se\xE7ilm\u0259yib")}</h3>
+          <p className="a-list-sub" style={{ whiteSpace: 'normal', marginTop: 4 }}>{tr("vaccinecalendar_peyvend_teqvimini_gormek_ucun__8ce451", "Peyv\u0259nd t\u0259qvimini g\xF6rm\u0259k \xFC\xE7\xFCn \u0259vv\u0259lc\u0259 u\u015Faq profili yarad\u0131n.")}</p>
         </div>
       </div>);
 
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="a-scope pb-24" style={{ background: 'var(--a-bg)', minHeight: '100vh' }}>
       <Header onBack={onBack} />
 
       {/* Child + Country selector */}
-      <div className="px-3 pt-2">
-        <div className="bg-card rounded-2xl border border-border p-3 shadow-sm">
+      <div className="a-shell">
+        <div className="a-card">
           <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-lg shrink-0">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="a-rank-avatar" style={{ background: 'var(--a-surface-soft)', fontSize: 19 }}>
                 {selectedChild.avatar_emoji}
-              </div>
+              </span>
               <div className="min-w-0">
                 {children.length > 1 ?
                 <DropdownMenu>
-                    <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-bold text-foreground">
-                      {selectedChild.name} <ChevronDown className="w-3 h-3" />
+                    <DropdownMenuTrigger className="a-list-title flex items-center gap-1" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
+                      {selectedChild.name} <ChevronDown size={12} />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       {children.map((c) =>
@@ -285,25 +291,23 @@ export default function VaccineCalendar({ onBack }: Props) {
                     </DropdownMenuContent>
                   </DropdownMenu> :
 
-                <h2 className="text-sm font-bold text-foreground truncate">{selectedChild.name}</h2>
+                <h2 className="a-list-title truncate">{selectedChild.name}</h2>
                 }
-                <p className="text-[11px] text-muted-foreground">{getChildAge(selectedChild).displayText}</p>
+                <p className="a-list-sub">{getChildAge(selectedChild).displayText}</p>
               </div>
             </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 px-2.5 gap-1.5 rounded-full">
-                  <span className="text-base leading-none">
-                    {country?.flag_emoji && !country.flag_emoji.startsWith('data:') && country.flag_emoji.length > 10 ? (
-                      <img src={`data:image/png;base64,${country.flag_emoji}`} alt="" className="w-4 h-3 object-cover rounded-sm" />
-                    ) : (
-                      <span>{country?.flag_emoji || '🌍'}</span>
-                    )}
-                  </span>
-                  <span className="text-[11px] font-semibold">{country?.name || effectiveCountry}</span>
-                  <ChevronDown className="w-3 h-3" />
-                </Button>
+                <button className="a-tag" style={{ cursor: 'pointer', flexShrink: 0 }}>
+                  {country?.flag_emoji && !country.flag_emoji.startsWith('data:') && country.flag_emoji.length > 10 ? (
+                    <img src={`data:image/png;base64,${country.flag_emoji}`} alt="" style={{ width: 15, height: 11, objectFit: 'cover', borderRadius: 2 }} />
+                  ) : (
+                    <span>{country?.flag_emoji || '🌍'}</span>
+                  )}
+                  <span style={{ fontWeight: 700 }}>{country?.name || effectiveCountry}</span>
+                  <ChevronDown size={11} />
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 {countries.map((c) =>
@@ -322,29 +326,32 @@ export default function VaccineCalendar({ onBack }: Props) {
             </DropdownMenu>
           </div>
 
-          {/* Progress */}
-          <div className="mt-3 grid grid-cols-4 gap-2">
+          {/* Stats */}
+          <div className="a-grid-2" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
             <Stat label={tr("vaccinecalendar_cemi_84214a", "C\u0259mi")} value={stats.total} />
-            <Stat label={tr("vaccine_stat_done", "Tamam")} value={stats.done} color="text-emerald-600" />
-            <Stat label={tr("vaccine_stat_pending", "Qalan")} value={stats.upcoming} color="text-amber-600" />
-            <Stat label={tr("vaccinecalendar_geciken_c7adb0", "Gecik\u0259n")} value={stats.overdue} color="text-red-600" />
+            <Stat label={tr("vaccine_stat_done", "Tamam")} value={stats.done} color="var(--a-green-ink)" />
+            <Stat label={tr("vaccine_stat_pending", "Qalan")} value={stats.upcoming} color="var(--a-warn-ink)" />
+            <Stat label={tr("vaccinecalendar_geciken_c7adb0", "Gecik\u0259n")} value={stats.overdue} color="var(--a-pink-ink)" />
           </div>
-          <div className="mt-2.5">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[10px] text-muted-foreground font-medium">{tr("vaccinecalendar_tereqqi_9cf2fe", "T\u0259r\u0259qqi")}</span>
-              <span className="text-[10px] font-bold text-foreground">{stats.pct}%</span>
+
+          {/* Progress */}
+          <div style={{ marginTop: 12 }}>
+            <div className="flex items-center justify-between" style={{ marginBottom: 5 }}>
+              <span className="a-list-sub" style={{ margin: 0 }}>{tr("vaccinecalendar_tereqqi_9cf2fe", "T\u0259r\u0259qqi")}</span>
+              <span className="a-list-value" style={{ color: 'var(--a-accent-ink)' }}>{stats.pct}%</span>
             </div>
-            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+            <div className="a-inline-bar" style={{ marginTop: 0 }}>
               <motion.div
-                className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500"
+                className="a-inline-bar-fill"
+                style={{ background: 'var(--a-grad-green)' }}
                 animate={{ width: `${stats.pct}%` }}
                 transition={{ duration: 0.6 }} />
             </div>
           </div>
         </div>
-      </div>
-      <div className="px-3 mt-3 sticky top-0 z-10">
-        <div className="flex bg-card rounded-full border border-border p-0.5 shadow-sm">
+
+        {/* Tabs */}
+        <div className="a-tabs" style={{ display: 'flex', width: '100%', marginTop: 14 }}>
           {([
           { k: 'upcoming', l: tr("vaccinecalendar_yaxinlasan_773e16", "Yax\u0131nla\u015Fan") },
           { k: 'all', l: tr("vaccinecalendar_tam_qrafik", "Tam qrafik") },
@@ -353,68 +360,68 @@ export default function VaccineCalendar({ onBack }: Props) {
           <button
             key={t.k}
             onClick={() => setTab(t.k)}
-            className={`flex-1 py-1.5 text-[11px] font-semibold rounded-full transition-all ${
-            tab === t.k ? 'bg-primary text-primary-foreground shadow' : 'text-muted-foreground'}`
-            }>
+            className={`a-tab${tab === t.k ? ' active' : ''}`}
+            style={{ flex: 1 }}>
             
               {t.l}
             </button>
           )}
         </div>
-      </div>
 
-      <div className="px-3 mt-3 space-y-2">
-        {schedLoading && <p className="text-center text-xs text-muted-foreground py-6">{tr("vaccinecalendar_yuklenir_5557de", "Y\xFCkl\u0259nir...")}</p>}
+        <div className="mt-3 space-y-2.5">
+          {schedLoading && <p className="a-list-sub text-center" style={{ padding: '24px 0', margin: 0 }}>{tr("vaccinecalendar_yuklenir_5557de", "Y\xFCkl\u0259nir...")}</p>}
 
-        {!schedLoading && schedule.length === 0 &&
-        <div className="bg-card rounded-2xl p-6 text-center border border-border">
-            <Globe className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm font-semibold text-foreground">{tr("vaccinecalendar_bu_olke_ucun_qrafik_hele_hazir_726119", "Bu \xF6lk\u0259 \xFC\xE7\xFCn qrafik h\u0259l\u0259 haz\u0131rlanmay\u0131b")}</p>
-            <p className="text-xs text-muted-foreground mt-1">{tr("vaccinecalendar_tezlikle_elave_olunacaq_da1414", "Tezlikl\u0259 \u0259lav\u0259 olunacaq.")}</p>
+          {!schedLoading && schedule.length === 0 &&
+          <div className="a-card" style={{ textAlign: 'center', padding: '28px 18px' }}>
+              <Globe size={36} style={{ color: 'var(--a-ink-faint)', margin: '0 auto 8px' }} />
+              <p className="a-list-title" style={{ marginBottom: 3 }}>{tr("vaccinecalendar_bu_olke_ucun_qrafik_hele_hazir_726119", "Bu \xF6lk\u0259 \xFC\xE7\xFCn qrafik h\u0259l\u0259 haz\u0131rlanmay\u0131b")}</p>
+              <p className="a-list-sub" style={{ margin: 0 }}>{tr("vaccinecalendar_tezlikle_elave_olunacaq_da1414", "Tezlikl\u0259 \u0259lav\u0259 olunacaq.")}</p>
+            </div>
+          }
+
+          {tab === 'upcoming' && upcomingRows.map(renderCard)}
+          {tab === 'done' && (
+          doneRows.length === 0 ?
+          <p className="a-list-sub text-center" style={{ padding: '24px 0', margin: 0 }}>{tr("vaccinecalendar_hele_tamamlanmis_peyvend_yoxdu_c76148", "H\u0259l\u0259 tamamlanm\u0131\u015F peyv\u0259nd yoxdur.")}</p> :
+          doneRows.map(renderCard))
+          }
+          {tab === 'all' && groupedAll.map((g) => {
+            const groupRows = rowsWithStatus.filter((x) => translateVaccineLabel(x.row.age_label, lang) === g.label);
+            return (
+              <div key={g.label} className="mt-4 first:mt-0">
+                <div className="flex items-center gap-2 mb-2 px-1">
+                  <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--a-peach-2)', flexShrink: 0 }} />
+                  <h3 className="a-today-info-eyebrow" style={{ margin: 0 }}>{g.label}</h3>
+                  <div style={{ flex: 1, height: 1, background: 'var(--a-line-strong)' }} />
+                </div>
+                <div className="space-y-2.5">{groupRows.map(renderCard)}</div>
+              </div>);
+
+          })}
+        </div>
+
+        {/* Source */}
+        {country?.source_url &&
+        <div className="mt-5">
+            <a
+            href={country.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="a-legend-item justify-center"
+            style={{ display: 'flex' }}>
+            
+              <Info size={11} />
+              <span>
+                {tr("vaccinecalendar_menbe_87d8be", "M\u0259nb\u0259:")}{" "}
+                {lang === 'en' && (country.source_label || '').includes('Səhiyyə Nazirliyi')
+                  ? 'Ministry of Health of the Republic of Azerbaijan — National Immunization Schedule'
+                  : country.source_label || country.source_url}
+              </span>
+              <ExternalLink size={9} />
+            </a>
           </div>
         }
-
-        {tab === 'upcoming' && upcomingRows.map(renderCard)}
-        {tab === 'done' && (
-        doneRows.length === 0 ?
-        <p className="text-center text-xs text-muted-foreground py-6">{tr("vaccinecalendar_hele_tamamlanmis_peyvend_yoxdu_c76148", "H\u0259l\u0259 tamamlanm\u0131\u015F peyv\u0259nd yoxdur.")}</p> :
-        doneRows.map(renderCard))
-        }
-        {tab === 'all' && groupedAll.map((g) => {
-          const groupRows = rowsWithStatus.filter((x) => translateVaccineLabel(x.row.age_label, lang) === g.label);
-          return (
-            <div key={g.label} className="mt-3 first:mt-0">
-              <div className="flex items-center gap-2 mb-1.5 px-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                <h3 className="text-[11px] font-bold text-foreground uppercase tracking-wide">{g.label}</h3>
-                <div className="flex-1 h-px bg-muted" />
-              </div>
-              <div className="space-y-2">{groupRows.map(renderCard)}</div>
-            </div>);
-
-        })}
       </div>
-
-      {/* Source */}
-      {country?.source_url &&
-      <div className="px-3 mt-5">
-          <a
-          href={country.source_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-1.5 justify-center text-[10px] text-muted-foreground hover:text-foreground">
-          
-            <Info className="w-3 h-3" />
-            <span>
-              {tr("vaccinecalendar_menbe_87d8be", "M\u0259nb\u0259:")}{" "}
-              {lang === 'en' && (country.source_label || '').includes('Səhiyyə Nazirliyi')
-                ? 'Ministry of Health of the Republic of Azerbaijan — National Immunization Schedule'
-                : country.source_label || country.source_url}
-            </span>
-            <ExternalLink className="w-2.5 h-2.5" />
-          </a>
-        </div>
-      }
 
       {/* Detail sheet */}
       <Sheet open={!!detailRow} onOpenChange={(o) => !o && setDetailRow(null)}>
@@ -441,8 +448,8 @@ export default function VaccineCalendar({ onBack }: Props) {
               <p className="text-[13px] text-foreground leading-relaxed">{translateVaccineLabel(detailRow.vaccine.short_description, lang)}</p>
               }
                 {detailRow.vaccine.full_description &&
-              <div className="bg-primary/5 rounded-xl p-3">
-                    <p className="text-[12px] text-foreground leading-relaxed whitespace-pre-line">
+              <div style={{ background: 'var(--a-surface-soft)', borderRadius: 14, padding: 12 }}>
+                    <p className="text-[12px] leading-relaxed whitespace-pre-line" style={{ color: 'var(--a-ink)' }}>
                       {translateVaccineLabel(detailRow.vaccine.full_description, lang)}
                     </p>
                   </div>
@@ -463,20 +470,20 @@ export default function VaccineCalendar({ onBack }: Props) {
 
                 {/* Actions */}
                 <div className="grid grid-cols-2 gap-2 pt-2">
-                  <Button
-                  size="sm"
-                  className="bg-emerald-500 hover:bg-emerald-600"
+                  <button
+                  className="a-cta-btn"
+                  style={{ justifyContent: 'center', background: 'var(--a-green-2)' }}
                   onClick={() => {setActionRow(detailRow);setActionMode('done');setDetailRow(null);}}>
                   
-                    <CheckCircle2 className="w-4 h-4 mr-1" /> {tr("vaccinecalendar_vuruldu", "Vuruldu")}
-                  </Button>
-                  <Button
-                  size="sm"
-                  variant="outline"
+                    <CheckCircle2 size={15} strokeWidth={2.2} /> {tr("vaccinecalendar_vuruldu", "Vuruldu")}
+                  </button>
+                  <button
+                  className="a-btn-soft"
+                  style={{ justifyContent: 'center' }}
                   onClick={() => {setActionRow(detailRow);setActionMode('skip');setDetailRow(null);}}>
                   
-                    <Ban className="w-4 h-4 mr-1" /> {tr("vaccinecalendar_buraxildi_61c6a0", "Burax\u0131ld\u0131")}
-                  </Button>
+                    <Ban size={15} strokeWidth={2.2} /> {tr("vaccinecalendar_buraxildi_61c6a0", "Burax\u0131ld\u0131")}
+                  </button>
                 </div>
 
                 {logs.find((l) => l.vaccine_schedule_id === detailRow.id) &&
@@ -527,35 +534,37 @@ export default function VaccineCalendar({ onBack }: Props) {
 
 function Header({ onBack }: {onBack: () => void;}) {
   return (
-    <header className="bg-card border-b border-border sticky top-0 z-20">
-      <div className="px-3 h-12 flex items-center gap-2">
-        <button onClick={onBack} className="w-8 h-8 -ml-1 flex items-center justify-center rounded-full active:bg-muted">
-          <ArrowLeft className="w-5 h-5 text-foreground" />
-        </button>
-        <div className="flex-1">
-          <h1 className="text-sm font-bold text-foreground leading-tight">{tr("vaccinecalendar_peyvend_teqvimi_d84c87", "Peyv\u0259nd T\u0259qvimi")}</h1>
-          <p className="text-[10px] text-muted-foreground leading-tight">{tr("vaccine_national_schedule", "Milli İmmunizasiya Qrafiki")}</p>
+    <div className="a-shell">
+      <header className="a-topbar">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
+            <ArrowLeft size={16} strokeWidth={2} />
+          </motion.button>
+          <div>
+            <p className="a-eyebrow">{tr("vaccine_national_schedule", "Milli İmmunizasiya Qrafiki")}</p>
+            <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("vaccinecalendar_peyvend_teqvimi_d84c87", "Peyv\u0259nd T\u0259qvimi")}</p>
+          </div>
         </div>
-        <Sparkles className="w-4 h-4 text-primary" />
-      </div>
-    </header>);
+        <Sparkles size={16} style={{ color: 'var(--a-peach-2)' }} />
+      </header>
+    </div>);
 
 }
 
-function Stat({ label, value, color = 'text-foreground' }: {label: string;value: number;color?: string;}) {
+function Stat({ label, value, color = 'var(--a-ink)' }: {label: string;value: number;color?: string;}) {
   return (
-    <div className="text-center">
-      <div className={`text-base font-extrabold leading-none ${color}`}>{value}</div>
-      <div className="text-[9px] text-muted-foreground mt-0.5">{label}</div>
+    <div className="a-stat-tile" style={{ flexDirection: 'column', alignItems: 'center', gap: 2, padding: '10px 4px', textAlign: 'center' }}>
+      <div style={{ fontSize: 15, fontWeight: 800, lineHeight: 1, color }}>{value}</div>
+      <div className="a-stat-tile-label">{label}</div>
     </div>);
 
 }
 
 function DetailRow({ label, value }: {label: string;value: string;}) {
   return (
-    <div className="border-l-2 border-primary/30 pl-3">
-      <p className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wide">{label}</p>
-      <p className="text-[13px] text-foreground leading-relaxed mt-0.5 whitespace-pre-line">{value}</p>
+    <div style={{ borderLeft: '2px solid var(--a-peach-2)', paddingLeft: 12 }}>
+      <p className="a-today-info-eyebrow" style={{ margin: 0 }}>{label}</p>
+      <p style={{ fontSize: 13, lineHeight: 1.6, marginTop: 2, whiteSpace: 'pre-line', color: 'var(--a-ink)' }}>{value}</p>
     </div>);
 
 }

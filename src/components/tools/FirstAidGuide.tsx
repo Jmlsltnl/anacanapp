@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, AlertTriangle, ChevronRight, ChevronLeft, Phone, Shield } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { AlertTriangle, ChevronRight, ChevronLeft, Phone } from 'lucide-react';
 import { useFirstAidScenarios, useFirstAidSteps, FirstAidScenario } from '@/hooks/useFirstAid';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
-import { toast } from 'sonner';
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 
 interface FirstAidGuideProps {
   onBack: () => void;
@@ -47,60 +45,29 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
     }
   };
 
-  const getEmergencyColor = (level: string) => {
+  // Emergency level → anacan design palette
+  const getEmergencyStyle = (level: string) => {
     switch (level) {
-      case 'critical':return 'from-red-600 to-red-700';
-      case 'high':return 'from-orange-500 to-red-500';
-      case 'medium':return 'from-amber-500 to-orange-500';
-      default:return 'from-yellow-500 to-amber-500';
-    }
-  };
-
-  const getEmergencyBg = (level: string) => {
-    switch (level) {
-      case 'critical':return 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800';
-      case 'high':return 'bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800';
-      case 'medium':return 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800';
-      default:return 'bg-yellow-50 dark:bg-yellow-950/30 border-yellow-200 dark:border-yellow-800';
+      case 'critical':return { grad: 'var(--a-grad-pink)', ink: 'var(--a-alert-ink)', tag: 'var(--a-pink-2)' };
+      case 'high':return { grad: 'var(--a-grad-peach)', ink: 'var(--a-accent-ink)', tag: 'var(--a-peach-2)' };
+      case 'medium':return { grad: 'var(--a-grad-yellow)', ink: 'var(--a-warn-ink)', tag: 'var(--a-yellow-2)' };
+      default:return { grad: 'var(--a-grad-yellow)', ink: 'var(--a-warn-ink)', tag: 'var(--a-yellow-2)' };
     }
   };
 
   const currentStepData = steps[currentStep];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Compact Header */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50">
-        <div className="px-4 pb-2">
-          <div className="flex items-center gap-3">
-            <motion.button
-              onClick={handleBack}
-              className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
-              
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-                <Shield className="w-5 h-5 text-red-500" />
-                {selectedScenario ? selectedScenario.title_az : tr("firstaidguide_heyat_qurtaran_sos_2f76df", "H\u0259yat Qurtaran SOS")}
-              </h1>
-              {selectedScenario &&
-              <p className="text-xs text-muted-foreground">
-                  {tr("firstaidguide_addim_9346cd", "Add\u0131m")} {currentStep + 1} / {steps.length}
-                </p>
-              }
-            </div>
-            {/* TTS button removed */}
-          </div>
-        </div>
-      </div>
+    <ToolPage>
+      <ToolHeader
+        onBack={handleBack}
+        eyebrow={selectedScenario ? <>{tr("firstaidguide_addim_9346cd", "Add\u0131m")} {currentStep + 1} / {steps.length}</> : tr("firstaidguide_tecili_tibbi_yardim_b28b39", "Təcili Tibbi Yardım")}
+        title={selectedScenario ? selectedScenario.title_az : tr("firstaidguide_heyat_qurtaran_sos_2f76df", "H\u0259yat Qurtaran SOS")} />
 
       <AnimatePresence mode="wait">
         {!selectedScenario ?
         <motion.div
           key="scenarios"
-          className="px-4 pt-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}>
@@ -108,69 +75,76 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
             {/* Emergency Call Button */}
             <motion.a
             href="tel:103"
-            className="block w-full mb-4"
+            className="a-card block w-full mb-3"
+            style={{ background: 'var(--a-pink-2)', border: 'none', textDecoration: 'none', padding: '14px 16px' }}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 }}>
             
-              <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-3 shadow-lg flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-white" />
-                </div>
+              <div className="flex items-center gap-3">
+                <span className="a-list-icon" style={{ background: 'rgba(255,255,255,0.25)', color: '#fff' }}>
+                  <Phone size={18} strokeWidth={2.2} />
+                </span>
                 <div className="flex-1">
-                  <p className="text-lg font-black text-white">103</p>
-                  <p className="text-xs text-white/80">{tr("firstaidguide_tecili_tibbi_yardim_b28b39", "Təcili Tibbi Yardım")}</p>
+                  <p className="a-heading" style={{ margin: 0, fontSize: 19, color: '#fff' }}>103</p>
+                  <p style={{ margin: 0, fontSize: 11.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{tr("firstaidguide_tecili_tibbi_yardim_b28b39", "Təcili Tibbi Yardım")}</p>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center animate-pulse">
-                  <ChevronRight className="w-4 h-4 text-white" />
-                </div>
+                <span className="w-8 h-8 rounded-full flex items-center justify-center animate-pulse" style={{ background: 'rgba(255,255,255,0.25)' }}>
+                  <ChevronRight size={15} style={{ color: '#fff' }} />
+                </span>
               </div>
             </motion.a>
 
-            <MedicalDisclaimer variant="compact" className="mb-3" />
+            <MedicalDisclaimer variant="anacan" className="mb-3" />
 
 
             {/* Scenario Selection */}
-            <h2 className="font-bold text-sm text-foreground mb-2 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-red-500" />
-              {tr("firstaidguide_tecili_veziyyet_secin_51d6bd", "T\u0259cili V\u0259ziyy\u0259t Se\xE7in")}
-            </h2>
+            <div className="a-section-head" style={{ marginTop: 4 }}>
+              <h2 className="a-section-title a-heading" style={{ fontSize: 15 }}>
+                {tr("firstaidguide_tecili_veziyyet_secin_51d6bd", "T\u0259cili V\u0259ziyy\u0259t Se\xE7in")}
+              </h2>
+              <AlertTriangle size={15} style={{ color: 'var(--a-pink-2)' }} />
+            </div>
 
             {isLoading ?
-          <div className="space-y-2">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[1, 2, 3].map((i) =>
-            <div key={i} className="bg-card rounded-xl p-4 animate-pulse">
-                    <div className="h-5 bg-muted rounded w-1/2 mb-1" />
-                    <div className="h-3 bg-muted rounded w-3/4" />
+            <div key={i} className="a-card animate-pulse">
+                    <div style={{ height: 18, width: '50%', borderRadius: 8, background: 'var(--a-surface-soft)', marginBottom: 6 }} />
+                    <div style={{ height: 12, width: '75%', borderRadius: 8, background: 'var(--a-surface-soft)' }} />
                   </div>
             )}
               </div> :
 
-          <div className="space-y-2 pb-4">
-                {scenarios.map((scenario, index) =>
-            <motion.button
-              key={scenario.id}
-              onClick={() => setSelectedScenario(scenario)}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={`w-full rounded-xl border p-3 text-left transition-all hover:shadow-md ${getEmergencyBg(scenario.emergency_level)}`}>
-              
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getEmergencyColor(scenario.emergency_level)} flex items-center justify-center text-xl shadow`}>
-                        {scenario.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-bold text-foreground">{scenario.title_az}</h3>
-                        <p className="text-xs text-muted-foreground line-clamp-1">{scenario.description_az}</p>
-                        <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-gradient-to-r ${getEmergencyColor(scenario.emergency_level)} text-white`}>
-                          {scenario.emergency_level === 'critical' ? tr("firstaid_critical", "KRİTİK") : scenario.emergency_level === 'high' ? tr("firstaidguide_yuksek_22d925", "Y\xDCKS\u018FK") : tr("firstaid_medium", "ORTA")}
+          <div className="a-list-card pb-4">
+                {scenarios.map((scenario, index) => {
+              const style = getEmergencyStyle(scenario.emergency_level);
+              return (
+                <motion.button
+                  key={scenario.id}
+                  onClick={() => setSelectedScenario(scenario)}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: Math.min(index * 0.05, 0.3) }}
+                  className="a-list-row w-full text-left"
+                  style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}>
+                  
+                        <span className="a-list-icon" style={{ background: style.grad, fontSize: 18 }}>
+                          {scenario.icon}
                         </span>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
-                    </div>
-                  </motion.button>
-            )}
+                        <div className="flex-1 min-w-0">
+                          <p className="a-list-title">{scenario.title_az}</p>
+                          <p className="a-list-sub" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{scenario.description_az}</p>
+                        </div>
+                        <span className="a-list-trail" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span className="a-rank-tag" style={{ margin: 0, background: style.grad, color: style.ink }}>
+                            {scenario.emergency_level === 'critical' ? tr("firstaid_critical", "KRİTİK") : scenario.emergency_level === 'high' ? tr("firstaidguide_yuksek_22d925", "Y\xDCKS\u018FK") : tr("firstaid_medium", "ORTA")}
+                          </span>
+                          <ChevronRight size={16} className="a-list-chevron" />
+                        </span>
+                      </motion.button>);
+
+            })}
               </div>
           }
           </motion.div> :
@@ -183,23 +157,18 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
           exit={{ opacity: 0, x: -30 }}>
           
             {/* Progress */}
-            <div className="px-3 pt-1.5">
-              <div className="flex items-center gap-1">
-                {steps.map((_, i) =>
-              <div
-                key={i}
-                className={`h-1 flex-1 rounded-full transition-all ${
-                i <= currentStep ?
-                `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}` :
-                'bg-muted'}`
-                } />
+            <div className="flex items-center gap-1 mb-3">
+              {steps.map((_, i) =>
+            <div
+              key={i}
+              className="h-1 flex-1 rounded-full transition-all"
+              style={{ background: i <= currentStep ? getEmergencyStyle(selectedScenario.emergency_level).tag : 'var(--a-line-strong)' }} />
 
-              )}
-              </div>
+            )}
             </div>
 
             {/* Step Content */}
-            <div className="flex flex-col items-center px-3 pt-1.5 text-center">
+            <div className="flex flex-col items-center text-center">
               {currentStepData &&
             <AnimatePresence mode="wait">
                   <motion.div
@@ -209,73 +178,68 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                 exit={{ opacity: 0, y: -10 }}
                 className="w-full max-w-sm">
                     
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${getEmergencyColor(selectedScenario.emergency_level)} flex items-center justify-center shadow-sm shrink-0`}>
-                        <span className="text-base">
-                          {currentStep === 0 ? '👋' : currentStep === steps.length - 1 ? '✅' : selectedScenario.icon}
-                        </span>
-                      </div>
-                      <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px] font-medium">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span
+                    className="a-list-icon"
+                    style={{ width: 34, height: 34, borderRadius: 11, background: getEmergencyStyle(selectedScenario.emergency_level).grad, fontSize: 15 }}>
+                        {currentStep === 0 ? '👋' : currentStep === steps.length - 1 ? '✅' : selectedScenario.icon}
+                      </span>
+                      <span className="a-tag" style={{ cursor: 'default', padding: '4px 10px', fontSize: 10 }}>
                         {tr("firstaidguide_addim_9346cd", "Add\u0131m")} {currentStep + 1}
                       </span>
                       {currentStepData.is_critical &&
-                  <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 px-2 py-0.5 rounded-full text-[10px] font-semibold inline-flex items-center gap-1">
-                          <AlertTriangle className="w-2.5 h-2.5" />
+                  <span className="a-tag" style={{ cursor: 'default', padding: '4px 10px', fontSize: 10, background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)' }}>
+                          <AlertTriangle size={10} />
                           {tr("firstaid_critical_badge", "Kritik")}
                         </span>
                   }
                       {currentStepData.duration_seconds &&
-                  <span className="ml-auto text-[10px] text-muted-foreground font-medium">
+                  <span className="a-list-time ml-auto" style={{ margin: '0 0 0 auto' }}>
                           ⏱️ {currentStepData.duration_seconds}s
                         </span>
                   }
                     </div>
 
-                    <div className="bg-card rounded-lg p-2.5 shadow-sm border border-border/50">
-                      <h2 className="text-sm font-bold text-foreground mb-0.5">{currentStepData.title_az}</h2>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
+                    <div className="a-card text-left">
+                      <h2 className="a-card-title a-heading" style={{ marginBottom: 6 }}>{currentStepData.title_az}</h2>
+                      <p className="a-cta-text">
                         {currentStepData.instruction_az}
                       </p>
                     </div>
 
                     {/* Navigation */}
-                    <div className="mt-3 space-y-1.5">
+                    <div className="mt-3 space-y-2">
                       <div className="flex gap-2">
-                        <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 h-10 rounded-xl text-sm"
+                        <button
+                      className="a-btn-soft flex-1"
+                      style={{ justifyContent: 'center', height: 44, opacity: currentStep === 0 ? 0.45 : 1 }}
                       onClick={prevStep}
                       disabled={currentStep === 0}>
                       
-                          <ChevronLeft className="w-4 h-4 mr-1" />
+                          <ChevronLeft size={15} strokeWidth={2.2} />
                           {tr("firstaidguide_evvelki_936896", "\u018Fvv\u0259lki")}
-                        </Button>
-                        <Button
-                      size="sm"
-                      className={`flex-1 h-10 rounded-xl text-sm font-bold ${
-                      currentStep === steps.length - 1 ?
-                      'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' :
-                      `bg-gradient-to-r ${getEmergencyColor(selectedScenario.emergency_level)}`}`
-                      }
+                        </button>
+                        <button
+                      className="a-cta-btn flex-1"
+                      style={{
+                        justifyContent: 'center', height: 44,
+                        background: currentStep === steps.length - 1 ? 'var(--a-green-2)' : getEmergencyStyle(selectedScenario.emergency_level).tag
+                      }}
                       onClick={currentStep === steps.length - 1 ? handleBack : nextStep}>
                       
                           {currentStep === steps.length - 1 ? tr("firstaid_complete", "Tamamla") : tr("firstaidguide_novbeti_6e8661", "N\xF6vb\u0259ti")}
-                          <ChevronRight className="w-4 h-4 ml-1" />
-                        </Button>
+                          <ChevronRight size={15} strokeWidth={2.2} />
+                        </button>
                       </div>
 
-                      <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full h-9 rounded-xl border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 text-xs"
-                    asChild>
+                      <a
+                    href="tel:103"
+                    className="a-btn-soft w-full"
+                    style={{ justifyContent: 'center', height: 40, background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)', textDecoration: 'none' }}>
                     
-                        <a href="tel:103">
-                          <Phone className="w-3.5 h-3.5 mr-1.5" />
-                          {tr("firstaidguide_103_zeng_et_52da85", "103 Z\u0259ng Et")}
-                        </a>
-                      </Button>
+                        <Phone size={13} strokeWidth={2.2} />
+                        {tr("firstaidguide_103_zeng_et_52da85", "103 Z\u0259ng Et")}
+                      </a>
                     </div>
                   </motion.div>
                 </AnimatePresence>
@@ -284,7 +248,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
           </motion.div>
         }
       </AnimatePresence>
-    </div>);
+    </ToolPage>);
 
 };
 

@@ -1,8 +1,8 @@
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Stethoscope } from 'lucide-react';
 import { tr } from '@/lib/tr';
 
 interface MedicalDisclaimerProps {
-  variant?: 'banner' | 'compact' | 'inline';
+  variant?: 'banner' | 'compact' | 'inline' | 'anacan';
   className?: string;
 }
 
@@ -15,6 +15,16 @@ const MedicalDisclaimer = ({ variant = 'banner', className = '' }: MedicalDiscla
     'medical_disclaimer_full',
     tr("medical_disclaimer_text", 'Bu məlumat yalnız maarifləndirmə məqsədi daşıyır və tibbi məsləhət, diaqnoz və ya müalicə əvəzi DEYİL. Hər hansı tibbi qərar verməzdən əvvəl mütləq həkiminizə və ya ixtisaslı tibb işçisinə müraciət edin. Təcili hallarda 103-ə zəng edin.')
   );
+
+  // Anacan redesign (anacan-demo) frosted disclaimer card
+  if (variant === 'anacan') {
+    return (
+      <div className={`a-disclaimer ${className}`}>
+        <Stethoscope size={15} />
+        <p>{text}</p>
+      </div>
+    );
+  }
 
   if (variant === 'inline') {
     return (

@@ -1,10 +1,10 @@
 import { useState, useMemo, forwardRef } from 'react';
 import { tr } from '@/lib/tr';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  ArrowLeft, Search, ChefHat, Clock, Heart,
+  Search, Clock, Heart,
   Users, Crown, Lock, Flame, Timer, Sparkles,
-  UtensilsCrossed, BookOpen, Star } from
+  UtensilsCrossed } from
 'lucide-react';
 import { useRecipes, Recipe } from '@/hooks/useDynamicContent';
 import { useRecipeCategories } from '@/hooks/useDynamicTools';
@@ -12,10 +12,9 @@ import { useUserStore } from '@/store/userStore';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { resetAppScrollPosition } from '@/lib/scroll';
-import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
-import { Input } from '@/components/ui/input';
+import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { PremiumModal } from '@/components/PremiumModal';
-import { Card, CardContent } from '@/components/ui/card';
+import { ToolPage, ToolHeader } from './anacan/ToolKit';
 
 interface RecipesProps {
   onBack: () => void;
@@ -250,251 +249,229 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
   // Recipe Detail View - scroll to top on open
   if (selectedRecipe && (isPremium || isRecipeFree(selectedRecipe))) {
     return (
-      <div ref={ref} className="min-h-screen bg-background pb-24" key={`recipe-${selectedRecipe.id}`}>
-        {/* Compact sticky header */}
-        <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
-          <div className="flex items-center gap-3 px-4 py-3">
-            <motion.button
-              onClick={handleBackFromDetail}
-              className="w-9 h-9 rounded-full bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.95 }}>
+      <div ref={ref} key={`recipe-${selectedRecipe.id}`}>
+        <ToolPage>
+          <ToolHeader
+            onBack={handleBackFromDetail}
+            eyebrow={getTranslatedCategoryName(selectedRecipe.category)}
+            title={selectedRecipe.title}
+            actions={
+            <button className="a-icon-btn" onClick={(e) => toggleFavorite(selectedRecipe.id, e as any)} aria-label="Favorite">
+                <Heart
+                size={16}
+                strokeWidth={2}
+                style={favorites.includes(selectedRecipe.id) ? { fill: 'var(--a-pink-2)', color: 'var(--a-pink-2)' } : undefined} />
+              </button>
+            } />
+
+          <div className="space-y-3">
+            {/* Hero Image/Emoji */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative rounded-[26px] overflow-hidden"
+              style={{ boxShadow: 'var(--a-card-shadow)' }}>
               
-              <ArrowLeft className="w-5 h-5 text-foreground" />
-            </motion.button>
-            <div className="flex-1 min-w-0">
-              <h1 className="font-semibold text-foreground truncate">{selectedRecipe.title}</h1>
-              <p className="text-xs text-muted-foreground">{getTranslatedCategoryName(selectedRecipe.category)}</p>
-            </div>
-            <motion.button
-              onClick={(e) => toggleFavorite(selectedRecipe.id, e)}
-              className="w-9 h-9 rounded-full bg-muted flex items-center justify-center"
-              whileTap={{ scale: 0.9 }}>
-              
-              <Heart className={`w-5 h-5 ${favorites.includes(selectedRecipe.id) ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
-            </motion.button>
-          </div>
-        </div>
-
-        <div className="px-4 py-4 space-y-4">
-          {/* Hero Image/Emoji */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative rounded-2xl overflow-hidden">
-            
-            {selectedRecipe.image_url ?
-            <img
-              src={selectedRecipe.image_url}
-              alt={selectedRecipe.title}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-48 object-cover" /> :
+              {selectedRecipe.image_url ?
+              <img
+                src={selectedRecipe.image_url}
+                alt={selectedRecipe.title}
+                loading="lazy"
+                decoding="async"
+                className="w-full h-48 object-cover" /> :
 
 
-            <div className="h-40 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/20 flex items-center justify-center">
-                <span className="text-7xl">{selectedRecipe.emoji || '🍽️'}</span>
-              </div>
-            }
-          </motion.div>
-
-          {/* Quick Stats Row */}
-          <motion.div
-            className="flex items-center gap-3 justify-center"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}>
-            
-            {selectedRecipe.prep_time && selectedRecipe.prep_time > 0 &&
-            <div className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-blue-50 dark:bg-blue-900/20">
-                <Timer className="w-4 h-4 text-blue-500" />
-                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">{selectedRecipe.prep_time} {tr("recipes_deq_780a5c", "d\u0259q")}</span>
-              </div>
-            }
-            {selectedRecipe.cook_time && selectedRecipe.cook_time > 0 &&
-            <div className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-orange-50 dark:bg-orange-900/20">
-                <Flame className="w-4 h-4 text-orange-500" />
-                <span className="text-sm font-medium text-orange-700 dark:text-orange-300">{selectedRecipe.cook_time} {tr("recipes_deq_780a5c", "d\u0259q")}</span>
-              </div>
-            }
-            {selectedRecipe.servings &&
-            <div className="flex items-center gap-1.5 px-3 py-2 rounded-full bg-emerald-50 dark:bg-emerald-900/20">
-                <Users className="w-4 h-4 text-emerald-500" />
-                <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">{selectedRecipe.servings} por.</span>
-              </div>
-            }
-          </motion.div>
-
-          {/* Description */}
-          {selectedRecipe.description &&
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="bg-amber-50/50 dark:bg-amber-900/10 rounded-xl p-4">
-            
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <div className="h-40 flex items-center justify-center" style={{ background: 'var(--a-illus-grad)' }}>
+                  <span className="text-7xl">{selectedRecipe.emoji || '🍽️'}</span>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{selectedRecipe.description}</p>
-              </div>
+              }
             </motion.div>
-          }
 
-          {/* Ingredients Section */}
-          {selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 &&
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-card rounded-xl overflow-hidden border border-border/50">
-            
-              <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 flex items-center justify-between">
-                <h3 className="font-semibold text-white flex items-center gap-2">
-                  <span className="text-lg">🥗</span> {tr("recipes_i_nqrediyentler_4c0854", "\u0130nqrediyentl\u0259r")}
-                </h3>
-                <span className="text-xs bg-white/20 text-white px-2 py-0.5 rounded-full">
-                  {selectedRecipe.ingredients.length}
-                </span>
-              </div>
-              <div className="p-4 space-y-2">
-                {selectedRecipe.ingredients.map((ingredient, idx) =>
-              <motion.div
-                key={idx}
-                className="flex items-center gap-3 py-2 border-b border-border/30 last:border-0"
-                initial={{ x: -10, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.25 + idx * 0.02 }}>
-                
-                    <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-xs font-bold text-emerald-600 dark:text-emerald-400 flex-shrink-0">
-                      {idx + 1}
-                    </div>
-                    <span className="text-sm text-foreground">{ingredient}</span>
-                  </motion.div>
-              )}
-              </div>
+            {/* Quick Stats Row */}
+            <motion.div
+              className="flex items-center gap-2 justify-center flex-wrap"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}>
+              
+              {selectedRecipe.prep_time && selectedRecipe.prep_time > 0 &&
+              <div className="flex items-center gap-1.5 px-3 py-2 rounded-full" style={{ background: 'var(--a-blue-1)' }}>
+                  <Timer className="w-4 h-4" style={{ color: 'var(--a-blue-ink)' }} />
+                  <span className="text-sm font-bold" style={{ color: 'var(--a-blue-ink)' }}>{selectedRecipe.prep_time} {tr("recipes_deq_780a5c", "d\u0259q")}</span>
+                </div>
+              }
+              {selectedRecipe.cook_time && selectedRecipe.cook_time > 0 &&
+              <div className="flex items-center gap-1.5 px-3 py-2 rounded-full" style={{ background: 'var(--a-peach-1)' }}>
+                  <Flame className="w-4 h-4" style={{ color: 'var(--a-accent-ink)' }} />
+                  <span className="text-sm font-bold" style={{ color: 'var(--a-accent-ink)' }}>{selectedRecipe.cook_time} {tr("recipes_deq_780a5c", "d\u0259q")}</span>
+                </div>
+              }
+              {selectedRecipe.servings &&
+              <div className="flex items-center gap-1.5 px-3 py-2 rounded-full" style={{ background: 'var(--a-green-1)' }}>
+                  <Users className="w-4 h-4" style={{ color: 'var(--a-green-ink)' }} />
+                  <span className="text-sm font-bold" style={{ color: 'var(--a-green-ink)' }}>{selectedRecipe.servings} por.</span>
+                </div>
+              }
             </motion.div>
-          }
 
-          {/* Instructions Section */}
-          {selectedRecipe.instructions && selectedRecipe.instructions.length > 0 &&
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-card rounded-xl overflow-hidden border border-border/50">
-            
-              <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 flex items-center justify-between">
-                <h3 className="font-semibold text-white flex items-center gap-2">
-                  <span className="text-lg">👩‍🍳</span> {tr("recipes_hazirlanma_13bf8d", "Haz\u0131rlanma")}
-                </h3>
-                <span className="text-xs bg-white/20 text-white px-2 py-0.5 rounded-full">
-                  {selectedRecipe.instructions.length} {tr("recipes_addim_74e240", "add\u0131m")}
-                </span>
-              </div>
-              <div className="p-4 space-y-4">
-                {selectedRecipe.instructions.map((instruction, idx) =>
-              <motion.div
-                key={idx}
-                className="flex gap-3"
-                initial={{ x: -10, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.35 + idx * 0.03 }}>
-                
-                    <div className="flex flex-col items-center flex-shrink-0">
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-xs font-bold shadow-md">
+            {/* Description */}
+            {selectedRecipe.description &&
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="a-card">
+              
+                <div className="flex items-start gap-3">
+                  <span className="a-list-icon" style={{ width: 34, height: 34, borderRadius: 11, background: 'var(--a-grad-yellow)', flexShrink: 0 }}>
+                    <Sparkles size={15} strokeWidth={2.2} style={{ color: 'var(--a-warn-ink)' }} />
+                  </span>
+                  <p className="a-cta-text" style={{ margin: 0 }}>{selectedRecipe.description}</p>
+                </div>
+              </motion.div>
+            }
+
+            {/* Ingredients Section */}
+            {selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 &&
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="a-card overflow-hidden"
+              style={{ padding: 0 }}>
+              
+                <div className="px-4 py-3 flex items-center justify-between" style={{ background: 'var(--a-grad-green)' }}>
+                  <h3 className="font-bold a-heading flex items-center gap-2" style={{ margin: 0, color: '#14532d' }}>
+                    <span className="text-lg">🥗</span> {tr("recipes_i_nqrediyentler_4c0854", "\u0130nqrediyentl\u0259r")}
+                  </h3>
+                  <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: 'rgba(255,255,255,0.45)', color: '#14532d' }}>
+                    {selectedRecipe.ingredients.length}
+                  </span>
+                </div>
+                <div className="p-4 space-y-2">
+                  {selectedRecipe.ingredients.map((ingredient, idx) =>
+                <motion.div
+                  key={idx}
+                  className="flex items-center gap-3 py-2"
+                  style={{ borderBottom: idx < selectedRecipe.ingredients!.length - 1 ? '1px solid var(--a-line)' : 'none' }}
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.25 + idx * 0.02 }}>
+                  
+                      <div
+                    className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                    style={{ background: 'var(--a-green-1)', color: 'var(--a-green-ink)' }}>
                         {idx + 1}
                       </div>
-                      {idx < selectedRecipe.instructions!.length - 1 &&
-                  <div className="w-0.5 flex-1 bg-gradient-to-b from-orange-300 to-transparent mt-2 min-h-[20px]" />
-                  }
-                    </div>
-                    <div className="flex-1 pb-2">
-                      <p className="text-sm text-foreground leading-relaxed bg-muted/30 p-3 rounded-xl">{instruction}</p>
-                    </div>
-                  </motion.div>
-              )}
-              </div>
-            </motion.div>
-          }
+                      <span className="text-sm" style={{ color: 'var(--a-ink)' }}>{ingredient}</span>
+                    </motion.div>
+                )}
+                </div>
+              </motion.div>
+            }
 
-          {/* Allergy Warning */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-rose-50 dark:bg-rose-900/10 rounded-xl p-4 border border-rose-200/50 dark:border-rose-800/30">
-            
-            <p className="text-xs text-rose-700 dark:text-rose-300 text-center">
-              {tr("recipes_allergiya_xeberdarligi_bal_ciy_7e75e8", "\u26A0\uFE0F Allergiya X\u0259b\u0259rdarl\u0131\u011F\u0131: Bal, \xE7iy\u0259l\u0259k v\u0259 ya f\u0131st\u0131q kimi qidalara allergiyan\u0131z varsa, h\u0259kiminizl\u0259 m\u0259sl\u0259h\u0259tl\u0259\u015Fin.")}
-            </p>
-          </motion.div>
-        </div>
+            {/* Instructions Section */}
+            {selectedRecipe.instructions && selectedRecipe.instructions.length > 0 &&
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="a-card overflow-hidden"
+              style={{ padding: 0 }}>
+              
+                <div className="px-4 py-3 flex items-center justify-between" style={{ background: 'var(--a-grad-peach)' }}>
+                  <h3 className="font-bold a-heading flex items-center gap-2" style={{ margin: 0, color: 'var(--a-accent-ink)' }}>
+                    <span className="text-lg">👩‍🍳</span> {tr("recipes_hazirlanma_13bf8d", "Haz\u0131rlanma")}
+                  </h3>
+                  <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: 'rgba(255,255,255,0.45)', color: 'var(--a-accent-ink)' }}>
+                    {selectedRecipe.instructions.length} {tr("recipes_addim_74e240", "add\u0131m")}
+                  </span>
+                </div>
+                <div className="p-4 space-y-4">
+                  {selectedRecipe.instructions.map((instruction, idx) =>
+                <motion.div
+                  key={idx}
+                  className="flex gap-3"
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.35 + idx * 0.03 }}>
+                  
+                      <div className="flex flex-col items-center flex-shrink-0">
+                        <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shadow-md"
+                      style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
+                          {idx + 1}
+                        </div>
+                        {idx < selectedRecipe.instructions!.length - 1 &&
+                    <div className="w-0.5 flex-1 mt-2 min-h-[20px]" style={{ background: 'linear-gradient(180deg, var(--a-peach-2), transparent)', opacity: 0.4 }} />
+                    }
+                      </div>
+                      <div className="flex-1 pb-2">
+                        <p className="text-sm leading-relaxed p-3 rounded-xl" style={{ margin: 0, color: 'var(--a-ink)', background: 'var(--a-surface-soft)' }}>{instruction}</p>
+                      </div>
+                    </motion.div>
+                )}
+                </div>
+              </motion.div>
+            }
+
+            {/* Allergy Warning */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="rounded-2xl p-4"
+              style={{ background: 'var(--a-alert-bg)' }}>
+              
+              <p className="text-xs text-center" style={{ margin: 0, color: 'var(--a-alert-ink)' }}>
+                {tr("recipes_allergiya_xeberdarligi_bal_ciy_7e75e8", "\u26A0\uFE0F Allergiya X\u0259b\u0259rdarl\u0131\u011F\u0131: Bal, \xE7iy\u0259l\u0259k v\u0259 ya f\u0131st\u0131q kimi qidalara allergiyan\u0131z varsa, h\u0259kiminizl\u0259 m\u0259sl\u0259h\u0259tl\u0259\u015Fin.")}
+              </p>
+            </motion.div>
+          </div>
+        </ToolPage>
       </div>);
 
   }
 
   return (
-    <div ref={ref} className="min-h-screen bg-gradient-to-b from-amber-50 dark:from-amber-900/10 to-background pb-24">
-      {/* Header */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500" />
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-4 right-4 text-8xl opacity-30">🍳</div>
-          <div className="absolute bottom-0 left-4 text-6xl opacity-20">🥗</div>
-        </div>
-        
-        <div className="relative px-4 pt-4 pb-8 z-20">
-          <div className="flex items-center gap-3 mb-4 relative z-20">
-            <motion.button
-              onClick={onBack}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20"
-              whileTap={{ scale: 0.95 }}>
-              
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </motion.button>
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                <ChefHat className="w-5 h-5" />
-                {tr("recipes_reseptler_98ed2c", "Reseptl\u0259r")}
-              </h1>
-              <p className="text-white/80 text-sm">{tr("recipes_saglam_ve_lezzetli_yemekler_ad49b7", "Sağlam və ləzzətli yeməklər")}</p>
+    <div ref={ref}>
+      <ToolPage>
+        <ToolHeader
+          onBack={onBack}
+          eyebrow={tr("recipes_saglam_ve_lezzetli_yemekler_ad49b7", "Sağlam və ləzzətli yeməklər")}
+          title={tr("recipes_reseptler_98ed2c", "Reseptl\u0259r")} />
+
+        {/* Premium banner for non-premium users */}
+        {!isPremium &&
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="a-card mb-3">
+          
+            <div className="flex items-center gap-3">
+              <span className="a-list-icon" style={{ background: 'var(--a-grad-yellow)', flexShrink: 0 }}>
+                <Crown size={17} strokeWidth={2.2} style={{ color: 'var(--a-warn-ink)' }} />
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="a-list-title" style={{ margin: 0 }}>{tr("recipes_daha_cox_resept_975410", "Daha çox resept?")}</p>
+                <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>{tr("recipes_her_kateqoriyadan_3_resept_pulsuzdur_ham_42a43d", "Hər kateqoriyadan 3 resept pulsuzdur. Hamısını görmək üçün Premium-a keçin")}</p>
+              </div>
+              <Sparkles className="w-5 h-5 animate-pulse flex-shrink-0" style={{ color: 'var(--a-yellow-2)' }} />
             </div>
-          </div>
+          </motion.div>
+        }
 
-          {/* Premium banner for non-premium users */}
-          {!isPremium &&
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/20 flex items-center gap-4">
-            
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center shadow-lg">
-                <Crown className="w-6 h-6 text-amber-900" />
-              </div>
-              <div className="flex-1">
-                <p className="text-white font-bold">{tr("recipes_daha_cox_resept_975410", "Daha çox resept?")}</p>
-                <p className="text-white/70 text-sm">{tr("recipes_her_kateqoriyadan_3_resept_pulsuzdur_ham_42a43d", "Hər kateqoriyadan 3 resept pulsuzdur. Hamısını görmək üçün Premium-a keçin")}</p>
-              </div>
-              <Sparkles className="w-5 h-5 text-amber-300 animate-pulse" />
-            </motion.div>
-          }
-        </div>
-      </div>
-
-      <div className="px-4 -mt-4 relative z-10">
         {/* Search */}
         <motion.div
-          className="relative mb-4"
+          className="a-search mb-3"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}>
           
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
+          <Search size={16} style={{ color: 'var(--a-ink-faint)', flexShrink: 0 }} />
+          <input
             value={recipeSearch}
             onChange={(e) => setRecipeSearch(e.target.value)}
-            placeholder={tr("untranslated_resept_axtar_8odzsd", "Resept axtar...")}
-            className="pl-12 h-12 text-base bg-card shadow-lg rounded-2xl border-0" />
+            placeholder={tr("untranslated_resept_axtar_8odzsd", "Resept axtar...")} />
           
         </motion.div>
 
@@ -509,18 +486,17 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
           <motion.button
             key={category.id}
             onClick={() => setRecipeCategory(category.id)}
-            className={`flex-shrink-0 px-4 py-2.5 rounded-2xl flex items-center gap-2 transition-all ${
-            recipeCategory === category.id ?
-            'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-orange-500/30' :
-            'bg-card text-muted-foreground shadow-sm hover:shadow-md'}`
-            }
+            className="flex-shrink-0 px-4 py-2.5 rounded-full flex items-center gap-2 transition-all"
+            style={recipeCategory === category.id ?
+            { background: 'var(--a-grad-cta)', border: '1px solid var(--a-btn-border)', color: 'var(--a-accent-ink)', boxShadow: 'var(--a-card-shadow)' } :
+            { background: 'var(--a-surface)', border: '1px solid var(--a-line)', color: 'var(--a-ink-soft)' }}
             whileTap={{ scale: 0.95 }}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 + idx * 0.03 }}>
             
               <span className="text-lg">{category.emoji}</span>
-              <span className="text-sm font-medium">{getTranslatedCategoryName(category.id) || category.name}</span>
+              <span className="text-sm font-bold">{getTranslatedCategoryName(category.id) || category.name}</span>
             </motion.button>
           )}
         </motion.div>
@@ -530,26 +506,27 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
           {recipesLoading ?
           <div className="grid grid-cols-2 gap-3">
               {[...Array(4)].map((_, i) =>
-            <div key={i} className="bg-card rounded-2xl overflow-hidden shadow-sm animate-pulse">
-                  <div className="h-28 bg-muted" />
+            <div key={i} className="a-card overflow-hidden animate-pulse" style={{ padding: 0 }}>
+                  <div className="h-28" style={{ background: 'var(--a-surface-soft)' }} />
                   <div className="p-3 space-y-2">
-                    <div className="h-4 bg-muted rounded-full w-3/4" />
-                    <div className="h-3 bg-muted rounded-full w-1/2" />
+                    <div className="h-4 rounded-full w-3/4" style={{ background: 'var(--a-surface-soft)' }} />
+                    <div className="h-3 rounded-full w-1/2" style={{ background: 'var(--a-surface-soft)' }} />
                   </div>
                 </div>
             )}
             </div> :
           filteredRecipes.length === 0 ?
           <motion.div
-            className="text-center py-12"
+            className="a-card text-center"
+            style={{ padding: '34px 18px' }}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}>
             
-              <div className="w-20 h-20 mx-auto mb-4 rounded-3xl bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/20 flex items-center justify-center">
-                <UtensilsCrossed className="w-10 h-10 text-amber-500" />
+              <div className="w-20 h-20 mx-auto mb-4 rounded-3xl flex items-center justify-center" style={{ background: 'var(--a-illus-grad)' }}>
+                <UtensilsCrossed className="w-10 h-10" style={{ color: 'var(--a-peach-2)' }} />
               </div>
-              <p className="text-muted-foreground font-medium">{tr("recipes_resept_tapilmadi_dde89b", "Resept tapılmadı")}</p>
-              <p className="text-sm text-muted-foreground/70 mt-1">{tr("recipes_basqa_kateqoriya_yoxlayin_31917a", "Başqa kateqoriya yoxlayın")}</p>
+              <p className="a-list-title" style={{ margin: 0 }}>{tr("recipes_resept_tapilmadi_dde89b", "Resept tapılmadı")}</p>
+              <p className="a-list-sub mt-1" style={{ margin: '4px 0 0', whiteSpace: 'normal' }}>{tr("recipes_basqa_kateqoriya_yoxlayin_31917a", "Başqa kateqoriya yoxlayın")}</p>
             </motion.div> :
 
           <div className="grid grid-cols-2 gap-3">
@@ -557,16 +534,17 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
             <div
               key={recipe.id}
               onClick={() => handleRecipeClick(recipe)}
-              className="relative bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all text-left group cursor-pointer active:scale-[0.98]">
+              className="relative overflow-hidden text-left group cursor-pointer active:scale-[0.98] transition-all rounded-[20px]"
+              style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', boxShadow: 'var(--a-card-shadow)' }}>
               
                   {/* Lock overlay for non-premium non-free recipes */}
                   {!isPremium && !isRecipeFree(recipe) &&
-              <div className="absolute inset-0 bg-background/60 backdrop-blur-md flex items-center justify-center z-10">
+              <div className="absolute inset-0 backdrop-blur-md flex items-center justify-center z-10" style={{ background: 'var(--a-chip-overlay)' }}>
                       <div className="flex flex-col items-center gap-1">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg">
-                          <Lock className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'var(--a-grad-yellow)' }}>
+                          <Lock className="w-5 h-5" style={{ color: 'var(--a-warn-ink)' }} />
                         </div>
-                        <span className="text-xs font-bold text-amber-600 dark:text-amber-400">Premium</span>
+                        <span className="text-xs font-bold" style={{ color: 'var(--a-yellow-ink)' }}>Premium</span>
                       </div>
                     </div>
               }
@@ -582,7 +560,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /> :
 
 
-                <div className="w-full h-full bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/20 flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--a-illus-grad)' }}>
                         <span className="text-5xl group-hover:scale-110 transition-transform duration-300">{recipe.emoji || '🍽️'}</span>
                       </div>
                 }
@@ -598,27 +576,30 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                     {/* Favorite button */}
                     <motion.button
                   onClick={(e) => toggleFavorite(recipe.id, e)}
-                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 dark:bg-card/90 backdrop-blur-sm flex items-center justify-center shadow-md z-20"
+                  className="absolute top-2 right-2 w-7 h-7 rounded-full backdrop-blur-sm flex items-center justify-center shadow-md z-20"
+                  style={{ background: 'rgba(255,255,255,0.9)' }}
                   whileTap={{ scale: 0.8 }}>
                   
-                      <Heart className={`w-3.5 h-3.5 ${favorites.includes(recipe.id) ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+                      <Heart
+                    className="w-3.5 h-3.5"
+                    style={favorites.includes(recipe.id) ? { fill: 'var(--a-pink-2)', color: 'var(--a-pink-2)' } : { color: 'var(--a-ink-faint)' }} />
                     </motion.button>
                   </div>
 
                   <div className="p-3">
-                    <h3 className="font-bold text-sm text-foreground line-clamp-2 mb-1">{recipe.title}</h3>
+                    <h3 className="font-bold text-sm line-clamp-2 mb-1" style={{ color: 'var(--a-ink)' }}>{recipe.title}</h3>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
                         {getTranslatedCategoryName(recipe.category)}
                       </span>
                       <div className="flex items-center gap-1.5">
                         {!isRecipeFree(recipe) &&
-                        <span className="flex items-center gap-0.5 text-[9px] font-bold text-amber-500">
+                        <span className="flex items-center gap-0.5 text-[9px] font-bold" style={{ color: 'var(--a-yellow-2)' }}>
                           <Crown className="w-3 h-3" />
                         </span>
                         }
                         {recipe.servings &&
-                        <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                        <span className="text-[10px] flex items-center gap-0.5" style={{ color: 'var(--a-ink-soft)' }}>
                           <Users className="w-3 h-3" />
                           {recipe.servings}
                         </span>
@@ -635,7 +616,8 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
         {/* Recipe count */}
         {!recipesLoading && filteredRecipes.length > 0 &&
         <motion.p
-          className="text-center text-xs text-muted-foreground mt-6"
+          className="text-center text-xs mt-6"
+          style={{ color: 'var(--a-on-bg-soft)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}>
@@ -643,14 +625,14 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
             {filteredRecipes.length} {tr("recipes_resept_tapildi_1d8733", "resept tap\u0131ld\u0131")}
           </motion.p>
         }
-      </div>
 
-      {/* Premium Modal */}
-      <PremiumModal
-        isOpen={showPremiumModal}
-        onClose={() => setShowPremiumModal(false)}
-        feature={tr("recipes_reseptler_98ed2c", "Reseptl\u0259r")} />
-      
+        {/* Premium Modal */}
+        <PremiumModal
+          isOpen={showPremiumModal}
+          onClose={() => setShowPremiumModal(false)}
+          feature={tr("recipes_reseptler_98ed2c", "Reseptl\u0259r")} />
+        
+      </ToolPage>
     </div>);
 
 });

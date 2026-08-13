@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Stethoscope, BookOpen, Camera, Music, 
-  Baby, Thermometer, AlertCircle, Sparkles, Star, Heart, LucideIcon, Lock, Crown
+  Baby, Thermometer, AlertCircle, Sparkles, Star, Heart, LucideIcon, Crown
 } from 'lucide-react';
 import { hapticFeedback } from '@/lib/native';
 import { useQuickActions } from '@/hooks/useQuickActions';
@@ -22,9 +22,14 @@ interface QuickActionsBarProps {
   onNavigateToTool?: (tool: string) => void;
 }
 
+/**
+ * Quick access grid — redesigned to the anacan-demo "a-trio" tiles.
+ * Premium-gated tools show a crown chip and open the premium modal.
+ * All data (quick_actions table, tool configs, disabled tools) unchanged.
+ */
 const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
   const { selectedChild, getChildAge } = useChildren();
-  const { lifeStage, language } = useUserStore();
+  const { lifeStage } = useUserStore();
   const { isPremium } = useSubscription();
   const { data: toolConfigs = [] } = useToolConfigs(lifeStage);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -58,22 +63,6 @@ const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
     onNavigateToTool?.(toolKey);
   };
 
-  if (isLoading) {
-    return (
-      <motion.div
-        className="bg-card rounded-2xl p-3 shadow-card border border-border/50"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-      >
-        <div className="grid grid-cols-4 gap-2">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-16 bg-muted/50 rounded-xl animate-pulse" />
-          ))}
-        </div>
-      </motion.div>
-    );
-  }
-
   const getTranslationKey = (toolKey: string): string => {
     const normalized = toolKey.replace(/-/g, '_');
     if (normalized === 'baby_photo') return 'quick_action_baby_photoshoot';
@@ -81,18 +70,30 @@ const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
     return `quick_action_${normalized}`;
   };
 
+  if (isLoading) {
+    return (
+      <section className="a-section">
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading">{tr('quickactionsbar_quick_access', 'Sürətli keçid')}</h2>
+        </div>
+        <div className="a-trio cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="a-trio-item animate-pulse" style={{ height: 84 }} />
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <>
-      <motion.div
-        className="bg-card rounded-2xl p-3 shadow-card border border-border/50"
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.05 }}
-      >
-        <p className="text-[10px] text-muted-foreground font-medium mb-2 px-1">
-          {ageGroup === 'newborn' ? tr('quickactionsbar_for_newborn', 'Yenidoğan üçün') : tr('quickactionsbar_quick_access', 'Sürətli keçid')}
-        </p>
-        <div className="grid grid-cols-4 gap-2">
+      <section className="a-section">
+        <div className="a-section-head">
+          <h2 className="a-section-title a-heading">
+            {tr('quickactionsbar_quick_access', 'Sürətli keçid')}
+          </h2>
+        </div>
+        <div className="a-trio cols-4">
           {filteredActions.map((action, idx) => {
             const IconComponent = ICON_MAP[action.icon] || Star;
             const needsPremium = !isPremium && isToolPremium(action.tool_key);
@@ -100,24 +101,27 @@ const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
               <motion.button
                 key={action.id}
                 onClick={() => handleAction(action.tool_key)}
-                className="relative bg-gradient-to-br from-primary to-primary/80 rounded-xl p-3 flex flex-col items-center gap-1.5 text-primary-foreground shadow-sm"
+                className="a-trio-item"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.1 + idx * 0.05 }}
-                whileTap={{ scale: 0.9 }}
+                transition={{ delay: 0.05 + idx * 0.04 }}
+                whileTap={{ scale: 0.92 }}
+                aria-label={needsPremium ? `${action.label} — Premium` : action.label}
               >
                 {needsPremium && (
-                  <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-amber-400/30 flex items-center justify-center">
-                    <Lock className="w-2.5 h-2.5 text-amber-200" />
-                  </div>
+                  <span className="a-crown-chip">
+                    <Crown size={11} strokeWidth={2.6} />
+                  </span>
                 )}
-                <IconComponent className="w-5 h-5" />
-                <span className="text-[10px] font-bold">{tr(getTranslationKey(action.tool_key), action.label_az || action.label)}</span>
+                <span className="a-trio-icon" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
+                  <IconComponent size={17} strokeWidth={2} />
+                </span>
+                <p className="a-trio-label">{tr(getTranslationKey(action.tool_key), action.label_az || action.label)}</p>
               </motion.button>
             );
           })}
         </div>
-      </motion.div>
+      </section>
 
       <PremiumModal
         isOpen={showPremiumModal}

@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { getLocaleTag } from '@/lib/i18n';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Camera, Save, User, Calendar, Loader2, CalendarDays, Baby, Sparkles, Globe } from 'lucide-react';
+import { ArrowLeft, Camera, Save, User, Calendar, Loader2, CalendarDays, Baby, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
 import countriesData from '../../countries.json';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -22,6 +22,11 @@ interface ProfileEditScreenProps {
 }
 
 type DateInputMode = 'lmp' | 'dueDate';
+
+// Form input stili — ağ səth + zərif haşiyə
+const inputCls = "h-11 rounded-xl";
+const inputStyle: React.CSSProperties = { background: 'var(--a-surface)', borderColor: 'var(--a-line-strong)', color: 'var(--a-ink)' };
+const labelStyle: React.CSSProperties = { fontSize: 12.5, fontWeight: 600, color: 'var(--a-ink-soft)' };
 
 const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
   useScrollToTop();
@@ -83,7 +88,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
 
   const formatDate = (date: Date | null): string => {
     if (!date) return '';
-    const locale = language === 'en' ? 'en-US' : 'az-AZ';
+    const locale = getLocaleTag();
     return date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
@@ -231,51 +236,53 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-background overflow-hidden">
+    <div className="a-scope fixed inset-0 flex flex-col overflow-hidden" style={{ background: 'var(--a-bg)' }}>
       {/* Safe area spacer */}
-      <div className="bg-card flex-shrink-0" style={{ height: 'env(safe-area-inset-top, 0px)' }} />
-      
+      <div className="flex-shrink-0" style={{ height: 'env(safe-area-inset-top, 0px)', background: 'var(--a-nav-bg)' }} />
+
       {/* Header */}
-      <div className="flex-shrink-0 bg-card border-b border-border/50">
-        <div className="px-5 py-4 flex items-center gap-4">
+      <div className="flex-shrink-0" style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
+        <div className="px-4 py-3 flex items-center gap-3">
           <motion.button
             onClick={onBack}
-            className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"
-            whileTap={{ scale: 0.95 }}>
-            
-            <ArrowLeft className="w-5 h-5" />
+            className="a-icon-btn"
+            whileTap={{ scale: 0.95 }}
+            aria-label={tr("common_geri", "Geri")}>
+
+            <ArrowLeft size={16} strokeWidth={2} />
           </motion.button>
-          <h1 className="text-lg font-bold text-foreground flex-1">{tr("profileeditscreen_profili_redakte_et_b5368c", "Profili Redaktə Et")}</h1>
-          <Button onClick={handleSave} disabled={loading} className="gradient-primary">
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+          <h1 className="flex-1 truncate" style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>{tr("profileeditscreen_profili_redakte_et_b5368c", "Profili Redaktə Et")}</h1>
+          <motion.button onClick={handleSave} disabled={loading} className="a-btn-solid disabled:opacity-50" whileTap={{ scale: 0.95 }}>
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save size={14} />}
             {tr("profileeditscreen_saxla", "Saxla")}
-          </Button>
+          </motion.button>
         </div>
       </div>
-      
+
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
 
-        <div className="px-5 py-6 space-y-6">
+        <div className="px-4 py-6 space-y-4 max-w-md mx-auto">
         {/* Avatar Section */}
         <div className="flex flex-col items-center">
           <div className="relative">
-            <Avatar className="w-28 h-28 border-4 border-primary/20">
+            <Avatar className="w-28 h-28" style={{ border: '4px solid var(--a-peach-1)' }}>
               <AvatarImage src={formData.avatar_url || undefined} />
-              <AvatarFallback className="bg-primary/10 text-primary text-3xl font-bold">
+              <AvatarFallback style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', fontSize: 30, fontWeight: 800 }}>
                 {formData.name?.charAt(0) || tr("common_initial_i", "İ")}
               </AvatarFallback>
             </Avatar>
             <motion.button
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 w-10 h-10 rounded-full gradient-primary flex items-center justify-center shadow-lg"
+                className="absolute bottom-0 right-0 w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ background: 'var(--a-peach-2)', boxShadow: '0 10px 20px -8px rgba(217, 108, 74, 0.55)', border: '3px solid var(--a-surface)' }}
                 whileTap={{ scale: 0.95 }}
                 disabled={uploading}>
-                
-              {uploading ?
-                <Loader2 className="w-5 h-5 text-white animate-spin" /> :
 
-                <Camera className="w-5 h-5 text-white" />
+              {uploading ?
+                <Loader2 className="w-4 h-4 text-white animate-spin" /> :
+
+                <Camera className="w-4 h-4 text-white" />
                 }
             </motion.button>
             <input
@@ -284,38 +291,40 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                 accept="image/*"
                 onChange={handleAvatarUpload}
                 className="hidden" />
-              
+
           </div>
-          <p className="text-sm text-muted-foreground mt-2">{tr("profileeditscreen_profil_seklini_deyis_7dbfc6", "Profil şəklini dəyiş")}</p>
+          <p className="mt-2" style={{ fontSize: 12.5, color: 'var(--a-ink-soft)' }}>{tr("profileeditscreen_profil_seklini_deyis_7dbfc6", "Profil şəklini dəyiş")}</p>
         </div>
 
         {/* Basic Info */}
-        <div className="bg-card rounded-2xl p-5 space-y-4 border border-border/50">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <User className="w-4 h-4 text-primary" />
+        <div className="a-card space-y-4">
+          <h3 className="a-card-title flex items-center gap-2">
+            <User size={15} style={{ color: 'var(--a-accent-ink)' }} />
             {tr("profileeditscreen_esas_melumatlar_56bfed", "\u018Fsas M\u0259lumatlar")}
           </h3>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">{tr("untranslated_ad_i34vkg", "Ad")}</label>
+            <label style={labelStyle}>{tr("untranslated_ad_i34vkg", "Ad")}</label>
             <Input
+                className={inputCls}
+                style={inputStyle}
                 value={formData.name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder={tr("profileeditscreen_adiniz_b3e84a", "Adınız")} />
-              
+
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">{tr("authscreen_olke", "Ölkə")}</label>
+            <label style={labelStyle}>{tr("authscreen_olke", "Ölkə")}</label>
             <Select value={formData.country_code} onValueChange={(val) => setFormData(prev => ({ ...prev, country_code: val }))}>
-              <SelectTrigger className="w-full h-11 rounded-xl bg-background border border-input">
+              <SelectTrigger className={`w-full ${inputCls}`} style={inputStyle}>
                 <SelectValue placeholder={tr("authscreen_olke_secin", "Ölkə seçin")} />
               </SelectTrigger>
-              <SelectContent className="max-h-[300px]">
+              <SelectContent className="a-scope max-h-[300px]">
                 {countriesData.map((country) => (
                   <SelectItem key={country.isoAlpha2} value={country.isoAlpha2}>
                     <span className="flex items-center gap-2">
-                      <img src={country.flag.startsWith('data:') ? country.flag : `data:image/png;base64,${country.flag}`} alt="" className="w-6 h-4 object-cover rounded-sm border border-border/50" />
+                      <img src={country.flag.startsWith('data:') ? country.flag : `data:image/png;base64,${country.flag}`} alt="" className="w-6 h-4 object-cover rounded-sm" style={{ border: '1px solid var(--a-line)' }} />
                       {country.name}
                     </span>
                   </SelectItem>
@@ -325,38 +334,40 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Bio</label>
+            <label style={labelStyle}>Bio</label>
             <Textarea
+                className="rounded-xl"
+                style={inputStyle}
                 value={formData.bio}
                 onChange={(e) => setFormData((prev) => ({ ...prev, bio: e.target.value }))}
                 placeholder={tr("profileeditscreen_ozunuz_haqqinda_qisa_melumat_1a283c", "Özünüz haqqında qısa məlumat...")}
                 rows={3} />
-              
+
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Email</label>
-            <Input value={user?.email || ''} disabled className="bg-muted" />
+            <label style={labelStyle}>Email</label>
+            <Input value={user?.email || ''} disabled className={inputCls} style={{ ...inputStyle, background: 'var(--a-surface-soft)' }} />
           </div>
         </div>
 
         {/* Life Stage Settings */}
-        <div className="bg-card rounded-2xl p-5 space-y-4 border border-border/50">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-primary" />
+        <div className="a-card space-y-4">
+          <h3 className="a-card-title flex items-center gap-2">
+            <Calendar size={15} style={{ color: 'var(--a-accent-ink)' }} />
             {tr("profileeditscreen_merhele_0e09aa", "M\u0259rh\u0259l\u0259")}
           </h3>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_merhele_0e09aa", "Mərhələ")}</label>
+            <label style={labelStyle}>{tr("profileeditscreen_merhele_0e09aa", "Mərhələ")}</label>
             <Select
                 value={formData.life_stage}
                 onValueChange={handleLifeStageChange}>
-                
-              <SelectTrigger>
+
+              <SelectTrigger className={`w-full ${inputCls}`} style={inputStyle}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="a-scope">
                 <SelectItem value="flow">{tr("profileeditscreen_menstruasiya_izleyicisi_b0d2dd", "🌸 Menstruasiya izləyicisi")}</SelectItem>
                 <SelectItem value="bump">{tr("profileeditscreen_hamileyem_01937d", "🤰 Hamiləyəm")}</SelectItem>
                 <SelectItem value="mommy">{tr("profileeditscreen_anayam_mommy", "👶 Anayam")}</SelectItem>
@@ -369,24 +380,26 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
             <>
               {/* Date Input Mode Toggle */}
               <div className="space-y-3">
-                <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_tarix_novunu_secin_ad6b20", "Tarix növünü seçin")}</label>
+                <label style={labelStyle}>{tr("profileeditscreen_tarix_novunu_secin_ad6b20", "Tarix növünü seçin")}</label>
                 <ToggleGroup
                   type="single"
                   value={dateInputMode}
                   onValueChange={(value) => value && setDateInputMode(value as DateInputMode)}
                   className="grid grid-cols-2 gap-2">
-                  
+
                   <ToggleGroupItem
                     value="lmp"
-                    className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border">
-                    
+                    className="flex items-center gap-2 h-auto py-3 px-4 rounded-xl border data-[state=on]:bg-[var(--a-peach-1)] data-[state=on]:text-[var(--a-accent-ink)] data-[state=on]:border-[var(--a-peach-2)]"
+                    style={{ borderColor: 'var(--a-line-strong)' }}>
+
                     <CalendarDays className="w-4 h-4" />
                     <span className="text-sm">{tr("profileeditscreen_son_menstruasiya_tarixi_7c9f8a", "📅 Son menstruasiya tarixi:")}</span>
                   </ToggleGroupItem>
                   <ToggleGroupItem
                     value="dueDate"
-                    className="flex items-center gap-2 h-auto py-3 px-4 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-xl border">
-                    
+                    className="flex items-center gap-2 h-auto py-3 px-4 rounded-xl border data-[state=on]:bg-[var(--a-peach-1)] data-[state=on]:text-[var(--a-accent-ink)] data-[state=on]:border-[var(--a-peach-2)]"
+                    style={{ borderColor: 'var(--a-line-strong)' }}>
+
                     <Baby className="w-4 h-4" />
                     <span className="text-sm">{tr("profileeditscreen_dogus_tarixi_e2caea", "Doğuş tarixi")}</span>
                   </ToggleGroupItem>
@@ -396,21 +409,25 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               {/* Date Input based on mode */}
               {dateInputMode === 'lmp' ?
               <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_son_menstruasiyan_ilk_gunu_c79f76", "Son menstruasiyanın ilk günü")}</label>
+                  <label style={labelStyle}>{tr("profileeditscreen_son_menstruasiyan_ilk_gunu_c79f76", "Son menstruasiyanın ilk günü")}</label>
                   <Input
+                  className={inputCls}
+                  style={inputStyle}
                   type="date"
                   value={formData.last_period_date}
                   onChange={(e) => setFormData((prev) => ({ ...prev, last_period_date: e.target.value }))} />
-                
+
                 </div> :
 
               <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_texmini_dogus_tarixi_a8b543", "Təxmini doğuş tarixi")}</label>
+                  <label style={labelStyle}>{tr("profileeditscreen_texmini_dogus_tarixi_a8b543", "Təxmini doğuş tarixi")}</label>
                   <Input
+                  className={inputCls}
+                  style={inputStyle}
                   type="date"
                   value={formData.due_date}
                   onChange={(e) => setFormData((prev) => ({ ...prev, due_date: e.target.value }))} />
-                
+
                 </div>
               }
 
@@ -419,40 +436,43 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-primary/10 rounded-xl p-4 space-y-2">
-                
-                  <div className="flex items-center gap-2 text-primary">
+                className="space-y-2"
+                style={{ background: 'var(--a-peach-1)', borderRadius: 16, padding: 16 }}>
+
+                  <div className="flex items-center gap-2" style={{ color: 'var(--a-accent-ink)' }}>
                     <Sparkles className="w-4 h-4" />
-                    <span className="text-sm font-medium">{tr("profileeditscreen_hesablanmis_melumatlar_b5a420", "Hesablanmış məlumatlar")}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700 }}>{tr("profileeditscreen_hesablanmis_melumatlar_b5a420", "Hesablanmış məlumatlar")}</span>
                   </div>
-                  
+
                   {calculatedDates.calculatedDueDate &&
-                <p className="text-sm text-foreground">
+                <p style={{ fontSize: 13, color: 'var(--a-accent-ink)' }}>
                       {tr("profileeditscreen_texmini_dogus_tarixi_011e51", "\uD83C\uDFAF T\u0259xmini do\u011Fu\u015F tarixi:")} <strong>{formatDate(calculatedDates.calculatedDueDate)}</strong>
                     </p>
                 }
-                  
+
                   {calculatedDates.calculatedLMP &&
-                <p className="text-sm text-foreground">
+                <p style={{ fontSize: 13, color: 'var(--a-accent-ink)' }}>
                       {tr("profileeditscreen_son_menstruasiya_tarixi_7c9f8a", "📅 Son menstruasiya tarixi:")} <strong>{formatDate(calculatedDates.calculatedLMP)}</strong>
                     </p>
                 }
-                  
+
                   {calculatedDates.week > 0 &&
-                <p className="text-sm text-muted-foreground">
+                <p style={{ fontSize: 13, color: 'var(--a-accent-ink)', opacity: 0.85 }}>
                       {tr("profileeditscreen_hazirda_33b3c8", "Hazırda:")} <strong>{calculatedDates.week} {tr("profileeditscreen_hefte_d4c248", "həftə")} {calculatedDates.day} {tr("profileeditscreen_gun_54e78d", "gün")}</strong>
                     </p>
                 }
                 </motion.div>
               }
-              
+
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_korpenin_adi_isteye_bagli_4e76c8", "Körpənin adı (istəyə bağlı)")}</label>
+                <label style={labelStyle}>{tr("profileeditscreen_korpenin_adi_isteye_bagli_4e76c8", "Körpənin adı (istəyə bağlı)")}</label>
                 <Input
+                  className={inputCls}
+                  style={inputStyle}
                   value={formData.baby_name}
                   onChange={(e) => setFormData((prev) => ({ ...prev, baby_name: e.target.value }))}
                   placeholder={tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")} />
-                
+
               </div>
             </>
             }
@@ -461,22 +481,26 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           {formData.life_stage === 'flow' &&
             <>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">{tr("untranslated_son_menstruasiya_tarixi_fgz9t7", "Son menstruasiya tarixi")}</label>
+                <label style={labelStyle}>{tr("untranslated_son_menstruasiya_tarixi_fgz9t7", "Son menstruasiya tarixi")}</label>
                 <Input
+                  className={inputCls}
+                  style={inputStyle}
                   type="date"
                   value={formData.last_period_date}
                   onChange={(e) => setFormData((prev) => ({ ...prev, last_period_date: e.target.value }))} />
-                
+
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_dovrun_uzunlugu_gun_4d99da", "Dövrün uzunluğu (gün)")}</label>
+                <label style={labelStyle}>{tr("profileeditscreen_dovrun_uzunlugu_gun_4d99da", "Dövrün uzunluğu (gün)")}</label>
                 <Input
+                  className={inputCls}
+                  style={inputStyle}
                   type="number"
                   value={formData.cycle_length}
                   onChange={(e) => setFormData((prev) => ({ ...prev, cycle_length: parseInt(e.target.value) || 28 }))}
                   min={10}
                   max={50} />
-                
+
               </div>
             </>
             }
@@ -485,31 +509,35 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           {formData.life_stage === 'mommy' &&
             <>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")}</label>
+                <label style={labelStyle}>{tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")}</label>
                 <Input
+                  className={inputCls}
+                  style={inputStyle}
                   value={formData.baby_name}
                   onChange={(e) => setFormData((prev) => ({ ...prev, baby_name: e.target.value }))}
                   placeholder={tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")} />
-                
+
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">{tr("profileeditscreen_dogus_tarixi_e2caea", "Doğuş tarixi")}</label>
+                <label style={labelStyle}>{tr("profileeditscreen_dogus_tarixi_e2caea", "Doğuş tarixi")}</label>
                 <Input
+                  className={inputCls}
+                  style={inputStyle}
                   type="date"
                   value={formData.baby_birth_date}
                   onChange={(e) => setFormData((prev) => ({ ...prev, baby_birth_date: e.target.value }))} />
-                
+
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">{tr("untranslated_cinsi_az7fty", "Cinsi")}</label>
+                <label style={labelStyle}>{tr("untranslated_cinsi_az7fty", "Cinsi")}</label>
                 <Select
                   value={formData.baby_gender}
                   onValueChange={(value) => setFormData((prev) => ({ ...prev, baby_gender: value as 'boy' | 'girl' }))}>
-                  
-                  <SelectTrigger>
+
+                  <SelectTrigger className={`w-full ${inputCls}`} style={inputStyle}>
                     <SelectValue placeholder={tr("profileeditscreen_secin_5c0c8d", "Seçin")} />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="a-scope">
                     <SelectItem value="boy">{tr("profileeditscreen_oglan_c41cd8", "👦 Oğlan")}</SelectItem>
                     <SelectItem value="girl">{tr("profileeditscreen_qiz_cc9008", "👧 Qız")}</SelectItem>
                   </SelectContent>

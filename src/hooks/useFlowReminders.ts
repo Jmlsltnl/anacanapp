@@ -154,6 +154,15 @@ export const useInitializeFlowReminders = () => {
         is_enabled: true,
         title: tr("useflowreminders_mehsuldar_gunler_b8c031", "Məhsuldar günlər"),
         message: tr("useflowreminders_sabahdan_mehsuldar_gunler_baslayir_fba6cc", "Sabahdan məhsuldar günlər başlayır!")
+      },
+      {
+        user_id: user.id,
+        reminder_type: 'pms',
+        days_before: 0,
+        time_of_day: '09:00',
+        is_enabled: true,
+        title: tr("useflowreminders_pms_dovru_16f417", "PMS Dövrü"),
+        message: tr("useflowreminders_pms_yaxinlasir_ozune_bax", "PMS dövrü yaxınlaşır — özünə qayğı göstər! ⚡")
       }];
 
 
