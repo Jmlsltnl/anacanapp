@@ -58,6 +58,8 @@ export async function signInWithAppleNative() {
   // Plugin tipləri clientId/redirectURI tələb edir, amma native iOS axınında
   // istifadə olunmurlar (yalnız web axını üçündür) — davranış dəyişmir.
   const res = await SignInWithApple.authorize({
+    clientId: "com.atlasoon.anacan",
+    redirectURI: `${window.location.origin}/`,
     scopes: "email name",
     state: "signin",
     nonce: hashedNonce,
