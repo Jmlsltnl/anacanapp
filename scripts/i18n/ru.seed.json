@@ -4590,5 +4590,9 @@
   "flowdashboard_reproduktiv_dovr_80642c": "Фертильное окно",
   "flowdashboard_ovulyasiya_gunu_811e84": "День овуляции",
   "livetimer_channel_name": "Таймеры",
-  "livetimer_channel_desc": "Активные таймеры кормления / сна"
+  "livetimer_channel_desc": "Активные таймеры кормления / сна",
+  "babynames_ai_search": "Искать с AI: {name}",
+  "babynames_ai_searching": "AI ищет...",
+  "babynames_ai_notfound": "AI не распознал это имя — проверьте написание",
+  "babynames_ai_error": "AI-поиск не удался — попробуйте ещё раз"
 }

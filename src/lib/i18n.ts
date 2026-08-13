@@ -85,9 +85,9 @@ const FALLBACK_LANGUAGES: AppLanguage[] = [
  * ru/tr istifadəçilərə açmaq üçün DB-də is_active=true etmək kifayətdir — app release lazım deyil.
  * Şəbəkə/RLS xətasında az+en fallback qaytarır.
  */
-/** DEV-only: lokal sınaq üçün ru/tr-ni siyahıya əlavə et (prod build-də silinir). */
+/** ru/tr bu bundle-da HƏMİŞƏ seçilə bilir (DB app_languages.is_active-dən asılı olmayaraq).
+    Köhnə buildlər köhnə bundle daşıdığı üçün onlarda görünmür — yalnız yeni web/build. */
 function withDevLanguages(list: AppLanguage[]): AppLanguage[] {
-  if (!import.meta.env.DEV) return list;
   const have = new Set(list.map((l) => l.code));
   const extras: AppLanguage[] = [
     { code: 'tr', name: 'Turkish', native_name: 'Türkçe' },

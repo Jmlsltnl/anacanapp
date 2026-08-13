@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { tr } from '@/lib/tr';
 import { Globe, Check } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
@@ -72,9 +73,9 @@ export default function LanguageSelector() {
         <span className="text-xs font-semibold text-primary uppercase">{current.code}</span>
       </button>
 
-      {open &&
+      {open && createPortal(
       <div
-        className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-4"
+        className="fixed inset-0 z-[95] bg-black/50 flex items-end sm:items-center justify-center p-4"
         onClick={() => !switching && setOpen(false)}>
         
           <div
@@ -106,7 +107,8 @@ export default function LanguageSelector() {
               {tr("languageselector_dili_deyisdikden_sonra_tetbiq__ad3607", "Dili d\u0259yi\u015Fdikd\u0259n sonra t\u0259tbiq yenil\u0259n\u0259c\u0259k. / The app will reload after changing language.")}
             </p>
           </div>
-        </div>
+        </div>,
+      document.body)
       }
     </>);
 

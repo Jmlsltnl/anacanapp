@@ -4590,5 +4590,9 @@
   "flowdashboard_reproduktiv_dovr_80642c": "Doğurgan Dönem",
   "flowdashboard_ovulyasiya_gunu_811e84": "Yumurtlama Günü",
   "livetimer_channel_name": "Zamanlayıcılar",
-  "livetimer_channel_desc": "Aktif emzirme / uyku zamanlayıcıları"
+  "livetimer_channel_desc": "Aktif emzirme / uyku zamanlayıcıları",
+  "babynames_ai_search": "AI ile ara: {name}",
+  "babynames_ai_searching": "AI arıyor...",
+  "babynames_ai_notfound": "AI bu adı tanımadı — yazımı kontrol edin",
+  "babynames_ai_error": "AI araması başarısız — tekrar deneyin"
 }

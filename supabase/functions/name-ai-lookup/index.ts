@@ -1,0 +1,174 @@
+/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+
+// name-ai-lookup: Körpə adları alətində tapılmayan adı AI ilə axtarır,
+// mənasını 4 dildə çıxarır və bazaya yazır (safety-ai-lookup pattern-i).
+// Bir dəfə axtarılan ad bir daha AI-ya getmir — DB-dən gəlir.
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { requireUser } from "../_shared/auth.ts";
+import { callGeminiSmart } from "../_shared/vertex-ai.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface NameRequest {
+  name: string;
+  language?: string; // az | en | ru | tr
+}
+
+const LANG_FIELD: Record<string, { meaning: string; origin: string }> = {
+  az: { meaning: 'meaning_az', origin: 'origin' },
+  en: { meaning: 'meaning_en', origin: 'origin_en' },
+  ru: { meaning: 'meaning_ru', origin: 'origin_ru' },
+  tr: { meaning: 'meaning_tr', origin: 'origin_tr' },
+};
+
+/** Adı bazadakı standart formaya salır: "aylin" → "Aylin" */
+function properCase(s: string): string {
+  const t = s.trim().toLocaleLowerCase('az');
+  return t.charAt(0).toLocaleUpperCase('az') + t.slice(1);
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const auth = await requireUser(req);
+    if (auth.error) return auth.error;
+
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+      throw new Error('Supabase credentials not configured');
+    }
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    const { name: rawName, language = 'az' } = await req.json() as NameRequest;
+    const lang = ['az', 'en', 'ru', 'tr'].includes(language) ? language : 'az';
+
+    const name = properCase(String(rawName || ''));
+    if (name.length < 2 || name.length > 30 || !/^[\p{L}\s'-]+$/u.test(name)) {
+      return new Response(JSON.stringify({ success: false, error: 'invalid_name' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // 1) Artıq bazadadır? (istənilən lang seqmentində — dublikat yaratmayaq)
+    const { data: existing } = await supabase
+      .from('baby_names_db')
+      .select('*')
+      .ilike('name', name)
+      .eq('is_active', true)
+      .limit(1)
+      .maybeSingle();
+
+    if (existing) {
+      const f = LANG_FIELD[lang];
+      return new Response(JSON.stringify({
+        success: true,
+        found: true,
+        fromDb: true,
+        item: existing,
+        display: {
+          name: existing.name,
+          gender: existing.gender,
+          meaning: existing[f.meaning] || existing.meaning_az || existing.meaning,
+          origin: existing[f.origin] || existing.origin,
+          popularity: existing.popularity || 0,
+        },
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // 2) AI axtarışı — 4 dildə məna + mənşə
+    const prompt = `Sən körpə adları üzrə etimoloji məlumat bazasısan.
+Ad: "${name}"
+
+Bu adın həqiqi şəxs adı olub-olmadığını müəyyən et (Azərbaycan, türk, ərəb, fars, rus, Avropa və s. mənşəli qadın/kişi adları).
+
+QAYDALAR:
+1. YALNIZ aşağıdakı JSON formatında cavab ver (başqa heç nə yazma, markdown yox):
+{"found":true,"gender":"girl","origin_az":"Ərəb mənşəli","origin_en":"Arabic","origin_ru":"Арабское","origin_tr":"Arapça kökenli","meaning_az":"...","meaning_en":"...","meaning_ru":"...","meaning_tr":"..."}
+2. gender: "boy" | "girl" | "unisex"
+3. Hər meaning_* qısa və dəqiq olsun (maksimum 120 simvol), həmin dildə yazılsın.
+4. Ad real şəxs adı deyilsə (təsadüfi söz, əşya, təhqir və s.): {"found":false}
+5. Uydurma etimologiya vermə — əmin deyilsənsə found:false qaytar.`;
+
+    const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+    let aiText = '';
+    for (const model of models) {
+      const resp = await callGeminiSmart(model, {
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 1024 },
+      });
+      if (resp.ok) {
+        const g = await resp.json();
+        aiText = g?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+        if (aiText) break;
+      }
+    }
+
+    const m = aiText.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('AI response parse failed');
+    const parsed = JSON.parse(m[0]);
+
+    if (!parsed.found) {
+      return new Response(JSON.stringify({ success: true, found: false }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const gender = ['boy', 'girl', 'unisex'].includes(parsed.gender) ? parsed.gender : 'unisex';
+    const clip = (v: unknown, n: number) => String(v ?? '').slice(0, n);
+
+    // 3) Bazaya yaz — istifadəçinin dil seqmentinə (lang) düşür,
+    //    bütün dillərin tərcümələri ilə birlikdə
+    const row = {
+      name,
+      gender,
+      lang,
+      origin: clip(parsed.origin_az, 80),
+      origin_en: clip(parsed.origin_en, 80),
+      origin_ru: clip(parsed.origin_ru, 80),
+      origin_tr: clip(parsed.origin_tr, 80),
+      meaning: clip(parsed.meaning_az, 200),
+      meaning_az: clip(parsed.meaning_az, 200),
+      meaning_en: clip(parsed.meaning_en, 200),
+      meaning_ru: clip(parsed.meaning_ru, 200),
+      meaning_tr: clip(parsed.meaning_tr, 200),
+      popularity: 25,
+      is_active: true,
+    };
+
+    const { data: inserted, error: insErr } = await supabase
+      .from('baby_names_db')
+      .insert(row)
+      .select()
+      .maybeSingle();
+
+    if (insErr) console.error('name insert failed:', insErr.message);
+
+    const f = LANG_FIELD[lang];
+    return new Response(JSON.stringify({
+      success: true,
+      found: true,
+      fromDb: false,
+      item: inserted ?? row,
+      display: {
+        name,
+        gender,
+        meaning: (row as any)[f.meaning] || row.meaning_az,
+        origin: (row as any)[f.origin] || row.origin,
+        popularity: row.popularity,
+      },
+    }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  } catch (error) {
+    console.error('name-ai-lookup error:', error);
+    return new Response(JSON.stringify({ success: false, error: String((error as Error)?.message ?? error) }), {
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+});

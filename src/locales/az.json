@@ -6765,5 +6765,9 @@
   "pm_feat_flow_symptom": "Simptom hesabatı",
   "pm_feat_flow_reminders": "Xatırlatmalar",
   "livetimer_channel_name": "Taymerlər",
-  "livetimer_channel_desc": "Aktiv süd vermə / yuxu taymerləri"
+  "livetimer_channel_desc": "Aktiv süd vermə / yuxu taymerləri",
+  "babynames_ai_search": "AI ilə axtar: {name}",
+  "babynames_ai_searching": "AI axtarır...",
+  "babynames_ai_notfound": "AI bu adı tanımadı — yazılışı yoxlayın",
+  "babynames_ai_error": "AI axtarışı alınmadı — yenidən cəhd edin"
 }

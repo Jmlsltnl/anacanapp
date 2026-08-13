@@ -1,10 +1,12 @@
 import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Search, Heart, Shuffle, Star, X } from 'lucide-react';
+import { ArrowLeft, Search, Heart, Shuffle, Star, X, Sparkles, Loader2 } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useFavoriteNames } from '@/hooks/useFavoriteNames';
 import { useBabyNames } from '@/hooks/useDynamicContent';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
+import { supabase } from '@/integrations/supabase/client';
 import { tr } from "@/lib/tr";
 import { useUserStore } from '@/store/userStore';
 
@@ -22,6 +24,44 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
   const [selectedName, setSelectedName] = useState<any | null>(null);
   const { favorites, loading: favsLoading, toggleFavorite, isFavorite } = useFavoriteNames();
   const { data: names = [], isLoading } = useBabyNames();
+  const queryClient = useQueryClient();
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiStatus, setAiStatus] = useState<'idle' | 'notfound' | 'error'>('idle');
+
+  // Bazada tapılmayan adı AI ilə axtar → mənası istifadəçi dilində göstərilir
+  // və baza zənginləşir (safety alətindəki pattern)
+  const handleAiSearch = async () => {
+    const q = searchQuery.trim();
+    if (q.length < 2 || aiLoading) return;
+    setAiLoading(true);
+    setAiStatus('idle');
+    try {
+      trackEvent('baby_names_ai_lookup', { name: q });
+      const { data, error } = await supabase.functions.invoke('name-ai-lookup', {
+        body: { name: q, language }
+      });
+      if (error || !data?.success) throw error || new Error('lookup failed');
+      if (!data.found) {
+        setAiStatus('notfound');
+        return;
+      }
+      // Siyahını yenilə (ad artıq bazadadır) və detal modalını aç
+      queryClient.invalidateQueries({ queryKey: ['baby_names'] });
+      setSelectedName({
+        id: data.item?.id || `ai-${Date.now()}`,
+        name: data.display.name,
+        gender: data.display.gender,
+        meaning: data.display.meaning,
+        origin: data.display.origin,
+        popularity: data.display.popularity
+      });
+    } catch (e) {
+      console.error('AI name lookup failed:', e);
+      setAiStatus('error');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const filteredNames = names.filter((name) => {
     const matchesSearch = name.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -210,7 +250,27 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
 
               <Search size={36} style={{ color: 'var(--a-ink-faint)', margin: '0 auto 10px' }} />
               <p className="a-list-title" style={{ marginBottom: 3 }}>{tr("babynames_ad_tapilmadi_cf4c7a", "Ad tapılmadı")}</p>
-              <p className="a-list-sub" style={{ margin: 0 }}>{tr("babynames_axtaris_sorgusunu_deyisin_992b5e", "Axtarış sorğusunu dəyişin")}</p>
+              <p className="a-list-sub" style={{ margin: 0 }}>
+                {aiStatus === 'notfound' ?
+                tr("babynames_ai_notfound", "AI bu adı tanımadı — yazılışı yoxlayın") :
+                aiStatus === 'error' ?
+                tr("babynames_ai_error", "AI axtarışı alınmadı — yenidən cəhd edin") :
+                tr("babynames_axtaris_sorgusunu_deyisin_992b5e", "Axtarış sorğusunu dəyişin")}
+              </p>
+
+              {/* AI axtarış — ad bazada yoxdursa mənasını AI tapıb bazaya yazır */}
+              {searchQuery.trim().length >= 2 &&
+              <motion.button
+                onClick={handleAiSearch}
+                disabled={aiLoading}
+                className="a-btn-solid"
+                style={{ marginTop: 14, justifyContent: 'center', opacity: aiLoading ? 0.6 : 1 }}
+                whileTap={{ scale: aiLoading ? 1 : 0.97 }}>
+                  {aiLoading ?
+                <><Loader2 size={15} className="animate-spin" /> {tr("babynames_ai_searching", "AI axtarır...")}</> :
+                <><Sparkles size={15} strokeWidth={2.2} /> {tr("babynames_ai_search", "AI ilə axtar: {name}").replace('{name}', searchQuery.trim())}</>}
+                </motion.button>
+              }
             </motion.div>
           }
         </section>

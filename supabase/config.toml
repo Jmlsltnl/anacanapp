@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.baby-insight]
 verify_jwt = false
+
+[functions.name-ai-lookup]
+verify_jwt = false

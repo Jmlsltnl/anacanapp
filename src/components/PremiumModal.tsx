@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
 import { X, Crown, Lock, Sparkles } from 'lucide-react';
 import { getDynamicIcon } from '@/lib/dynamicIcon';
 import { useEffect, useRef } from 'react';
@@ -75,7 +76,8 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const featureLabel = feature ? (FEATURE_LABELS[feature] ?? feature) : '';
   const featureLockText = feature ? cfg.feature_lock_text.replace('{feature}', featureLabel) : '';
 
-  return (
+  // PORTAL: modal transform-lu kartların içindən çağırılır (stacking context tələsi)
+  return createPortal(
     <AnimatePresence>
       {isOpen &&
       <motion.div
@@ -174,7 +176,8 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
           </motion.div>
         </motion.div>
       }
-    </AnimatePresence>);
+    </AnimatePresence>,
+    document.body);
 
 }
 

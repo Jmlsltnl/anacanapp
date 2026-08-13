@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Siren, Baby, X, Check } from 'lucide-react';
 import { useSOSAlert } from '@/hooks/useSOSAlert';
@@ -56,7 +57,9 @@ const MotherSOSSheet = ({ open, onClose, lifeStage }: Props) => {
 
   if (!hasPartner) return null;
 
-  return (
+  // PORTAL: kart transform-lu (framer-motion) valideyn içindədir — fixed overlay
+  // stacking context tələsinə düşüb footer nav-ın altında qalırdı.
+  return createPortal(
     <AnimatePresence>
       {open &&
       <motion.div
@@ -170,7 +173,8 @@ const MotherSOSSheet = ({ open, onClose, lifeStage }: Props) => {
           </motion.div>
         </motion.div>
       }
-    </AnimatePresence>);
+    </AnimatePresence>,
+    document.body);
 
 };
 

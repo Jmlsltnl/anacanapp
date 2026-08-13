@@ -1181,61 +1181,6 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
         </section>
       }
 
-      {/* Weekly review — Premium (Flo-stil blur teaser) */}
-      <PremiumBlurGate
-        feature="weekly_stats"
-        title={tr('premiumgate_weekly_title', 'Həftəlik inkişaf icmalı')}
-        subtitle={tr('premiumgate_weekly_sub', 'Yuxu, qidalanma və bez statistikası — körpənizin həftəlik analizi Premium-da')}
-      >
-        <QuickStatsWidget />
-      </PremiumBlurGate>
-
-      {/* Teething — Premium */}
-      <div className="a-section">
-        <PremiumBlurGate
-          feature="teething"
-          title={tr('premiumgate_teething_title', 'Diş çıxarma izləyicisi')}
-          subtitle={tr('premiumgate_teething_sub', 'Hər dişin vaxtı, simptomlar və rahatlatma bələdçisi Premium-da')}
-          blur="sm"
-        >
-          <TeethingWidget onOpen={() => onNavigateToTool?.('teething')} />
-        </PremiumBlurGate>
-      </div>
-
-      {/* Growth — Premium */}
-      <div className="a-section">
-        <PremiumBlurGate
-          feature="growth"
-          title={tr('premiumgate_growth_title', 'Boy-çəki artım əyriləri')}
-          subtitle={tr('premiumgate_growth_sub', 'ÜST standartları ilə müqayisəli inkişaf qrafikləri Premium-da')}
-        >
-          <GrowthTrackerWidget />
-        </PremiumBlurGate>
-      </div>
-
-      {/* Cakes cross-sell — navigate to cakes tab, hide after 12 months, hide if disabled for language */}
-      {!isToolDisabled('cakes') && babyData.ageInMonths < 12 &&
-      <section className="a-section">
-          <motion.button
-          className="a-card a-fade-in"
-          style={{ width: '100%', textAlign: 'left', cursor: 'pointer', padding: '14px 18px' }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => onNavigateToTool?.('cakes')}>
-          
-            <div className="a-rank-row" style={{ borderTop: 'none', padding: 0 }}>
-              <span className="a-rank-avatar" style={{ background: 'var(--a-peach-1)', fontSize: 20 }}>🎂</span>
-              <div style={{ minWidth: 0 }}>
-                <p className="a-rank-title">{tr("dashboard_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</p>
-                <p className="a-rank-sub">
-                  {babyData.ageInMonths > 0 ? tr('dashboard_order_monthly_cake', '{n}-ci aylıq tortunu sifariş ver!').replace('{n}', String(babyData.ageInMonths + 1)) : tr("dashboard_korpeniz_ucun_milestone_tortla_3bcbc1", "K\xF6rp\u0259niz \xFC\xE7\xFCn milestone tortlar\u0131")}
-                </p>
-              </div>
-              <ChevronRight className="a-list-chevron" style={{ marginLeft: 'auto' }} size={18} />
-            </div>
-          </motion.button>
-        </section>
-      }
-
       {/* Log today — water + trackers + summary */}
       <section className="a-section">
         <div className="a-section-head">
@@ -1722,6 +1667,61 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
         </div>
       </motion.div>
 
+      {/* Weekly review — Premium (Flo-stil blur teaser) */}
+      <PremiumBlurGate
+        feature="weekly_stats"
+        title={tr('premiumgate_weekly_title', 'Həftəlik inkişaf icmalı')}
+        subtitle={tr('premiumgate_weekly_sub', 'Yuxu, qidalanma və bez statistikası — körpənizin həftəlik analizi Premium-da')}
+      >
+        <QuickStatsWidget />
+      </PremiumBlurGate>
+
+      {/* Teething — Premium */}
+      <div className="a-section">
+        <PremiumBlurGate
+          feature="teething"
+          title={tr('premiumgate_teething_title', 'Diş çıxarma izləyicisi')}
+          subtitle={tr('premiumgate_teething_sub', 'Hər dişin vaxtı, simptomlar və rahatlatma bələdçisi Premium-da')}
+          blur="sm"
+        >
+          <TeethingWidget onOpen={() => onNavigateToTool?.('teething')} />
+        </PremiumBlurGate>
+      </div>
+
+      {/* Growth — Premium */}
+      <div className="a-section">
+        <PremiumBlurGate
+          feature="growth"
+          title={tr('premiumgate_growth_title', 'Boy-çəki artım əyriləri')}
+          subtitle={tr('premiumgate_growth_sub', 'ÜST standartları ilə müqayisəli inkişaf qrafikləri Premium-da')}
+        >
+          <GrowthTrackerWidget />
+        </PremiumBlurGate>
+      </div>
+
+      {/* Cakes cross-sell — navigate to cakes tab, hide after 12 months, hide if disabled for language */}
+      {!isToolDisabled('cakes') && babyData.ageInMonths < 12 &&
+      <section className="a-section">
+          <motion.button
+          className="a-card a-fade-in"
+          style={{ width: '100%', textAlign: 'left', cursor: 'pointer', padding: '14px 18px' }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onNavigateToTool?.('cakes')}>
+          
+            <div className="a-rank-row" style={{ borderTop: 'none', padding: 0 }}>
+              <span className="a-rank-avatar" style={{ background: 'var(--a-peach-1)', fontSize: 20 }}>🎂</span>
+              <div style={{ minWidth: 0 }}>
+                <p className="a-rank-title">{tr("dashboard_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</p>
+                <p className="a-rank-sub">
+                  {babyData.ageInMonths > 0 ? tr('dashboard_order_monthly_cake', '{n}-ci aylıq tortunu sifariş ver!').replace('{n}', String(babyData.ageInMonths + 1)) : tr("dashboard_korpeniz_ucun_milestone_tortla_3bcbc1", "K\xF6rp\u0259niz \xFC\xE7\xFCn milestone tortlar\u0131")}
+                </p>
+              </div>
+              <ChevronRight className="a-list-chevron" style={{ marginLeft: 'auto' }} size={18} />
+            </div>
+          </motion.button>
+        </section>
+      }
+
       {/* Milestones with Carousel */}
       <section className="a-section">
         <div className="a-section-head">
@@ -1930,7 +1930,9 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
 
           {/* Partnyorum kartı — sevgi statistikası, təşəkkür, SOS/Doğuş siqnalı */}
           {profile?.linked_partner_id &&
-          <PartnerCareCard lifeStage={lifeStage} onOpenSharing={onNavigate ? () => onNavigate('partner-sharing') : undefined} />
+          <div className="a-section" style={{ marginTop: 14 }}>
+            <PartnerCareCard lifeStage={lifeStage} onOpenSharing={onNavigate ? () => onNavigate('partner-sharing') : undefined} />
+          </div>
           }
 
           {/* Recent Blog Posts */}

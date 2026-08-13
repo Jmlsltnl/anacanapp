@@ -11,9 +11,8 @@
  *  - Bump dashboard: hero, tövsiyələr, bədən dəyişiklikləri, körpə inkişafı, trimester
  *  - Flow: hero, bugün üçün, gecikmə, period təqvimi, faza məsləhətləri, qarşıdan gələnlər
  *  - Alətlər: shop (ikinci əl), cakes, tövsiyə məhsullar, blog
- *  - TƏHLÜKƏSİZLİK İSTİSNASI: danger-signs + first-aid free saxlanılıb —
- *    təcili tibbi məlumatı paywall arxasına qoymaq həm etik, həm də
- *    App Store review riskidir. (İstəsəniz siyahıdan çıxarın.)
+ *  - first-aid free saxlanılıb (təcili tibbi məlumat — etik + App Store review).
+ *    danger-signs istifadəçi qərarı ilə premium edildi.
  */
 
 const FREE_TOOL_IDS = new Set<string>([
@@ -23,7 +22,6 @@ const FREE_TOOL_IDS = new Set<string>([
 'affiliate', 'affiliate-products',
 'blog',
 // Təhlükəsizlik istisnası
-'danger-signs',
 'first-aid']
 );
 

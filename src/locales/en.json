@@ -8287,5 +8287,9 @@
   "pm_feat_flow_symptom": "Symptom report",
   "pm_feat_flow_reminders": "Reminders",
   "livetimer_channel_name": "Timers",
-  "livetimer_channel_desc": "Active feeding / sleep timers"
+  "livetimer_channel_desc": "Active feeding / sleep timers",
+  "babynames_ai_search": "Search with AI: {name}",
+  "babynames_ai_searching": "AI is searching...",
+  "babynames_ai_notfound": "AI didn't recognize this name — check the spelling",
+  "babynames_ai_error": "AI search failed — try again"
 }
