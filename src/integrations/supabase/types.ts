@@ -5195,6 +5195,8 @@ export type Database = {
         Row: {
           body: string
           body_en: string | null
+          body_ru: string | null
+          body_tr: string | null
           created_at: string
           day_number: number
           emoji: string | null
@@ -5203,11 +5205,15 @@ export type Database = {
           send_time: string
           title: string
           title_en: string | null
+          title_ru: string | null
+          title_tr: string | null
           updated_at: string
         }
         Insert: {
           body: string
           body_en?: string | null
+          body_ru?: string | null
+          body_tr?: string | null
           created_at?: string
           day_number: number
           emoji?: string | null
@@ -5216,11 +5222,15 @@ export type Database = {
           send_time?: string
           title: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string
         }
         Update: {
           body?: string
           body_en?: string | null
+          body_ru?: string | null
+          body_tr?: string | null
           created_at?: string
           day_number?: number
           emoji?: string | null
@@ -5229,6 +5239,8 @@ export type Database = {
           send_time?: string
           title?: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -7806,6 +7818,8 @@ export type Database = {
         Row: {
           body: string
           body_en: string | null
+          body_ru: string | null
+          body_tr: string | null
           created_at: string | null
           day_number: number
           emoji: string | null
@@ -7814,11 +7828,15 @@ export type Database = {
           send_time: string
           title: string
           title_en: string | null
+          title_ru: string | null
+          title_tr: string | null
           updated_at: string | null
         }
         Insert: {
           body: string
           body_en?: string | null
+          body_ru?: string | null
+          body_tr?: string | null
           created_at?: string | null
           day_number: number
           emoji?: string | null
@@ -7827,11 +7845,15 @@ export type Database = {
           send_time?: string
           title: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string | null
         }
         Update: {
           body?: string
           body_en?: string | null
+          body_ru?: string | null
+          body_tr?: string | null
           created_at?: string | null
           day_number?: number
           emoji?: string | null
@@ -7840,6 +7862,8 @@ export type Database = {
           send_time?: string
           title?: string
           title_en?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
           updated_at?: string | null
         }
         Relationships: []
