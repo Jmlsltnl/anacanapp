@@ -137,6 +137,7 @@ const AdminContentTranslations = () => {
               <SelectContent>
                 <SelectItem value="ru">Rus (ru)</SelectItem>
                 <SelectItem value="tr">Türk (tr)</SelectItem>
+                <SelectItem value="kk">Qazax (kk)</SelectItem>
                 <SelectItem value="en">İngilis (en) — backfill</SelectItem>
               </SelectContent>
             </Select>
