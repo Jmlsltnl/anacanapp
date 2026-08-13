@@ -34,9 +34,18 @@ export interface PartnerCategory {
   key: string;
   label_az: string;
   label_en: string | null;
+  label_ru?: string | null;
+  label_tr?: string | null;
   icon: string;
   sort_order: number;
 }
+
+/** Kateqoriya adını istifadəçi dilində qaytar */
+export const localizeCategoryLabel = (c: PartnerCategory, language: string): string => {
+  if (language === 'az') return c.label_az;
+  const loc = (c as any)[`label_${language}`];
+  return loc || c.label_en || c.label_az;
+};
 
 export const usePartnerCategories = () => {
   return useQuery({
@@ -66,7 +75,13 @@ export const usePartnerVenues = (categoryKey?: string) => {
       if (categoryKey && categoryKey !== 'all') q = q.eq('category_key', categoryKey);
       const { data, error } = await q;
       if (error) throw error;
-      return (data || []) as PartnerVenue[];
+      // Ölkə hədəfləməsi: countries boş/null = qlobal; dolu = yalnız o ölkələr
+      const store = (await import('@/store/userStore')).useUserStore.getState();
+      const userCountry = store.countryCode || 'AZ';
+      return ((data || []) as PartnerVenue[]).filter((v: any) => {
+        const cs: string[] = Array.isArray(v.countries) ? v.countries : [];
+        return cs.length === 0 || cs.includes(userCountry);
+      });
     },
     staleTime: 1000 * 60 * 5,
   });

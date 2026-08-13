@@ -157,12 +157,15 @@ export const useUserStore = create<UserState>()(
 
       setMultiplesData: (babyCount, multiplesType) => set({ babyCount, multiplesType }),
 
-      setLanguage: (lang) => {
-        set({ language: lang });
-        if (isNative()) {
-          void Preferences.set({ key: 'anacan_app_language', value: lang });
-        }
-      },
+  setLanguage: (lang) => {
+    set({ language: lang });
+    // KRİTİK: getLocaleTag() bunu oxuyur — tarix/ay/həftə adlarının
+    // düzgün lokalda formatlanması üçün (əvvəllər yazılmırdı → həmişə az-AZ idi)
+    try { localStorage.setItem('language', lang); } catch { /* boş */ }
+    if (isNative()) {
+      void Preferences.set({ key: 'anacan_app_language', value: lang });
+    }
+  },
 
       setPartnerCode: (code) => set({ partnerCode: code }),
 

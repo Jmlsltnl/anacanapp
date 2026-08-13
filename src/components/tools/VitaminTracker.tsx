@@ -42,16 +42,20 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
   const language = useUserStore((state) => state.language);
   
   const { data: dbVitamins = [] } = useQuery({
-    queryKey: ['all_raw_vitamins'],
+    queryKey: ['all_raw_vitamins', language],
     queryFn: async () => {
-      const { data } = await supabase.from('vitamins').select('name, name_az, icon_emoji').eq('is_active', true);
-      return data || [];
+      const { data } = await supabase.from('vitamins').select('name, name_az, name_en, name_ru, name_tr, icon_emoji').eq('is_active', true);
+      return (data || []) as any[];
     },
     staleTime: 1000 * 60 * 60,
   });
 
+  // Vitamin adını istifadəçi dilində qaytar (ru/tr sütunları oxunur — əvvəllər oxunmurdu)
+  const locVitName = (v: any): string =>
+  language === 'az' ? (v.name_az || v.name) : (v[`name_${language}`] || v.name_en || v.name);
+
   const dynamicPresets = dbVitamins.length > 0 ? dbVitamins.map(v => ({
-    name: language === 'az' ? (v.name_az || v.name) : v.name,
+    name: locVitName(v),
     emoji: v.icon_emoji || '💊'
   })) : VITAMIN_PRESETS;
 
@@ -65,7 +69,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
     );
     
     if (dbVit) {
-      return language === 'az' ? (dbVit.name_az || dbVit.name) : dbVit.name;
+      return locVitName(dbVit);
     }
     
     if (normalized === 'folat (fol turşusu)' || normalized === 'folate (folic acid)') return tr("vitamintracker_folat_fol_tursusu_941d76", "Folat (Fol turşusu)");

@@ -188,7 +188,13 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
         content: g.content,
         icon: g.icon || '⚖️'
       }))
-    : (isAZ ? selectedRule.guidelines_az : selectedRule.guidelines_en).map((g, i) => ({
+    : (
+      // Dil üzrə seçim: az→az, ru→ru||en, tr→tr||en, digər→en
+      language === 'az' ? selectedRule.guidelines_az :
+      language === 'ru' ? (selectedRule.guidelines_ru || selectedRule.guidelines_en) :
+      language === 'tr' ? (selectedRule.guidelines_tr || selectedRule.guidelines_en) :
+      selectedRule.guidelines_en
+      ).map((g, i) => ({
         id: `guide-${i}`,
         title: g.title,
         content: g.content,

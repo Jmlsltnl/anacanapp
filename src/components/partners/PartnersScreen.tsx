@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Search, MapPin, Sparkles, Crown, Lock, Phone, Globe, Instagram, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { usePartnerCategories, usePartnerVenues, PartnerVenue } from '@/hooks/usePartnerVenues';
+import { usePartnerCategories, usePartnerVenues, localizeCategoryLabel, PartnerVenue } from '@/hooks/usePartnerVenues';
 import { useSubscription } from '@/hooks/useSubscription';
 import { PremiumModal } from '@/components/PremiumModal';
 import RedemptionQRSheet from './RedemptionQRSheet';
@@ -79,8 +79,7 @@ export default function PartnersScreen({ onBack }: Props) {
         <div className="flex gap-2 px-3 pb-3 overflow-x-auto scrollbar-hide">
           <CategoryPill active={category === 'all'} onClick={() => setCategory('all')} label={tr("partnersscreen_hamisi_c73c4d", "Ham\u0131s\u0131")} />
           {categories?.map((c) => {
-            const lang = getPersistedLanguage();
-            const label = lang === 'en' ? (c.label_en || c.label_az) : c.label_az;
+            const label = localizeCategoryLabel(c, getPersistedLanguage());
             return (
               <CategoryPill key={c.key} active={category === c.key} onClick={() => setCategory(c.key)} label={label} />
             );

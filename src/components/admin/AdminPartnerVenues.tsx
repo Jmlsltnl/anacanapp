@@ -33,12 +33,15 @@ interface Venue {
   is_active: boolean;
   is_featured: boolean;
   sort_order: number;
+  /** Boş = qlobal (bütün ölkələr); dolu = yalnız bu ISO kodlar */
+  countries?: string[] | null;
 }
 
 const emptyVenue = (): Venue => ({
   name: '', category_key: 'spa', discount_label: '20% endirim',
   redemption_cooldown_hours: 24, qr_ttl_seconds: 300,
-  is_active: true, is_featured: false, sort_order: 0
+  is_active: true, is_featured: false, sort_order: 0,
+  countries: []
 });
 
 export default function AdminPartnerVenues() {
@@ -153,6 +156,15 @@ export default function AdminPartnerVenues() {
                 <Input placeholder="Telefon" value={editing.phone || ''} onChange={(e) => setEditing({ ...editing, phone: e.target.value })} />
                 <Input placeholder="Veb sayt" value={editing.website || ''} onChange={(e) => setEditing({ ...editing, website: e.target.value })} />
                 <Input placeholder="Instagram (@user)" value={editing.instagram || ''} onChange={(e) => setEditing({ ...editing, instagram: e.target.value })} />
+              </div>
+              <div>
+                <Input
+                placeholder={tr("adminpartnervenues_olkeler_ph", "Ölkələr (ISO, vergüllə — boş = qlobal): AZ, TR")}
+                value={(editing.countries || []).join(', ')}
+                onChange={(e) => setEditing({ ...editing, countries: e.target.value.split(',').map((c) => c.trim().toUpperCase()).filter(Boolean) })} />
+                <p className="text-xs text-muted-foreground mt-1">
+                  🌍 {tr("adminpartnervenues_olkeler_hint", "Boş saxlasanız məkan bütün ölkələrdə görünür (qlobal). ISO kod yazsanız yalnız o ölkələrdə.")}
+                </p>
               </div>
               <div className="border-t pt-3">
                 <h4 className="text-sm font-bold mb-2">{tr("adminpartnervenues_endirim_qaydalari_ff9857", "Endirim qaydalar\u0131")}</h4>

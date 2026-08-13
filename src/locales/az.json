@@ -5994,7 +5994,7 @@
   "whitenoise_yungul_yagis_ve_yarpaq_xisiltisi_kimi_d5aea8": "Yüngül yağış və yarpaq xışıltısı kimi",
   "whitenoise_yuxu_sesleri_4b518b": "Yuxu Səsləri",
   "mommy_hero_day_label": "Gün",
-  "mommy_hero_headline": "{days} gündür {name} böyüyür",
+  "mommy_hero_headline": "{days} gündür {name} həyatınızdadır",
   "mommy_meta_months": "ay",
   "mommy_meta_days": "gün",
   "dashboard_daily_badge": "Gündəlik",
@@ -6790,5 +6790,6 @@
   "ft_child_name_ph": "Məsələn: Aysel, Murad...",
   "ft_child_names_ph": "Məsələn: Aysel, Murad, Ləman...",
   "mc_example_prefix": "Məsələn",
-  "rf_urgent_guidance_n": "⚠️ Gözləməyin: dərhal həkiminizə zəng edin və ya təcili yardıma ({n}) müraciət edin."
+  "rf_urgent_guidance_n": "⚠️ Gözləməyin: dərhal həkiminizə zəng edin və ya təcili yardıma ({n}) müraciət edin.",
+  "pdf_notes_ph": "Həkiminiz üçün əlavə qeydlər yazın..."
 }

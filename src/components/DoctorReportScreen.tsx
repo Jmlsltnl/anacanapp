@@ -408,7 +408,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder={language === 'en' ? "Write additional notes for your doctor..." : "Həkiminiz üçün əlavə qeydlər yazın..."}
+              placeholder={tr('pdf_notes_ph', 'Həkiminiz üçün əlavə qeydlər yazın...')}
               className="w-full h-24 resize-none outline-none"
               style={{ padding: 14, borderRadius: 16, background: 'var(--a-surface-soft)', fontSize: 13, color: 'var(--a-ink)', border: '1px solid transparent' }} />
 

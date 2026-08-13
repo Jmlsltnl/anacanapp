@@ -1072,7 +1072,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
   const remainingDays = (babyData as any).ageRemainingDays ?? babyData.ageInDays % 30;
 
   // Editorial hero headline template (anacan-demo design)
-  const heroHeadlineTpl = tr('mommy_hero_headline', '{days} gündür {name} böyüyür')
+  const heroHeadlineTpl = tr('mommy_hero_headline', '{days} gündür {name} həyatınızdadır')
     .replace('{days}', String(babyData.ageInDays));
   const [heroBefore, heroAfter = ''] = heroHeadlineTpl.split('{name}');
 

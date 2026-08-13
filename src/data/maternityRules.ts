@@ -43,6 +43,9 @@ export interface MaternityRule {
   payDescription_en: string;
   guidelines_az: { title: string; content: string; icon: string }[];
   guidelines_en: { title: string; content: string; icon: string }[];
+  /** İstəyə bağlı ru/tr — yoxdursa _en fallback işləyir */
+  guidelines_ru?: { title: string; content: string; icon: string }[];
+  guidelines_tr?: { title: string; content: string; icon: string }[];
 }
 
 export const maternityRules: MaternityRule[] = [
@@ -129,6 +132,13 @@ export const maternityRules: MaternityRule[] = [
       {
         title: 'Qanunvericilik',
         content: 'Türkiyədə qanuni analıq məzuniyyəti ümumilikdə 16 həftədir (doğuşdan əvvəl 8, doğuşdan sonra 8 həftə). Çoxdöllü hamiləlikdə doğuşdan əvvəlki dövrə əlavə 2 həftə əlavə olunur.',
+        icon: '⚖️'
+      }
+    ],
+    guidelines_tr: [
+      {
+        title: 'Mevzuat',
+        content: 'Türkiye’de yasal doğum izni toplam 16 haftadır (doğumdan önce 8, sonra 8 hafta). Çoğul gebeliklerde doğum öncesine 2 hafta daha eklenir.',
         icon: '⚖️'
       }
     ],
@@ -317,6 +327,13 @@ export const maternityRules: MaternityRule[] = [
       {
         title: 'Qanunvericilik',
         content: 'Rusiyada standart analıq məzuniyyəti 140 gündür (70 gün əvvəl, 70 gün sonra). Mürəkkəb doğuşlarda və çoxdöllü hamiləliklərdə bu müddət artırılır.',
+        icon: '⚖️'
+      }
+    ],
+    guidelines_ru: [
+      {
+        title: 'Законодательство',
+        content: 'Стандартный декретный отпуск в России — 140 дней (70 до и 70 после родов). При осложнённых родах и многоплодной беременности срок продлевается.',
         icon: '⚖️'
       }
     ],

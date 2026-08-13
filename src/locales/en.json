@@ -7517,7 +7517,7 @@
   "whitenoise_yungul_yagis_ve_yarpaq_xisiltisi_kimi_d5aea8": "Like light rain and leaves rustling",
   "whitenoise_yuxu_sesleri_4b518b": "Sleep Sounds",
   "mommy_hero_day_label": "Day",
-  "mommy_hero_headline": "{days} days of watching {name} grow",
+  "mommy_hero_headline": "{name} has been in your life for {days} days",
   "mommy_meta_months": "mo",
   "mommy_meta_days": "days",
   "dashboard_daily_badge": "Daily",
@@ -8312,5 +8312,6 @@
   "ft_child_name_ph": "For example: Emma, Liam...",
   "ft_child_names_ph": "For example: Emma, Liam, Olivia...",
   "mc_example_prefix": "e.g.",
-  "rf_urgent_guidance_n": "⚠️ Don't wait: call your doctor immediately or contact emergency services ({n})."
+  "rf_urgent_guidance_n": "⚠️ Don't wait: call your doctor immediately or contact emergency services ({n}).",
+  "pdf_notes_ph": "Write additional notes for your doctor..."
 }

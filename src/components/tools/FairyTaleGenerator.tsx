@@ -414,40 +414,39 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
 
               </div>
 
-              {/* Language & Age */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  {fieldLabel(tr("untranslated_dil_g90qr5", "Dil"))}
-                  <div className="grid grid-cols-2 gap-1 mt-1">
-                    {LANGUAGES.map((lang) =>
-                      <button
-                        key={lang.code}
-                        type="button"
-                        onClick={() => setDirectLanguage(lang.code)}
-                        className="p-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1"
-                        style={directLanguage === lang.code ? pillOn : pillOff}>
-
-                        <img src={`https://flagcdn.com/w40/${lang.flag}.png`} alt={lang.code} className="w-5 h-auto rounded-sm shadow-sm" />
-                        {lang.label}
-                      </button>
-                    )}
-                  </div>
+              {/* Dil — tam eni, bərabər 4 sütun (sığmayan söz problemi yoxdur) */}
+              <div>
+                {fieldLabel(tr("untranslated_dil_g90qr5", "Dil"))}
+                <div className="grid grid-cols-4 gap-2 mt-2">
+                  {LANGUAGES.map((lang) =>
+                    <button
+                      key={lang.code}
+                      type="button"
+                      onClick={() => setDirectLanguage(lang.code)}
+                      className="rounded-xl transition-all flex flex-col items-center justify-center gap-1"
+                      style={{ ...(directLanguage === lang.code ? pillOn : pillOff), height: 56, padding: 0 }}>
+                      <img src={`https://flagcdn.com/w40/${lang.flag}.png`} alt={lang.code} style={{ width: 24, height: 17, objectFit: 'cover', borderRadius: 3 }} />
+                      <span className="text-[10.5px] font-bold uppercase tracking-wide">{lang.code}</span>
+                    </button>
+                  )}
                 </div>
-                <div>
-                  {fieldLabel(tr("fairytalegenerator_yas_95595b", "Yaş"))}
-                  <div className="grid grid-cols-2 gap-1 mt-1">
-                    {AGE_RANGES.map((age) =>
-                      <button
-                        key={age.value}
-                        type="button"
-                        onClick={() => setDirectAgeRange(age.value)}
-                        className="p-1.5 rounded-lg text-xs text-center transition-all font-semibold"
-                        style={directAgeRange === age.value ? pillOn : pillOff}>
+              </div>
 
-                        {age.emoji} {age.label}
-                      </button>
-                    )}
-                  </div>
+              {/* Yaş — eyni üslubda 4 sütun */}
+              <div>
+                {fieldLabel(tr("fairytalegenerator_yas_95595b", "Yaş"))}
+                <div className="grid grid-cols-4 gap-2 mt-2">
+                  {AGE_RANGES.map((age) =>
+                    <button
+                      key={age.value}
+                      type="button"
+                      onClick={() => setDirectAgeRange(age.value)}
+                      className="rounded-xl transition-all flex flex-col items-center justify-center gap-0.5"
+                      style={{ ...(directAgeRange === age.value ? pillOn : pillOff), height: 56, padding: 0 }}>
+                      <span className="text-base leading-none">{age.emoji}</span>
+                      <span className="text-[10.5px] font-semibold whitespace-nowrap">{age.label}</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -520,20 +519,19 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                       </div>
                     </div>
 
-                    {/* Language Selection */}
+                    {/* Language Selection — vahid 4 sütunlu dizayn */}
                     <div>
                       {fieldLabel(tr("fairytalegenerator_nagilin_dili_04ad3e", "Na\u011F\u0131l\u0131n dili"), <Globe className="h-4 w-4" />)}
-                      <div className="grid grid-cols-2 gap-2 mt-2">
+                      <div className="grid grid-cols-4 gap-2 mt-2">
                         {LANGUAGES.map((lang) =>
                           <button
                             key={lang.code}
                             type="button"
                             onClick={() => setFormData({ ...formData, language: lang.code })}
-                            className="p-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2"
-                            style={formData.language === lang.code ? pillOn : pillOff}>
-
-                            <img src={`https://flagcdn.com/w40/${lang.flag}.png`} alt={lang.code} className="w-6 h-auto rounded-sm shadow-sm" />
-                            {lang.label}
+                            className="rounded-xl transition-all flex flex-col items-center justify-center gap-1"
+                            style={{ ...(formData.language === lang.code ? pillOn : pillOff), height: 58, padding: 0 }}>
+                            <img src={`https://flagcdn.com/w40/${lang.flag}.png`} alt={lang.code} style={{ width: 26, height: 18, objectFit: 'cover', borderRadius: 3 }} />
+                            <span className="text-[10.5px] font-bold uppercase tracking-wide">{lang.code}</span>
                           </button>
                         )}
                       </div>

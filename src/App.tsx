@@ -62,6 +62,8 @@ initRevenueCat().catch(console.error);
 // Preload translations for current language (after Zustand rehydrate)
 setTimeout(() => {
   const lang = useUserStore.getState().language;
+  // getLocaleTag() üçün sync — mövcud istifadəçilərdə localStorage boş qala bilərdi
+  try { localStorage.setItem('language', lang || 'az'); } catch { /* boş */ }
   if (lang && lang !== 'az') loadTranslations(lang).catch(console.error);
 }, 0);
 
