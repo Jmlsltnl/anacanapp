@@ -1628,6 +1628,8 @@ export type Database = {
           content_en: string | null
           content_ru: string | null
           content_tr: string | null
+          countries_exclude: string[] | null
+          countries_include: string[] | null
           cover_image_url: string | null
           created_at: string
           excerpt: string | null
@@ -1664,6 +1666,8 @@ export type Database = {
           content_en?: string | null
           content_ru?: string | null
           content_tr?: string | null
+          countries_exclude?: string[] | null
+          countries_include?: string[] | null
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
@@ -1700,6 +1704,8 @@ export type Database = {
           content_en?: string | null
           content_ru?: string | null
           content_tr?: string | null
+          countries_exclude?: string[] | null
+          countries_include?: string[] | null
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
@@ -2335,6 +2341,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "community_post_reads_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_post_translations: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          lang: string
+          model: string | null
+          post_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          lang: string
+          model?: string | null
+          post_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          lang?: string
+          model?: string | null
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_post_translations_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "community_posts"
@@ -4040,6 +4081,7 @@ export type Database = {
           address_ru: string | null
           address_tr: string | null
           city: string | null
+          country_code: string
           created_at: string | null
           description: string | null
           description_az: string | null
@@ -4081,6 +4123,7 @@ export type Database = {
           address_ru?: string | null
           address_tr?: string | null
           city?: string | null
+          country_code?: string
           created_at?: string | null
           description?: string | null
           description_az?: string | null
@@ -4122,6 +4165,7 @@ export type Database = {
           address_ru?: string | null
           address_tr?: string | null
           city?: string | null
+          country_code?: string
           created_at?: string | null
           description?: string | null
           description_az?: string | null
@@ -6354,6 +6398,7 @@ export type Database = {
           category_key: string
           city: string | null
           city_en: string | null
+          countries: string[] | null
           cover_url: string | null
           created_at: string
           description: string | null
@@ -6392,6 +6437,7 @@ export type Database = {
           category_key: string
           city?: string | null
           city_en?: string | null
+          countries?: string[] | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
@@ -6430,6 +6476,7 @@ export type Database = {
           category_key?: string
           city?: string | null
           city_en?: string | null
+          countries?: string[] | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
@@ -9985,6 +10032,7 @@ export type Database = {
           daily_push_enabled: boolean | null
           exercise_days: number[] | null
           exercise_reminder: boolean | null
+          feed_languages: string[] | null
           id: string
           language: string
           last_delay_notification_at: string | null
@@ -10021,6 +10069,7 @@ export type Database = {
           daily_push_enabled?: boolean | null
           exercise_days?: number[] | null
           exercise_reminder?: boolean | null
+          feed_languages?: string[] | null
           id?: string
           language?: string
           last_delay_notification_at?: string | null
@@ -10057,6 +10106,7 @@ export type Database = {
           daily_push_enabled?: boolean | null
           exercise_days?: number[] | null
           exercise_reminder?: boolean | null
+          feed_languages?: string[] | null
           id?: string
           language?: string
           last_delay_notification_at?: string | null
@@ -10961,15 +11011,22 @@ export type Database = {
       partner_venues_public: {
         Row: {
           address: string | null
+          address_en: string | null
           category_key: string | null
           city: string | null
+          city_en: string | null
+          countries: string[] | null
           cover_url: string | null
           created_at: string | null
           description: string | null
+          description_en: string | null
           discount_label: string | null
+          discount_label_en: string | null
           discount_terms: string | null
+          discount_terms_en: string | null
           discount_value: number | null
           district: string | null
+          district_en: string | null
           gallery_urls: string[] | null
           id: string | null
           instagram: string | null
@@ -10979,6 +11036,7 @@ export type Database = {
           logo_url: string | null
           longitude: number | null
           name: string | null
+          name_en: string | null
           phone: string | null
           qr_ttl_seconds: number | null
           redemption_cooldown_hours: number | null
@@ -10991,15 +11049,22 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          address_en?: string | null
           category_key?: string | null
           city?: string | null
+          city_en?: string | null
+          countries?: string[] | null
           cover_url?: string | null
           created_at?: string | null
           description?: string | null
+          description_en?: string | null
           discount_label?: string | null
+          discount_label_en?: string | null
           discount_terms?: string | null
+          discount_terms_en?: string | null
           discount_value?: number | null
           district?: string | null
+          district_en?: string | null
           gallery_urls?: string[] | null
           id?: string | null
           instagram?: string | null
@@ -11009,6 +11074,7 @@ export type Database = {
           logo_url?: string | null
           longitude?: number | null
           name?: string | null
+          name_en?: string | null
           phone?: string | null
           qr_ttl_seconds?: number | null
           redemption_cooldown_hours?: number | null
@@ -11021,15 +11087,22 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          address_en?: string | null
           category_key?: string | null
           city?: string | null
+          city_en?: string | null
+          countries?: string[] | null
           cover_url?: string | null
           created_at?: string | null
           description?: string | null
+          description_en?: string | null
           discount_label?: string | null
+          discount_label_en?: string | null
           discount_terms?: string | null
+          discount_terms_en?: string | null
           discount_value?: number | null
           district?: string | null
+          district_en?: string | null
           gallery_urls?: string[] | null
           id?: string | null
           instagram?: string | null
@@ -11039,6 +11112,7 @@ export type Database = {
           logo_url?: string | null
           longitude?: number | null
           name?: string | null
+          name_en?: string | null
           phone?: string | null
           qr_ttl_seconds?: number | null
           redemption_cooldown_hours?: number | null
