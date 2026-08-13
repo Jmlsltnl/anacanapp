@@ -176,19 +176,19 @@ const DangerSignsScreen = ({ onBack }: Props) => {
 
         {/* Təcili əlamətlər */}
         <div>
-          <h3 className="a-section-title" style={{ marginBottom: 10 }}>🚨 {tr('rf_urgent_section', 'Dərhal müraciət')}</h3>
+          <h3 className="a-section-title" style={{ marginBottom: 10, fontWeight: 800 }}>🚨 {tr('rf_urgent_section', 'Dərhal müraciət')}</h3>
           <div className="space-y-2.5">{urgentSigns.map(renderSign)}</div>
         </div>
 
         {/* Bu gün həkimə */}
         {soonSigns.length > 0 &&
         <div>
-            <h3 className="a-section-title" style={{ marginBottom: 10 }}>📞 {tr('rf_soon_section', 'Bu gün həkimlə əlaqə')}</h3>
+            <h3 className="a-section-title" style={{ marginBottom: 10, fontWeight: 800 }}>📞 {tr('rf_soon_section', 'Bu gün həkimlə əlaqə')}</h3>
             <div className="space-y-2.5">{soonSigns.map(renderSign)}</div>
           </div>
         }
 
-        <p className="text-center" style={{ fontSize: 10.5, color: 'var(--a-ink-faint)', padding: '4px 16px' }}>
+        <p className="text-center" style={{ fontSize: 10.5, color: 'var(--a-ink)', padding: '4px 16px' }}>
           {tr('rf_disclaimer', 'Bu siyahı məlumat xarakterlidir və həkim qiymətləndirməsini əvəz etmir.')}
         </p>
       </div>

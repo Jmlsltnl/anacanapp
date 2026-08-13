@@ -578,7 +578,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
 
   return (
-    <div ref={ref} className="a-scope fixed inset-0 bottom-[80px] flex flex-col" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)', background: 'var(--a-bg)' }}>
+    <div ref={ref} className="a-scope fixed inset-x-0 top-0 flex flex-col" style={{ bottom: 'calc(94px + env(safe-area-inset-bottom, 0px))', background: 'var(--a-bg)' }}>
       {/* Chat header (anacan-demo) */}
       <div className="safe-area-top" style={{ paddingLeft: 20, paddingRight: 20, flexShrink: 0 }}>
         <div className="a-chat-header">
@@ -720,7 +720,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       </AnimatePresence>
 
       {/* Input Area (anacan-demo pill) */}
-      <div style={{ padding: '8px 16px 6px', flexShrink: 0 }}>
+      <div style={{ padding: '8px 16px 10px', flexShrink: 0 }}>
         <div className="a-chat-input">
           <Textarea
             value={input}

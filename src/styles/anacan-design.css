@@ -2085,17 +2085,25 @@
 }
 
 .a-chat-send {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: var(--a-ink);
-  color: var(--a-bg);
+  background: var(--a-peach-2);
+  color: #ffffff;
   display: grid;
   place-items: center;
   flex-shrink: 0;
   border: none;
   cursor: pointer;
+  align-self: flex-end;
+  margin-bottom: 1px;
+  box-shadow: 0 6px 14px -6px rgba(255, 90, 95, 0.55);
   transition: transform 120ms ease, opacity 150ms ease;
+}
+
+.a-chat-send:disabled {
+  opacity: 0.4;
+  box-shadow: none;
 }
 
 .a-chat-send:active {

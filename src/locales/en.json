@@ -8291,5 +8291,19 @@
   "babynames_ai_search": "Search with AI: {name}",
   "babynames_ai_searching": "AI is searching...",
   "babynames_ai_notfound": "AI didn't recognize this name — check the spelling",
-  "babynames_ai_error": "AI search failed — try again"
+  "babynames_ai_error": "AI search failed — try again",
+  "funnel_month_stats": "months old — 82% of moms with a baby this age face similar challenges.",
+  "funnel_cycle_stats": "day cycle — we prepared a personal analysis based on it.",
+  "funneldata_ay_1": "Month 1",
+  "funneldata_ay_3": "Month 3",
+  "revtrial_context_bump": "Week {week}, trimester {tri}",
+  "revtrial_context_mommy": "{name} — {months} months old",
+  "howapphelps_stat_tools": "Expert tools",
+  "howapphelps_stat_moms": "Moms in community",
+  "howapphelps_stat_langs": "Languages",
+  "howapphelps_trust_line": "Content is doctor-reviewed · Your data is protected",
+  "nutrition_ai_kalori_axtarir": "AI is estimating...",
+  "countryselect_olke_secin": "Select country",
+  "countryselect_axtar": "Search...",
+  "countryselect_tapilmadi": "No countries found"
 }

@@ -4,6 +4,7 @@ import {
   ArrowLeft, Utensils, Apple, Coffee, Droplets, Droplet,
   Plus, Star, X, Check, Trash2, Heart } from
 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useMealLogs } from '@/hooks/useMealLogs';
 import { useNutritionTips } from '@/hooks/useDynamicContent';
@@ -60,6 +61,25 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [customFood, setCustomFood] = useState({ name: '', calories: '' });
+  const [aiCalLoading, setAiCalLoading] = useState(false);
+
+  // Qida adına görə kalorini AI ilə avtomatik təyin et (istifadəçi yazmayıbsa)
+  const autoFillCalories = async (foodName: string) => {
+    const n = foodName.trim();
+    if (n.length < 2 || customFood.calories || aiCalLoading) return;
+    setAiCalLoading(true);
+    try {
+      const { data } = await supabase.functions.invoke('food-calories', { body: { name: n } });
+      if (data?.found && data?.calories) {
+        // İstifadəçi bu arada özü yazmayıbsa doldur
+        setCustomFood((prev) => prev.calories ? prev : { ...prev, calories: String(data.calories) });
+      }
+    } catch (e) {
+      console.warn('food-calories lookup failed:', e);
+    } finally {
+      setAiCalLoading(false);
+    }
+  };
 
   const { todayLog, loading: logsLoading, updateWaterIntake } = useDailyLogs();
   const { loading: mealLoading, addMealLog, deleteMealLog, getTodayStats, getMealsByType } = useMealLogs();
@@ -309,11 +329,19 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                       className="a-input w-full"
                       value={customFood.name}
                       onChange={(e) => setCustomFood({ ...customFood, name: e.target.value })}
+                      onBlur={(e) => autoFillCalories(e.target.value)}
                       placeholder={language === 'en' ? "e.g. Salad" : "məs. Plov"} />
                     
                     </div>
                     <div>
-                      <label className="a-list-sub mb-1 block" style={{ margin: '0 0 4px' }}>{tr("untranslated_kalori_y6oaf2", "Kalori")}</label>
+                      <label className="a-list-sub mb-1 block" style={{ margin: '0 0 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {tr("untranslated_kalori_y6oaf2", "Kalori")}
+                        {aiCalLoading &&
+                        <span style={{ fontSize: 10.5, color: 'var(--a-peach-2)', fontWeight: 700 }}>
+                          ✨ {tr("nutrition_ai_kalori_axtarir", "AI təyin edir...")}
+                        </span>
+                        }
+                      </label>
                       <input
                       className="a-input w-full"
                       type="number"

@@ -13,7 +13,7 @@ import { tr } from "@/lib/tr";
 import { useUserStore } from '@/store/userStore';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Globe } from 'lucide-react';
-import countriesData from '../../countries.json';
+import CountrySelect from '@/components/CountrySelect';
 
 type AuthMode = 'login' | 'register' | 'forgot-password';
 type PartnerAuthMode = 'login' | 'register';
@@ -538,21 +538,11 @@ const AuthScreen = () => {
                           <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
                             <Globe className="w-5 h-5 transition-colors group-focus-within:text-[#63acdf]" style={{ color: 'var(--a-ink-faint)' }} />
                           </div>
-                          <Select value={countryCode || ''} onValueChange={setCountryCode}>
-                            <SelectTrigger className={fieldClsBlue}>
-                              <SelectValue placeholder={tr("authscreen_olke_secin", "Ölkə seçin")} />
-                            </SelectTrigger>
-                            <SelectContent className="a-scope max-h-[300px]">
-                              {countriesData.map((country) => (
-                                <SelectItem key={country.isoAlpha2} value={country.isoAlpha2}>
-                                  <span className="flex items-center gap-2">
-                                    <img src={country.flag.startsWith('data:') ? country.flag : `data:image/png;base64,${country.flag}`} alt="" className="w-6 h-4 object-cover rounded-sm" style={{ border: '1px solid var(--a-line)' }} />
-                                    {country.name}
-                                  </span>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <CountrySelect
+                            value={countryCode}
+                            onChange={setCountryCode}
+                            placeholder={tr("authscreen_olke_secin", "Ölkə seçin")}
+                            triggerClassName={`${fieldClsBlue} flex items-center gap-2`} />
                         </div>
                       </motion.div>
                     )}
@@ -788,21 +778,11 @@ const AuthScreen = () => {
                           <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
                             <Globe className="w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
                           </div>
-                          <Select value={countryCode || ''} onValueChange={setCountryCode}>
-                            <SelectTrigger className={fieldCls}>
-                              <SelectValue placeholder={tr("authscreen_olke_secin", "Ölkə seçin")} />
-                            </SelectTrigger>
-                            <SelectContent className="a-scope max-h-[300px]">
-                              {countriesData.map((country) => (
-                                <SelectItem key={country.isoAlpha2} value={country.isoAlpha2}>
-                                  <span className="flex items-center gap-2">
-                                    <img src={country.flag} alt="" className="w-6 h-4 object-cover rounded-sm" />
-                                    {country.name}
-                                  </span>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <CountrySelect
+                            value={countryCode}
+                            onChange={setCountryCode}
+                            placeholder={tr("authscreen_olke_secin", "Ölkə seçin")}
+                            triggerClassName={`${fieldCls} flex items-center gap-2`} />
                         </div>
                       </motion.div>
                     )}

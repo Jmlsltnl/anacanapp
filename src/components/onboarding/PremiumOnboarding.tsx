@@ -29,6 +29,37 @@ export const PENDING_FUNNEL_KEY = 'anacan_pending_funnel';
 const todayStr = () => new Date().toISOString().split('T')[0];
 const DAY = 24 * 60 * 60 * 1000;
 
+/** Tarix sahəsi — mobil overflow düzəlişi + boş olanda dd/mm/yyyy placeholder.
+    (input[type=date] boş olanda iOS-da heç nə göstərmir, Android-də kənara çıxa bilirdi) */
+const DateField = ({ value, onChange, min, max }: {
+  value: string;
+  onChange: (v: string) => void;
+  min?: string;
+  max?: string;
+}) =>
+<div style={{ position: 'relative', width: '100%' }}>
+    <input
+    type="date"
+    value={value}
+    min={min}
+    max={max}
+    onChange={(e) => onChange(e.target.value)}
+    className="a-input w-full"
+    style={{
+      height: 52, fontSize: 16, width: '100%', minWidth: 0, maxWidth: '100%',
+      boxSizing: 'border-box', WebkitAppearance: 'none', appearance: 'none',
+      color: value ? 'var(--a-ink)' : 'transparent'
+    }} />
+    {!value &&
+  <span style={{
+    position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
+    fontSize: 15, color: 'var(--a-ink-faint)', pointerEvents: 'none'
+  }}>
+      dd/mm/yyyy
+    </span>
+  }
+  </div>;
+
 /** Push icazəsini istə və nəticəni qaytar (native.ts pattern-i, boolean nəticə ilə). */
 const requestPushPermission = async (): Promise<boolean> => {
   try {
@@ -634,14 +665,11 @@ const PremiumOnboarding = () => {
                       <Calendar size={12} />
                       {bumpDateMode === 'lmp' ? tr('ponb_bump_lmp_label', 'Son menstruasiyanın ilk günü') : tr('ponb_bump_due_label', 'Gözlənilən doğuş tarixi')}
                     </label>
-                    <input
-                    type="date"
+                    <DateField
                     value={bumpDate}
                     min={bumpDateMode === 'due' ? todayStr() : undefined}
                     max={bumpDateMode === 'lmp' ? todayStr() : undefined}
-                    onChange={(e) => setBumpDate(e.target.value)}
-                    className="a-input w-full"
-                    style={{ height: 52, fontSize: 16 }} />
+                    onChange={setBumpDate} />
                   </div>
                   <ContinueBtn onClick={() => goNextOrFinish()} />
                 </>
@@ -711,13 +739,10 @@ const PremiumOnboarding = () => {
                     <label className="a-today-info-eyebrow flex items-center gap-1.5" style={{ marginBottom: 8 }}>
                       <Calendar size={12} /> {tr('ponb_mommy_birth', 'Doğum tarixi')}
                     </label>
-                    <input
-                    type="date"
+                    <DateField
                     value={babyBirthDate}
                     max={todayStr()}
-                    onChange={(e) => setBabyBirthDate(e.target.value)}
-                    className="a-input w-full"
-                    style={{ height: 52, fontSize: 16 }} />
+                    onChange={setBabyBirthDate} />
                   </div>
                   <ContinueBtn onClick={() => goNextOrFinish()} />
                 </>
@@ -731,13 +756,10 @@ const PremiumOnboarding = () => {
                     <label className="a-today-info-eyebrow flex items-center gap-1.5" style={{ marginBottom: 8 }}>
                       <Droplets size={12} /> {tr('ponb_flow_lmp', 'Son periodun ilk günü')}
                     </label>
-                    <input
-                    type="date"
+                    <DateField
                     value={lmpDate}
                     max={todayStr()}
-                    onChange={(e) => setLmpDate(e.target.value)}
-                    className="a-input w-full"
-                    style={{ height: 52, fontSize: 16 }} />
+                    onChange={setLmpDate} />
                   </div>
                   <ContinueBtn onClick={() => goNextOrFinish()} />
                 </>

@@ -6769,5 +6769,19 @@
   "babynames_ai_search": "AI ilə axtar: {name}",
   "babynames_ai_searching": "AI axtarır...",
   "babynames_ai_notfound": "AI bu adı tanımadı — yazılışı yoxlayın",
-  "babynames_ai_error": "AI axtarışı alınmadı — yenidən cəhd edin"
+  "babynames_ai_error": "AI axtarışı alınmadı — yenidən cəhd edin",
+  "funnel_month_stats": "aylıq körpəsi olan anaların 82%-i oxşar çətinliklərlə üzləşir.",
+  "funnel_cycle_stats": "günlük tsiklinizə əsasən fərdi təhlil hazırladıq.",
+  "funneldata_ay_1": "Ay 1",
+  "funneldata_ay_3": "Ay 3",
+  "revtrial_context_bump": "{week}-ci həftə, {tri}-ci trimester",
+  "revtrial_context_mommy": "{name} — {months} aylıq",
+  "howapphelps_stat_tools": "Peşəkar alət",
+  "howapphelps_stat_moms": "Ana icmada",
+  "howapphelps_stat_langs": "Dil dəstəyi",
+  "howapphelps_trust_line": "Məzmun həkim baxışından keçir · Məlumatlarınız qorunur",
+  "nutrition_ai_kalori_axtarir": "AI təyin edir...",
+  "countryselect_olke_secin": "Ölkə seçin",
+  "countryselect_axtar": "Axtar...",
+  "countryselect_tapilmadi": "Ölkə tapılmadı"
 }

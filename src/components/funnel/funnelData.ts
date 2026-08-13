@@ -27,6 +27,8 @@ export interface Feature {
   title: string;
   description: string;
   emoji: string;
+  /** lucide icon adı (FeaturesStep-də emoji əvəzinə səliqəli icon) */
+  icon?: string;
 }
 
 // ─── Quiz Questions by Life Stage ───
@@ -143,7 +145,7 @@ export const SYMPTOM_MAPPINGS: Record<string, SymptomMapping> = {
   financial: { painPoint: tr("funneldata_maddi_planlasdirma_18435a", "Maddi planla\u015Fd\u0131rma"), solution: tr("funneldata_alis_veris_siyahisi_magaza_b3e1f8", "Al\u0131\u015F-veri\u015F Siyah\u0131s\u0131 & Ma\u011Faza"), emoji: '🛒', toolId: 'shopping-list', isPremium: false },
   // sleep
   interrupted: { painPoint: tr("funneldata_yuxu_problemleri_627bba", "Yuxu probleml\u0259ri"), solution: tr("funneldata_yuxu_sesleri_ag_kuy_5e05f1", "Yuxu S\u0259sl\u0259ri & A\u011F K\xFCy"), emoji: '🎵', toolId: 'white-noise', isPremium: true },
-  bad: { painPoint: 'Ciddi yuxusuzluq', solution: tr("funneldata_yuxu_sesleri_meditasiya_fb635f", "Yuxu S\u0259sl\u0259ri & Meditasiya"), emoji: '🌙', toolId: 'white-noise', isPremium: true },
+  bad: { painPoint: tr("funneldata_ciddi_yuxusuzluq_painpoint", "Ciddi yuxusuzluq"), solution: tr("funneldata_yuxu_sesleri_meditasiya_fb635f", "Yuxu S\u0259sl\u0259ri & Meditasiya"), emoji: '🌙', toolId: 'white-noise', isPremium: true },
   // support
   partial: { painPoint: tr("funneldata_destek_ehtiyaci_7b31a6", "D\u0259st\u0259k ehtiyac\u0131"), solution: tr("funneldata_ana_cemiyyeti_partnyor_baglant_f72b92", "Ana C\u0259miyy\u0259ti & Partnyor Ba\u011Flant\u0131s\u0131"), emoji: '🤝', toolId: 'community', isPremium: false },
   no: { painPoint: tr("funneldata_destek_catismazligi_e5147a", "D\u0259st\u0259k \xE7at\u0131\u015Fmazl\u0131\u011F\u0131"), solution: '24/7 Anacan.AI Asistan', emoji: '🤖', toolId: 'ai-chat', isPremium: true },
@@ -151,7 +153,7 @@ export const SYMPTOM_MAPPINGS: Record<string, SymptomMapping> = {
   high: { painPoint: tr("funneldata_yuksek_stres_a96d92", "Y\xFCks\u0259k stres"), solution: tr("funneldata_nefes_mesqleri_meditasiya_225210", "N\u0259f\u0259s M\u0259\u015Fql\u0259ri & Meditasiya"), emoji: '🧘', toolId: 'breathing', isPremium: true },
   very_high: { painPoint: tr("funneldata_cox_yuksek_stres_26e2b3", "\xC7ox y\xFCks\u0259k stres"), solution: tr("funneldata_ai_asistan_nefes_mesqleri_f00217", "AI Asistan & N\u0259f\u0259s M\u0259\u015Fql\u0259ri"), emoji: '🆘', toolId: 'ai-chat', isPremium: true },
   // mommy answers
-  sleep: { painPoint: 'Yuxusuzluq', solution: tr("funneldata_yuxu_i_zleyicisi_ag_kuy_39d4f4", "Yuxu \u0130zl\u0259yicisi & A\u011F K\xFCy"), emoji: '😴', toolId: 'white-noise', isPremium: true },
+  sleep: { painPoint: tr("funneldata_yuxusuzluq_painpoint", "Yuxusuzluq"), solution: tr("funneldata_yuxu_i_zleyicisi_ag_kuy_39d4f4", "Yuxu \u0130zl\u0259yicisi & A\u011F K\xFCy"), emoji: '😴', toolId: 'white-noise', isPremium: true },
   loneliness: { painPoint: tr("funneldata_tenhaliq_hissi_d0e57e", "T\u0259nhal\u0131q hissi"), solution: tr("funneldata_ana_cemiyyeti_ffc4bd", "Ana C\u0259miyy\u0259ti"), emoji: '👩‍👩‍👦', toolId: 'community', isPremium: false },
   feeding: { painPoint: tr("funneldata_qidalanma_cetinliyi_3b7f06", "Qidalanma \xE7\u0259tinliyi"), solution: tr("funneldata_emizdirme_i_zleyicisi_b0137e", "\u018Fmizdirm\u0259 \u0130zl\u0259yicisi"), emoji: '🍼', toolId: 'feeding-tracker', isPremium: false },
   no_time: { painPoint: tr("funneldata_vaxt_catismazligi_259e8d", "Vaxt \xE7at\u0131\u015Fmazl\u0131\u011F\u0131"), solution: tr("funneldata_gundelik_planlasdirma_a6d707", "G\xFCnd\u0259lik Planla\u015Fd\u0131rma"), emoji: '📋', toolId: 'daily-summary', isPremium: true },
@@ -233,28 +235,28 @@ export const REVIEWS: Record<LifeStage, Review[]> = {
 
 // ─── Feature Showcase ───
 export const FEATURES: Feature[] = [
-{ title: tr("funneldata_ai_fotosessiya_title", "AI Fotosessiya"), description: tr("funneldata_korpenizin_professional_fotolarini_suni__ec1b0b", "Körpənizin professional fotolarını süni intellekt ilə yaradın"), emoji: '📸' },
-{ title: tr("funneldata_partnyor_hesabi_ba746f", "Partnyor Hesabı"), description: tr("funneldata_heyat_yoldasinizi_baglayin_birlikde_izle_762187", "Həyat yoldaşınızı bağlayın, birlikdə izləyin"), emoji: '💑' },
-{ title: tr("funneldata_ai_asistan_title", "24/7 AI Asistan"), description: tr("funneldata_istenilen_sualiniza_derhal_cavab_alin_8938d5", "İstənilən sualınıza dərhal cavab alın"), emoji: '🤖' },
-{ title: tr("funneldata_heftelik_hesabat_283d76", "Həftəlik Hesabat"), description: tr("funneldata_hamileliyin_ve_ya_korpenin_heftelik_inki_ad5912", "Hamiləliyin və ya körpənin həftəlik inkişaf hesabatı"), emoji: '📊' }];
+{ title: tr("funneldata_ai_fotosessiya_title", "AI Fotosessiya"), description: tr("funneldata_korpenizin_professional_fotolarini_suni__ec1b0b", "Körpənizin professional fotolarını süni intellekt ilə yaradın"), emoji: '📸', icon: 'Camera' },
+{ title: tr("funneldata_partnyor_hesabi_ba746f", "Partnyor Hesabı"), description: tr("funneldata_heyat_yoldasinizi_baglayin_birlikde_izle_762187", "Həyat yoldaşınızı bağlayın, birlikdə izləyin"), emoji: '💑', icon: 'HeartHandshake' },
+{ title: tr("funneldata_ai_asistan_title", "24/7 AI Asistan"), description: tr("funneldata_istenilen_sualiniza_derhal_cavab_alin_8938d5", "İstənilən sualınıza dərhal cavab alın"), emoji: '🤖', icon: 'Bot' },
+{ title: tr("funneldata_heftelik_hesabat_283d76", "Həftəlik Hesabat"), description: tr("funneldata_hamileliyin_ve_ya_korpenin_heftelik_inki_ad5912", "Hamiləliyin və ya körpənin həftəlik inkişaf hesabatı"), emoji: '📊', icon: 'BarChart3' }];
 
 
 // ─── Milestone Plan ───
 export const PLAN_MILESTONES: Record<LifeStage, {week: string;label: string;}[]> = {
   bump: [
   { week: tr("funneldata_hefte_1_1efd81", "H\u0259ft\u0259 1"), label: tr("funneldata_hamilelik_izlemeye_basla_5c2941", "Hamiləlik izləməyə başla") },
-  { week: 'Ay 1', label: tr("funneldata_stres_seviyyesini_azalt_6bf5de", "Stres səviyyəsini azalt") },
-  { week: 'Ay 3', label: tr("funneldata_dogusa_tam_hazir_ol_58a0df", "Doğuşa tam hazır ol") }],
+  { week: tr("funneldata_ay_1", "Ay 1"), label: tr("funneldata_stres_seviyyesini_azalt_6bf5de", "Stres səviyyəsini azalt") },
+  { week: tr("funneldata_ay_3", "Ay 3"), label: tr("funneldata_dogusa_tam_hazir_ol_58a0df", "Doğuşa tam hazır ol") }],
 
   mommy: [
   { week: tr("funneldata_hefte_1_1efd81", "H\u0259ft\u0259 1"), label: tr("funneldata_korpe_izlemeye_basla_bd8634", "Körpə izləməyə başla") },
-  { week: 'Ay 1', label: tr("funneldata_rutin_qur_rahatla_label", "Rutin qur, rahatla") },
-  { week: 'Ay 3', label: tr("funneldata_tam_nezaretde_ol_2630cf", "Tam nəzarətdə ol") }],
+  { week: tr("funneldata_ay_1", "Ay 1"), label: tr("funneldata_rutin_qur_rahatla_label", "Rutin qur, rahatla") },
+  { week: tr("funneldata_ay_3", "Ay 3"), label: tr("funneldata_tam_nezaretde_ol_2630cf", "Tam nəzarətdə ol") }],
 
   flow: [
   { week: tr("funneldata_hefte_1_1efd81", "H\u0259ft\u0259 1"), label: tr("funneldata_tsikl_izlemeye_basla_3faf9b", "Tsikl izləməyə başla") },
-  { week: 'Ay 1', label: tr("funneldata_bedenini_tani_dca5a1", "Bədənini tanı") },
-  { week: 'Ay 3', label: tr("funneldata_saglamligini_idare_et_1680af", "Sağlamlığını idarə et") }],
+  { week: tr("funneldata_ay_1", "Ay 1"), label: tr("funneldata_bedenini_tani_dca5a1", "Bədənini tanı") },
+  { week: tr("funneldata_ay_3", "Ay 3"), label: tr("funneldata_saglamligini_idare_et_1680af", "Sağlamlığını idarə et") }],
 
   partner: []
 };

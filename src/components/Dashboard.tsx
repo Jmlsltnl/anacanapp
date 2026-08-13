@@ -57,7 +57,6 @@ import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
 import WinBackCard from '@/components/WinBackCard';
 import FlowDashboard from '@/components/flow/FlowDashboard';
 import BirthOnboardingModal from '@/components/BirthOnboardingModal';
-import PregnancyDayNavigator from '@/components/bump/PregnancyDayNavigator';
 import WaterWidget from '@/components/dashboard/WaterWidget';
 
 // Fetus images by month
@@ -172,16 +171,13 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
   getPregnancyDay(pregData.lastPeriodDate) :
   1;
 
-  // Day navigation hook - allows viewing past/future days
+  // Day hook — naviqasiya UI silinib, həmişə cari gün göstərilir
   const {
     selectedDay: pregnancyDay,
     selectedWeek,
     selectedDayInWeek,
     selectedTrimester,
-    daysUntilDueFromSelected,
-    isViewingCurrentDay,
-    navigateToDay,
-    actualCurrentDay
+    daysUntilDueFromSelected
   } = usePregnancyDayNavigation({
     lastPeriodDate: pregData?.lastPeriodDate || null,
     dueDate: pregData?.dueDate
@@ -330,30 +326,9 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
       {/* Qırmızı bayraq: bu günkü BP ≥140/90 → avtomatik xəbərdarlıq */}
       <RedFlagBanner onOpenTool={onNavigateToTool} />
 
-      {/* Editorial hero (anacan-demo pregnancy design) */}
+      {/* Editorial hero (anacan-demo pregnancy design) —
+          gün naviqatoru silinib: həmişə cari gün göstərilir */}
       <section className="a-hero-min a-fade-in">
-        {/* Day Navigator — functional, allows viewing past/future days */}
-        <div className="w-full mb-2" style={{ textAlign: 'initial' }}>
-          <PregnancyDayNavigator
-            currentActualDay={actualCurrentDay}
-            selectedDay={pregnancyDay}
-            onDayChange={navigateToDay}
-            isPremium={isPremium} />
-          
-        </div>
-
-        {/* Viewing past/future day indicator */}
-        {!isViewingCurrentDay &&
-        <motion.span
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="a-tag on"
-          style={{ cursor: 'default', marginBottom: 12 }}>
-          
-            {pregnancyDay < actualCurrentDay ? tr("dashboard_kecmis_a3b2bf", "\u23EE\uFE0F Ke\xE7mi\u015F") : tr("dashboard_gelecek_8dc8dc", "\u23ED\uFE0F G\u0259l\u0259c\u0259k")} {tr("dashboard_gune_baxirsiniz_165efc", "g\xFCn\u0259 bax\u0131rs\u0131n\u0131z")}
-          </motion.span>
-        }
-
         <p className="a-hero-eyebrow">
           {selectedWeek}{tr("dashboard_hefte_5af01f", ". h\u0259ft\u0259,")} <strong>{selectedDayInWeek}{tr("dashboard_gun_a4ba4e", ". g\xFCn \u2022")}</strong> {selectedTrimester === 1 ? tr("dashboard_1_trimester", "1-ci Trimester") :
           selectedTrimester === 2 ? tr("dashboard_2_trimester", "2-ci Trimester") :
@@ -542,7 +517,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
                   <Baby size={18} strokeWidth={2} />
                 </span>
               </div>
-              <p className="a-cta-text" style={{ position: 'relative', marginTop: 14, fontSize: 13.5, fontWeight: 500, color: 'var(--a-ink)' }}>
+              <p className="a-cta-text" style={{ position: 'relative', marginTop: 14, fontSize: 13.5, fontWeight: 500, color: 'var(--a-ink-soft)', lineHeight: 1.65 }}>
                 {dayContent.baby_message}
               </p>
             </motion.div>

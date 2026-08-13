@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Home, Compass, MessageCircle, User, Users, Sparkles, HeartHandshake } from 'lucide-react';
+import { RiApps2AiLine } from 'react-icons/ri';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useUnreadCommunityPosts } from '@/hooks/useUnreadCommunityPosts';
 import { tr } from "@/lib/tr";
@@ -22,7 +23,7 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
 
   const womanTabs = [
     { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
-    { id: 'tools', label: tr("bottomnav_aletler_4778b4", 'Alətlər'), icon: Compass },
+    { id: 'tools', label: tr("bottomnav_aletler_4778b4", 'Alətlər'), icon: RiApps2AiLine },
 
     { id: 'community', label: tr("bottomnav_cemiyyet_2dc44d", 'Cəmiyyət'), icon: Users },
     { id: 'ai', label: 'Anacan.AI', icon: Sparkles, special: true },

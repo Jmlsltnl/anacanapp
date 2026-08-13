@@ -425,7 +425,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                     }} />
                   </button>
                 </div>
-                <p className="a-list-time" style={{ marginTop: -8, marginLeft: 4 }}>
+                <p className="a-list-time" style={{ marginTop: 8, marginLeft: 4, marginBottom: 4, lineHeight: 1.5 }}>
                   {tr("vitamintracker_qebul_vaxtindan_5_deqiqe_evvel_023b26", "Q\u0259bul vaxt\u0131ndan 5 d\u0259qiq\u0259 \u0259vv\u0259l bildiri\u015F g\xF6nd\u0259ril\u0259c\u0259k")}
                 </p>
               </div>

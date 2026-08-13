@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { getDynamicIcon } from '@/lib/dynamicIcon';
 import type { Feature } from '../funnelData';
 
 interface FeaturesStepProps {
@@ -27,7 +28,13 @@ export default function FeaturesStep({ features, onContinue }: FeaturesStepProps
             exit={{ opacity: 0, x: -40 }}
             className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl border border-primary/20 p-8 text-center"
           >
-            <div className="text-6xl mb-4">{features[active].emoji}</div>
+            {(() => {
+              const IconComp = getDynamicIcon(features[active].icon || 'Sparkles', Sparkles);
+              return (
+                <div className="w-20 h-20 rounded-3xl bg-primary/15 flex items-center justify-center mx-auto mb-5">
+                  <IconComp className="w-10 h-10 text-primary" strokeWidth={1.8} />
+                </div>);
+            })()}
             <h3 className="text-lg font-bold text-foreground mb-2">{features[active].title}</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">{features[active].description}</p>
           </motion.div>

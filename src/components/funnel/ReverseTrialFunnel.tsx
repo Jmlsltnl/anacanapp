@@ -36,11 +36,19 @@ export default function ReverseTrialFunnel({ onComplete }: ReverseTrialFunnelPro
   const contextLine = useMemo(() => {
     if (stage === 'bump') {
       const pd = getPregnancyData();
-      return pd ? `${pd.currentWeek}-ci həftə, ${pd.trimester}-ci trimester` : tr("reversetrialfunnel_hamilelik_e86feb", "Hamil\u0259lik");
+      return pd ?
+      tr("revtrial_context_bump", "{week}-ci həftə, {tri}-ci trimester").
+      replace('{week}', String(pd.currentWeek)).
+      replace('{tri}', String(pd.trimester)) :
+      tr("reversetrialfunnel_hamilelik_e86feb", "Hamil\u0259lik");
     }
     if (stage === 'mommy') {
       const bd = getBabyData();
-      return bd ? `${bd.name} — ${bd.ageInMonths} aylıq` : tr("reversetrialfunnel_analiq_9e762d", "Anal\u0131q");
+      return bd ?
+      tr("revtrial_context_mommy", "{name} — {months} aylıq").
+      replace('{name}', bd.name).
+      replace('{months}', String(bd.ageInMonths)) :
+      tr("reversetrialfunnel_analiq_9e762d", "Anal\u0131q");
     }
     return tr("reversetrialfunnel_cycle_status", "Tsikl: {length} gün").replace("{length}", String(cycleLength));
   }, [stage, getPregnancyData, getBabyData, cycleLength]);
