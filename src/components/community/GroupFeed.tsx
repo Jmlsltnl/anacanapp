@@ -124,7 +124,7 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
                 <span className="text-lg">{group?.icon_emoji || '👥'}</span>
               </div>
               <div>
-                <h1 className="text-[16px] font-black text-foreground truncate leading-tight">{group?.name || tr("groupfeed_umumi_1b5521", "\xDCmumi")}</h1>
+                <h1 className="text-[16px] font-black text-foreground truncate leading-tight">{group?.name ? tr(`group_name_${group.name.replace(/\s+/g, '_').toLowerCase()}`, group.name) : tr("groupfeed_umumi_1b5521", "\xDCmumi")}</h1>
                 <div className="flex items-center gap-1 text-[10px] text-muted-foreground/40 font-medium">
                   <Users className="w-3 h-3" />
                   <span>{group?.member_count || 0} {tr("groupfeed_uzv_3f0dbc", "\xFCzv")}</span>
