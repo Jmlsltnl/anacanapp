@@ -347,7 +347,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                       type="number"
                       value={customFood.calories}
                       onChange={(e) => setCustomFood({ ...customFood, calories: e.target.value })}
-                      placeholder={language === 'en' ? "e.g. 350" : "məs. 350"} />
+                      placeholder={tr("nutrition_kcal_ph", "məs. 350")} />
                     
                     </div>
                     <button

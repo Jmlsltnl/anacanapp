@@ -524,10 +524,10 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                         <span className="a-list-icon" style={{ background: 'var(--a-grad-blue)', color: 'var(--a-blue-ink)' }}>
                           <CheckCircle2 size={17} strokeWidth={2} />
                         </span>
-                        <p className="a-list-title">{language === 'en' ? "Tenure Requirement" : "İş Stajı Tələbi"}</p>
+                        <p className="a-list-title">{tr("maternity_is_staji_telebi", "İş Stajı Tələbi")}</p>
                       </div>
                       <p style={{ margin: '10px 0 0', fontSize: 12.5, lineHeight: 1.65, color: 'var(--a-ink-soft)' }}>
-                        {isAZ ? `Məzuniyyət ödənişi almaq üçün son iş yerində minimum ${result.rule.tenureRequirementMonths} ay iş stajınız olmalıdır.` : `You must have at least ${result.rule.tenureRequirementMonths} months of tenure at your current job to receive paid leave.`}
+                        {tr("maternity_staj_metni", "Məzuniyyət ödənişi almaq üçün son iş yerində minimum {n} ay iş stajınız olmalıdır.").replace('{n}', String(result.rule.tenureRequirementMonths))}
                       </p>
                     </div>
                   )}
@@ -540,8 +540,8 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                           <Baby size={17} strokeWidth={2} />
                         </span>
                         <div>
-                          <p className="a-list-title">{language === 'en' ? "Parental Leave" : "Uşağa Qulluq Məzuniyyəti"}</p>
-                          <p className="a-list-sub">{language === 'en' ? "Duration" : "Müddət"}: {result.rule.parental.months} {language === 'en' ? "months" : "ay"}</p>
+                          <p className="a-list-title">{tr("maternity_usaga_qulluq_mezuniyyeti", "Uşağa Qulluq Məzuniyyəti")}</p>
+                          <p className="a-list-sub">{tr("maternity_muddet", "Müddət")}: {result.rule.parental.months} {tr("common_ay_unit", "ay")}</p>
                         </div>
                       </div>
                       <p style={{ margin: '10px 0 0', fontSize: 12.5, lineHeight: 1.65, color: 'var(--a-ink-soft)' }}>

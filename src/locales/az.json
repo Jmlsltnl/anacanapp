@@ -6969,5 +6969,16 @@
   "usementalhealthdata_pis_e041c6": "Pis",
   "weighttracker_indi_eef": "Cari:",
   "bp_systolic_hint": "(yuxarı)",
-  "bp_diastolic_hint": "(aşağı)"
+  "bp_diastolic_hint": "(aşağı)",
+  "vaccinecalendar_yer_ph": "məs. Bakı Uşaq Klinik Xəstəxanası",
+  "vaccinecalendar_sebeb_ph": "məs. Tibbi əks-göstəriş",
+  "maternity_is_staji_telebi": "İş Stajı Tələbi",
+  "maternity_staj_metni": "Məzuniyyət ödənişi almaq üçün son iş yerində minimum {n} ay iş stajınız olmalıdır.",
+  "maternity_usaga_qulluq_mezuniyyeti": "Uşağa Qulluq Məzuniyyəti",
+  "maternity_muddet": "Müddət",
+  "common_ay_unit": "ay",
+  "dashboard_diger_ml_ph": "Digər (ml)",
+  "dashboard_qida_ph": "Məs: balkabaqlı püre",
+  "nutrition_kcal_ph": "məs. 350",
+  "games_user_fallback": "Anacan istifadəçisi"
 }

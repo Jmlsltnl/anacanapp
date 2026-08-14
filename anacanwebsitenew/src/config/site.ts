@@ -15,7 +15,11 @@ export const SITE = {
   /** Mobile app identity */
   app: {
     bundleId: 'com.atlasoon.anacan',
-    appStoreUrl: 'https://apps.apple.com/app/anacan/id6745406124',
+    /**
+     * Country-agnostic App Store URL (no /us/): Apple geo-redirects every
+     * visitor to their own storefront — better for international SEO.
+     */
+    appStoreUrl: 'https://apps.apple.com/app/anacan-flow-pregnancy-baby/id6758301924',
     playStoreUrl: 'https://play.google.com/store/apps/details?id=com.atlasoon.anacan',
     appUrl: 'https://app.anacan.az',
     scheme: 'anacan://',

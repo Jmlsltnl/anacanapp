@@ -52,7 +52,19 @@ const breadcrumbs = [
           {featured && (
             <a href={featured.path} class="featured-post reveal">
               <div class="post-cover" data-theme={featured.entry.data.theme}>
-                <span aria-hidden="true">{featured.entry.data.emoji}</span>
+                {featured.entry.data.cover ? (
+                  <img
+                    class="cover-img"
+                    src={featured.entry.data.cover}
+                    alt={featured.entry.data.title}
+                    width="800"
+                    height="450"
+                    loading="eager"
+                    decoding="async"
+                  />
+                ) : (
+                  <span aria-hidden="true">{featured.entry.data.emoji}</span>
+                )}
                 <span class="cat">{t(`blog.categories.${featured.entry.data.category}`)}</span>
               </div>
               <div class="post-body">
@@ -89,7 +101,19 @@ const breadcrumbs = [
                 style={`transition-delay:${(i % 3) * 60}ms`}
               >
                 <div class="post-cover" data-theme={post.entry.data.theme}>
-                  <span aria-hidden="true">{post.entry.data.emoji}</span>
+                  {post.entry.data.cover ? (
+                    <img
+                      class="cover-img"
+                      src={post.entry.data.cover}
+                      alt={post.entry.data.title}
+                      width="640"
+                      height="360"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <span aria-hidden="true">{post.entry.data.emoji}</span>
+                  )}
                   <span class="cat">{t(`blog.categories.${post.entry.data.category}`)}</span>
                 </div>
                 <div class="post-body">

@@ -4729,5 +4729,16 @@
   "group_name_təcrübəli_analar": "Deneyimli Anneler",
   "group_desc_təcrübəli_analar": "Tavsiye ve deneyimlerini paylaş",
   "group_name_yeni_analar": "Yeni Anneler",
-  "group_desc_yeni_analar": "Yenidoğan bakımı deneyimlerini paylaş"
+  "group_desc_yeni_analar": "Yenidoğan bakımı deneyimlerini paylaş",
+  "vaccinecalendar_yer_ph": "örn. İstanbul Çocuk Kliniği",
+  "vaccinecalendar_sebeb_ph": "örn. Tıbbi kontrendikasyon",
+  "maternity_is_staji_telebi": "Çalışma Süresi Şartı",
+  "maternity_staj_metni": "İzin ödemesi alabilmeniz için son iş yerinizde en az {n} ay çalışmış olmanız gerekir.",
+  "maternity_usaga_qulluq_mezuniyyeti": "Çocuk Bakım İzni",
+  "maternity_muddet": "Süre",
+  "common_ay_unit": "ay",
+  "dashboard_diger_ml_ph": "Diğer (ml)",
+  "dashboard_qida_ph": "Örn. balkabaklı püre",
+  "nutrition_kcal_ph": "örn. 350",
+  "games_user_fallback": "Anacan kullanıcısı"
 }

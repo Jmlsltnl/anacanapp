@@ -1339,7 +1339,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
                 type="number"
                 value={formulaML}
                 onChange={(e) => setFormulaML(e.target.value)}
-                placeholder={language === 'en' ? "Other (ml)" : "Digər (ml)"}
+                placeholder={tr("dashboard_diger_ml_ph", "Digər (ml)")}
                 className="a-input"
                 min="1"
                 max="500" />
@@ -1381,7 +1381,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
                 type="text"
                 value={solidFoodName}
                 onChange={(e) => setSolidFoodName(e.target.value)}
-                placeholder={language === 'en' ? "e.g. pumpkin puree" : "Məs: balkabaqlı püre"}
+                placeholder={tr("dashboard_qida_ph", "Məs: balkabaqlı püre")}
                 className="a-input" />
               
                 <motion.button

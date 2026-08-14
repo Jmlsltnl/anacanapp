@@ -9,6 +9,7 @@
     "start": "astro dev",
     "og": "node scripts/generate-og.mjs",
     "og:force": "node scripts/generate-og.mjs --force",
+    "blog:sync": "node scripts/sync-blog.mjs --wipe",
     "build": "npm run og && astro build && npm run seo:audit",
     "build:fast": "astro build",
     "seo:audit": "node scripts/seo-audit.mjs",

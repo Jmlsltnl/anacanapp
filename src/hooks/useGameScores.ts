@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { tr } from '@/lib/tr';
 
 // Global leaderboard support for Mini Games.
 // NOTE: reads/writes are wrapped defensively — if the `game_scores` table
@@ -50,7 +51,7 @@ export function useGameLeaderboard(gameId: string, limit = 20) {
 
       return rows.map((r) => ({
         userId: r.user_id,
-        name: profileMap.get(r.user_id)?.name || 'Anacan istifadəçisi',
+        name: profileMap.get(r.user_id)?.name || tr("games_user_fallback", "Anacan istifadəçisi"),
         avatarUrl: profileMap.get(r.user_id)?.avatar_url || null,
         bestScore: r.best_score,
         bestLevel: r.best_level,

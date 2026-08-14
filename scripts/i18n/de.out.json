@@ -8472,5 +8472,16 @@
  "group_name_təcrübəli_analar": "Erfahrene Mamas",
  "group_desc_təcrübəli_analar": "Teilt eure Tipps und Erfahrungen",
  "group_name_yeni_analar": "Junge Mamas",
- "group_desc_yeni_analar": "Tauscht euch über die Pflege von Neugeborenen aus"
+ "group_desc_yeni_analar": "Tauscht euch über die Pflege von Neugeborenen aus",
+ "vaccinecalendar_yer_ph": "z. B. Kinderklinik München",
+ "vaccinecalendar_sebeb_ph": "z. B. medizinische Kontraindikation",
+ "maternity_is_staji_telebi": "Erforderliche Beschäftigungsdauer",
+ "maternity_staj_metni": "Um Urlaubsgeld zu erhalten, musst du bei deinem letzten Arbeitgeber mindestens {n} Monate beschäftigt gewesen sein.",
+ "maternity_usaga_qulluq_mezuniyyeti": "Elternzeit",
+ "maternity_muddet": "Dauer",
+ "common_ay_unit": "Monat",
+ "dashboard_diger_ml_ph": "Sonstiges (ml)",
+ "dashboard_qida_ph": "z. B. Kürbispüree",
+ "nutrition_kcal_ph": "z. B. 350",
+ "games_user_fallback": "Anacan-Nutzerin"
 }

@@ -77,6 +77,13 @@ export default function InitialLanguageScreen() {
   const handleCountrySelect = (code: string) => {
     setCountryCode(code);
     setHasSelectedLanguage(true);
+    // KRİTİK: qeyri-az dillərdə BİR DƏFƏ reload — main-chunk modul konstantları
+    // (onboarding sual mətnləri, flow seçimləri və s.) import anında tr() ilə
+    // hesablanır; reload-suz ilk quraşdırmada AZ donub qalırdılar.
+    // Keş artıq localStorage-a yazılıb → reload-dan sonra zero-flash işləyir.
+    if (selectedLang && selectedLang !== 'az') {
+      setTimeout(() => window.location.reload(), 80);
+    }
   };
 
   const filteredCountries = useMemo(() => {

@@ -8472,5 +8472,16 @@
   "group_name_təcrübəli_analar": "Тәжірибелі аналар",
   "group_desc_təcrübəli_analar": "Кеңес пен тәжірибе бөлісіңіз",
   "group_name_yeni_analar": "Жаңа босанған аналар",
-  "group_desc_yeni_analar": "Нәресте күтімі туралы тәжірибе бөлісіңіз"
+  "group_desc_yeni_analar": "Нәресте күтімі туралы тәжірибе бөлісіңіз",
+  "vaccinecalendar_yer_ph": "мыс. Алматы қалалық балалар клиникалық ауруханасы",
+  "vaccinecalendar_sebeb_ph": "мыс. Медициналық қарсы көрсетілім",
+  "maternity_is_staji_telebi": "Еңбек өтіліне қойылатын талап",
+  "maternity_staj_metni": "Демалыс төлемін алу үшін соңғы жұмыс орныңызда кемінде {n} ай еңбек өтіліңіз болуы тиіс.",
+  "maternity_usaga_qulluq_mezuniyyeti": "Бала күтіміне байланысты демалыс",
+  "maternity_muddet": "Ұзақтығы",
+  "common_ay_unit": "ай",
+  "dashboard_diger_ml_ph": "Басқа (мл)",
+  "dashboard_qida_ph": "Мыс.: асқабақ езбесі",
+  "nutrition_kcal_ph": "мыс. 350",
+  "games_user_fallback": "Anacan пайдаланушысы"
 }

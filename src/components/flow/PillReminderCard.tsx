@@ -23,7 +23,8 @@ const PillReminderCard = () => {
   
   const getPillTitle = () => {
     if (!pill?.title) return tr("pillremindercard_hebinizi_qebul_edin_03c5be", defaultTitleAz);
-    if (language === 'en' && pill.title === defaultTitleAz) return "Take your pill";
+    // Başlıq hələ default AZ mətndirsə → BÜTÜN dillərdə lokallaşdır (əvvəllər yalnız en idi)
+    if (pill.title === defaultTitleAz) return tr("pillremindercard_hebinizi_qebul_edin_03c5be", defaultTitleAz);
     return pill.title;
   };
 

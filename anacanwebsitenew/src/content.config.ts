@@ -23,6 +23,8 @@ const blog = defineCollection({
     /** Visual theme of the cover card */
     theme: z.enum(['flow', 'bump', 'mommy', 'partner']).default('bump'),
     emoji: z.string().default('💛'),
+    /** Real cover image URL (synced from the app's database) */
+    cover: z.string().optional(),
     featured: z.boolean().default(false),
     draft: z.boolean().default(false),
   }),

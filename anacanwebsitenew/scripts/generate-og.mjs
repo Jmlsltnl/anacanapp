@@ -54,7 +54,19 @@ function parseFrontmatter(md) {
   const out = {};
   for (const line of match[1].split(/\r?\n/)) {
     const m = line.match(/^(\w+):\s*(.*)$/);
-    if (m) out[m[1]] = m[2].replace(/^["']|["']$/g, '');
+    if (!m) continue;
+    let value = m[2].trim();
+    if (value.startsWith('"')) {
+      /* JSON-escaped scalar (written by sync-blog) */
+      try {
+        value = JSON.parse(value);
+      } catch {
+        value = value.replace(/^["']|["']$/g, '');
+      }
+    } else {
+      value = value.replace(/^["']|["']$/g, '');
+    }
+    out[m[1]] = value;
   }
   return out;
 }

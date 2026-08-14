@@ -597,7 +597,7 @@ function ActionDialog({
             </div>
             <div>
               <Label className="text-xs">{tr("vaccinecalendar_yer_xestexana_klinika_d8c111", "Yer (xəstəxana/klinika)")}</Label>
-              <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder={lang === 'en' ? "e.g. Baku Children's Clinic" : "məs. Bakı Uşaq Klinik Xəstəxanası"} />
+              <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder={tr("vaccinecalendar_yer_ph", "məs. Bakı Uşaq Klinik Xəstəxanası")} />
             </div>
             <div>
               <Label className="text-xs">{tr("vaccinecalendar_partiya_nomresi_isteye_bagli_4b290a", "Partiya n\xF6mr\u0259si (ist\u0259y\u0259 ba\u011Fl\u0131)")}</Label>
@@ -618,7 +618,7 @@ function ActionDialog({
         <div className="space-y-3 mt-2">
             <div>
               <Label className="text-xs">{tr("vaccinecalendar_sebeb_7b51f1", "Səbəb")}</Label>
-              <Textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} placeholder={lang === 'en' ? "e.g. Medical contraindication" : "məs. Tibbi əks-göstəriş"} />
+              <Textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} placeholder={tr("vaccinecalendar_sebeb_ph", "məs. Tibbi əks-göstəriş")} />
             </div>
             <Button
             variant="outline"

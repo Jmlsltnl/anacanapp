@@ -8461,5 +8461,16 @@
   "group_name_sağlamlıq_tövsiyələri": "Health Tips",
   "group_desc_sağlamlıq_tövsiyələri": "Health and care advice",
   "group_name_üçüz_anaları": "Moms of Triplets",
-  "group_desc_üçüz_anaları": "A group for moms of triplets"
+  "group_desc_üçüz_anaları": "A group for moms of triplets",
+  "vaccinecalendar_yer_ph": "e.g. London Children's Hospital",
+  "vaccinecalendar_sebeb_ph": "e.g. Medical contraindication",
+  "maternity_is_staji_telebi": "Employment Requirement",
+  "maternity_staj_metni": "To receive maternity pay, you must have worked at your current workplace for at least {n} months.",
+  "maternity_usaga_qulluq_mezuniyyeti": "Childcare Leave",
+  "maternity_muddet": "Duration",
+  "common_ay_unit": "months",
+  "dashboard_diger_ml_ph": "Other (ml)",
+  "dashboard_qida_ph": "e.g. pumpkin purée",
+  "nutrition_kcal_ph": "e.g. 350",
+  "games_user_fallback": "Anacan user"
 }

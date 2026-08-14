@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { tr } from '@/lib/tr';
 
 /**
  * Referral proqramı (konversiya-əsaslı):
@@ -87,7 +88,7 @@ export const useReferral = () => {
           const card = cardMap.get(r.referred_user_id);
           return {
             id: r.id,
-            name: card?.name || 'İstifadəçi',
+            name: card?.name || tr("usecommunity_i_stifadeci_b6bdd6", "İstifadəçi"),
             avatarUrl: card?.avatar_url || null,
             status: (r.status || 'registered') as ReferralStatus,
             isPremiumNow: !!card?.is_premium,

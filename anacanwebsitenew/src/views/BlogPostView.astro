@@ -44,7 +44,25 @@ const breadcrumbs: BreadcrumbItem[] = [
   { name: data.title, path: post.path },
 ];
 
-const wordCount = (post.entry.body ?? '').split(/\s+/).filter(Boolean).length;
+const wordCount = (post.entry.body ?? '')
+  .replace(/<[^>]+>/g, ' ')
+  .split(/\s+/)
+  .filter(Boolean).length;
+
+/*
+ * <title> tag: DB titles can be long (up to ~120 chars).
+ *  - short titles get the brand suffix
+ *  - 51–68 chars: used as-is
+ *  - longer: cut at a word boundary (~62 chars) for SERP-safe length;
+ *    the visible H1 always shows the full title.
+ */
+const rawTitle = data.title;
+const titleTag =
+  rawTitle.length <= 50
+    ? `${rawTitle} — Anacan`
+    : rawTitle.length <= 65
+      ? rawTitle
+      : `${rawTitle.slice(0, 62).replace(/\s+\S*$/, '')}…`;
 
 const extraLd = [
   articleLd(site, {
@@ -65,7 +83,7 @@ const extraLd = [
 
 <Base
   lang={lang}
-  title={data.title.length > 50 ? data.title : `${data.title} — Anacan`}
+  title={titleTag}
   description={data.description}
   alternates={alternates}
   ogImage={ogImage}
@@ -107,7 +125,22 @@ const extraLd = [
         data-theme={data.theme}
         style="max-width:780px;margin-inline:auto;border-radius:var(--r-xl);font-size:4rem"
       >
-        <span aria-hidden="true">{data.emoji}</span>
+        {
+          data.cover ? (
+            <img
+              class="cover-img"
+              src={data.cover}
+              alt={data.title}
+              width="780"
+              height="439"
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
+            />
+          ) : (
+            <span aria-hidden="true">{data.emoji}</span>
+          )
+        }
       </div>
 
       <div class="prose section" style="padding-top:2.2rem">
@@ -137,7 +170,19 @@ const extraLd = [
               {related.map((rp, i) => (
                 <a href={rp.path} class="post-card reveal" style={`transition-delay:${i * 60}ms`}>
                   <div class="post-cover" data-theme={rp.entry.data.theme}>
-                    <span aria-hidden="true">{rp.entry.data.emoji}</span>
+                    {rp.entry.data.cover ? (
+                      <img
+                        class="cover-img"
+                        src={rp.entry.data.cover}
+                        alt={rp.entry.data.title}
+                        width="640"
+                        height="360"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <span aria-hidden="true">{rp.entry.data.emoji}</span>
+                    )}
                     <span class="cat">{t(`blog.categories.${rp.entry.data.category}`)}</span>
                   </div>
                   <div class="post-body">

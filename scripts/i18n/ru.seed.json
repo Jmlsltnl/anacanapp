@@ -4729,5 +4729,16 @@
   "group_name_təcrübəli_analar": "Опытные мамы",
   "group_desc_təcrübəli_analar": "Делитесь советами и опытом",
   "group_name_yeni_analar": "Молодые мамы",
-  "group_desc_yeni_analar": "Делитесь опытом ухода за новорождёнными"
+  "group_desc_yeni_analar": "Делитесь опытом ухода за новорождёнными",
+  "vaccinecalendar_yer_ph": "напр., Детская городская клиническая больница",
+  "vaccinecalendar_sebeb_ph": "напр., медицинское противопоказание",
+  "maternity_is_staji_telebi": "Требование к трудовому стажу",
+  "maternity_staj_metni": "Чтобы получить отпускные выплаты, ваш трудовой стаж на последнем месте работы должен составлять не менее {n} месяцев.",
+  "maternity_usaga_qulluq_mezuniyyeti": "Отпуск по уходу за ребёнком",
+  "maternity_muddet": "Продолжительность",
+  "common_ay_unit": "месяц",
+  "dashboard_diger_ml_ph": "Другое (мл)",
+  "dashboard_qida_ph": "Напр.: тыквенное пюре",
+  "nutrition_kcal_ph": "напр., 350",
+  "games_user_fallback": "Пользователь Anacan"
 }
