@@ -130,8 +130,8 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1 }}>
         
-        <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -left-10 -bottom-10 w-32 h-32 rounded-full bg-white/5 blur-xl" />
+        <div className="absolute -end-10 -top-10 w-40 h-40 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute -start-10 -bottom-10 w-32 h-32 rounded-full bg-white/5 blur-xl" />
         
         <div className="relative z-10 flex items-center gap-4">
           <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-4xl shadow-lg">
@@ -360,8 +360,8 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
               <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center">
                 <Icon className="w-5 h-5 text-muted-foreground" />
               </div>
-              <span className="flex-1 text-left font-medium text-foreground">{item.label}</span>
-              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              <span className="flex-1 text-start font-medium text-foreground">{item.label}</span>
+              <ChevronRight className="rtl:rotate-180 w-5 h-5 text-muted-foreground" />
             </motion.button>);
 
         })}

@@ -25,12 +25,12 @@ const MommyHeroAurora = ({ babyData, exactMonths, remainingDays, babyIllustratio
 
       {/* Animated aurora ribbons */}
       <motion.div
-        className="absolute -top-20 -left-10 w-[140%] h-56 bg-gradient-to-r from-[hsl(180,80%,55%)]/40 via-[hsl(280,90%,65%)]/30 to-[hsl(340,90%,65%)]/40 blur-3xl"
+        className="absolute -top-20 -start-10 w-[140%] h-56 bg-gradient-to-r from-[hsl(180,80%,55%)]/40 via-[hsl(280,90%,65%)]/30 to-[hsl(340,90%,65%)]/40 blur-3xl"
         animate={{ x: [-30, 30, -30], rotate: [0, 8, 0] }}
         transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }} />
       
       <motion.div
-        className="absolute -bottom-24 -right-10 w-[120%] h-56 bg-gradient-to-l from-[hsl(20,90%,60%)]/40 via-[hsl(330,90%,60%)]/30 to-[hsl(260,90%,60%)]/40 blur-3xl"
+        className="absolute -bottom-24 -end-10 w-[120%] h-56 bg-gradient-to-l from-[hsl(20,90%,60%)]/40 via-[hsl(330,90%,60%)]/30 to-[hsl(260,90%,60%)]/40 blur-3xl"
         animate={{ x: [20, -20, 20], rotate: [0, -6, 0] }}
         transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }} />
       
@@ -41,7 +41,7 @@ const MommyHeroAurora = ({ babyData, exactMonths, remainingDays, babyIllustratio
         <motion.div
           key={i}
           className="absolute w-1 h-1 rounded-full bg-white"
-          style={{ top: `${i * 37 % 100}%`, left: `${i * 53 % 100}%` }}
+          style={{ top: `${i * 37 % 100}%`, insetInlineStart: `${i * 53 % 100}%` }}
           animate={{ opacity: [0.2, 1, 0.2], scale: [0.6, 1.2, 0.6] }}
           transition={{ duration: 2 + i % 3, repeat: Infinity, delay: i * 0.2 }} />
 

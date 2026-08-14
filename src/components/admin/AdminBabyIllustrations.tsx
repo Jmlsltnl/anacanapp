@@ -228,7 +228,7 @@ const AdminBabyIllustrations = () => {
                   <Button
                   size="sm"
                   variant="destructive"
-                  className="absolute top-0 right-0"
+                  className="absolute top-0 end-0"
                   onClick={() => setFormData((prev) => ({ ...prev, image_url: '' }))}>
                   
                     <Trash2 className="w-3 h-3" />
@@ -280,7 +280,7 @@ const AdminBabyIllustrations = () => {
                   setDialogOpen(false);
                 }}>
                 
-                  <Trash2 className="w-4 h-4 mr-2" />
+                  <Trash2 className="w-4 h-4 me-2" />
                   Sil
                 </Button>
               }
@@ -289,7 +289,7 @@ const AdminBabyIllustrations = () => {
                 disabled={!formData.image_url || upsertMutation.isPending}
                 className="flex-1">
                 
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="w-4 h-4 me-2" />
                 Yadda saxla
               </Button>
             </div>

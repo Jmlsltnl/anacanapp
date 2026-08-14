@@ -47,7 +47,7 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
         <header className="a-topbar safe-area-top">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("untranslated_mesajlar_ak8wzw", "Mesajlar")}</p>
           </div>
@@ -73,7 +73,7 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
           <motion.button
             key={conv.user_id}
             onClick={() => onOpenChat(conv.user_id, conv.name, conv.avatar_url)}
-            className="w-full flex items-center gap-3 text-left"
+            className="w-full flex items-center gap-3 text-start"
             whileTap={{ scale: 0.98 }}
             style={{
               padding: '12px 16px',
@@ -86,7 +86,7 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
                     <AvatarFallback style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', fontWeight: 700 }}>{conv.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   {conv.unread_count > 0 &&
-              <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center"
+              <span className="absolute -top-0.5 -end-0.5 flex items-center justify-center"
               style={{ width: 20, height: 20, borderRadius: 999, background: 'var(--a-peach-2)', color: '#fff', fontSize: 10, fontWeight: 800, border: '2px solid var(--a-surface)' }}>
                       {conv.unread_count > 9 ? '9+' : conv.unread_count}
                     </span>
@@ -97,7 +97,7 @@ const ConversationListScreen = ({ onBack, onOpenChat, partnerId }: ConversationL
                     <p className="truncate" style={{ fontSize: 14, fontWeight: conv.unread_count > 0 ? 800 : 600, color: 'var(--a-ink)' }}>
                       {conv.name}
                     </p>
-                    <span className="flex-shrink-0 ml-2" style={{ fontSize: 10, color: 'var(--a-ink-faint)', fontWeight: 500 }}>
+                    <span className="flex-shrink-0 ms-2" style={{ fontSize: 10, color: 'var(--a-ink-faint)', fontWeight: 500 }}>
                       {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: false, locale: getCurrentDateLocale() })}
                     </span>
                   </div>

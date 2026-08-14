@@ -324,7 +324,7 @@ const AdminModeration = () => {
             <Flag className="w-4 h-4" />
             <span className="hidden sm:inline">{tr("adminmoderation_sikayetler_4ad77f", "Şikayətlər")}</span>
             {pendingReports.length > 0 &&
-            <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
+            <Badge variant="destructive" className="ms-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
                 {pendingReports.length}
               </Badge>
             }
@@ -345,12 +345,12 @@ const AdminModeration = () => {
 
         <div className="mb-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Axtar..."
-              className="pl-10" />
+              className="ps-10" />
             
           </div>
         </div>
@@ -656,7 +656,7 @@ const AdminModeration = () => {
                   size="sm"
                   onClick={() => unblockUser(block.id)}>
                   
-                        <Check className="w-4 h-4 mr-1" />
+                        <Check className="w-4 h-4 me-1" />
                         {tr("adminmoderation_bloku_ac_b83fbb", "Bloku A\xE7")}
                       </Button>
                 }
@@ -708,7 +708,7 @@ const AdminModeration = () => {
                 {tr("adminmoderation_legv_et_b5e49c", "L\u0259\u011Fv et")}
               </Button>
               <Button onClick={blockUser} variant="destructive" className="flex-1">
-                <Ban className="w-4 h-4 mr-2" />
+                <Ban className="w-4 h-4 me-2" />
                 Blokla
               </Button>
             </div>

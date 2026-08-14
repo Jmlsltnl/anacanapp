@@ -152,13 +152,13 @@ const AdminContentTranslations = () => {
               {!running ? (
                 <>
                   <Button onClick={start} className="flex-1">
-                    <Play className="w-4 h-4 mr-1" /> Başlat
+                    <Play className="w-4 h-4 me-1" /> Başlat
                   </Button>
                   <Button variant="outline" onClick={checkRemaining}>Yoxla</Button>
                 </>
               ) : (
                 <Button variant="destructive" onClick={() => { stopRef.current = true; }} className="flex-1">
-                  <Square className="w-4 h-4 mr-1" /> Dayandır
+                  <Square className="w-4 h-4 me-1" /> Dayandır
                 </Button>
               )}
             </div>

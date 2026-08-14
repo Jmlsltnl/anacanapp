@@ -59,7 +59,7 @@ const AppRatingPrompt = () => {
             {/* Close button */}
             <button
             onClick={handleLater}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center">
+            className="absolute top-4 end-4 w-8 h-8 rounded-full bg-muted/50 flex items-center justify-center">
             
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
@@ -123,7 +123,7 @@ const AppRatingPrompt = () => {
             variant="ghost"
             className="w-full h-10 text-muted-foreground hover:text-foreground">
             
-              <Clock className="w-4 h-4 mr-2" />
+              <Clock className="w-4 h-4 me-2" />
               {tr("appratingprompt_daha_sonra", "Daha sonra")}
             </Button>
 

@@ -252,18 +252,18 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             <DropdownMenuContent align="end" className="bg-popover border-border/20 z-50 rounded-xl shadow-xl min-w-[150px]">
               {isOwnPost &&
               <DropdownMenuItem onClick={() => {setEditContent(post.content);setIsEditing(true);}} className="text-foreground text-[11px] rounded-lg">
-                  <Pencil className="w-3 h-3 mr-2" /> {tr("postcard_redakte_et_66cf3b", "Redakt\u0259 et")}
+                  <Pencil className="w-3 h-3 me-2" /> {tr("postcard_redakte_et_66cf3b", "Redakt\u0259 et")}
                 </DropdownMenuItem>
               }
               {!isOwnPost &&
               <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600 text-[11px] rounded-lg">
-                  <Flag className="w-3 h-3 mr-2" /> {tr("postcard_sikayet_et_e8b63a", "\u015Eikay\u0259t et")}
+                  <Flag className="w-3 h-3 me-2" /> {tr("postcard_sikayet_et_e8b63a", "\u015Eikay\u0259t et")}
                 </DropdownMenuItem>
               }
               {(isAdmin || isOwnPost) && <DropdownMenuSeparator className="bg-border/10" />}
               {(isAdmin || isOwnPost) &&
               <DropdownMenuItem onClick={handleDeletePost} className="text-destructive text-[11px] rounded-lg">
-                  <Trash2 className="w-3 h-3 mr-2" />{tr("untranslated_sil_zwa7lz", "Sil")}</DropdownMenuItem>
+                  <Trash2 className="w-3 h-3 me-2" />{tr("untranslated_sil_zwa7lz", "Sil")}</DropdownMenuItem>
               }
             </DropdownMenuContent>
           </DropdownMenu>
@@ -282,7 +282,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
           </div> :
 
         <div onClick={handleDoubleTap} className="relative">
-            <p className="a-post-text">
+            <p className="a-post-text" dir="auto">
               {(showTranslation && translation ? translation : post.content).split(/(\s+)/).map((word, index) => {
               if (word.startsWith('#')) return <span key={index} className="a-post-tag">{word}</span>;
               if (word.startsWith('@')) return <span key={index} style={{ color: 'var(--a-blue-2)', fontWeight: 700 }}>{word}</span>;

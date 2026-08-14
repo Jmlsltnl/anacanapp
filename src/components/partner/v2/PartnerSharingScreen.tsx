@@ -76,7 +76,7 @@ const PartnerSharingScreen = ({ onBack }: Props) => {
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr('common_geri', 'Geri')}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
               <p className="a-eyebrow">{tr('partnerv2_siz_idare_edirsiniz', 'Siz idarÉ™ edirsiniz')}</p>
@@ -127,7 +127,7 @@ const PartnerSharingScreen = ({ onBack }: Props) => {
           {/* BaÄŸlantÄ±nÄ± kÉ™s */}
           <motion.button
             onClick={() => setShowUnlink(true)}
-            className="w-full flex items-center gap-4 text-left"
+            className="w-full flex items-center gap-4 text-start"
             style={{ padding: 14, borderRadius: 16, background: 'var(--a-alert-bg)' }}
             whileTap={{ scale: 0.98 }}>
             <div className="w-10 h-10 flex items-center justify-center shrink-0" style={{ borderRadius: 13, background: 'var(--a-chip-overlay)' }}>

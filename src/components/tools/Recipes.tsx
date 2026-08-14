@@ -534,7 +534,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
             <div
               key={recipe.id}
               onClick={() => handleRecipeClick(recipe)}
-              className="relative overflow-hidden text-left group cursor-pointer active:scale-[0.98] transition-all rounded-[20px]"
+              className="relative overflow-hidden text-start group cursor-pointer active:scale-[0.98] transition-all rounded-[20px]"
               style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', boxShadow: 'var(--a-card-shadow)' }}>
               
                   {/* Lock overlay for non-premium non-free recipes */}
@@ -567,7 +567,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                     
                     {/* Time badge */}
                     {totalTime(recipe) > 0 &&
-                <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-1 rounded-full flex items-center gap-1">
+                <div className="absolute top-2 start-2 bg-black/60 backdrop-blur-sm text-white text-[10px] px-2 py-1 rounded-full flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {totalTime(recipe)} {tr("recipes_deq_780a5c", "d\u0259q")}
                       </div>
@@ -576,7 +576,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                     {/* Favorite button */}
                     <motion.button
                   onClick={(e) => toggleFavorite(recipe.id, e)}
-                  className="absolute top-2 right-2 w-7 h-7 rounded-full backdrop-blur-sm flex items-center justify-center shadow-md z-20"
+                  className="absolute top-2 end-2 w-7 h-7 rounded-full backdrop-blur-sm flex items-center justify-center shadow-md z-20"
                   style={{ background: 'rgba(255,255,255,0.9)' }}
                   whileTap={{ scale: 0.8 }}>
                   

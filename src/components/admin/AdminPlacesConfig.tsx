@@ -130,7 +130,7 @@ const AdminPlacesConfig = () => {
         <TabsContent value="categories" className="space-y-4">
           <div className="flex justify-end">
             <Button onClick={() => setNewCategory(true)} disabled={newCategory}>
-              <Plus className="w-4 h-4 mr-2" /> Yeni Kateqoriya
+              <Plus className="w-4 h-4 me-2" /> Yeni Kateqoriya
             </Button>
           </div>
 
@@ -193,7 +193,7 @@ const AdminPlacesConfig = () => {
         <TabsContent value="amenities" className="space-y-4">
           <div className="flex justify-end">
             <Button onClick={() => setNewAmenity(true)} disabled={newAmenity}>
-              <Plus className="w-4 h-4 mr-2" /> Yeni İmkan
+              <Plus className="w-4 h-4 me-2" /> Yeni İmkan
             </Button>
           </div>
 
@@ -279,10 +279,10 @@ const CategoryForm = ({ category, onSave, onCancel, isLoading }: any) => {
       </div>
       <div className="flex gap-2">
         <Button onClick={() => onSave(form)} disabled={isLoading || !form.category_key}>
-          <Save className="w-4 h-4 mr-2" /> Yadda saxla
+          <Save className="w-4 h-4 me-2" /> Yadda saxla
         </Button>
         <Button variant="outline" onClick={onCancel}>
-          <X className="w-4 h-4 mr-2" /> {tr("adminplacesconfig_legv_et_b5e49c", "L\u0259\u011Fv et")}
+          <X className="w-4 h-4 me-2" /> {tr("adminplacesconfig_legv_et_b5e49c", "L\u0259\u011Fv et")}
         </Button>
       </div>
     </div>);
@@ -311,10 +311,10 @@ const AmenityForm = ({ amenity, onSave, onCancel, isLoading }: any) => {
       </div>
       <div className="flex gap-2">
         <Button onClick={() => onSave(form)} disabled={isLoading || !form.amenity_key}>
-          <Save className="w-4 h-4 mr-2" /> Yadda saxla
+          <Save className="w-4 h-4 me-2" /> Yadda saxla
         </Button>
         <Button variant="outline" onClick={onCancel}>
-          <X className="w-4 h-4 mr-2" /> {tr("adminplacesconfig_legv_et_b5e49c", "L\u0259\u011Fv et")}
+          <X className="w-4 h-4 me-2" /> {tr("adminplacesconfig_legv_et_b5e49c", "L\u0259\u011Fv et")}
         </Button>
       </div>
     </div>);

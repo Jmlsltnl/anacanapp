@@ -61,7 +61,7 @@ const CountrySelect = ({ value, onChange, placeholder, triggerClassName }: Count
         type="button"
         onClick={() => setOpen(true)}
         className={triggerClassName || 'a-input w-full flex items-center gap-2'}
-        style={{ textAlign: 'left', cursor: 'pointer' }}>
+        style={{ textAlign: 'start', cursor: 'pointer' }}>
         {selected ?
         <span className="flex items-center gap-2 flex-1 min-w-0">
             <img src={flagSrc(selected.flag)} alt="" style={{ width: 24, height: 16, objectFit: 'cover', borderRadius: 3, border: '1px solid var(--a-line)', flexShrink: 0 }} />
@@ -123,7 +123,7 @@ const CountrySelect = ({ value, onChange, placeholder, triggerClassName }: Count
                   style={{
                     padding: '10px 10px', borderRadius: 12, border: 'none', cursor: 'pointer',
                     background: value === c.isoAlpha2 ? 'var(--a-peach-1)' : 'transparent',
-                    textAlign: 'left'
+                    textAlign: 'start'
                   }}>
                     <img src={flagSrc(c.flag)} alt="" style={{ width: 26, height: 18, objectFit: 'cover', borderRadius: 3, border: '1px solid var(--a-line)', flexShrink: 0 }} />
                     <span className="flex-1 truncate" style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--a-ink)' }}>{c.name}</span>

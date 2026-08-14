@@ -85,7 +85,7 @@ const WinBackCard = ({ variant = 'card' }: Props) => {
         className="a-card relative overflow-hidden"
         style={{ marginTop: 12, border: '2px solid var(--a-peach-2)' }}>
 
-        <span className="absolute top-0 right-0" aria-hidden
+        <span className="absolute top-0 end-0" aria-hidden
         style={{ width: 120, height: 120, borderRadius: 999, background: 'var(--a-peach-1)', opacity: 0.5, transform: 'translate(35%, -35%)' }} />
 
         <div className="relative">

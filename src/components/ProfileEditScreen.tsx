@@ -276,7 +276,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
             whileTap={{ scale: 0.95 }}
             aria-label={tr("common_geri", "Geri")}>
 
-            <ArrowLeft size={16} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
           </motion.button>
           <h1 className="flex-1 truncate" style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>{tr("profileeditscreen_profili_redakte_et_b5368c", "Profili Redaktə Et")}</h1>
           <motion.button onClick={handleSave} disabled={loading} className="a-btn-solid disabled:opacity-50" whileTap={{ scale: 0.95 }}>
@@ -301,7 +301,7 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
             </Avatar>
             <motion.button
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 w-10 h-10 rounded-full flex items-center justify-center"
+                className="absolute bottom-0 end-0 w-10 h-10 rounded-full flex items-center justify-center"
                 style={{ background: 'var(--a-peach-2)', boxShadow: '0 10px 20px -8px rgba(217, 108, 74, 0.55)', border: '3px solid var(--a-surface)' }}
                 whileTap={{ scale: 0.95 }}
                 disabled={uploading}>

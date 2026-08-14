@@ -27,20 +27,20 @@ const MommyHeroStorybook = ({ babyData, exactMonths, remainingDays, babyIllustra
 
       {/* Cloud blobs */}
       <motion.div
-        className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/70 blur-2xl"
+        className="absolute -top-8 -end-8 w-40 h-40 rounded-full bg-white/70 blur-2xl"
         animate={{ x: [0, 8, 0], y: [0, 4, 0] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} />
       
       <motion.div
-        className="absolute -bottom-10 -left-10 w-44 h-44 rounded-full bg-[hsl(340,90%,90%)]/70 blur-2xl"
+        className="absolute -bottom-10 -start-10 w-44 h-44 rounded-full bg-[hsl(340,90%,90%)]/70 blur-2xl"
         animate={{ x: [0, -6, 0], y: [0, -4, 0] }}
         transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }} />
       
 
       {/* Decorative emojis */}
-      <span className="absolute top-3 left-4 text-xl opacity-60">🌷</span>
-      <span className="absolute top-6 right-6 text-lg opacity-50">☁️</span>
-      <span className="absolute bottom-4 right-4 text-xl opacity-60">🌙</span>
+      <span className="absolute top-3 start-4 text-xl opacity-60">🌷</span>
+      <span className="absolute top-6 end-6 text-lg opacity-50">☁️</span>
+      <span className="absolute bottom-4 end-4 text-xl opacity-60">🌙</span>
 
       <div className="relative z-10 p-5 flex items-center gap-3">
         {/* Left: text */}
@@ -107,7 +107,7 @@ const MommyHeroStorybook = ({ babyData, exactMonths, remainingDays, babyIllustra
               }} />
             
           </div>
-          <span className="absolute -bottom-1.5 -right-1.5 text-2xl drop-shadow-sm">💖</span>
+          <span className="absolute -bottom-1.5 -end-1.5 text-2xl drop-shadow-sm">💖</span>
         </motion.div>
       </div>
     </motion.div>);

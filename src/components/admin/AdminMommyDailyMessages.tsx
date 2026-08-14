@@ -127,19 +127,19 @@ const AdminMommyDailyMessages = () => {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-2.5 top-2.5 text-muted-foreground" />
+            <Search className="w-4 h-4 absolute start-2.5 top-2.5 text-muted-foreground" />
             <Input
               placeholder={tr("adminmommydailymessages_gun_axtar_4c2871", "Gün axtar...")}
               value={searchDay}
               onChange={(e) => setSearchDay(e.target.value)}
-              className="pl-8 w-32 h-9" />
+              className="ps-8 w-32 h-9" />
             
           </div>
           <Button size="sm" variant="outline" onClick={downloadTemplate}>
-            <Download className="w-4 h-4 mr-1" /> {tr("adminmommydailymessages_numune_19d1f6", "N\xFCmun\u0259")}
+            <Download className="w-4 h-4 me-1" /> {tr("adminmommydailymessages_numune_19d1f6", "N\xFCmun\u0259")}
           </Button>
           <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
-            <Upload className="w-4 h-4 mr-1" /> CSV Import
+            <Upload className="w-4 h-4 me-1" /> CSV Import
           </Button>
           <Button
             size="sm"
@@ -158,16 +158,16 @@ const AdminMommyDailyMessages = () => {
             }}
             disabled={data.length === 0}>
             
-            <FileDown className="w-4 h-4 mr-1" /> İxrac
+            <FileDown className="w-4 h-4 me-1" /> İxrac
           </Button>
           <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleCSVImport} />
           <Button size="sm" onClick={handleCreate}>
-            <Plus className="w-4 h-4 mr-1" /> {tr("adminmommydailymessages_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+            <Plus className="w-4 h-4 me-1" /> {tr("adminmommydailymessages_elave_et_6e1b9b", "\u018Flav\u0259 et")}
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-2 max-h-[65vh] overflow-y-auto pr-1">
+      <div className="grid gap-2 max-h-[65vh] overflow-y-auto pe-1">
         {filteredData.map((item) =>
         <Card key={item.id} className="border-border/50">
             <CardContent className="p-3">
@@ -198,10 +198,10 @@ const AdminMommyDailyMessages = () => {
               
                   <div className="flex gap-2">
                     <Button size="sm" onClick={() => handleUpdate(item.id)}>
-                      <Save className="w-3 h-3 mr-1" /> Saxla
+                      <Save className="w-3 h-3 me-1" /> Saxla
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => {setEditingId(null);setFormData({});}}>
-                      <X className="w-3 h-3 mr-1" /> {tr("adminmommydailymessages_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                      <X className="w-3 h-3 me-1" /> {tr("adminmommydailymessages_legv_et_b5e49c", "L\u0259\u011Fv et")}
                     </Button>
                   </div>
                 </div> :

@@ -18,9 +18,9 @@ export default function CustomPlanStep({ userName, milestones, onContinue }: Cus
         <p className="text-sm text-muted-foreground text-center mb-10">{tr("customplanstep_ferdi_yol_xeriteniz_bb96ed", "Fərdi yol xəritəniz")}</p>
 
         {/* Visual roadmap */}
-        <div className="relative pl-8">
+        <div className="relative ps-8">
           {/* Vertical line */}
-          <div className="absolute left-[14px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary via-primary/60 to-primary/20" />
+          <div className="absolute start-[14px] top-2 bottom-2 w-0.5 bg-gradient-to-b from-primary via-primary/60 to-primary/20" />
 
           {milestones.map((m, i) =>
           <motion.div
@@ -31,7 +31,7 @@ export default function CustomPlanStep({ userName, milestones, onContinue }: Cus
             className="relative mb-8 last:mb-0">
 
               {/* Dot */}
-              <div className={`absolute -left-8 top-1 w-7 h-7 rounded-full flex items-center justify-center ${
+              <div className={`absolute -start-8 top-1 w-7 h-7 rounded-full flex items-center justify-center ${
             i === 0 ? 'bg-primary text-primary-foreground' : 'bg-primary/20 text-primary'}`
             }>
                 <span className="text-xs font-bold">{i + 1}</span>

@@ -13,7 +13,7 @@ const PartnerWeeklyStatsScreen = ({ onBack }: {onBack: () => void;}) => {
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr('common_geri', 'Geri')}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
               <p className="a-eyebrow">{tr('partnerv2_son_7_gun', 'Son 7 gÃ¼n')}</p>

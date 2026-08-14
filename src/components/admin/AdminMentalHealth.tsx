@@ -94,7 +94,7 @@ const EPDSTab = () => {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setEditItem(null)}>
-              <Plus className="w-4 h-4 mr-2" /> {tr("adminmentalhealth_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+              <Plus className="w-4 h-4 me-2" /> {tr("adminmentalhealth_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -210,7 +210,7 @@ const MoodTab = () => {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setEditItem(null)}>
-              <Plus className="w-4 h-4 mr-2" /> {tr("adminmentalhealth_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+              <Plus className="w-4 h-4 me-2" /> {tr("adminmentalhealth_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -310,7 +310,7 @@ const BreathingTab = () => {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setEditItem(null)}>
-              <Plus className="w-4 h-4 mr-2" /> {tr("adminmentalhealth_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+              <Plus className="w-4 h-4 me-2" /> {tr("adminmentalhealth_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg">
@@ -440,7 +440,7 @@ const NoiseTab = () => {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setEditItem(null)}>
-              <Plus className="w-4 h-4 mr-2" /> {tr("adminmentalhealth_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+              <Plus className="w-4 h-4 me-2" /> {tr("adminmentalhealth_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -606,7 +606,7 @@ const ResourcesTab = () => {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button size="sm" onClick={() => {setEditItem(null);setFormData({ name: '', name_az: '', description: '', description_az: '', resource_type: 'hotline', phone: '', website: '', address: '', address_az: '', is_emergency: false, is_active: true, sort_order: 0 });}}>
-              <Plus className="w-4 h-4 mr-1" /> {tr("adminmentalhealth_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+              <Plus className="w-4 h-4 me-1" /> {tr("adminmentalhealth_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-h-[85vh] overflow-y-auto">

@@ -128,7 +128,7 @@ const AdminPhaseTips = () => {
           <p className="text-muted-foreground">{tr("adminphasetips_menstruasiya_fazalarina_uygun_meslehetle_26de89", "Menstruasiya fazalarına uyğun məsləhətləri idarə edin")}</p>
         </div>
         <Button onClick={handleCreate} className="bg-primary">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {tr("adminphasetips_yeni_meslehet_8a124f", "Yeni M\u0259sl\u0259h\u0259t")}
         </Button>
       </div>
@@ -148,7 +148,7 @@ const AdminPhaseTips = () => {
           
             <span className="text-lg">{PHASE_INFO[phase].emoji}</span>
             <span>{PHASE_INFO[phase].labelAz}</span>
-            <Badge variant="secondary" className="ml-1 text-xs">
+            <Badge variant="secondary" className="ms-1 text-xs">
               {tipsByPhase[phase]?.length || 0}
             </Badge>
           </button>
@@ -157,12 +157,12 @@ const AdminPhaseTips = () => {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder={tr("adminphasetips_meslehet_axtar_52d3a3", "Məsləhət axtar...")}
-          className="pl-10" />
+          className="ps-10" />
         
       </div>
 
@@ -196,7 +196,7 @@ const AdminPhaseTips = () => {
 
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => handleEdit(tip)}>
-                <Edit className="w-3 h-3 mr-1" />
+                <Edit className="w-3 h-3 me-1" />
                 {tr("adminphasetips_redakte_d53ba7", "Redakt\u0259")}
               </Button>
               <Button
@@ -217,7 +217,7 @@ const AdminPhaseTips = () => {
           <div className="text-5xl mb-4">{PHASE_INFO[activePhase].emoji}</div>
           <p className="text-muted-foreground">{tr("adminphasetips_bu_faza_ucun_meslehet_yoxdur_c20833", "Bu faza üçün məsləhət yoxdur")}</p>
           <Button onClick={handleCreate} variant="outline" className="mt-4">
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4 me-2" />
             {tr("adminphasetips_i_lk_mesleheti_elave_et_791422", "\u0130lk m\u0259sl\u0259h\u0259ti \u0259lav\u0259 et")}
           </Button>
         </div>
@@ -364,7 +364,7 @@ const AdminPhaseTips = () => {
                   {tr("adminphasetips_legv_et_b5e49c", "L\u0259\u011Fv et")}
                 </Button>
                 <Button onClick={handleSave} className="bg-primary">
-                  <Save className="w-4 h-4 mr-2" />
+                  <Save className="w-4 h-4 me-2" />
                   {editingTip ? tr("adminphasetips_yenile_570ce2", "Yenil\u0259") : 'Yarat'}
                 </Button>
               </div>

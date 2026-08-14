@@ -20,17 +20,17 @@ const MommyHeroMesh = ({ babyData, exactMonths, remainingDays, babyIllustration 
       {/* Mesh gradient base */}
       <div className="absolute inset-0 bg-[hsl(15,30%,12%)]" />
       <motion.div
-        className="absolute -top-20 -left-16 w-80 h-80 rounded-full bg-[hsl(15,90%,55%)] blur-3xl opacity-70"
+        className="absolute -top-20 -start-16 w-80 h-80 rounded-full bg-[hsl(15,90%,55%)] blur-3xl opacity-70"
         animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
         transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }} />
       
       <motion.div
-        className="absolute top-10 -right-20 w-72 h-72 rounded-full bg-[hsl(340,90%,60%)] blur-3xl opacity-60"
+        className="absolute top-10 -end-20 w-72 h-72 rounded-full bg-[hsl(340,90%,60%)] blur-3xl opacity-60"
         animate={{ x: [0, -25, 0], y: [0, -15, 0] }}
         transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }} />
       
       <motion.div
-        className="absolute -bottom-16 left-1/3 w-72 h-72 rounded-full bg-[hsl(45,95%,60%)] blur-3xl opacity-55"
+        className="absolute -bottom-16 start-1/3 w-72 h-72 rounded-full bg-[hsl(45,95%,60%)] blur-3xl opacity-55"
         animate={{ x: [0, 20, 0], y: [0, -10, 0] }}
         transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }} />
       

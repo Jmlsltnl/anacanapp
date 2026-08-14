@@ -272,7 +272,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
         animate={{ width: sidebarWidth }}
         transition={{ duration: 0.2, ease: 'easeInOut' }}
         className={cn(
-          "bg-card border-r border-border flex flex-col fixed h-full z-50",
+          "bg-card border-e border-border flex flex-col fixed h-full z-50",
           "max-lg:w-[300px] max-lg:transition-transform max-lg:duration-300",
           mobileSidebarOpen ? 'max-lg:translate-x-0' : 'max-lg:-translate-x-full'
         )}>
@@ -303,7 +303,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="shrink-0 h-8 w-8 hidden lg:flex">
             
-            {sidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            {sidebarOpen ? <ChevronLeft className="rtl:rotate-180 w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </Button>
         </div>
 
@@ -311,12 +311,12 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
         {sidebarOpen &&
         <div className="px-3 py-2 border-b border-border shrink-0">
             <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <Search className="absolute start-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <Input
               placeholder="Menyu axtar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 h-8 text-xs bg-muted/50 border-0" />
+              className="ps-8 h-8 text-xs bg-muted/50 border-0" />
             
             </div>
           </div>
@@ -334,7 +334,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
                 <button
                   onClick={() => sidebarOpen ? toggleGroup(group.id) : undefined}
                   className={cn(
-                    "w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all text-left",
+                    "w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all text-start",
                     hasActiveItem ?
                     "bg-primary/10 text-primary" :
                     "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -366,7 +366,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
                     transition={{ duration: 0.2, ease: 'easeInOut' }}
                     className="overflow-hidden">
                     
-                      <div className="pl-3 py-0.5 space-y-0.5">
+                      <div className="ps-3 py-0.5 space-y-0.5">
                         {group.items.map((item) => {
                         const pendingCount = item.id === 'places' ? pendingCounts?.places : 0;
                         return (
@@ -374,7 +374,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
                             key={item.id}
                             onClick={() => handleTabChange(item.id)}
                             className={cn(
-                              "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md transition-all text-left text-xs",
+                              "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md transition-all text-start text-xs",
                               activeTab === item.id ?
                               "bg-primary/15 text-primary font-medium" :
                               "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
@@ -423,7 +423,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
               className={cn("flex-1 h-7 text-xs", !sidebarOpen && "px-2")}>
               
               <Home className="w-3.5 h-3.5" />
-              {sidebarOpen && <span className="ml-1.5">{tr("adminlayout_tetbiqe_qayit_a4ef23", "Tətbiqə qayıt")}</span>}
+              {sidebarOpen && <span className="ms-1.5">{tr("adminlayout_tetbiqe_qayit_a4ef23", "Tətbiqə qayıt")}</span>}
             </Button>
           </div>
           
@@ -437,7 +437,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
             )}>
             
             <LogOut className="w-3.5 h-3.5" />
-            {sidebarOpen && <span className="ml-1.5">{tr("adminlayout_cixis_c2de5c", "Çıxış")}</span>}
+            {sidebarOpen && <span className="ms-1.5">{tr("adminlayout_cixis_c2de5c", "Çıxış")}</span>}
           </Button>
         </div>
       </motion.aside>
@@ -445,8 +445,8 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
       {/* Main Content */}
       <main className={cn(
         "flex-1 transition-all duration-200 min-h-screen flex flex-col",
-        "max-lg:ml-0",
-        sidebarOpen ? 'lg:ml-[280px]' : 'lg:ml-[72px]'
+        "max-lg:ms-0",
+        sidebarOpen ? 'lg:ms-[280px]' : 'lg:ms-[72px]'
       )}>
         {/* Top Bar */}
         <header className="h-14 border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40 flex items-center justify-between px-4 sm:px-6 shrink-0 safe-area-top">
@@ -460,10 +460,10 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
               <Menu className="w-5 h-5" />
             </Button>
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Axtar..."
-                className="pl-10 h-9 bg-muted/50 border-0" />
+                className="ps-10 h-9 bg-muted/50 border-0" />
               
             </div>
           </div>
@@ -488,7 +488,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
             
             <Button variant="ghost" size="icon" className="relative h-8 w-8">
               <Bell className="w-4 h-4" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
+              <span className="absolute top-1 end-1 w-2 h-2 bg-primary rounded-full" />
             </Button>
           </div>
         </header>

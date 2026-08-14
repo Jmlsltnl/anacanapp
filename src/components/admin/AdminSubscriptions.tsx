@@ -184,12 +184,12 @@ const AdminSubscriptions = () => {
       {/* Filters */}
       <div className="flex gap-4 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={tr("adminsubscriptions_istifadeci_axtar_4c82f8", "İstifadəçi axtar...")}
-            className="pl-10" />
+            className="ps-10" />
           
         </div>
         <div className="flex gap-2">
@@ -230,7 +230,7 @@ const AdminSubscriptions = () => {
                   <h3 className="font-semibold truncate">{user.name}</h3>
                   {user.is_premium &&
               <Badge className="bg-gradient-to-r from-amber-400 to-amber-600 text-white">
-                      <Crown className="w-3 h-3 mr-1" />
+                      <Crown className="w-3 h-3 me-1" />
                       Premium
                     </Badge>
               }
@@ -238,7 +238,7 @@ const AdminSubscriptions = () => {
                 <p className="text-sm text-muted-foreground truncate">{user.email}</p>
                 {user.premium_until &&
             <p className="text-xs text-muted-foreground">
-                    <Calendar className="w-3 h-3 inline mr-1" />
+                    <Calendar className="w-3 h-3 inline me-1" />
                     {tr("adminsubscriptions_bitme_c270e3", "Bitm\u0259:")} {format(new Date(user.premium_until), 'dd.MM.yyyy')}
                   </p>
             }
@@ -252,12 +252,12 @@ const AdminSubscriptions = () => {
                 <DropdownMenuContent align="end">
                   {user.is_premium ?
               <DropdownMenuItem onClick={() => revokePremium(user)} className="text-red-600">
-                      <X className="w-4 h-4 mr-2" />
+                      <X className="w-4 h-4 me-2" />
                       {tr("adminsubscriptions_premium_legv_et_779f4b", "Premium L\u0259\u011Fv Et")}
                     </DropdownMenuItem> :
 
               <DropdownMenuItem onClick={() => {setSelectedUser(user);setShowModal(true);}}>
-                      <Crown className="w-4 h-4 mr-2 text-amber-500" />
+                      <Crown className="w-4 h-4 me-2 text-amber-500" />
                       Premium Ver
                     </DropdownMenuItem>
               }
@@ -294,7 +294,7 @@ const AdminSubscriptions = () => {
                 {tr("adminsubscriptions_legv_et_b5e49c", "L\u0259\u011Fv et")}
               </Button>
               <Button onClick={grantPremium} className="flex-1 bg-gradient-to-r from-amber-400 to-amber-600">
-                <Crown className="w-4 h-4 mr-2" />
+                <Crown className="w-4 h-4 me-2" />
                 Premium Ver
               </Button>
             </div>

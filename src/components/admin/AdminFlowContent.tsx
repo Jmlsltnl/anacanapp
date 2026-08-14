@@ -284,7 +284,7 @@ const AdminFlowContent = () => {
               
               <Icon className="w-4 h-4" />
               {tab.label}
-              <Badge variant="secondary" className="ml-1">{tab.count}</Badge>
+              <Badge variant="secondary" className="ms-1">{tab.count}</Badge>
             </button>);
 
         })}
@@ -333,12 +333,12 @@ const AdminFlowContent = () => {
       <>
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
             placeholder="Axtar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10" />
+            className="ps-10" />
           
       </div>
 

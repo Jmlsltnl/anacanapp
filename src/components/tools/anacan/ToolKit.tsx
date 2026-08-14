@@ -48,7 +48,7 @@ export const ToolHeader = ({ title, eyebrow, onBack, actions }: ToolHeaderProps)
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
       {onBack && (
         <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label="Back">
-          <ArrowLeft size={16} strokeWidth={2} />
+          <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
         </motion.button>
       )}
       <div style={{ minWidth: 0 }}>

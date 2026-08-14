@@ -186,7 +186,7 @@ const PartnerHomeScreen = ({ onNavigate, onOpenChat }: Props) => {
         </p>
         <div className="a-card relative z-10 max-w-sm" style={{ padding: 20 }}>
           <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)', marginBottom: 8 }}>{tr('partnerdashboard_nece_baglanmali_8234cb', '📲 Necə bağlanmalı?')}</p>
-          <ol className="text-left space-y-1.5 list-decimal list-inside" style={{ fontSize: 12, color: 'var(--a-ink-soft)' }}>
+          <ol className="text-start space-y-1.5 list-decimal list-inside" style={{ fontSize: 12, color: 'var(--a-ink-soft)' }}>
             <li>{tr('partnerdashboard_heyat_yoldasinizdan_onun_profilindeki_pa_c8a86f', 'Həyat yoldaşınızdan onun profilindəki partnyor kodunu istəyin')}</li>
             <li>{tr('partnerdashboard_profil_bolmesine_kecerek_kodu_daxil_edin_2d8a3e', 'Profil bölməsinə keçərək kodu daxil edin')}</li>
             <li>{tr('partnerdashboard_bir_nece_saniye_icinde_baglanti_yaranaca_99fbd5', 'Bir neçə saniyə içində bağlantı yaranacaq')}</li>
@@ -292,7 +292,7 @@ const PartnerHomeScreen = ({ onNavigate, onOpenChat }: Props) => {
           {getUnreadCount() > 0 &&
           <motion.button
             onClick={onOpenChat}
-            className="w-full flex items-center gap-3 text-left"
+            className="w-full flex items-center gap-3 text-start"
             style={{ background: 'var(--a-blue-1)', borderRadius: 18, padding: 14, border: '1.5px solid rgba(99, 172, 223, 0.5)' }}
             initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
             whileTap={{ scale: 0.99 }}>
@@ -396,7 +396,7 @@ const PartnerHomeScreen = ({ onNavigate, onOpenChat }: Props) => {
                   tr('partnerdashboard_gunun_tovsiyesi_b3a563', 'Günün Tövsiyəsi')}
                   </h3>
                 </div>
-                {!partnerTip && <span className="ml-auto text-2xl">{tipEmoji}</span>}
+                {!partnerTip && <span className="ms-auto text-2xl">{tipEmoji}</span>}
               </div>
               <p className="leading-relaxed" style={{ fontSize: 13, color: 'var(--a-body-text)' }}>
                 {partnerTip || tipText}

@@ -40,7 +40,7 @@ const CycleTrendChart = () => {
         <span className="a-section-link" style={{ color: 'var(--a-ink-soft)' }}>{tr("cycletrendchart_tsikl_count", "{count} tsikl").replace("{count}", String(chartData.length))}</span>
       </div>
 
-      <div className="h-44 -ml-2">
+      <div className="h-44 -ms-2">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 6, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 5" stroke="var(--a-line-strong)" opacity={0.6} />

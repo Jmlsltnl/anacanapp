@@ -33,7 +33,7 @@ const MommyHeroPolaroid = ({ babyData, exactMonths, remainingDays, babyIllustrat
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_hsl(340,60%,92%)_0%,_transparent_60%)]" />
 
       {/* Date stamp top-left */}
-      <div className="absolute top-4 left-5 z-10">
+      <div className="absolute top-4 start-5 z-10">
         <p className="text-[9px] font-bold tracking-[0.3em] uppercase text-[hsl(15,40%,40%)]/60">
           Mommy diary
         </p>
@@ -61,7 +61,7 @@ const MommyHeroPolaroid = ({ babyData, exactMonths, remainingDays, babyIllustrat
                 }} />
               
             </div>
-            <p className="absolute bottom-2 left-0 right-0 text-center text-[11px] font-bold text-[hsl(15,50%,30%)] [font-family:'Caveat',cursive] tracking-wide">
+            <p className="absolute bottom-2 start-0 end-0 text-center text-[11px] font-bold text-[hsl(15,50%,30%)] [font-family:'Caveat',cursive] tracking-wide">
               {babyData.name} · {ageLabel}
             </p>
           </div>

@@ -232,7 +232,7 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
               <p className="a-eyebrow">{tr("doctorshospitals_klinika_3c7a2d", "Klinika")} · {tr("doctorshospitals_hekim_c127f7", 'Həkim')}</p>
@@ -310,7 +310,7 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: Math.min(index * 0.05, 0.3) }}
             onClick={() => setSelectedProvider(provider)}
-            className="a-card w-full text-left"
+            className="a-card w-full text-start"
             style={{ padding: '14px 16px', cursor: 'pointer' }}>
             
                 <div className="flex gap-3">
@@ -334,7 +334,7 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
                     }
                         <h3 className="a-list-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{provider.name}</h3>
                       </div>
-                      <ChevronRight size={15} className="a-list-chevron" style={{ marginTop: 3 }} />
+                      <ChevronRight size={15} className="rtl:rotate-180 a-list-chevron" style={{ marginTop: 3 }} />
                     </div>
                     
                     <p className="a-list-sub" style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--a-peach-2)', fontWeight: 600 }}>
@@ -443,9 +443,9 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, var(--a-bg), transparent 60%)' }} />
         <button
           onClick={onBack}
-          className="a-icon-btn absolute top-4 left-4">
+          className="a-icon-btn absolute top-4 start-4">
           
-          <ArrowLeft size={16} strokeWidth={2} />
+          <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
         </button>
       </div>
 

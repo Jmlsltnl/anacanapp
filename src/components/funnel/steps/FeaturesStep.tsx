@@ -45,7 +45,7 @@ export default function FeaturesStep({ features, onContinue }: FeaturesStepProps
             onClick={() => setActive((active - 1 + features.length) % features.length)}
             className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
           >
-            <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+            <ChevronLeft className="rtl:rotate-180 w-4 h-4 text-muted-foreground" />
           </button>
           <div className="flex items-center gap-1.5">
             {features.map((_, i) => (
@@ -56,7 +56,7 @@ export default function FeaturesStep({ features, onContinue }: FeaturesStepProps
             onClick={() => setActive((active + 1) % features.length)}
             className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
           >
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            <ChevronRight className="rtl:rotate-180 w-4 h-4 text-muted-foreground" />
           </button>
         </div>
       </div>

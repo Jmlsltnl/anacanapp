@@ -170,7 +170,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div style={{ minWidth: 0 }}>
               {lifeStage === 'flow' && currentCycleDay &&
@@ -219,7 +219,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
               className="a-icon-btn"
               whileTap={{ scale: 0.95 }}
               aria-label={tr("calendarscreen_evvelki_ay", "ÆvvÉ™lki ay")}>
-              <ChevronLeft size={16} />
+              <ChevronLeft className="rtl:rotate-180" size={16} />
             </motion.button>
             <h2 className="capitalize" style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>
               {format(currentMonth, 'MMMM yyyy', { locale: getCurrentDateLocale() })}
@@ -229,7 +229,7 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
               className="a-icon-btn"
               whileTap={{ scale: 0.95 }}
               aria-label={tr("calendarscreen_novbeti_ay", "NÃ¶vbÉ™ti ay")}>
-              <ChevronRight size={16} />
+              <ChevronRight className="rtl:rotate-180" size={16} />
             </motion.button>
           </div>
 

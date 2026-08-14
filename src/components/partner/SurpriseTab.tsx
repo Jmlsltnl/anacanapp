@@ -241,7 +241,7 @@ const SurpriseTab = () => {
         {/* Stats Badge */}
         <div className="flex items-center gap-2 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 px-4 py-2 rounded-2xl">
           <Trophy className="w-5 h-5 text-amber-600" />
-          <div className="text-right">
+          <div className="text-end">
             <p className="text-xs text-amber-700 dark:text-amber-400">{tr("untranslated_toplam_lheej5", "Toplam")}</p>
             <p className="font-bold text-amber-800 dark:text-amber-300">{totalPoints} xal</p>
           </div>
@@ -290,7 +290,7 @@ const SurpriseTab = () => {
                 </div>
               </div>
               {planned.notes &&
-          <p className="text-sm text-muted-foreground mt-2 pl-12">{planned.notes}</p>
+          <p className="text-sm text-muted-foreground mt-2 ps-12">{planned.notes}</p>
           }
             </motion.div>
         )}
@@ -309,7 +309,7 @@ const SurpriseTab = () => {
               <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center">
                 <History className="w-5 h-5 text-white" />
               </div>
-              <div className="text-left">
+              <div className="text-start">
                 <h3 className="font-semibold text-emerald-800 dark:text-emerald-200">{tr("surprisetab_surpriz_tarixcesi_46a7ab", "Sürpriz Tarixçəsi")}</h3>
                 <p className="text-sm text-emerald-600 dark:text-emerald-400">
                   {completedSurprises.length} {tr("surprisetab_surpriz_tamamlanib_e7514f", "s\xFCrpriz tamamlan\u0131b")}

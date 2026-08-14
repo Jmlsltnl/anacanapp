@@ -88,7 +88,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
         <div className="flex items-center gap-3 p-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)', background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
           <motion.button onClick={() => setSelectedDoc(null)} className="a-icon-btn shrink-0" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-            <ArrowLeft size={16} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
           </motion.button>
           <h1 className="truncate" style={{ fontSize: 15, fontWeight: 800, color: 'var(--a-ink)' }}>{pickTitle(selectedDoc)}</h1>
         </div>
@@ -116,7 +116,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
       <div className="flex items-center gap-3 p-4"
       style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)', background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
         <motion.button onClick={onBack} className="a-icon-btn shrink-0" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-          <ArrowLeft size={16} strokeWidth={2} />
+          <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
         </motion.button>
         <h1 style={{ fontSize: 15, fontWeight: 800, color: 'var(--a-ink)' }}>{tr("legalscreen_huquqi_senedler_ca8c60", "Hüquqi Sənədlər")}</h1>
       </div>
@@ -135,7 +135,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
               <motion.button
                 key={doc.id}
                 onClick={() => setSelectedDoc(doc)}
-                className="w-full flex items-center gap-4 text-left transition-colors"
+                className="w-full flex items-center gap-4 text-start transition-colors"
                 style={{ padding: 14, borderRadius: 'var(--a-radius-md)', background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)' }}
                 whileTap={{ scale: 0.98 }}>
 
@@ -148,7 +148,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
                       Versiya {doc.version}
                     </p>
                   </div>
-                  <ChevronRight size={18} style={{ color: 'var(--a-ink-faint)' }} />
+                  <ChevronRight className="rtl:rotate-180" size={18} style={{ color: 'var(--a-ink-faint)' }} />
                 </motion.button>);
 
           })

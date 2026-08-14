@@ -273,6 +273,69 @@ async function main() {
     }
   }
 
+  /* ── competitor comparison cards ("Anacan vs X") ─────────────────────────
+     Written to the SAME public/og/blog/<lang>/<slug>.png path pattern that
+     CompetitorPostView.astro requests, so no extra routing is needed. */
+  const competitorsDir = join(root, 'src/content/competitors');
+  for (const lang of langs) {
+    const langDir = join(competitorsDir, lang);
+    if (!(await exists(langDir))) continue;
+    const dict = JSON.parse(await readFile(join(i18nDir, `${lang}.json`), 'utf8'));
+
+    const files = (await readdir(langDir)).filter((f) => f.endsWith('.md'));
+    for (const file of files) {
+      const slug = basename(file, '.md'); // "anacan-vs-<competitorSlug>"
+      const out = join(root, `public/og/blog/${lang}/${slug}.png`);
+      if (!FORCE && (await exists(out))) {
+        skipped++;
+        continue;
+      }
+      const fm = parseFrontmatter(await readFile(join(langDir, file), 'utf8'));
+      const theme = THEME[fm.theme] ?? THEME.brand;
+      const category = dict.compare?.categories?.[fm.category] ?? fm.category ?? 'Compare';
+      const vsWord = dict.compare?.vs ?? 'vs';
+      const title = `Anacan ${vsWord} ${fm.competitor ?? ''}`.trim();
+
+      const node = baseFrame(theme, [
+        brandRow(logoSrc, dict.compare?.eyebrow ?? 'Compare'),
+        el(
+          'div',
+          {
+            display: 'flex',
+            marginTop: '44px',
+            fontSize: '22px',
+            fontWeight: 700,
+            color: theme.color,
+            backgroundColor: theme.soft,
+            padding: '8px 22px',
+            borderRadius: '999px',
+            alignSelf: 'flex-start',
+            textTransform: 'uppercase',
+            letterSpacing: '2px',
+          },
+          category,
+        ),
+        el(
+          'div',
+          {
+            display: 'flex',
+            fontSize: '60px',
+            fontWeight: 700,
+            lineHeight: 1.18,
+            marginTop: '22px',
+            maxWidth: '1030px',
+          },
+          title,
+        ),
+        footerRow(theme, lang.toUpperCase()),
+      ]);
+
+      await renderPng(node, fonts, out);
+      generated++;
+      console.log(`og  ✓ blog/${lang}/${slug}.png (compare)`);
+    }
+  }
+
   console.log(`\nOG images: ${generated} generated, ${skipped} skipped (already exist).`);
 }
 

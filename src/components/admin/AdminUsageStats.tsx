@@ -213,7 +213,7 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
             {eventDataBreakdown.map((item, i) =>
           <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded bg-muted/30 text-sm">
                 <span className="truncate flex-1">{item.label}</span>
-                <span className="font-semibold ml-2">{item.count}</span>
+                <span className="font-semibold ms-2">{item.count}</span>
               </div>
           )}
           </div>
@@ -231,7 +231,7 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
                   <TableHead className="text-xs">{tr("adminusagestats_istifadeci_b6bdd6", "İstifadəçi")}</TableHead>
                   <TableHead className="text-xs">Email</TableHead>
                   <TableHead className="text-xs text-center">Premium</TableHead>
-                  <TableHead className="text-xs text-right">{tr("adminusagestats_sayi_deaa4b", "Sayı")}</TableHead>
+                  <TableHead className="text-xs text-end">{tr("adminusagestats_sayi_deaa4b", "Sayı")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -242,7 +242,7 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
                     <TableCell className="text-center">
                       {u.is_premium ? <span className="text-xs bg-amber-500/10 text-amber-600 px-1.5 py-0.5 rounded">Premium</span> : <span className="text-xs text-muted-foreground">—</span>}
                     </TableCell>
-                    <TableCell className="text-right font-semibold text-xs">{u.count}</TableCell>
+                    <TableCell className="text-end font-semibold text-xs">{u.count}</TableCell>
                   </TableRow>
               )}
               </TableBody>

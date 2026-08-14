@@ -436,20 +436,26 @@ async function main() {
   });
 
   {
+    /* Dedup key includes language: identical titles across DIFFERENT languages
+       are normal, expected hreflang alternates (not duplicate content) — e.g.
+       "Anacan vs Flo" legitimately renders the same in every locale because
+       "vs" and brand names don't need translating. Only same-language dupes
+       are a real problem. */
     const seen = new Map();
     const dupes = new Set();
     for (const p of pages) {
-      if (seen.has(p.title)) {
+      const key = `${p.lang}::${p.title}`;
+      if (seen.has(key)) {
         dupes.add(p.path);
-        dupes.add(seen.get(p.title));
-      } else seen.set(p.title, p.path);
+        dupes.add(seen.get(key));
+      } else seen.set(key, p.path);
     }
     addCheck(
       'onpage',
       'title-unique',
-      'Title tags are unique across the site',
+      'Title tags are unique within each language',
       dupes.size === 0 ? 'pass' : 'fail',
-      dupes.size === 0 ? 'No duplicate titles.' : `${dupes.size} pages share titles.`,
+      dupes.size === 0 ? 'No duplicate titles within any single language.' : `${dupes.size} pages share a title with another page in the SAME language.`,
       [...dupes].slice(0, 24),
     );
   }
@@ -461,20 +467,22 @@ async function main() {
   });
 
   {
+    /* Same reasoning as title-unique: scope by language. */
     const seen = new Map();
     const dupes = new Set();
     for (const p of pages) {
-      if (seen.has(p.metaDesc)) {
+      const key = `${p.lang}::${p.metaDesc}`;
+      if (seen.has(key)) {
         dupes.add(p.path);
-        dupes.add(seen.get(p.metaDesc));
-      } else seen.set(p.metaDesc, p.path);
+        dupes.add(seen.get(key));
+      } else seen.set(key, p.path);
     }
     addCheck(
       'onpage',
       'desc-unique',
-      'Meta descriptions are unique',
+      'Meta descriptions are unique within each language',
       dupes.size === 0 ? 'pass' : 'warn',
-      dupes.size === 0 ? 'No duplicate descriptions.' : `${dupes.size} pages share descriptions.`,
+      dupes.size === 0 ? 'No duplicate descriptions within any single language.' : `${dupes.size} pages share a description with another page in the SAME language.`,
       [...dupes].slice(0, 24),
     );
   }

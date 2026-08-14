@@ -141,7 +141,7 @@ const AdminForceUpdate = () => {
             disabled={saveMutation.isPending}
             className="w-full">
             
-            <Save className="w-4 h-4 mr-2" />
+            <Save className="w-4 h-4 me-2" />
             {saveMutation.isPending ? tr("adminforceupdate_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : 'Saxla'}
           </Button>
         </CardContent>

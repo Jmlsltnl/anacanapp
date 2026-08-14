@@ -62,7 +62,7 @@ const OrderSuccessScreen = ({ onContinue }: OrderSuccessScreenProps) => {
           <div className="w-12 h-12 flex items-center justify-center shrink-0" style={{ borderRadius: 14, background: 'var(--a-peach-1)' }}>
             <Package size={22} style={{ color: 'var(--a-accent-ink)' }} />
           </div>
-          <div className="text-left">
+          <div className="text-start">
             <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{tr("ordersuccessscreen_catdirilma_muddeti_07869a", "Çatdırılma Müddəti")}</p>
             <p style={{ fontSize: 12.5, color: 'var(--a-ink-soft)' }}>{tr("ordersuccessscreen_1_3_is_gunu_6b7ab5", "1-3 iş günü")}</p>
           </div>
@@ -79,7 +79,7 @@ const OrderSuccessScreen = ({ onContinue }: OrderSuccessScreenProps) => {
         className="gap-2 rounded-full text-white border-0 hover:opacity-95"
         style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}>
           {tr("ordersuccessscreen_alis_verise_davam_et_8cd3a3", "Al\u0131\u015F-veri\u015F\u0259 Davam Et")}
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="rtl:rotate-180 w-4 h-4" />
         </Button>
       </motion.div>
     </motion.div>);

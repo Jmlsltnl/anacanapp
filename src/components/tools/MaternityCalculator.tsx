@@ -219,7 +219,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
               <p className="a-eyebrow">{isAZ ? selectedRule.name_az : selectedRule.name_en} {selectedRule.flag}</p>
@@ -233,13 +233,13 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
             <TabsTrigger
               value="calculator"
               className="rounded-full py-1.5 text-[11.5px] font-bold border-0 shadow-none data-[state=active]:shadow-none data-[state=active]:bg-[var(--a-peach-1)] data-[state=active]:text-[var(--a-accent-ink)] text-[var(--a-ink-soft)]">
-              <Calculator className="w-3.5 h-3.5 mr-1.5" />
+              <Calculator className="w-3.5 h-3.5 me-1.5" />
               {tr("maternitycalculator_calculate_3c7a2d", "Hesabla")}
             </TabsTrigger>
             <TabsTrigger
               value="guide"
               className="rounded-full py-1.5 text-[11.5px] font-bold border-0 shadow-none data-[state=active]:shadow-none data-[state=active]:bg-[var(--a-peach-1)] data-[state=active]:text-[var(--a-accent-ink)] text-[var(--a-ink-soft)]">
-              <FileText className="w-3.5 h-3.5 mr-1.5" />
+              <FileText className="w-3.5 h-3.5 me-1.5" />
               {tr("maternitycalculator_beledci_013a52", "Bələdçi")}
             </TabsTrigger>
           </TabsList>
@@ -261,7 +261,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                 <SelectContent className="max-h-[300px]">
                   {maternityRules.map((country) => (
                     <SelectItem key={country.code} value={country.code} className="text-base py-3">
-                      <span className="mr-2 text-xl">{country.flag}</span>
+                      <span className="me-2 text-xl">{country.flag}</span>
                       {isAZ ? country.name_az : country.name_en}
                     </SelectItem>
                   ))}
@@ -336,7 +336,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                     className="a-input"
                     style={{ width: '100%', padding: '13px 60px 13px 14px', fontSize: 15, fontWeight: 700 }}
                   />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 a-list-value" style={{ color: 'var(--a-ink-soft)' }}>
+                  <span className="absolute end-4 top-1/2 -translate-y-1/2 a-list-value" style={{ color: 'var(--a-ink-soft)' }}>
                     {selectedRule.compensation.currency}
                   </span>
                 </div>
@@ -411,7 +411,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                 
                   {/* Total Result Card (anacan-demo CTA) */}
                   <div className="a-cta" style={{ background: 'var(--a-grad-green)' }}>
-                    <span className="a-cta-shape" style={{ width: 120, height: 120, top: -40, right: -30, background: 'rgba(255,255,255,0.35)' }} />
+                    <span className="a-cta-shape" style={{ width: 120, height: 120, top: -40, insetInlineEnd: -30, background: 'rgba(255,255,255,0.35)' }} />
                     <div className="a-cta-top">
                       <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: '#14532d' }}>
                         {result.rule.flag} {isAZ ? result.rule.name_az : result.rule.name_en} · {tr("maternitycalculator_cemi_mezuniyyet_93196a", "Cəmi məzuniyyət")}
@@ -430,10 +430,10 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                     <div className="a-card-head" style={{ marginBottom: 14 }}>
                       <h3 className="a-card-title a-heading">📅 {tr("maternitycalculator_zaman_xetti_visual", "Zaman Xətti")}</h3>
                     </div>
-                    <div className="relative pl-6 space-y-5 ml-2" style={{ borderLeft: '2px solid var(--a-line-strong)' }}>
+                    <div className="relative ps-6 space-y-5 ms-2" style={{ borderLeft: '2px solid var(--a-line-strong)' }}>
                       {/* Start Date */}
                       <div className="relative">
-                        <span className="absolute top-1 w-4 h-4 rounded-full" style={{ left: -33, background: 'var(--a-peach-1)', border: '2.5px solid var(--a-peach-2)' }} />
+                        <span className="absolute top-1 w-4 h-4 rounded-full" style={{ insetInlineStart: -33, background: 'var(--a-peach-1)', border: '2.5px solid var(--a-peach-2)' }} />
                         <p className="a-list-title">{formatDate(result.leaveStartDate)}</p>
                         <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{result.role === 'father' ? tr("maternitycalculator_paternity_start", "Atalıq məzuniyyətinin başlanğıcı") : tr("maternitycalculator_leave_start_date", "Məzuniyyətin Başlanğıcı")}</p>
                       </div>
@@ -441,7 +441,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                       {/* EDD */}
                       {result.role === 'mother' && (
                         <div className="relative">
-                          <span className="absolute top-1 w-4 h-4 rounded-full" style={{ left: -33, background: 'var(--a-yellow-1)', border: '2.5px solid var(--a-yellow-2)' }} />
+                          <span className="absolute top-1 w-4 h-4 rounded-full" style={{ insetInlineStart: -33, background: 'var(--a-yellow-1)', border: '2.5px solid var(--a-yellow-2)' }} />
                           <p className="a-list-title">{formatDate(new Date(eddDate))}</p>
                           <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("maternitycalculator_edd_date", "Təxmini Doğuş Tarixi (EDD)")}</p>
                         </div>
@@ -449,14 +449,14 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                       
                       {/* End Date */}
                       <div className="relative">
-                        <span className="absolute top-1 w-4 h-4 rounded-full" style={{ left: -33, background: 'var(--a-pink-1)', border: '2.5px solid var(--a-pink-2)' }} />
+                        <span className="absolute top-1 w-4 h-4 rounded-full" style={{ insetInlineStart: -33, background: 'var(--a-pink-1)', border: '2.5px solid var(--a-pink-2)' }} />
                         <p className="a-list-title">{formatDate(result.leaveEndDate)}</p>
                         <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("maternitycalculator_leave_end_date", "Məzuniyyətin Sonu")}</p>
                       </div>
                       
                       {/* Return to Work */}
                       <div className="relative">
-                        <span className="absolute top-1 w-4 h-4 rounded-full" style={{ left: -33, background: 'var(--a-green-1)', border: '2.5px solid var(--a-green-2)' }} />
+                        <span className="absolute top-1 w-4 h-4 rounded-full" style={{ insetInlineStart: -33, background: 'var(--a-green-1)', border: '2.5px solid var(--a-green-2)' }} />
                         <p className="a-list-title">{formatDate(result.returnToWorkDate)}</p>
                         <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("maternitycalculator_return_to_work", "İşə Qayıdış Tarixi")}</p>
                       </div>
@@ -565,13 +565,13 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               style={{ padding: 0, overflow: 'hidden' }}>
                 <button
                 onClick={() => setExpandedGuideline(expandedGuideline === guide.id ? null : guide.id)}
-                className="a-list-row w-full text-left"
+                className="a-list-row w-full text-start"
                 style={{ width: '100%', background: 'none', border: 'none', borderTop: 'none', cursor: 'pointer' }}>
                   <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', fontSize: 18 }}>{guide.icon}</span>
                   <p className="a-list-title" style={{ flex: 1, whiteSpace: 'normal' }}>{guide.title}</p>
                   <ChevronRight
                   size={16}
-                  className={`a-list-chevron transition-transform ${
+                  className={`rtl:rotate-180 a-list-chevron transition-transform ${
                   expandedGuideline === guide.id ? 'rotate-90' : ''}`
                   } />
                 </button>

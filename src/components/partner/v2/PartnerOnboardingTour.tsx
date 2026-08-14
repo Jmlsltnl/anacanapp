@@ -109,7 +109,7 @@ const PartnerOnboardingTour = ({ onClose }: Props) => {
           </AnimatePresence>
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center"
+            className="absolute top-3 end-3 w-8 h-8 rounded-full flex items-center justify-center"
             style={{ background: 'rgba(255,255,255,0.45)', border: 'none', cursor: 'pointer' }}
             aria-label={tr('ptour_skip', 'Keç')}>
             
@@ -169,7 +169,7 @@ const PartnerOnboardingTour = ({ onClose }: Props) => {
               whileTap={{ scale: 0.98 }}>
               
               {isLast ? tr('ptour_done', 'Başlayaq! 💙') : tr('ptour_next', 'Növbəti')}
-              {!isLast && <ChevronRight size={16} strokeWidth={2.4} />}
+              {!isLast && <ChevronRight className="rtl:rotate-180" size={16} strokeWidth={2.4} />}
             </motion.button>
           </div>
         </div>

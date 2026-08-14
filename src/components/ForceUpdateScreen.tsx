@@ -85,7 +85,7 @@ const ForceUpdateScreen = ({ title, message, androidUrl, iosUrl }: ForceUpdateSc
           <Button onClick={handleUpdate} size="lg"
           className="w-full rounded-full text-base font-semibold h-14 text-white border-0 hover:opacity-95"
           style={{ background: 'var(--a-peach-2)', boxShadow: '0 16px 32px -12px rgba(217, 108, 74, 0.6)' }}>
-            <Shield className="w-5 h-5 mr-2" />
+            <Shield className="w-5 h-5 me-2" />
             {tr("forceupdatescreen_tetbiqi_yenile_18f4f3", "T\u0259tbiqi yenil\u0259")}
           </Button>
         </motion.div>

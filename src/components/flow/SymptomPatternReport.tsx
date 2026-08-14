@@ -127,7 +127,7 @@ const SymptomPatternReport = ({ onUpgrade }: Props) => {
         {patterns.map((p) => {
           const phase = PHASE_LABEL[p.dominantPhase] || { label: p.dominantPhase, emoji: '•' };
           return (
-            <div key={p.symptom} className="a-list-row" style={{ display: 'block', paddingLeft: 0, paddingRight: 0 }}>
+            <div key={p.symptom} className="a-list-row" style={{ display: 'block', paddingInlineStart: 0, paddingInlineEnd: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 13 }}>
                 <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', fontSize: 17 }}>
                   {p.emoji}
@@ -140,7 +140,7 @@ const SymptomPatternReport = ({ onUpgrade }: Props) => {
                 </div>
                 <span className="a-list-value">{p.percentage}%</span>
               </div>
-              <div className="a-inline-bar" style={{ marginLeft: 53 }}>
+              <div className="a-inline-bar" style={{ marginInlineStart: 53 }}>
                 <div className="a-inline-bar-fill" style={{ width: `${p.percentage}%` }} />
               </div>
             </div>);

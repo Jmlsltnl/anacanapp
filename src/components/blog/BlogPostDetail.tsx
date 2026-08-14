@@ -101,7 +101,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
   const renderComment = (comment: BlogComment, isReply = false) =>
   <motion.div
     key={comment.id}
-    className={`${isReply ? 'ml-10 mt-3' : ''}`}
+    className={`${isReply ? 'ms-10 mt-3' : ''}`}
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}>
     
@@ -114,7 +114,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         </Avatar>
 
         <div className="flex-1">
-          <div className="rounded-2xl rounded-tl-none p-3" style={{ background: 'var(--a-surface-soft)' }}>
+          <div className="rounded-2xl rounded-ss-none p-3" style={{ background: 'var(--a-surface-soft)' }}>
             <div className="flex items-center gap-2 mb-1">
               <span className="font-bold text-sm" style={{ color: 'var(--a-ink)' }}>{comment.user_name}</span>
               {comment.user_badge &&
@@ -154,7 +154,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             {user?.id === comment.user_id &&
           <button
             onClick={() => deleteComment(comment.id)}
-            className="text-xs ml-auto"
+            className="text-xs ms-auto"
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--a-pink-ink)' }}>
             
                 <Trash2 className="w-3.5 h-3.5" />
@@ -249,11 +249,11 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             e.stopPropagation();
             onBack();
           }}
-          className="absolute left-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center cursor-pointer"
+          className="absolute start-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center cursor-pointer"
           style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)', border: 'none' }}
           whileTap={{ scale: 0.95 }}>
           
-          <ArrowLeft className="w-5 h-5 text-white" />
+          <ArrowLeft className="rtl:rotate-180 w-5 h-5 text-white" />
         </motion.button>
 
         {/* Floating Share Button */}
@@ -262,7 +262,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             e.stopPropagation();
             handleShare();
           }}
-          className="absolute right-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center cursor-pointer"
+          className="absolute end-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center cursor-pointer"
           style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)', border: 'none' }}
           whileTap={{ scale: 0.95 }}>
           

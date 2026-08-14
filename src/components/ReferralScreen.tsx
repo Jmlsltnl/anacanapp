@@ -108,7 +108,7 @@ const ReferralScreen = ({ onBack }: Props) => {
         {/* Header */}
         <div className="flex items-center gap-3 py-5">
           <button onClick={onBack} className="a-icon-btn" style={{ width: 44, height: 44 }} aria-label={tr('common_geri', 'Geri')}>
-            <ArrowLeft size={18} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={18} strokeWidth={2} />
           </button>
           <div>
             <p className="a-today-info-eyebrow" style={{ margin: 0 }}>{tr('ref_eyebrow', 'Referral proqramı')}</p>
@@ -123,7 +123,7 @@ const ReferralScreen = ({ onBack }: Props) => {
           className="a-card text-center relative overflow-hidden"
           style={{ padding: '24px 18px', border: '2px solid var(--a-peach-2)' }}>
 
-          <span className="absolute top-0 left-0" aria-hidden
+          <span className="absolute top-0 start-0" aria-hidden
           style={{ width: 110, height: 110, borderRadius: 999, background: 'var(--a-peach-1)', opacity: 0.5, transform: 'translate(-35%, -35%)' }} />
 
           <div className="relative">

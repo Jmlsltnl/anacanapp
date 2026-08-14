@@ -144,7 +144,7 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
       <div className="sticky top-0 z-40 safe-area-top" style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
         <div className="flex items-center gap-3 px-4 py-2.5">
           <motion.button onClick={onBack} className="a-icon-btn shrink-0" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
-            <ArrowLeft size={16} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
           </motion.button>
           <Avatar className="w-9 h-9" style={{ border: '2px solid var(--a-peach-1)' }}>
             <AvatarImage src={userAvatar || undefined} />
@@ -311,7 +311,7 @@ const MessageBubble = ({ message, isMe, formatTime }: {message: any;isMe: boolea
           <div className="h-1 rounded-full" style={{ background: isMe ? 'rgba(255,255,255,0.25)' : 'var(--a-peach-1)' }}>
             <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: isMe ? 'var(--a-bg)' : 'var(--a-peach-2)' }} />
           </div>
-          <p className="mt-1 text-right" style={{ fontSize: 10, color: isMe ? 'rgba(255,231,225,0.7)' : 'var(--a-ink-faint)' }}>{formatTime(message.created_at)}</p>
+          <p className="mt-1 text-end" style={{ fontSize: 10, color: isMe ? 'rgba(255,231,225,0.7)' : 'var(--a-ink-faint)' }}>{formatTime(message.created_at)}</p>
         </div>
       </div>);
 

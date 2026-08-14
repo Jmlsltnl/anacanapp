@@ -199,7 +199,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                   <p className="a-rank-title">{tr("babycrisiswidget_kriz_teqvimi_aa2ea5", "Kriz Təqvimi")}</p>
                   <p className="a-rank-sub">{tr('babycrisiswidget_no_upcoming', 'Yaxınlaşan kriz yoxdur')}</p>
                 </div>
-                <ChevronRight className="a-list-chevron" style={{ marginLeft: 'auto' }} size={16} />
+                <ChevronRight className="rtl:rotate-180 a-list-chevron" style={{ marginInlineStart: 'auto' }} size={16} />
               </div>
             )}
           </motion.div>
@@ -249,11 +249,11 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
               <div className="overflow-y-auto max-h-[calc(90vh-80px)] p-4 pb-24">
                 <div className="relative">
                   {/* Timeline line */}
-                  <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-border" />
+                  <div className="absolute start-5 top-0 bottom-0 w-0.5 bg-border" />
                   
                   {/* Current position indicator */}
                   <motion.div 
-                    className="absolute left-3 w-5 h-5 rounded-full bg-primary border-4 border-background shadow-lg z-10"
+                    className="absolute start-3 w-5 h-5 rounded-full bg-primary border-4 border-background shadow-lg z-10"
                     style={{ 
                       top: `${Math.min(95, (babyAgeWeeks / 80) * 100)}%` 
                     }}
@@ -272,10 +272,10 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                           initial={{ opacity: 0, x: -20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="relative pl-12"
+                          className="relative ps-12"
                         >
                           {/* Timeline dot */}
-                          <div className={`absolute left-3 w-5 h-5 rounded-full flex items-center justify-center ${
+                          <div className={`absolute start-3 w-5 h-5 rounded-full flex items-center justify-center ${
                             isCurrent 
                               ? `bg-gradient-to-br ${getSeverityConfig(crisis.severity).color} animate-pulse shadow-lg`
                               : isPast
@@ -288,7 +288,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                           {/* Card */}
                           <motion.button
                             onClick={() => openCrisisDetail(crisis)}
-                            className={`w-full text-left p-4 rounded-2xl border transition-all ${
+                            className={`w-full text-start p-4 rounded-2xl border transition-all ${
                               isCurrent 
                                 ? `${getSeverityConfig(crisis.severity).bgColor} ${getSeverityConfig(crisis.severity).borderColor} shadow-md`
                                 : isPast
@@ -324,7 +324,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
                                   </p>
                                 )}
                               </div>
-                              <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                              <ChevronRight className="rtl:rotate-180 w-5 h-5 text-muted-foreground flex-shrink-0" />
                             </div>
                           </motion.button>
                         </motion.div>
@@ -363,7 +363,7 @@ const BabyCrisisWidget = ({ babyAgeWeeks, babyName }: BabyCrisisWidgetProps) => 
               <div className={`bg-gradient-to-br ${getSeverityConfig(selectedCrisis.severity).color} px-4 py-6 relative`}>
                 <motion.button
                   onClick={() => setSelectedCrisis(null)}
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center"
+                  className="absolute top-4 end-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center"
                   whileTap={{ scale: 0.9 }}
                 >
                   <X className="w-5 h-5 text-white" />

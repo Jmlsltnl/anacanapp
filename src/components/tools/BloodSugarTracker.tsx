@@ -348,7 +348,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
               <button
                 key={type.id}
                 onClick={() => setSelectedType(type.id)}
-                className="flex items-center text-left transition-all"
+                className="flex items-center text-start transition-all"
                 style={{
                   padding: 9,
                   borderRadius: 14,
@@ -357,7 +357,7 @@ const BloodSugarTracker = ({ onBack }: BloodSugarTrackerProps) => {
                   cursor: 'pointer'
                 }}>
                 
-                    <span className="text-base mr-2">{type.emoji}</span>
+                    <span className="text-base me-2">{type.emoji}</span>
                     <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--a-ink)' }}>{type.label}</span>
                   </button>
               )}

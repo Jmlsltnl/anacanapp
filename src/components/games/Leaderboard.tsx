@@ -91,7 +91,7 @@ const Leaderboard = ({ gameId }: LeaderboardProps) => {
                   {tr('saglamsebet_level_label', 'Səviyyə')} {entry.bestLevel}
                 </p>
               </div>
-              <div className="text-right flex-shrink-0">
+              <div className="text-end flex-shrink-0">
                 <p className="text-sm font-extrabold" style={{ margin: 0, color: 'var(--a-accent-ink)' }}>{entry.bestScore}</p>
                 <p className="text-[10px]" style={{ margin: 0, color: isMe ? 'var(--a-accent-ink)' : 'var(--a-ink-soft)', opacity: isMe ? 0.75 : 1 }}>{tr('minigames_points_label', 'xal')}</p>
               </div>

@@ -337,7 +337,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
                   className="w-full h-full object-cover" />
                 
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <div className="absolute bottom-2 left-2 right-2">
+                  <div className="absolute bottom-2 start-2 end-2">
                     <span className="text-[10px] px-2 py-0.5 rounded-full font-bold inline-block" style={{ background: 'rgba(255,255,255,0.25)', color: '#fff', backdropFilter: 'blur(4px)' }}>
                       {month.label}
                     </span>

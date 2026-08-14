@@ -99,7 +99,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
               </div>
             </div>
             <div
-              className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm cursor-pointer"
+              className="absolute -bottom-0.5 -end-0.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm cursor-pointer"
               style={{ background: 'var(--a-peach-2)', border: '2px solid var(--a-surface)' }}
               onClick={(e) => {e.stopPropagation();setShowCreateModal(true);}}>
               

@@ -51,7 +51,7 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr('common_geri', 'Geri')}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
               <p className="a-eyebrow">{tr('partnerv2_dogus_vaxti', 'DoÄŸuÅŸ vaxtÄ±')}</p>
@@ -66,7 +66,7 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
           <motion.button
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
             onClick={() => window.open(`https://maps.google.com/?q=${birthAlert!.latitude},${birthAlert!.longitude}`, '_blank')}
-            className="w-full flex items-center gap-3 text-left"
+            className="w-full flex items-center gap-3 text-start"
             style={{ background: 'var(--a-blue-2)', borderRadius: 'var(--a-radius-md)', padding: 16, boxShadow: '0 14px 28px -12px rgba(99, 172, 223, 0.6)' }}
             whileTap={{ scale: 0.98 }}>
               <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.25)' }}>
@@ -84,7 +84,7 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
           <motion.button
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
             onClick={() => onNavigate('partner-hospital-bag')}
-            className="w-full a-card text-left"
+            className="w-full a-card text-start"
             whileTap={{ scale: 0.98 }}>
             <div className="flex items-center gap-3 mb-2.5">
               <div className="w-11 h-11 flex items-center justify-center shrink-0" style={{ borderRadius: 14, background: 'var(--a-peach-1)' }}>
@@ -107,7 +107,7 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
           <motion.button
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
             onClick={onOpenContractions}
-            className="w-full flex items-center gap-3 text-left"
+            className="w-full flex items-center gap-3 text-start"
             style={{ background: 'var(--a-pink-1)', borderRadius: 'var(--a-radius-md)', padding: 16 }}
             whileTap={{ scale: 0.98 }}>
               <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0" style={{ background: 'var(--a-chip-overlay)' }}>
@@ -131,7 +131,7 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
                   <motion.button
                     key={i}
                     onClick={() => toggleStep(i)}
-                    className="w-full flex items-center gap-3 text-left transition-all"
+                    className="w-full flex items-center gap-3 text-start transition-all"
                     style={{
                       padding: '11px 13px',
                       borderRadius: 14,

@@ -70,7 +70,7 @@ const NextAppointmentCard = ({ motherUserId, onOpen }: Props) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       onClick={onOpen}
-      className="w-full flex items-center gap-3 text-left"
+      className="w-full flex items-center gap-3 text-start"
       style={{
         padding: 15,
         borderRadius: 'var(--a-radius-md)',
@@ -96,7 +96,7 @@ const NextAppointmentCard = ({ motherUserId, onOpen }: Props) => {
           {dateLabel}{appointment.event_time ? ` · ${appointment.event_time.slice(0, 5)}` : ''} — {tr('partnerv2_onu_aparmagi_unutma', 'onu aparmağı unutma')} 🚗
         </p>
       </div>
-      <ChevronRight size={16} className="shrink-0" style={{ color: 'var(--a-ink-faint)' }} />
+      <ChevronRight size={16} className="rtl:rotate-180 shrink-0" style={{ color: 'var(--a-ink-faint)' }} />
     </motion.button>);
 
 };

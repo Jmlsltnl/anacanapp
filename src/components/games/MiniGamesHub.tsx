@@ -142,7 +142,7 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label="Back">
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div style={{ minWidth: 0 }}>
               <p className="a-eyebrow">{tr('minigames_hub_subtitle', 'Stresi at, oyna, rahatla')}</p>
@@ -183,10 +183,10 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
                     key={game.id}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => openGame(game.id)}
-                    className={`w-full relative overflow-hidden rounded-3xl bg-gradient-to-br ${game.gradient} p-4 text-left shadow-xl mb-4`}
+                    className={`w-full relative overflow-hidden rounded-3xl bg-gradient-to-br ${game.gradient} p-4 text-start shadow-xl mb-4`}
                   >
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.18),transparent_60%)]" />
-                    <div className="absolute -right-3 -bottom-3 opacity-15">
+                    <div className="absolute -end-3 -bottom-3 opacity-15">
                       <Icon className="w-28 h-28 text-white" />
                     </div>
                     <div className="relative z-10">
@@ -203,7 +203,7 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
                           <h3 className="text-white font-bold text-base">{tr(game.titleKey, game.title)}</h3>
                           <p className="text-white/80 text-xs">{tr(game.descKey, game.desc)}</p>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-white/70 flex-shrink-0" />
+                        <ChevronRight className="rtl:rotate-180 w-5 h-5 text-white/70 flex-shrink-0" />
                       </div>
 
                       <div className="flex items-center gap-3 text-white/90 text-[11px]">

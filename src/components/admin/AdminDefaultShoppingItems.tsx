@@ -167,7 +167,7 @@ const AdminDefaultShoppingItems = () => {
           </p>
         </div>
         <Button onClick={openCreateModal}>
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {tr("admindefaultshoppingitems_yeni_mehsul_cd3d1a", "Yeni M\u0259hsul")}
         </Button>
       </div>
@@ -311,11 +311,11 @@ const AdminDefaultShoppingItems = () => {
 
             <div className="flex gap-2 pt-4">
               <Button variant="outline" className="flex-1" onClick={handleModalClose}>
-                <X className="w-4 h-4 mr-2" />
+                <X className="w-4 h-4 me-2" />
                 {tr("admindefaultshoppingitems_legv_et_b5e49c", "L\u0259\u011Fv et")}
               </Button>
               <Button className="flex-1" onClick={handleSave}>
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="w-4 h-4 me-2" />
                 Saxla
               </Button>
             </div>

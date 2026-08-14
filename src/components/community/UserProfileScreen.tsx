@@ -179,7 +179,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
           <header className="a-topbar">
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
-                <ArrowLeft size={16} strokeWidth={2} />
+                <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
               </motion.button>
               <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("untranslated_profil_v8b0sk", "Profil")}</p>
             </div>
@@ -202,7 +202,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("untranslated_profil_v8b0sk", "Profil")}</p>
           </div>
@@ -339,7 +339,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
                 className="w-full h-full object-cover" />
 
               }
-                    <div className="absolute bottom-2 left-2 right-2">
+                    <div className="absolute bottom-2 start-2 end-2">
                       <span className="text-white/90 bg-black/40 px-2 py-0.5 rounded-full" style={{ fontSize: 10 }}>
                         {formatDistanceToNow(new Date(story.created_at), { addSuffix: false, locale: getCurrentDateLocale() })}
                       </span>

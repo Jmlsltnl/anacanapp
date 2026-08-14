@@ -447,12 +447,12 @@ const AdminMarketplace = () => {
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Axtar..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9" />
+                className="ps-9" />
               
             </div>
             
@@ -512,7 +512,7 @@ const AdminMarketplace = () => {
                     <TableHead>{tr("adminmarketplace_qiymet_54c4f3", "Qiymət")}</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Tarix</TableHead>
-                    <TableHead className="text-right">{tr("adminmarketplace_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
+                    <TableHead className="text-end">{tr("adminmarketplace_emeliyyatlar_54d70c", "Əməliyyatlar")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -551,7 +551,7 @@ const AdminMarketplace = () => {
                           className={`${statusInfo.color} text-white border-0`}>
                           
                             {statusInfo.icon}
-                            <span className="ml-1">{statusInfo.label}</span>
+                            <span className="ms-1">{statusInfo.label}</span>
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -559,7 +559,7 @@ const AdminMarketplace = () => {
                             {format(new Date(listing.created_at), 'dd MMM yyyy', { locale: getCurrentDateLocale() })}
                           </span>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-end">
                           <div className="flex items-center justify-end gap-1">
                             {listing.status === 'pending' &&
                           <>
@@ -725,9 +725,9 @@ const AdminMarketplace = () => {
               disabled={isSubmitting || !rejectReason.trim()}>
               
               {isSubmitting ?
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" /> :
+              <Loader2 className="w-4 h-4 me-2 animate-spin" /> :
 
-              <X className="w-4 h-4 mr-2" />
+              <X className="w-4 h-4 me-2" />
               }
               {tr("adminmarketplace_redd_et_627e77", "R\u0259dd et")}
             </Button>
@@ -871,9 +871,9 @@ const AdminMarketplace = () => {
             </Button>
             <Button onClick={handleSaveEdit} disabled={isSubmitting}>
               {isSubmitting ?
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" /> :
+              <Loader2 className="w-4 h-4 me-2 animate-spin" /> :
 
-              <Check className="w-4 h-4 mr-2" />
+              <Check className="w-4 h-4 me-2" />
               }
               Yadda saxla
             </Button>

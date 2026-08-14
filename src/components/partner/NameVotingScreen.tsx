@@ -96,7 +96,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
             {isMatch &&
             <span className="inline-flex items-center shrink-0"
             style={{ background: 'var(--a-pink-2)', color: '#fff', borderRadius: 999, padding: '2px 7px', fontSize: 9.5, fontWeight: 800 }}>
-                <Sparkles className="w-2.5 h-2.5 mr-0.5" />
+                <Sparkles className="w-2.5 h-2.5 me-0.5" />
                 Match
               </span>
             }
@@ -133,7 +133,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
         <header className="a-topbar" style={{ paddingTop: 'max(env(safe-area-inset-top), 14px)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div style={{ minWidth: 0 }}>
               <p className="a-eyebrow">{tr("namevotingscreen_her_ikiniz_beyendikde_match_olur_28c3f5", "Hər ikiniz bəyəndikdə match olur")}</p>
@@ -162,7 +162,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
           <button onClick={() => setActiveTab('matches')} className={`a-tab ${activeTab === 'matches' ? 'active' : ''}`}>
             Match
             {matches.length > 0 &&
-            <span className="ml-1 px-1.5 py-0.5 rounded-full" style={{ fontSize: 10, background: 'var(--a-pink-2)', color: '#fff', fontWeight: 800 }}>
+            <span className="ms-1 px-1.5 py-0.5 rounded-full" style={{ fontSize: 10, background: 'var(--a-pink-2)', color: '#fff', fontWeight: 800 }}>
                 {matches.length}
               </span>
             }
@@ -173,12 +173,12 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
         <div className="space-y-3">
             {/* Search + filter */}
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--a-ink-faint)' }} />
+              <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--a-ink-faint)' }} />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={tr("namevotingscreen_ad_ve_ya_mena_axtarin_30a88e", "Ad və ya məna axtarın...")}
-                className="w-full h-11 pl-11 pr-4 outline-none"
+                className="w-full h-11 ps-11 pe-4 outline-none"
                 style={{ borderRadius: 999, background: 'var(--a-surface)', border: '1px solid var(--a-line)', fontSize: 13, color: 'var(--a-ink)', boxShadow: 'var(--a-card-shadow)' }} />
 
             </div>

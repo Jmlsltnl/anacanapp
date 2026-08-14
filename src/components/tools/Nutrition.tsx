@@ -445,7 +445,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                       onClick={() => setSelectedMeal(meal.id)}
-                      className="a-list-row w-full text-left"
+                      className="a-list-row w-full text-start"
                       style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}>
                       
                         <span className="a-list-icon" style={{ background: 'var(--a-grad-peach)', fontSize: 18 }}>

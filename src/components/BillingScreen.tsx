@@ -154,7 +154,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
           whileTap={{ scale: 0.95 }}
           aria-label={tr("common_geri", "Geri")}
         >
-          <ArrowLeft size={16} strokeWidth={2} />
+          <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
         </motion.button>
         <h1 style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>{tr("billingscreen_title", "My Subscription")}</h1>
       </div>
@@ -213,7 +213,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
               className="w-full mt-4 h-12 rounded-full text-white font-bold border-0 hover:opacity-95"
               style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}
             >
-              <Crown className="w-4 h-4 mr-2" />
+              <Crown className="w-4 h-4 me-2" />
               {tr("billingscreen_upgrade_btn", "Upgrade to Premium")}
             </Button>
           )}
@@ -246,21 +246,21 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
             <div className="col-span-2 flex gap-2" style={{ background: 'var(--a-surface)', borderRadius: 18, padding: 8, boxShadow: 'var(--a-card-shadow)' }}>
               {isCancelled ? (
                 <Button onClick={handleRestoreSubscription} disabled={isRestoring} className="w-full h-11 rounded-full text-white font-bold text-sm border-0 hover:opacity-95" style={{ background: '#63bd8b' }}>
-                  {isRestoring ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RotateCcw className="w-4 h-4 mr-2" />}
+                  {isRestoring ? <Loader2 className="w-4 h-4 me-2 animate-spin" /> : <RotateCcw className="w-4 h-4 me-2" />}
                   {config.restore_cta}
                 </Button>
               ) : subscription?.plan_type === 'premium' ? (
                 <>
                   <Button onClick={() => setShowPremiumModal(true)} className="flex-1 h-11 rounded-full font-bold text-sm border-0 hover:opacity-90" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
-                    <Crown className="w-4 h-4 mr-1.5" /> {tr("billingscreen_upgrade", "Upgrade")}
+                    <Crown className="w-4 h-4 me-1.5" /> {tr("billingscreen_upgrade", "Upgrade")}
                   </Button>
                   <Button onClick={handleCancelSubscription} disabled={isCanceling} variant="ghost" className="flex-1 h-11 rounded-full font-bold text-sm" style={{ color: 'var(--a-ink-soft)' }}>
-                    {isCanceling ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <XCircle className="w-4 h-4 mr-1.5" />} {config.cancel_cta}
+                    {isCanceling ? <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> : <XCircle className="w-4 h-4 me-1.5" />} {config.cancel_cta}
                   </Button>
                 </>
               ) : (
                 <Button onClick={handleCancelSubscription} disabled={isCanceling} variant="ghost" className="w-full h-11 rounded-full font-bold text-sm" style={{ color: 'var(--a-ink-soft)' }}>
-                  {isCanceling ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <XCircle className="w-4 h-4 mr-2" />} {config.cancel_cta}
+                  {isCanceling ? <Loader2 className="w-4 h-4 me-2 animate-spin" /> : <XCircle className="w-4 h-4 me-2" />} {config.cancel_cta}
                 </Button>
               )}
             </div>
@@ -295,9 +295,9 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                     <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--a-ink)' }}>{text}</p>
                   </div>
                   {!isPremium ? (
-                    <Lock className="w-3.5 h-3.5 shrink-0 mr-1" style={{ color: 'var(--a-ink-faint)' }} />
+                    <Lock className="w-3.5 h-3.5 shrink-0 me-1" style={{ color: 'var(--a-ink-faint)' }} />
                   ) : (
-                    <CheckCircle className="w-3.5 h-3.5 shrink-0 mr-1" style={{ color: '#63bd8b' }} />
+                    <CheckCircle className="w-3.5 h-3.5 shrink-0 me-1" style={{ color: '#63bd8b' }} />
                   )}
                 </div>
               );
@@ -321,7 +321,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
               </button>
             </div>
 
-            <div className="relative pl-5 space-y-4 ml-1.5" style={{ borderLeft: '1px solid var(--a-line-strong)' }}>
+            <div className="relative ps-5 space-y-4 ms-1.5" style={{ borderLeft: '1px solid var(--a-line-strong)' }}>
               {payments.map((p, i) => {
                 const isNext = p.type === 'next';
                 const isOriginal = p.type === 'original';
@@ -333,7 +333,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
 
                 return (
                   <div key={`${p.productId}-${p.date}-${i}`} className="relative">
-                    <div className="absolute -left-[25px] top-1 w-2.5 h-2.5 rounded-full"
+                    <div className="absolute -start-[25px] top-1 w-2.5 h-2.5 rounded-full"
                     style={{ background: isNext ? '#ffc94d' : 'var(--a-peach-2)', boxShadow: '0 0 0 2px var(--a-surface)' }} />
                     <div className="flex justify-between items-start">
                       <div>
@@ -363,7 +363,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                 style={{ background: 'var(--a-surface-soft)', fontSize: 12, fontWeight: 700, color: 'var(--a-accent-ink)' }}
               >
                 {tr("billingscreen_open_in_store", "View in App Store")}
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="rtl:rotate-180 w-3.5 h-3.5" />
               </button>
             )}
           </div>

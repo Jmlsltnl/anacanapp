@@ -280,7 +280,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
             whileTap={{ scale: 0.95 }}
             aria-label={tr("common_geri", "Geri")}>
 
-            <ArrowLeft size={16} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
           </motion.button>
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <motion.div

@@ -58,12 +58,12 @@ const EmptyState = ({
         
         {/* Sparkle effects */}
         <motion.div
-          className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary/60"
+          className="absolute -top-1 -end-1 w-3 h-3 rounded-full bg-primary/60"
           animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
         />
         <motion.div
-          className="absolute -bottom-1 -left-1 w-2 h-2 rounded-full bg-pink-500/60"
+          className="absolute -bottom-1 -start-1 w-2 h-2 rounded-full bg-pink-500/60"
           animate={{ scale: [1, 0.8, 1], opacity: [0.6, 0.3, 0.6] }}
           transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
         />

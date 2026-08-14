@@ -88,7 +88,7 @@ const AdminDevelopmentTips = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">{tr("admindevelopmenttips_inkisaf_tovsiyeleri_9f473e", "İnkişaf Tövsiyələri")}</h2>
         <Button onClick={handleCreate} size="sm">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           Yeni
         </Button>
       </div>
@@ -144,7 +144,7 @@ const AdminDevelopmentTips = () => {
                   placeholder={tr("admindevelopmenttips_sira_421c5f", "Sıra")} />
                 
                       <Button size="sm" onClick={() => handleUpdate(tip.id)}>
-                        <Save className="w-4 h-4 mr-1" />
+                        <Save className="w-4 h-4 me-1" />
                         Yadda saxla
                       </Button>
                       <Button size="sm" variant="ghost" onClick={cancelEdit}>

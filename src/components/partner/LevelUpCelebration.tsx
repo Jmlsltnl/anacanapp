@@ -86,26 +86,26 @@ const LevelUpCelebration = ({ show, level, onClose }: LevelUpCelebrationProps) =
           onClick={(e) => e.stopPropagation()}>
           
             {/* Decorative elements */}
-            <div className="absolute -top-10 -left-10 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
-            <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-pink-500/20 blur-3xl" />
+            <div className="absolute -top-10 -start-10 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
+            <div className="absolute -bottom-10 -end-10 w-40 h-40 rounded-full bg-pink-500/20 blur-3xl" />
             
             {/* Floating stars */}
             <motion.div
-            className="absolute top-4 left-4"
+            className="absolute top-4 start-4"
             animate={{ y: [0, -10, 0], rotate: [0, 15, 0] }}
             transition={{ duration: 2, repeat: Infinity }}>
             
               <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
             </motion.div>
             <motion.div
-            className="absolute top-6 right-6"
+            className="absolute top-6 end-6"
             animate={{ y: [0, -8, 0], rotate: [0, -15, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}>
             
               <Sparkles className="w-5 h-5 text-pink-300" />
             </motion.div>
             <motion.div
-            className="absolute bottom-8 left-8"
+            className="absolute bottom-8 start-8"
             animate={{ y: [0, -6, 0] }}
             transition={{ duration: 1.8, repeat: Infinity, delay: 0.5 }}>
             
@@ -147,7 +147,7 @@ const LevelUpCelebration = ({ show, level, onClose }: LevelUpCelebrationProps) =
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-md">
                   <span className="text-white font-black text-2xl">{level}</span>
                 </div>
-                <div className="text-left">
+                <div className="text-start">
                   <p className="text-white/70 text-sm">{tr("levelupcelebration_seviyye_8266e7", "Səviyyə")}</p>
                   <p className="text-white font-bold text-xl">Level {level}</p>
                 </div>

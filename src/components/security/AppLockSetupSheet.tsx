@@ -172,7 +172,7 @@ const AppLockSetupSheet = ({ open, onClose, onChanged }: Props) => {
 
                 <motion.button
               onClick={() => setStep('verify-change')}
-              className="w-full flex items-center gap-3 text-left"
+              className="w-full flex items-center gap-3 text-start"
               style={{ padding: '13px 14px', borderRadius: 16, background: 'var(--a-surface-soft)' }}
               whileTap={{ scale: 0.98 }}>
                   <div className="w-10 h-10 flex items-center justify-center shrink-0" style={{ borderRadius: 13, background: 'var(--a-blue-1)' }}>
@@ -185,7 +185,7 @@ const AppLockSetupSheet = ({ open, onClose, onChanged }: Props) => {
 
                 <motion.button
               onClick={() => setStep('verify-disable')}
-              className="w-full flex items-center gap-3 text-left"
+              className="w-full flex items-center gap-3 text-start"
               style={{ padding: '13px 14px', borderRadius: 16, background: 'var(--a-alert-bg)' }}
               whileTap={{ scale: 0.98 }}>
                   <div className="w-10 h-10 flex items-center justify-center shrink-0" style={{ borderRadius: 13, background: 'var(--a-chip-overlay)' }}>

@@ -30,7 +30,7 @@ export default function PaywallStep({ onPurchase, onClose }: PaywallStepProps) {
       {/* Bağla → endirim təklifinə keçir */}
       <button
         onClick={onClose}
-        className="a-icon-btn absolute top-4 right-4 z-10"
+        className="a-icon-btn absolute top-4 end-4 z-10"
         style={{ borderRadius: 999 }}
         aria-label={tr('pw_close', 'Bağla')}>
         <X size={15} strokeWidth={2.2} />

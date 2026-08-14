@@ -338,7 +338,7 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <motion.button onClick={() => setAnalysisResult(null)} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label="Back">
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div style={{ minWidth: 0 }}>
               <p className="a-eyebrow">{tr("horoscopecompatibility_ulduz_fali_344189", "Ulduz Fal\u0131")}</p>
@@ -584,7 +584,7 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
             className="a-btn-soft flex-1"
             style={{ justifyContent: 'center', height: 48 }}>
             
-              <ArrowLeft size={15} strokeWidth={2.2} />
+              <ArrowLeft className="rtl:rotate-180" size={15} strokeWidth={2.2} />
               {tr("horoscope_back", "Geri")}
             </button>
           }
@@ -597,7 +597,7 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
             disabled={currentStep === 1 && !momData.birthDate}>
               {tr("horoscopecompatibility_novbeti_6e8661", "N\xF6vb\u0259ti")}
               
-            <ArrowRight size={15} strokeWidth={2.2} />
+            <ArrowRight className="rtl:rotate-180" size={15} strokeWidth={2.2} />
             </button> :
 
           <button
@@ -654,7 +654,7 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
               key={i}
               className="absolute text-white/20"
               style={{
-                left: `${Math.random() * 100}%`,
+                insetInlineStart: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
                 fontSize: `${4 + Math.random() * 16}px`
               }}
@@ -864,7 +864,7 @@ const PersonInput = ({
             </p>
           </div>
           {data.hasBirthTime &&
-        <div className="text-right">
+        <div className="text-end">
               <p className="text-xs" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{tr("horoscopecompatibility_yukselen_b35c71", "Yüksələn")}</p>
               <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-lav-2)' }}>{tr("untranslated_hesablanacaq_w6pf63", "Hesablanacaq ↗")}</p>
             </div>
@@ -882,7 +882,7 @@ const BirthChartCard = ({ chart, label, emoji }: {chart: ChartData;label: string
       <span className="text-xl">{emoji}</span>
       <span className="a-list-title" style={{ margin: 0 }}>{label}</span>
       {chart.isExpected &&
-    <span className="a-rank-tag ml-auto" style={{ margin: '0 0 0 auto', background: 'var(--a-lav-1)', color: 'var(--a-lav-ink)' }}>
+    <span className="a-rank-tag ms-auto" style={{ margin: '0 0 0 auto', background: 'var(--a-lav-1)', color: 'var(--a-lav-ink)' }}>
           {tr("horoscopecompatibility_gozlenilen_4885bf", "G\xF6zl\u0259nil\u0259n")}
         </span>
     }

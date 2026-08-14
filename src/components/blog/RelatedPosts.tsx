@@ -74,7 +74,7 @@ const RelatedPosts = ({ currentPost, allPosts, onSelectPost }: RelatedPostsProps
         <motion.button
           key={post.id}
           onClick={() => onSelectPost(post)}
-          className="a-list-row w-full text-left"
+          className="a-list-row w-full text-start"
           style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -105,7 +105,7 @@ const RelatedPosts = ({ currentPost, allPosts, onSelectPost }: RelatedPostsProps
               </p>
             </div>
             
-            <ChevronRight size={16} className="a-list-chevron" />
+            <ChevronRight size={16} className="rtl:rotate-180 a-list-chevron" />
           </motion.button>
         )}
       </div>

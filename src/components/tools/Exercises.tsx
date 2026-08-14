@@ -181,7 +181,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: Math.min(index * 0.08, 0.4) }}
                     onClick={() => setSelectedExerciseId(exercise.id)}
-                    className="a-card w-full flex items-center gap-4 text-left"
+                    className="a-card w-full flex items-center gap-4 text-start"
                     style={{
                       cursor: 'pointer',
                       ...(isCompleted ? { background: 'var(--a-green-1)', border: 'none' } : {})
@@ -192,7 +192,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                       style={{ background: isCompleted ? 'var(--a-grad-green)' : 'var(--a-blue-1)' }}>
                           {isCompleted ? '✅' : exercise.icon}
                         </div>
-                        <div className="flex-1 text-left min-w-0">
+                        <div className="flex-1 text-start min-w-0">
                           <h3 className="a-list-title" style={{ margin: 0, color: isCompleted ? '#14532d' : undefined }}>{exercise.name}</h3>
                           <p className="a-list-sub line-clamp-1" style={{ margin: 0, whiteSpace: 'normal', color: isCompleted ? 'rgba(20, 83, 45, 0.7)' : undefined }}>{exercise.description}</p>
                           <div className="flex gap-3 mt-1 items-center flex-wrap">
@@ -217,7 +217,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                       style={{ background: isCompleted ? 'var(--a-chip-overlay)' : 'var(--a-surface-soft)' }}>
                           {isCompleted ?
                       <Check className="w-5 h-5" style={{ color: 'var(--a-green-ink)' }} /> :
-                      <ChevronRight className="w-5 h-5" style={{ color: 'var(--a-ink-faint)' }} />
+                      <ChevronRight className="rtl:rotate-180 w-5 h-5" style={{ color: 'var(--a-ink-faint)' }} />
                       }
                         </div>
                       </motion.button>);

@@ -333,7 +333,7 @@ const OnboardingScreen = () => {
           whileTap={{ scale: 0.95 }}
           aria-label={tr("common_geri", "Geri")}>
 
-            <ArrowLeft size={18} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={18} strokeWidth={2} />
           </motion.button> :
 
         <div className="w-11" />
@@ -406,7 +406,7 @@ const OnboardingScreen = () => {
                     key={stage.id}
                     variants={childVariants}
                     onClick={() => handleStageSelect(stage.id)}
-                    className={`w-full text-left transition-all duration-300 relative overflow-hidden ${
+                    className={`w-full text-start transition-all duration-300 relative overflow-hidden ${
                     isSelected ?
                     `bg-gradient-to-r ${stage.bgGradient} text-white` :
                     ''}`
@@ -602,7 +602,7 @@ const OnboardingScreen = () => {
                         </motion.button>
                         <div className="flex-1 h-14 flex items-center justify-center" style={{ borderRadius: 18, background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)' }}>
                           <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--a-ink)' }}>{cycleLength}</span>
-                          <span className="ml-2" style={{ color: 'var(--a-ink-soft)' }}>{tr("onboardingscreen_gun_54e78d", "gün")}</span>
+                          <span className="ms-2" style={{ color: 'var(--a-ink-soft)' }}>{tr("onboardingscreen_gun_54e78d", "gün")}</span>
                         </div>
                         <motion.button
                       type="button"
@@ -634,7 +634,7 @@ const OnboardingScreen = () => {
                         </motion.button>
                         <div className="flex-1 h-14 flex items-center justify-center" style={{ borderRadius: 18, background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)' }}>
                           <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--a-ink)' }}>{periodLength}</span>
-                          <span className="ml-2" style={{ color: 'var(--a-ink-soft)' }}>{tr("onboardingscreen_gun_54e78d", "gün")}</span>
+                          <span className="ms-2" style={{ color: 'var(--a-ink-soft)' }}>{tr("onboardingscreen_gun_54e78d", "gün")}</span>
                         </div>
                         <motion.button
                       type="button"
@@ -694,7 +694,7 @@ const OnboardingScreen = () => {
                 animate={{ x: [0, 5, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}>
 
-                  <ArrowRight className="w-6 h-6" />
+                  <ArrowRight className="rtl:rotate-180 w-6 h-6" />
                 </motion.div>
               </>
             }

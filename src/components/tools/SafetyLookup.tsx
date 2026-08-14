@@ -162,7 +162,7 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
               <button
                 key={item.id}
                 onClick={() => setSelectedItem(item)}
-                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-left"
+                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-start"
                 style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', boxShadow: 'var(--a-card-shadow)', cursor: 'pointer' }}>
                 
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: cfg.grad }}>

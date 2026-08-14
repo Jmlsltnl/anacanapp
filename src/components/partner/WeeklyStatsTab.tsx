@@ -199,7 +199,7 @@ const WeeklyStatsTab = () => {
         <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
           <div className="w-3 h-3 rounded bg-cyan-500 dark:bg-cyan-400" />
           <span>{tr("weeklystatstab_hedefe_catdi_2l_23ea87", "Hədəfə çatdı (2L+)")}</span>
-          <div className="w-3 h-3 rounded bg-cyan-300 dark:bg-cyan-600 ml-2" />
+          <div className="w-3 h-3 rounded bg-cyan-300 dark:bg-cyan-600 ms-2" />
           <span>{tr("weeklystatstab_hedef_alti_2de340", "Hədəf altı")}</span>
         </div>
       </motion.div>

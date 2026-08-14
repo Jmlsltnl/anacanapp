@@ -80,7 +80,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
       style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
         <div className="flex items-center gap-3">
           <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-            <ArrowLeft size={16} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
           </motion.button>
           <h1 style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>{tr("checkoutscreen_sifarisi_tamamla_a8b546", "Sifarişi Tamamla")}</h1>
         </div>
@@ -162,13 +162,13 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
         </div>
       </form>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 safe-bottom"
+      <div className="fixed bottom-0 start-0 end-0 p-4 safe-bottom"
       style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', borderTop: '1px solid var(--a-line)' }}>
         <Button onClick={handleSubmit} disabled={loading}
         className="w-full h-12 text-base font-bold rounded-full text-white border-0 max-w-md mx-auto flex hover:opacity-95"
         style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}>
           {loading ?
-          <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{tr("checkoutscreen_gozleyin_9c465b", "Gözləyin...")}</> :
+          <><Loader2 className="w-5 h-5 me-2 animate-spin" />{tr("checkoutscreen_gozleyin_9c465b", "Gözləyin...")}</> :
 
           `${tr("checkout_place_order", "Sifariş Ver")} - ${finalPrice.toFixed(2)} ₼`
           }

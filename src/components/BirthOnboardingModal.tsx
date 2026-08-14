@@ -161,7 +161,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
           <div className="relative bg-gradient-to-br from-pink-500 via-rose-500 to-red-500 p-6 text-white">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+              className="absolute top-4 end-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
               
               <X className="w-4 h-4" />
             </button>
@@ -214,11 +214,11 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                       <Button
                       variant="outline"
                       className={cn(
-                        "w-full h-14 justify-start text-left font-medium text-base",
+                        "w-full h-14 justify-start text-start font-medium text-base",
                         !birthDate && "text-muted-foreground"
                       )}>
                       
-                        <Calendar className="mr-3 h-5 w-5 text-pink-500" />
+                        <Calendar className="me-3 h-5 w-5 text-pink-500" />
                         {birthDate ? format(birthDate, "d MMMM yyyy", { locale: getCurrentDateLocale() }) : tr("birthonboardingmodal_tarix_secin_3377b4", "Tarix se\xE7in")}
                       </Button>
                     </PopoverTrigger>
@@ -315,12 +315,12 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                     whileTap={{ scale: 0.98 }}>
                     
                         <span className="text-2xl">{option.emoji}</span>
-                        <div className="text-left">
+                        <div className="text-start">
                           <p className="font-semibold text-foreground">{option.label}</p>
                           <p className="text-xs text-muted-foreground">{option.description}</p>
                         </div>
                         {deliveryType === option.value &&
-                    <Check className="w-5 h-5 text-pink-500 ml-auto" />
+                    <Check className="w-5 h-5 text-pink-500 ms-auto" />
                     }
                       </motion.button>
                   )}
@@ -349,7 +349,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                     <div>
                       <Label className="text-xs text-muted-foreground mb-1 block">{tr("birthonboardingmodal_ceki_kq_2f7555", "Çəki (kq)")}</Label>
                       <div className="relative">
-                        <Scale className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Scale className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                         type="number"
                         step="0.1"
@@ -358,14 +358,14 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                         value={birthWeight}
                         onChange={(e) => setBirthWeight(e.target.value)}
                         placeholder="3.5"
-                        className="pl-10 h-12" />
+                        className="ps-10 h-12" />
                       
                       </div>
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground mb-1 block">{tr("birthonboardingmodal_boy_sm_3bc841", "Boy (sm)")}</Label>
                       <div className="relative">
-                        <Ruler className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Ruler className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                         type="number"
                         step="1"
@@ -374,7 +374,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                         value={birthHeight}
                         onChange={(e) => setBirthHeight(e.target.value)}
                         placeholder="50"
-                        className="pl-10 h-12" />
+                        className="ps-10 h-12" />
                       
                       </div>
                     </div>
@@ -406,7 +406,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
               onClick={prevStep}
               className="flex-1 h-12">
               
-                <ChevronLeft className="w-4 h-4 mr-1" />
+                <ChevronLeft className="rtl:rotate-180 w-4 h-4 me-1" />
                 {tr("common_geri", "Geri")}
               </Button>
             }
@@ -415,7 +415,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
             <Button
               onClick={nextStep}
               disabled={!canProceed()}
-              className="flex-1 h-12 bg-gradient-to-r from-pink-500 to-rose-500">{tr("untranslated_davam_et_rchhd5", "Davam et")}<ChevronRight className="w-4 h-4 ml-1" />
+              className="flex-1 h-12 bg-gradient-to-r from-pink-500 to-rose-500">{tr("untranslated_davam_et_rchhd5", "Davam et")}<ChevronRight className="rtl:rotate-180 w-4 h-4 ms-1" />
               </Button> :
 
             <Button
@@ -427,7 +427,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> :
 
               <>
-                    <Sparkles className="w-4 h-4 mr-2" />
+                    <Sparkles className="w-4 h-4 me-2" />
                     {tr("common_tamamla", "Tamamla")}
                   </>
               }

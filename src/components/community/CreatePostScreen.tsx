@@ -185,7 +185,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("createpostscreen_yeni_paylasim_4f5b15", "Yeni Paylaşım")}</p>
           </div>
@@ -212,13 +212,13 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
                 value={content}
                 onChange={handleContentChange}
                 placeholder={tr("createpostscreen_ne_dusunursunuz_474859", "Nə düşünürsünüz? ✨")}
-                className="min-h-[180px] resize-none border-0 bg-transparent shadow-none focus-visible:ring-0 pr-12 leading-relaxed"
+                className="min-h-[180px] resize-none border-0 bg-transparent shadow-none focus-visible:ring-0 pe-12 leading-relaxed"
                 style={{ fontSize: 14, color: 'var(--a-ink)' }}
                 autoFocus />
 
               <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
                 <PopoverTrigger asChild>
-                  <button type="button" className="absolute right-4 top-4 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                  <button type="button" className="absolute end-4 top-4 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
                   style={{ background: 'var(--a-surface-soft)' }} aria-label="Emoji">
                     <Smile size={16} style={{ color: 'var(--a-ink-soft)' }} />
                   </button>
@@ -230,11 +230,11 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
             </div>
 
             {showSuggestions && suggestions.length > 0 &&
-            <div className="absolute left-0 right-0 top-full mt-1 z-50 overflow-hidden"
+            <div className="absolute start-0 end-0 top-full mt-1 z-50 overflow-hidden"
             style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', borderRadius: 18, boxShadow: 'var(--a-card-shadow)' }}>
                 {suggestions.map((suggestion, index) =>
               <button key={`${suggestion.type}-${suggestion.value}-${index}`} onClick={() => applySuggestion(suggestion)}
-              className="w-full px-4 py-2.5 flex items-center gap-3 text-left transition-colors"
+              className="w-full px-4 py-2.5 flex items-center gap-3 text-start transition-colors"
               style={{ borderBottom: index < suggestions.length - 1 ? '1px solid var(--a-line)' : 'none' }}>
                     <div className="w-7 h-7 rounded-full flex items-center justify-center overflow-hidden shrink-0" style={{ background: 'var(--a-peach-1)' }}>
                       {suggestion.type === 'user' && suggestion.avatar ?
@@ -270,13 +270,13 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
               <div className="relative w-full h-full">
                       <video src={preview.url} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"><Play className="w-5 h-5 ml-0.5" style={{ color: 'var(--a-ink)' }} /></div>
+                        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"><Play className="w-5 h-5 ms-0.5" style={{ color: 'var(--a-ink)' }} /></div>
                       </div>
                     </div> :
 
               <img src={preview.url} alt="" className="w-full h-full object-cover" />
               }
-                  <button onClick={() => removeMedia(index)} className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
+                  <button onClick={() => removeMedia(index)} className="absolute top-2 end-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
                     <X className="w-3 h-3 text-white" />
                   </button>
                 </div>
@@ -298,7 +298,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
             className="a-icon-btn disabled:opacity-40" style={{ width: 40, height: 40 }} aria-label="Video">
               <Video size={17} style={{ color: 'var(--a-blue-ink)' }} />
             </button>
-            {mediaFiles.length > 0 && <span className="ml-auto" style={{ fontSize: 10, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{mediaFiles.length}/4</span>}
+            {mediaFiles.length > 0 && <span className="ms-auto" style={{ fontSize: 10, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{mediaFiles.length}/4</span>}
           </div>
 
           {/* Post dili — yazdıqca avtomatik aşkarlanır, çiplə düzəldilə bilər.
@@ -336,12 +336,12 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
             style={{ background: isAnonymous ? 'var(--a-lav-1)' : 'var(--a-surface-soft)' }}>
               <EyeOff size={16} style={{ color: isAnonymous ? 'var(--a-lav-ink)' : 'var(--a-ink-soft)' }} />
             </div>
-            <div className="flex-1 text-left">
+            <div className="flex-1 text-start">
               <p style={{ fontSize: 12.5, fontWeight: 700, color: isAnonymous ? 'var(--a-lav-ink)' : 'var(--a-ink)' }}>{tr("createpostscreen_anonim_paylas_6074c9", "Anonim paylaş")}</p>
               <p style={{ fontSize: 10.5, color: 'var(--a-ink-soft)' }}>{tr("createpostscreen_adiniz_ve_sekliniz_gizledilir_6fc767", "Adınız və şəkliniz gizlədilir")}</p>
             </div>
             <div className="w-10 h-6 rounded-full transition-colors shrink-0" style={{ background: isAnonymous ? 'var(--a-lav-2)' : 'var(--a-line-strong)' }}>
-              <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'ml-[18px]' : 'ml-0.5'}`} />
+              <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'ms-[18px]' : 'ms-0.5'}`} />
             </div>
           </button>
         </div>

@@ -90,7 +90,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                   <p style={{ margin: 0, fontSize: 11.5, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{tr("firstaidguide_tecili_tibbi_yardim_b28b39", "Təcili Tibbi Yardım")}</p>
                 </div>
                 <span className="w-8 h-8 rounded-full flex items-center justify-center animate-pulse" style={{ background: 'rgba(255,255,255,0.25)' }}>
-                  <ChevronRight size={15} style={{ color: '#fff' }} />
+                  <ChevronRight className="rtl:rotate-180" size={15} style={{ color: '#fff' }} />
                 </span>
               </div>
             </motion.a>
@@ -126,7 +126,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: Math.min(index * 0.05, 0.3) }}
-                  className="a-list-row w-full text-left"
+                  className="a-list-row w-full text-start"
                   style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}>
                   
                         <span className="a-list-icon" style={{ background: style.grad, fontSize: 18 }}>
@@ -140,7 +140,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                           <span className="a-rank-tag" style={{ margin: 0, background: style.grad, color: style.ink }}>
                             {scenario.emergency_level === 'critical' ? tr("firstaid_critical", "KRİTİK") : scenario.emergency_level === 'high' ? tr("firstaidguide_yuksek_22d925", "Y\xDCKS\u018FK") : tr("firstaid_medium", "ORTA")}
                           </span>
-                          <ChevronRight size={16} className="a-list-chevron" />
+                          <ChevronRight size={16} className="rtl:rotate-180 a-list-chevron" />
                         </span>
                       </motion.button>);
 
@@ -194,13 +194,13 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                         </span>
                   }
                       {currentStepData.duration_seconds &&
-                  <span className="a-list-time ml-auto" style={{ margin: '0 0 0 auto' }}>
+                  <span className="a-list-time ms-auto" style={{ margin: '0 0 0 auto' }}>
                           ⏱️ {currentStepData.duration_seconds}s
                         </span>
                   }
                     </div>
 
-                    <div className="a-card text-left">
+                    <div className="a-card text-start">
                       <h2 className="a-card-title a-heading" style={{ marginBottom: 6 }}>{currentStepData.title_az}</h2>
                       <p className="a-cta-text">
                         {currentStepData.instruction_az}
@@ -216,7 +216,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                       onClick={prevStep}
                       disabled={currentStep === 0}>
                       
-                          <ChevronLeft size={15} strokeWidth={2.2} />
+                          <ChevronLeft className="rtl:rotate-180" size={15} strokeWidth={2.2} />
                           {tr("firstaidguide_evvelki_936896", "\u018Fvv\u0259lki")}
                         </button>
                         <button
@@ -228,7 +228,7 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
                       onClick={currentStep === steps.length - 1 ? handleBack : nextStep}>
                       
                           {currentStep === steps.length - 1 ? tr("firstaid_complete", "Tamamla") : tr("firstaidguide_novbeti_6e8661", "N\xF6vb\u0259ti")}
-                          <ChevronRight size={15} strokeWidth={2.2} />
+                          <ChevronRight className="rtl:rotate-180" size={15} strokeWidth={2.2} />
                         </button>
                       </div>
 

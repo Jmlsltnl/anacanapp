@@ -127,7 +127,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'var(--a-grad-lav)' }}>
             <Moon className="w-4 h-4" style={{ color: '#3c2e5c' }} />
           </div>
-          <div className="text-left">
+          <div className="text-start">
             <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-ink)' }}>{tr("sleephistorypanel_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>
             <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>
               {todaySleepStats.count > 0
@@ -138,7 +138,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
         </div>
         <div className="flex items-center gap-2">
           {todaySleepStats.count > 0 && (
-            <div className="text-right mr-2">
+            <div className="text-end me-2">
               <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-lav-ink)' }}>
                 {formatDuration(todaySleepStats.totalMinutes)}
               </p>

@@ -111,7 +111,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             {onBack &&
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
-                <ArrowLeft size={16} strokeWidth={2} />
+                <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
               </motion.button>
             }
             <div>
@@ -132,7 +132,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
                 style={{
                   position: 'absolute',
                   top: -4,
-                  right: -4,
+                  insetInlineEnd: -4,
                   minWidth: 15,
                   height: 15,
                   padding: '0 4px',

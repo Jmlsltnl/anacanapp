@@ -226,7 +226,7 @@ const AdminMaternityBenefits = () => {
         <TabsContent value="guidelines" className="space-y-4">
           <div className="flex justify-end">
             <Button onClick={() => openGuideModal()}>
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 me-2" />
               {tr("adminmaternitybenefits_yeni_beledci_1e4796", "Yeni B\u0259l\u0259d\xE7i")}
             </Button>
           </div>
@@ -339,11 +339,11 @@ const AdminMaternityBenefits = () => {
 
             <div className="flex gap-2 pt-4">
               <Button variant="outline" className="flex-1" onClick={handleGuideModalClose}>
-                <X className="w-4 h-4 mr-2" />
+                <X className="w-4 h-4 me-2" />
                 {tr("adminmaternitybenefits_legv_et_b5e49c", "L\u0259\u011Fv et")}
               </Button>
               <Button className="flex-1" onClick={handleSaveGuide}>
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="w-4 h-4 me-2" />
                 Saxla
               </Button>
             </div>

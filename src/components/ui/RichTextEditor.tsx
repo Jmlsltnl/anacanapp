@@ -239,13 +239,13 @@ const RichTextEditor = ({ content, onChange, placeholder = tr("richtexteditor_me
 
         <div className="w-px h-5 bg-border mx-1" />
 
-        <MenuButton onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor.isActive({ textAlign: 'left' })} title={tr("richtexteditor_sola", 'Sola')}>
+        <MenuButton onClick={() => editor.chain().focus().setTextAlign('left').run()} active={editor.isActive({ textAlign: 'start' })} title={tr("richtexteditor_sola", 'Sola')}>
           <AlignLeft size={s} />
         </MenuButton>
         <MenuButton onClick={() => editor.chain().focus().setTextAlign('center').run()} active={editor.isActive({ textAlign: 'center' })} title={tr("richtexteditor_ortaya", 'Ortaya')}>
           <AlignCenter size={s} />
         </MenuButton>
-        <MenuButton onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor.isActive({ textAlign: 'right' })} title={tr("richtexteditor_saga_804f56", "Sağa")}>
+        <MenuButton onClick={() => editor.chain().focus().setTextAlign('right').run()} active={editor.isActive({ textAlign: 'end' })} title={tr("richtexteditor_saga_804f56", "Sağa")}>
           <AlignRight size={s} />
         </MenuButton>
 
@@ -284,12 +284,12 @@ const RichTextEditor = ({ content, onChange, placeholder = tr("richtexteditor_me
           '[&_.ProseMirror_h2]:text-xl [&_.ProseMirror_h2]:font-semibold [&_.ProseMirror_h2]:mb-2 [&_.ProseMirror_h2]:mt-3',
           '[&_.ProseMirror_h3]:text-lg [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:mb-2 [&_.ProseMirror_h3]:mt-3',
           // Lists
-          '[&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ul]:mb-3',
-          '[&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_ol]:mb-3',
+          '[&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:ps-6 [&_.ProseMirror_ul]:mb-3',
+          '[&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:ps-6 [&_.ProseMirror_ol]:mb-3',
           '[&_.ProseMirror_li]:mb-1',
           // Blockquote
-          '[&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-primary/30',
-          '[&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic',
+          '[&_.ProseMirror_blockquote]:border-s-4 [&_.ProseMirror_blockquote]:border-primary/30',
+          '[&_.ProseMirror_blockquote]:ps-4 [&_.ProseMirror_blockquote]:italic',
           '[&_.ProseMirror_blockquote]:text-muted-foreground [&_.ProseMirror_blockquote]:my-3',
           // Code block
           '[&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:rounded-lg [&_.ProseMirror_pre]:p-3',

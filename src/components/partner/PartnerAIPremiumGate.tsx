@@ -52,7 +52,7 @@ const PartnerAIPremiumGate = () => {
               <Crown size={44} style={{ color: 'var(--a-accent-ink)' }} />
             </motion.div>
             <motion.div
-              className="absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center"
+              className="absolute -top-2 -end-2 w-8 h-8 rounded-full flex items-center justify-center"
               style={{ background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)' }}
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 2, repeat: Infinity }}>
@@ -97,7 +97,7 @@ const PartnerAIPremiumGate = () => {
           className="w-full h-14 rounded-full text-white font-bold text-base border-0 hover:opacity-95"
           style={{ background: 'var(--a-peach-2)', boxShadow: '0 16px 32px -12px rgba(217, 108, 74, 0.6)' }}>
 
-          <Crown className="w-5 h-5 mr-2" />
+          <Crown className="w-5 h-5 me-2" />
           {tr("partneraipremiumgate_premium_a_kec_9dadb6", "Premium-a ke\xE7")}
         </Button>
         <p className="text-center mt-3" style={{ fontSize: 11.5, color: 'var(--a-on-bg-soft)' }}>

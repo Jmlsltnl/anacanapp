@@ -31,7 +31,7 @@ const CouponInput = ({
         <Check className="w-4 h-4 text-green-600 shrink-0" />
         <div className="flex-1 min-w-0">
           <span className="text-xs font-bold text-green-700 dark:text-green-400">{appliedCoupon.coupon.code}</span>
-          <span className="text-[10px] text-green-600 dark:text-green-500 ml-1.5">
+          <span className="text-[10px] text-green-600 dark:text-green-500 ms-1.5">
             -{appliedCoupon.discountAmount.toFixed(2)}₼
           </span>
         </div>
@@ -45,13 +45,13 @@ const CouponInput = ({
   return (
     <div className="flex gap-2">
       <div className="relative flex-1">
-        <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+        <Tag className="absolute start-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
         <input
           type="text"
           value={couponCode}
           onChange={(e) => onCodeChange(e.target.value.toUpperCase())}
           placeholder={tr("untranslated_kupon_kodu_xiawxh", "Kupon kodu")}
-          className="w-full h-9 pl-9 pr-3 rounded-lg bg-muted/50 border border-border text-sm outline-none focus:border-primary/40 transition-colors" />
+          className="w-full h-9 ps-9 pe-3 rounded-lg bg-muted/50 border border-border text-sm outline-none focus:border-primary/40 transition-colors" />
         
       </div>
       <button

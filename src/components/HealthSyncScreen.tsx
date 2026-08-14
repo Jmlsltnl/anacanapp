@@ -123,7 +123,7 @@ const HealthSyncScreen = ({ onBack }: Props) => {
         {/* Header */}
         <div className="flex items-center gap-3 py-5">
           <button onClick={onBack} className="a-icon-btn" style={{ width: 44, height: 44 }} aria-label={tr('common_geri', 'Geri')}>
-            <ArrowLeft size={18} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={18} strokeWidth={2} />
           </button>
           <div>
             <p className="a-today-info-eyebrow" style={{ margin: 0 }}>{tr('health_eyebrow', 'Sağlamlıq inteqrasiyası')}</p>
@@ -277,7 +277,7 @@ const HealthSyncScreen = ({ onBack }: Props) => {
 
             {/* İdarəetmə */}
             <div className="a-list-card" style={{ marginTop: 12 }}>
-              <button className="a-list-row w-full text-left" style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={openHealthSettings}>
+              <button className="a-list-row w-full text-start" style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={openHealthSettings}>
                 <span className="a-list-icon" style={{ background: 'var(--a-blue-1)', color: 'var(--a-blue-ink)' }}>
                   <Settings2 size={17} strokeWidth={2} />
                 </span>
@@ -286,7 +286,7 @@ const HealthSyncScreen = ({ onBack }: Props) => {
                   <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{`${platformName} ${tr('health_open_settings_desc', 'icazələrini idarə edin')}`}</p>
                 </div>
               </button>
-              <button className="a-list-row w-full text-left" style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={handleDisconnect}>
+              <button className="a-list-row w-full text-start" style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={handleDisconnect}>
                 <span className="a-list-icon" style={{ background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)' }}>
                   <Link2 size={17} strokeWidth={2} />
                 </span>

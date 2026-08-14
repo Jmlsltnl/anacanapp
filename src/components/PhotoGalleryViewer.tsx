@@ -201,7 +201,7 @@ const PhotoGalleryViewer = ({
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="absolute top-0 left-0 right-0 z-10 p-4 safe-top">
+          className="absolute top-0 start-0 end-0 z-10 p-4 safe-top">
           
           <div className="flex items-center justify-between">
             <Button
@@ -237,18 +237,18 @@ const PhotoGalleryViewer = ({
           {hasPrev &&
           <button
             onClick={goToPrev}
-            className="absolute left-4 z-10 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 transition-colors hidden md:flex">
+            className="absolute start-4 z-10 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 transition-colors hidden md:flex">
             
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="rtl:rotate-180 w-6 h-6" />
             </button>
           }
           
           {hasNext &&
           <button
             onClick={goToNext}
-            className="absolute right-4 z-10 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 transition-colors hidden md:flex">
+            className="absolute end-4 z-10 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/20 transition-colors hidden md:flex">
             
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="rtl:rotate-180 w-6 h-6" />
             </button>
           }
 
@@ -278,7 +278,7 @@ const PhotoGalleryViewer = ({
           </AnimatePresence>
 
           {/* Swipe indicators for mobile */}
-          <div className="absolute bottom-32 left-0 right-0 flex justify-center gap-1.5 md:hidden">
+          <div className="absolute bottom-32 start-0 end-0 flex justify-center gap-1.5 md:hidden">
             {photos.map((_, index) =>
             <div
               key={index}
@@ -305,7 +305,7 @@ const PhotoGalleryViewer = ({
               onClick={handleShare}
               className="flex-1 h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20">
               
-              <Share2 className="w-5 h-5 mr-2" />
+              <Share2 className="w-5 h-5 me-2" />
               {tr("photogalleryviewer_paylas_b4be3b", "Payla\u015F")}
             </Button>
             
@@ -315,9 +315,9 @@ const PhotoGalleryViewer = ({
               className="flex-1 h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 disabled:opacity-50">
               
               {isDownloading ?
-              <Loader2 className="w-5 h-5 mr-2 animate-spin" /> :
+              <Loader2 className="w-5 h-5 me-2 animate-spin" /> :
 
-              <Download className="w-5 h-5 mr-2" />
+              <Download className="w-5 h-5 me-2" />
               }
               {isDownloading ? tr("photogalleryviewer_yuklenir_5557de", "Y\xFCkl\u0259nir...") : tr("photogalleryviewer_yukle_2b8e67", "Y\xFCkl\u0259")}
             </Button>

@@ -122,7 +122,7 @@ const AdminFairyTales = () => {
           </p>
         </div>
         <Button onClick={() => setNewTheme(true)}>
-          <Plus className="w-4 h-4 mr-1" />
+          <Plus className="w-4 h-4 me-1" />
           Yeni Tema
         </Button>
       </div>
@@ -202,7 +202,7 @@ const AdminFairyTales = () => {
                       
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => setEditingTheme(theme)}>
-                          <Edit className="w-3 h-3 mr-1" />
+                          <Edit className="w-3 h-3 me-1" />
                           {tr("adminfairytales_redakte_d53ba7", "Redakt\u0259")}
                         </Button>
                         <Button
@@ -313,11 +313,11 @@ const ThemeForm = ({ theme, onSave, onCancel, isLoading }: ThemeFormProps) => {
       
       <div className="flex gap-2">
         <Button onClick={() => onSave(form)} disabled={isLoading}>
-          <Save className="w-4 h-4 mr-1" />
+          <Save className="w-4 h-4 me-1" />
           {isLoading ? tr("adminfairytales_saxlanir_9ea540", "Saxlan\u0131r...") : 'Yadda saxla'}
         </Button>
         <Button variant="outline" onClick={onCancel}>
-          <X className="w-4 h-4 mr-1" />
+          <X className="w-4 h-4 me-1" />
           {tr("adminfairytales_legv_et_b5e49c", "L\u0259\u011Fv et")}
         </Button>
       </div>

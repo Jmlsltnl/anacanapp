@@ -26,7 +26,7 @@ const PartnerFlowStatusCard = () => {
       animate={{ opacity: 1, y: 0 }}
       className={`relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br ${phase.color}`}>
       
-      <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-white/10 -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute top-0 end-0 w-32 h-32 rounded-full bg-white/10 -translate-y-1/2 translate-x-1/2" />
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-3">
           <div>
@@ -36,7 +36,7 @@ const PartnerFlowStatusCard = () => {
               {phase.label}
             </h2>
           </div>
-          <div className="text-right">
+          <div className="text-end">
             <p className="text-white/70 text-[10px]">{tr("partnerflowstatuscard_tsikl_gunu_b9e250", "Tsikl g\xFCn\xFC")}</p>
             <p className="text-3xl font-bold text-white">{phaseInfo.dayInCycle}</p>
           </div>

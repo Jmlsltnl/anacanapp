@@ -209,7 +209,7 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("settingsscreen_tenzimlemeler_085659", "TÉ™nzimlÉ™mÉ™lÉ™r")}</p>
           </div>
@@ -392,7 +392,7 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
                     {tr("paywall_aktiv", "Aktiv")}
                   </span>
                 }
-                <ChevronRight size={18} style={{ color: 'var(--a-ink-faint)' }} />
+                <ChevronRight className="rtl:rotate-180" size={18} style={{ color: 'var(--a-ink-faint)' }} />
               </span>
             </SettingRow>
             <SettingRow
@@ -402,7 +402,7 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
               onClick={() => onNavigate?.('health-sync')}
               tintBg="var(--a-pink-1)" tintInk="var(--a-pink-ink)">
 
-              <ChevronRight size={18} style={{ color: 'var(--a-ink-faint)' }} />
+              <ChevronRight className="rtl:rotate-180" size={18} style={{ color: 'var(--a-ink-faint)' }} />
             </SettingRow>
             <SettingRow
               icon={Download}
@@ -414,7 +414,7 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
               {isExporting ?
               <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--a-peach-2)' }} /> :
 
-              <ChevronRight size={18} style={{ color: 'var(--a-ink-faint)' }} />
+              <ChevronRight className="rtl:rotate-180" size={18} style={{ color: 'var(--a-ink-faint)' }} />
               }
             </SettingRow>
             <SettingRow
@@ -424,7 +424,7 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
               onClick={() => setShowDeleteDialog(true)}
               danger>
 
-              <ChevronRight size={18} style={{ color: 'var(--a-alert-ink)' }} />
+              <ChevronRight className="rtl:rotate-180" size={18} style={{ color: 'var(--a-alert-ink)' }} />
             </SettingRow>
           </SectionCard>
 
@@ -491,9 +491,9 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
               className="bg-destructive hover:bg-destructive/90 rounded-full">
 
               {isDeleting ?
-              <Loader2 className="w-4 h-4 animate-spin mr-2" /> :
+              <Loader2 className="w-4 h-4 animate-spin me-2" /> :
 
-              <Trash2 className="w-4 h-4 mr-2" />
+              <Trash2 className="w-4 h-4 me-2" />
               }
               {tr("settingsscreen_hesabi_sil_95d759", "Hesab\u0131 sil")}
             </AlertDialogAction>

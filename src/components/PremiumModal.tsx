@@ -113,7 +113,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
             <button
             ref={closeButtonRef}
             onClick={onClose}
-            className="a-icon-btn absolute top-3 right-4 z-10"
+            className="a-icon-btn absolute top-3 end-4 z-10"
             style={{ borderRadius: 999, marginTop: 'env(safe-area-inset-top, 0px)' }}
             aria-label={tr("premiummodal_bagla_84bdc9", "Bağla")}>
               <X size={16} strokeWidth={2} />
@@ -135,7 +135,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
                 {/* Parıltı nöqtələri */}
                 <motion.span
                 aria-hidden
-                className="absolute -top-1 -right-1 text-sm"
+                className="absolute -top-1 -end-1 text-sm"
                 animate={{ scale: [1, 1.25, 1], rotate: [0, 12, 0] }}
                 transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2.4 }}>
                   ✨

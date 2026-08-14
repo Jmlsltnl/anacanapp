@@ -141,7 +141,7 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
               <p className="a-eyebrow">{tr("partnerprivacyscreen_partner_melumatlarinizi_idare_edin_7c5e99", "Partner mÉ™lumatlarÄ±nÄ±zÄ± idarÉ™ edin")}</p>
@@ -203,7 +203,7 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
             <div className="space-y-2.5">
               <motion.button
                 onClick={handleExportData}
-                className="w-full flex items-center gap-4 text-left transition-colors"
+                className="w-full flex items-center gap-4 text-start transition-colors"
                 style={{ padding: 14, borderRadius: 16, background: 'var(--a-surface-soft)' }}
                 whileTap={{ scale: 0.98 }}>
 
@@ -218,7 +218,7 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
 
               <motion.button
                 onClick={() => setShowUnlinkDialog(true)}
-                className="w-full flex items-center gap-4 text-left transition-colors"
+                className="w-full flex items-center gap-4 text-start transition-colors"
                 style={{ padding: 14, borderRadius: 16, background: 'var(--a-surface-soft)' }}
                 whileTap={{ scale: 0.98 }}>
 
@@ -233,7 +233,7 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
 
               <motion.button
                 onClick={() => setShowDeleteDialog(true)}
-                className="w-full flex items-center gap-4 text-left transition-colors"
+                className="w-full flex items-center gap-4 text-start transition-colors"
                 style={{ padding: 14, borderRadius: 16, background: 'var(--a-alert-bg)' }}
                 whileTap={{ scale: 0.98 }}>
 
@@ -291,7 +291,7 @@ const PartnerPrivacyScreen = ({ onBack }: PartnerPrivacyScreenProps) => {
               <AlertTriangle className="w-5 h-5" />
               {tr("partnerprivacyscreen_hesabi_silmek_6d444c", "Hesab\u0131 Silm\u0259k")}
             </DialogTitle>
-            <DialogDescription className="text-left">
+            <DialogDescription className="text-start">
               {tr("partnerprivacyscreen_bu_emeliyyat_geri_qaytarila_bi_fdaca8", "Bu \u0259m\u0259liyyat geri qaytar\u0131la bilm\u0259z. B\xFCt\xFCn m\u0259lumatlar\u0131n\u0131z, o c\xFCml\u0259d\u0259n:")}
               <ul className="list-disc list-inside mt-2 space-y-1">
                 <li>{tr("partnerprivacyscreen_profil_melumatlari_82c76c", "Profil mÉ™lumatlarÄ±")}</li>

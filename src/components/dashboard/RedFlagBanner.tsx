@@ -36,7 +36,7 @@ const RedFlagBanner = ({ onOpenTool }: Props) => {
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       onClick={() => onOpenTool?.('blood-pressure')}
-      className="w-full flex items-center gap-3 text-left mb-3"
+      className="w-full flex items-center gap-3 text-start mb-3"
       style={{
         background: 'var(--a-alert-bg)',
         borderRadius: 'var(--a-radius-md)',
@@ -65,7 +65,7 @@ const RedFlagBanner = ({ onOpenTool }: Props) => {
           tr('rfb_warning_sub', 'Preeklampsiya riski — bu gün həkiminizlə danışın')}
         </p>
       </div>
-      <ChevronRight size={16} className="shrink-0" style={{ color: 'var(--a-alert-ink)' }} />
+      <ChevronRight size={16} className="rtl:rotate-180 shrink-0" style={{ color: 'var(--a-alert-ink)' }} />
     </motion.button>);
 
 };

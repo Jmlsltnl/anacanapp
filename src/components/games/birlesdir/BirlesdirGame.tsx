@@ -330,7 +330,7 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
       return (
         <div className="relative w-full h-full rounded-xl bg-gradient-to-br from-amber-200/70 to-amber-400/70 flex items-center justify-center ring-2 ring-amber-400/70">
           <span style={{ fontSize: cellSize * 0.55 }}>{emoji}</span>
-          <Sparkles className="w-3 h-3 text-amber-600 absolute -top-1 -right-1" />
+          <Sparkles className="w-3 h-3 text-amber-600 absolute -top-1 -end-1" />
         </div>
       );
     }
@@ -361,7 +361,7 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
             whileTap={{ scale: 0.9 }}
             className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center flex-shrink-0"
           >
-            {phase === 'playing' ? <Pause className="w-4 h-4 text-foreground" /> : <ArrowLeft className="w-4 h-4 text-foreground" />}
+            {phase === 'playing' ? <Pause className="w-4 h-4 text-foreground" /> : <ArrowLeft className="rtl:rotate-180 w-4 h-4 text-foreground" />}
           </motion.button>
 
           <div className="flex-1 min-w-0">

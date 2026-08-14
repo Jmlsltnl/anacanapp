@@ -143,7 +143,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
               className="a-icon-btn"
               whileTap={{ scale: 0.9 }}>
               
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
               <p className="a-eyebrow">{posts.length} {tr("blogscreen_meqale_63f1b2", "m\u0259qal\u0259")}</p>
@@ -242,7 +242,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
                         <BookOpen size={32} style={{ color: 'rgba(75, 47, 138, 0.5)' }} />
                       </div>
                 }
-                    <span className="a-cta-badge" style={{ position: 'absolute', top: 8, left: 8, padding: '4px 9px', fontSize: 9.5 }}>
+                    <span className="a-cta-badge" style={{ position: 'absolute', top: 8, insetInlineStart: 8, padding: '4px 9px', fontSize: 9.5 }}>
                       ⭐ {tr("blogscreen_secilmis_1fa6ef", "Se\xE7ilmi\u015F")}
                     </span>
                   </div>
@@ -318,7 +318,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
                 <BookOpen size={20} style={{ color: 'var(--a-lav-ink)' }} />
                 }
                     {savedPosts.includes(post.id) &&
-                <span style={{ position: 'absolute', top: 3, right: 3, width: 18, height: 18, borderRadius: 999, background: 'var(--a-yellow-2)', display: 'grid', placeItems: 'center' }}>
+                <span style={{ position: 'absolute', top: 3, insetInlineEnd: 3, width: 18, height: 18, borderRadius: 999, background: 'var(--a-yellow-2)', display: 'grid', placeItems: 'center' }}>
                         <Bookmark size={9} style={{ color: '#fff', fill: '#fff' }} />
                       </span>
                 }
@@ -335,7 +335,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
                     </div>
                   </div>
                   
-                  <ChevronRight size={15} className="a-list-chevron" />
+                  <ChevronRight size={15} className="rtl:rotate-180 a-list-chevron" />
                 </motion.button>
             )}
             </div>

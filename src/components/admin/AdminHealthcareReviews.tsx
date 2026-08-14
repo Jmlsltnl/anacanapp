@@ -201,17 +201,17 @@ const AdminHealthcareReviews = () => {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder={tr("adminhealthcarereviews_axtar_hekim_istifadeci_rey_7de668", "Axtar (həkim, istifadəçi, rəy)...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10" />
+            className="ps-10" />
           
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[180px]">
-            <Filter className="w-4 h-4 mr-2" />
+            <Filter className="w-4 h-4 me-2" />
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -286,7 +286,7 @@ const AdminHealthcareReviews = () => {
                     } />
 
                   )}
-                      <span className="text-sm ml-1">{review.rating}/5</span>
+                      <span className="text-sm ms-1">{review.rating}/5</span>
                     </div>
 
                     {review.comment &&
@@ -308,7 +308,7 @@ const AdminHealthcareReviews = () => {
                 onClick={() => approveMutation.mutate(review.id)}
                 className="text-green-600 border-green-600/30 hover:bg-green-600/10">
                 
-                      <Check className="w-4 h-4 mr-1" />
+                      <Check className="w-4 h-4 me-1" />
                       {tr("adminhealthcarereviews_tesdiqle_4ffd4c", "T\u0259sdiql\u0259")}
                     </Button> :
 
@@ -318,7 +318,7 @@ const AdminHealthcareReviews = () => {
                 onClick={() => rejectMutation.mutate(review.id)}
                 className="text-amber-600 border-amber-600/30 hover:bg-amber-600/10">
                 
-                      <Eye className="w-4 h-4 mr-1" />
+                      <Eye className="w-4 h-4 me-1" />
                       {tr("adminhealthcarereviews_gizle_ea86e3", "Gizl\u0259")}
                     </Button>
               }
@@ -328,7 +328,7 @@ const AdminHealthcareReviews = () => {
                 variant="outline"
                 onClick={() => openEditDialog(review)}>
                 
-                    <Edit2 className="w-4 h-4 mr-1" />
+                    <Edit2 className="w-4 h-4 me-1" />
                     {tr("adminhealthcarereviews_redakte_d53ba7", "Redakt\u0259")}
                   </Button>
                   
@@ -342,7 +342,7 @@ const AdminHealthcareReviews = () => {
                 }}
                 className="text-destructive border-destructive/30 hover:bg-destructive/10">
                 
-                    <Trash2 className="w-4 h-4 mr-1" />
+                    <Trash2 className="w-4 h-4 me-1" />
                     Sil
                   </Button>
                 </div>
@@ -397,7 +397,7 @@ const AdminHealthcareReviews = () => {
               {tr("adminhealthcarereviews_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button onClick={handleSaveEdit} disabled={updateMutation.isPending}>
-              <Save className="w-4 h-4 mr-2" />
+              <Save className="w-4 h-4 me-2" />
               Yadda saxla
             </Button>
           </DialogFooter>

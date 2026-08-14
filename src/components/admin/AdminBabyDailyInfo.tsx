@@ -142,14 +142,14 @@ const AdminBabyDailyInfo = () => {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <Button onClick={handleCreate} size="sm">
-          <Plus className="w-4 h-4 mr-1" /> {tr("adminbabydailyinfo_yeni_gun_d62838", "Yeni g\xFCn")}
+          <Plus className="w-4 h-4 me-1" /> {tr("adminbabydailyinfo_yeni_gun_d62838", "Yeni g\xFCn")}
         </Button>
         <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-          <Upload className="w-4 h-4 mr-1" /> CSV İdxal
+          <Upload className="w-4 h-4 me-1" /> CSV İdxal
         </Button>
         <a href="/templates/gunluk_melumat_numune.csv" download>
           <Button variant="ghost" size="sm">
-            <Download className="w-4 h-4 mr-1" /> {tr("adminbabydailyinfo_numune_csv_c52f80", "N\xFCmun\u0259 CSV")}
+            <Download className="w-4 h-4 me-1" /> {tr("adminbabydailyinfo_numune_csv_c52f80", "N\xFCmun\u0259 CSV")}
           </Button>
         </a>
         <Button
@@ -169,7 +169,7 @@ const AdminBabyDailyInfo = () => {
           }}
           disabled={data.length === 0}>
           
-          <FileDown className="w-4 h-4 mr-1" /> İxrac
+          <FileDown className="w-4 h-4 me-1" /> İxrac
         </Button>
         <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleCSVImport} />
 
@@ -202,7 +202,7 @@ const AdminBabyDailyInfo = () => {
                   onChange={(e) => setFormData({ ...formData, day_number: parseInt(e.target.value) })}
                   className="w-24 h-8 text-sm" />
                 
-                    <div className="flex items-center gap-1 ml-auto">
+                    <div className="flex items-center gap-1 ms-auto">
                       <span className="text-xs">Aktiv:</span>
                       <Switch
                     checked={formData.is_active ?? item.is_active}
@@ -218,10 +218,10 @@ const AdminBabyDailyInfo = () => {
               
                   <div className="flex gap-2">
                     <Button size="sm" onClick={() => handleUpdate(item.id)}>
-                      <Save className="w-3 h-3 mr-1" /> Saxla
+                      <Save className="w-3 h-3 me-1" /> Saxla
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => {setEditingId(null);setFormData({});}}>
-                      <X className="w-3 h-3 mr-1" /> {tr("adminbabydailyinfo_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                      <X className="w-3 h-3 me-1" /> {tr("adminbabydailyinfo_legv_et_b5e49c", "L\u0259\u011Fv et")}
                     </Button>
                   </div>
                 </div> :

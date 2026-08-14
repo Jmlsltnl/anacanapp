@@ -27,7 +27,7 @@ const MommyHeroStory = ({ babyData, exactMonths, remainingDays, babyIllustration
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_white/30_0%,_transparent_60%)]" />
 
       {/* Top story progress bars */}
-      <div className="absolute top-3 left-4 right-4 z-20 flex gap-1">
+      <div className="absolute top-3 start-4 end-4 z-20 flex gap-1">
         {[0, 1, 2].map((i) => (
           <div key={i} className="flex-1 h-[3px] rounded-full bg-white/30 overflow-hidden">
             {i === 0 && (
@@ -43,7 +43,7 @@ const MommyHeroStory = ({ babyData, exactMonths, remainingDays, babyIllustration
       </div>
 
       {/* Top label */}
-      <div className="absolute top-7 left-4 right-4 z-20 flex items-center justify-between">
+      <div className="absolute top-7 start-4 end-4 z-20 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-white/30 backdrop-blur-md border border-white/50 flex items-center justify-center">
             <span className="text-xs">👶</span>
@@ -80,7 +80,7 @@ const MommyHeroStory = ({ babyData, exactMonths, remainingDays, babyIllustration
       </div>
 
       {/* Bottom overlay text */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 p-5 pt-16 bg-gradient-to-t from-black/35 via-black/10 to-transparent">
+      <div className="absolute bottom-0 start-0 end-0 z-10 p-5 pt-16 bg-gradient-to-t from-black/35 via-black/10 to-transparent">
         <motion.h2
           className="text-3xl font-black text-white tracking-tight drop-shadow-lg leading-tight"
           initial={{ opacity: 0, y: 10 }}

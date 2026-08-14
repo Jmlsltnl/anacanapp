@@ -246,7 +246,7 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
             whileTap={{ scale: 0.95 }}
             aria-label={tr("common_geri", "Geri")}>
 
-            <ArrowLeft size={16} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
           </motion.button>
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <div className="w-9 h-9 rounded-full flex items-center justify-center text-lg shrink-0" style={{ background: 'var(--a-pink-1)' }}>

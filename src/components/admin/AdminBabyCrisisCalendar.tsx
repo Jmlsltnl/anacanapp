@@ -197,7 +197,7 @@ const AdminBabyCrisisCalendar = () => {
           </p>
         </div>
         <Button onClick={handleCreate}>
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {tr("adminbabycrisiscalendar_yeni_kriz_dovru_88ca15", "Yeni Kriz D\xF6vr\xFC")}
         </Button>
       </div>
@@ -249,7 +249,7 @@ const AdminBabyCrisisCalendar = () => {
               <CollapsibleTrigger asChild>
                 <button
                 onClick={() => setExpandedId(expandedId === period.id ? null : period.id)}
-                className="w-full p-4 flex items-center gap-4 bg-card hover:bg-muted/50 transition-colors text-left">
+                className="w-full p-4 flex items-center gap-4 bg-card hover:bg-muted/50 transition-colors text-start">
                 
                   <div className="text-3xl">{period.emoji}</div>
                   <div className="flex-1">
@@ -516,7 +516,7 @@ const AdminBabyCrisisCalendar = () => {
                 disabled={!formData.title || createMutation.isPending || updateMutation.isPending}
                 className="flex-1">
                 
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="w-4 h-4 me-2" />
                 {editingId ? tr("adminbabycrisiscalendar_yenile_570ce2", "Yenil\u0259") : 'Yarat'}
               </Button>
             </div>

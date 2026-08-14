@@ -116,7 +116,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {onBack &&
           <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
           }
           <div>
@@ -130,7 +130,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
             {totalItems > 0 &&
             <span
               style={{
-                position: 'absolute', top: -4, right: -4, minWidth: 15, height: 15, padding: '0 4px',
+                position: 'absolute', top: -4, insetInlineEnd: -4, minWidth: 15, height: 15, padding: '0 4px',
                 borderRadius: 999, background: 'var(--a-peach-2)', color: '#fff', fontSize: 8.5, fontWeight: 800,
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
               }}>
@@ -159,7 +159,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
 
       {/* Banner (anacan-demo CTA) */}
       <motion.div className="a-cta a-fade-in" style={{ background: 'var(--a-grad-pink)', marginTop: 14 }} initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2 }}>
-        <span className="a-cta-shape" style={{ width: 120, height: 120, top: -40, right: -30, background: 'rgba(255,255,255,0.35)' }} />
+        <span className="a-cta-shape" style={{ width: 120, height: 120, top: -40, insetInlineEnd: -30, background: 'rgba(255,255,255,0.35)' }} />
         <div className="relative z-10">
           <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-alert-ink)' }}>🎂 {tr("cakesscreen_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</span>
           <h3 className="a-cta-title a-heading" style={{ color: 'var(--a-alert-ink)', margin: '12px 0 6px', fontSize: 18 }}>{tr("cakesscreen_korpenizin_xususi_gunu_ucun_c2d99a", "Körpənizin xüsusi günü üçün!")}</h3>
@@ -184,10 +184,10 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
           <div className="relative" style={{ height: 132 }}>
                 <img src={cake.image_url} alt={cake.name} className="w-full h-full object-cover" />
                 {cake.category === 'milestone' && cake.milestone_label &&
-            <span className="a-cta-badge" style={{ position: 'absolute', top: 8, left: 8, padding: '3px 8px', fontSize: 9, background: 'var(--a-yellow-1)', color: 'var(--a-warn-ink)' }}>{cake.milestone_label}</span>
+            <span className="a-cta-badge" style={{ position: 'absolute', top: 8, insetInlineStart: 8, padding: '3px 8px', fontSize: 9, background: 'var(--a-yellow-1)', color: 'var(--a-warn-ink)' }}>{cake.milestone_label}</span>
             }
                 {cake.category === 'month' && cake.month_number &&
-            <span className="a-cta-badge" style={{ position: 'absolute', top: 8, left: 8, padding: '3px 8px', fontSize: 9 }}>{tr(`common_month_label_${cake.month_number}`, `${getOrdinal(cake.month_number!, language)} ay`)}</span>
+            <span className="a-cta-badge" style={{ position: 'absolute', top: 8, insetInlineStart: 8, padding: '3px 8px', fontSize: 9 }}>{tr(`common_month_label_${cake.month_number}`, `${getOrdinal(cake.month_number!, language)} ay`)}</span>
             }
               </div> :
 
@@ -223,13 +223,13 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         onClick={() => setShowCart(true)}
-        className="fixed right-4 z-40 w-14 h-14 rounded-full flex items-center justify-center"
+        className="fixed end-4 z-40 w-14 h-14 rounded-full flex items-center justify-center"
         style={{ bottom: 'calc(96px + env(safe-area-inset-bottom))', background: 'var(--a-peach-2)', color: '#fff', border: 'none', cursor: 'pointer', boxShadow: '0 14px 30px -10px rgba(255, 138, 76, 0.7)' }}>
         
           <ShoppingCart size={22} strokeWidth={2.2} />
           <span
           style={{
-            position: 'absolute', top: -4, right: -4, width: 22, height: 22, borderRadius: 999,
+            position: 'absolute', top: -4, insetInlineEnd: -4, width: 22, height: 22, borderRadius: 999,
             background: 'var(--a-ink)', color: 'var(--a-bg)', fontSize: 11, fontWeight: 800,
             display: 'flex', alignItems: 'center', justifyContent: 'center'
           }}>

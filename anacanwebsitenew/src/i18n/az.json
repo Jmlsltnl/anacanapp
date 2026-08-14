@@ -66,7 +66,7 @@
     },
     "ovulation": {
       "title": "Ovulyasiya Kalkulyatoru — Fertil Pəncərənizi Hesablayın",
-      "description": "Pulsuz ovulyasiya kalkulyatoru: son menstruasiya tarixinizi daxil edin, fertil pəncərənizi, ovulyasiya gününüzü və hamilə qalma ehtimalı ən yüksək günləri saniyələr içində öyrənin."
+      "description": "Pulsuz ovulyasiya kalkulyatoru: son menstruasiya tarixinizi daxil edin, fertil pəncərənizi və hamilə qalma ehtimalı ən yüksək günləri saniyələr içində öyrənin."
     },
     "symptoms": {
       "title": "Hamiləlik Əlamətləri — 12 Erkən Siqnal və PMS Fərqi",
@@ -897,4 +897,5 @@
     "backToHub": "Bütün müqayisələrə qayıt",
     "ctaTitle": "Anacan-ı özünüz sınayın",
     "ctaText": "30+ alət, 24/7 AI köməkçi və 5 dil dəstəyi ilə — pulsuz yükləyin, öz nəticənizi çıxarın."
-  },
+  }
+}

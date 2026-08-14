@@ -173,12 +173,12 @@ const AdminBabyGrowth = () => {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder={tr("adminbabygrowth_istifadeci_axtar_4c82f8", "İstifadəçi axtar...")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10" />
+          className="ps-10" />
         
       </div>
 
@@ -207,13 +207,13 @@ const AdminBabyGrowth = () => {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">{tr("adminbabygrowth_istifadeci_b6bdd6", "İstifadəçi")}</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Tarix</th>
+                    <th className="text-start py-3 px-4 text-sm font-medium text-muted-foreground">{tr("adminbabygrowth_istifadeci_b6bdd6", "İstifadəçi")}</th>
+                    <th className="text-start py-3 px-4 text-sm font-medium text-muted-foreground">Tarix</th>
                     <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">{tr("adminbabygrowth_ceki_kq_2f7555", "Çəki (kq)")}</th>
                     <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">Boy (sm)</th>
                     <th className="text-center py-3 px-4 text-sm font-medium text-muted-foreground">{tr("adminbabygrowth_bas_sm_927b99", "Baş (sm)")}</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Qeyd</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">{tr("adminbabygrowth_emeliyyatlar_54d70c", "Əməliyyatlar")}</th>
+                    <th className="text-start py-3 px-4 text-sm font-medium text-muted-foreground">Qeyd</th>
+                    <th className="text-end py-3 px-4 text-sm font-medium text-muted-foreground">{tr("adminbabygrowth_emeliyyatlar_54d70c", "Əməliyyatlar")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -277,7 +277,7 @@ const AdminBabyGrowth = () => {
                           {entry.notes || '—'}
                         </p>
                       </td>
-                      <td className="py-3 px-4 text-right">
+                      <td className="py-3 px-4 text-end">
                         <Button
                       variant="ghost"
                       size="icon"

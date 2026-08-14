@@ -55,7 +55,7 @@ const PartnerQuickStats = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="bg-gradient-to-r from-partner via-indigo-600 to-violet-700 rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden">
         
-        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute -top-10 -end-10 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
         
         <motion.div
           className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center"
@@ -90,7 +90,7 @@ const PartnerQuickStats = () => {
               transition={{ delay: item.delay }}
               className={`bg-gradient-to-br ${item.gradient} rounded-2xl p-4 relative overflow-hidden`}>
               
-              <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-white/10 blur-xl" />
+              <div className="absolute -top-4 -end-4 w-16 h-16 rounded-full bg-white/10 blur-xl" />
               <Icon className="w-5 h-5 text-white/80 mb-2" />
               <p className="text-3xl font-black text-white">{item.value}</p>
               <p className="text-white/70 text-xs font-medium">{item.label}</p>

@@ -70,7 +70,7 @@ export default function WaterWidget({ variant = 'default' }: WaterWidgetProps) {
 
   return (
     <div className="bg-cyan-50/80 border border-cyan-100/50 rounded-xl p-3 text-cyan-800 shadow-sm relative overflow-hidden h-full flex flex-col justify-between min-h-[80px]">
-      <div className="absolute -top-3 -right-3 p-2 opacity-5">
+      <div className="absolute -top-3 -end-3 p-2 opacity-5">
         <Droplets className="w-16 h-16 text-cyan-600" />
       </div>
       

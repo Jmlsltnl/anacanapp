@@ -375,10 +375,10 @@ const AdminAffiliateProducts = () => {
               className="hidden" />
             
             <Button variant="outline" onClick={downloadCSVTemplate}>
-              <Download className="w-4 h-4 mr-2" /> {tr("adminaffiliateproducts_csv_sablon_dbbc38", "CSV \u015Eablon")}
+              <Download className="w-4 h-4 me-2" /> {tr("adminaffiliateproducts_csv_sablon_dbbc38", "CSV \u015Eablon")}
             </Button>
             <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={importing}>
-              <Upload className="w-4 h-4 mr-2" /> {importing ? tr("adminaffiliateproducts_yuklenir_5557de", "Y\xFCkl\u0259nir...") : 'CSV İmport'}
+              <Upload className="w-4 h-4 me-2" /> {importing ? tr("adminaffiliateproducts_yuklenir_5557de", "Y\xFCkl\u0259nir...") : 'CSV İmport'}
             </Button>
             <Button
               variant="outline"
@@ -414,10 +414,10 @@ const AdminAffiliateProducts = () => {
               }}
               disabled={products.length === 0}>
               
-              <FileDown className="w-4 h-4 mr-2" /> İxrac
+              <FileDown className="w-4 h-4 me-2" /> İxrac
             </Button>
             <Button onClick={() => setShowAddForm(true)} disabled={showAddForm}>
-              <Plus className="w-4 h-4 mr-2" /> {tr("adminaffiliateproducts_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+              <Plus className="w-4 h-4 me-2" /> {tr("adminaffiliateproducts_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </div>
         </div>
@@ -554,7 +554,7 @@ const AdminAffiliateProducts = () => {
           disabled={!formData.name_az || !formData.affiliate_url || saveMutation.isPending}
           className="w-full">
           
-            <Save className="w-4 h-4 mr-2" /> {saveMutation.isPending ? tr("adminaffiliateproducts_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : 'Yadda saxla'}
+            <Save className="w-4 h-4 me-2" /> {saveMutation.isPending ? tr("adminaffiliateproducts_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : 'Yadda saxla'}
           </Button>
         </div>
       }
@@ -593,7 +593,7 @@ const AdminAffiliateProducts = () => {
                   <div className="text-xs text-muted-foreground">
                     {product.store_name || product.platform} • {product.price ? `${product.price} ${product.currency}` : tr("adminaffiliateproducts_qiymet_yoxdur_11556d", "Qiym\u0259t yoxdur")}
                     {product.original_price && product.original_price > product.price &&
-                <span className="text-red-500 ml-2">(-{Math.round((1 - product.price / product.original_price) * 100)}%)</span>
+                <span className="text-red-500 ms-2">(-{Math.round((1 - product.price / product.original_price) * 100)}%)</span>
                 }
                   </div>
                 </div>

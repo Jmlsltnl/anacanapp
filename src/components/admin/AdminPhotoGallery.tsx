@@ -159,13 +159,13 @@ const AdminPhotoGallery = () => {
           {totalPages > 1 &&
         <div className="flex items-center justify-center gap-2">
               <Button variant="outline" size="sm" onClick={() => setPage((p) => p - 1)} disabled={page === 0}>
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="rtl:rotate-180 w-4 h-4" />
               </Button>
               <span className="text-sm text-muted-foreground">
                 {page + 1} / {totalPages}
               </span>
               <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={page >= totalPages - 1}>
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="rtl:rotate-180 w-4 h-4" />
               </Button>
             </div>
         }

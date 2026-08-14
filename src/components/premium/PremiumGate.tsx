@@ -37,11 +37,11 @@ const PremiumGate = ({ children, title, description, feature, emoji = '✨' }: P
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         onClick={() => setShowPaywall(true)}
-        className="a-card w-full text-left relative overflow-hidden"
+        className="a-card w-full text-start relative overflow-hidden"
         style={{ padding: '16px', border: '1px dashed var(--a-peach-2)', cursor: 'pointer' }}
         whileTap={{ scale: 0.98 }}>
 
-        <span className="absolute top-0 right-0" aria-hidden
+        <span className="absolute top-0 end-0" aria-hidden
         style={{ width: 90, height: 90, borderRadius: 999, background: 'var(--a-peach-1)', opacity: 0.45, transform: 'translate(30%, -30%)' }} />
 
         <div className="relative flex items-center gap-3">

@@ -242,7 +242,7 @@ const AdminData = () => {
             <thead className="bg-muted/50">
               <tr>
                 {getTableColumns().map((col) =>
-                <th key={col} className="text-left p-4 font-medium text-muted-foreground">
+                <th key={col} className="text-start p-4 font-medium text-muted-foreground">
                     {col}
                   </th>
                 )}

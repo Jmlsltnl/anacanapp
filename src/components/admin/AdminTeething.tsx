@@ -224,7 +224,7 @@ const AdminTeething = () => {
           <p className="text-muted-foreground">{tr("adminteething_korpe_disleri_qulluq_meslehetleri_ve_sim_bedaf6", "Körpə dişləri, qulluq məsləhətləri və simptomları idarə edin")}</p>
         </div>
         <Button onClick={handleCreate}>
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {tr("adminteething_yeni_elave_et_fa6b69", "Yeni \u018Flav\u0259 Et")}
         </Button>
       </div>
@@ -628,7 +628,7 @@ const AdminTeething = () => {
             }
 
               <Button onClick={handleSave} className="w-full">
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="w-4 h-4 me-2" />
                 Yadda Saxla
               </Button>
             </div>

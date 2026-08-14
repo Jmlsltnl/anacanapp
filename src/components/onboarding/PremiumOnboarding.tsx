@@ -52,7 +52,7 @@ const DateField = ({ value, onChange, min, max }: {
     }} />
     {!value &&
   <span style={{
-    position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)',
+    position: 'absolute', insetInlineStart: 14, top: '50%', transform: 'translateY(-50%)',
     fontSize: 15, color: 'var(--a-ink-faint)', pointerEvents: 'none'
   }}>
       dd/mm/yyyy
@@ -479,7 +479,7 @@ const PremiumOnboarding = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 * i }}
             onClick={() => setSingle(qid, o.id)}
-            className="a-card w-full text-left flex items-center gap-3.5"
+            className="a-card w-full text-start flex items-center gap-3.5"
             style={{
               padding: '15px 16px', cursor: 'pointer',
               border: selected === o.id ? '2px solid var(--a-peach-2)' : '1px solid var(--a-line)',
@@ -513,7 +513,7 @@ const PremiumOnboarding = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.04 * i }}
             onClick={() => toggleMulti(qid, o.id)}
-            className="a-card text-left"
+            className="a-card text-start"
             style={{
               padding: '14px 13px', cursor: 'pointer',
               border: selected.includes(o.id) ? '2px solid var(--a-peach-2)' : '1px solid var(--a-line)',
@@ -558,7 +558,7 @@ const PremiumOnboarding = () => {
           style={{ width: 42, height: 42 }}
           whileTap={{ scale: 0.95 }}
           aria-label={tr('common_geri', 'Geri')}>
-            <ArrowLeft size={17} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={17} strokeWidth={2} />
           </motion.button> :
         <div style={{ width: 42 }} />}
 
@@ -571,7 +571,7 @@ const PremiumOnboarding = () => {
         </div>
 
         {steps.length > 1 ?
-        <span className="shrink-0" style={{ fontSize: 12, fontWeight: 700, color: 'var(--a-ink-soft)', minWidth: 34, textAlign: 'right' }}>
+        <span className="shrink-0" style={{ fontSize: 12, fontWeight: 700, color: 'var(--a-ink-soft)', minWidth: 34, textAlign: 'end' }}>
             {stepIdx + 1}/{steps.length}
           </span> :
         <div style={{ width: 34 }} />}
@@ -616,7 +616,7 @@ const PremiumOnboarding = () => {
                       setStage(s.id);
                       setStepIdx(1);
                     }}
-                    className="a-card w-full text-left flex items-center gap-4"
+                    className="a-card w-full text-start flex items-center gap-4"
                     style={{ padding: '18px 16px', cursor: 'pointer', border: '1px solid var(--a-line)' }}
                     whileTap={{ scale: 0.98 }}>
                         <span className="w-14 h-14 flex items-center justify-center shrink-0 text-3xl" style={{ borderRadius: 16, background: s.bg }}>

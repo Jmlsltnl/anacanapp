@@ -67,7 +67,7 @@ export default function LanguageSelector() {
           <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
             <Globe className="w-4.5 h-4.5 text-primary" />
           </div>
-          <div className="text-left">
+          <div className="text-start">
             <div className="text-sm font-semibold text-foreground">{tr("untranslated_dil_language_7oaxzb", "Dil / Language")}</div>
             <div className="text-xs text-muted-foreground">{current.native}</div>
           </div>
@@ -97,7 +97,7 @@ export default function LanguageSelector() {
               'border-border hover:bg-muted/40'}`
               }>
               
-                  <div className="text-left">
+                  <div className="text-start">
                     <div className="text-sm font-semibold text-foreground">{l.native}</div>
                     <div className="text-[11px] text-muted-foreground uppercase">{l.code}</div>
                   </div>

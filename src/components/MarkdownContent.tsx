@@ -15,8 +15,8 @@ const MarkdownContent = ({ content, variant = 'default' }: MarkdownContentProps)
           h1: ({ children }) => <h1 className="text-xl font-bold mt-4 mb-2 text-foreground">{children}</h1>,
           h2: ({ children }) => <h2 className="text-lg font-bold mt-3 mb-2 text-foreground">{children}</h2>,
           h3: ({ children }) => <h3 className="text-base font-semibold mt-2 mb-1 text-foreground">{children}</h3>,
-          ul: ({ children }) => <ul className="list-disc pl-4 my-2 space-y-1">{children}</ul>,
-          ol: ({ children }) => <ol className="list-decimal pl-4 my-2 space-y-1">{children}</ol>,
+          ul: ({ children }) => <ul className="list-disc ps-4 my-2 space-y-1">{children}</ul>,
+          ol: ({ children }) => <ol className="list-decimal ps-4 my-2 space-y-1">{children}</ol>,
           li: ({ children }) => <li className="text-sm">{children}</li>,
           a: ({ href, children }) => (
             <a href={href} className="text-primary underline hover:no-underline" target="_blank" rel="noopener noreferrer">
@@ -42,7 +42,7 @@ const MarkdownContent = ({ content, variant = 'default' }: MarkdownContentProps)
           },
           pre: ({ children }) => <pre className="bg-muted rounded-lg p-3 my-3 overflow-x-auto text-xs">{children}</pre>,
           blockquote: ({ children }) => (
-            <blockquote className="border-l-2 border-primary pl-3 my-2 italic text-muted-foreground">
+            <blockquote className="border-s-2 border-primary ps-3 my-2 italic text-muted-foreground">
               {children}
             </blockquote>
           ),
@@ -64,7 +64,7 @@ const MarkdownContent = ({ content, variant = 'default' }: MarkdownContentProps)
             <tr className="border-b border-border last:border-b-0">{children}</tr>
           ),
           th: ({ children }) => (
-            <th className="px-3 py-2 text-left font-semibold text-foreground text-xs">{children}</th>
+            <th className="px-3 py-2 text-start font-semibold text-foreground text-xs">{children}</th>
           ),
           td: ({ children }) => (
             <td className="px-3 py-2 text-muted-foreground text-xs">{children}</td>
@@ -75,7 +75,7 @@ const MarkdownContent = ({ content, variant = 'default' }: MarkdownContentProps)
               type="checkbox"
               checked={checked}
               readOnly
-              className="mr-1.5 rounded border-border accent-primary"
+              className="me-1.5 rounded border-border accent-primary"
               {...props}
             />
           ),

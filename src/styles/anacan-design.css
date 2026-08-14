@@ -191,8 +191,8 @@
 .a-sky {
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   height: 330px;
   z-index: 0;
   pointer-events: none;
@@ -223,11 +223,11 @@
   background: rgba(255, 255, 255, 0.07);
 }
 
-.a-cloud.c1 { width: 160px; height: 48px; top: 34px; left: -34px; }
-.a-cloud.c2 { width: 120px; height: 38px; top: 84px; right: -22px; opacity: 0.9; animation-delay: 2.6s; }
-.a-cloud.c3 { width: 92px; height: 30px; top: 156px; left: 12%; opacity: 0.7; animation-delay: 5.2s; }
-.a-cloud.c4 { width: 130px; height: 40px; top: 196px; right: 8%; opacity: 0.55; animation-delay: 7.4s; }
-.a-cloud.c5 { width: 72px; height: 26px; top: 118px; left: 44%; opacity: 0.55; animation-delay: 3.8s; }
+.a-cloud.c1 { width: 160px; height: 48px; top: 34px; inset-inline-start: -34px; }
+.a-cloud.c2 { width: 120px; height: 38px; top: 84px; inset-inline-end: -22px; opacity: 0.9; animation-delay: 2.6s; }
+.a-cloud.c3 { width: 92px; height: 30px; top: 156px; inset-inline-start: 12%; opacity: 0.7; animation-delay: 5.2s; }
+.a-cloud.c4 { width: 130px; height: 40px; top: 196px; inset-inline-end: 8%; opacity: 0.55; animation-delay: 7.4s; }
+.a-cloud.c5 { width: 72px; height: 26px; top: 118px; inset-inline-start: 44%; opacity: 0.55; animation-delay: 3.8s; }
 
 .a-cloud.deep {
   background: rgba(245, 158, 128, 0.4);
@@ -237,8 +237,8 @@
   background: rgba(245, 158, 128, 0.1);
 }
 
-.a-cloud.c6 { width: 110px; height: 36px; top: 58px; left: 30%; animation-delay: 6.3s; }
-.a-cloud.c7 { width: 84px; height: 30px; top: 232px; left: 34%; opacity: 0.4; animation-delay: 1.4s; }
+.a-cloud.c6 { width: 110px; height: 36px; top: 58px; inset-inline-start: 30%; animation-delay: 6.3s; }
+.a-cloud.c7 { width: 84px; height: 30px; top: 232px; inset-inline-start: 34%; opacity: 0.4; animation-delay: 1.4s; }
 
 @keyframes a-cloud-drift {
   0%, 100% { transform: translate(0, 0); }
@@ -297,7 +297,7 @@
 .a-icon-btn .a-dot {
   position: absolute;
   top: 8px;
-  right: 9px;
+  inset-inline-end: 9px;
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -408,7 +408,7 @@
   border: 1px solid var(--a-line);
   border-radius: var(--a-radius-md);
   padding: 14px;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 
@@ -505,7 +505,7 @@
 .a-egg-heart {
   position: absolute;
   top: -12px;
-  left: 50%;
+  inset-inline-start: 50%;
   transform: translateX(-50%);
   display: grid;
   place-items: center;
@@ -677,8 +677,8 @@
 }
 
 .a-list-trail {
-  margin-left: auto;
-  text-align: right;
+  margin-inline-start: auto;
+  text-align: end;
   flex-shrink: 0;
 }
 
@@ -876,7 +876,7 @@
 }
 
 .a-today-info-badge {
-  margin-left: auto;
+  margin-inline-start: auto;
   flex-shrink: 0;
   padding: 5px 11px;
   border-radius: 999px;
@@ -985,7 +985,7 @@
 .a-crown-chip {
   position: absolute;
   top: 7px;
-  right: 7px;
+  inset-inline-end: 7px;
   display: grid;
   place-items: center;
   width: 20px;
@@ -1120,7 +1120,7 @@
 .a-chart-tooltip::after {
   content: "";
   position: absolute;
-  left: 50%;
+  inset-inline-start: 50%;
   bottom: -4px;
   width: 8px;
   height: 8px;
@@ -1376,7 +1376,7 @@
 }
 
 .a-rank-tag {
-  margin-left: auto;
+  margin-inline-start: auto;
   flex-shrink: 0;
   font-size: 10.5px;
   font-weight: 800;
@@ -1417,7 +1417,7 @@
   padding: 13px 0;
   border-top: 1px solid var(--a-line);
   width: 100%;
-  text-align: left;
+  text-align: start;
   background: none;
   border-left: none;
   border-right: none;
@@ -1509,8 +1509,8 @@
 
 .a-nav-wrap {
   position: fixed;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   bottom: 0;
   /* 40: kontentdən üstün, amma overlay-lardan (sheet/dialog/popup = z-50+) AŞAĞI.
      Əvvəllər 50 idi → in-tree bottom sheet-lər DOM sırasına görə nav altında
@@ -1589,7 +1589,7 @@
 .a-nav-badge {
   position: absolute;
   top: 5px;
-  left: calc(50% + 5px);
+  inset-inline-start: calc(50% + 5px);
   min-width: 15px;
   height: 15px;
   padding: 0 4px;
@@ -1648,7 +1648,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
-  text-align: left;
+  text-align: start;
 }
 
 .a-premium-mini-title {
@@ -1667,7 +1667,7 @@
 }
 
 .a-premium-mini-cta {
-  margin-left: auto;
+  margin-inline-start: auto;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -1721,7 +1721,7 @@
   box-shadow: var(--a-card-shadow);
   cursor: pointer;
   width: 100%;
-  text-align: left;
+  text-align: start;
 }
 
 .a-composer-avatar {
@@ -1934,7 +1934,7 @@
   align-items: center;
   gap: 9px;
   width: 100%;
-  text-align: left;
+  text-align: start;
   background: none;
   border: none;
   padding: 0;
@@ -2041,7 +2041,7 @@
 
 .a-chat-suggest-btn {
   align-self: flex-start;
-  text-align: left;
+  text-align: start;
   padding: 9px 14px;
   border-radius: 999px;
   background: var(--a-surface);
@@ -2136,7 +2136,7 @@
   border: 1px solid var(--a-line);
   border-radius: var(--a-radius-md);
   padding: 14px;
-  text-align: left;
+  text-align: start;
   box-shadow: var(--a-card-shadow);
   cursor: pointer;
 }
@@ -2264,3 +2264,20 @@
   background: #ffffff !important;
   color: var(--a-peach-2) !important;
 }
+
+/* ============================================================
+   RTL (ereb) qaydalari
+   - Reqem/tarix/tel inputlari RTL-de LTR qalir (reqem daxiletmesi qarismasin)
+   - Latin dirnaqli qiymet/kod parcalari ucun .ltr-island utility
+   ============================================================ */
+[dir='rtl'] input[type='number'],
+[dir='rtl'] input[type='tel'],
+[dir='rtl'] input[type='date'],
+[dir='rtl'] input[type='time'],
+[dir='rtl'] input[type='email'],
+[dir='rtl'] input[inputmode='numeric'],
+[dir='rtl'] input[inputmode='decimal'] {
+  direction: ltr;
+  text-align: end;
+}
+.ltr-island { direction: ltr; unicode-bidi: isolate; }

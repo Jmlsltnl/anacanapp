@@ -83,7 +83,7 @@ const PregnancyDayNavigator = ({
         )}
         whileTap={canGoBack ? { scale: 0.9 } : {}}>
         
-        <ChevronLeft className="w-5 h-5" />
+        <ChevronLeft className="rtl:rotate-180 w-5 h-5" />
       </motion.button>
 
       {/* Current day indicator */}
@@ -133,7 +133,7 @@ const PregnancyDayNavigator = ({
         )}
         whileTap={canGoForward ? { scale: 0.9 } : {}}>
         
-        <ChevronRight className="w-5 h-5" />
+        <ChevronRight className="rtl:rotate-180 w-5 h-5" />
       </motion.button>
 
       {/* Reset button - only show when not viewing current day */}
@@ -144,7 +144,7 @@ const PregnancyDayNavigator = ({
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
-          className="w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 flex items-center justify-center ml-1"
+          className="w-8 h-8 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 flex items-center justify-center ms-1"
           whileTap={{ scale: 0.9 }}
           title={tr("pregnancydaynavigator_bu_gune_qayit_9c007f", "Bu günə qayıt")}>
           

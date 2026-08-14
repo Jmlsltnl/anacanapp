@@ -51,7 +51,7 @@ export default function PartnersScreen({ onBack }: Props) {
       style={{ paddingTop: 'env(safe-area-inset-top)', background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
         <div className="flex items-center gap-3 p-3">
           <motion.button onClick={onBack} className="a-icon-btn shrink-0" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-            <ArrowLeft size={16} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
           </motion.button>
           <div className="flex-1 min-w-0">
             <h1 className="flex items-center gap-1.5" style={{ fontSize: 15.5, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>
@@ -69,9 +69,9 @@ export default function PartnersScreen({ onBack }: Props) {
 
         <div className="px-3 pb-2">
           <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--a-ink-faint)' }} />
+            <Search className="absolute start-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--a-ink-faint)' }} />
             <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={tr("partnersscreen_mekan_axtar_8b889d", "M\u0259kan axtar...")}
-            className="w-full h-10 pl-10 pr-4 outline-none"
+            className="w-full h-10 ps-10 pe-4 outline-none"
             style={{ borderRadius: 999, background: 'var(--a-surface)', border: '1px solid var(--a-line)', fontSize: 13, color: 'var(--a-ink)' }} />
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function PartnersScreen({ onBack }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.03 }}
           onClick={() => setSelectedVenue(v)}
-          className="w-full overflow-hidden text-left"
+          className="w-full overflow-hidden text-start"
           style={{ background: 'var(--a-surface)', borderRadius: 'var(--a-radius-md)', boxShadow: 'var(--a-card-shadow)' }}>
 
             {v.cover_url &&
@@ -139,7 +139,7 @@ export default function PartnersScreen({ onBack }: Props) {
                   <Sparkles className="w-3 h-3" /> {v.discount_label}
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 mt-3 shrink-0" style={{ color: 'var(--a-ink-faint)' }} />
+              <ChevronRight className="rtl:rotate-180 w-4 h-4 mt-3 shrink-0" style={{ color: 'var(--a-ink-faint)' }} />
             </div>
           </motion.button>
         )}
@@ -189,8 +189,8 @@ function VenueDetail({ venue, isPremium, onBack, onRedeem }: {venue: PartnerVenu
             <Sparkles size={60} style={{ color: 'var(--a-accent-ink)', opacity: 0.5 }} />
           </div>
         }
-        <button onClick={onBack} className="a-icon-btn absolute top-3 left-3" style={{ borderRadius: 999 }} aria-label={tr("common_geri", "Geri")}>
-          <ArrowLeft size={16} strokeWidth={2} />
+        <button onClick={onBack} className="a-icon-btn absolute top-3 start-3" style={{ borderRadius: 999 }} aria-label={tr("common_geri", "Geri")}>
+          <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
         </button>
       </div>
 
@@ -254,15 +254,15 @@ function VenueDetail({ venue, isPremium, onBack, onRedeem }: {venue: PartnerVenu
           }
         </div>
 
-        <div className="fixed left-0 right-0 bottom-0 p-4"
+        <div className="fixed start-0 end-0 bottom-0 p-4"
         style={{ background: 'linear-gradient(to top, var(--a-bg) 55%, transparent)' }}>
           <Button onClick={onRedeem} size="lg"
           className="w-full h-12 text-base font-bold rounded-full text-white border-0 max-w-md mx-auto flex hover:opacity-95"
           style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}>
             {isPremium ?
-            <><Sparkles className="w-5 h-5 mr-2" />{tr("untranslated_endirimi_al_qr_yarat_6yd90i", "Endirimi al — QR yarat")}</> :
+            <><Sparkles className="w-5 h-5 me-2" />{tr("untranslated_endirimi_al_qr_yarat_6yd90i", "Endirimi al — QR yarat")}</> :
 
-            <><Lock className="w-5 h-5 mr-2" /> {tr("partnersscreen_premium_ile_endirim_al_634879", "Premium il\u0259 endirim al")}</>
+            <><Lock className="w-5 h-5 me-2" /> {tr("partnersscreen_premium_ile_endirim_al_634879", "Premium il\u0259 endirim al")}</>
             }
           </Button>
         </div>

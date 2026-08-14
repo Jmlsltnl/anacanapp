@@ -67,7 +67,7 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
   return (
     <motion.button
       onClick={onOpen}
-      className="w-full text-left"
+      className="w-full text-start"
       style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       whileTap={{ scale: 0.98 }}
       initial={{ opacity: 0, y: 10 }}
@@ -77,7 +77,7 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
         <div className="a-card-head" style={{ marginBottom: 6 }}>
           <h3 className="a-card-title a-heading">{tr("teethingwidget_dis_cixarma_ca53f7", "Diş Çıxarma")}</h3>
           <span className="a-section-link" style={{ color: 'var(--a-ink-soft)' }}>
-            {emergedCount}/{totalTeeth} <ChevronRight size={13} />
+            {emergedCount}/{totalTeeth} <ChevronRight className="rtl:rotate-180" size={13} />
           </span>
         </div>
 
@@ -125,7 +125,7 @@ const TeethingWidget = ({ onOpen }: TeethingWidgetProps) => {
           <span>
             {selectedChild.name} · <strong>{childAge.displayText}</strong>
           </span>
-          <ChevronRight size={15} style={{ color: 'var(--a-ink-faint)', flexShrink: 0 }} />
+          <ChevronRight className="rtl:rotate-180" size={15} style={{ color: 'var(--a-ink-faint)', flexShrink: 0 }} />
         </div>
       </div>
     </motion.button>);

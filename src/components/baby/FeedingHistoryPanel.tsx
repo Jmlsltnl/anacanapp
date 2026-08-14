@@ -131,14 +131,14 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'var(--a-grad-peach)' }}>
             <Baby className="w-4 h-4" style={{ color: 'var(--a-accent-ink)' }} />
           </div>
-          <div className="text-left">
+          <div className="text-start">
             <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-ink)' }}>{tr("feedinghistorypanel_qidalanma_xulasesi_836869", "Qidalanma xülasəsi")}</p>
             <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{buildSummaryText()}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {hasAnyFeedings && (
-            <div className="text-right mr-2">
+            <div className="text-end me-2">
               <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-accent-ink)' }}>{totalFeedings} {tr('feedinghistorypanel_times','dəfə')}</p>
               <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{tr("feedinghistorypanel_bu_gun_7d7f30", "bu gün")}</p>
             </div>
@@ -162,7 +162,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                   {todayBreakdown.leftCount > 0 && (
                     <div className="rounded-xl p-2.5 text-center" style={{ background: 'var(--a-peach-1)' }}>
                       <div className="flex items-center justify-center gap-1 mb-1">
-                        <ArrowLeft className="w-3 h-3" style={{ color: 'var(--a-accent-ink)' }} />
+                        <ArrowLeft className="rtl:rotate-180 w-3 h-3" style={{ color: 'var(--a-accent-ink)' }} />
                         <span className="text-xs font-bold" style={{ color: 'var(--a-accent-ink)' }}>{tr("feedinghistorypanel_sol_sine_64d1ac", "Sol sinə")}</span>
                       </div>
                       <p className="text-sm font-bold" style={{ margin: 0, color: 'var(--a-accent-ink)' }}>{formatDuration(todayBreakdown.leftTotalSeconds)}</p>
@@ -173,7 +173,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                     <div className="rounded-xl p-2.5 text-center" style={{ background: 'var(--a-peach-1)' }}>
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <span className="text-xs font-bold" style={{ color: 'var(--a-accent-ink)' }}>{tr("feedinghistorypanel_sag_sine_074475", "Sağ sinə")}</span>
-                        <ArrowRight className="w-3 h-3" style={{ color: 'var(--a-accent-ink)' }} />
+                        <ArrowRight className="rtl:rotate-180 w-3 h-3" style={{ color: 'var(--a-accent-ink)' }} />
                       </div>
                       <p className="text-sm font-bold" style={{ margin: 0, color: 'var(--a-accent-ink)' }}>{formatDuration(todayBreakdown.rightTotalSeconds)}</p>
                       <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-accent-ink)', opacity: 0.7 }}>{todayBreakdown.rightCount} {tr('feedinghistorypanel_times','dəfə')}</p>
@@ -269,7 +269,7 @@ const FeedingHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultEx
                                   <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-ink)' }}>
                                     {item.feedType === 'solid' && item.notes ? item.notes : getFeedTypeLabel(item.feedType)}
                                     {item.feedType === 'formula' && item.notes && item.notes.includes('ml') && (
-                                      <span className="ml-1 font-bold" style={{ color: 'var(--a-accent-ink)' }}>({item.notes})</span>
+                                      <span className="ms-1 font-bold" style={{ color: 'var(--a-accent-ink)' }}>({item.notes})</span>
                                     )}
                                   </p>
                                   <p className="text-[10px]" style={{ margin: 0, color: 'var(--a-ink-soft)' }}>

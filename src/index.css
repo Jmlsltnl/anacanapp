@@ -341,11 +341,11 @@
   }
 
   .safe-left {
-    padding-left: env(safe-area-inset-left, 0px);
+    padding-inline-start: env(safe-area-inset-left, 0px);
   }
 
   .safe-right {
-    padding-right: env(safe-area-inset-right, 0px);
+    padding-inline-end: env(safe-area-inset-right, 0px);
   }
 
   /* Alt CTA-lar üçün: safe-area + minimum nəfəs payı.

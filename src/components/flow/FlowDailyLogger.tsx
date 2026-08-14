@@ -189,7 +189,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
       <button
         onClick={() => setExpanded(!expanded)}
         className="a-list-row w-full"
-        style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', borderTop: 'none', cursor: 'pointer', padding: '16px 18px' }}>
+        style={{ width: '100%', textAlign: 'start', background: 'none', border: 'none', borderTop: 'none', cursor: 'pointer', padding: '16px 18px' }}>
         
         <span className="a-list-icon" style={{ background: 'var(--a-grad-pink)', color: 'var(--a-berry-ink)' }}>
           <Heart size={17} strokeWidth={2} />
@@ -294,7 +294,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
               <div>
                 <label className="text-sm font-medium text-foreground mb-3 block">
                   {tr("flowdailylogger_servikal_maye", "Servikal maye")}
-                  <span className="ml-1.5" style={{ fontSize: 11, fontWeight: 500, color: 'var(--a-ink-soft)' }}>
+                  <span className="ms-1.5" style={{ fontSize: 11, fontWeight: 500, color: 'var(--a-ink-soft)' }}>
                     ({tr("flowdailylogger_fertillik_gostericisi", "fertillik göstəricisi")})
                   </span>
                 </label>
@@ -323,7 +323,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
               <div>
                 <label className="text-sm font-medium text-foreground mb-3 block">
                   {tr("flowdailylogger_ovulyasiya_testi", "Ovulyasiya testi")}
-                  <span className="ml-1.5" style={{ fontSize: 11, fontWeight: 500, color: 'var(--a-ink-soft)' }}>
+                  <span className="ms-1.5" style={{ fontSize: 11, fontWeight: 500, color: 'var(--a-ink-soft)' }}>
                     (OPK/LH)
                   </span>
                 </label>

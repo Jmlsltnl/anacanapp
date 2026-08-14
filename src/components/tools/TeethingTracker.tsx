@@ -139,7 +139,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               
               {/* Tooth shine effect */}
               <div className={`absolute inset-0 ${position === 'upper' ? 'rounded-t-lg rounded-b-[40%]' : 'rounded-b-lg rounded-t-[40%]'} overflow-hidden`}>
-                <div className="absolute top-0 left-0 w-1/3 h-full" style={{ background: 'rgba(255,255,255,0.35)' }} />
+                <div className="absolute top-0 start-0 w-1/3 h-full" style={{ background: 'rgba(255,255,255,0.35)' }} />
               </div>
               
               {/* Root indication for emerged teeth */}
@@ -154,7 +154,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className={`absolute ${position === 'upper' ? '-top-2' : '-bottom-2'} -right-1 w-4 h-4 rounded-full flex items-center justify-center shadow-sm z-10`}
+                className={`absolute ${position === 'upper' ? '-top-2' : '-bottom-2'} -end-1 w-4 h-4 rounded-full flex items-center justify-center shadow-sm z-10`}
                 style={{ background: 'var(--a-green-2)' }}>
                 
                   <Check className="w-2.5 h-2.5 text-white" />
@@ -196,7 +196,7 @@ const TeethingTracker = ({ onBack }: TeethingTrackerProps) => {
                 <p className="a-heading" style={{ margin: 0, fontSize: 20 }}>{emergedCount} <span style={{ fontSize: 13, color: 'var(--a-ink-soft)' }}>/ {totalTeeth}</span></p>
               </div>
             </div>
-            <div className="text-right">
+            <div className="text-end">
               <p className="a-heading" style={{ margin: 0, fontSize: 20, color: 'var(--a-berry-ink)' }}>{Math.round(progress)}%</p>
               <p className="a-list-sub" style={{ margin: 0 }}>{tr("teethingtracker_tamamlandi_d6728f", "tamamlandı")}</p>
             </div>

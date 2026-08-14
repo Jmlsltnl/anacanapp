@@ -162,6 +162,8 @@ export const useUserStore = create<UserState>()(
     // KRİTİK: getLocaleTag() bunu oxuyur — tarix/ay/həftə adlarının
     // düzgün lokalda formatlanması üçün (əvvəllər yazılmırdı → həmişə az-AZ idi)
     try { localStorage.setItem('language', lang); } catch { /* boş */ }
+    // RTL (ar) ↔ LTR keçidi dərhal — reload-a qədər də düzgün istiqamət
+    import('@/lib/rtl').then((m) => m.applyDocumentDirection(lang)).catch(() => {});
     if (isNative()) {
       void Preferences.set({ key: 'anacan_app_language', value: lang });
     }

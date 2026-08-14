@@ -62,7 +62,7 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
               <p className="a-eyebrow">{tr("appearancescreen_tema_ve_reng_secimleri_f46e36", "Tema vÉ™ rÉ™ng seÃ§imlÉ™ri")}</p>
@@ -107,7 +107,7 @@ const AppearanceScreen = ({ onBack }: AppearanceScreenProps) => {
                       <Icon size={22} style={{ color: option.previewInk }} />
                     </div>
 
-                    <div className="flex-1 text-left">
+                    <div className="flex-1 text-start">
                       <p style={{ fontSize: 14, fontWeight: 700, color: isSelected ? 'var(--a-accent-ink)' : 'var(--a-ink)' }}>{option.label}</p>
                       <p style={{ fontSize: 11.5, color: 'var(--a-ink-soft)', marginTop: 1 }}>{option.description}</p>
                     </div>

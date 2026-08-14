@@ -20,8 +20,8 @@ type PartnerAuthMode = 'login' | 'register';
 type MainView = 'main' | 'partner';
 
 // Dizayn sistemi input stili — yumşaq səth + fokus vurğusu
-const fieldCls = "pl-11 h-12 rounded-xl border-2 border-transparent text-base transition-all bg-[var(--a-surface-soft)] text-[var(--a-ink)] focus:border-[var(--a-peach-2)] focus-visible:ring-0";
-const fieldClsBlue = "pl-11 h-12 rounded-xl border-2 border-transparent text-base transition-all bg-[var(--a-surface-soft)] text-[var(--a-ink)] focus:border-[#63acdf] focus-visible:ring-0";
+const fieldCls = "ps-11 h-12 rounded-xl border-2 border-transparent text-base transition-all bg-[var(--a-surface-soft)] text-[var(--a-ink)] focus:border-[var(--a-peach-2)] focus-visible:ring-0";
+const fieldClsBlue = "ps-11 h-12 rounded-xl border-2 border-transparent text-base transition-all bg-[var(--a-surface-soft)] text-[var(--a-ink)] focus:border-[#63acdf] focus-visible:ring-0";
 
 function getSignupErrorMessage(error: any): string {
   const code = error?.code || '';
@@ -437,7 +437,7 @@ const AuthScreen = () => {
               }}
               className="a-icon-btn shrink-0"
               aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2.5} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2.5} />
             </button>
             <div className="flex items-center gap-3 flex-1">
               <div className="w-10 h-10 flex items-center justify-center shrink-0"
@@ -507,7 +507,7 @@ const AuthScreen = () => {
                   {partnerMode === 'register' &&
                   <motion.div variants={itemVariants}>
                       <div className="relative group">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[#63acdf]" style={{ color: 'var(--a-ink-faint)' }} />
+                        <User className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[#63acdf]" style={{ color: 'var(--a-ink-faint)' }} />
                         <Input
                         ref={nameInputRef}
                         type="text"
@@ -522,7 +522,7 @@ const AuthScreen = () => {
 
                     <motion.div variants={itemVariants}>
                       <div className="relative group">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[#63acdf]" style={{ color: 'var(--a-ink-faint)' }} />
+                        <Mail className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[#63acdf]" style={{ color: 'var(--a-ink-faint)' }} />
                         <Input
                         type="email"
                         placeholder="E-mail"
@@ -535,7 +535,7 @@ const AuthScreen = () => {
                     {partnerMode === 'register' && (
                       <motion.div variants={itemVariants}>
                         <div className="relative group">
-                          <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                          <div className="absolute start-4 top-1/2 -translate-y-1/2 z-10">
                             <Globe className="w-5 h-5 transition-colors group-focus-within:text-[#63acdf]" style={{ color: 'var(--a-ink-faint)' }} />
                           </div>
                           <CountrySelect
@@ -549,18 +549,18 @@ const AuthScreen = () => {
 
                     <motion.div variants={itemVariants}>
                       <div className="relative group">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[#63acdf]" style={{ color: 'var(--a-ink-faint)' }} />
+                        <Lock className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[#63acdf]" style={{ color: 'var(--a-ink-faint)' }} />
                         <Input
                           type={showPassword ? 'text' : 'password'}
                           placeholder={tr("authscreen_sifre_6771ac", "Şifrə")}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          className={`${fieldClsBlue} pr-11`} />
+                          className={`${fieldClsBlue} pe-11`} />
 
                         <button
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                          className="absolute end-4 top-1/2 -translate-y-1/2 transition-colors"
                           style={{ color: 'var(--a-ink-faint)' }}>
 
                           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -571,7 +571,7 @@ const AuthScreen = () => {
                   {partnerMode === 'register' &&
                   <motion.div variants={itemVariants}>
                       <div className="relative group">
-                        <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[#63acdf]" style={{ color: 'var(--a-ink-faint)' }} />
+                        <Sparkles className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[#63acdf]" style={{ color: 'var(--a-ink-faint)' }} />
                         <Input
                         type="text"
                         placeholder="ANACAN-XXXX"
@@ -602,7 +602,7 @@ const AuthScreen = () => {
 
                       <span className="flex items-center gap-2">
                           {partnerMode === 'register' ? tr("authscreen_qeydiyyatdan_kec_433379", "Qeydiyyatdan keç") : tr("authscreen_daxil_ol", 'Daxil ol')}
-                          <ArrowRight className="w-5 h-5" />
+                          <ArrowRight className="rtl:rotate-180 w-5 h-5" />
                         </span>
                       }
                     </Button>
@@ -713,11 +713,11 @@ const AuthScreen = () => {
                       <button
                       type="button"
                       onClick={() => setMode('login')}
-                      className="absolute left-0 top-0 p-2 transition-colors"
+                      className="absolute start-0 top-0 p-2 transition-colors"
                       style={{ color: 'var(--a-ink-soft)' }}
                       aria-label={tr("common_geri", "Geri")}>
 
-                        <ArrowLeft className="w-5 h-5" />
+                        <ArrowLeft className="rtl:rotate-180 w-5 h-5" />
                       </button>
                       <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--a-peach-1)' }}>
                         <Lock size={28} style={{ color: 'var(--a-accent-ink)' }} />
@@ -730,7 +730,7 @@ const AuthScreen = () => {
 
                     <motion.div variants={itemVariants}>
                       <div className="relative group">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
+                        <Mail className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
                         <Input
                         type="email"
                         placeholder="E-mail"
@@ -746,7 +746,7 @@ const AuthScreen = () => {
                     {mode === 'register' &&
                   <motion.div variants={itemVariants}>
                         <div className="relative group">
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
+                          <User className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
                           <Input
                         ref={nameInputRef}
                         type="text"
@@ -761,7 +761,7 @@ const AuthScreen = () => {
 
                     <motion.div variants={itemVariants}>
                       <div className="relative group">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
+                        <Mail className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
                         <Input
                         type="email"
                         placeholder="E-mail"
@@ -775,7 +775,7 @@ const AuthScreen = () => {
                     {mode === 'register' && (
                       <motion.div variants={itemVariants}>
                         <div className="relative group">
-                          <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                          <div className="absolute start-4 top-1/2 -translate-y-1/2 z-10">
                             <Globe className="w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
                           </div>
                           <CountrySelect
@@ -789,18 +789,18 @@ const AuthScreen = () => {
 
                     <motion.div variants={itemVariants}>
                       <div className="relative group">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
+                        <Lock className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
                         <Input
                         type={showPassword ? 'text' : 'password'}
                         placeholder={tr("authscreen_sifre_6771ac", "Şifrə")}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className={`${fieldCls} pr-11`} />
+                        className={`${fieldCls} pe-11`} />
 
                         <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                        className="absolute end-4 top-1/2 -translate-y-1/2 transition-colors"
                         style={{ color: 'var(--a-ink-faint)' }}>
 
                           {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -809,7 +809,7 @@ const AuthScreen = () => {
                     </motion.div>
 
                     {mode === 'login' &&
-                  <motion.div variants={itemVariants} className="text-right">
+                  <motion.div variants={itemVariants} className="text-end">
                         <button
                       type="button"
                       onClick={() => setMode('forgot-password')}
@@ -839,7 +839,7 @@ const AuthScreen = () => {
 
                       <span className="flex items-center gap-2">
                         {mode === 'login' ? tr("authscreen_daxil_ol", 'Daxil ol') : mode === 'register' ? tr("authscreen_qeydiyyatdan_kec_433379", "Qeydiyyatdan keç") : tr("authscreen_link_gonder_d6b028", "Link göndər")}
-                        <ArrowRight className="w-5 h-5" />
+                        <ArrowRight className="rtl:rotate-180 w-5 h-5" />
                       </span>
                     }
                   </Button>
@@ -915,12 +915,12 @@ const AuthScreen = () => {
                   style={{ borderRadius: 14, background: 'var(--a-blue-2)', boxShadow: '0 8px 16px -8px rgba(99, 172, 223, 0.6)' }}>
                     <Users size={18} className="text-white" />
                   </div>
-                  <div className="text-left">
+                  <div className="text-start">
                     <p style={{ fontSize: 13.5, fontWeight: 800, color: '#153e57' }}>{tr("authscreen_partnyor_bolmesi_ed393a", "Partnyor Bölməsi")}</p>
                     <p style={{ fontSize: 11, color: 'var(--a-blue-ink)' }}>{tr("authscreen_xaniminizla_baglanmaq_ucun_d7b234", "Xanımınızla bağlanmaq üçün")}</p>
                   </div>
                 </div>
-                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" style={{ color: 'var(--a-blue-ink)' }} />
+                <ArrowRight size={18} className="rtl:rotate-180 group-hover:translate-x-1 transition-transform" style={{ color: 'var(--a-blue-ink)' }} />
               </button>
             </motion.div>
           </motion.div>

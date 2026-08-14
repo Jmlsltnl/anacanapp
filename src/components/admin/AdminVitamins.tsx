@@ -154,7 +154,7 @@ const AdminVitamins = () => {
           <p className="text-sm text-muted-foreground">{tr("adminvitamins_heftelik_vitamin_tovsiyelerini_idare_edi_d31541", "Həftəlik vitamin tövsiyələrini idarə edin")}</p>
         </div>
         <Button onClick={openCreateModal} size="sm">
-          <Plus className="w-4 h-4 mr-1" />
+          <Plus className="w-4 h-4 me-1" />
           {tr("adminvitamins_elave_et_6e1b9b", "\u018Flav\u0259 et")}
         </Button>
       </div>
@@ -162,12 +162,12 @@ const AdminVitamins = () => {
       {/* Filters */}
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Axtar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 h-9" />
+            className="ps-9 h-9" />
           
         </div>
         <Select value={filterStage} onValueChange={setFilterStage}>
@@ -426,11 +426,11 @@ const AdminVitamins = () => {
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-                  <X className="w-4 h-4 mr-1" />
+                  <X className="w-4 h-4 me-1" />
                   {tr("adminvitamins_legv_et_b5e49c", "L\u0259\u011Fv et")}
                 </Button>
                 <Button onClick={handleSave} disabled={!formData.name}>
-                  <Check className="w-4 h-4 mr-1" />
+                  <Check className="w-4 h-4 me-1" />
                   Yadda saxla
                 </Button>
               </div>

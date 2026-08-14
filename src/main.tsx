@@ -28,6 +28,7 @@ import { restoreNativeSession, startNativeSessionSync } from "./lib/session-pers
 import { Preferences } from '@capacitor/preferences';
 import { useUserStore } from '@/store/userStore';
 import { ensureLanguageReady } from '@/lib/i18n';
+import { applyDocumentDirection } from '@/lib/rtl';
 
 // Initialize crash reporter first (catches all errors from this point)
 initCrashReporter();
@@ -87,6 +88,8 @@ async function bootstrap() {
   // Guard: hər ehtimala qarşı 4s-dən çox bloklamasın (splash arxasında keçir).
   try {
     const lang = useUserStore.getState().language || 'az';
+    // RTL dilləri (ar) üçün <html dir="rtl"> İLK render-dən əvvəl — layout flash-sız
+    applyDocumentDirection(lang);
     await Promise.race([
       ensureLanguageReady(lang),
       new Promise((r) => setTimeout(r, 4000)),

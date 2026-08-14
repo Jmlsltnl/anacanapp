@@ -114,7 +114,7 @@ export default function AdminPartnerVenues() {
           <h1 className="text-2xl font-bold flex items-center gap-2"><Sparkles className="w-5 h-5 text-primary" /> {tr("adminpartnervenues_partnyor_mekanlari_3b1b0e", "Partnyor M\u0259kanlar\u0131")}</h1>
           <p className="text-sm text-muted-foreground">{tr("adminpartnervenues_premium_istifadecilere_endirim_87c381", "Premium istifad\u0259\xE7il\u0259r\u0259 endirim ver\u0259n m\u0259kanlar")}</p>
         </div>
-        <Button onClick={openNew}><Plus className="w-4 h-4 mr-1" /> {tr("adminpartnervenues_yeni_mekan_b6bd89", "Yeni m\u0259kan")}</Button>
+        <Button onClick={openNew}><Plus className="w-4 h-4 me-1" /> {tr("adminpartnervenues_yeni_mekan_b6bd89", "Yeni m\u0259kan")}</Button>
       </div>
 
       <div className="grid gap-3">
@@ -180,7 +180,7 @@ export default function AdminPartnerVenues() {
                 <h4 className="text-sm font-bold mb-2">{tr("adminpartnervenues_mekan_pin_kodu_138eb6", "M\u0259kan PIN kodu")} {editing.id && tr("adminpartnervenues_bos_buraxin_deyismez_218725", "(bo\u015F burax\u0131n \u2192 d\u0259yi\u015Fm\u0259z)")}</h4>
                 <div className="relative">
                   <Input type={showPin ? 'text' : 'password'} placeholder={editing.id ? tr("adminpartnervenues_yeni_pin_bos_saxlanilir_b6dd56", "Yeni PIN (bo\u015F = saxlan\u0131l\u0131r)") : 'PIN qoy'} value={pin} onChange={(e) => setPin(e.target.value)} />
-                  <button type="button" className="absolute right-2 top-2" onClick={() => setShowPin(!showPin)}>{showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
+                  <button type="button" className="absolute end-2 top-2" onClick={() => setShowPin(!showPin)}>{showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}</button>
                 </div>
               </div>
               <div className="flex gap-4 items-center">

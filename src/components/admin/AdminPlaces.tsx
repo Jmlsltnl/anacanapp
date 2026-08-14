@@ -142,7 +142,7 @@ const AdminPlaces = () => {
           <TabsTrigger value="places" className="relative">
             {tr("adminplaces_mekanlar_ac212e", "M\u0259kanlar")}
             {pendingPlaces > 0 &&
-            <span className="ml-2 px-1.5 py-0.5 text-xs font-bold bg-destructive text-destructive-foreground rounded-full">
+            <span className="ms-2 px-1.5 py-0.5 text-xs font-bold bg-destructive text-destructive-foreground rounded-full">
                 {pendingPlaces}
               </span>
             }
@@ -150,7 +150,7 @@ const AdminPlaces = () => {
           <TabsTrigger value="reviews" className="relative">
             {tr("adminplaces_reyler_032ec8", "R\u0259yl\u0259r")}
             {pendingReviews > 0 &&
-            <span className="ml-2 px-1.5 py-0.5 text-xs font-bold bg-destructive text-destructive-foreground rounded-full">
+            <span className="ms-2 px-1.5 py-0.5 text-xs font-bold bg-destructive text-destructive-foreground rounded-full">
                 {pendingReviews}
               </span>
             }
@@ -197,7 +197,7 @@ const AdminPlaces = () => {
                           <Badge className="bg-green-500">{tr("adminplaces_tesdiqlenmis_cf7b5f", "Təsdiqlənmiş")}</Badge> :
 
                           <Badge variant="outline" className="text-orange-500 border-orange-500">
-                                  <AlertTriangle className="w-3 h-3 mr-1" />{tr("adminplaces_gozleyir_9ac18a", "G\xF6zl\u0259yir")}
+                                  <AlertTriangle className="w-3 h-3 me-1" />{tr("adminplaces_gozleyir_9ac18a", "G\xF6zl\u0259yir")}
                                 </Badge>
                           }
                             </div>
@@ -221,7 +221,7 @@ const AdminPlaces = () => {
                         <div className="flex items-center gap-2 shrink-0">
                           {!place.is_verified &&
                       <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => approveMutation.mutate(place.id)}>
-                              <Check className="w-4 h-4 mr-1" />{tr("adminplaces_tesdiqle_4ffd4c", "T\u0259sdiql\u0259")}
+                              <Check className="w-4 h-4 me-1" />{tr("adminplaces_tesdiqle_4ffd4c", "T\u0259sdiql\u0259")}
                             </Button>
                       }
                           <Button variant="outline" size="sm" className="text-destructive" onClick={() => deleteMutation.mutate(place.id)}>
@@ -272,7 +272,7 @@ const AdminPlaces = () => {
                         <Badge className="bg-green-500 text-xs">{tr("adminplaces_tesdiqlenmis_cf7b5f", "Təsdiqlənmiş")}</Badge> :
 
                         <Badge variant="outline" className="text-orange-500 border-orange-500 text-xs">
-                                <AlertTriangle className="w-3 h-3 mr-1" />{tr("adminplaces_gozleyir_9ac18a", "G\xF6zl\u0259yir")}
+                                <AlertTriangle className="w-3 h-3 me-1" />{tr("adminplaces_gozleyir_9ac18a", "G\xF6zl\u0259yir")}
                               </Badge>
                         }
                           </div>

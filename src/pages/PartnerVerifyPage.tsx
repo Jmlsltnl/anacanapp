@@ -148,7 +148,7 @@ export default function PartnerVerifyPage() {
           <p style={{ fontSize: 13, color: 'var(--a-ink-soft)' }}>{status?.discount_label}</p>
           <div className="mt-3" style={{ background: 'var(--a-surface-soft)', borderRadius: 14, padding: '8px 16px', fontSize: 13, color: 'var(--a-ink)' }}>
             {tr("partnerverifypage_musteri_f512e9", "M\xFC\u015Ft\u0259ri:")} <strong>{status?.user_name}</strong>
-            {status?.is_premium && <span className="ml-2" style={{ color: 'var(--a-yellow-ink)' }}>★ Premium</span>}
+            {status?.is_premium && <span className="ms-2" style={{ color: 'var(--a-yellow-ink)' }}>★ Premium</span>}
           </div>
         </div>
 

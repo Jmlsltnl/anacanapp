@@ -60,7 +60,7 @@ const DailySummaryScreen: React.FC<DailySummaryScreenProps> = ({ onBack }) => {
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("dailysummaryscreen_gundelik_xulase_3d07a5", "GÃ¼ndÉ™lik XÃ¼lasÉ™")}</p>
           </div>

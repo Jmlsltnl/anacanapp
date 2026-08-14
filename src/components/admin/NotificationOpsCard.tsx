@@ -136,19 +136,19 @@ const NotificationOpsCard = () => {
         </div>
         <div className="flex gap-2 flex-wrap">
           <Button size="sm" variant="outline" onClick={refresh} disabled={loading}>
-            {loading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-1" />}
+            {loading ? <Loader2 className="h-4 w-4 me-1 animate-spin" /> : <RefreshCw className="h-4 w-4 me-1" />}
             {tr("notificationopscard_yenile_570ce2", "Yenil\u0259")}
           </Button>
           <Button size="sm" onClick={() => callTest('send-daily-notifications')} disabled={testing !== null}>
-            {testing === 'send-daily-notifications' ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Send className="h-4 w-4 mr-1" />}
+            {testing === 'send-daily-notifications' ? <Loader2 className="h-4 w-4 me-1 animate-spin" /> : <Send className="h-4 w-4 me-1" />}
             Test: Daily
           </Button>
           <Button size="sm" variant="secondary" onClick={() => callTest('send-flow-reminders')} disabled={testing !== null}>
-            {testing === 'send-flow-reminders' ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Send className="h-4 w-4 mr-1" />}
+            {testing === 'send-flow-reminders' ? <Loader2 className="h-4 w-4 me-1 animate-spin" /> : <Send className="h-4 w-4 me-1" />}
             Test: Flow
           </Button>
           <Button size="sm" variant="secondary" onClick={() => callTest('send-vitamin-reminders')} disabled={testing !== null}>
-            {testing === 'send-vitamin-reminders' ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Send className="h-4 w-4 mr-1" />}
+            {testing === 'send-vitamin-reminders' ? <Loader2 className="h-4 w-4 me-1 animate-spin" /> : <Send className="h-4 w-4 me-1" />}
             Test: Vitamin
           </Button>
         </div>
@@ -169,11 +169,11 @@ const NotificationOpsCard = () => {
               <table className="w-full text-xs">
                 <thead className="bg-muted/40">
                   <tr>
-                    <th className="text-left p-2">Ad</th>
-                    <th className="text-left p-2">Schedule (UTC)</th>
-                    <th className="text-left p-2">{tr("notificationopscard_baku_saatlari_de5041", "Baku saatları")}</th>
-                    <th className="text-left p-2">Validation</th>
-                    <th className="text-left p-2">Son icra</th>
+                    <th className="text-start p-2">Ad</th>
+                    <th className="text-start p-2">Schedule (UTC)</th>
+                    <th className="text-start p-2">{tr("notificationopscard_baku_saatlari_de5041", "Baku saatları")}</th>
+                    <th className="text-start p-2">Validation</th>
+                    <th className="text-start p-2">Son icra</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -184,7 +184,7 @@ const NotificationOpsCard = () => {
                     <tr key={j.jobid} className="border-t">
                         <td className="p-2 font-medium">
                           {j.jobname}{' '}
-                          {!j.active && <Badge variant="outline" className="ml-1">{tr("notificationopscard_sondurulub_0ea98c", "söndürülüb")}</Badge>}
+                          {!j.active && <Badge variant="outline" className="ms-1">{tr("notificationopscard_sondurulub_0ea98c", "söndürülüb")}</Badge>}
                         </td>
                         <td className="p-2 font-mono">{j.schedule}</td>
                         <td className="p-2 font-mono">{baku.baku}</td>
@@ -232,26 +232,26 @@ const NotificationOpsCard = () => {
               <table className="w-full text-xs">
                 <thead className="bg-muted/40">
                   <tr>
-                    <th className="text-left p-2">Funksiya</th>
-                    <th className="text-right p-2">{tr("notificationopscard_icralar_5cb87f", "İcralar")}</th>
-                    <th className="text-right p-2">{tr("notificationopscard_ugurlu_7fe64c", "Uğurlu")}</th>
-                    <th className="text-right p-2">{tr("notificationopscard_xeta_3cdbb6", "Xəta")}</th>
-                    <th className="text-right p-2">{tr("notificationopscard_gonderilen_686392", "Göndərilən")}</th>
-                    <th className="text-right p-2">{tr("notificationopscard_ugursuz_541932", "Uğursuz")}</th>
-                    <th className="text-right p-2">{tr("notificationopscard_kecilen_271294", "Keçilən")}</th>
-                    <th className="text-left p-2">{tr("notificationopscard_son_bitme_8a369d", "Son bitmə")}</th>
+                    <th className="text-start p-2">Funksiya</th>
+                    <th className="text-end p-2">{tr("notificationopscard_icralar_5cb87f", "İcralar")}</th>
+                    <th className="text-end p-2">{tr("notificationopscard_ugurlu_7fe64c", "Uğurlu")}</th>
+                    <th className="text-end p-2">{tr("notificationopscard_xeta_3cdbb6", "Xəta")}</th>
+                    <th className="text-end p-2">{tr("notificationopscard_gonderilen_686392", "Göndərilən")}</th>
+                    <th className="text-end p-2">{tr("notificationopscard_ugursuz_541932", "Uğursuz")}</th>
+                    <th className="text-end p-2">{tr("notificationopscard_kecilen_271294", "Keçilən")}</th>
+                    <th className="text-start p-2">{tr("notificationopscard_son_bitme_8a369d", "Son bitmə")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.today_runs.map((r) =>
                 <tr key={r.function_name} className="border-t">
                       <td className="p-2 font-medium">{r.function_name}</td>
-                      <td className="p-2 text-right">{r.runs}</td>
-                      <td className="p-2 text-right text-emerald-600">{r.success_runs}</td>
-                      <td className="p-2 text-right text-destructive">{r.error_runs}</td>
-                      <td className="p-2 text-right">{r.sent_total ?? 0}</td>
-                      <td className="p-2 text-right">{r.failed_total ?? 0}</td>
-                      <td className="p-2 text-right">{r.skipped_total ?? 0}</td>
+                      <td className="p-2 text-end">{r.runs}</td>
+                      <td className="p-2 text-end text-emerald-600">{r.success_runs}</td>
+                      <td className="p-2 text-end text-destructive">{r.error_runs}</td>
+                      <td className="p-2 text-end">{r.sent_total ?? 0}</td>
+                      <td className="p-2 text-end">{r.failed_total ?? 0}</td>
+                      <td className="p-2 text-end">{r.skipped_total ?? 0}</td>
                       <td className="p-2">{r.last_ended_at ? new Date(r.last_ended_at).toLocaleString('az-AZ') : '—'}</td>
                     </tr>
                 )}
@@ -270,10 +270,10 @@ const NotificationOpsCard = () => {
               <table className="w-full text-xs">
                 <thead className="bg-muted/40 sticky top-0">
                   <tr>
-                    <th className="text-left p-2">Tip</th>
-                    <th className="text-left p-2">Status</th>
-                    <th className="text-left p-2">{tr("notificationopscard_sebeb_7b51f1", "Səbəb")}</th>
-                    <th className="text-right p-2">Say</th>
+                    <th className="text-start p-2">Tip</th>
+                    <th className="text-start p-2">Status</th>
+                    <th className="text-start p-2">{tr("notificationopscard_sebeb_7b51f1", "Səbəb")}</th>
+                    <th className="text-end p-2">Say</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -286,7 +286,7 @@ const NotificationOpsCard = () => {
                         </Badge>
                       </td>
                       <td className="p-2 font-mono break-all">{s.reason}</td>
-                      <td className="p-2 text-right">{s.cnt}</td>
+                      <td className="p-2 text-end">{s.cnt}</td>
                     </tr>
                 )}
                   {data.today_sends.length === 0 &&

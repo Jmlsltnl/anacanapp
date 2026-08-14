@@ -125,7 +125,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
       <div className="sticky top-0 z-20" style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
         <div className="px-4 py-2.5 safe-area-top flex items-center gap-3">
           <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-            <ArrowLeft size={16} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
           </motion.button>
           <h1 className="flex items-center gap-2" style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>
             <ShoppingBag size={18} style={{ color: 'var(--a-accent-ink)' }} />
@@ -214,7 +214,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
             <button
               key={m.id}
               onClick={() => setPaymentMethod(m.method_key)}
-              className="w-full flex items-center gap-3 transition-all text-left"
+              className="w-full flex items-center gap-3 transition-all text-start"
               style={{
                 padding: 13,
                 borderRadius: 16,
@@ -293,7 +293,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
       </div>
 
       {/* Fixed Bottom Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 safe-bottom"
+      <div className="fixed bottom-0 start-0 end-0 p-4 safe-bottom"
       style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)', borderTop: '1px solid var(--a-line)' }}>
         <Button
           onClick={handleSubmit}
@@ -302,7 +302,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
           style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}>
 
           {submitting ?
-          <><Loader2 className="w-5 h-5 mr-2 animate-spin" />{tr("albumorderscreen_gonderilir_1d548c", "Göndərilir...")}</> : tr("albumorderscreen_sifarisi_gonder_41d5a1", "Sifari\u015Fi G\xF6nd\u0259r")
+          <><Loader2 className="w-5 h-5 me-2 animate-spin" />{tr("albumorderscreen_gonderilir_1d548c", "Göndərilir...")}</> : tr("albumorderscreen_sifarisi_gonder_41d5a1", "Sifari\u015Fi G\xF6nd\u0259r")
 
 
           }

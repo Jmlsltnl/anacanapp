@@ -271,12 +271,12 @@ const AdminUsers = () => {
       <Card className="p-4">
         <div className="flex items-center gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder={tr("adminusers_ad_ve_ya_email_ile_axtar_335c5a", "Ad və ya email ilə axtar...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10" />
+              className="ps-10" />
             
           </div>
           <Button variant="outline" className="gap-2">
@@ -292,12 +292,12 @@ const AdminUsers = () => {
           <table className="w-full">
             <thead className="bg-muted/50">
               <tr>
-                <th className="text-left p-4 font-medium text-muted-foreground">{tr("adminusers_istifadeci_b6bdd6", "İstifadəçi")}</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">{tr("adminusers_merhele_0e09aa", "Mərhələ")}</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">Rol</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">Partner Kodu</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">Tarix</th>
-                <th className="text-right p-4 font-medium text-muted-foreground">{tr("adminusers_emeliyyatlar_54d70c", "Əməliyyatlar")}</th>
+                <th className="text-start p-4 font-medium text-muted-foreground">{tr("adminusers_istifadeci_b6bdd6", "İstifadəçi")}</th>
+                <th className="text-start p-4 font-medium text-muted-foreground">{tr("adminusers_merhele_0e09aa", "Mərhələ")}</th>
+                <th className="text-start p-4 font-medium text-muted-foreground">Rol</th>
+                <th className="text-start p-4 font-medium text-muted-foreground">Partner Kodu</th>
+                <th className="text-start p-4 font-medium text-muted-foreground">Tarix</th>
+                <th className="text-end p-4 font-medium text-muted-foreground">{tr("adminusers_emeliyyatlar_54d70c", "Əməliyyatlar")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -356,7 +356,7 @@ const AdminUsers = () => {
                       <td className="p-4 text-sm text-muted-foreground">
                         {new Date(user.created_at).toLocaleDateString('az-AZ')}
                       </td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 text-end">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
@@ -368,7 +368,7 @@ const AdminUsers = () => {
                             setSelectedUser(user);
                             setEditDialogOpen(true);
                           }}>
-                              <Edit className="w-4 h-4 mr-2" />
+                              <Edit className="w-4 h-4 me-2" />
                               {tr("adminusers_redakte_et_66cf3b", "Redakt\u0259 et")}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
@@ -376,7 +376,7 @@ const AdminUsers = () => {
                             setSelectedRole(getUserRole(user.user_id));
                             setRoleDialogOpen(true);
                           }}>
-                              <Shield className="w-4 h-4 mr-2" />
+                              <Shield className="w-4 h-4 me-2" />
                               {tr("adminusers_rol_teyin_et_41b431", "Rol t\u0259yin et")}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
@@ -385,12 +385,12 @@ const AdminUsers = () => {
                             setConfirmPassword('');
                             setPasswordDialogOpen(true);
                           }}>
-                              <KeyRound className="w-4 h-4 mr-2" />
+                              <KeyRound className="w-4 h-4 me-2" />
                               {tr("adminusers_sifreni_deyis_a48972", "\u015Eifr\u0259ni d\u0259yi\u015F")}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="text-destructive">
-                              <Trash2 className="w-4 h-4 mr-2" />
+                              <Trash2 className="w-4 h-4 me-2" />
                               Sil
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -545,12 +545,12 @@ const AdminUsers = () => {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder={tr("adminusers_en_azi_8_simvol_168104", "Ən azı 8 simvol")}
-                  className="pr-10" />
+                  className="pe-10" />
                 
                   <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>

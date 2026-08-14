@@ -123,7 +123,7 @@ const FlowPeriodCalendar = () => {
             className="a-icon-btn"
             style={{ width: 28, height: 28 }}>
             
-            <ChevronLeft size={14} />
+            <ChevronLeft className="rtl:rotate-180" size={14} />
           </button>
           <span className="a-section-link" style={{ minWidth: 100, justifyContent: 'center', color: 'var(--a-ink)' }}>
             {format(calendarMonth, 'MMMM yyyy', { locale: getCurrentDateLocale() })}
@@ -133,7 +133,7 @@ const FlowPeriodCalendar = () => {
             className="a-icon-btn"
             style={{ width: 28, height: 28 }}>
             
-            <ChevronRight size={14} />
+            <ChevronRight className="rtl:rotate-180" size={14} />
           </button>
         </div>
       </div>
@@ -199,7 +199,7 @@ const FlowPeriodCalendar = () => {
               <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-red-300 dark:bg-red-600" />
               }
               {info.isOvulation &&
-              <span className="absolute -top-0.5 -right-0.5 text-[8px]">🌸</span>
+              <span className="absolute -top-0.5 -end-0.5 text-[8px]">🌸</span>
               }
             </motion.button>);
 

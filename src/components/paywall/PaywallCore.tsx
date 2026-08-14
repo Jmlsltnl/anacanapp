@@ -172,7 +172,7 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
         whileTap={{ scale: 0.98 }}
         onClick={() => setSelected(plan)}
         aria-pressed={active}
-        className="relative w-full text-left"
+        className="relative w-full text-start"
         style={{
           borderRadius: 20,
           padding: '14px 16px',
@@ -184,7 +184,7 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
 
         {badge &&
         <span
-          className="absolute -top-2.5 right-4"
+          className="absolute -top-2.5 end-4"
           style={{
             background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)',
             fontSize: 9.5, fontWeight: 900, letterSpacing: '0.06em',
@@ -219,7 +219,7 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
             <p style={{ fontSize: 10.5, color: 'var(--a-ink-soft)', margin: '2px 0 0' }}>{sub}</p>
           </div>
 
-          <div className="text-right shrink-0">
+          <div className="text-end shrink-0">
             <p style={{ fontSize: 19, fontWeight: 900, color: 'var(--a-ink)', letterSpacing: '-0.02em', margin: 0 }}>
               {priceMain}
               {priceMainSuffix && <span style={{ fontSize: 10.5, fontWeight: 500, color: 'var(--a-ink-soft)' }}>{priceMainSuffix}</span>}
@@ -263,7 +263,7 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
         {[1, 2, 3, 4, 5].map((i) =>
         <Star key={i} size={13} style={{ fill: '#ffc94d', color: '#ffc94d' }} />
         )}
-        <span className="ml-1.5" style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--a-ink-soft)' }}>
+        <span className="ms-1.5" style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--a-ink-soft)' }}>
           {tr('pw_social_proof', '10,000+ Azərbaycanlı ana bizi seçib')}
         </span>
       </div>
@@ -326,8 +326,8 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
           aria-hidden
           className="absolute top-0 bottom-0"
           style={{ width: 60, background: 'linear-gradient(105deg, transparent, rgba(255,255,255,0.45), transparent)', transform: 'skewX(-20deg)' }}
-          initial={{ left: '-20%' }}
-          animate={{ left: '120%' }}
+          initial={{ insetInlineStart: '-20%' }}
+          animate={{ insetInlineStart: '120%' }}
           transition={{ repeat: Number.POSITIVE_INFINITY, duration: 2.2, ease: 'easeInOut', repeatDelay: 1.4 }} />
         }
         {busy ?

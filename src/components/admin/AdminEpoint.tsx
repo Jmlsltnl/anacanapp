@@ -195,12 +195,12 @@ const AdminEpoint = () => {
                     value={privateKey}
                     onChange={(e) => setPrivateKey(e.target.value)}
                     placeholder={tr("adminepoint_api_giris_acari_34edbe", "API giriş açarı")}
-                    className="pr-10" />
+                    className="pe-10" />
                   
                       <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute right-0 top-0 h-full"
+                    className="absolute end-0 top-0 h-full"
                     onClick={() => setShowPrivateKey(!showPrivateKey)}>
                     
                         {showPrivateKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -280,12 +280,12 @@ const AdminEpoint = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-muted/50">
-                    <th className="text-left p-3 font-medium text-muted-foreground">Tarix</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">{tr("adminepoint_sifaris_id_f7533c", "Sifariş ID")}</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">{tr("adminepoint_nov_98ad7c", "Növ")}</th>
-                    <th className="text-right p-3 font-medium text-muted-foreground">{tr("adminepoint_mebleg_479276", "Məbləğ")}</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Status</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground">Kart</th>
+                    <th className="text-start p-3 font-medium text-muted-foreground">Tarix</th>
+                    <th className="text-start p-3 font-medium text-muted-foreground">{tr("adminepoint_sifaris_id_f7533c", "Sifariş ID")}</th>
+                    <th className="text-start p-3 font-medium text-muted-foreground">{tr("adminepoint_nov_98ad7c", "Növ")}</th>
+                    <th className="text-end p-3 font-medium text-muted-foreground">{tr("adminepoint_mebleg_479276", "Məbləğ")}</th>
+                    <th className="text-start p-3 font-medium text-muted-foreground">Status</th>
+                    <th className="text-start p-3 font-medium text-muted-foreground">Kart</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -321,7 +321,7 @@ const AdminEpoint = () => {
                               {orderTypeLabels[txn.order_type] || txn.order_type}
                             </Badge>
                           </td>
-                          <td className="p-3 text-right font-medium text-foreground">
+                          <td className="p-3 text-end font-medium text-foreground">
                             {parseFloat(txn.amount).toFixed(2)} ₼
                           </td>
                           <td className="p-3">

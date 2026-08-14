@@ -205,7 +205,7 @@ const GrowthTrackerWidget = () => {
           <div className="a-chart-wrap">
             <span
               className="a-chart-tooltip"
-              style={{ left: `${(chart.last[0] / width) * 100}%` }}
+              style={{ insetInlineStart: `${(chart.last[0] / width) * 100}%` }}
             >
               {chartValues[chartValues.length - 1]} {unit}
             </span>

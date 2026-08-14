@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
-const fieldCls = "pl-12 pr-12 h-14 rounded-2xl border-2 border-transparent text-base transition-all bg-[var(--a-surface-soft)] text-[var(--a-ink)] focus:border-[var(--a-peach-2)] focus-visible:ring-0";
+const fieldCls = "ps-12 pe-12 h-14 rounded-2xl border-2 border-transparent text-base transition-all bg-[var(--a-surface-soft)] text-[var(--a-ink)] focus:border-[var(--a-peach-2)] focus-visible:ring-0";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
@@ -161,7 +161,7 @@ const ResetPassword = () => {
                   {tr("resetpassword_yeni_sifre_56fd00", "Yeni \u015Eifr\u0259")}
                 </label>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
+                  <Lock className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
                   <Input
                   type={showPassword ? 'text' : 'password'}
                   placeholder={tr("untranslated_minimum_6_simvol_nifi5y", "Minimum 6 simvol")}
@@ -172,7 +172,7 @@ const ResetPassword = () => {
                   <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                  className="absolute end-4 top-1/2 -translate-y-1/2 transition-colors"
                   style={{ color: 'var(--a-ink-faint)' }}>
 
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -189,7 +189,7 @@ const ResetPassword = () => {
                   {tr("resetpassword_sifreni_tesdiqle_030254", "\u015Eifr\u0259ni T\u0259sdiql\u0259")}
                 </label>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
+                  <Lock className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors group-focus-within:text-[var(--a-peach-2)]" style={{ color: 'var(--a-ink-faint)' }} />
                   <Input
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder={tr("resetpassword_sifreni_yeniden_daxil_edin_7e89fb", "Şifrəni yenidən daxil edin")}
@@ -200,7 +200,7 @@ const ResetPassword = () => {
                   <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                  className="absolute end-4 top-1/2 -translate-y-1/2 transition-colors"
                   style={{ color: 'var(--a-ink-faint)' }}>
 
                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -239,7 +239,7 @@ const ResetPassword = () => {
                 className="flex items-center justify-center gap-2 mx-auto transition-colors hover:opacity-80"
                 style={{ fontSize: 13, color: 'var(--a-ink-soft)' }}>
 
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="rtl:rotate-180 w-4 h-4" />
                   {tr("resetpassword_ana_sehifeye_qayit_723295", "Ana s\u0259hif\u0259y\u0259 qay\u0131t")}
                 </button>
               </motion.div>

@@ -205,7 +205,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1 }}>
         
-        <span className="a-cta-shape" style={{ width: 140, height: 140, top: -50, right: -40, background: 'rgba(255,255,255,0.35)' }} />
+        <span className="a-cta-shape" style={{ width: 140, height: 140, top: -50, insetInlineEnd: -40, background: 'rgba(255,255,255,0.35)' }} />
         <div className="relative z-10 flex items-center gap-3">
           <div
             className="w-14 h-14 flex items-center justify-center text-3xl overflow-hidden flex-shrink-0"
@@ -251,7 +251,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
       <motion.button
         onClick={() => isPremium ? onNavigate?.('billing') : setShowPremiumModal(true)}
         className="a-card a-fade-in"
-        style={{ width: '100%', textAlign: 'left', cursor: 'pointer', padding: '14px 18px', marginTop: 12 }}
+        style={{ width: '100%', textAlign: 'start', cursor: 'pointer', padding: '14px 18px', marginTop: 12 }}
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
@@ -267,7 +267,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               {isPremium ? tr("profilescreen_premium_abuneliyiniz_aktivdir_9f6e62", "Premium abunəliyiniz aktivdir") : tr("profilescreen_butun_xususiyyetleri_acin_a7583b", "Bütün xüsusiyyətləri açın")}
             </p>
           </div>
-          <ChevronRight className="a-list-chevron" style={{ marginLeft: 'auto' }} size={18} />
+          <ChevronRight className="rtl:rotate-180 a-list-chevron" style={{ marginInlineStart: 'auto' }} size={18} />
         </div>
       </motion.button>
 
@@ -338,12 +338,12 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           <motion.button
           onClick={() => setShowPartnerInfo(true)}
           className="a-teaser w-full"
-          style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', background: 'none', border: 'none', borderTop: '1px dashed var(--a-line-strong)', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'start', background: 'none', border: 'none', borderTop: '1px dashed var(--a-line-strong)', cursor: 'pointer' }}
           whileTap={{ scale: 0.98 }}>
           
             <Info size={15} style={{ color: 'var(--a-pink-2)', flexShrink: 0 }} />
             <span style={{ flex: 1 }}>{tr("profilescreen_partnyor_neler_gore_ve_ede_biler_3fa7fa", "Partnyor nələr görə və edə bilər?")}</span>
-            <ChevronRight size={15} className="a-list-chevron" />
+            <ChevronRight size={15} className="rtl:rotate-180 a-list-chevron" />
           </motion.button>
 
           {/* Paylaşım ayarları — yalnız bağlı partnyor olduqda */}
@@ -351,12 +351,12 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
           <motion.button
           onClick={() => onNavigate?.('partner-sharing')}
           className="a-teaser w-full"
-          style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'left', background: 'none', border: 'none', borderTop: '1px dashed var(--a-line-strong)', cursor: 'pointer' }}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', textAlign: 'start', background: 'none', border: 'none', borderTop: '1px dashed var(--a-line-strong)', cursor: 'pointer' }}
           whileTap={{ scale: 0.98 }}>
 
               <Shield size={15} style={{ color: 'var(--a-blue-2)', flexShrink: 0 }} />
               <span style={{ flex: 1 }}>{tr("partnerv2_partnyor_nleri_gorur", "Partnyor nələri görür?")}</span>
-              <ChevronRight size={15} className="a-list-chevron" />
+              <ChevronRight size={15} className="rtl:rotate-180 a-list-chevron" />
             </motion.button>
           }
         </motion.div>
@@ -502,7 +502,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                     <motion.button
                   onClick={() => openEditChild(child)}
                   className="a-icon-btn"
-                  style={{ width: 30, height: 30, marginLeft: 'auto' }}
+                  style={{ width: 30, height: 30, marginInlineStart: 'auto' }}
                   whileTap={{ scale: 0.9 }}>
                   
                       <Edit size={13} strokeWidth={2} />
@@ -614,7 +614,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
               variants={itemVariants}
               onClick={() => onNavigate?.(item.id)}
               className="a-list-row w-full"
-              style={{ width: '100%', textAlign: 'left', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}>
+              style={{ width: '100%', textAlign: 'start', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}>
               
               <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
                 <Icon size={17} strokeWidth={2} />
@@ -625,7 +625,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                   {item.badge}
                 </span>
               }
-              <ChevronRight size={16} className="a-list-chevron" />
+              <ChevronRight size={16} className="rtl:rotate-180 a-list-chevron" />
             </motion.button>);
 
         })}
@@ -679,14 +679,14 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
                 key={item.id}
                 onClick={() => onNavigate?.(item.id)}
                 className="a-list-row w-full"
-                style={{ width: '100%', textAlign: 'left', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer', padding: '11px 16px' }}
+                style={{ width: '100%', textAlign: 'start', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer', padding: '11px 16px' }}
                 whileTap={{ scale: 0.99 }}>
                 
                 <span className="a-list-icon" style={{ width: 30, height: 30, borderRadius: 10, background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
                   <Icon size={13} strokeWidth={2} />
                 </span>
                 <p className="a-list-sub" style={{ flex: 1, margin: 0, fontWeight: 600 }}>{item.label}</p>
-                <ChevronRight size={14} className="a-list-chevron" />
+                <ChevronRight size={14} className="rtl:rotate-180 a-list-chevron" />
               </motion.button>);
 
           })}

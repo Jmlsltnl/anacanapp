@@ -432,7 +432,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           {/* Breathing Exercise */}
           <motion.button
             onClick={() => setShowBreathing(true)}
-            className="a-card text-left"
+            className="a-card text-start"
             style={{ cursor: 'pointer' }}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -448,7 +448,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           {/* EPDS Assessment */}
           <motion.button
             onClick={() => setShowEPDS(true)}
-            className="a-card text-left"
+            className="a-card text-start"
             style={{ cursor: 'pointer' }}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -480,7 +480,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
             <motion.button
               key={assessment.id}
               onClick={() => setShowResult(assessment)}
-              className="a-list-row w-full text-left"
+              className="a-list-row w-full text-start"
               style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -602,7 +602,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 <motion.button
                   key={i}
                   onClick={() => setSelectedExercise(ex)}
-                  className="w-full p-4 rounded-2xl text-left transition-all flex items-center gap-3"
+                  className="w-full p-4 rounded-2xl text-start transition-all flex items-center gap-3"
                   style={selectedExercise.name === ex.name ?
                   { background: 'var(--a-green-1)', border: '2px solid var(--a-green-2)', cursor: 'pointer' } :
                   { background: 'var(--a-surface-soft)', border: '2px solid transparent', cursor: 'pointer' }}
@@ -700,7 +700,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                       <motion.button
                         key={option.value}
                         type="button"
-                        className="w-full flex items-center space-x-3 p-4 rounded-2xl transition-all text-left"
+                        className="w-full flex items-center space-x-3 rtl:space-x-reverse p-4 rounded-2xl transition-all text-start"
                         style={isSelected ?
                         { background: 'var(--a-green-1)', border: '2px solid var(--a-green-2)', cursor: 'pointer' } :
                         { background: 'var(--a-surface-soft)', border: '2px solid transparent', cursor: 'pointer' }}
@@ -728,7 +728,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 onClick={goToPrevQuestion}
                 disabled={currentQuestion === 0}>
                 
-                <ChevronLeft size={14} strokeWidth={2.2} />
+                <ChevronLeft className="rtl:rotate-180" size={14} strokeWidth={2.2} />
                 {tr("common_back", "Geri")}
               </button>
               
@@ -740,7 +740,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 disabled={epdsAnswers[EPDS_QUESTIONS[currentQuestion].id] === undefined}>
                   {tr("mentalhealthtracker_novbeti_6e8661", "Növbəti")}
                   
-                <ChevronRight size={14} strokeWidth={2.2} />
+                <ChevronRight className="rtl:rotate-180" size={14} strokeWidth={2.2} />
                 </button> :
 
               <button

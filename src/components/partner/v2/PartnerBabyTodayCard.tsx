@@ -90,15 +90,15 @@ const PartnerBabyTodayCard = ({ motherUserId, babyName, onOpen }: Props) => {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       onClick={onOpen}
-      className="w-full a-card text-left"
+      className="w-full a-card text-start"
       whileTap={{ scale: 0.98 }}>
 
       <div className="flex items-center justify-between mb-2.5">
         <h3 style={{ fontSize: 14, fontWeight: 800, color: 'var(--a-ink)' }}>
           {babyName} {tr('partnerv2_bu_gun_lower', 'bu gün')}
-          {agg.sleepOngoing && <span className="ml-2" style={{ fontSize: 11, fontWeight: 700, color: 'var(--a-lav-ink)' }}>😴 {tr('partnerv2_indi_yatir', 'indi yatır')}</span>}
+          {agg.sleepOngoing && <span className="ms-2" style={{ fontSize: 11, fontWeight: 700, color: 'var(--a-lav-ink)' }}>😴 {tr('partnerv2_indi_yatir', 'indi yatır')}</span>}
         </h3>
-        <ChevronRight size={15} style={{ color: 'var(--a-ink-faint)' }} />
+        <ChevronRight className="rtl:rotate-180" size={15} style={{ color: 'var(--a-ink-faint)' }} />
       </div>
       <div className="grid grid-cols-3 gap-2">
         {tiles.map((t) =>

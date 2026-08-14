@@ -58,7 +58,7 @@ const FlowRemindersCard = () => {
           {displayedReminders.map((reminder) => {
           const info = REMINDER_TYPE_INFO[reminder.reminder_type as ReminderType];
           return (
-            <div key={reminder.id} className="a-list-row" style={{ paddingLeft: 0, paddingRight: 0, opacity: reminder.is_enabled ? 1 : 0.55 }}>
+            <div key={reminder.id} className="a-list-row" style={{ paddingInlineStart: 0, paddingInlineEnd: 0, opacity: reminder.is_enabled ? 1 : 0.55 }}>
                 <span className="a-list-icon" style={{ background: 'var(--a-surface-soft)', fontSize: 17 }}>
                   {info?.emoji || '🔔'}
                 </span>
@@ -90,12 +90,12 @@ const FlowRemindersCard = () => {
         <button
           onClick={() => setShowAll(!showAll)}
           className="a-list-row"
-          style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', borderTop: '1px solid var(--a-line)', cursor: 'pointer', paddingLeft: 0, paddingRight: 0 }}>
+          style={{ width: '100%', textAlign: 'start', background: 'none', border: 'none', borderTop: '1px solid var(--a-line)', cursor: 'pointer', paddingInlineStart: 0, paddingInlineEnd: 0 }}>
           
               <span style={{ flex: 1, fontSize: 12.5, fontWeight: 700, color: 'var(--a-ink-soft)' }}>
                 {showAll ? tr("flowreminderscard_daha_az_goster_47a81d", "Daha az g\xF6st\u0259r") : tr("flowreminderscard_hamisini_goster_f123bc", "Hamısını göstər ({count})").replace("{count}", String(reminders.length))}
               </span>
-              <ChevronRight size={15} className={`a-list-chevron transition-transform ${showAll ? 'rotate-90' : ''}`} />
+              <ChevronRight size={15} className={`rtl:rotate-180 a-list-chevron transition-transform ${showAll ? 'rotate-90' : ''}`} />
             </button>
         }
         </div> :

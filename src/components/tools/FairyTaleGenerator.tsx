@@ -210,7 +210,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               <motion.div
                 key={i}
                 className="absolute"
-                style={{ left: `${10 + i * 12}%`, top: `${20 + i % 3 * 25}%`, opacity: 0.35 }}
+                style={{ insetInlineStart: `${10 + i * 12}%`, top: `${20 + i % 3 * 25}%`, opacity: 0.35 }}
                 animate={{ opacity: [0.2, 0.7, 0.2], scale: [1, 1.3, 1] }}
                 transition={{ duration: 2 + i * 0.3, repeat: Infinity, delay: i * 0.2 }}>
 
@@ -260,7 +260,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
         <TabsList className="w-full grid grid-cols-2 h-auto rounded-full p-[3px] border-0 mb-4" style={{ background: 'var(--a-surface-soft)' }}>
           <TabsTrigger value="all" className={tabTriggerClass}>{tr("fairytalegenerator_hamisi_3ff72c", "Ham\u0131s\u0131 (")}{tales.length})</TabsTrigger>
           <TabsTrigger value="favorites" className={tabTriggerClass}>
-            <Heart className="h-3.5 w-3.5 mr-1" />
+            <Heart className="h-3.5 w-3.5 me-1" />
             ({favoriteTales.length})
           </TabsTrigger>
         </TabsList>
@@ -295,7 +295,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: Math.min(index * 0.05, 0.3) }}
-                      className="a-list-row w-full text-left"
+                      className="a-list-row w-full text-start"
                       style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}
                       onClick={() => setSelectedTale(tale)}>
 
@@ -335,7 +335,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               {favoriteTales.map((tale) =>
                 <button
                   key={tale.id}
-                  className="a-list-row w-full text-left"
+                  className="a-list-row w-full text-start"
                   style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}
                   onClick={() => setSelectedTale(tale)}>
 
@@ -670,7 +670,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                             key={lesson.value}
                             type="button"
                             onClick={() => setFormData({ ...formData, moral_lesson: lesson.value })}
-                            className="p-2 rounded-lg text-left text-sm transition-all font-semibold"
+                            className="p-2 rounded-lg text-start text-sm transition-all font-semibold"
                             style={formData.moral_lesson === lesson.value ? pillOn : pillOff}>
 
                             {lesson.emoji} {lesson.label}
@@ -782,13 +782,13 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 {/* Close button */}
                 <button
                   onClick={() => setSelectedTale(null)}
-                  className="absolute top-3 right-3 z-30 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                  className="absolute top-3 end-3 z-30 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
                   style={{ background: 'rgba(255,255,255,0.35)' }}>
 
                   <X className="h-5 w-5" style={{ color: '#3c2e5c' }} />
                 </button>
 
-                <div className="flex items-center gap-3 mb-4 relative z-20 pr-8">
+                <div className="flex items-center gap-3 mb-4 relative z-20 pe-8">
                   <div className="text-4xl">
                     {themes.find((t) => t.name === selectedTale.theme)?.emoji || '📖'}
                   </div>

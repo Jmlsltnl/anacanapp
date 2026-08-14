@@ -236,7 +236,7 @@ const AdminCakes = () => {
             onClick={() => setActiveTab('cakes')}
             size="sm">
             
-            <CakeIcon className="w-4 h-4 mr-1" /> Tortlar ({cakes.length})
+            <CakeIcon className="w-4 h-4 me-1" /> Tortlar ({cakes.length})
           </Button>
           <Button
             variant={activeTab === 'orders' ? 'default' : 'outline'}
@@ -250,7 +250,7 @@ const AdminCakes = () => {
             onClick={() => setActiveTab('payments')}
             size="sm">
             
-            <Settings className="w-4 h-4 mr-1" /> {tr("admincakes_odenis_a4610e", "\xD6d\u0259ni\u015F")}
+            <Settings className="w-4 h-4 me-1" /> {tr("admincakes_odenis_a4610e", "\xD6d\u0259ni\u015F")}
           </Button>
         </div>
       </div>
@@ -258,7 +258,7 @@ const AdminCakes = () => {
       {activeTab === 'cakes' &&
       <>
           <Button onClick={() => setShowForm(true)}>
-            <Plus className="w-4 h-4 mr-2" /> {tr("admincakes_tort_elave_et_5d759e", "Tort \u0259lav\u0259 et")}
+            <Plus className="w-4 h-4 me-2" /> {tr("admincakes_tort_elave_et_5d759e", "Tort \u0259lav\u0259 et")}
           </Button>
 
           {showForm &&
@@ -352,7 +352,7 @@ const AdminCakes = () => {
                 {formData.image_url ?
             <div className="relative inline-block mt-2">
                     <img src={formData.image_url} alt="preview" className="w-32 h-32 object-cover rounded-xl" />
-                    <button onClick={() => setFormData({ ...formData, image_url: '' })} className="absolute -top-2 -right-2 w-6 h-6 bg-destructive rounded-full flex items-center justify-center">
+                    <button onClick={() => setFormData({ ...formData, image_url: '' })} className="absolute -top-2 -end-2 w-6 h-6 bg-destructive rounded-full flex items-center justify-center">
                       <X className="w-3 h-3 text-destructive-foreground" />
                     </button>
                   </div> :
@@ -371,7 +371,7 @@ const AdminCakes = () => {
                   {formData.images.map((img, i) =>
               <div key={i} className="relative">
                       <img src={img} alt="" className="w-20 h-20 object-cover rounded-lg" />
-                      <button onClick={() => removeAdditionalImage(i)} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive rounded-full flex items-center justify-center">
+                      <button onClick={() => removeAdditionalImage(i)} className="absolute -top-1.5 -end-1.5 w-5 h-5 bg-destructive rounded-full flex items-center justify-center">
                         <X className="w-2.5 h-2.5 text-destructive-foreground" />
                       </button>
                     </div>

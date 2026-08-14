@@ -95,7 +95,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
               <p className="a-eyebrow">{names.length} {tr("babynames_ad_count_3c7a2d", "ad")} · {language === 'en' ? '🇬🇧 English' : language === 'tr' ? '🇹🇷 Türkçe' : language === 'ru' ? '🇷🇺 Русские' : language === 'kk' ? '🇰🇿 Қазақша' : language === 'de' ? '🇩🇪 International' : `🇦🇿 ${tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan")}`}</p>
@@ -305,7 +305,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                     <>
                       <button
                         onClick={() => setSelectedName(null)}
-                        className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center"
+                        className="absolute top-3 end-3 w-8 h-8 rounded-full flex items-center justify-center"
                         style={{ background: 'rgba(255,255,255,0.5)', border: 'none', cursor: 'pointer' }}>
 
                         <X size={15} style={{ color: ink }} />

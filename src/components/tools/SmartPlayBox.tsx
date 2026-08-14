@@ -210,7 +210,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
             <Package size={16} strokeWidth={2} />
             {userInventory.length > 0 &&
           <span
-            className="absolute -top-1 -right-1 text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold"
+            className="absolute -top-1 -end-1 text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-bold"
             style={{ background: 'var(--a-lav-2)', color: '#fff' }}>
                 {userInventory.length}
               </span>
@@ -372,7 +372,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(index * 0.05, 0.3) }}
-                className="a-list-row w-full text-left"
+                className="a-list-row w-full text-start"
                 style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer' }}
                 onClick={() => setSelectedActivity(activity)}>
                 
@@ -389,7 +389,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                       <span style={{ fontSize: 13 }}>
                         {activity.skill_tags?.slice(0, 3).map((skill) => SKILL_ICONS[skill]).join(' ')}
                       </span>
-                      <ChevronRight size={16} className="a-list-chevron" />
+                      <ChevronRight size={16} className="rtl:rotate-180 a-list-chevron" />
                     </span>
                   </motion.button>
               )}

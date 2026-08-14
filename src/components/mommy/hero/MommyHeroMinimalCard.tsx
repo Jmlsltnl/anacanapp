@@ -19,7 +19,7 @@ const MommyHeroMinimalCard = ({ babyData, exactMonths, remainingDays, babyIllust
       transition={{ duration: 0.45 }}>
       
       {/* Faint coral accent strip */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[hsl(15,85%,60%)] via-[hsl(340,80%,65%)] to-[hsl(280,70%,65%)]" />
+      <div className="absolute top-0 start-0 end-0 h-1 bg-gradient-to-r from-[hsl(15,85%,60%)] via-[hsl(340,80%,65%)] to-[hsl(280,70%,65%)]" />
 
       <div className="relative p-4 flex items-center gap-4">
         {/* Photo */}
@@ -58,7 +58,7 @@ const MommyHeroMinimalCard = ({ babyData, exactMonths, remainingDays, babyIllust
             </span>
             <span className="text-sm font-bold text-muted-foreground">{primaryUnit}</span>
             {exactMonths > 0 && remainingDays > 0 && (
-              <span className="text-xs font-medium text-muted-foreground/70 ml-1">
+              <span className="text-xs font-medium text-muted-foreground/70 ms-1">
                 {remainingDays} {remainingDays > 1 ? tr("time_days", "gün") : tr("time_day", "gün")}
               </span>
             )}

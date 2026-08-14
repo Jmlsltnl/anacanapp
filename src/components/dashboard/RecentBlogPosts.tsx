@@ -24,7 +24,7 @@ const BlogPostCard = ({ post, index, onClick }: {post: BlogPost;index: number;on
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
       onClick={onClick}
-      className="flex gap-3 p-3 bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/30 transition-all text-left w-full group">
+      className="flex gap-3 p-3 bg-card rounded-2xl border border-border/50 shadow-sm hover:shadow-lg hover:border-primary/30 transition-all text-start w-full group">
       
       {/* Thumbnail */}
       <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-muted">
@@ -63,7 +63,7 @@ const BlogPostCard = ({ post, index, onClick }: {post: BlogPost;index: number;on
 
       {/* Arrow */}
       <div className="flex items-center">
-        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+        <ChevronRight className="rtl:rotate-180 w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
       </div>
     </motion.button>);
 
@@ -99,7 +99,7 @@ const RecentBlogPosts = ({ onNavigate, lifeStage, variant = 'default' }: RecentB
         <div className="a-section-head">
           <h2 className="a-section-title a-heading">{tr("recentblogposts_son_meqaleler_0618a6", "Son Məqalələr")}</h2>
           <button type="button" className="a-section-link" onClick={() => onNavigate('blog')}>
-            {tr('blogscreen_all_filter', 'Hamısı')} <ChevronRight size={13} />
+            {tr('blogscreen_all_filter', 'Hamısı')} <ChevronRight className="rtl:rotate-180" size={13} />
           </button>
         </div>
         <div className="a-card a-fade-in" style={{ padding: '6px 18px' }}>
@@ -192,7 +192,7 @@ const RecentBlogPosts = ({ onNavigate, lifeStage, variant = 'default' }: RecentB
           whileTap={{ scale: 0.95 }}>
           
           {tr('blogscreen_all_filter', 'Hamısı')}
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="rtl:rotate-180 w-4 h-4" />
         </motion.button>
       </div>
 

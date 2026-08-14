@@ -86,7 +86,7 @@ const NativeBanner = ({ banner, onClick }: BannerItemProps) => {
         <Sparkles className="w-6 h-6" style={{ color: textColor }} />
       </div>
       
-      <div className="flex-1 text-left">
+      <div className="flex-1 text-start">
         <h3 className="font-semibold text-base" style={{ color: textColor }}>
           {banner.title}
         </h3>
@@ -106,7 +106,7 @@ const NativeBanner = ({ banner, onClick }: BannerItemProps) => {
         {banner.link_type === 'external' ? (
           <ExternalLink className="w-5 h-5" style={{ color: textColor }} />
         ) : (
-          <ChevronRight className="w-5 h-5" style={{ color: textColor }} />
+          <ChevronRight className="rtl:rotate-180 w-5 h-5" style={{ color: textColor }} />
         )}
       </div>
     </button>
@@ -127,7 +127,7 @@ const ImageBanner = ({ banner, onClick }: BannerItemProps) => {
         className="w-full h-auto object-cover"
       />
       {banner.link_type === 'external' && (
-        <div className="absolute top-2 right-2 bg-black/50 rounded-full p-1.5">
+        <div className="absolute top-2 end-2 bg-black/50 rounded-full p-1.5">
           <ExternalLink className="w-4 h-4 text-white" />
         </div>
       )}

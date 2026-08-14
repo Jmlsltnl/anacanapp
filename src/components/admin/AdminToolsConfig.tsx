@@ -102,7 +102,7 @@ function ConfigTable({ tableName, title, columns, defaultValues }: ConfigTablePr
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" onClick={openCreate}>
-              <Plus className="w-4 h-4 mr-1" /> {tr("admintoolsconfig_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+              <Plus className="w-4 h-4 me-1" /> {tr("admintoolsconfig_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
@@ -149,7 +149,7 @@ function ConfigTable({ tableName, title, columns, defaultValues }: ConfigTablePr
                 className="w-full"
                 disabled={saveMutation.isPending}>
                 
-                {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin me-2" /> : <Save className="w-4 h-4 me-2" />}
                 Saxla
               </Button>
             </div>

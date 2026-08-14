@@ -558,12 +558,12 @@ const AdminRecipes = () => {
       {/* Search */}
       <Card className="p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Resept axtar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10" />
+            className="ps-10" />
           
         </div>
       </Card>
@@ -649,7 +649,7 @@ const AdminRecipes = () => {
           <DialogHeader>
             <DialogTitle>{editingItem ? tr("adminrecipes_resept_redakte_et_ca3682", "Resept Redakt\u0259 Et") : 'Yeni Resept'}</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-[60vh] pr-4">
+          <ScrollArea className="max-h-[60vh] pe-4">
             <div className="space-y-4">
               <Input
                 placeholder={tr("adminrecipes_basliq_e1f6c5", "Başlıq")}
@@ -753,7 +753,7 @@ const AdminRecipes = () => {
                     type="button"
                     variant="destructive"
                     size="icon"
-                    className="absolute top-2 right-2 h-8 w-8"
+                    className="absolute top-2 end-2 h-8 w-8"
                     onClick={handleRemoveImage}>
                     
                       <X className="w-4 h-4" />
@@ -832,7 +832,7 @@ const AdminRecipes = () => {
             </DialogTitle>
           </DialogHeader>
           <ScrollArea className="flex-1 max-h-[50vh]">
-            <div className="space-y-2 pr-4">
+            <div className="space-y-2 pe-4">
               {importData.map((recipe, idx) =>
               <div key={idx} className="p-3 bg-muted/30 rounded-lg">
                   <div className="flex items-center justify-between">

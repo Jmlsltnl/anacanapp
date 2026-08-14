@@ -67,7 +67,7 @@ const PostSeenObserver = ({ postId, createdAt, postUserId, children }: PostSeenO
       {isUnread &&
       <span
         aria-label={tr("postseenobserver_oxunmamis_post_42ef5b", "Oxunmam\u0131\u015F post")}
-        className="absolute top-3 right-3 z-20 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-background shadow-sm animate-pulse" />
+        className="absolute top-3 end-3 z-20 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-background shadow-sm animate-pulse" />
 
       }
       {children}

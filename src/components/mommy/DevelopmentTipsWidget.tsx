@@ -103,7 +103,7 @@ const DevelopmentTipsWidget = () => {
             onClick={handlePrev}
             aria-label="Previous"
           >
-            <ChevronLeft size={15} />
+            <ChevronLeft className="rtl:rotate-180" size={15} />
           </button>
           <div style={{ display: 'flex', gap: 5 }}>
             {tips.map((_, idx) => (
@@ -132,7 +132,7 @@ const DevelopmentTipsWidget = () => {
             onClick={handleNext}
             aria-label="Next"
           >
-            <ChevronRight size={15} />
+            <ChevronRight className="rtl:rotate-180" size={15} />
           </button>
         </div>
       )}

@@ -108,7 +108,7 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
             {tr("affiliateproducts_saxlanilmis_a1090d", "Saxlan\u0131lm\u0131\u015F")}
             {savedProducts.length > 0 &&
           <span
-            className="absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center text-[10px] rounded-full font-bold"
+            className="absolute -top-2 -end-2 w-5 h-5 flex items-center justify-center text-[10px] rounded-full font-bold"
             style={{ background: 'var(--a-pink-2)', color: '#fff' }}>
                 {savedProducts.length}
               </span>

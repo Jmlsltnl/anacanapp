@@ -133,7 +133,7 @@ const PillReminderCard = () => {
         <button
           onClick={() => setEditing(true)}
           className="a-stat-tile"
-          style={{ width: '100%', textAlign: 'left', border: 'none', cursor: 'pointer', justifyContent: 'space-between' }}>
+          style={{ width: '100%', textAlign: 'start', border: 'none', cursor: 'pointer', justifyContent: 'space-between' }}>
           
               <div>
                 <p className="a-list-title">{title}</p>

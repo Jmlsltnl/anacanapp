@@ -164,7 +164,7 @@ const AdminBanners = () => {
           <p className="text-muted-foreground">{tr("adminbanners_tetbiqdeki_bannerleri_idare_edin_a0927c", "Tətbiqdəki bannerləri idarə edin")}</p>
         </div>
         <Button onClick={() => handleOpenDialog()}>
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           Yeni Banner
         </Button>
       </div>

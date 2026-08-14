@@ -68,7 +68,7 @@ const FreeLimitsTab = () => {
     <div className="space-y-4">
       <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
         <p className="text-sm text-muted-foreground">
-          <Settings2 className="w-4 h-4 inline mr-1" />
+          <Settings2 className="w-4 h-4 inline me-1" />
           {tr("adminpremiumconfig_pulsuz_istifadeciler_ucun_gund_2c9784", "Pulsuz istifad\u0259\xE7il\u0259r \xFC\xE7\xFCn g\xFCnd\u0259lik limitl\u0259ri burada t\u0259nziml\u0259yin. D\u0259yi\u015Fiklikl\u0259r d\u0259rhal t\u0259tbiq olunur.")}
         </p>
       </div>
@@ -106,7 +106,7 @@ const FreeLimitsTab = () => {
       {hasChanges &&
       <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
           <Button onClick={handleSave} className="w-full" disabled={updateSetting.isPending}>
-            <Save className="w-4 h-4 mr-2" />
+            <Save className="w-4 h-4 me-2" />
             {updateSetting.isPending ? tr("adminpremiumconfig_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : tr("adminpremiumconfig_limitleri_saxla_0ed386", "Limitl\u0259ri Saxla")}
           </Button>
         </motion.div>
@@ -267,7 +267,7 @@ const UserSubscriptionsTab = () => {
     <div className="space-y-4">
       <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
         <p className="text-sm text-muted-foreground">
-          <Users className="w-4 h-4 inline mr-1" />
+          <Users className="w-4 h-4 inline me-1" />
           {tr("adminpremiumconfig_i_stifadecileri_ad_ve_ya_email_ece99b", "\u0130stifad\u0259\xE7il\u0259ri ad v\u0259 ya email il\u0259 axtar\u0131n, plan tipini d\u0259yi\u015Fdirin v\u0259 ya premium verin.")}
         </p>
       </div>
@@ -301,7 +301,7 @@ const UserSubscriptionsTab = () => {
                 </div>
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
               </div>
-              <div className="flex items-center gap-2 ml-2">
+              <div className="flex items-center gap-2 ms-2">
                 <Switch
               checked={user.is_premium || user.plan_type === 'premium' || user.plan_type === 'premium_plus'}
               onCheckedChange={() => quickTogglePremium(user)} />
@@ -371,7 +371,7 @@ const UserSubscriptionsTab = () => {
                   {tr("adminpremiumconfig_legv_et_b5e49c", "L\u0259\u011Fv et")}
                 </Button>
                 <Button className="flex-1" onClick={handleSaveUser}>
-                  <Save className="w-4 h-4 mr-2" />
+                  <Save className="w-4 h-4 me-2" />
                   Saxla
                 </Button>
               </div>
@@ -524,7 +524,7 @@ const AdminPremiumConfig = () => {
         <TabsContent value="features" className="space-y-4">
           <div className="flex justify-end">
             <Button onClick={() => openFeatureModal()}>
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 me-2" />
               Yeni Funksiya
             </Button>
           </div>
@@ -565,7 +565,7 @@ const AdminPremiumConfig = () => {
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">{plan.price_yearly} {plan.currency}/il</p>
                   <Button className="mt-4 w-full" variant="outline" onClick={() => openPlanModal(plan)}>
-                    <Edit2 className="w-4 h-4 mr-2" />
+                    <Edit2 className="w-4 h-4 me-2" />
                     {tr("adminpremiumconfig_redakte_et_78eab1", "Redakt\u0259 Et")}
                   </Button>
                 </div>
@@ -592,7 +592,7 @@ const AdminPremiumConfig = () => {
               <table className="w-full">
                 <thead>
                   <tr>
-                    <th className="text-left p-3">Funksiya</th>
+                    <th className="text-start p-3">Funksiya</th>
                     {plans.map((plan) =>
                     <th key={plan.id} className="text-center p-3">
                         {localize(plan, 'name')}
@@ -604,7 +604,7 @@ const AdminPremiumConfig = () => {
                 <tbody>
                   {features.map((feature) =>
                   <tr key={feature.id} className="border-t">
-                      <td className="p-3"><span className="mr-2">{feature.icon}</span>{localize(feature, 'title')}</td>
+                      <td className="p-3"><span className="me-2">{feature.icon}</span>{localize(feature, 'title')}</td>
                       <td className="text-center p-3">{feature.is_included_free ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : <Minus className="w-5 h-5 text-muted-foreground mx-auto" />}</td>
                       <td className="text-center p-3">{feature.is_included_premium ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : <Minus className="w-5 h-5 text-muted-foreground mx-auto" />}</td>
                       <td className="text-center p-3">{feature.is_included_premium_plus ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : <Minus className="w-5 h-5 text-muted-foreground mx-auto" />}</td>
@@ -642,8 +642,8 @@ const AdminPremiumConfig = () => {
             </div>
             <div className="flex items-center justify-between pt-2"><Label>Aktiv</Label><Switch checked={featureForm.is_active} onCheckedChange={(v) => setFeatureForm({ ...featureForm, is_active: v })} /></div>
             <div className="flex gap-2 pt-4">
-              <Button variant="outline" className="flex-1" onClick={handleFeatureModalClose}><X className="w-4 h-4 mr-2" />{tr("adminpremiumconfig_legv_et_b5e49c", "Ləğv et")}</Button>
-              <Button className="flex-1" onClick={handleSaveFeature}><Save className="w-4 h-4 mr-2" />Saxla</Button>
+              <Button variant="outline" className="flex-1" onClick={handleFeatureModalClose}><X className="w-4 h-4 me-2" />{tr("adminpremiumconfig_legv_et_b5e49c", "Ləğv et")}</Button>
+              <Button className="flex-1" onClick={handleSaveFeature}><Save className="w-4 h-4 me-2" />Saxla</Button>
             </div>
           </div>
         </DialogContent>
@@ -664,8 +664,8 @@ const AdminPremiumConfig = () => {
             <div className="flex items-center justify-between"><Label>Populyar</Label><Switch checked={planForm.is_popular} onCheckedChange={(v) => setPlanForm({ ...planForm, is_popular: v })} /></div>
             <div className="flex items-center justify-between"><Label>Aktiv</Label><Switch checked={planForm.is_active} onCheckedChange={(v) => setPlanForm({ ...planForm, is_active: v })} /></div>
             <div className="flex gap-2 pt-4">
-              <Button variant="outline" className="flex-1" onClick={handlePlanModalClose}><X className="w-4 h-4 mr-2" />{tr("adminpremiumconfig_legv_et_b5e49c", "Ləğv et")}</Button>
-              <Button className="flex-1" onClick={handleSavePlan}><Save className="w-4 h-4 mr-2" />Saxla</Button>
+              <Button variant="outline" className="flex-1" onClick={handlePlanModalClose}><X className="w-4 h-4 me-2" />{tr("adminpremiumconfig_legv_et_b5e49c", "Ləğv et")}</Button>
+              <Button className="flex-1" onClick={handleSavePlan}><Save className="w-4 h-4 me-2" />Saxla</Button>
             </div>
           </div>
         </DialogContent>

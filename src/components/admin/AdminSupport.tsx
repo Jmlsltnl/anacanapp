@@ -172,7 +172,7 @@ const AdminSupport = () => {
               }}
               className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center hover:bg-muted/80">
               
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="rtl:rotate-180 w-4 h-4" />
             </button>
             <div className="flex-1 min-w-0">
               <h2 className="font-bold text-foreground truncate">{selectedTicket.subject}</h2>
@@ -225,13 +225,13 @@ const AdminSupport = () => {
             </Select>
             {selectedTicket.status !== 'closed' &&
             <Button variant="outline" size="sm" className="h-8 text-xs" onClick={handleCloseTicket}>
-                <XCircle className="w-3 h-3 mr-1" />
+                <XCircle className="w-3 h-3 me-1" />
                 {tr("adminsupport_bagla_84bdc9", "Ba\u011Fla")}
               </Button>
             }
             {selectedTicket.status !== 'resolved' && selectedTicket.status !== 'closed' &&
             <Button variant="outline" size="sm" className="h-8 text-xs text-green-600" onClick={handleResolveTicket}>
-                <CheckCircle className="w-3 h-3 mr-1" />
+                <CheckCircle className="w-3 h-3 me-1" />
                 {tr("adminsupport_hell_et_aae47e", "H\u0259ll et")}
               </Button>
             }
@@ -242,7 +242,7 @@ const AdminSupport = () => {
         <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-muted/20">
           {/* User's initial message */}
           <div className="flex justify-start">
-            <div className="max-w-[75%] bg-card p-3 rounded-2xl rounded-bl-md border border-border">
+            <div className="max-w-[75%] bg-card p-3 rounded-2xl rounded-es-md border border-border">
               <div className="flex items-center gap-1.5 mb-1">
                 <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
                   <User className="w-3 h-3 text-primary" />
@@ -259,10 +259,10 @@ const AdminSupport = () => {
           {/* Legacy admin response */}
           {selectedTicket.admin_response &&
           <div className="flex justify-end">
-              <div className="max-w-[75%] bg-primary text-primary-foreground p-3 rounded-2xl rounded-br-md">
+              <div className="max-w-[75%] bg-primary text-primary-foreground p-3 rounded-2xl rounded-ee-md">
                 <p className="text-sm">{selectedTicket.admin_response}</p>
                 {selectedTicket.responded_at &&
-              <p className="text-[10px] opacity-70 mt-1 text-right">
+              <p className="text-[10px] opacity-70 mt-1 text-end">
                     {format(new Date(selectedTicket.responded_at), 'd MMM, HH:mm', { locale: getCurrentDateLocale() })}
                   </p>
               }
@@ -280,8 +280,8 @@ const AdminSupport = () => {
           <div key={reply.id} className={`flex ${reply.is_admin ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[75%] p-3 rounded-2xl ${
             reply.is_admin ?
-            'bg-primary text-primary-foreground rounded-br-md' :
-            'bg-card border border-border rounded-bl-md'}`
+            'bg-primary text-primary-foreground rounded-ee-md' :
+            'bg-card border border-border rounded-es-md'}`
             }>
                   {!reply.is_admin &&
               <div className="flex items-center gap-1.5 mb-1">
@@ -293,7 +293,7 @@ const AdminSupport = () => {
               }
                   <p className={`text-sm ${reply.is_admin ? '' : 'text-foreground'}`}>{reply.message}</p>
                   <p className={`text-[10px] mt-1 ${
-              reply.is_admin ? 'opacity-70 text-right' : 'text-muted-foreground'}`
+              reply.is_admin ? 'opacity-70 text-end' : 'text-muted-foreground'}`
               }>
                     {format(new Date(reply.created_at), 'd MMMM, HH:mm', { locale: getCurrentDateLocale() })}
                   </p>

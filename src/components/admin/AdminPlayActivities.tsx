@@ -112,7 +112,7 @@ const AdminPlayActivities = () => {
           </p>
         </div>
         <Button onClick={() => setNewActivity(true)}>
-          <Plus className="w-4 h-4 mr-1" />
+          <Plus className="w-4 h-4 me-1" />
           Yeni Oyun
         </Button>
       </div>
@@ -214,7 +214,7 @@ const AdminPlayActivities = () => {
                       
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => setEditingId(activity.id)}>
-                          <Edit className="w-3 h-3 mr-1" />
+                          <Edit className="w-3 h-3 me-1" />
                           {tr("adminplayactivities_redakte_d53ba7", "Redakt\u0259")}
                         </Button>
                         <Button
@@ -369,11 +369,11 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
       
       <div className="flex gap-2">
         <Button onClick={handleSave} disabled={isLoading || !form.title}>
-          <Save className="w-4 h-4 mr-1" />
+          <Save className="w-4 h-4 me-1" />
           {isLoading ? tr("adminplayactivities_saxlanir_9ea540", "Saxlan\u0131r...") : 'Yadda saxla'}
         </Button>
         <Button variant="outline" onClick={onCancel}>
-          <X className="w-4 h-4 mr-1" />
+          <X className="w-4 h-4 me-1" />
           {tr("adminplayactivities_legv_et_b5e49c", "L\u0259\u011Fv et")}
         </Button>
       </div>

@@ -160,7 +160,7 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
           
             <Sparkles className="w-4 h-4" style={{ color: 'var(--a-peach-2)' }} />
             <span className="text-sm font-bold">{tr("shoppinglist_platformanin_tovsiyeleri_2e687e", "Platforman\u0131n t\xF6vsiy\u0259l\u0259ri (")}{filteredRecommendations.length})</span>
-            {showRecommendations ? <ChevronUp className="w-4 h-4 ml-auto" /> : <ChevronDown className="w-4 h-4 ml-auto" />}
+            {showRecommendations ? <ChevronUp className="w-4 h-4 ms-auto" /> : <ChevronDown className="w-4 h-4 ms-auto" />}
           </button>
 
           <AnimatePresence>

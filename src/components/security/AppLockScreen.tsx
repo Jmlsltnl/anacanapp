@@ -107,7 +107,7 @@ const AppLockScreen = ({ onUnlock }: Props) => {
           style={{ borderRadius: 20, background: 'var(--a-grad-peach)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.5)' }}>
             <img src={logoImage} alt="Anacan" className="w-10 h-10 object-contain" />
           </div>
-          <div className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full flex items-center justify-center"
+          <div className="absolute -bottom-1.5 -end-1.5 w-7 h-7 rounded-full flex items-center justify-center"
           style={{ background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)' }}>
             <Lock size={13} style={{ color: 'var(--a-accent-ink)' }} />
           </div>

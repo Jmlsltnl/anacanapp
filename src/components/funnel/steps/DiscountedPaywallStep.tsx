@@ -78,7 +78,7 @@ export default function DiscountedPaywallStep({ onAccept, onDecline }: Discounte
           <Gift size={34} strokeWidth={2} style={{ color: 'var(--a-berry-ink)' }} />
           <motion.span
             aria-hidden
-            className="absolute -top-1.5 -right-1.5 text-base"
+            className="absolute -top-1.5 -end-1.5 text-base"
             animate={{ scale: [1, 1.3, 1] }}
             transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.8 }}>
             🎁
@@ -103,7 +103,7 @@ export default function DiscountedPaywallStep({ onAccept, onDecline }: Discounte
           className="a-card relative overflow-hidden text-center"
           style={{ padding: '22px 18px', marginBottom: 20, border: '2px solid var(--a-peach-2)' }}>
 
-          <span className="absolute top-0 right-0" aria-hidden
+          <span className="absolute top-0 end-0" aria-hidden
           style={{ width: 110, height: 110, borderRadius: 999, background: 'var(--a-peach-1)', opacity: 0.55, transform: 'translate(35%, -35%)' }} />
 
           <div className="relative">

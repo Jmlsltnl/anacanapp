@@ -51,7 +51,7 @@ const AffiliateProductCard = ({ product, onSelect, index = 0, variant = 'grid' }
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: index * 0.1 }}
         onClick={() => onSelect(product)}
-        className="flex-shrink-0 w-64 overflow-hidden text-left transition-shadow rounded-[20px]"
+        className="flex-shrink-0 w-64 overflow-hidden text-start transition-shadow rounded-[20px]"
         style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', boxShadow: 'var(--a-card-shadow)', cursor: 'pointer' }}>
         
         <div className="relative h-36" style={{ background: 'var(--a-illus-grad)' }}>
@@ -67,14 +67,14 @@ const AffiliateProductCard = ({ product, onSelect, index = 0, variant = 'grid' }
           
           {/* Platform Badge */}
           <span
-            className="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full font-bold"
+            className="absolute top-2 start-2 text-[10px] px-2 py-0.5 rounded-full font-bold"
             style={{ background: platform.bg, color: platform.ink }}>
             {product.store_name || product.platform}
           </span>
           
           {/* Discount Badge */}
           {discountPercent &&
-          <span className="absolute top-2 right-10 text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: 'var(--a-pink-2)', color: '#fff' }}>
+          <span className="absolute top-2 end-10 text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: 'var(--a-pink-2)', color: '#fff' }}>
               -{discountPercent}%
             </span>
           }
@@ -82,7 +82,7 @@ const AffiliateProductCard = ({ product, onSelect, index = 0, variant = 'grid' }
           {/* Save Button */}
           <button
             onClick={handleSaveToggle}
-            className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-colors"
+            className="absolute top-2 end-2 w-7 h-7 rounded-full flex items-center justify-center transition-colors"
             style={isSaved ?
             { background: 'var(--a-pink-2)', color: '#fff', border: 'none', cursor: 'pointer' } :
             { background: 'rgba(255,255,255,0.92)', color: 'var(--a-ink-faint)', border: 'none', cursor: 'pointer' }}>
@@ -139,7 +139,7 @@ const AffiliateProductCard = ({ product, onSelect, index = 0, variant = 'grid' }
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(index * 0.03, 0.3) }}
       onClick={() => onSelect(product)}
-      className="overflow-hidden text-left transition-all rounded-[18px]"
+      className="overflow-hidden text-start transition-all rounded-[18px]"
       style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', boxShadow: 'var(--a-card-shadow)', cursor: 'pointer' }}>
       
       <div className="relative aspect-square" style={{ background: 'var(--a-illus-grad)' }}>
@@ -155,14 +155,14 @@ const AffiliateProductCard = ({ product, onSelect, index = 0, variant = 'grid' }
         
         {/* Platform Badge */}
         <span
-          className="absolute top-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded-full font-bold"
+          className="absolute top-1.5 start-1.5 text-[8px] px-1.5 py-0.5 rounded-full font-bold"
           style={{ background: platform.bg, color: platform.ink }}>
           {product.store_name || product.platform}
         </span>
         
         {/* Discount Badge */}
         {discountPercent &&
-        <span className="absolute bottom-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: 'var(--a-pink-2)', color: '#fff' }}>
+        <span className="absolute bottom-1.5 start-1.5 text-[8px] px-1.5 py-0.5 rounded-full font-bold" style={{ background: 'var(--a-pink-2)', color: '#fff' }}>
             -{discountPercent}%
           </span>
         }
@@ -170,7 +170,7 @@ const AffiliateProductCard = ({ product, onSelect, index = 0, variant = 'grid' }
         {/* Save Button */}
         <button
           onClick={handleSaveToggle}
-          className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+          className="absolute top-1.5 end-1.5 w-6 h-6 rounded-full flex items-center justify-center transition-colors"
           style={isSaved ?
           { background: 'var(--a-pink-2)', color: '#fff', border: 'none', cursor: 'pointer' } :
           { background: 'rgba(255,255,255,0.92)', color: 'var(--a-ink-faint)', border: 'none', cursor: 'pointer' }}>

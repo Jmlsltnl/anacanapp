@@ -106,7 +106,7 @@ const QuickActionButton = ({ icon: Icon, label, color, value, onClick }: QuickAc
     <Icon className="w-5 h-5" />
     <span className="text-[10px] font-bold">{label}</span>
     {value &&
-  <span className="absolute top-1.5 right-1.5 text-[9px] font-bold bg-white/30 px-1 py-0.5 rounded-full">
+  <span className="absolute top-1.5 end-1.5 text-[9px] font-bold bg-white/30 px-1 py-0.5 rounded-full">
         {value}
       </span>
   }
@@ -384,7 +384,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 1, delay: 0.3 }} />
             
-            <span className="a-pbar-pct" style={{ left: `${Math.min(94, Math.max(6, progressPercent))}%` }}>
+            <span className="a-pbar-pct" style={{ insetInlineStart: `${Math.min(94, Math.max(6, progressPercent))}%` }}>
               {Math.round(progressPercent)}%
             </span>
           </div>
@@ -513,8 +513,8 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}>
             
-              <span className="a-cta-shape" style={{ width: 140, height: 140, top: -50, right: -40 }} />
-              <span className="a-cta-shape" style={{ width: 90, height: 90, bottom: -30, left: -20 }} />
+              <span className="a-cta-shape" style={{ width: 140, height: 140, top: -50, insetInlineEnd: -40 }} />
+              <span className="a-cta-shape" style={{ width: 90, height: 90, bottom: -30, insetInlineStart: -20 }} />
               <div className="a-cta-top">
                 <span className="a-cta-badge">
                   {tr("dashboard_gun_18b2f4", "G\xFCn")} {pregnancyDay} / 280 · {tr("dashboard_korpeden_mesaj_89353a", "Körpədən Mesaj")}
@@ -708,14 +708,14 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
           <motion.button
           onClick={() => setShowBirthModal(true)}
           className="a-cta a-fade-in"
-          style={{ width: '100%', textAlign: 'left', cursor: 'pointer' }}
+          style={{ width: '100%', textAlign: 'start', cursor: 'pointer' }}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
           whileTap={{ scale: 0.98 }}>
           
-            <span className="a-cta-shape" style={{ width: 140, height: 140, top: -50, right: -40, background: 'var(--a-pink-1)' }} />
-            <span className="a-cta-shape" style={{ width: 90, height: 90, bottom: -30, left: -20, background: 'var(--a-pink-1)' }} />
+            <span className="a-cta-shape" style={{ width: 140, height: 140, top: -50, insetInlineEnd: -40, background: 'var(--a-pink-1)' }} />
+            <span className="a-cta-shape" style={{ width: 90, height: 90, bottom: -30, insetInlineStart: -20, background: 'var(--a-pink-1)' }} />
             <div className="a-cta-top">
               <span className="a-cta-badge" style={{ background: 'var(--a-pink-1)', color: 'var(--a-berry-ink)' }}>
                 {tr("dashboard_hefte_3aa886", "H\u0259ft\u0259")} {selectedWeek} 🎉
@@ -727,7 +727,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
             <h2 className="a-cta-title a-heading">{tr("dashboard_dogum_etdim_e3eca9", "Doğum etdim! 🎉")}</h2>
             <p className="a-cta-text">{tr("dashboard_analiq_seyahetinize_baslayin_b03582", "Analıq səyahətinizə başlayın")}</p>
             <span className="a-cta-btn" style={{ marginTop: 16, background: 'var(--a-pink-2)' }}>
-              {tr("dashboard_dogum_etdim_e3eca9", "Doğum etdim! 🎉").replace(' 🎉', '')} <ChevronRight size={14} />
+              {tr("dashboard_dogum_etdim_e3eca9", "Doğum etdim! 🎉").replace(' 🎉', '')} <ChevronRight className="rtl:rotate-180" size={14} />
             </span>
           </motion.button>
         </section>
@@ -1242,7 +1242,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
             <span className="a-list-icon" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
               <Baby size={17} strokeWidth={2} />
             </span>
-            <div className="text-left">
+            <div className="text-start">
               <p className="a-list-title">{tr("dashboard_qidalanmaya_nezaret_1b60b4", "Qidalanmaya nəzarət")}</p>
               <p className="a-list-sub">{tr('dashboard_today_label', 'Bu gün')}: {todayStats.feedingCount} {tr('dashboard_times_unit', 'dəfə')}</p>
             </div>
@@ -1544,7 +1544,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
             <button
               onClick={() => setSleepExpanded(!sleepExpanded)}
               className="a-list-row w-full"
-              style={{ cursor: 'pointer', width: '100%', textAlign: 'left', background: 'none', border: 'none', borderTop: 'none' }}>
+              style={{ cursor: 'pointer', width: '100%', textAlign: 'start', background: 'none', border: 'none', borderTop: 'none' }}>
               
               <span className="a-list-icon" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
                 <Moon size={17} strokeWidth={2} />
@@ -1630,7 +1630,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
           <button
             onClick={() => setShowDiaperModal(true)}
             className="a-list-row w-full"
-            style={{ cursor: 'pointer', width: '100%', textAlign: 'left', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', borderTop: '1px solid var(--a-line)' }}>
+            style={{ cursor: 'pointer', width: '100%', textAlign: 'start', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', borderTop: '1px solid var(--a-line)' }}>
             
             <span className="a-list-icon" style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' }}>
               <Clock size={17} strokeWidth={2} />
@@ -1686,7 +1686,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
       <section className="a-section">
           <motion.button
           className="a-card a-fade-in"
-          style={{ width: '100%', textAlign: 'left', cursor: 'pointer', padding: '14px 18px' }}
+          style={{ width: '100%', textAlign: 'start', cursor: 'pointer', padding: '14px 18px' }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onNavigateToTool?.('cakes')}>
           
@@ -1698,7 +1698,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
                   {babyData.ageInMonths > 0 ? tr('dashboard_order_monthly_cake', '{n}-ci aylıq tortunu sifariş ver!').replace('{n}', String(babyData.ageInMonths + 1)) : tr("dashboard_korpeniz_ucun_milestone_tortla_3bcbc1", "K\xF6rp\u0259niz \xFC\xE7\xFCn milestone tortlar\u0131")}
                 </p>
               </div>
-              <ChevronRight className="a-list-chevron" style={{ marginLeft: 'auto' }} size={18} />
+              <ChevronRight className="rtl:rotate-180 a-list-chevron" style={{ marginInlineStart: 'auto' }} size={18} />
             </div>
           </motion.button>
         </section>
@@ -1728,7 +1728,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
               style={{ width: 30, height: 30 }}
               whileTap={{ scale: 0.9 }}>
               
-                <ChevronRight size={15} className="rotate-180" />
+                <ChevronRight size={15} className="rtl:rotate-180 rotate-180" />
               </motion.button>
               <div className="flex gap-1.5">
                 {Array.from({ length: totalMilestonePages }).map((_, i) =>
@@ -1751,7 +1751,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
               style={{ width: 30, height: 30 }}
               whileTap={{ scale: 0.9 }}>
               
-                <ChevronRight size={15} />
+                <ChevronRight className="rtl:rotate-180" size={15} />
               </motion.button>
             </div>
           }
@@ -1775,7 +1775,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
                 { background: 'var(--a-surface-soft)', opacity: 0.65 }}>
                   {milestone.emoji}
                   {milestone.achieved &&
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: 'var(--a-green-2)' }}>
+                <div className="absolute -bottom-1 -end-1 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: 'var(--a-green-2)' }}>
                       <Check className="w-2.5 h-2.5 text-white" />
                     </div>
                 }
@@ -1878,7 +1878,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
                   style={{
                     position: 'absolute',
                     top: -4,
-                    right: -4,
+                    insetInlineEnd: -4,
                     minWidth: 15,
                     height: 15,
                     padding: '0 4px',
@@ -1958,7 +1958,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
             <motion.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+              className="absolute -top-1 -end-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center">
               
                   {totalUnread > 9 ? '9+' : totalUnread}
                 </motion.span>

@@ -137,7 +137,7 @@ const BlogAnalytics = ({ posts }: BlogAnalyticsProps) => {
         <div className="flex items-center gap-2 mb-4">
           <TrendingUp className="w-5 h-5 text-primary" />
           <h3 className="font-bold text-foreground">{tr("bloganalytics_heftelik_trend_e734f8", "Həftəlik Trend")}</h3>
-          <span className="text-xs text-muted-foreground ml-auto">
+          <span className="text-xs text-muted-foreground ms-auto">
             {tr("bloganalytics_bu_hefte_60eb9f", "Bu h\u0259ft\u0259:")} {analytics.weeklyViews} {tr("bloganalytics_baxis_d4da3e", "bax\u0131\u015F")}
           </span>
         </div>

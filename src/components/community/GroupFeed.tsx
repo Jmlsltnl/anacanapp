@@ -117,7 +117,7 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
         <div className="px-5 py-3">
           <div className="flex items-center gap-3">
             <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted/40 flex items-center justify-center" whileTap={{ scale: 0.9 }}>
-              <ArrowLeft className="w-4 h-4 text-foreground" />
+              <ArrowLeft className="rtl:rotate-180 w-4 h-4 text-foreground" />
             </motion.button>
             <div className="flex-1 min-w-0 flex items-center gap-2.5">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/8 flex items-center justify-center">

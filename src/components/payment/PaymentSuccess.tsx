@@ -45,7 +45,7 @@ const PaymentSuccess = () => {
           <Button onClick={() => navigate('/')}
           className="w-full gap-2 rounded-full text-white border-0 hover:opacity-95"
           style={{ background: 'var(--a-peach-2)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.55)' }}>
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="rtl:rotate-180 w-4 h-4" />
             {tr("paymentsuccess_ana_sehifeye_qayit_2458e3", "Ana S\u0259hif\u0259y\u0259 Qay\u0131t")}
           </Button>
         </div>

@@ -33,22 +33,22 @@ const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute -top-32 -left-32 w-80 h-80 rounded-full bg-white/10"
+          className="absolute -top-32 -start-32 w-80 h-80 rounded-full bg-white/10"
           animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.2, 0.1], rotate: [0, 90, 0] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} />
         
         <motion.div
-          className="absolute top-1/4 -right-20 w-56 h-56 rounded-full bg-white/5"
+          className="absolute top-1/4 -end-20 w-56 h-56 rounded-full bg-white/5"
           animate={{ scale: [1.2, 1, 1.2], x: [0, -20, 0] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} />
         
         <motion.div
-          className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-white/10"
+          className="absolute -bottom-40 -end-40 w-96 h-96 rounded-full bg-white/10"
           animate={{ scale: [1.2, 1, 1.2], opacity: [0.15, 0.1, 0.15], rotate: [0, -90, 0] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} />
         
         <motion.div
-          className="absolute bottom-1/3 -left-16 w-40 h-40 rounded-full bg-white/5"
+          className="absolute bottom-1/3 -start-16 w-40 h-40 rounded-full bg-white/5"
           animate={{ y: [0, -30, 0], scale: [1, 1.1, 1] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} />
         
@@ -56,7 +56,7 @@ const SplashScreen = forwardRef<HTMLDivElement, SplashScreenProps>(({ onComplete
         <motion.div
           key={i}
           className="absolute w-2 h-2 rounded-full bg-white/30"
-          style={{ left: `${15 + i * 10}%`, top: `${20 + i % 3 * 25}%` }}
+          style={{ insetInlineStart: `${15 + i * 10}%`, top: `${20 + i % 3 * 25}%` }}
           animate={{ y: [0, -40, 0], opacity: [0.3, 0.7, 0.3], scale: [1, 1.5, 1] }}
           transition={{ duration: 3 + i * 0.5, repeat: Infinity, delay: i * 0.3, ease: "easeInOut" }} />
 

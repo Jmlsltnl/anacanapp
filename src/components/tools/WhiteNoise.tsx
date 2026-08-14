@@ -294,8 +294,8 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
             style={{ boxShadow: 'var(--a-card-shadow)' }}>
             
               <div className="absolute inset-0 opacity-20">
-                <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/30 blur-2xl" />
-                <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-white/20 blur-3xl" />
+                <div className="absolute -top-10 -end-10 w-32 h-32 rounded-full bg-white/30 blur-2xl" />
+                <div className="absolute -bottom-10 -start-10 w-40 h-40 rounded-full bg-white/20 blur-3xl" />
               </div>
               
               <div className="relative z-10">
@@ -382,7 +382,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
           <div className="flex items-center gap-2 mb-3">
             <Volume2 className="w-4 h-4" style={{ color: 'var(--a-peach-2)' }} />
             <span className="text-sm font-bold" style={{ color: 'var(--a-ink)' }}>{tr("whitenoise_ses_seviyyesi_7296d5", "Səs səviyyəsi")}</span>
-            <span className="ml-auto text-sm font-bold" style={{ color: 'var(--a-accent-ink)' }}>{isMuted ? 0 : volume}%</span>
+            <span className="ms-auto text-sm font-bold" style={{ color: 'var(--a-accent-ink)' }}>{isMuted ? 0 : volume}%</span>
           </div>
           <div className="relative">
             <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--a-line-strong)' }}>
@@ -498,7 +498,7 @@ const WhiteNoise = forwardRef<HTMLDivElement, WhiteNoiseProps>(function WhiteNoi
                           transition={{ duration: 2, repeat: Infinity }} />
                         
                           <motion.div
-                          className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-white shadow-lg"
+                          className="absolute top-2 end-2 w-2.5 h-2.5 rounded-full bg-white shadow-lg"
                           animate={{ scale: [1, 1.3, 1] }}
                           transition={{ duration: 1, repeat: Infinity }} />
                         

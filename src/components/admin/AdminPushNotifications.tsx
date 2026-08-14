@@ -223,7 +223,7 @@ const ScheduledNotificationsTab = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Card className="p-4 bg-blue-500/10 border-blue-500/20 flex-1 mr-4">
+        <Card className="p-4 bg-blue-500/10 border-blue-500/20 flex-1 me-4">
           <div className="flex items-start gap-3">
             <Clock className="h-5 w-5 text-blue-500 mt-0.5" />
             <div>
@@ -234,11 +234,11 @@ const ScheduledNotificationsTab = () => {
         </Card>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleTriggerNow} disabled={triggerDaily.isPending}>
-            <Send className="h-4 w-4 mr-2" />
+            <Send className="h-4 w-4 me-2" />
             İndi Test Et
           </Button>
           <Button onClick={handleCreate}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             Yeni
           </Button>
         </div>
@@ -564,7 +564,7 @@ const PregnancyDayNotificationsTab = () => {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
-              <Download className="h-4 w-4 mr-1" />
+              <Download className="h-4 w-4 me-1" />
               {tr("adminpushnotifications_numune_csv_c52f80", "N\xFCmun\u0259 CSV")}
             </Button>
             <Button
@@ -587,11 +587,11 @@ const PregnancyDayNotificationsTab = () => {
               }}
               disabled={notifications.length === 0}>
               
-              <FileDown className="h-4 w-4 mr-1" />
+              <FileDown className="h-4 w-4 me-1" />
               İxrac
             </Button>
             <Button size="sm" onClick={() => fileInputRef.current?.click()} disabled={importing}>
-              {importing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
+              {importing ? <Loader2 className="h-4 w-4 me-1 animate-spin" /> : <Upload className="h-4 w-4 me-1" />}
               CSV Import
             </Button>
             <input
@@ -633,7 +633,7 @@ const PregnancyDayNotificationsTab = () => {
             disabled={currentPage === 0}
             onClick={() => setCurrentPage((p) => p - 1)}>
             
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="rtl:rotate-180 h-4 w-4" />
             </Button>
             <span className="text-sm text-muted-foreground min-w-[100px] text-center">
               {tr("adminpushnotifications_gun_18b2f4", "G\xFCn")} {startDay} - {endDay - 1}
@@ -644,7 +644,7 @@ const PregnancyDayNotificationsTab = () => {
             disabled={currentPage >= totalPages - 1}
             onClick={() => setCurrentPage((p) => p + 1)}>
             
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="rtl:rotate-180 h-4 w-4" />
             </Button>
           </div>
         }
@@ -803,7 +803,7 @@ const PregnancyDayNotificationsTab = () => {
                 setDeleteDialog(editingId);
               }}>
               
-                <Trash2 className="h-4 w-4 mr-2" />
+                <Trash2 className="h-4 w-4 me-2" />
                 Sil
               </Button>
             }
@@ -865,7 +865,7 @@ const PregnancyDayNotificationsTab = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setDayListDialog(false)}>{tr("adminpushnotifications_bagla_84bdc9", "Bağla")}</Button>
             <Button onClick={() => {setDayListDialog(false);handleCreate(selectedDay);}}>
-              <Plus className="h-4 w-4 mr-1" /> {tr("adminpushnotifications_yeni_bildiris_40105e", "Yeni Bildiri\u015F")}
+              <Plus className="h-4 w-4 me-1" /> {tr("adminpushnotifications_yeni_bildiris_40105e", "Yeni Bildiri\u015F")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1018,14 +1018,14 @@ const FlowRemindersTab = () => {
       {/* Actions */}
       <div className="flex justify-between items-center">
         <Button variant="outline" onClick={loadStats}>
-          <RefreshCw className="h-4 w-4 mr-2" />
+          <RefreshCw className="h-4 w-4 me-2" />
           {tr("adminpushnotifications_yenile_570ce2", "Yenil\u0259")}
         </Button>
         <Button onClick={handleTriggerNow} disabled={isTriggering}>
           {isTriggering ?
-          <Loader2 className="h-4 w-4 mr-2 animate-spin" /> :
+          <Loader2 className="h-4 w-4 me-2 animate-spin" /> :
 
-          <Send className="h-4 w-4 mr-2" />
+          <Send className="h-4 w-4 me-2" />
           }
           İndi Test Et
         </Button>
@@ -1220,7 +1220,7 @@ const BulkPushTab = () => {
             📱 Cihazlar ({stats?.users_with_tokens || 0})
           </Button>
           <Button variant="outline" size="sm" onClick={handleRefreshStats}>
-            <RefreshCw className="h-4 w-4 mr-1" />
+            <RefreshCw className="h-4 w-4 me-1" />
             {tr("adminpushnotifications_yenile_570ce2", "Yenil\u0259")}
           </Button>
         </div>
@@ -1285,7 +1285,7 @@ const BulkPushTab = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="text-right text-xs text-muted-foreground">
+                    <div className="text-end text-xs text-muted-foreground">
                       <div>Token: ...{device.token.slice(-8)}</div>
                       <div>{new Date(device.created_at).toLocaleDateString('az-AZ')}</div>
                     </div>
@@ -1408,12 +1408,12 @@ const BulkPushTab = () => {
             
             {isSending ?
             <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-4 w-4 me-2 animate-spin" />
                 {tr("adminpushnotifications_gonderilir_1d548c", "G\xF6nd\u0259rilir...")}
               </> :
 
             <>
-                <Send className="h-4 w-4 mr-2" />
+                <Send className="h-4 w-4 me-2" />
                 {currentTargetStats.tokens} {tr("adminpushnotifications_cihaza_gonder_4ef80f", "Cihaza G\xF6nd\u0259r")}
               </>
             }
@@ -1512,7 +1512,7 @@ const EmptyState = ({ onAdd }: {onAdd: () => void;}) =>
     <h3 className="font-medium mb-2">{tr("adminpushnotifications_bildiris_yoxdur_806a42", "Bildiriş Yoxdur")}</h3>
     <p className="text-sm text-muted-foreground mb-4">{tr("adminpushnotifications_gundelik_avtomatik_bildirisler_elave_edi_c1a864", "Gündəlik avtomatik bildirişlər əlavə edin")}</p>
     <Button onClick={onAdd}>
-      <Plus className="h-4 w-4 mr-2" />
+      <Plus className="h-4 w-4 me-2" />
       {tr("adminpushnotifications_i_lk_bildirisi_yarat_b9f9ca", "\u0130lk Bildiri\u015Fi Yarat")}
     </Button>
   </Card>;
@@ -1908,7 +1908,7 @@ const MommyDayNotificationsTab = () => {
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
-              <Download className="h-4 w-4 mr-1" />
+              <Download className="h-4 w-4 me-1" />
               {tr("adminpushnotifications_numune_csv_c52f80", "N\xFCmun\u0259 CSV")}
             </Button>
             <Button
@@ -1931,11 +1931,11 @@ const MommyDayNotificationsTab = () => {
               }}
               disabled={notifications.length === 0}>
               
-              <FileDown className="h-4 w-4 mr-1" />
+              <FileDown className="h-4 w-4 me-1" />
               İxrac
             </Button>
             <Button size="sm" onClick={() => fileInputRef.current?.click()} disabled={importing}>
-              {importing ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
+              {importing ? <Loader2 className="h-4 w-4 me-1 animate-spin" /> : <Upload className="h-4 w-4 me-1" />}
               CSV Import
             </Button>
             <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleCSVImport} />
@@ -1964,13 +1964,13 @@ const MommyDayNotificationsTab = () => {
         {!searchDay &&
         <div className="flex items-center gap-2">
             <Button variant="outline" size="icon" disabled={currentPage === 0} onClick={() => setCurrentPage((p) => p - 1)}>
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="rtl:rotate-180 h-4 w-4" />
             </Button>
             <span className="text-sm text-muted-foreground min-w-[100px] text-center">
               {tr("adminpushnotifications_gun_18b2f4", "G\xFCn")} {startDay} - {endDay}
             </span>
             <Button variant="outline" size="icon" disabled={currentPage >= totalPages - 1} onClick={() => setCurrentPage((p) => p + 1)}>
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="rtl:rotate-180 h-4 w-4" />
             </Button>
           </div>
         }
@@ -2093,7 +2093,7 @@ const MommyDayNotificationsTab = () => {
             <Button variant="outline" onClick={() => setEditDialog(false)}>{tr("adminpushnotifications_legv_et_b5e49c", "Ləğv et")}</Button>
             {editingId &&
             <Button variant="destructive" onClick={() => {setEditDialog(false);setDeleteDialog(editingId);}}>
-                <Trash2 className="h-4 w-4 mr-1" /> Sil
+                <Trash2 className="h-4 w-4 me-1" /> Sil
               </Button>
             }
             <Button onClick={handleSave} disabled={createNotification.isPending || updateNotification.isPending}>
@@ -2151,7 +2151,7 @@ const MommyDayNotificationsTab = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setDayListDialog(false)}>{tr("adminpushnotifications_bagla_84bdc9", "Bağla")}</Button>
             <Button onClick={() => {setDayListDialog(false);handleCreate(selectedDay);}}>
-              <Plus className="h-4 w-4 mr-1" /> {tr("adminpushnotifications_yeni_bildiris_40105e", "Yeni Bildiri\u015F")}
+              <Plus className="h-4 w-4 me-1" /> {tr("adminpushnotifications_yeni_bildiris_40105e", "Yeni Bildiri\u015F")}
             </Button>
           </DialogFooter>
         </DialogContent>

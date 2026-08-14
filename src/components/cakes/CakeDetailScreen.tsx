@@ -73,7 +73,7 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
           style={{ pointerEvents: 'auto' }}
           aria-label="Back">
           
-          <ArrowLeft size={16} strokeWidth={2} />
+          <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
         </button>
         <h2 className="a-wordmark truncate max-w-[50%]" style={{ fontSize: 15 }}>{cake.name}</h2>
         <button
@@ -85,7 +85,7 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
           <ShoppingCart size={16} strokeWidth={2} />
           {totalItems > 0 &&
           <span
-            className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center"
+            className="absolute -top-1 -end-1 w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center"
             style={{ background: 'var(--a-peach-2)', color: '#fff' }}>
               {totalItems}
             </span>
@@ -125,17 +125,17 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
         <>
             <button
             onClick={goToPrev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center shadow-md"
+            className="absolute start-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center shadow-md"
             style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)', border: 'none', cursor: 'pointer' }}>
             
-              <ChevronLeft className="w-5 h-5" style={{ color: 'var(--a-ink)' }} />
+              <ChevronLeft className="rtl:rotate-180 w-5 h-5" style={{ color: 'var(--a-ink)' }} />
             </button>
             <button
             onClick={goToNext}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center shadow-md"
+            className="absolute end-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center shadow-md"
             style={{ background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(4px)', border: 'none', cursor: 'pointer' }}>
             
-              <ChevronRight className="w-5 h-5" style={{ color: 'var(--a-ink)' }} />
+              <ChevronRight className="rtl:rotate-180 w-5 h-5" style={{ color: 'var(--a-ink)' }} />
             </button>
           </>
         }
@@ -160,12 +160,12 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
 
         {/* Badge */}
         {cake.category === 'month' && cake.month_number &&
-        <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold shadow" style={{ background: 'var(--a-peach-2)', color: '#fff' }}>
+        <span className="absolute top-3 start-3 px-3 py-1 rounded-full text-xs font-bold shadow" style={{ background: 'var(--a-peach-2)', color: '#fff' }}>
             {tr(`common_month_label_${cake.month_number}`, `${cake.month_number}-ci ay`)}
           </span>
         }
         {cake.category === 'milestone' && cake.milestone_label &&
-        <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold shadow" style={{ background: 'var(--a-yellow-2)', color: '#5a3d00' }}>
+        <span className="absolute top-3 start-3 px-3 py-1 rounded-full text-xs font-bold shadow" style={{ background: 'var(--a-yellow-2)', color: '#5a3d00' }}>
             {cake.milestone_label}
           </span>
         }
@@ -203,7 +203,7 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
               
               <Plus className="w-4 h-4" />
             </button>
-            <span className="ml-auto text-lg font-bold" style={{ color: 'var(--a-ink-soft)' }}>
+            <span className="ms-auto text-lg font-bold" style={{ color: 'var(--a-ink-soft)' }}>
               {(cake.price * quantity).toFixed(2)}₼
             </span>
           </div>
@@ -248,7 +248,7 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
 
       {/* Fixed Bottom CTA - above BottomNav */}
       <div
-        className="fixed left-0 right-0 z-40 px-4 py-3"
+        className="fixed start-0 end-0 z-40 px-4 py-3"
         style={{ bottom: 'calc(72px + env(safe-area-inset-bottom))', background: 'var(--a-nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid var(--a-line)' }}>
         
         <button

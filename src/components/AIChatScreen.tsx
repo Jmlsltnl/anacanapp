@@ -77,7 +77,7 @@ const ChatMessageRow = memo(({ message, copied, onCopy }: {
         <span className="whitespace-pre-wrap">{message.content}</span>}
         {message.isStreaming && message.content &&
         <motion.span
-          className="inline-block w-1.5 h-3.5 ml-1 align-middle"
+          className="inline-block w-1.5 h-3.5 ms-1 align-middle"
           style={{ background: 'var(--a-peach-2)', borderRadius: 2 }}
           animate={{ opacity: [1, 0.2] }}
           transition={{ duration: 0.55, repeat: Infinity }} />}
@@ -580,7 +580,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <div ref={ref} className="a-scope fixed inset-x-0 top-0 flex flex-col" style={{ bottom: 'calc(94px + env(safe-area-inset-bottom, 0px))', background: 'var(--a-bg)' }}>
       {/* Chat header (anacan-demo) */}
-      <div className="safe-area-top" style={{ paddingLeft: 20, paddingRight: 20, flexShrink: 0 }}>
+      <div className="safe-area-top" style={{ paddingInlineStart: 20, paddingInlineEnd: 20, flexShrink: 0 }}>
         <div className="a-chat-header">
           <span className="a-chat-header-avatar">
             <Sparkles size={19} strokeWidth={2} />
@@ -647,7 +647,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         onScroll={handleViewportScroll}
         data-scroll-ignore
         className="flex-1 overflow-y-auto overscroll-contain relative"
-        style={{ paddingLeft: 20, paddingRight: 20, WebkitOverflowScrolling: 'touch' }}>
+        style={{ paddingInlineStart: 20, paddingInlineEnd: 20, WebkitOverflowScrolling: 'touch' }}>
 
         <div className="pb-4 pt-1">
           <AnimatePresence initial={false}>
@@ -701,7 +701,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           aria-label={tr('aichat_jump_down', 'Ən son mesaja keç')}
           className="absolute grid place-items-center"
           style={{
-            right: 18, bottom: 86, zIndex: 5,
+            insetInlineEnd: 18, bottom: 86, zIndex: 5,
             width: 38, height: 38, borderRadius: 999,
             background: 'var(--a-surface)', border: '1px solid var(--a-line)',
             boxShadow: '0 10px 24px -8px rgba(217, 108, 74, 0.45)',

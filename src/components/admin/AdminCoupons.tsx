@@ -241,7 +241,7 @@ const AdminCoupons = () => {
 
           <div className="flex gap-2">
             <Button onClick={() => saveMutation.mutate()} disabled={!form.code || saveMutation.isPending}>
-              {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+              {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin me-1" /> : null}
               {editing ? tr("admincoupons_yenile_570ce2", "Yenil\u0259") : 'Yarat'}
             </Button>
             <Button variant="outline" onClick={() => {setShowForm(false);setEditing(null);}}>{tr("admincoupons_legv_et_b5e49c", "Ləğv et")}</Button>

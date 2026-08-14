@@ -257,7 +257,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                     <MapPin className="w-4 h-4" style={{ color: 'var(--a-peach-2)' }} />
                     <span className="a-list-title" style={{ margin: 0 }}>{cityName}</span>
                     <span
-                    className="ml-auto px-3 py-1 rounded-full text-xs font-bold"
+                    className="ms-auto px-3 py-1 rounded-full text-xs font-bold"
                     style={advice.safeToGoOut ?
                     { background: 'var(--a-green-1)', color: 'var(--a-green-ink)' } :
                     { background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)' }}>

@@ -441,7 +441,7 @@ const AdminPhotoshoot = () => {
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_sekil_novleri_1d0187", "\u015E\u0259kil N\xF6vl\u0259ri (")}{imageStyles.length})</h3>
             <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'image_style' });}}>
-              <Plus className="w-4 h-4 mr-2" /> Yeni Stil
+              <Plus className="w-4 h-4 me-2" /> Yeni Stil
             </Button>
           </div>
 
@@ -476,10 +476,10 @@ const AdminPhotoshoot = () => {
                 <div className="flex gap-2">
                   <Button onClick={() => handleSaveImageStyle(newItem, true)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ml-2">Yadda saxla</span>
+                    <span className="ms-2">Yadda saxla</span>
                   </Button>
                   <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
-                    <X className="w-4 h-4 mr-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                    <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
               </CardContent>
@@ -537,7 +537,7 @@ const AdminPhotoshoot = () => {
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_butun_fonlar_19b064", "B\xFCt\xFCn Fonlar (")}{backgrounds.length})</h3>
             <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'background' });}}>
-              <Plus className="w-4 h-4 mr-2" /> Yeni Fon
+              <Plus className="w-4 h-4 me-2" /> Yeni Fon
             </Button>
           </div>
 
@@ -592,10 +592,10 @@ const AdminPhotoshoot = () => {
                 <div className="flex gap-2">
                   <Button onClick={() => handleSaveBackground(newItem, true)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ml-2">Yadda saxla</span>
+                    <span className="ms-2">Yadda saxla</span>
                   </Button>
                   <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
-                    <X className="w-4 h-4 mr-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                    <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
               </CardContent>
@@ -648,7 +648,7 @@ const AdminPhotoshoot = () => {
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_butun_geyimler_45a2c6", "B\xFCt\xFCn Geyiml\u0259r (")}{outfits.length})</h3>
             <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'outfit' });}}>
-              <Plus className="w-4 h-4 mr-2" /> Yeni Geyim
+              <Plus className="w-4 h-4 me-2" /> Yeni Geyim
             </Button>
           </div>
 
@@ -690,10 +690,10 @@ const AdminPhotoshoot = () => {
                 <div className="flex gap-2">
                   <Button onClick={() => handleSaveOutfit(newItem, true)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ml-2">Yadda saxla</span>
+                    <span className="ms-2">Yadda saxla</span>
                   </Button>
                   <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
-                    <X className="w-4 h-4 mr-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                    <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
               </CardContent>
@@ -746,7 +746,7 @@ const AdminPhotoshoot = () => {
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_butun_goz_rengleri_f4f265", "B\xFCt\xFCn G\xF6z R\u0259ngl\u0259ri (")}{eyeColors.length})</h3>
             <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'eye_color' });}}>
-              <Plus className="w-4 h-4 mr-2" /> {tr("adminphotoshoot_yeni_goz_rengi_b3befd", "Yeni G\xF6z R\u0259ngi")}
+              <Plus className="w-4 h-4 me-2" /> {tr("adminphotoshoot_yeni_goz_rengi_b3befd", "Yeni G\xF6z R\u0259ngi")}
             </Button>
           </div>
 
@@ -775,10 +775,10 @@ const AdminPhotoshoot = () => {
                 <div className="flex gap-2">
                   <Button onClick={() => handleSaveEyeColor(newItem, true)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ml-2">Yadda saxla</span>
+                    <span className="ms-2">Yadda saxla</span>
                   </Button>
                   <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
-                    <X className="w-4 h-4 mr-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                    <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
               </CardContent>
@@ -829,7 +829,7 @@ const AdminPhotoshoot = () => {
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_butun_sac_rengleri_7ef7b8", "B\xFCt\xFCn Sa\xE7 R\u0259ngl\u0259ri (")}{hairColors.length})</h3>
             <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'hair_color' });}}>
-              <Plus className="w-4 h-4 mr-2" /> {tr("adminphotoshoot_yeni_sac_rengi_961241", "Yeni Sa\xE7 R\u0259ngi")}
+              <Plus className="w-4 h-4 me-2" /> {tr("adminphotoshoot_yeni_sac_rengi_961241", "Yeni Sa\xE7 R\u0259ngi")}
             </Button>
           </div>
 
@@ -858,10 +858,10 @@ const AdminPhotoshoot = () => {
                 <div className="flex gap-2">
                   <Button onClick={() => handleSaveHairColor(newItem, true)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ml-2">Yadda saxla</span>
+                    <span className="ms-2">Yadda saxla</span>
                   </Button>
                   <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
-                    <X className="w-4 h-4 mr-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                    <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
               </CardContent>
@@ -912,7 +912,7 @@ const AdminPhotoshoot = () => {
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_butun_sac_formalari_e89a19", "B\xFCt\xFCn Sa\xE7 Formalar\u0131 (")}{hairStyles.length})</h3>
             <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'hair_style' });}}>
-              <Plus className="w-4 h-4 mr-2" /> {tr("adminphotoshoot_yeni_sac_formasi_3063a3", "Yeni Sa\xE7 Formas\u0131")}
+              <Plus className="w-4 h-4 me-2" /> {tr("adminphotoshoot_yeni_sac_formasi_3063a3", "Yeni Sa\xE7 Formas\u0131")}
             </Button>
           </div>
 
@@ -941,10 +941,10 @@ const AdminPhotoshoot = () => {
                 <div className="flex gap-2">
                   <Button onClick={() => handleSaveHairStyle(newItem, true)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ml-2">Yadda saxla</span>
+                    <span className="ms-2">Yadda saxla</span>
                   </Button>
                   <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
-                    <X className="w-4 h-4 mr-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                    <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
               </CardContent>

@@ -109,7 +109,7 @@ const AdminPartnerConfig = () => {
         <TabsContent value="achievements" className="space-y-4">
           <div className="flex justify-end">
             <Button onClick={() => setIsAdding(true)} disabled={isAdding}>
-              <Plus className="w-4 h-4 mr-2" /> {tr("adminpartnerconfig_yeni_nailiyyet_3c28d2", "Yeni Nailiyy\u0259t")}
+              <Plus className="w-4 h-4 me-2" /> {tr("adminpartnerconfig_yeni_nailiyyet_3c28d2", "Yeni Nailiyy\u0259t")}
             </Button>
           </div>
 
@@ -169,7 +169,7 @@ const AdminPartnerConfig = () => {
         <TabsContent value="menu" className="space-y-4">
           <div className="flex justify-end">
             <Button onClick={() => setIsAdding(true)} disabled={isAdding}>
-              <Plus className="w-4 h-4 mr-2" /> Yeni Menyu
+              <Plus className="w-4 h-4 me-2" /> Yeni Menyu
             </Button>
           </div>
 
@@ -227,7 +227,7 @@ const AdminPartnerConfig = () => {
         <TabsContent value="surprises" className="space-y-4">
           <div className="flex justify-end">
             <Button onClick={() => setIsAdding(true)} disabled={isAdding}>
-              <Plus className="w-4 h-4 mr-2" /> {tr("adminpartnerconfig_yeni_surpriz_novu_c33b08", "Yeni S\xFCrpriz N\xF6v\xFC")}
+              <Plus className="w-4 h-4 me-2" /> {tr("adminpartnerconfig_yeni_surpriz_novu_c33b08", "Yeni S\xFCrpriz N\xF6v\xFC")}
             </Button>
           </div>
 
@@ -309,8 +309,8 @@ const AchievementForm = ({ item, onSave, onCancel, isLoading }: any) => {
         <Input type="number" placeholder="Threshold" value={form.unlock_threshold} onChange={(e) => setForm({ ...form, unlock_threshold: parseInt(e.target.value) || 0 })} />
       </div>
       <div className="flex gap-2">
-        <Button onClick={() => onSave(form)} disabled={isLoading}><Save className="w-4 h-4 mr-2" /> Yadda saxla</Button>
-        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 mr-2" />{tr("adminpartnerconfig_legv_et_b5e49c", "Ləğv et")}</Button>
+        <Button onClick={() => onSave(form)} disabled={isLoading}><Save className="w-4 h-4 me-2" /> Yadda saxla</Button>
+        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 me-2" />{tr("adminpartnerconfig_legv_et_b5e49c", "Ləğv et")}</Button>
       </div>
     </div>);
 
@@ -338,8 +338,8 @@ const MenuItemForm = ({ item, onSave, onCancel, isLoading }: any) => {
         <Input type="number" placeholder="Sort Order" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
       </div>
       <div className="flex gap-2">
-        <Button onClick={() => onSave(form)} disabled={isLoading}><Save className="w-4 h-4 mr-2" /> Yadda saxla</Button>
-        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 mr-2" />{tr("adminpartnerconfig_legv_et_b5e49c", "Ləğv et")}</Button>
+        <Button onClick={() => onSave(form)} disabled={isLoading}><Save className="w-4 h-4 me-2" /> Yadda saxla</Button>
+        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 me-2" />{tr("adminpartnerconfig_legv_et_b5e49c", "Ləğv et")}</Button>
       </div>
     </div>);
 
@@ -367,8 +367,8 @@ const SurpriseCategoryForm = ({ item, onSave, onCancel, isLoading }: any) => {
         <Input type="number" placeholder="Sort Order" value={form.sort_order} onChange={(e) => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
       </div>
       <div className="flex gap-2">
-        <Button onClick={() => onSave(form)} disabled={isLoading}><Save className="w-4 h-4 mr-2" /> Yadda saxla</Button>
-        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 mr-2" />{tr("adminpartnerconfig_legv_et_b5e49c", "Ləğv et")}</Button>
+        <Button onClick={() => onSave(form)} disabled={isLoading}><Save className="w-4 h-4 me-2" /> Yadda saxla</Button>
+        <Button variant="outline" onClick={onCancel}><X className="w-4 h-4 me-2" />{tr("adminpartnerconfig_legv_et_b5e49c", "Ləğv et")}</Button>
       </div>
     </div>);
 

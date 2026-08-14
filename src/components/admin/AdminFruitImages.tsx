@@ -178,7 +178,7 @@ const AdminFruitImages = () => {
           </p>
         </div>
         <Button variant="outline" onClick={fetchFruitImages} disabled={loading}>
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 me-2 ${loading ? 'animate-spin' : ''}`} />
           {tr("adminfruitimages_yenile_570ce2", "Yenil\u0259")}
         </Button>
       </div>
@@ -220,7 +220,7 @@ const AdminFruitImages = () => {
               transition={{ delay: index * 0.02 }}>
               
                 <Card className="p-3 text-center relative overflow-hidden">
-                  <div className="absolute top-1.5 right-1.5 text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-bold">
+                  <div className="absolute top-1.5 end-1.5 text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-bold">
                     {weekData.week}{tr("adminfruitimages_hefte_459cfe", ". h\u0259ft\u0259")}
                   </div>
 

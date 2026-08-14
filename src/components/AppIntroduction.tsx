@@ -118,14 +118,14 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 0.35, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className={`absolute -top-32 -right-32 w-80 h-80 rounded-full ${slide.bg_decor || 'bg-pink-100 dark:bg-pink-900/20'} blur-3xl`} />
+          className={`absolute -top-32 -end-32 w-80 h-80 rounded-full ${slide.bg_decor || 'bg-pink-100 dark:bg-pink-900/20'} blur-3xl`} />
 
         <motion.div
           key={`decor-2-${currentSlide}`}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 0.25, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className={`absolute -bottom-40 -left-40 w-96 h-96 rounded-full ${slide.bg_decor || 'bg-pink-100 dark:bg-pink-900/20'} blur-3xl`} />
+          className={`absolute -bottom-40 -start-40 w-96 h-96 rounded-full ${slide.bg_decor || 'bg-pink-100 dark:bg-pink-900/20'} blur-3xl`} />
 
       </div>
 
@@ -197,7 +197,7 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
           {currentSlide > 0 &&
           <Button variant="outline" size="lg" onClick={goToPrev} className="h-14 px-6 rounded-full border-0"
           style={{ background: 'var(--a-surface)', color: 'var(--a-ink)', boxShadow: 'var(--a-card-shadow)' }}>
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="rtl:rotate-180 w-5 h-5" />
             </Button>
           }
           <Button
@@ -206,9 +206,9 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
             className={`flex-1 h-14 rounded-full bg-gradient-to-r ${slide.gradient} text-white font-semibold text-base shadow-lg hover:shadow-xl transition-shadow border-0`}>
 
             {currentSlide === slides.length - 1 ?
-            <>{tr("appintroduction_basla_4820bc", "Başla")}<Sparkles className="w-5 h-5 ml-2" /></> :
+            <>{tr("appintroduction_basla_4820bc", "Başla")}<Sparkles className="w-5 h-5 ms-2" /></> :
 
-            <>{tr("untranslated_davam_et_rchhd5", "Davam et")}<ChevronRight className="w-5 h-5 ml-2" /></>
+            <>{tr("untranslated_davam_et_rchhd5", "Davam et")}<ChevronRight className="rtl:rotate-180 w-5 h-5 ms-2" /></>
             }
           </Button>
         </div>

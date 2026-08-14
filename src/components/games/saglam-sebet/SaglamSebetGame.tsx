@@ -340,7 +340,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
             whileTap={{ scale: 0.9 }}
             className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center flex-shrink-0"
           >
-            {phase === 'playing' ? <Pause className="w-4 h-4 text-foreground" /> : <ArrowLeft className="w-4 h-4 text-foreground" />}
+            {phase === 'playing' ? <Pause className="w-4 h-4 text-foreground" /> : <ArrowLeft className="rtl:rotate-180 w-4 h-4 text-foreground" />}
           </motion.button>
 
           <div className="flex-1 min-w-0">
@@ -405,8 +405,8 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
         }}
       >
         {/* decorative clouds */}
-        <div className="absolute top-6 left-6 text-3xl opacity-30 animate-float pointer-events-none">☁️</div>
-        <div className="absolute top-16 right-10 text-2xl opacity-20 animate-float-delayed pointer-events-none">☁️</div>
+        <div className="absolute top-6 start-6 text-3xl opacity-30 animate-float pointer-events-none">☁️</div>
+        <div className="absolute top-16 end-10 text-2xl opacity-20 animate-float-delayed pointer-events-none">☁️</div>
 
         {/* Falling objects */}
         {objects.map((obj) => (
@@ -414,7 +414,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
             key={obj.id}
             className="absolute leading-none drop-shadow-md pointer-events-none"
             style={{
-              left: 0,
+              insetInlineStart: 0,
               top: 0,
               width: obj.size,
               height: obj.size,
@@ -438,7 +438,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
               exit={{ opacity: 0 }}
               transition={{ duration: 0.7 }}
               className={`absolute font-extrabold text-sm pointer-events-none ${ft.color}`}
-              style={{ left: ft.x - 16, top: ft.y }}
+              style={{ insetInlineStart: ft.x - 16, top: ft.y }}
             >
               {ft.text}
             </motion.div>
@@ -449,7 +449,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
         <motion.div
           className="absolute flex items-end justify-center pointer-events-none"
           style={{
-            left: 0,
+            insetInlineStart: 0,
             bottom: BASKET_BOTTOM_MARGIN,
             width: BASKET_WIDTH,
             height: BASKET_HEIGHT,

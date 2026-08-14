@@ -126,7 +126,7 @@ const FloatingTimerWidget = () => {
         exit={{ scale: 0, opacity: 0 }}
         onClick={() => setExpanded(true)}
         whileTap={{ scale: 0.9 }}
-        className="fixed right-3 z-[55] flex items-center gap-1.5 rounded-full shadow-lg border border-border/60 bg-card/95 backdrop-blur-xl px-2.5 py-1.5"
+        className="fixed end-3 z-[55] flex items-center gap-1.5 rounded-full shadow-lg border border-border/60 bg-card/95 backdrop-blur-xl px-2.5 py-1.5"
         style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.75rem)' }}>
         
           <div className="relative">
@@ -161,7 +161,7 @@ const FloatingTimerWidget = () => {
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 60, opacity: 0 }}
         transition={{ type: 'spring', damping: 22, stiffness: 300 }}
-        className="fixed right-3 z-[55] w-52"
+        className="fixed end-3 z-[55] w-52"
         style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.75rem)' }}>
         
           <div className="bg-card/95 backdrop-blur-xl rounded-2xl shadow-lg border border-border/60 overflow-hidden">

@@ -439,11 +439,11 @@ const AdminBlog = () => {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setShowCategoryModal(true)}>
-            <Tag className="w-4 h-4 mr-2" />
+            <Tag className="w-4 h-4 me-2" />
             Kateqoriya
           </Button>
           <Button onClick={() => setShowEditor(true)} className="bg-primary">
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4 me-2" />
             {tr("adminblog_yeni_meqale_ee5489", "Yeni M\u0259qal\u0259")}
           </Button>
         </div>
@@ -489,12 +489,12 @@ const AdminBlog = () => {
       <>
           {/* Search */}
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={tr("adminblog_meqale_axtar_0441c1", "Məqalə axtar...")}
-            className="pl-10" />
+            className="ps-10" />
           
           </div>
 
@@ -569,7 +569,7 @@ const AdminBlog = () => {
 
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline" onClick={() => handleEdit(post)}>
-                      <Edit className="w-3 h-3 mr-1" />
+                      <Edit className="w-3 h-3 me-1" />
                       {tr("adminblog_redakte_d53ba7", "Redakt\u0259")}
                     </Button>
                     <Button
@@ -779,7 +779,7 @@ const AdminBlog = () => {
                     type="button"
                     variant="destructive"
                     size="icon"
-                    className="absolute top-2 right-2 w-8 h-8"
+                    className="absolute top-2 end-2 w-8 h-8"
                     onClick={() => setFormData({ ...formData, cover_image_url: '' })}>
                     
                         <X className="w-4 h-4" />
@@ -807,7 +807,7 @@ const AdminBlog = () => {
                         
                           <span>{cat.icon}</span>
                           <span>{cat.name}</span>
-                          {isSelected && <X className="w-3 h-3 ml-1" />}
+                          {isSelected && <X className="w-3 h-3 ms-1" />}
                         </button>);
 
                   })}
@@ -872,7 +872,7 @@ const AdminBlog = () => {
                   <div className="flex gap-2 mb-2 flex-wrap">
                     {formData.tags.map((tag) =>
                   <Badge key={tag} variant="secondary" className="cursor-pointer" onClick={() => handleRemoveTag(tag)}>
-                        {tag} <X className="w-3 h-3 ml-1" />
+                        {tag} <X className="w-3 h-3 ms-1" />
                       </Badge>
                   )}
                   </div>
@@ -982,7 +982,7 @@ const AdminBlog = () => {
                   {tr("adminblog_legv_et_b5e49c", "L\u0259\u011Fv et")}
                 </Button>
                 <Button onClick={handleSave} className="bg-primary">
-                  <Save className="w-4 h-4 mr-2" />
+                  <Save className="w-4 h-4 me-2" />
                   {editingPost ? tr("adminblog_yenile_570ce2", "Yenil\u0259") : 'Yarat'}
                 </Button>
               </div>

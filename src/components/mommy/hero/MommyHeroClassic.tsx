@@ -39,8 +39,8 @@ const MommyHeroClassic = ({ babyData, exactMonths, remainingDays, babyIllustrati
       transition={{ delay: 0.1 }}>
       
       {/* Background blur orbs — same style as pregnancy hero */}
-      <div className="absolute -top-12 -right-12 w-36 h-36 rounded-full bg-primary/10 blur-2xl" />
-      <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full bg-amber-200/40 blur-xl opacity-60" />
+      <div className="absolute -top-12 -end-12 w-36 h-36 rounded-full bg-primary/10 blur-2xl" />
+      <div className="absolute bottom-0 start-0 w-24 h-24 rounded-full bg-amber-200/40 blur-xl opacity-60" />
 
       <div className="relative z-10 flex flex-col items-center">
         {/* Baby Image — centered with subtle float, matching pregnancy fetus image style */}

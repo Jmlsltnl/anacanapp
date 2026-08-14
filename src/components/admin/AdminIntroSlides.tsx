@@ -142,7 +142,7 @@ const AdminIntroSlides = () => {
         </div>
         {!creating &&
         <Button onClick={() => {setCreating(true);setForm({ ...emptySlide, sort_order: slides.length + 1 });}}>
-            <Plus className="w-4 h-4 mr-2" /> Yeni Slayd
+            <Plus className="w-4 h-4 me-2" /> Yeni Slayd
           </Button>
         }
       </div>
@@ -212,10 +212,10 @@ const AdminIntroSlides = () => {
 
             <div className="flex gap-2">
               <Button onClick={handleSave} disabled={saveMutation.isPending}>
-                <Save className="w-4 h-4 mr-2" /> Saxla
+                <Save className="w-4 h-4 me-2" /> Saxla
               </Button>
               <Button variant="outline" onClick={resetForm}>
-                <X className="w-4 h-4 mr-2" /> {tr("adminintroslides_legv_et_b5e49c", "L\u0259\u011Fv et")}
+                <X className="w-4 h-4 me-2" /> {tr("adminintroslides_legv_et_b5e49c", "L\u0259\u011Fv et")}
               </Button>
             </div>
           </CardContent>

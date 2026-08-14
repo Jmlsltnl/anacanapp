@@ -137,7 +137,7 @@ const AdminLanguages = () => {
           <h2 className="text-2xl font-bold">{tr("adminlanguages_dil_idareetmesi_fd660e", "Dil İdarəetməsi")}</h2>
         </div>
         <Button onClick={() => setShowAdd(!showAdd)} size="sm">
-          <Plus className="w-4 h-4 mr-1" /> Yeni Dil
+          <Plus className="w-4 h-4 me-1" /> Yeni Dil
         </Button>
       </div>
 
@@ -167,7 +167,7 @@ const AdminLanguages = () => {
               </div>
             </div>
             <Button onClick={() => addLanguage.mutate()} disabled={!newLang.code || !newLang.name}>
-              <Save className="w-4 h-4 mr-1" /> {tr("adminlanguages_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+              <Save className="w-4 h-4 me-1" /> {tr("adminlanguages_elave_et_6e1b9b", "\u018Flav\u0259 et")}
             </Button>
           </CardContent>
         </Card>
@@ -189,7 +189,7 @@ const AdminLanguages = () => {
                     <div className="text-sm text-muted-foreground">
                       {tr("adminlanguages_bolgeler_efbefd", "B\xF6lg\u0259l\u0259r:")} {(lang.regions as string[])?.join(', ') || '—'}
                       {lang.code !== 'az' &&
-                    <span className="ml-3">
+                    <span className="ms-3">
                           {tr("adminlanguages_tercume_17fe4c", "T\u0259rc\xFCm\u0259:")} <strong>{translationCounts[lang.code] ?? 0}</strong> {tr("adminlanguages_acar_44578b", "a\xE7ar")}
                         </span>
                     }
@@ -215,7 +215,7 @@ const AdminLanguages = () => {
                             });
                           }}
                         >
-                          <Save className="w-3 h-3 mr-1" /> Saxla
+                          <Save className="w-3 h-3 me-1" /> Saxla
                         </Button>
                         <Button variant="ghost" size="sm" className="h-8" onClick={() => setEditingId(null)}>
                           ×

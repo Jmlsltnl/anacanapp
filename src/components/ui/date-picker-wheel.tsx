@@ -140,7 +140,7 @@ export function DatePickerWheel({
         onClick={handlePrevMonth}
         className="h-9 w-9 rounded-full">
         
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="rtl:rotate-180 h-4 w-4" />
         </Button>
 
         <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ export function DatePickerWheel({
         onClick={handleNextMonth}
         className="h-9 w-9 rounded-full">
         
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="rtl:rotate-180 h-4 w-4" />
         </Button>
       </div>
 
@@ -245,7 +245,7 @@ export function DatePickerWheel({
         disabled={yearPage === 0}
         className="h-9 w-9 rounded-full">
         
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="rtl:rotate-180 h-4 w-4" />
         </Button>
 
         <span className="font-semibold text-sm text-muted-foreground">
@@ -259,7 +259,7 @@ export function DatePickerWheel({
         disabled={yearPage >= totalYearPages - 1}
         className="h-9 w-9 rounded-full">
         
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="rtl:rotate-180 h-4 w-4" />
         </Button>
       </div>
 
@@ -331,7 +331,7 @@ export function DatePickerWheel({
         variant="outline"
         onClick={() => setIsOpen(true)}
         className={cn(
-          "w-full h-14 justify-start text-left font-normal rounded-2xl border-2",
+          "w-full h-14 justify-start text-start font-normal rounded-2xl border-2",
           "bg-gradient-to-br from-muted/30 to-muted/50",
           "hover:border-primary/50 hover:bg-muted/60 transition-all",
           !value && "text-muted-foreground",

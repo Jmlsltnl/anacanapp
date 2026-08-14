@@ -857,20 +857,20 @@ const AdminTranslations = () => {
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <Button variant="outline" size="sm" onClick={() => setShowAddKey(!showAddKey)}>
-                <Plus className="w-4 h-4 mr-1" /> {tr("admintranslations_acar_644193", "Açarlar")}
+                <Plus className="w-4 h-4 me-1" /> {tr("admintranslations_acar_644193", "Açarlar")}
               </Button>
               <Button variant="outline" size="sm" onClick={handleExport}>
-                <Download className="w-4 h-4 mr-1" /> CSV İxrac
+                <Download className="w-4 h-4 me-1" /> CSV İxrac
               </Button>
               <label>
                 <Button variant="outline" size="sm" asChild>
-                  <span><Upload className="w-4 h-4 mr-1" />{tr("admintranslations_csv_idxal_f88021", "CSV İdxal")}</span>
+                  <span><Upload className="w-4 h-4 me-1" />{tr("admintranslations_csv_idxal_f88021", "CSV İdxal")}</span>
                 </Button>
                 <input type="file" accept=".csv" className="hidden" onChange={handleImport} />
               </label>
               {Object.keys(editedValues).length > 0 &&
               <Button size="sm" onClick={saveAll}>
-                  <Save className="w-4 h-4 mr-1" /> {tr("admintranslations_hamisini_saxla_7a6f24", "Hamısını Saxla (")}{Object.keys(editedValues).length})
+                  <Save className="w-4 h-4 me-1" /> {tr("admintranslations_hamisini_saxla_7a6f24", "Hamısını Saxla (")}{Object.keys(editedValues).length})
                 </Button>
               }
             </div>
@@ -915,8 +915,8 @@ const AdminTranslations = () => {
             <div className="flex-1 min-w-[200px]">
               <Label>Axtar</Label>
               <div className="relative">
-                <Search className="absolute left-2 top-2.5 w-4 h-4 text-muted-foreground" />
-                <Input className="pl-8" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={tr("admintranslations_acar_ve_ya_deyer_axtar_7422e0", "Açar və ya dəyər axtar...")} />
+                <Search className="absolute start-2 top-2.5 w-4 h-4 text-muted-foreground" />
+                <Input className="ps-8" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={tr("admintranslations_acar_ve_ya_deyer_axtar_7422e0", "Açar və ya dəyər axtar...")} />
               </div>
             </div>
           </div>

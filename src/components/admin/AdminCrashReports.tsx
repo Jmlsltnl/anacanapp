@@ -95,7 +95,7 @@ const AdminCrashReports = () => {
             <RefreshCw className="w-4 h-4" />
           </Button>
           <Button size="sm" variant="destructive" onClick={deleteAll}>
-            <Trash2 className="w-4 h-4 mr-1" /> {tr("admincrashreports_hamisini_sil_f6a3d6", "Ham\u0131s\u0131n\u0131 sil")}
+            <Trash2 className="w-4 h-4 me-1" /> {tr("admincrashreports_hamisini_sil_f6a3d6", "Ham\u0131s\u0131n\u0131 sil")}
           </Button>
         </div>
       </div>

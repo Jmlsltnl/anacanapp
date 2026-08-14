@@ -21,6 +21,8 @@ import PartnerVerifyPage from "./pages/PartnerVerifyPage";
 import MiniGamesPage from "./pages/MiniGamesPage";
 import { initRevenueCat } from "@/lib/revenuecat";
 import { loadTranslations } from "@/lib/i18n";
+import { DirectionProvider } from "@radix-ui/react-direction";
+import { applyDocumentDirection, isRtlLang } from "@/lib/rtl";
 import { useUserStore } from "@/store/userStore";
 
 // Offline-first: sorğu cache-i localStorage-da saxlanılır ki, şəbəkəsiz açılışda
@@ -75,7 +77,8 @@ const App = () => {
 
   useEffect(() => {
     if (language) {
-      document.documentElement.setAttribute('lang', language);
+      // dir + lang birlikdə (ar → rtl); main.tsx boot-da da təyin olunur
+      applyDocumentDirection(language);
       if (language !== 'az') {
         loadTranslations(language).catch(console.error);
       }
@@ -86,6 +89,8 @@ const App = () => {
     <ErrorBoundary>
       <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {/* Radix primitivləri (dropdown/select/dialog align) RTL-i buradan öyrənir */}
+          <DirectionProvider dir={isRtlLang(language) ? 'rtl' : 'ltr'}>
           <AuthProvider>
             <TooltipProvider>
               <Toaster />
@@ -109,6 +114,7 @@ const App = () => {
               </BrowserRouter>
             </TooltipProvider>
           </AuthProvider>
+          </DirectionProvider>
         </ThemeProvider>
       </PersistQueryClientProvider>
     </ErrorBoundary>

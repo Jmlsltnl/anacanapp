@@ -230,22 +230,22 @@ export default function AdminVaccines() {
             </SelectContent>
           </Select>
           <Button size="sm" variant="outline" onClick={() => setCopyDlg(true)} disabled={vaccines.length === 0}>
-            <Copy className="w-4 h-4 mr-1" /> {tr("adminvaccines_kocur_5a87f7", "K\xF6\xE7\xFCr")}
+            <Copy className="w-4 h-4 me-1" /> {tr("adminvaccines_kocur_5a87f7", "K\xF6\xE7\xFCr")}
           </Button>
         </div>
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="countries"><Globe className="w-3.5 h-3.5 mr-1" />{tr("adminvaccines_olkeler_dd8fd5", "\xD6lk\u0259l\u0259r")}</TabsTrigger>
-          <TabsTrigger value="vaccines"><Syringe className="w-3.5 h-3.5 mr-1" />{tr("adminvaccines_peyvendler_093a96", "Peyv\u0259ndl\u0259r")}</TabsTrigger>
-          <TabsTrigger value="schedules"><Calendar className="w-3.5 h-3.5 mr-1" />Qrafik</TabsTrigger>
+          <TabsTrigger value="countries"><Globe className="w-3.5 h-3.5 me-1" />{tr("adminvaccines_olkeler_dd8fd5", "\xD6lk\u0259l\u0259r")}</TabsTrigger>
+          <TabsTrigger value="vaccines"><Syringe className="w-3.5 h-3.5 me-1" />{tr("adminvaccines_peyvendler_093a96", "Peyv\u0259ndl\u0259r")}</TabsTrigger>
+          <TabsTrigger value="schedules"><Calendar className="w-3.5 h-3.5 me-1" />Qrafik</TabsTrigger>
         </TabsList>
 
         {/* Countries */}
         <TabsContent value="countries" className="space-y-2 mt-3">
           <Button size="sm" onClick={() => setCountryDlg({ is_active: true, sort_order: countries.length, flag_emoji: '🌍' })}>
-            <Plus className="w-4 h-4 mr-1" /> {tr("adminvaccines_yeni_olke_561985", "Yeni \xF6lk\u0259")}
+            <Plus className="w-4 h-4 me-1" /> {tr("adminvaccines_yeni_olke_561985", "Yeni \xF6lk\u0259")}
           </Button>
           {countries.map((c) =>
           <Card key={c.id} className="p-3 flex items-center justify-between">
@@ -273,7 +273,7 @@ export default function AdminVaccines() {
         {/* Vaccines */}
         <TabsContent value="vaccines" className="space-y-2 mt-3">
           <Button size="sm" onClick={() => setVaccineDlg({ is_mandatory: true, is_active: true, sort_order: vaccines.length, color_hex: '#F28155' })}>
-            <Plus className="w-4 h-4 mr-1" /> {tr("adminvaccines_yeni_peyvend_c3cef1", "Yeni peyv\u0259nd")}
+            <Plus className="w-4 h-4 me-1" /> {tr("adminvaccines_yeni_peyvend_c3cef1", "Yeni peyv\u0259nd")}
           </Button>
           {vaccines.map((v) =>
           <Card key={v.id} className="p-3">
@@ -303,7 +303,7 @@ export default function AdminVaccines() {
         {/* Schedules */}
         <TabsContent value="schedules" className="space-y-2 mt-3">
           <Button size="sm" onClick={() => setScheduleDlg({ dose_number: 1, recommended_age_days: 0, sort_order: schedules.length })}>
-            <Plus className="w-4 h-4 mr-1" /> Yeni doza
+            <Plus className="w-4 h-4 me-1" /> Yeni doza
           </Button>
           {schedules.map((s) => {
             const v = vaccinesById.get(s.vaccine_id);

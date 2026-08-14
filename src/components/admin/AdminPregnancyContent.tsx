@@ -489,15 +489,15 @@ const AdminPregnancyContent = () => {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={downloadExcel}>
-            <Download className="w-4 h-4 mr-2" />
+            <Download className="w-4 h-4 me-2" />
             İxrac et
           </Button>
           <Button variant="outline" onClick={() => setImportModalOpen(true)}>
-            <Upload className="w-4 h-4 mr-2" />
+            <Upload className="w-4 h-4 me-2" />
             İmport et
           </Button>
           <Button onClick={openCreateModal}>
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4 me-2" />
             {tr("adminpregnancycontent_yeni_elave_et_bcd4a4", "Yeni \u0259lav\u0259 et")}
           </Button>
         </div>
@@ -530,18 +530,18 @@ const AdminPregnancyContent = () => {
       {/* Toolbar */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder={tr("adminpregnancycontent_hefte_meyve_inkisaf_axtar_5b38a8", "Həftə, meyvə, inkişaf axtar...")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10" />
+            className="ps-10" />
           
         </div>
         
         {selectedItems.length > 0 &&
         <Button variant="destructive" onClick={handleBulkDelete}>
-            <Trash2 className="w-4 h-4 mr-2" />
+            <Trash2 className="w-4 h-4 me-2" />
             {selectedItems.length} {tr("adminpregnancycontent_secilmisi_sil_7cfd57", "se\xE7ilmi\u015Fi sil")}
           </Button>
         }
@@ -833,7 +833,7 @@ const AdminPregnancyContent = () => {
                 <span>{tr("adminpregnancycontent_csv_ve_ya_json_formatinda_fayl_yukleyin_25e1aa", "CSV və ya JSON formatında fayl yükləyin")}</span>
               </div>
               <Button variant="outline" size="sm" onClick={downloadTemplate}>
-                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                <FileSpreadsheet className="w-4 h-4 me-2" />
                 {tr("adminpregnancycontent_sablon_yukle_45cf3b", "\u015Eablon y\xFCkl\u0259")}
               </Button>
             </div>
@@ -851,7 +851,7 @@ const AdminPregnancyContent = () => {
               onClick={() => fileInputRef.current?.click()}
               disabled={importing}>
               
-              <Upload className="w-4 h-4 mr-2" />
+              <Upload className="w-4 h-4 me-2" />
               {tr("adminpregnancycontent_fayl_sec_4fed3f", "Fayl se\xE7")}
             </Button>
 

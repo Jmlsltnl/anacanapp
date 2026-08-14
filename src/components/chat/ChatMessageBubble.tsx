@@ -72,7 +72,7 @@ const ChatMessageBubble = ({ message, isMe }: ChatMessageBubbleProps) => {
   // Image message
   if (message.message_type === 'image' && message.content) {
     return (
-      <div className={`max-w-[75%] rounded-2xl overflow-hidden ${isMe ? 'rounded-br-md' : 'rounded-bl-md'}`}>
+      <div className={`max-w-[75%] rounded-2xl overflow-hidden ${isMe ? 'rounded-ee-md' : 'rounded-es-md'}`}>
         <a href={message.content} target="_blank" rel="noopener noreferrer">
           <img
             src={message.content}
@@ -95,7 +95,7 @@ const ChatMessageBubble = ({ message, isMe }: ChatMessageBubbleProps) => {
     return (
       <div
         className={`flex items-center gap-3 px-4 py-3 rounded-2xl min-w-[200px] ${
-          isMe ? 'bg-primary rounded-br-md' : 'bg-muted rounded-bl-md'
+          isMe ? 'bg-primary rounded-ee-md' : 'bg-muted rounded-es-md'
         }`}
       >
         <audio
@@ -144,8 +144,8 @@ const ChatMessageBubble = ({ message, isMe }: ChatMessageBubbleProps) => {
     <div
       className={`max-w-[75%] px-4 py-2.5 rounded-2xl ${
         isMe
-          ? 'bg-primary text-white rounded-br-md'
-          : 'bg-muted text-foreground rounded-bl-md'
+          ? 'bg-primary text-white rounded-ee-md'
+          : 'bg-muted text-foreground rounded-es-md'
       }`}
     >
       <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>

@@ -353,7 +353,7 @@ const AdminAnalytics = () => {
         <div className="flex items-center gap-3">
           <Select value={dateRange} onValueChange={setDateRange}>
             <SelectTrigger className="w-36">
-              <Calendar className="w-4 h-4 mr-2" />
+              <Calendar className="w-4 h-4 me-2" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -365,7 +365,7 @@ const AdminAnalytics = () => {
           </Select>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-36">
-              <Filter className="w-4 h-4 mr-2" />
+              <Filter className="w-4 h-4 me-2" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -376,7 +376,7 @@ const AdminAnalytics = () => {
             </SelectContent>
           </Select>
           <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
-            <RefreshCw className={`w-4 h-4 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 me-1 ${refreshing ? 'animate-spin' : ''}`} />
             {tr("adminanalytics_yenile_570ce2", "Yenil\u0259")}
           </Button>
         </div>
@@ -409,7 +409,7 @@ const AdminAnalytics = () => {
           <TabsTrigger value="tools">{tr("adminanalytics_alet_istifadesi_b15cf9", "Alət İstifadəsi")}</TabsTrigger>
           <TabsTrigger value="premium">Premium Analiz</TabsTrigger>
           <TabsTrigger value="users">{tr("adminanalytics_istifadeci_segmentleri_f5dd13", "İstifadəçi Segmentləri")}</TabsTrigger>
-          <TabsTrigger value="startup" className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"><Rocket className="w-4 h-4 mr-1.5" /> Startup / SaaS</TabsTrigger>
+          <TabsTrigger value="startup" className="bg-gradient-to-r from-indigo-500/10 to-purple-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800"><Rocket className="w-4 h-4 me-1.5" /> Startup / SaaS</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
@@ -454,7 +454,7 @@ const AdminAnalytics = () => {
                     </div>
                     <div className="flex items-center gap-4">
                       <span className="text-xs text-muted-foreground">{ev.unique_users} {tr("adminanalytics_istifadeci_84a198", "istifad\u0259\xE7i")}</span>
-                      <span className="text-sm font-bold text-foreground min-w-[40px] text-right">{ev.count}</span>
+                      <span className="text-sm font-bold text-foreground min-w-[40px] text-end">{ev.count}</span>
                     </div>
                   </div>
                 )}
@@ -517,11 +517,11 @@ const AdminAnalytics = () => {
                         <span className="text-sm font-medium">{tool.tool_name}</span>
                       </div>
                       <div className="flex items-center gap-6">
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="text-sm font-bold">{tool.count}</p>
                           <p className="text-xs text-muted-foreground">{tr("adminanalytics_istifade_ddadc5", "istifadə")}</p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="text-sm font-bold">{tool.unique_users}</p>
                           <p className="text-xs text-muted-foreground">{tr("adminanalytics_istifadeci_84a198", "istifadəçi")}</p>
                         </div>
@@ -677,7 +677,7 @@ const AdminAnalytics = () => {
         <TabsContent value="startup" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="p-5 border-indigo-100 dark:border-indigo-900 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10">
+              <div className="absolute top-0 end-0 p-4 opacity-10">
                 <DollarSign className="w-16 h-16" />
               </div>
               <p className="text-sm text-muted-foreground font-medium">MRR (Aylıq Gəlir)</p>
@@ -686,7 +686,7 @@ const AdminAnalytics = () => {
             </Card>
             
             <Card className="p-5 border-emerald-100 dark:border-emerald-900 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10">
+              <div className="absolute top-0 end-0 p-4 opacity-10">
                 <Zap className="w-16 h-16" />
               </div>
               <p className="text-sm text-muted-foreground font-medium">Məhsul Stickiness (DAU/MAU)</p>
@@ -695,7 +695,7 @@ const AdminAnalytics = () => {
             </Card>
 
             <Card className="p-5 border-rose-100 dark:border-rose-900 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10">
+              <div className="absolute top-0 end-0 p-4 opacity-10">
                 <Activity className="w-16 h-16" />
               </div>
               <p className="text-sm text-muted-foreground font-medium">Churn Rate (İtgi)</p>
@@ -704,7 +704,7 @@ const AdminAnalytics = () => {
             </Card>
 
             <Card className="p-5 border-amber-100 dark:border-amber-900 shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10">
+              <div className="absolute top-0 end-0 p-4 opacity-10">
                 <LineChartIcon className="w-16 h-16" />
               </div>
               <p className="text-sm text-muted-foreground font-medium">LTV (Həyat Dəyəri)</p>

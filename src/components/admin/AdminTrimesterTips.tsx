@@ -97,7 +97,7 @@ const AdminTrimesterTips = () => {
           <p className="text-muted-foreground">{tr("admintrimestertips_her_trimester_ucun_xususi_tovsiyeleri_id_2b4d22", "Hər trimester üçün xüsusi tövsiyələri idarə edin")}</p>
         </div>
         <Button onClick={() => setIsAdding(true)} disabled={isAdding}>
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           {tr("admintrimestertips_yeni_tovsiye_597286", "Yeni T\xF6vsiy\u0259")}
         </Button>
       </div>
@@ -163,11 +163,11 @@ const AdminTrimesterTips = () => {
             </div>
             <div className="flex gap-2">
               <Button onClick={handleCreate} disabled={createTip.isPending}>
-                {createTip.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                {createTip.isPending ? <Loader2 className="w-4 h-4 me-2 animate-spin" /> : <Save className="w-4 h-4 me-2" />}
                 Yadda Saxla
               </Button>
               <Button variant="outline" onClick={() => setIsAdding(false)}>
-                <X className="w-4 h-4 mr-2" />
+                <X className="w-4 h-4 me-2" />
                 {tr("admintrimestertips_legv_et_8dc1d6", "L\u0259\u011Fv Et")}
               </Button>
             </div>

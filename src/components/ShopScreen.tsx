@@ -153,7 +153,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
         <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50 safe-area-top">
           <div className="px-4 py-2.5 flex items-center gap-3">
             <motion.button onClick={() => setSelectedProduct(null)} className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center" whileTap={{ scale: 0.95 }}>
-              <ArrowLeft className="w-4.5 h-4.5" />
+              <ArrowLeft className="rtl:rotate-180 w-4.5 h-4.5" />
             </motion.button>
             <h1 className="text-base font-bold flex-1 line-clamp-1">{selectedProduct.name}</h1>
             <motion.button
@@ -163,7 +163,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
               
               <ShoppingCart className="w-4.5 h-4.5 text-primary" />
               {totalItems > 0 &&
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+              <span className="absolute -top-1 -end-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center">
                   {totalItems}
                 </span>
               }
@@ -197,7 +197,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
             <div>
               <span className="text-2xl font-black text-primary">{selectedProduct.price}₼</span>
               {selectedProduct.originalPrice && selectedProduct.originalPrice > selectedProduct.price &&
-              <span className="text-sm text-muted-foreground line-through ml-2">{selectedProduct.originalPrice}₼</span>
+              <span className="text-sm text-muted-foreground line-through ms-2">{selectedProduct.originalPrice}₼</span>
               }
             </div>
             <motion.button
@@ -230,8 +230,8 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           {onBack &&
-          <button onClick={onBack} className="p-1.5 -ml-1.5 rounded-full hover:bg-muted">
-              <ArrowLeft className="w-5 h-5" />
+          <button onClick={onBack} className="p-1.5 -ms-1.5 rounded-full hover:bg-muted">
+              <ArrowLeft className="rtl:rotate-180 w-5 h-5" />
             </button>
           }
           <div>
@@ -246,7 +246,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
           
           <ShoppingCart className="w-5 h-5 text-primary" />
           {totalItems > 0 &&
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center">
+          <span className="absolute -top-1 -end-1 w-4 h-4 bg-destructive rounded-full text-[9px] font-bold text-white flex items-center justify-center">
               {totalItems}
             </span>
           }
@@ -255,13 +255,13 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
 
       {/* Search - compact */}
       <div className="relative mb-3">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           type="text"
           placeholder={tr("shopscreen_mehsul_axtarin_7356a7", "Məhsul axtarın...")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/50 border border-transparent focus:border-primary/30 text-sm transition-all outline-none" />
+          className="w-full h-10 ps-10 pe-4 rounded-xl bg-muted/50 border border-transparent focus:border-primary/30 text-sm transition-all outline-none" />
         
       </div>
 
@@ -285,7 +285,7 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
 
       {/* Banner - compact */}
       <div className="relative overflow-hidden rounded-xl gradient-sunset p-3 mb-3">
-        <div className="absolute -right-2 -bottom-2 text-5xl opacity-30">🎁</div>
+        <div className="absolute -end-2 -bottom-2 text-5xl opacity-30">🎁</div>
         <div className="relative z-10">
           <span className="inline-block px-2 py-0.5 bg-white/20 rounded-full text-white text-[10px] font-bold mb-1">
             {tr("shopscreen_xususi_teklif_d781d9", "X\xFCsusi T\u0259klif")}
@@ -304,13 +304,13 @@ const ShopScreen = ({ onBack }: ShopScreenProps) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.03 * index }}
-          className="bg-card rounded-xl overflow-hidden border border-border/50 text-left">
+          className="bg-card rounded-xl overflow-hidden border border-border/50 text-start">
           
             {/* Product Image - compact */}
             <div className="relative px-3 pt-3 pb-1">
               <button
               onClick={(e) => {e.stopPropagation();}}
-              className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/80 shadow-sm flex items-center justify-center z-10">
+              className="absolute top-2 end-2 w-6 h-6 rounded-full bg-white/80 shadow-sm flex items-center justify-center z-10">
               
                 <Heart className="w-3 h-3 text-muted-foreground" />
               </button>

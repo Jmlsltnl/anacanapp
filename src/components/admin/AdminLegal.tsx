@@ -100,7 +100,7 @@ const AdminLegal = () => {
           <p className="text-muted-foreground">{tr("adminlegal_sertler_mexfilik_gdpr_ve_diger_senedleri_4d1d93", "Şərtlər, Məxfilik, GDPR və digər sənədləri idarə edin")}</p>
         </div>
         <Button onClick={handleCreate}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           {tr("adminlegal_yeni_sened_98a562", "Yeni S\u0259n\u0259d")}
         </Button>
       </div>
@@ -129,11 +129,11 @@ const AdminLegal = () => {
                   setPreviewOpen(true);
                 }}>
                 
-                  <Eye className="h-4 w-4 mr-1" />
+                  <Eye className="h-4 w-4 me-1" />
                   {tr("adminlegal_onizleme_1f8cc7", "\xD6nizl\u0259m\u0259")}
                 </Button>
                 <Button size="sm" onClick={() => handleEdit(doc)}>
-                  <Edit className="h-4 w-4 mr-1" />
+                  <Edit className="h-4 w-4 me-1" />
                   {tr("adminlegal_redakte_d53ba7", "Redakt\u0259")}
                 </Button>
               </div>
@@ -238,7 +238,7 @@ const AdminLegal = () => {
               {tr("adminlegal_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button onClick={handleSave} disabled={updateDocument.isPending || createDocument.isPending}>
-              <Save className="h-4 w-4 mr-2" />
+              <Save className="h-4 w-4 me-2" />
               Yadda saxla
             </Button>
           </div>

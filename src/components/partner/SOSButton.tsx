@@ -110,7 +110,7 @@ const SOSButton: React.FC<SOSButtonProps> = ({ variant = 'full' }) => {
           
           <div className="relative z-10 flex items-center justify-center gap-3">
             <AlertTriangle className="w-8 h-8 text-white" />
-            <div className="text-left">
+            <div className="text-start">
               <div className="text-xl font-bold text-white">SOS</div>
               <div className="text-white/80 text-sm">
                 {loading ? tr("sosbutton_gonderilir_1d548c", "G\xF6nd\u0259rilir...") : tr("sosbutton_basib_saxla_2_san_27183d", "Bas\u0131b saxla (2 san)")}
@@ -226,7 +226,7 @@ export const SOSAlertReceiver: React.FC = () => {
           </p>
 
           <div className="text-sm text-white/60 mb-8">
-            <Clock className="w-4 h-4 inline-block mr-1" />
+            <Clock className="w-4 h-4 inline-block me-1" />
             {format(new Date(pendingAlert.created_at), 'HH:mm', { locale: getCurrentDateLocale() })}
           </div>
 
@@ -238,7 +238,7 @@ export const SOSAlertReceiver: React.FC = () => {
               className="w-full bg-white text-red-500 hover:bg-white/90"
               onClick={openMaps}>
               
-                <Navigation className="w-5 h-5 mr-2" />
+                <Navigation className="w-5 h-5 me-2" />
                 Lokasiyaya Get
               </Button>
             }
@@ -249,7 +249,7 @@ export const SOSAlertReceiver: React.FC = () => {
               className="w-full border-white text-white hover:bg-white/10"
               onClick={() => acknowledgeAlert(pendingAlert.id)}>
               
-              <Check className="w-5 h-5 mr-2" />
+              <Check className="w-5 h-5 me-2" />
               {tr("sosbutton_anladim_fd05e3", "Anlad\u0131m")}
             </Button>
           </div>

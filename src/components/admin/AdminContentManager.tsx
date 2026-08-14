@@ -554,7 +554,7 @@ const AdminContentManager = () => {
                 <Button
                 variant="destructive"
                 size="icon"
-                className="absolute top-2 right-2"
+                className="absolute top-2 end-2"
                 onClick={() => setFormData({ ...formData, image_url: '' })}>
                 
                   <X className="w-4 h-4" />
@@ -802,7 +802,7 @@ const AdminContentManager = () => {
             </>
           }
           <Button onClick={openCreateModal} className="gradient-primary">
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4 me-2" />
             {tr("admincontentmanager_yeni_elave_et_fa6b69", "Yeni \u018Flav\u0259 Et")}
           </Button>
         </div>
@@ -838,12 +838,12 @@ const AdminContentManager = () => {
 
         <div className="mb-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Axtar..."
-              className="pl-10" />
+              className="ps-10" />
             
           </div>
         </div>
@@ -969,7 +969,7 @@ const AdminContentManager = () => {
                     {localize(item, 'meaning')}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
                     {item.popularity}%
                   </span>
@@ -1028,7 +1028,7 @@ const AdminContentManager = () => {
                       {item.description}
                     </p>
                   </div>
-                  <div className="text-right text-xs text-muted-foreground">
+                  <div className="text-end text-xs text-muted-foreground">
                     <p>⏱️ {item.prep_time || 0}+{item.cook_time || 0} {tr("admincontentmanager_deq_780a5c", "d\u0259q")}</p>
                     <p>🍴 {item.servings || 1} porsiya</p>
                   </div>

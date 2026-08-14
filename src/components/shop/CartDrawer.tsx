@@ -35,7 +35,7 @@ const CartDrawer = ({ isOpen, onClose, onCheckout }: CartDrawerProps) => {
         animate={{ x: 0 }}
         exit={{ x: '100%' }}
         transition={{ type: 'spring', damping: 25 }}
-        className="fixed right-0 top-0 h-full w-full max-w-md bg-background z-50 shadow-xl flex flex-col">
+        className="fixed end-0 top-0 h-full w-full max-w-md bg-background z-50 shadow-xl flex flex-col">
         
         <div className="flex items-center justify-between p-4 border-b border-border">
           <h2 className="text-lg font-bold">{tr("cartdrawer_sebet_9a08cf", "Səbət")}</h2>
@@ -91,7 +91,7 @@ const CartDrawer = ({ isOpen, onClose, onCheckout }: CartDrawerProps) => {
                     </button>
                     <button
                   onClick={() => removeFromCart(item.id)}
-                  className="ml-auto p-1.5 text-destructive hover:bg-destructive/10 rounded-lg">
+                  className="ms-auto p-1.5 text-destructive hover:bg-destructive/10 rounded-lg">
                   
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

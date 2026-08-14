@@ -68,7 +68,7 @@ const PaywallDesignerTab = () => {
     <div className="space-y-4">
       <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
         <p className="text-sm text-muted-foreground">
-          <Palette className="w-4 h-4 inline mr-1 text-amber-500" />
+          <Palette className="w-4 h-4 inline me-1 text-amber-500" />
           {tr("paywalldesignertab_premium_paywall_sehifesindeki__bf1e9e", "Premium Paywall s\u0259hif\u0259sind\u0259ki b\xFCt\xFCn m\u0259tnl\u0259ri, r\u0259ngl\u0259ri v\u0259 elementl\u0259ri buradan idar\u0259 edin.")}
         </p>
       </div>
@@ -127,7 +127,7 @@ const PaywallDesignerTab = () => {
             </div>
           )}
           <Button variant="outline" size="sm" onClick={addPill}>
-            <Plus className="w-3 h-3 mr-1" />{tr("paywalldesignertab_etiket_elave_et_4a65ae", "Etiket \u0259lav\u0259 et")}
+            <Plus className="w-3 h-3 me-1" />{tr("paywalldesignertab_etiket_elave_et_4a65ae", "Etiket \u0259lav\u0259 et")}
           </Button>
         </div>
         <p className="text-[10px] text-muted-foreground">{tr("paywalldesignertab_ikon_adlari_zap_shield_sparkles_star_cro_7c0843", "İkon adları: Zap, Shield, Sparkles, Star, Crown, Heart və s. (Lucide icon adları)")}</p>
@@ -224,7 +224,7 @@ const PaywallDesignerTab = () => {
           Defolt-a qaytar
         </Button>
         <Button className="flex-1" onClick={handleSave} disabled={isPending || !hasChanges}>
-          {isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+          {isPending ? <Loader2 className="w-4 h-4 me-2 animate-spin" /> : <Save className="w-4 h-4 me-2" />}
           {isPending ? tr("paywalldesignertab_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : 'Saxla'}
         </Button>
       </div>

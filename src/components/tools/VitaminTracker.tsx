@@ -191,7 +191,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}>
         
-        <span className="a-cta-shape" style={{ width: 110, height: 110, top: -40, right: -30, background: 'rgba(255,255,255,0.35)' }} />
+        <span className="a-cta-shape" style={{ width: 110, height: 110, top: -40, insetInlineEnd: -30, background: 'rgba(255,255,255,0.35)' }} />
         <div className="a-cta-top">
           <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: '#14532d' }}>
             💊 {tr("vitamintracker_bugunku_qebul_ae152d", "Bugünkü qəbul")}
@@ -430,11 +430,11 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
                     style={{
                       position: 'absolute', top: 3, width: 19, height: 19, borderRadius: 999, background: '#fff',
                       boxShadow: '0 2px 4px rgba(0,0,0,0.2)', transition: 'left 150ms ease',
-                      left: newVitamin.notification ? 22 : 3
+                      insetInlineStart: newVitamin.notification ? 22 : 3
                     }} />
                   </button>
                 </div>
-                <p className="a-list-time" style={{ marginTop: 8, marginLeft: 4, marginBottom: 4, lineHeight: 1.5 }}>
+                <p className="a-list-time" style={{ marginTop: 8, marginInlineStart: 4, marginBottom: 4, lineHeight: 1.5 }}>
                   {tr("vitamintracker_qebul_vaxtindan_5_deqiqe_evvel_023b26", "Q\u0259bul vaxt\u0131ndan 5 d\u0259qiq\u0259 \u0259vv\u0259l bildiri\u015F g\xF6nd\u0259ril\u0259c\u0259k")}
                 </p>
               </div>

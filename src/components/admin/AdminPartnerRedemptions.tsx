@@ -49,12 +49,12 @@ export default function AdminPartnerRedemptions() {
         <table className="w-full text-sm">
           <thead className="bg-muted">
             <tr>
-              <th className="p-2 text-left">Status</th>
-              <th className="p-2 text-left">{tr("adminpartnerredemptions_mekan_90b8af", "M\u0259kan")}</th>
-              <th className="p-2 text-left">{tr("adminpartnerredemptions_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}</th>
-              <th className="p-2 text-left">{tr("adminpartnerredemptions_yaradilib_0230e2", "Yarad\u0131l\u0131b")}</th>
-              <th className="p-2 text-left">{tr("adminpartnerredemptions_tesdiqlenib_96c431", "T\u0259sdiql\u0259nib")}</th>
-              <th className="p-2 text-left">IP</th>
+              <th className="p-2 text-start">Status</th>
+              <th className="p-2 text-start">{tr("adminpartnerredemptions_mekan_90b8af", "M\u0259kan")}</th>
+              <th className="p-2 text-start">{tr("adminpartnerredemptions_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}</th>
+              <th className="p-2 text-start">{tr("adminpartnerredemptions_yaradilib_0230e2", "Yarad\u0131l\u0131b")}</th>
+              <th className="p-2 text-start">{tr("adminpartnerredemptions_tesdiqlenib_96c431", "T\u0259sdiql\u0259nib")}</th>
+              <th className="p-2 text-start">IP</th>
             </tr>
           </thead>
           <tbody>

@@ -123,7 +123,7 @@ const MotherSOSSheet = ({ open, onClose, lifeStage }: Props) => {
               onPointerDown={() => startHold('birth')}
               onPointerUp={stopHold}
               onPointerLeave={stopHold}
-              className="w-full relative overflow-hidden text-left select-none"
+              className="w-full relative overflow-hidden text-start select-none"
               style={{ borderRadius: 20, background: 'var(--a-peach-1)', border: '2px solid var(--a-peach-2)', padding: 18, touchAction: 'none' }}>
                     {holdType === 'birth' &&
               <motion.div className="absolute inset-0" style={{ background: 'rgba(255,157,99,0.35)', width: `${progress}%` }} />
@@ -149,7 +149,7 @@ const MotherSOSSheet = ({ open, onClose, lifeStage }: Props) => {
               onPointerDown={() => startHold('emergency')}
               onPointerUp={stopHold}
               onPointerLeave={stopHold}
-              className="w-full relative overflow-hidden text-left select-none"
+              className="w-full relative overflow-hidden text-start select-none"
               style={{ borderRadius: 20, background: 'var(--a-alert-bg)', border: '2px solid rgba(177, 39, 91, 0.35)', padding: 18, touchAction: 'none' }}>
                   {holdType === 'emergency' &&
               <motion.div className="absolute inset-0" style={{ background: 'rgba(177,39,91,0.22)', width: `${progress}%` }} />

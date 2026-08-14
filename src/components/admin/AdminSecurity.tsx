@@ -288,9 +288,9 @@ const AdminSecurity = () => {
           <table className="w-full">
             <thead className="bg-muted/50">
               <tr>
-                <th className="text-left p-4 font-medium text-muted-foreground">{tr("adminsecurity_istifadeci_b6bdd6", "İstifadəçi")}</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">Rol</th>
-                <th className="text-right p-4 font-medium text-muted-foreground">{tr("adminsecurity_emeliyyat_580469", "Əməliyyat")}</th>
+                <th className="text-start p-4 font-medium text-muted-foreground">{tr("adminsecurity_istifadeci_b6bdd6", "İstifadəçi")}</th>
+                <th className="text-start p-4 font-medium text-muted-foreground">Rol</th>
+                <th className="text-end p-4 font-medium text-muted-foreground">{tr("adminsecurity_emeliyyat_580469", "Əməliyyat")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -335,7 +335,7 @@ const AdminSecurity = () => {
                           {getRoleLabel(role.role)}
                         </Badge>
                       </td>
-                      <td className="p-4 text-right">
+                      <td className="p-4 text-end">
                         <Select
                         value={role.role}
                         onValueChange={(v) => handleUpdateRole(role.user_id, v as any)}>

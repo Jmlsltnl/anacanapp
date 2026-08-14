@@ -158,7 +158,7 @@ const AdminFirstAid = () => {
           </p>
         </div>
         <Button onClick={() => setNewScenario(true)}>
-          <Plus className="w-4 h-4 mr-1" />
+          <Plus className="w-4 h-4 me-1" />
           Yeni Ssenari
         </Button>
       </div>
@@ -329,11 +329,11 @@ const ScenarioForm = ({ scenario, onSave, onCancel, isLoading }: ScenarioFormPro
       
       <div className="flex gap-2">
         <Button onClick={() => onSave(form)} disabled={isLoading}>
-          <Save className="w-4 h-4 mr-1" />
+          <Save className="w-4 h-4 me-1" />
           {isLoading ? tr("adminfirstaid_saxlanir_9ea540", "Saxlan\u0131r...") : 'Yadda saxla'}
         </Button>
         <Button variant="outline" onClick={onCancel}>
-          <X className="w-4 h-4 mr-1" />
+          <X className="w-4 h-4 me-1" />
           {tr("adminfirstaid_legv_et_b5e49c", "L\u0259\u011Fv et")}
         </Button>
       </div>

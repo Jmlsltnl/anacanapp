@@ -24,7 +24,7 @@ const CakeCartDrawer = ({ open, onClose, onCheckout }: CakeCartDrawerProps) => {
           onClick={onClose} />
         
           <motion.div
-          className="a-scope fixed bottom-0 left-0 right-0 z-50 rounded-t-[26px] max-h-[85vh] flex flex-col"
+          className="a-scope fixed bottom-0 start-0 end-0 z-50 rounded-t-[26px] max-h-[85vh] flex flex-col"
           style={{ background: 'var(--a-surface)' }}
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
@@ -87,7 +87,7 @@ const CakeCartDrawer = ({ open, onClose, onCheckout }: CakeCartDrawerProps) => {
                         </button>
                         <button
                     onClick={() => removeItem(index)}
-                    className="ml-auto p-1.5 rounded-lg"
+                    className="ms-auto p-1.5 rounded-lg"
                     style={{ background: 'var(--a-pink-1)', border: 'none', cursor: 'pointer' }}>
                     
                           <Trash2 className="w-4 h-4" style={{ color: 'var(--a-pink-ink)' }} />

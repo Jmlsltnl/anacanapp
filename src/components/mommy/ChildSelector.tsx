@@ -203,7 +203,7 @@ const ChildSelector = ({ compact = false }: ChildSelectorProps) => {
               initial={{ opacity: 0, y: -10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className={`absolute top-full mt-2 w-64 bg-card rounded-2xl border shadow-xl z-50 overflow-hidden ${compact ? 'right-0' : 'left-0'}`}>
+              className={`absolute top-full mt-2 w-64 bg-card rounded-2xl border shadow-xl z-50 overflow-hidden ${compact ? 'end-0' : 'start-0'}`}>
               
                 <div className="p-2">
                   {children.map((child) => {

@@ -121,9 +121,9 @@ const PushDiagnosticsCard = () => {
             disabled={loading !== null}>
             
             {loading === 'check-tokens' ?
-            <Loader2 className="h-4 w-4 mr-1 animate-spin" /> :
+            <Loader2 className="h-4 w-4 me-1 animate-spin" /> :
 
-            <RefreshCw className="h-4 w-4 mr-1" />
+            <RefreshCw className="h-4 w-4 me-1" />
             }
             {tr("pushdiagnosticscard_tokenlerimi_yoxla_749170", "Tokenl\u0259rimi yoxla")}
           </Button>
@@ -133,9 +133,9 @@ const PushDiagnosticsCard = () => {
             disabled={loading !== null}>
             
             {loading === 'me-daily' ?
-            <Loader2 className="h-4 w-4 mr-1 animate-spin" /> :
+            <Loader2 className="h-4 w-4 me-1 animate-spin" /> :
 
-            <Send className="h-4 w-4 mr-1" />
+            <Send className="h-4 w-4 me-1" />
             }
             {tr("pushdiagnosticscard_mene_dinamik_push_gonder_642e6b", "M\u0259n\u0259 dinamik push g\xF6nd\u0259r")}
           </Button>
@@ -146,9 +146,9 @@ const PushDiagnosticsCard = () => {
             disabled={loading !== null}>
             
             {loading === 'me-flow' ?
-            <Loader2 className="h-4 w-4 mr-1 animate-spin" /> :
+            <Loader2 className="h-4 w-4 me-1 animate-spin" /> :
 
-            <Send className="h-4 w-4 mr-1" />
+            <Send className="h-4 w-4 me-1" />
             }
             {tr("pushdiagnosticscard_flow_reminderlerini_icra_et_f80582", "Flow reminderl\u0259rini icra et")}
           </Button>

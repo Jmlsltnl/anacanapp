@@ -155,7 +155,7 @@ const PartnerTogetherScreen = ({ onNavigate }: Props) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.04 }}
                 onClick={() => onNavigate(f.screen)}
-                className="text-left relative"
+                className="text-start relative"
                 style={{
                   background: 'var(--a-surface)',
                   borderRadius: 'var(--a-radius-md)',
@@ -183,13 +183,13 @@ const PartnerTogetherScreen = ({ onNavigate }: Props) => {
                 }
 
                 {f.badge &&
-                <span className="absolute top-3 right-3"
+                <span className="absolute top-3 end-3"
                 style={{ background: f.bg, color: f.ink, borderRadius: 999, padding: '3px 8px', fontSize: 10, fontWeight: 800 }}>
                     {f.badge}
                   </span>
                 }
                 {!f.badge && f.progress === undefined &&
-                <ChevronRight size={14} className="absolute bottom-4 right-3.5" style={{ color: 'var(--a-ink-faint)' }} />
+                <ChevronRight size={14} className="rtl:rotate-180 absolute bottom-4 end-3.5" style={{ color: 'var(--a-ink-faint)' }} />
                 }
               </motion.button>);
 

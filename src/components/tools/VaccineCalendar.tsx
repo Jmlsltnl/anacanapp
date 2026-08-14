@@ -219,7 +219,7 @@ export default function VaccineCalendar({ onBack }: Props) {
         layout
         whileTap={{ scale: 0.98 }}
         onClick={() => setDetailRow(row)}
-        className="a-card w-full text-left"
+        className="a-card w-full text-start"
         style={{ padding: '14px 16px', cursor: 'pointer' }}>
         
         <div className="flex items-start gap-3">
@@ -436,7 +436,7 @@ export default function VaccineCalendar({ onBack }: Props) {
                   
                     <Syringe className="w-6 h-6" />
                   </div>
-                  <div className="flex-1 text-left">
+                  <div className="flex-1 text-start">
                     <SheetTitle className="text-base">{translateVaccineLabel(detailRow.vaccine.name, lang)}</SheetTitle>
                     <p className="text-[11px] text-muted-foreground">{translateVaccineLabel(detailRow.age_label, lang)} • {translateVaccineLabel(detailRow.dose_label, lang)}</p>
                   </div>
@@ -538,7 +538,7 @@ function Header({ onBack }: {onBack: () => void;}) {
       <header className="a-topbar">
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }}>
-            <ArrowLeft size={16} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
           </motion.button>
           <div>
             <p className="a-eyebrow">{tr("vaccine_national_schedule", "Milli İmmunizasiya Qrafiki")}</p>
@@ -562,7 +562,7 @@ function Stat({ label, value, color = 'var(--a-ink)' }: {label: string;value: nu
 
 function DetailRow({ label, value }: {label: string;value: string;}) {
   return (
-    <div style={{ borderLeft: '2px solid var(--a-peach-2)', paddingLeft: 12 }}>
+    <div style={{ borderLeft: '2px solid var(--a-peach-2)', paddingInlineStart: 12 }}>
       <p className="a-today-info-eyebrow" style={{ margin: 0 }}>{label}</p>
       <p style={{ fontSize: 13, lineHeight: 1.6, marginTop: 2, whiteSpace: 'pre-line', color: 'var(--a-ink)' }}>{value}</p>
     </div>);

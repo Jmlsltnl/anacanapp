@@ -407,7 +407,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                 onClick={() => setShowResetConfirm(true)}
                 className="text-destructive focus:text-destructive">
                 
-                  <RotateCcw className="w-4 h-4 mr-2" />
+                  <RotateCcw className="w-4 h-4 me-2" />
                   {tr("weighttracker_tarixceni_sifirla_577dd6", "Tarixçəni sıfırla")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -559,7 +559,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
                   className="a-input w-full text-center"
                   style={{ height: 60, fontSize: 28, fontWeight: 800, borderRadius: 18 }} />
                 
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 a-list-value" style={{ color: 'var(--a-ink-soft)' }}>kg</span>
+                  <span className="absolute end-4 top-1/2 -translate-y-1/2 a-list-value" style={{ color: 'var(--a-ink-soft)' }}>kg</span>
                 </div>
 
                 <motion.button

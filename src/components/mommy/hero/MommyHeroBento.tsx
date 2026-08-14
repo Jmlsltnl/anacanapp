@@ -34,7 +34,7 @@ const MommyHeroBento = ({ babyData, exactMonths, remainingDays, babyIllustration
             }} />
           
         </div>
-        <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/40 to-transparent">
+        <div className="absolute bottom-0 start-0 end-0 p-3 bg-gradient-to-t from-black/40 to-transparent">
           <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/80">{tr("mommyherobento_bu_gun_786fd4", "Bu gün")}</p>
           <h3 className="text-base font-black text-white drop-shadow truncate">{babyData.name}</h3>
         </div>
@@ -47,7 +47,7 @@ const MommyHeroBento = ({ babyData, exactMonths, remainingDays, babyIllustration
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.05 }}>
         
-        <div className="absolute -bottom-6 -right-4 w-32 h-32 rounded-full bg-[hsl(15,85%,60%)]/20 blur-2xl" />
+        <div className="absolute -bottom-6 -end-4 w-32 h-32 rounded-full bg-[hsl(15,85%,60%)]/20 blur-2xl" />
         <div className="relative flex items-baseline gap-1.5">
           <span className="text-[56px] font-black leading-none tabular-nums tracking-tighter">
             {exactMonths > 0 ? exactMonths : babyData.ageInDays}
@@ -61,7 +61,7 @@ const MommyHeroBento = ({ babyData, exactMonths, remainingDays, babyIllustration
           `+ ${remainingDays} ${remainingDays > 1 ? tr("time_days", "gün") : tr("time_day", "gün")} ${tr("mommyherobento_boyumeye_davam_edir", "böyüməyə davam edir")}` : tr("mommyherobento_yas_95595b", "Yaş")
           }
         </p>
-        <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[hsl(15,85%,60%)] flex items-center justify-center">
+        <div className="absolute top-3 end-3 w-8 h-8 rounded-full bg-[hsl(15,85%,60%)] flex items-center justify-center">
           <Sparkles className="w-4 h-4 text-white" />
         </div>
       </motion.div>
@@ -99,7 +99,7 @@ const MommyHeroBento = ({ babyData, exactMonths, remainingDays, babyIllustration
             {tr("mommyherobento_sevgi_ile_boyuyur_6b7588", "Sevgi ilə böyüyür ✨")}
           </div>
         </div>
-        <div className="w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center shadow-sm shrink-0 ml-2">
+        <div className="w-9 h-9 rounded-full bg-white/70 backdrop-blur-sm flex items-center justify-center shadow-sm shrink-0 ms-2">
           <Heart className="w-4 h-4 text-[hsl(340,80%,55%)] fill-current" />
         </div>
       </motion.div>

@@ -158,12 +158,12 @@ const AdminFAQ = () => {
       {/* Search */}
       <Card className="p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Sual axtar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-10" />
+            className="ps-10" />
           
         </div>
       </Card>
@@ -203,7 +203,7 @@ const AdminFAQ = () => {
                         {localize(faq, 'answer')}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 ml-4">
+                    <div className="flex items-center gap-2 ms-4">
                       <Button variant="ghost" size="icon" onClick={() => openEditModal(faq)}>
                         <Pencil className="w-4 h-4" />
                       </Button>
@@ -225,7 +225,7 @@ const AdminFAQ = () => {
           <DialogHeader>
             <DialogTitle>{editingItem ? tr("adminfaq_sual_redakte_et_85d075", "Sual Redakt\u0259 Et") : 'Yeni Sual'}</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-[60vh] pr-4">
+          <ScrollArea className="max-h-[60vh] pe-4">
             <div className="space-y-4">
               <Input
                 placeholder="Sual (EN)"

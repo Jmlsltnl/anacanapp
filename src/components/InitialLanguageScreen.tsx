@@ -187,7 +187,7 @@ export default function InitialLanguageScreen() {
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ type: 'spring', stiffness: 400, damping: 18 }}
-                          className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
+                          className="absolute top-2 end-2 w-5 h-5 rounded-full flex items-center justify-center"
                           style={{ background: 'var(--a-peach-2)' }}
                         >
                           <Check className="w-3 h-3 text-white" strokeWidth={3.5} />
@@ -241,7 +241,7 @@ export default function InitialLanguageScreen() {
                   className="a-icon-btn"
                   aria-label="Back"
                 >
-                  <ChevronLeft size={18} strokeWidth={2.5} />
+                  <ChevronLeft className="rtl:rotate-180" size={18} strokeWidth={2.5} />
                 </button>
                 <div className="text-center">
                   <h2 style={{ fontSize: 17, fontWeight: 800, lineHeight: 1.2, color: 'var(--a-ink)' }}>
@@ -256,13 +256,13 @@ export default function InitialLanguageScreen() {
 
               {/* Search */}
               <div className="relative mb-4">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" strokeWidth={2.5} style={{ color: 'var(--a-ink-faint)' }} />
+                <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4" strokeWidth={2.5} style={{ color: 'var(--a-ink-faint)' }} />
                 <input
                   type="text"
                   placeholder={t.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full py-3.5 pl-11 pr-4 rounded-2xl text-sm focus:outline-none transition-colors"
+                  className="w-full py-3.5 ps-11 pe-4 rounded-2xl text-sm focus:outline-none transition-colors"
                   style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', color: 'var(--a-ink)', boxShadow: 'var(--a-card-shadow)' }}
                 />
               </div>
@@ -281,17 +281,17 @@ export default function InitialLanguageScreen() {
                         className="w-full flex items-center px-4 py-3 transition-colors cursor-pointer"
                         style={{ borderBottom: '1px solid var(--a-line)' }}
                       >
-                        <div className="w-6 h-4 mr-3 overflow-hidden rounded-sm flex-shrink-0" style={{ border: '1px solid var(--a-line)' }}>
+                        <div className="w-6 h-4 me-3 overflow-hidden rounded-sm flex-shrink-0" style={{ border: '1px solid var(--a-line)' }}>
                           <img
                             src={country.flag.startsWith('data:') ? country.flag : `data:image/png;base64,${country.flag}`}
                             alt={country.name}
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <span className="text-left flex-1" style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--a-ink)' }}>
+                        <span className="text-start flex-1" style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--a-ink)' }}>
                           {country.name}
                         </span>
-                        <ChevronLeft className="w-4 h-4 rotate-180" style={{ color: 'var(--a-ink-faint)' }} />
+                        <ChevronLeft className="rtl:rotate-180 w-4 h-4 rotate-180" style={{ color: 'var(--a-ink-faint)' }} />
                       </motion.button>
                     ))
                   ) : (

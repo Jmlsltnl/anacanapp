@@ -206,7 +206,7 @@ const StoryViewer = ({
           <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent z-10 pointer-events-none" />
 
           {/* Progress bars */}
-          <div className="absolute top-0 left-0 right-0 flex gap-[3px] z-20 px-2 pt-[calc(env(safe-area-inset-top,8px)+8px)]">
+          <div className="absolute top-0 start-0 end-0 flex gap-[3px] z-20 px-2 pt-[calc(env(safe-area-inset-top,8px)+8px)]">
             {currentGroup.stories.map((_, index) =>
             <div
               key={index}
@@ -229,7 +229,7 @@ const StoryViewer = ({
           </div>
 
           {/* Header */}
-          <div className="absolute left-0 right-0 z-20 px-4" style={{ top: 'calc(env(safe-area-inset-top, 8px) + 20px)' }}>
+          <div className="absolute start-0 end-0 z-20 px-4" style={{ top: 'calc(env(safe-area-inset-top, 8px) + 20px)' }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full ring-2 ring-white/80 overflow-hidden">
@@ -285,7 +285,7 @@ const StoryViewer = ({
 
           {/* Text overlay */}
           {currentStory.text_overlay &&
-          <div className="absolute bottom-24 left-4 right-4 text-center z-20 pointer-events-none">
+          <div className="absolute bottom-24 start-4 end-4 text-center z-20 pointer-events-none">
               <p className="text-white text-lg font-medium drop-shadow-lg bg-black/30 backdrop-blur-sm rounded-2xl px-5 py-3">
                 {currentStory.text_overlay}
               </p>
@@ -294,7 +294,7 @@ const StoryViewer = ({
 
           {/* Bottom: View count for own stories (swipe up to see viewers) */}
           {isOwnStory &&
-          <div className="absolute bottom-0 left-0 right-0 z-20 pb-[calc(env(safe-area-inset-bottom,16px)+16px)]">
+          <div className="absolute bottom-0 start-0 end-0 z-20 pb-[calc(env(safe-area-inset-bottom,16px)+16px)]">
               <motion.button
               onClick={(e) => {
                 e.stopPropagation();
@@ -349,7 +349,7 @@ const StoryViewer = ({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="absolute bottom-0 left-0 right-0 max-h-[70vh] bg-card rounded-t-3xl overflow-hidden"
+            className="absolute bottom-0 start-0 end-0 max-h-[70vh] bg-card rounded-t-3xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}>
             
               {/* Handle */}

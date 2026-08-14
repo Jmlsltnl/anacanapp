@@ -361,7 +361,7 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
                 <div key={idx} className="flex items-center gap-3 p-2.5 rounded-xl" style={{ background: 'var(--a-surface-soft)' }}>
                     <div className="w-2 h-2 rounded-full" style={{ background: level.dot }} />
                     <span className="a-list-title" style={{ margin: 0 }}>{item.db} dB</span>
-                    <span className="a-list-time ml-auto" style={{ margin: '0 0 0 auto' }}>
+                    <span className="a-list-time ms-auto" style={{ margin: '0 0 0 auto' }}>
                       {item.time.toLocaleTimeString(getLocaleTag(), { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>);

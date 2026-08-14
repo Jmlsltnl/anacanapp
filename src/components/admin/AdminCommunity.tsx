@@ -297,17 +297,17 @@ const AdminCommunity = () => {
       <Card className="p-4">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Qrup axtar..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10" />
+              className="ps-10" />
             
           </div>
           <Select value={filterType} onValueChange={setFilterType}>
             <SelectTrigger className="w-48">
-              <Filter className="w-4 h-4 mr-2" />
+              <Filter className="w-4 h-4 me-2" />
               <SelectValue placeholder="Tip filteri" />
             </SelectTrigger>
             <SelectContent>
@@ -505,14 +505,14 @@ const AdminCommunity = () => {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-              <X className="w-4 h-4 mr-2" />
+              <X className="w-4 h-4 me-2" />
               {tr("admincommunity_legv_et_b5e49c", "L\u0259\u011Fv et")}
             </Button>
             <Button onClick={handleSave} disabled={saving}>
               {saving ?
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" /> :
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin me-2" /> :
 
-              <Save className="w-4 h-4 mr-2" />
+              <Save className="w-4 h-4 me-2" />
               }
               {editingGroup ? tr("admincommunity_yenile_570ce2", "Yenil\u0259") : 'Yarat'}
             </Button>

@@ -109,7 +109,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
       <header className="a-topbar">
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
           <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label="Back">
-            <ArrowLeft size={16} strokeWidth={2} />
+            <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
           </motion.button>
           <div style={{ minWidth: 0 }}>
             <p className="a-eyebrow">{product.store_name || platformLabels[product.platform] || product.platform}</p>
@@ -141,9 +141,9 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
           className="w-full"
           opts={{ loop: true }}>
           
-            <CarouselContent className="-ml-0">
+            <CarouselContent className="-ms-0">
               {allImages.map((img, idx) =>
-            <CarouselItem key={idx} className="pl-0">
+            <CarouselItem key={idx} className="ps-0">
                   <div className="relative aspect-square flex items-center justify-center p-6">
                     <img
                   src={img || '/placeholder.svg'}
@@ -167,7 +167,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
 
         {/* Discount Badge */}
         {discountPercent &&
-        <div className="absolute top-4 left-4">
+        <div className="absolute top-4 start-4">
             <span className="text-sm px-3 py-1 rounded-full font-bold shadow-lg" style={{ background: 'var(--a-pink-2)', color: '#fff' }}>
               -{discountPercent}%
             </span>
@@ -176,7 +176,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
 
         {/* Featured Badge */}
         {product.is_featured &&
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 end-4">
             <span className="px-3 py-1 rounded-full font-bold shadow-lg flex items-center gap-1 text-xs" style={{ background: 'var(--a-yellow-2)', color: '#5a3d00' }}>
               <Sparkles className="w-3 h-3" />
               {tr("affiliateproductdetail_tovsiyye_45368e", "T\xF6vsiyy\u0259")}
@@ -188,7 +188,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
         {product.video_url &&
         <button
           onClick={() => setShowVideo(true)}
-          className="absolute bottom-20 right-4 px-4 py-2.5 rounded-full flex items-center gap-2 shadow-xl z-10"
+          className="absolute bottom-20 end-4 px-4 py-2.5 rounded-full flex items-center gap-2 shadow-xl z-10"
           style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)', cursor: 'pointer' }}>
           
             <Play className="w-4 h-4 fill-current" style={{ color: 'var(--a-peach-2)' }} />
@@ -263,7 +263,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
                   <span className="a-heading" style={{ fontSize: 30, color: 'var(--a-accent-ink)' }}>{product.price}</span>
                   <span className="text-lg font-bold" style={{ color: 'var(--a-accent-ink)' }}>{product.currency}</span>
                   {product.original_price && product.original_price > product.price &&
-                <span className="text-base line-through ml-2" style={{ color: 'var(--a-accent-ink)', opacity: 0.55 }}>
+                <span className="text-base line-through ms-2" style={{ color: 'var(--a-accent-ink)', opacity: 0.55 }}>
                       {product.original_price} {product.currency}
                     </span>
                 }
@@ -291,7 +291,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
                 <ExternalLink className="w-4 h-4" style={{ color: 'var(--a-accent-ink)' }} />
                 <span className="text-sm font-bold" style={{ color: 'var(--a-accent-ink)' }}>{tr("affiliateproductdetail_mehsula_get_eff59e", "Məhsula get")}</span>
               </div>
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" style={{ color: 'var(--a-accent-ink)' }} />
+              <ChevronRight className="rtl:rotate-180 w-4 h-4 group-hover:translate-x-1 transition-transform" style={{ color: 'var(--a-accent-ink)' }} />
             </button>
           </div>
           
@@ -377,7 +377,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
               style={{ borderBottom: idx !== arr.length - 1 ? '1px solid var(--a-line)' : 'none' }}>
               
                   <span className="text-sm" style={{ color: 'var(--a-ink-soft)' }}>{key}</span>
-                  <span className="text-sm font-semibold text-right max-w-[60%]" style={{ color: 'var(--a-ink)' }}>{value}</span>
+                  <span className="text-sm font-semibold text-end max-w-[60%]" style={{ color: 'var(--a-ink)' }}>{value}</span>
                 </div>
             )}
             </div>
@@ -410,7 +410,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
 
       {/* Fixed Bottom Bar */}
       <div
-        className="fixed left-0 right-0 z-30"
+        className="fixed start-0 end-0 z-30"
         style={{ bottom: 'calc(env(safe-area-inset-bottom) + 72px)', background: 'var(--a-nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid var(--a-line)' }}>
         
         <div className="flex gap-3 p-4">
@@ -444,7 +444,7 @@ const AffiliateProductDetail = ({ product, onBack }: AffiliateProductDetailProps
           onClick={() => setShowVideo(false)}>
           
             <button
-            className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-white"
+            className="absolute top-4 end-4 w-10 h-10 rounded-full flex items-center justify-center text-white"
             style={{ background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer' }}
             onClick={() => setShowVideo(false)}>
             

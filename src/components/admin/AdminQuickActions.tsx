@@ -81,7 +81,7 @@ const AdminQuickActions = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">{tr("adminquickactions_suretli_kecidler_cee44e", "Sürətli Keçidlər")}</h2>
         <Button onClick={handleCreate} size="sm">
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           Yeni
         </Button>
       </div>

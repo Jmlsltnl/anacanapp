@@ -64,7 +64,7 @@ export default function RedemptionQRSheet({ open, onClose, venueId, venueName }:
       <SheetContent side="bottom" className="rounded-t-3xl p-0 max-h-[92vh] overflow-y-auto">
         <div className="p-5 pb-8 flex flex-col items-center text-center">
           <div className="w-12 h-1.5 bg-muted rounded-full mb-4" />
-          <button onClick={onClose} className="absolute top-3 right-3 w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+          <button onClick={onClose} className="absolute top-3 end-3 w-9 h-9 rounded-full bg-muted flex items-center justify-center">
             <X className="w-4 h-4" />
           </button>
 
@@ -114,7 +114,7 @@ export default function RedemptionQRSheet({ open, onClose, venueId, venueName }:
 
               {expired &&
             <Button onClick={generate} className="mt-4 w-full" size="lg">
-                  <RefreshCw className="w-4 h-4 mr-2" /> {tr("redemptionqrsheet_yeni_qr_yarat_f123bc", "Yeni QR yarat")}
+                  <RefreshCw className="w-4 h-4 me-2" /> {tr("redemptionqrsheet_yeni_qr_yarat_f123bc", "Yeni QR yarat")}
                 </Button>
             }
             </>

@@ -68,7 +68,7 @@ const DangerSignsScreen = ({ onBack }: Props) => {
           border: isOpen ? `1.5px solid ${isUrgent ? 'var(--a-pink-2)' : '#ffc94d'}` : '1.5px solid transparent'
         }}>
 
-        <button onClick={() => toggle(sign.id)} className="w-full flex items-center gap-3 text-left" style={{ padding: 14 }}>
+        <button onClick={() => toggle(sign.id)} className="w-full flex items-center gap-3 text-start" style={{ padding: 14 }}>
           <div className="w-11 h-11 flex items-center justify-center text-2xl shrink-0"
           style={{ borderRadius: 14, background: isUrgent ? 'var(--a-pink-1)' : 'var(--a-yellow-1)' }}>
             {sign.emoji}

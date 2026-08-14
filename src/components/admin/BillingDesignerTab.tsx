@@ -67,7 +67,7 @@ const BillingDesignerTab = () => {
     <div className="space-y-4">
       <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
         <p className="text-sm text-muted-foreground">
-          <CreditCard className="w-4 h-4 inline mr-1 text-primary" />
+          <CreditCard className="w-4 h-4 inline me-1 text-primary" />
           {tr("billingdesignertab_abuneliyim_sehifesindeki_butun_c8757d", "Abun\u0259liyim s\u0259hif\u0259sind\u0259ki b\xFCt\xFCn m\u0259tnl\u0259ri, r\u0259ngl\u0259ri v\u0259 elementl\u0259ri buradan idar\u0259 edin.")}
         </p>
       </div>
@@ -148,7 +148,7 @@ const BillingDesignerTab = () => {
             </div>
           )}
           <Button variant="outline" size="sm" onClick={addFeature}>
-            <Plus className="w-3 h-3 mr-1" />{tr("billingdesignertab_elave_et_6e1b9b", "\u018Flav\u0259 et")}
+            <Plus className="w-3 h-3 me-1" />{tr("billingdesignertab_elave_et_6e1b9b", "\u018Flav\u0259 et")}
           </Button>
         </div>
       </Section>
@@ -268,7 +268,7 @@ const BillingDesignerTab = () => {
           Defolt-a qaytar
         </Button>
         <Button className="flex-1" onClick={handleSave} disabled={isPending || !hasChanges}>
-          {isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+          {isPending ? <Loader2 className="w-4 h-4 me-2 animate-spin" /> : <Save className="w-4 h-4 me-2" />}
           {isPending ? tr("billingdesignertab_saxlanilir_ee05ad", "Saxlan\u0131l\u0131r...") : 'Saxla'}
         </Button>
       </div>

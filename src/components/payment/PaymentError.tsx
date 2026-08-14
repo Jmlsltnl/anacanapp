@@ -49,7 +49,7 @@ const PaymentError = () => {
           <Button variant="outline" onClick={() => navigate('/')}
           className="w-full gap-2 rounded-full"
           style={{ background: 'var(--a-surface)', borderColor: 'var(--a-line-strong)', color: 'var(--a-ink)' }}>
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="rtl:rotate-180 w-4 h-4" />
             {tr("paymenterror_ana_sehifeye_qayit_2458e3", "Ana S\u0259hif\u0259y\u0259 Qay\u0131t")}
           </Button>
         </div>

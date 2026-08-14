@@ -115,12 +115,12 @@ const AdminOrders = () => {
       {/* Filters */}
       <div className="flex gap-4 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={tr("adminorders_sifaris_nomresi_ad_ve_ya_telefon_24cdf0", "Sifariş nömrəsi, ad və ya telefon...")}
-            className="pl-10" />
+            className="ps-10" />
           
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>

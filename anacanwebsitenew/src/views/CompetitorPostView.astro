@@ -38,6 +38,11 @@ const ogImage = `/og/blog/${lang}/${slug}.png`;
 const categoryLabel = t(`compare.categories.${data.category}`);
 const titleH1 = `Anacan ${t('compare.vs')} ${data.competitor}`;
 
+/* <title> tag: prefer the rich, keyword-full frontmatter title (each
+   comparison article ships one, e.g. "Anacan vs Flo: Which App Should You
+   Choose? (2026)") over the short generic "Anacan vs X" H1 pattern. */
+const titleTag = data.title.length >= 25 ? data.title : `${titleH1} — Anacan`;
+
 const breadcrumbs: BreadcrumbItem[] = [
   { name: t('breadcrumbs.home'), path: pagePath('home', lang) },
   { name: t('compare.hubTitle'), path: pagePath('competitors', lang) },
@@ -78,7 +83,7 @@ const rows: { label: string; anacan: string; them: string }[] = [
 
 <Base
   lang={lang}
-  title={`${titleH1} — Anacan`}
+  title={titleTag}
   description={data.description}
   alternates={alternates}
   ogImage={ogImage}

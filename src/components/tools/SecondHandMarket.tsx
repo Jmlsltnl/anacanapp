@@ -488,7 +488,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                     }
                       
                       {/* Price badge */}
-                      <div className="absolute top-2 left-2">
+                      <div className="absolute top-2 start-2">
                         {listing.is_free ?
                       <span className="px-2 py-0.5 rounded-full text-xs font-bold shadow-lg" style={{ background: 'var(--a-green-2)', color: '#fff' }}>{tr("untranslated_pulsuz_27d02z", "Pulsuz")}</span> :
 
@@ -500,7 +500,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                       
                       {/* Image count */}
                       {listing.images && listing.images.length > 1 &&
-                    <div className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-md px-2 py-1 rounded-lg text-white text-xs flex items-center gap-1">
+                    <div className="absolute bottom-2 end-2 bg-black/50 backdrop-blur-md px-2 py-1 rounded-lg text-white text-xs flex items-center gap-1">
                           <ImageIcon className="w-3 h-3" />
                           {listing.images.length}
                         </div>
@@ -558,7 +558,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                     <img src={img} alt="" className="w-full h-full object-cover" />
                     <motion.button
                     onClick={() => removeImage(index)}
-                    className="absolute top-1 right-1 w-6 h-6 rounded-full text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 end-1 w-6 h-6 rounded-full text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     style={{ background: 'var(--a-pink-2)', border: 'none', cursor: 'pointer' }}
                     whileTap={{ scale: 0.9 }}>
                     
@@ -765,7 +765,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 
                 <motion.button
                 onClick={() => setShowDetailModal(false)}
-                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
+                className="absolute top-3 end-3 w-8 h-8 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
                 style={{ border: 'none', cursor: 'pointer' }}
                 whileTap={{ scale: 0.95 }}>
                 
@@ -774,7 +774,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
 
                 {/* Image thumbnails */}
                 {selectedListing.images && selectedListing.images.length > 1 &&
-              <div className="absolute bottom-3 left-3 right-3 flex gap-2 overflow-x-auto">
+              <div className="absolute bottom-3 start-3 end-3 flex gap-2 overflow-x-auto">
                     {selectedListing.images.map((img, i) =>
                 <div key={i} className="w-12 h-12 rounded-lg overflow-hidden shrink-0 border-2 border-white/50">
                         <img src={img} alt="" className="w-full h-full object-cover" />
@@ -899,7 +899,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 
                       <div
                   className={`max-w-[75%] px-3 py-2 text-sm ${
-                  msg.sender_id === profile?.user_id ? 'rounded-2xl rounded-br-sm' : 'rounded-2xl rounded-bl-sm'}`}
+                  msg.sender_id === profile?.user_id ? 'rounded-2xl rounded-ee-sm' : 'rounded-2xl rounded-es-sm'}`}
                   style={msg.sender_id === profile?.user_id ?
                   { background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)' } :
                   { background: 'var(--a-surface-soft)', color: 'var(--a-ink)' }}>

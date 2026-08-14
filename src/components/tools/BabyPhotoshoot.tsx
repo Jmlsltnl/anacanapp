@@ -499,7 +499,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                 
                   <motion.button
                   onClick={handleRemoveImage}
-                  className="absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+                  className="absolute top-3 end-3 w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
                   style={{ background: 'var(--a-pink-2)' }}
                   whileTap={{ scale: 0.9 }}>
                   
@@ -625,7 +625,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   whileTap={{ scale: 0.95 }}>
                   
                       {bg.premium && !isPremium &&
-                  <div className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: 'var(--a-yellow-2)' }}>
+                  <div className="absolute -top-0.5 -end-0.5 w-4 h-4 rounded-full flex items-center justify-center" style={{ background: 'var(--a-yellow-2)' }}>
                           <Lock className="w-2.5 h-2.5" style={{ color: '#5a3d00' }} />
                         </div>
                   }
@@ -739,7 +739,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   whileTap={{ scale: 0.95 }}>
                   
                     {outfit.premium && !isPremium &&
-                  <div className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ background: 'var(--a-yellow-2)' }}>
+                  <div className="absolute -top-0.5 -end-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ background: 'var(--a-yellow-2)' }}>
                         <Lock className="w-2 h-2" style={{ color: '#5a3d00' }} />
                       </div>
                   }
@@ -860,7 +860,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
 
         {/* Fixed Bottom Buttons — nav-ın ÜSTÜNDƏ dayanır (altında qalmasın) */}
         <div
-          className="fixed left-0 right-0 z-50 px-5 py-3"
+          className="fixed start-0 end-0 z-50 px-5 py-3"
           style={{ bottom: 'calc(94px + env(safe-area-inset-bottom, 0px))', background: 'var(--a-nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid var(--a-line)' }}>
           
           <div className="flex gap-3">

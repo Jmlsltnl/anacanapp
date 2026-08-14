@@ -532,19 +532,19 @@ const AdminDynamicContent = () => {
             <tab.icon className="w-4 h-4" />
             <span className="hidden sm:inline">{tab.label}</span>
             <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
-            <Badge variant="secondary" className="ml-0.5 text-xs">{tab.count}</Badge>
+            <Badge variant="secondary" className="ms-0.5 text-xs">{tab.count}</Badge>
           </Button>
         )}
       </div>
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="Axtar..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-10" />
+          className="ps-10" />
         
       </div>
 

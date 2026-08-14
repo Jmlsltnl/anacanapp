@@ -65,7 +65,7 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
               >
                 {!isPlaying && (
                   <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
-                    <Play className="w-8 h-8 text-foreground ml-1" fill="currentColor" />
+                    <Play className="w-8 h-8 text-foreground ms-1" fill="currentColor" />
                   </div>
                 )}
               </button>
@@ -112,7 +112,7 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
                     className="absolute inset-0 flex items-center justify-center"
                   >
                     <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
-                      <Play className="w-8 h-8 text-foreground ml-1" fill="currentColor" />
+                      <Play className="w-8 h-8 text-foreground ms-1" fill="currentColor" />
                     </div>
                   </button>
                 )}
@@ -130,15 +130,15 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
         {/* Navigation Arrows */}
         <button
           onClick={goToPrevious}
-          className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+          className="absolute start-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="rtl:rotate-180 w-5 h-5" />
         </button>
         <button
           onClick={goToNext}
-          className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+          className="absolute end-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="rtl:rotate-180 w-5 h-5" />
         </button>
 
         {/* Dots */}
@@ -157,7 +157,7 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
         </div>
 
         {/* Counter */}
-        <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-black/50 text-white text-xs font-medium">
+        <div className="absolute top-2 end-2 px-2 py-1 rounded-full bg-black/50 text-white text-xs font-medium">
           {currentIndex + 1} / {media.length}
         </div>
 

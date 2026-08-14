@@ -77,7 +77,7 @@ const PremiumBlurGate = ({
           style={{
             position: 'absolute',
             top: 10,
-            right: 14,
+            insetInlineEnd: 14,
             display: 'flex',
             alignItems: 'center',
             gap: 4,

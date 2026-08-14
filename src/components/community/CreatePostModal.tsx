@@ -222,11 +222,11 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                 value={content}
                 onChange={handleContentChange}
                 placeholder={tr("createpostmodal_ne_dusunursunuz_474859", "Nə düşünürsünüz? ✨")}
-                className="min-h-[130px] rounded-2xl resize-none text-[14px] bg-muted/25 border-border/25 focus:border-primary/30 pr-12 leading-relaxed" />
+                className="min-h-[130px] rounded-2xl resize-none text-[14px] bg-muted/25 border-border/25 focus:border-primary/30 pe-12 leading-relaxed" />
               
                 <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
                   <PopoverTrigger asChild>
-                    <button type="button" className="absolute right-3 top-3 w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/70 flex items-center justify-center transition-colors">
+                    <button type="button" className="absolute end-3 top-3 w-8 h-8 rounded-full bg-muted/50 hover:bg-muted/70 flex items-center justify-center transition-colors">
                       <Smile className="w-4 h-4 text-muted-foreground/80" />
                     </button>
                   </PopoverTrigger>
@@ -236,10 +236,10 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                 </Popover>
 
                 {showSuggestions && suggestions.length > 0 &&
-              <div className="absolute left-0 right-0 top-full mt-1 bg-popover border border-border/15 rounded-2xl shadow-lg z-50 overflow-hidden">
+              <div className="absolute start-0 end-0 top-full mt-1 bg-popover border border-border/15 rounded-2xl shadow-lg z-50 overflow-hidden">
                     {suggestions.map((suggestion, index) =>
                 <button key={`${suggestion.type}-${suggestion.value}-${index}`} onClick={() => applySuggestion(suggestion)}
-                className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left">
+                className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-muted/50 transition-colors text-start">
                         <div className="w-7 h-7 rounded-full bg-primary/8 flex items-center justify-center overflow-hidden">
                           {suggestion.type === 'user' && suggestion.avatar ?
                     <img src={suggestion.avatar} alt="" className="w-full h-full object-cover" /> :
@@ -275,13 +275,13 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                 <div className="relative w-full h-full">
                           <video src={preview.url} className="w-full h-full object-cover" />
                           <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"><Play className="w-5 h-5 text-foreground ml-0.5" /></div>
+                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"><Play className="w-5 h-5 text-foreground ms-0.5" /></div>
                           </div>
                         </div> :
 
                 <img src={preview.url} alt="" className="w-full h-full object-cover" />
                 }
-                      <button onClick={() => removeMedia(index)} className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
+                      <button onClick={() => removeMedia(index)} className="absolute top-2 end-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
                         <X className="w-3 h-3 text-white" />
                       </button>
                     </div>
@@ -303,7 +303,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
               className="w-9 h-9 rounded-full bg-blue-500/15 flex items-center justify-center disabled:opacity-40 transition-colors active:bg-blue-500/25">
                   <Video className="w-4 h-4 text-blue-500" />
                 </button>
-                {mediaFiles.length > 0 && <span className="text-[10px] text-muted-foreground/60 font-medium ml-auto">{mediaFiles.length}/4</span>}
+                {mediaFiles.length > 0 && <span className="text-[10px] text-muted-foreground/60 font-medium ms-auto">{mediaFiles.length}/4</span>}
               </div>
 
               {/* Anonymous Toggle */}
@@ -317,12 +317,12 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isAnonymous ? 'bg-primary text-primary-foreground' : 'bg-muted/70 text-muted-foreground/75'}`}>
                   <EyeOff className="w-4 h-4" />
                 </div>
-                <div className="flex-1 text-left">
+                <div className="flex-1 text-start">
                   <p className={`text-[12px] font-bold ${isAnonymous ? 'text-primary' : 'text-foreground'}`}>{tr("createpostmodal_anonim_paylas_6074c9", "Anonim paylaş")}</p>
                   <p className="text-[10px] text-muted-foreground/65">{tr("createpostmodal_adiniz_gizledilir_fb1df0", "Adınız gizlədilir")}</p>
                 </div>
                 <div className={`w-10 h-6 rounded-full transition-colors ${isAnonymous ? 'bg-primary' : 'bg-muted-foreground/40'}`}>
-                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'ml-[18px]' : 'ml-0.5'}`} />
+                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mt-0.5 ${isAnonymous ? 'ms-[18px]' : 'ms-0.5'}`} />
                 </div>
               </button>
 
@@ -335,7 +335,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                 {isUploading || createPost.isPending ?
               <div className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /><span>{tr("createpostmodal_yuklenir_5557de", "Yüklənir...")}</span></div> :
 
-              <><Send className="w-4 h-4 mr-2" />{tr("createpostmodal_paylas_b4be3b", "Paylaş")}</>
+              <><Send className="w-4 h-4 me-2" />{tr("createpostmodal_paylas_b4be3b", "Paylaş")}</>
               }
               </Button>
             </div>

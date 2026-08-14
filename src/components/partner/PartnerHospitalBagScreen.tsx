@@ -91,7 +91,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
           <header className="a-topbar">
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-                <ArrowLeft size={16} strokeWidth={2} />
+                <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
               </motion.button>
               <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("partnerhospitalbagscreen_xestexana_cantasi_045078", "XÉ™stÉ™xana Ã‡antasÄ±")}</p>
             </div>
@@ -121,7 +121,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("partnerhospitalbagscreen_xestexana_cantasi_045078", "XÉ™stÉ™xana Ã‡antasÄ±")}</p>
           </div>
@@ -163,7 +163,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
                     onClick={handleAddItem}
                     disabled={!newItemName.trim()}>
 
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4 me-2" />
                     {tr("partnerhospitalbagscreen_elave_et_6e1b9b", "\u018Flav\u0259 et")}
                   </Button>
                 </div>
@@ -248,7 +248,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
                 {item.added_by === 'partner' &&
               <span className="inline-flex items-center shrink-0"
               style={{ background: 'var(--a-blue-1)', color: 'var(--a-blue-ink)', borderRadius: 999, padding: '3px 9px', fontSize: 10.5, fontWeight: 700 }}>
-                    <User className="w-3 h-3 mr-1" />
+                    <User className="w-3 h-3 me-1" />
                     {tr("partnerhospitalbagscreen_sen_0580e7", "S\u0259n")}
                   </span>
               }

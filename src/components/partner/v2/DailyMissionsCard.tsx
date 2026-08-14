@@ -67,7 +67,7 @@ const DailyMissionsCard = () => {
             {completedToday}/{missions.length} {tr('partnerv2_tamamlandi', 'tamamlandı')}
           </p>
         </div>
-        <div className="text-right shrink-0">
+        <div className="text-end shrink-0">
           <span className="inline-flex items-center gap-1"
           style={{ background: 'var(--a-blue-1)', color: 'var(--a-blue-ink)', borderRadius: 999, padding: '5px 12px', fontSize: 11.5, fontWeight: 800 }}>
             <Zap size={12} /> {tr('partnerv2_seviyye', 'Səviyyə')} {level}
@@ -85,7 +85,7 @@ const DailyMissionsCard = () => {
             animate={{ width: `${levelProgress}%` }}
             transition={{ duration: 0.5 }} />
         </div>
-        <p className="mt-1 text-right" style={{ fontSize: 10, color: 'var(--a-ink-faint)' }}>
+        <p className="mt-1 text-end" style={{ fontSize: 10, color: 'var(--a-ink-faint)' }}>
           {tr('partnerv2_novbeti_seviyyeye', 'Növbəti səviyyəyə')}: {pointsToNextLevel} {tr('partnerv2_xal', 'xal')}
         </p>
       </div>
@@ -106,7 +106,7 @@ const DailyMissionsCard = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 onClick={() => handleToggle(m.id, m.points, m.isCompleted)}
-                className="w-full flex items-center gap-3 text-left transition-all"
+                className="w-full flex items-center gap-3 text-start transition-all"
                 style={{
                   padding: '11px 13px',
                   borderRadius: 16,

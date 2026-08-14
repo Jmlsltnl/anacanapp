@@ -176,7 +176,7 @@ const BulkTimeManager = () => {
 
           <div className="flex items-end">
             <Button onClick={applyBulk} disabled={saving || selected.size === 0} className="w-full">
-              {saving ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <ArrowRight className="h-4 w-4 mr-1" />}
+              {saving ? <Loader2 className="h-4 w-4 me-1 animate-spin" /> : <ArrowRight className="rtl:rotate-180 h-4 w-4 me-1" />}
               {selected.size} {tr("bulktimemanager_setre_tetbiq_et_873f93", "s\u0259tr\u0259 t\u0259tbiq et")}
             </Button>
           </div>
@@ -187,7 +187,7 @@ const BulkTimeManager = () => {
           <Badge variant="outline">{tr("bulktimemanager_filterlenmis_fdc550", "Filterl\u0259nmi\u015F:")} {filtered.length}</Badge>
           <Badge variant="secondary">{tr("bulktimemanager_secilmis_3c154a", "Se\xE7ilmi\u015F:")} {selected.size}</Badge>
           <Button size="sm" variant="ghost" onClick={load} disabled={loading}>
-            {loading ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : null} {tr("bulktimemanager_yenile_570ce2", "Yenil\u0259")}
+            {loading ? <Loader2 className="h-3 w-3 me-1 animate-spin" /> : null} {tr("bulktimemanager_yenile_570ce2", "Yenil\u0259")}
           </Button>
         </div>
       </Card>
@@ -197,13 +197,13 @@ const BulkTimeManager = () => {
           <table className="w-full text-xs">
             <thead className="bg-muted/40 sticky top-0">
               <tr>
-                <th className="p-2 text-left w-10">
+                <th className="p-2 text-start w-10">
                   <Checkbox checked={allSelected} onCheckedChange={toggleAll} />
                 </th>
-                <th className="p-2 text-left">Saat</th>
-                {source !== 'flow_reminders' && <th className="p-2 text-left">{tr("bulktimemanager_gun_18b2f4", "Gün")}</th>}
-                <th className="p-2 text-left">{tr("bulktimemanager_basliq_e1f6c5", "Başlıq")}</th>
-                <th className="p-2 text-left">ID</th>
+                <th className="p-2 text-start">Saat</th>
+                {source !== 'flow_reminders' && <th className="p-2 text-start">{tr("bulktimemanager_gun_18b2f4", "Gün")}</th>}
+                <th className="p-2 text-start">{tr("bulktimemanager_basliq_e1f6c5", "Başlıq")}</th>
+                <th className="p-2 text-start">ID</th>
               </tr>
             </thead>
             <tbody>

@@ -85,10 +85,10 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   const canReply = level < 2;
 
   return (
-    <div className={`relative ${level > 0 ? 'ml-8' : ''}`}>
+    <div className={`relative ${level > 0 ? 'ms-8' : ''}`}>
       {/* Thread line */}
       {level > 0 &&
-      <div className="absolute left-[-16px] top-0 bottom-0 w-[2px] bg-border/10 rounded-full" />
+      <div className="absolute start-[-16px] top-0 bottom-0 w-[2px] bg-border/10 rounded-full" />
       }
       <div className="flex gap-2.5">
         <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.95 }} className="flex-shrink-0 mt-1">
@@ -108,18 +108,18 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
               <UserBadge type={comment.author?.badge_type as any} />
               <span className="text-[8px] text-muted-foreground/30">· {timeAgo}</span>
               {isAdmin &&
-              <button onClick={handleDelete} className="ml-auto text-destructive/40 hover:text-destructive p-0.5">
+              <button onClick={handleDelete} className="ms-auto text-destructive/40 hover:text-destructive p-0.5">
                   <Trash2 className="w-2.5 h-2.5" />
                 </button>
               }
             </div>
-            <p className="text-[12px] text-foreground/80 mt-1 leading-relaxed">
+            <p className="text-[12px] text-foreground/80 mt-1 leading-relaxed" dir="auto">
               {comment.content}
             </p>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 mt-1 ml-2">
+          <div className="flex items-center gap-3 mt-1 ms-2">
             <motion.button
               onClick={handleLikeComment}
               className={`flex items-center gap-0.5 text-[9px] transition-colors ${comment.is_liked ? 'text-rose-500' : 'text-muted-foreground/30 active:text-rose-400'}`}

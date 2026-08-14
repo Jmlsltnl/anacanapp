@@ -215,7 +215,7 @@ const TrackerAIInsight = ({ section, api }: TrackerAIInsightProps) => {
             onClick={() => api.limitReached ? setShowModal(true) : api.request()}
             disabled={api.loading}
             aria-label={tr('babyai_refresh', 'Yenilə')}
-            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: 'var(--a-ink-soft)' }}>
+            style={{ marginInlineStart: 'auto', background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: 'var(--a-ink-soft)' }}>
                 {api.loading ?
             <Loader2 size={12} className="animate-spin" /> :
             api.limitReached ? <Crown size={12} style={{ color: '#b8860b' }} /> : <RefreshCw size={12} />}

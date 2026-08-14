@@ -315,7 +315,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(index * 0.05, 0.3) }}
-                className="a-list-row w-full text-left"
+                className="a-list-row w-full text-start"
                 style={{ width: '100%', background: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none', cursor: 'pointer', alignItems: 'flex-start' }}
                 onClick={() => setSelectedPlace(place)}>
                 
@@ -363,7 +363,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                     </div>
                   </div>
                   
-                  <ChevronRight size={16} className="a-list-chevron self-center" />
+                  <ChevronRight size={16} className="rtl:rotate-180 a-list-chevron self-center" />
                 </motion.button>);
 
           })}
@@ -470,7 +470,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                 </div>
                 <motion.button
                 onClick={() => setSelectedPlace(null)}
-                className="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center"
+                className="absolute top-3 end-3 w-8 h-8 rounded-full flex items-center justify-center"
                 style={{ background: 'rgba(255,255,255,0.35)', border: 'none', cursor: 'pointer' }}
                 whileTap={{ scale: 0.95 }}>
                 
@@ -616,7 +616,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                         className={`w-3.5 h-3.5 ${s <= review.rating ? 'fill-current' : ''}`}
                         style={{ color: s <= review.rating ? 'var(--a-yellow-2)' : 'var(--a-ink-faint)' }} />
                       )}
-                            <span className="text-xs ml-2" style={{ color: 'var(--a-ink-soft)' }}>
+                            <span className="text-xs ms-2" style={{ color: 'var(--a-ink-soft)' }}>
                               {new Date(review.created_at).toLocaleDateString(getLocaleTag())}
                             </span>
                           </div>

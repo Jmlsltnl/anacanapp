@@ -143,7 +143,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
               whileTap={{ scale: 0.95 }}
               aria-label={tr("common_geri", "Geri")}>
 
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div className="flex-1 min-w-0">
               <h1 className="line-clamp-1" style={{ fontSize: 15, fontWeight: 800, color: 'var(--a-ink)' }}>{selectedTicket.subject}</h1>
@@ -161,7 +161,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
           <div className="flex justify-end">
             <div className="a-chat-bubble user max-w-[80%]">
               <p style={{ margin: 0 }}>{selectedTicket.message}</p>
-              <p className="text-right" style={{ fontSize: 10, opacity: 0.6, marginTop: 4 }}>
+              <p className="text-end" style={{ fontSize: 10, opacity: 0.6, marginTop: 4 }}>
                 {format(new Date(selectedTicket.created_at), 'd MMM, HH:mm', { locale: getCurrentDateLocale() })}
               </p>
             </div>
@@ -205,7 +205,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                     </div>
               }
                   <p style={{ margin: 0 }}>{reply.message}</p>
-                  <p className={reply.is_admin ? '' : 'text-right'} style={{ fontSize: 10, opacity: reply.is_admin ? 1 : 0.6, color: reply.is_admin ? 'var(--a-ink-faint)' : undefined, marginTop: 4 }}>
+                  <p className={reply.is_admin ? '' : 'text-end'} style={{ fontSize: 10, opacity: reply.is_admin ? 1 : 0.6, color: reply.is_admin ? 'var(--a-ink-faint)' : undefined, marginTop: 4 }}>
                     {format(new Date(reply.created_at), 'd MMMM, HH:mm', { locale: getCurrentDateLocale() })}
                   </p>
                 </div>
@@ -268,7 +268,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft size={16} strokeWidth={2} />
+              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
               <p className="a-eyebrow">{tr("helpscreen_suallariniza_cavab_tapin_764218", "Suallarınıza cavab tapın")}</p>
@@ -318,7 +318,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                 <Accordion type="single" collapsible className="space-y-2">
                       {(faqs || []).map((faq, index) =>
                   <AccordionItem key={faq.id} value={`item-${index}`} className="border-none">
-                          <AccordionTrigger className="text-left text-sm font-medium hover:no-underline py-3 px-3 rounded-xl data-[state=open]:bg-[var(--a-peach-1)] data-[state=open]:text-[var(--a-accent-ink)]"
+                          <AccordionTrigger className="text-start text-sm font-medium hover:no-underline py-3 px-3 rounded-xl data-[state=open]:bg-[var(--a-peach-1)] data-[state=open]:text-[var(--a-accent-ink)]"
                     style={{ color: 'var(--a-ink)' }}>
                             {faq.question}
                           </AccordionTrigger>
@@ -358,7 +358,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                       <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{tr("helpscreen_e_poct_f5c193", "E-poçt")}</p>
                       <p style={{ fontSize: 12.5, color: 'var(--a-accent-ink)', fontWeight: 600 }}>info@anacan.az</p>
                     </div>
-                    <ChevronRight size={18} style={{ color: 'var(--a-ink-faint)' }} />
+                    <ChevronRight className="rtl:rotate-180" size={18} style={{ color: 'var(--a-ink-faint)' }} />
                   </motion.a>
 
                   <motion.a
@@ -374,7 +374,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                       <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{tr("untranslated_telefon_vwjgg5", "Telefon")}</p>
                       <p style={{ fontSize: 12.5, color: 'var(--a-green-ink)', fontWeight: 600 }}>+994 10 321 65 07</p>
                     </div>
-                    <ChevronRight size={18} style={{ color: 'var(--a-ink-faint)' }} />
+                    <ChevronRight className="rtl:rotate-180" size={18} style={{ color: 'var(--a-ink-faint)' }} />
                   </motion.a>
                 </div>
 
@@ -511,7 +511,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                       {tickets.map((ticket) =>
                   <motion.button
                     key={ticket.id}
-                    className="w-full text-left transition-colors"
+                    className="w-full text-start transition-colors"
                     style={{ padding: 14, borderRadius: 16, background: 'var(--a-surface-soft)' }}
                     onClick={() => setSelectedTicket(ticket)}
                     initial={{ opacity: 0 }}
@@ -520,7 +520,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
 
                           <div className="flex items-start justify-between mb-1.5">
                             <h4 className="flex-1 line-clamp-1" style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{ticket.subject}</h4>
-                            <div className="flex items-center gap-1 ml-2" style={{ fontSize: 11 }}>
+                            <div className="flex items-center gap-1 ms-2" style={{ fontSize: 11 }}>
                               {getStatusIcon(ticket.status)}
                               <span style={{ color: 'var(--a-ink-soft)' }}>{getStatusText(ticket.status)}</span>
                             </div>
@@ -530,7 +530,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
                             <p style={{ fontSize: 11, color: 'var(--a-ink-faint)' }}>
                               {format(new Date(ticket.created_at), 'd MMM yyyy', { locale: getCurrentDateLocale() })}
                             </p>
-                            <ChevronRight size={15} style={{ color: 'var(--a-ink-faint)' }} />
+                            <ChevronRight className="rtl:rotate-180" size={15} style={{ color: 'var(--a-ink-faint)' }} />
                           </div>
                         </motion.button>
                   )}

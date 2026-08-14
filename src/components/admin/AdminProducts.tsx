@@ -274,12 +274,12 @@ const AdminProducts = () => {
       {/* Search */}
       <Card className="p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder={tr("adminproducts_mehsul_axtar_580a05", "Məhsul axtar...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10" />
+            className="ps-10" />
           
         </div>
       </Card>
@@ -321,7 +321,7 @@ const AdminProducts = () => {
                     </div>
               }
                   {!product.is_active &&
-              <Badge className="absolute top-2 left-2 bg-red-500">
+              <Badge className="absolute top-2 start-2 bg-red-500">
                       Deaktiv
                     </Badge>
               }
@@ -340,14 +340,14 @@ const AdminProducts = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleEdit(product)}>
-                          <Edit className="w-4 h-4 mr-2" />
+                          <Edit className="w-4 h-4 me-2" />
                           {tr("adminproducts_redakte_et_66cf3b", "Redakt\u0259 et")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                       className="text-destructive"
                       onClick={() => handleDelete(product.id)}>
                       
-                          <Trash2 className="w-4 h-4 mr-2" />
+                          <Trash2 className="w-4 h-4 me-2" />
                           Sil
                         </DropdownMenuItem>
                       </DropdownMenuContent>

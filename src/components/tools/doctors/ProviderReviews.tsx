@@ -85,7 +85,7 @@ const ProviderReviews = ({ providerId, providerName }: ProviderReviewsProps) => 
               
                 </button>
             )}
-              <span className="ml-2 text-sm" style={{ color: 'var(--a-ink-soft)' }}>
+              <span className="ms-2 text-sm" style={{ color: 'var(--a-ink-soft)' }}>
                 {rating > 0 ? `${rating}/5` : tr("providerreviews_qiymetlendirin_df8e66", "Qiym\u0259tl\u0259ndirin")}
               </span>
             </div>

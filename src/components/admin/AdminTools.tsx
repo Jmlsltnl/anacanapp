@@ -351,7 +351,7 @@ const AdminTools = () => {
           {hasChanges &&
           <>
               <Button variant="outline" size="sm" onClick={resetChanges}>
-                <RefreshCw className="w-4 h-4 mr-1" />
+                <RefreshCw className="w-4 h-4 me-1" />
                 {tr("admintools_legv_et_b5e49c", "L\u0259\u011Fv et")}
               </Button>
               <Button
@@ -359,7 +359,7 @@ const AdminTools = () => {
               onClick={() => saveMutation.mutate()}
               disabled={saveMutation.isPending}>
               
-                <Save className="w-4 h-4 mr-1" />
+                <Save className="w-4 h-4 me-1" />
                 {saveMutation.isPending ? tr("admintools_saxlanir_9ea540", "Saxlan\u0131r...") : 'Yadda saxla'}
               </Button>
             </>
@@ -368,12 +368,12 @@ const AdminTools = () => {
       </div>
 
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder={tr("admintools_alet_axtar_1f976c", "Alət axtar...")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9" />
+          className="ps-9" />
         
       </div>
 
@@ -692,7 +692,7 @@ const EditToolForm = ({
 
 
   return (
-    <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+    <div className="space-y-4 max-h-[70vh] overflow-y-auto pe-1">
       {/* Basic Info */}
       <div>
         <Label>{tr("admintools_gorunen_ad_az_991e41", "Görünən Ad (AZ)")}</Label>
@@ -814,11 +814,11 @@ const EditToolForm = ({
 
       <DialogFooter>
         <Button variant="outline" onClick={onCancel}>
-          <X className="w-4 h-4 mr-1" />
+          <X className="w-4 h-4 me-1" />
           {tr("admintools_legv_et_b5e49c", "L\u0259\u011Fv et")}
         </Button>
         <Button onClick={() => onSave({ displayName, description, heroGradient, heroSubtitle, heroBadge, heroOrder, quickAccessGradient, quickAccessOrder })}>
-          <Check className="w-4 h-4 mr-1" />
+          <Check className="w-4 h-4 me-1" />
           Yadda saxla
         </Button>
       </DialogFooter>
@@ -899,11 +899,11 @@ const PremiumSettingsForm = ({
 
       <DialogFooter>
         <Button variant="outline" onClick={onCancel}>
-          <X className="w-4 h-4 mr-1" />
+          <X className="w-4 h-4 me-1" />
           {tr("admintools_legv_et_b5e49c", "L\u0259\u011Fv et")}
         </Button>
         <Button onClick={() => onSave(isPremium, premiumType, premiumLimit)}>
-          <Check className="w-4 h-4 mr-1" />
+          <Check className="w-4 h-4 me-1" />
           Yadda saxla
         </Button>
       </DialogFooter>

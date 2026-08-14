@@ -59,7 +59,7 @@ export default function QuizStep({ questions, onComplete }: QuizStepProps) {
           <button
             key={opt.id}
             onClick={() => setSelected(opt.id)}
-            className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 text-left ${
+            className={`w-full flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 text-start ${
             selected === opt.id ?
             'border-primary bg-primary/10 shadow-md' :
             'border-border bg-card hover:border-primary/40'}`
