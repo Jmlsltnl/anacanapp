@@ -18,34 +18,46 @@ export type Database = {
         Row: {
           calories: number | null
           category: string
+          category_de: string | null
           category_en: string | null
+          category_kk: string | null
           category_ru: string | null
           category_tr: string | null
           cook_time: number | null
           created_at: string
           description: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           id: string
           image_url: string | null
           ingredients: Json
+          ingredients_de: Json | null
           ingredients_en: Json | null
+          ingredients_kk: Json | null
           ingredients_ru: Json | null
           ingredients_tr: Json | null
           instructions: Json
+          instructions_de: Json | null
           instructions_en: Json | null
+          instructions_kk: Json | null
           instructions_ru: Json | null
           instructions_tr: Json | null
           is_active: boolean | null
           prep_time: number | null
           servings: number | null
           tags: string[] | null
+          tags_de: string[] | null
           tags_en: string[] | null
+          tags_kk: string[] | null
           tags_ru: string[] | null
           tags_tr: string[] | null
           title: string
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string
@@ -53,34 +65,46 @@ export type Database = {
         Insert: {
           calories?: number | null
           category?: string
+          category_de?: string | null
           category_en?: string | null
+          category_kk?: string | null
           category_ru?: string | null
           category_tr?: string | null
           cook_time?: number | null
           created_at?: string
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
           image_url?: string | null
           ingredients?: Json
+          ingredients_de?: Json | null
           ingredients_en?: Json | null
+          ingredients_kk?: Json | null
           ingredients_ru?: Json | null
           ingredients_tr?: Json | null
           instructions?: Json
+          instructions_de?: Json | null
           instructions_en?: Json | null
+          instructions_kk?: Json | null
           instructions_ru?: Json | null
           instructions_tr?: Json | null
           is_active?: boolean | null
           prep_time?: number | null
           servings?: number | null
           tags?: string[] | null
+          tags_de?: string[] | null
           tags_en?: string[] | null
+          tags_kk?: string[] | null
           tags_ru?: string[] | null
           tags_tr?: string[] | null
           title: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -88,34 +112,46 @@ export type Database = {
         Update: {
           calories?: number | null
           category?: string
+          category_de?: string | null
           category_en?: string | null
+          category_kk?: string | null
           category_ru?: string | null
           category_tr?: string | null
           cook_time?: number | null
           created_at?: string
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
           image_url?: string | null
           ingredients?: Json
+          ingredients_de?: Json | null
           ingredients_en?: Json | null
+          ingredients_kk?: Json | null
           ingredients_ru?: Json | null
           ingredients_tr?: Json | null
           instructions?: Json
+          instructions_de?: Json | null
           instructions_en?: Json | null
+          instructions_kk?: Json | null
           instructions_ru?: Json | null
           instructions_tr?: Json | null
           is_active?: boolean | null
           prep_time?: number | null
           servings?: number | null
           tags?: string[] | null
+          tags_de?: string[] | null
           tags_en?: string[] | null
+          tags_kk?: string[] | null
           tags_ru?: string[] | null
           tags_tr?: string[] | null
           title?: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -355,7 +391,9 @@ export type Database = {
           life_stage: string
           question: string
           question_az: string | null
+          question_de: string | null
           question_en: string | null
+          question_kk: string | null
           question_ru: string | null
           question_tr: string | null
           sort_order: number | null
@@ -371,7 +409,9 @@ export type Database = {
           life_stage?: string
           question: string
           question_az?: string | null
+          question_de?: string | null
           question_en?: string | null
+          question_kk?: string | null
           question_ru?: string | null
           question_tr?: string | null
           sort_order?: number | null
@@ -387,7 +427,9 @@ export type Database = {
           life_stage?: string
           question?: string
           question_az?: string | null
+          question_de?: string | null
           question_en?: string | null
+          question_kk?: string | null
           question_ru?: string | null
           question_tr?: string | null
           sort_order?: number | null
@@ -734,7 +776,9 @@ export type Database = {
           created_at: string
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           duration_days: number | null
@@ -746,17 +790,23 @@ export type Database = {
           sort_order: number
           symptoms: string[] | null
           symptoms_az: string[] | null
+          symptoms_de: string | null
           symptoms_en: string | null
+          symptoms_kk: string | null
           symptoms_ru: string | null
           symptoms_tr: string | null
           tips: string[] | null
           tips_az: string[] | null
+          tips_de: string | null
           tips_en: string | null
+          tips_kk: string | null
           tips_ru: string | null
           tips_tr: string | null
           title: string
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string
@@ -768,7 +818,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           duration_days?: number | null
@@ -780,17 +832,23 @@ export type Database = {
           sort_order?: number
           symptoms?: string[] | null
           symptoms_az?: string[] | null
+          symptoms_de?: string | null
           symptoms_en?: string | null
+          symptoms_kk?: string | null
           symptoms_ru?: string | null
           symptoms_tr?: string | null
           tips?: string[] | null
           tips_az?: string[] | null
+          tips_de?: string | null
           tips_en?: string | null
+          tips_kk?: string | null
           tips_ru?: string | null
           tips_tr?: string | null
           title: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -802,7 +860,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           duration_days?: number | null
@@ -814,17 +874,23 @@ export type Database = {
           sort_order?: number
           symptoms?: string[] | null
           symptoms_az?: string[] | null
+          symptoms_de?: string | null
           symptoms_en?: string | null
+          symptoms_kk?: string | null
           symptoms_ru?: string | null
           symptoms_tr?: string | null
           tips?: string[] | null
           tips_az?: string[] | null
+          tips_de?: string | null
           tips_en?: string | null
+          tips_kk?: string | null
           tips_ru?: string | null
           tips_tr?: string | null
           title?: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -839,7 +905,9 @@ export type Database = {
           day_number: number
           id: string
           info: string
+          info_de: string | null
           info_en: string | null
+          info_kk: string | null
           info_ru: string | null
           info_tr: string | null
           is_active: boolean
@@ -850,7 +918,9 @@ export type Database = {
           day_number: number
           id?: string
           info: string
+          info_de?: string | null
           info_en?: string | null
+          info_kk?: string | null
           info_ru?: string | null
           info_tr?: string | null
           is_active?: boolean
@@ -861,7 +931,9 @@ export type Database = {
           day_number?: number
           id?: string
           info?: string
+          info_de?: string | null
           info_en?: string | null
+          info_kk?: string | null
           info_ru?: string | null
           info_tr?: string | null
           is_active?: boolean
@@ -1006,7 +1078,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           emoji: string | null
@@ -1014,7 +1088,9 @@ export type Database = {
           is_active: boolean | null
           label: string
           label_az: string | null
+          label_de: string | null
           label_en: string | null
+          label_kk: string | null
           label_ru: string | null
           label_tr: string | null
           milestone_key: string
@@ -1025,7 +1101,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -1033,7 +1111,9 @@ export type Database = {
           is_active?: boolean | null
           label: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           milestone_key: string
@@ -1044,7 +1124,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -1052,7 +1134,9 @@ export type Database = {
           is_active?: boolean | null
           label?: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           milestone_key?: string
@@ -1066,7 +1150,9 @@ export type Database = {
           created_at: string
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           id: string
@@ -1076,7 +1162,9 @@ export type Database = {
           sort_order: number
           title: string | null
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string
@@ -1085,7 +1173,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -1095,7 +1185,9 @@ export type Database = {
           sort_order?: number
           title?: string | null
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -1104,7 +1196,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -1114,7 +1208,9 @@ export type Database = {
           sort_order?: number
           title?: string | null
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -1130,12 +1226,16 @@ export type Database = {
           lang: string
           meaning: string | null
           meaning_az: string | null
+          meaning_de: string | null
           meaning_en: string | null
+          meaning_kk: string | null
           meaning_ru: string | null
           meaning_tr: string | null
           name: string
           origin: string | null
+          origin_de: string | null
           origin_en: string | null
+          origin_kk: string | null
           origin_ru: string | null
           origin_tr: string | null
           popularity: number | null
@@ -1148,12 +1248,16 @@ export type Database = {
           lang?: string
           meaning?: string | null
           meaning_az?: string | null
+          meaning_de?: string | null
           meaning_en?: string | null
+          meaning_kk?: string | null
           meaning_ru?: string | null
           meaning_tr?: string | null
           name: string
           origin?: string | null
+          origin_de?: string | null
           origin_en?: string | null
+          origin_kk?: string | null
           origin_ru?: string | null
           origin_tr?: string | null
           popularity?: number | null
@@ -1166,12 +1270,16 @@ export type Database = {
           lang?: string
           meaning?: string | null
           meaning_az?: string | null
+          meaning_de?: string | null
           meaning_en?: string | null
+          meaning_kk?: string | null
           meaning_ru?: string | null
           meaning_tr?: string | null
           name?: string
           origin?: string | null
+          origin_de?: string | null
           origin_en?: string | null
+          origin_kk?: string | null
           origin_ru?: string | null
           origin_tr?: string | null
           popularity?: number | null
@@ -1216,14 +1324,18 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           id: string
           is_active: boolean | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           position: string
@@ -1239,14 +1351,18 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
           is_active?: boolean | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           position: string
@@ -1262,14 +1378,18 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
           is_active?: boolean | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           position?: string
@@ -1393,14 +1513,18 @@ export type Database = {
           color: string | null
           created_at: string
           description: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           icon: string | null
           id: string
           is_active: boolean | null
           name: string
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           slug: string
@@ -1410,14 +1534,18 @@ export type Database = {
           color?: string | null
           created_at?: string
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean | null
           name: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           slug: string
@@ -1427,14 +1555,18 @@ export type Database = {
           color?: string | null
           created_at?: string
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean | null
           name?: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           slug?: string
@@ -1625,7 +1757,9 @@ export type Database = {
           comments_count: number | null
           content: string
           content_az: string | null
+          content_de: string | null
           content_en: string | null
+          content_kk: string | null
           content_ru: string | null
           content_tr: string | null
           countries_exclude: string[] | null
@@ -1634,7 +1768,9 @@ export type Database = {
           created_at: string
           excerpt: string | null
           excerpt_az: string | null
+          excerpt_de: string | null
           excerpt_en: string | null
+          excerpt_kk: string | null
           excerpt_ru: string | null
           excerpt_tr: string | null
           id: string
@@ -1649,7 +1785,9 @@ export type Database = {
           tags_en: string[] | null
           title: string
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string
@@ -1663,7 +1801,9 @@ export type Database = {
           comments_count?: number | null
           content: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           countries_exclude?: string[] | null
@@ -1672,7 +1812,9 @@ export type Database = {
           created_at?: string
           excerpt?: string | null
           excerpt_az?: string | null
+          excerpt_de?: string | null
           excerpt_en?: string | null
+          excerpt_kk?: string | null
           excerpt_ru?: string | null
           excerpt_tr?: string | null
           id?: string
@@ -1687,7 +1829,9 @@ export type Database = {
           tags_en?: string[] | null
           title: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -1701,7 +1845,9 @@ export type Database = {
           comments_count?: number | null
           content?: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           countries_exclude?: string[] | null
@@ -1710,7 +1856,9 @@ export type Database = {
           created_at?: string
           excerpt?: string | null
           excerpt_az?: string | null
+          excerpt_de?: string | null
           excerpt_en?: string | null
+          excerpt_kk?: string | null
           excerpt_ru?: string | null
           excerpt_tr?: string | null
           id?: string
@@ -1725,7 +1873,9 @@ export type Database = {
           tags_en?: string[] | null
           title?: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -1810,7 +1960,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           exhale_seconds: number
@@ -1822,7 +1974,9 @@ export type Database = {
           is_active: boolean | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           sort_order: number | null
@@ -1838,7 +1992,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           exhale_seconds?: number
@@ -1850,7 +2006,9 @@ export type Database = {
           is_active?: boolean | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -1866,7 +2024,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           exhale_seconds?: number
@@ -1878,7 +2038,9 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -2008,7 +2170,9 @@ export type Database = {
           created_at: string
           custom_field_labels: Json | null
           description: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           has_custom_fields: boolean | null
@@ -2017,13 +2181,17 @@ export type Database = {
           images: string[] | null
           is_active: boolean | null
           milestone_label: string | null
+          milestone_label_de: string | null
           milestone_label_en: string | null
+          milestone_label_kk: string | null
           milestone_label_ru: string | null
           milestone_label_tr: string | null
           milestone_type: string | null
           month_number: number | null
           name: string
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           price: number
@@ -2035,7 +2203,9 @@ export type Database = {
           created_at?: string
           custom_field_labels?: Json | null
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           has_custom_fields?: boolean | null
@@ -2044,13 +2214,17 @@ export type Database = {
           images?: string[] | null
           is_active?: boolean | null
           milestone_label?: string | null
+          milestone_label_de?: string | null
           milestone_label_en?: string | null
+          milestone_label_kk?: string | null
           milestone_label_ru?: string | null
           milestone_label_tr?: string | null
           milestone_type?: string | null
           month_number?: number | null
           name: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           price?: number
@@ -2062,7 +2236,9 @@ export type Database = {
           created_at?: string
           custom_field_labels?: Json | null
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           has_custom_fields?: boolean | null
@@ -2071,13 +2247,17 @@ export type Database = {
           images?: string[] | null
           is_active?: boolean | null
           milestone_label?: string | null
+          milestone_label_de?: string | null
           milestone_label_en?: string | null
+          milestone_label_kk?: string | null
           milestone_label_ru?: string | null
           milestone_label_tr?: string | null
           milestone_type?: string | null
           month_number?: number | null
           name?: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           price?: number
@@ -2228,7 +2408,9 @@ export type Database = {
           meal_types: string[] | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           sort_order: number | null
@@ -2243,7 +2425,9 @@ export type Database = {
           meal_types?: string[] | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -2258,7 +2442,9 @@ export type Database = {
           meal_types?: string[] | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -2923,7 +3109,9 @@ export type Database = {
           life_stage: string | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           priority: string | null
@@ -2938,7 +3126,9 @@ export type Database = {
           life_stage?: string | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           priority?: string | null
@@ -2953,7 +3143,9 @@ export type Database = {
           life_stage?: string | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           priority?: string | null
@@ -2967,7 +3159,9 @@ export type Database = {
           age_group: string
           content: string
           content_az: string | null
+          content_de: string | null
           content_en: string | null
+          content_kk: string | null
           content_ru: string | null
           content_tr: string | null
           created_at: string | null
@@ -2977,7 +3171,9 @@ export type Database = {
           sort_order: number | null
           title: string
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
         }
@@ -2985,7 +3181,9 @@ export type Database = {
           age_group: string
           content: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string | null
@@ -2995,7 +3193,9 @@ export type Database = {
           sort_order?: number | null
           title: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -3003,7 +3203,9 @@ export type Database = {
           age_group?: string
           content?: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string | null
@@ -3013,7 +3215,9 @@ export type Database = {
           sort_order?: number | null
           title?: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -3122,7 +3326,9 @@ export type Database = {
           question_number: number
           question_text: string
           question_text_az: string | null
+          question_text_de: string | null
           question_text_en: string | null
+          question_text_kk: string | null
           question_text_ru: string | null
           question_text_tr: string | null
           sort_order: number | null
@@ -3136,7 +3342,9 @@ export type Database = {
           question_number: number
           question_text: string
           question_text_az?: string | null
+          question_text_de?: string | null
           question_text_en?: string | null
+          question_text_kk?: string | null
           question_text_ru?: string | null
           question_text_tr?: string | null
           sort_order?: number | null
@@ -3150,7 +3358,9 @@ export type Database = {
           question_number?: number
           question_text?: string
           question_text_az?: string | null
+          question_text_de?: string | null
           question_text_en?: string | null
+          question_text_kk?: string | null
           question_text_ru?: string | null
           question_text_tr?: string | null
           sort_order?: number | null
@@ -3234,7 +3444,9 @@ export type Database = {
           calories: number
           created_at: string | null
           description: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           duration_minutes: number
@@ -3256,7 +3468,9 @@ export type Database = {
           calories?: number
           created_at?: string | null
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           duration_minutes?: number
@@ -3278,7 +3492,9 @@ export type Database = {
           calories?: number
           created_at?: string | null
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           duration_minutes?: number
@@ -3303,7 +3519,9 @@ export type Database = {
           cover_image_url: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           emoji: string | null
@@ -3311,7 +3529,9 @@ export type Database = {
           is_active: boolean | null
           name: string
           name_az: string
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           sort_order: number | null
@@ -3320,7 +3540,9 @@ export type Database = {
           cover_image_url?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -3328,7 +3550,9 @@ export type Database = {
           is_active?: boolean | null
           name: string
           name_az: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -3337,7 +3561,9 @@ export type Database = {
           cover_image_url?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -3345,7 +3571,9 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           name_az?: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -3407,7 +3635,9 @@ export type Database = {
         Row: {
           answer: string
           answer_az: string | null
+          answer_de: string | null
           answer_en: string | null
+          answer_kk: string | null
           answer_ru: string | null
           answer_tr: string | null
           category: string | null
@@ -3416,7 +3646,9 @@ export type Database = {
           is_active: boolean | null
           question: string
           question_az: string | null
+          question_de: string | null
           question_en: string | null
+          question_kk: string | null
           question_ru: string | null
           question_tr: string | null
           sort_order: number | null
@@ -3424,7 +3656,9 @@ export type Database = {
         Insert: {
           answer: string
           answer_az?: string | null
+          answer_de?: string | null
           answer_en?: string | null
+          answer_kk?: string | null
           answer_ru?: string | null
           answer_tr?: string | null
           category?: string | null
@@ -3433,7 +3667,9 @@ export type Database = {
           is_active?: boolean | null
           question: string
           question_az?: string | null
+          question_de?: string | null
           question_en?: string | null
+          question_kk?: string | null
           question_ru?: string | null
           question_tr?: string | null
           sort_order?: number | null
@@ -3441,7 +3677,9 @@ export type Database = {
         Update: {
           answer?: string
           answer_az?: string | null
+          answer_de?: string | null
           answer_en?: string | null
+          answer_kk?: string | null
           answer_ru?: string | null
           answer_tr?: string | null
           category?: string | null
@@ -3450,7 +3688,9 @@ export type Database = {
           is_active?: boolean | null
           question?: string
           question_az?: string | null
+          question_de?: string | null
           question_en?: string | null
+          question_kk?: string | null
           question_ru?: string | null
           question_tr?: string | null
           sort_order?: number | null
@@ -3492,7 +3732,9 @@ export type Database = {
           color: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           emergency_level: string | null
@@ -3502,7 +3744,9 @@ export type Database = {
           sort_order: number | null
           title: string
           title_az: string
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
         }
@@ -3510,7 +3754,9 @@ export type Database = {
           color?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emergency_level?: string | null
@@ -3520,7 +3766,9 @@ export type Database = {
           sort_order?: number | null
           title: string
           title_az: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -3528,7 +3776,9 @@ export type Database = {
           color?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emergency_level?: string | null
@@ -3538,7 +3788,9 @@ export type Database = {
           sort_order?: number | null
           title?: string
           title_az?: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -3553,7 +3805,9 @@ export type Database = {
           image_url: string | null
           instruction: string
           instruction_az: string
+          instruction_de: string | null
           instruction_en: string | null
+          instruction_kk: string | null
           instruction_ru: string | null
           instruction_tr: string | null
           is_critical: boolean | null
@@ -3561,7 +3815,9 @@ export type Database = {
           step_number: number
           title: string
           title_az: string
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
         }
@@ -3573,7 +3829,9 @@ export type Database = {
           image_url?: string | null
           instruction: string
           instruction_az: string
+          instruction_de?: string | null
           instruction_en?: string | null
+          instruction_kk?: string | null
           instruction_ru?: string | null
           instruction_tr?: string | null
           is_critical?: boolean | null
@@ -3581,7 +3839,9 @@ export type Database = {
           step_number: number
           title: string
           title_az: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -3593,7 +3853,9 @@ export type Database = {
           image_url?: string | null
           instruction?: string
           instruction_az?: string
+          instruction_de?: string | null
           instruction_en?: string | null
+          instruction_kk?: string | null
           instruction_ru?: string | null
           instruction_tr?: string | null
           is_critical?: boolean | null
@@ -3601,7 +3863,9 @@ export type Database = {
           step_number?: number
           title?: string
           title_az?: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -3683,7 +3947,9 @@ export type Database = {
           category: string | null
           content: string
           content_az: string | null
+          content_de: string | null
           content_en: string | null
+          content_kk: string | null
           content_ru: string | null
           content_tr: string | null
           created_at: string | null
@@ -3694,7 +3960,9 @@ export type Database = {
           sort_order: number | null
           title: string
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
         }
@@ -3702,7 +3970,9 @@ export type Database = {
           category?: string | null
           content: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string | null
@@ -3713,7 +3983,9 @@ export type Database = {
           sort_order?: number | null
           title: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -3721,7 +3993,9 @@ export type Database = {
           category?: string | null
           content?: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string | null
@@ -3732,7 +4006,9 @@ export type Database = {
           sort_order?: number | null
           title?: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -3749,7 +4025,9 @@ export type Database = {
           sort_order: number | null
           tip_text: string
           tip_text_az: string | null
+          tip_text_de: string | null
           tip_text_en: string | null
+          tip_text_kk: string | null
           tip_text_ru: string | null
           tip_text_tr: string | null
         }
@@ -3763,7 +4041,9 @@ export type Database = {
           sort_order?: number | null
           tip_text: string
           tip_text_az?: string | null
+          tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
         }
@@ -3777,7 +4057,9 @@ export type Database = {
           sort_order?: number | null
           tip_text?: string
           tip_text_az?: string | null
+          tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
         }
@@ -3882,7 +4164,9 @@ export type Database = {
           is_active: boolean | null
           label: string
           label_az: string | null
+          label_de: string | null
           label_en: string | null
+          label_kk: string | null
           label_ru: string | null
           label_tr: string | null
           sort_order: number | null
@@ -3896,7 +4180,9 @@ export type Database = {
           is_active?: boolean | null
           label: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           sort_order?: number | null
@@ -3910,7 +4196,9 @@ export type Database = {
           is_active?: boolean | null
           label?: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           sort_order?: number | null
@@ -4077,7 +4365,9 @@ export type Database = {
           accepts_reservations: boolean | null
           address: string | null
           address_az: string | null
+          address_de: string | null
           address_en: string | null
+          address_kk: string | null
           address_ru: string | null
           address_tr: string | null
           city: string | null
@@ -4085,7 +4375,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           email: string | null
@@ -4097,7 +4389,9 @@ export type Database = {
           longitude: number | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           phone: string | null
@@ -4108,7 +4402,9 @@ export type Database = {
           sort_order: number | null
           specialty: string | null
           specialty_az: string | null
+          specialty_de: string | null
           specialty_en: string | null
+          specialty_kk: string | null
           specialty_ru: string | null
           specialty_tr: string | null
           updated_at: string | null
@@ -4119,7 +4415,9 @@ export type Database = {
           accepts_reservations?: boolean | null
           address?: string | null
           address_az?: string | null
+          address_de?: string | null
           address_en?: string | null
+          address_kk?: string | null
           address_ru?: string | null
           address_tr?: string | null
           city?: string | null
@@ -4127,7 +4425,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           email?: string | null
@@ -4139,7 +4439,9 @@ export type Database = {
           longitude?: number | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           phone?: string | null
@@ -4150,7 +4452,9 @@ export type Database = {
           sort_order?: number | null
           specialty?: string | null
           specialty_az?: string | null
+          specialty_de?: string | null
           specialty_en?: string | null
+          specialty_kk?: string | null
           specialty_ru?: string | null
           specialty_tr?: string | null
           updated_at?: string | null
@@ -4161,7 +4465,9 @@ export type Database = {
           accepts_reservations?: boolean | null
           address?: string | null
           address_az?: string | null
+          address_de?: string | null
           address_en?: string | null
+          address_kk?: string | null
           address_ru?: string | null
           address_tr?: string | null
           city?: string | null
@@ -4169,7 +4475,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           email?: string | null
@@ -4181,7 +4489,9 @@ export type Database = {
           longitude?: number | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           phone?: string | null
@@ -4192,7 +4502,9 @@ export type Database = {
           sort_order?: number | null
           specialty?: string | null
           specialty_az?: string | null
+          specialty_de?: string | null
           specialty_en?: string | null
+          specialty_kk?: string | null
           specialty_ru?: string | null
           specialty_tr?: string | null
           updated_at?: string | null
@@ -4390,11 +4702,15 @@ export type Database = {
           is_essential: boolean | null
           item_name: string
           item_name_az: string | null
+          item_name_de: string | null
           item_name_en: string | null
+          item_name_kk: string | null
           item_name_ru: string | null
           item_name_tr: string | null
           notes: string | null
+          notes_de: string | null
           notes_en: string | null
+          notes_kk: string | null
           notes_ru: string | null
           notes_tr: string | null
           priority: number | null
@@ -4409,11 +4725,15 @@ export type Database = {
           is_essential?: boolean | null
           item_name: string
           item_name_az?: string | null
+          item_name_de?: string | null
           item_name_en?: string | null
+          item_name_kk?: string | null
           item_name_ru?: string | null
           item_name_tr?: string | null
           notes?: string | null
+          notes_de?: string | null
           notes_en?: string | null
+          notes_kk?: string | null
           notes_ru?: string | null
           notes_tr?: string | null
           priority?: number | null
@@ -4428,11 +4748,15 @@ export type Database = {
           is_essential?: boolean | null
           item_name?: string
           item_name_az?: string | null
+          item_name_de?: string | null
           item_name_en?: string | null
+          item_name_kk?: string | null
           item_name_ru?: string | null
           item_name_tr?: string | null
           notes?: string | null
+          notes_de?: string | null
           notes_en?: string | null
+          notes_kk?: string | null
           notes_ru?: string | null
           notes_tr?: string | null
           priority?: number | null
@@ -4446,7 +4770,9 @@ export type Database = {
           bg_decor: string | null
           created_at: string
           description: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           gradient: string
@@ -4455,11 +4781,15 @@ export type Database = {
           is_active: boolean
           sort_order: number
           subtitle: string | null
+          subtitle_de: string | null
           subtitle_en: string | null
+          subtitle_kk: string | null
           subtitle_ru: string | null
           subtitle_tr: string | null
           title: string
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string
@@ -4468,7 +4798,9 @@ export type Database = {
           bg_decor?: string | null
           created_at?: string
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           gradient?: string
@@ -4477,11 +4809,15 @@ export type Database = {
           is_active?: boolean
           sort_order?: number
           subtitle?: string | null
+          subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_kk?: string | null
           subtitle_ru?: string | null
           subtitle_tr?: string | null
           title: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -4490,7 +4826,9 @@ export type Database = {
           bg_decor?: string | null
           created_at?: string
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           gradient?: string
@@ -4499,11 +4837,15 @@ export type Database = {
           is_active?: boolean
           sort_order?: number
           subtitle?: string | null
+          subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_kk?: string | null
           subtitle_ru?: string | null
           subtitle_tr?: string | null
           title?: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -4541,7 +4883,9 @@ export type Database = {
         Row: {
           content: string
           content_az: string | null
+          content_de: string | null
           content_en: string | null
+          content_kk: string | null
           content_ru: string | null
           content_tr: string | null
           created_at: string | null
@@ -4551,7 +4895,9 @@ export type Database = {
           is_active: boolean | null
           title: string
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string | null
@@ -4560,7 +4906,9 @@ export type Database = {
         Insert: {
           content: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string | null
@@ -4570,7 +4918,9 @@ export type Database = {
           is_active?: boolean | null
           title: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
@@ -4579,7 +4929,9 @@ export type Database = {
         Update: {
           content?: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string | null
@@ -4589,7 +4941,9 @@ export type Database = {
           is_active?: boolean | null
           title?: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
@@ -4796,7 +5150,9 @@ export type Database = {
           category: string | null
           content: string
           content_az: string | null
+          content_de: string | null
           content_en: string | null
+          content_kk: string | null
           content_ru: string | null
           content_tr: string | null
           created_at: string | null
@@ -4806,7 +5162,9 @@ export type Database = {
           sort_order: number | null
           title: string
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string | null
@@ -4815,7 +5173,9 @@ export type Database = {
           category?: string | null
           content: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string | null
@@ -4825,7 +5185,9 @@ export type Database = {
           sort_order?: number | null
           title: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
@@ -4834,7 +5196,9 @@ export type Database = {
           category?: string | null
           content?: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string | null
@@ -4844,7 +5208,9 @@ export type Database = {
           sort_order?: number | null
           title?: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
@@ -4897,7 +5263,9 @@ export type Database = {
           meal_id: string
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           sort_order: number | null
@@ -4912,7 +5280,9 @@ export type Database = {
           meal_id: string
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -4927,7 +5297,9 @@ export type Database = {
           meal_id?: string
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -5007,7 +5379,9 @@ export type Database = {
           address_tr: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           id: string
@@ -5015,7 +5389,9 @@ export type Database = {
           is_emergency: boolean | null
           name: string
           name_az: string
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           phone: string | null
@@ -5031,7 +5407,9 @@ export type Database = {
           address_tr?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -5039,7 +5417,9 @@ export type Database = {
           is_emergency?: boolean | null
           name: string
           name_az: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           phone?: string | null
@@ -5055,7 +5435,9 @@ export type Database = {
           address_tr?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -5063,7 +5445,9 @@ export type Database = {
           is_emergency?: boolean | null
           name?: string
           name_az?: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           phone?: string | null
@@ -5077,7 +5461,9 @@ export type Database = {
         Row: {
           address: string | null
           address_az: string | null
+          address_de: string | null
           address_en: string | null
+          address_kk: string | null
           address_ru: string | null
           address_tr: string | null
           avg_rating: number | null
@@ -5086,7 +5472,9 @@ export type Database = {
           created_by: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           has_breastfeeding_room: boolean | null
@@ -5106,7 +5494,9 @@ export type Database = {
           longitude: number
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           phone: string | null
@@ -5118,7 +5508,9 @@ export type Database = {
         Insert: {
           address?: string | null
           address_az?: string | null
+          address_de?: string | null
           address_en?: string | null
+          address_kk?: string | null
           address_ru?: string | null
           address_tr?: string | null
           avg_rating?: number | null
@@ -5127,7 +5519,9 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           has_breastfeeding_room?: boolean | null
@@ -5147,7 +5541,9 @@ export type Database = {
           longitude: number
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           phone?: string | null
@@ -5159,7 +5555,9 @@ export type Database = {
         Update: {
           address?: string | null
           address_az?: string | null
+          address_de?: string | null
           address_en?: string | null
+          address_kk?: string | null
           address_ru?: string | null
           address_tr?: string | null
           avg_rating?: number | null
@@ -5168,7 +5566,9 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           has_breastfeeding_room?: boolean | null
@@ -5188,7 +5588,9 @@ export type Database = {
           longitude?: number
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           phone?: string | null
@@ -5206,7 +5608,9 @@ export type Database = {
           id: string
           is_active: boolean
           message: string
+          message_de: string | null
           message_en: string | null
+          message_kk: string | null
           message_ru: string | null
           message_tr: string | null
           updated_at: string
@@ -5217,7 +5621,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           message: string
+          message_de?: string | null
           message_en?: string | null
+          message_kk?: string | null
           message_ru?: string | null
           message_tr?: string | null
           updated_at?: string
@@ -5228,7 +5634,9 @@ export type Database = {
           id?: string
           is_active?: boolean
           message?: string
+          message_de?: string | null
           message_en?: string | null
+          message_kk?: string | null
           message_ru?: string | null
           message_tr?: string | null
           updated_at?: string
@@ -5238,7 +5646,9 @@ export type Database = {
       mommy_day_notifications: {
         Row: {
           body: string
+          body_de: string | null
           body_en: string | null
+          body_kk: string | null
           body_ru: string | null
           body_tr: string | null
           created_at: string
@@ -5248,14 +5658,18 @@ export type Database = {
           is_active: boolean | null
           send_time: string
           title: string
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string
         }
         Insert: {
           body: string
+          body_de?: string | null
           body_en?: string | null
+          body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
           created_at?: string
@@ -5265,14 +5679,18 @@ export type Database = {
           is_active?: boolean | null
           send_time?: string
           title: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
         }
         Update: {
           body?: string
+          body_de?: string | null
           body_en?: string | null
+          body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
           created_at?: string
@@ -5282,7 +5700,9 @@ export type Database = {
           is_active?: boolean | null
           send_time?: string
           title?: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -5328,7 +5748,9 @@ export type Database = {
           is_active: boolean | null
           label: string
           label_az: string | null
+          label_de: string | null
           label_en: string | null
+          label_kk: string | null
           label_ru: string | null
           label_tr: string | null
           mood_value: number
@@ -5342,7 +5764,9 @@ export type Database = {
           is_active?: boolean | null
           label: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           mood_value: number
@@ -5356,7 +5780,9 @@ export type Database = {
           is_active?: boolean | null
           label?: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           mood_value?: number
@@ -5373,7 +5799,9 @@ export type Database = {
           is_active: boolean | null
           label: string
           label_az: string | null
+          label_de: string | null
           label_en: string | null
+          label_kk: string | null
           label_ru: string | null
           label_tr: string | null
           value: number
@@ -5386,7 +5814,9 @@ export type Database = {
           is_active?: boolean | null
           label: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           value: number
@@ -5399,7 +5829,9 @@ export type Database = {
           is_active?: boolean | null
           label?: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           value?: number
@@ -5415,7 +5847,9 @@ export type Database = {
           is_active: boolean | null
           label: string
           label_az: string | null
+          label_de: string | null
           label_en: string | null
+          label_kk: string | null
           label_ru: string | null
           label_tr: string | null
           option_id: string
@@ -5429,7 +5863,9 @@ export type Database = {
           is_active?: boolean | null
           label: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           option_id: string
@@ -5443,7 +5879,9 @@ export type Database = {
           is_active?: boolean | null
           label?: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           option_id?: string
@@ -5520,7 +5958,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           emoji: string | null
@@ -5528,7 +5968,9 @@ export type Database = {
           is_active: boolean | null
           label: string
           label_az: string | null
+          label_de: string | null
           label_en: string | null
+          label_kk: string | null
           label_ru: string | null
           label_tr: string | null
           max_db: number | null
@@ -5541,7 +5983,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -5549,7 +5993,9 @@ export type Database = {
           is_active?: boolean | null
           label: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           max_db?: number | null
@@ -5562,7 +6008,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -5570,7 +6018,9 @@ export type Database = {
           is_active?: boolean | null
           label?: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           max_db?: number | null
@@ -5729,7 +6179,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           id: string
@@ -5743,7 +6195,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -5757,7 +6211,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -5773,7 +6229,9 @@ export type Database = {
           calories: number | null
           category: string
           content: string
+          content_de: string | null
           content_en: string | null
+          content_kk: string | null
           content_ru: string | null
           content_tr: string | null
           created_at: string
@@ -5781,7 +6239,9 @@ export type Database = {
           is_active: boolean | null
           nutrients: Json | null
           title: string
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           trimester: number | null
@@ -5791,7 +6251,9 @@ export type Database = {
           calories?: number | null
           category?: string
           content: string
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string
@@ -5799,7 +6261,9 @@ export type Database = {
           is_active?: boolean | null
           nutrients?: Json | null
           title: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           trimester?: number | null
@@ -5809,7 +6273,9 @@ export type Database = {
           calories?: number | null
           category?: string
           content?: string
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string
@@ -5817,7 +6283,9 @@ export type Database = {
           is_active?: boolean | null
           nutrients?: Json | null
           title?: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           trimester?: number | null
@@ -5831,7 +6299,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           emoji: string | null
@@ -5842,12 +6312,16 @@ export type Database = {
           stage_id: string
           subtitle: string | null
           subtitle_az: string | null
+          subtitle_de: string | null
           subtitle_en: string | null
+          subtitle_kk: string | null
           subtitle_ru: string | null
           subtitle_tr: string | null
           title: string
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
         }
@@ -5856,7 +6330,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -5867,12 +6343,16 @@ export type Database = {
           stage_id: string
           subtitle?: string | null
           subtitle_az?: string | null
+          subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_kk?: string | null
           subtitle_ru?: string | null
           subtitle_tr?: string | null
           title: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -5881,7 +6361,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -5892,12 +6374,16 @@ export type Database = {
           stage_id?: string
           subtitle?: string | null
           subtitle_az?: string | null
+          subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_kk?: string | null
           subtitle_ru?: string | null
           subtitle_tr?: string | null
           title?: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -6056,7 +6542,9 @@ export type Database = {
           tip_emoji: string | null
           tip_text: string
           tip_text_az: string | null
+          tip_text_de: string | null
           tip_text_en: string | null
+          tip_text_kk: string | null
           tip_text_ru: string | null
           tip_text_tr: string | null
           updated_at: string | null
@@ -6071,7 +6559,9 @@ export type Database = {
           tip_emoji?: string | null
           tip_text: string
           tip_text_az?: string | null
+          tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
           updated_at?: string | null
@@ -6086,7 +6576,9 @@ export type Database = {
           tip_emoji?: string | null
           tip_text?: string
           tip_text_az?: string | null
+          tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
           updated_at?: string | null
@@ -6357,7 +6849,9 @@ export type Database = {
           is_active: boolean
           key: string
           label_az: string
+          label_de: string | null
           label_en: string | null
+          label_kk: string | null
           label_ru: string | null
           label_tr: string | null
           sort_order: number
@@ -6370,7 +6864,9 @@ export type Database = {
           is_active?: boolean
           key: string
           label_az: string
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           sort_order?: number
@@ -6383,7 +6879,9 @@ export type Database = {
           is_active?: boolean
           key?: string
           label_az?: string
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           sort_order?: number
@@ -6689,7 +7187,9 @@ export type Database = {
           category_id: string
           category_name: string
           category_name_az: string | null
+          category_name_de: string | null
           category_name_en: string | null
+          category_name_kk: string | null
           category_name_ru: string | null
           category_name_tr: string | null
           created_at: string | null
@@ -6703,7 +7203,9 @@ export type Database = {
           theme_id: string
           theme_name: string
           theme_name_az: string | null
+          theme_name_de: string | null
           theme_name_en: string | null
+          theme_name_kk: string | null
           theme_name_ru: string | null
           theme_name_tr: string | null
           updated_at: string | null
@@ -6712,7 +7214,9 @@ export type Database = {
           category_id: string
           category_name: string
           category_name_az?: string | null
+          category_name_de?: string | null
           category_name_en?: string | null
+          category_name_kk?: string | null
           category_name_ru?: string | null
           category_name_tr?: string | null
           created_at?: string | null
@@ -6726,7 +7230,9 @@ export type Database = {
           theme_id: string
           theme_name: string
           theme_name_az?: string | null
+          theme_name_de?: string | null
           theme_name_en?: string | null
+          theme_name_kk?: string | null
           theme_name_ru?: string | null
           theme_name_tr?: string | null
           updated_at?: string | null
@@ -6735,7 +7241,9 @@ export type Database = {
           category_id?: string
           category_name?: string
           category_name_az?: string | null
+          category_name_de?: string | null
           category_name_en?: string | null
+          category_name_kk?: string | null
           category_name_ru?: string | null
           category_name_tr?: string | null
           created_at?: string | null
@@ -6749,7 +7257,9 @@ export type Database = {
           theme_id?: string
           theme_name?: string
           theme_name_az?: string | null
+          theme_name_de?: string | null
           theme_name_en?: string | null
+          theme_name_kk?: string | null
           theme_name_ru?: string | null
           theme_name_tr?: string | null
           updated_at?: string | null
@@ -6761,7 +7271,9 @@ export type Database = {
           color_id: string
           color_name: string
           color_name_az: string | null
+          color_name_de: string | null
           color_name_en: string | null
+          color_name_kk: string | null
           color_name_ru: string | null
           color_name_tr: string | null
           created_at: string | null
@@ -6774,7 +7286,9 @@ export type Database = {
           color_id: string
           color_name: string
           color_name_az?: string | null
+          color_name_de?: string | null
           color_name_en?: string | null
+          color_name_kk?: string | null
           color_name_ru?: string | null
           color_name_tr?: string | null
           created_at?: string | null
@@ -6787,7 +7301,9 @@ export type Database = {
           color_id?: string
           color_name?: string
           color_name_az?: string | null
+          color_name_de?: string | null
           color_name_en?: string | null
+          color_name_kk?: string | null
           color_name_ru?: string | null
           color_name_tr?: string | null
           created_at?: string | null
@@ -6803,7 +7319,9 @@ export type Database = {
           color_id: string
           color_name: string
           color_name_az: string | null
+          color_name_de: string | null
           color_name_en: string | null
+          color_name_kk: string | null
           color_name_ru: string | null
           color_name_tr: string | null
           created_at: string | null
@@ -6816,7 +7334,9 @@ export type Database = {
           color_id: string
           color_name: string
           color_name_az?: string | null
+          color_name_de?: string | null
           color_name_en?: string | null
+          color_name_kk?: string | null
           color_name_ru?: string | null
           color_name_tr?: string | null
           created_at?: string | null
@@ -6829,7 +7349,9 @@ export type Database = {
           color_id?: string
           color_name?: string
           color_name_az?: string | null
+          color_name_de?: string | null
           color_name_en?: string | null
+          color_name_kk?: string | null
           color_name_ru?: string | null
           color_name_tr?: string | null
           created_at?: string | null
@@ -6850,7 +7372,9 @@ export type Database = {
           style_id: string
           style_name: string
           style_name_az: string | null
+          style_name_de: string | null
           style_name_en: string | null
+          style_name_kk: string | null
           style_name_ru: string | null
           style_name_tr: string | null
         }
@@ -6863,7 +7387,9 @@ export type Database = {
           style_id: string
           style_name: string
           style_name_az?: string | null
+          style_name_de?: string | null
           style_name_en?: string | null
+          style_name_kk?: string | null
           style_name_ru?: string | null
           style_name_tr?: string | null
         }
@@ -6876,7 +7402,9 @@ export type Database = {
           style_id?: string
           style_name?: string
           style_name_az?: string | null
+          style_name_de?: string | null
           style_name_en?: string | null
+          style_name_kk?: string | null
           style_name_ru?: string | null
           style_name_tr?: string | null
         }
@@ -6893,7 +7421,9 @@ export type Database = {
           style_id: string
           style_name: string
           style_name_az: string | null
+          style_name_de: string | null
           style_name_en: string | null
+          style_name_kk: string | null
           style_name_ru: string | null
           style_name_tr: string | null
         }
@@ -6907,7 +7437,9 @@ export type Database = {
           style_id: string
           style_name: string
           style_name_az?: string | null
+          style_name_de?: string | null
           style_name_en?: string | null
+          style_name_kk?: string | null
           style_name_ru?: string | null
           style_name_tr?: string | null
         }
@@ -6921,7 +7453,9 @@ export type Database = {
           style_id?: string
           style_name?: string
           style_name_az?: string | null
+          style_name_de?: string | null
           style_name_en?: string | null
+          style_name_kk?: string | null
           style_name_ru?: string | null
           style_name_tr?: string | null
         }
@@ -6937,7 +7471,9 @@ export type Database = {
           outfit_id: string
           outfit_name: string
           outfit_name_az: string | null
+          outfit_name_de: string | null
           outfit_name_en: string | null
+          outfit_name_kk: string | null
           outfit_name_ru: string | null
           outfit_name_tr: string | null
           sort_order: number | null
@@ -6951,7 +7487,9 @@ export type Database = {
           outfit_id: string
           outfit_name: string
           outfit_name_az?: string | null
+          outfit_name_de?: string | null
           outfit_name_en?: string | null
+          outfit_name_kk?: string | null
           outfit_name_ru?: string | null
           outfit_name_tr?: string | null
           sort_order?: number | null
@@ -6965,7 +7503,9 @@ export type Database = {
           outfit_id?: string
           outfit_name?: string
           outfit_name_az?: string | null
+          outfit_name_de?: string | null
           outfit_name_en?: string | null
+          outfit_name_kk?: string | null
           outfit_name_ru?: string | null
           outfit_name_tr?: string | null
           sort_order?: number | null
@@ -7032,7 +7572,9 @@ export type Database = {
           is_active: boolean | null
           label: string
           label_az: string | null
+          label_de: string | null
           label_en: string | null
+          label_kk: string | null
           label_ru: string | null
           label_tr: string | null
           sort_order: number | null
@@ -7045,7 +7587,9 @@ export type Database = {
           is_active?: boolean | null
           label: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           sort_order?: number | null
@@ -7058,7 +7602,9 @@ export type Database = {
           is_active?: boolean | null
           label?: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           sort_order?: number | null
@@ -7075,7 +7621,9 @@ export type Database = {
           is_active: boolean | null
           label: string
           label_az: string | null
+          label_de: string | null
           label_en: string | null
+          label_kk: string | null
           label_ru: string | null
           label_tr: string | null
           sort_order: number | null
@@ -7089,7 +7637,9 @@ export type Database = {
           is_active?: boolean | null
           label: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           sort_order?: number | null
@@ -7103,7 +7653,9 @@ export type Database = {
           is_active?: boolean | null
           label?: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           sort_order?: number | null
@@ -7197,7 +7749,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           difficulty_level: string | null
@@ -7206,7 +7760,9 @@ export type Database = {
           image_url: string | null
           instructions: string | null
           instructions_az: string | null
+          instructions_de: string | null
           instructions_en: string | null
+          instructions_kk: string | null
           instructions_ru: string | null
           instructions_tr: string | null
           is_active: boolean | null
@@ -7217,7 +7773,9 @@ export type Database = {
           sort_order: number | null
           title: string
           title_az: string
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           video_url: string | null
@@ -7226,7 +7784,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           difficulty_level?: string | null
@@ -7235,7 +7795,9 @@ export type Database = {
           image_url?: string | null
           instructions?: string | null
           instructions_az?: string | null
+          instructions_de?: string | null
           instructions_en?: string | null
+          instructions_kk?: string | null
           instructions_ru?: string | null
           instructions_tr?: string | null
           is_active?: boolean | null
@@ -7246,7 +7808,9 @@ export type Database = {
           sort_order?: number | null
           title: string
           title_az: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           video_url?: string | null
@@ -7255,7 +7819,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           difficulty_level?: string | null
@@ -7264,7 +7830,9 @@ export type Database = {
           image_url?: string | null
           instructions?: string | null
           instructions_az?: string | null
+          instructions_de?: string | null
           instructions_en?: string | null
+          instructions_kk?: string | null
           instructions_ru?: string | null
           instructions_tr?: string | null
           is_active?: boolean | null
@@ -7275,7 +7843,9 @@ export type Database = {
           sort_order?: number | null
           title?: string
           title_az?: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           video_url?: string | null
@@ -7325,7 +7895,9 @@ export type Database = {
           is_active: boolean | null
           name: string
           name_az: string
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           sort_order: number | null
@@ -7337,7 +7909,9 @@ export type Database = {
           is_active?: boolean | null
           name: string
           name_az: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -7349,7 +7923,9 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           name_az?: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -7615,80 +8191,114 @@ export type Database = {
       pregnancy_daily_content: {
         Row: {
           baby_development: string | null
+          baby_development_de: string | null
           baby_development_en: string | null
+          baby_development_kk: string | null
           baby_development_ru: string | null
           baby_development_tr: string | null
           baby_message: string | null
+          baby_message_de: string | null
           baby_message_en: string | null
+          baby_message_kk: string | null
           baby_message_ru: string | null
           baby_message_tr: string | null
           baby_size_cm: number | null
           baby_size_fruit: string | null
+          baby_size_fruit_de: string | null
           baby_size_fruit_en: string | null
+          baby_size_fruit_kk: string | null
           baby_size_fruit_ru: string | null
           baby_size_fruit_tr: string | null
           baby_weight_gram: number | null
           body_changes: string | null
+          body_changes_de: string | null
           body_changes_en: string | null
+          body_changes_kk: string | null
           body_changes_ru: string | null
           body_changes_tr: string | null
           created_at: string
           daily_tip: string | null
+          daily_tip_de: string | null
           daily_tip_en: string | null
+          daily_tip_kk: string | null
           daily_tip_ru: string | null
           daily_tip_tr: string | null
           day_number: number | null
           days_until_birth: number | null
           doctor_visit_tip: string | null
+          doctor_visit_tip_de: string | null
           doctor_visit_tip_en: string | null
+          doctor_visit_tip_kk: string | null
           doctor_visit_tip_ru: string | null
           doctor_visit_tip_tr: string | null
           emotional_tip: string | null
+          emotional_tip_de: string | null
           emotional_tip_en: string | null
+          emotional_tip_kk: string | null
           emotional_tip_ru: string | null
           emotional_tip_tr: string | null
           exercise_tip: string | null
+          exercise_tip_de: string | null
           exercise_tip_en: string | null
+          exercise_tip_kk: string | null
           exercise_tip_ru: string | null
           exercise_tip_tr: string | null
           foods_to_avoid: string[] | null
+          foods_to_avoid_de: string[] | null
           foods_to_avoid_en: string[] | null
+          foods_to_avoid_kk: string[] | null
           foods_to_avoid_ru: string[] | null
           foods_to_avoid_tr: string[] | null
           id: string
           image_url: string | null
           is_active: boolean | null
           mother_symptoms: string[] | null
+          mother_symptoms_de: string[] | null
           mother_symptoms_en: string[] | null
+          mother_symptoms_kk: string[] | null
           mother_symptoms_ru: string[] | null
           mother_symptoms_tr: string[] | null
           mother_tips: string | null
+          mother_tips_de: string | null
           mother_tips_en: string | null
+          mother_tips_kk: string | null
           mother_tips_ru: string | null
           mother_tips_tr: string | null
           mother_warnings: string | null
+          mother_warnings_de: string | null
           mother_warnings_en: string | null
+          mother_warnings_kk: string | null
           mother_warnings_ru: string | null
           mother_warnings_tr: string | null
           nutrition_tip: string | null
+          nutrition_tip_de: string | null
           nutrition_tip_en: string | null
+          nutrition_tip_kk: string | null
           nutrition_tip_ru: string | null
           nutrition_tip_tr: string | null
           partner_tip: string | null
+          partner_tip_de: string | null
           partner_tip_en: string | null
+          partner_tip_kk: string | null
           partner_tip_ru: string | null
           partner_tip_tr: string | null
           pregnancy_day: number | null
           recommended_exercises: string[] | null
+          recommended_exercises_de: string[] | null
           recommended_exercises_en: string[] | null
+          recommended_exercises_kk: string[] | null
           recommended_exercises_ru: string[] | null
           recommended_exercises_tr: string[] | null
           recommended_foods: string[] | null
+          recommended_foods_de: string[] | null
           recommended_foods_en: string[] | null
+          recommended_foods_kk: string[] | null
           recommended_foods_ru: string[] | null
           recommended_foods_tr: string[] | null
           tests_to_do: string[] | null
+          tests_to_do_de: string[] | null
           tests_to_do_en: string[] | null
+          tests_to_do_kk: string[] | null
           tests_to_do_ru: string[] | null
           tests_to_do_tr: string[] | null
           updated_at: string
@@ -7697,80 +8307,114 @@ export type Database = {
         }
         Insert: {
           baby_development?: string | null
+          baby_development_de?: string | null
           baby_development_en?: string | null
+          baby_development_kk?: string | null
           baby_development_ru?: string | null
           baby_development_tr?: string | null
           baby_message?: string | null
+          baby_message_de?: string | null
           baby_message_en?: string | null
+          baby_message_kk?: string | null
           baby_message_ru?: string | null
           baby_message_tr?: string | null
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
+          baby_size_fruit_de?: string | null
           baby_size_fruit_en?: string | null
+          baby_size_fruit_kk?: string | null
           baby_size_fruit_ru?: string | null
           baby_size_fruit_tr?: string | null
           baby_weight_gram?: number | null
           body_changes?: string | null
+          body_changes_de?: string | null
           body_changes_en?: string | null
+          body_changes_kk?: string | null
           body_changes_ru?: string | null
           body_changes_tr?: string | null
           created_at?: string
           daily_tip?: string | null
+          daily_tip_de?: string | null
           daily_tip_en?: string | null
+          daily_tip_kk?: string | null
           daily_tip_ru?: string | null
           daily_tip_tr?: string | null
           day_number?: number | null
           days_until_birth?: number | null
           doctor_visit_tip?: string | null
+          doctor_visit_tip_de?: string | null
           doctor_visit_tip_en?: string | null
+          doctor_visit_tip_kk?: string | null
           doctor_visit_tip_ru?: string | null
           doctor_visit_tip_tr?: string | null
           emotional_tip?: string | null
+          emotional_tip_de?: string | null
           emotional_tip_en?: string | null
+          emotional_tip_kk?: string | null
           emotional_tip_ru?: string | null
           emotional_tip_tr?: string | null
           exercise_tip?: string | null
+          exercise_tip_de?: string | null
           exercise_tip_en?: string | null
+          exercise_tip_kk?: string | null
           exercise_tip_ru?: string | null
           exercise_tip_tr?: string | null
           foods_to_avoid?: string[] | null
+          foods_to_avoid_de?: string[] | null
           foods_to_avoid_en?: string[] | null
+          foods_to_avoid_kk?: string[] | null
           foods_to_avoid_ru?: string[] | null
           foods_to_avoid_tr?: string[] | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           mother_symptoms?: string[] | null
+          mother_symptoms_de?: string[] | null
           mother_symptoms_en?: string[] | null
+          mother_symptoms_kk?: string[] | null
           mother_symptoms_ru?: string[] | null
           mother_symptoms_tr?: string[] | null
           mother_tips?: string | null
+          mother_tips_de?: string | null
           mother_tips_en?: string | null
+          mother_tips_kk?: string | null
           mother_tips_ru?: string | null
           mother_tips_tr?: string | null
           mother_warnings?: string | null
+          mother_warnings_de?: string | null
           mother_warnings_en?: string | null
+          mother_warnings_kk?: string | null
           mother_warnings_ru?: string | null
           mother_warnings_tr?: string | null
           nutrition_tip?: string | null
+          nutrition_tip_de?: string | null
           nutrition_tip_en?: string | null
+          nutrition_tip_kk?: string | null
           nutrition_tip_ru?: string | null
           nutrition_tip_tr?: string | null
           partner_tip?: string | null
+          partner_tip_de?: string | null
           partner_tip_en?: string | null
+          partner_tip_kk?: string | null
           partner_tip_ru?: string | null
           partner_tip_tr?: string | null
           pregnancy_day?: number | null
           recommended_exercises?: string[] | null
+          recommended_exercises_de?: string[] | null
           recommended_exercises_en?: string[] | null
+          recommended_exercises_kk?: string[] | null
           recommended_exercises_ru?: string[] | null
           recommended_exercises_tr?: string[] | null
           recommended_foods?: string[] | null
+          recommended_foods_de?: string[] | null
           recommended_foods_en?: string[] | null
+          recommended_foods_kk?: string[] | null
           recommended_foods_ru?: string[] | null
           recommended_foods_tr?: string[] | null
           tests_to_do?: string[] | null
+          tests_to_do_de?: string[] | null
           tests_to_do_en?: string[] | null
+          tests_to_do_kk?: string[] | null
           tests_to_do_ru?: string[] | null
           tests_to_do_tr?: string[] | null
           updated_at?: string
@@ -7779,80 +8423,114 @@ export type Database = {
         }
         Update: {
           baby_development?: string | null
+          baby_development_de?: string | null
           baby_development_en?: string | null
+          baby_development_kk?: string | null
           baby_development_ru?: string | null
           baby_development_tr?: string | null
           baby_message?: string | null
+          baby_message_de?: string | null
           baby_message_en?: string | null
+          baby_message_kk?: string | null
           baby_message_ru?: string | null
           baby_message_tr?: string | null
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
+          baby_size_fruit_de?: string | null
           baby_size_fruit_en?: string | null
+          baby_size_fruit_kk?: string | null
           baby_size_fruit_ru?: string | null
           baby_size_fruit_tr?: string | null
           baby_weight_gram?: number | null
           body_changes?: string | null
+          body_changes_de?: string | null
           body_changes_en?: string | null
+          body_changes_kk?: string | null
           body_changes_ru?: string | null
           body_changes_tr?: string | null
           created_at?: string
           daily_tip?: string | null
+          daily_tip_de?: string | null
           daily_tip_en?: string | null
+          daily_tip_kk?: string | null
           daily_tip_ru?: string | null
           daily_tip_tr?: string | null
           day_number?: number | null
           days_until_birth?: number | null
           doctor_visit_tip?: string | null
+          doctor_visit_tip_de?: string | null
           doctor_visit_tip_en?: string | null
+          doctor_visit_tip_kk?: string | null
           doctor_visit_tip_ru?: string | null
           doctor_visit_tip_tr?: string | null
           emotional_tip?: string | null
+          emotional_tip_de?: string | null
           emotional_tip_en?: string | null
+          emotional_tip_kk?: string | null
           emotional_tip_ru?: string | null
           emotional_tip_tr?: string | null
           exercise_tip?: string | null
+          exercise_tip_de?: string | null
           exercise_tip_en?: string | null
+          exercise_tip_kk?: string | null
           exercise_tip_ru?: string | null
           exercise_tip_tr?: string | null
           foods_to_avoid?: string[] | null
+          foods_to_avoid_de?: string[] | null
           foods_to_avoid_en?: string[] | null
+          foods_to_avoid_kk?: string[] | null
           foods_to_avoid_ru?: string[] | null
           foods_to_avoid_tr?: string[] | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           mother_symptoms?: string[] | null
+          mother_symptoms_de?: string[] | null
           mother_symptoms_en?: string[] | null
+          mother_symptoms_kk?: string[] | null
           mother_symptoms_ru?: string[] | null
           mother_symptoms_tr?: string[] | null
           mother_tips?: string | null
+          mother_tips_de?: string | null
           mother_tips_en?: string | null
+          mother_tips_kk?: string | null
           mother_tips_ru?: string | null
           mother_tips_tr?: string | null
           mother_warnings?: string | null
+          mother_warnings_de?: string | null
           mother_warnings_en?: string | null
+          mother_warnings_kk?: string | null
           mother_warnings_ru?: string | null
           mother_warnings_tr?: string | null
           nutrition_tip?: string | null
+          nutrition_tip_de?: string | null
           nutrition_tip_en?: string | null
+          nutrition_tip_kk?: string | null
           nutrition_tip_ru?: string | null
           nutrition_tip_tr?: string | null
           partner_tip?: string | null
+          partner_tip_de?: string | null
           partner_tip_en?: string | null
+          partner_tip_kk?: string | null
           partner_tip_ru?: string | null
           partner_tip_tr?: string | null
           pregnancy_day?: number | null
           recommended_exercises?: string[] | null
+          recommended_exercises_de?: string[] | null
           recommended_exercises_en?: string[] | null
+          recommended_exercises_kk?: string[] | null
           recommended_exercises_ru?: string[] | null
           recommended_exercises_tr?: string[] | null
           recommended_foods?: string[] | null
+          recommended_foods_de?: string[] | null
           recommended_foods_en?: string[] | null
+          recommended_foods_kk?: string[] | null
           recommended_foods_ru?: string[] | null
           recommended_foods_tr?: string[] | null
           tests_to_do?: string[] | null
+          tests_to_do_de?: string[] | null
           tests_to_do_en?: string[] | null
+          tests_to_do_kk?: string[] | null
           tests_to_do_ru?: string[] | null
           tests_to_do_tr?: string[] | null
           updated_at?: string
@@ -7864,7 +8542,9 @@ export type Database = {
       pregnancy_day_notifications: {
         Row: {
           body: string
+          body_de: string | null
           body_en: string | null
+          body_kk: string | null
           body_ru: string | null
           body_tr: string | null
           created_at: string | null
@@ -7874,14 +8554,18 @@ export type Database = {
           is_active: boolean | null
           send_time: string
           title: string
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string | null
         }
         Insert: {
           body: string
+          body_de?: string | null
           body_en?: string | null
+          body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
           created_at?: string | null
@@ -7891,14 +8575,18 @@ export type Database = {
           is_active?: boolean | null
           send_time?: string
           title: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
         }
         Update: {
           body?: string
+          body_de?: string | null
           body_en?: string | null
+          body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
           created_at?: string | null
@@ -7908,7 +8596,9 @@ export type Database = {
           is_active?: boolean | null
           send_time?: string
           title?: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
@@ -7920,7 +8610,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           icon: string | null
@@ -7932,7 +8624,9 @@ export type Database = {
           sort_order: number | null
           title: string
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string | null
@@ -7941,7 +8635,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           icon?: string | null
@@ -7953,7 +8649,9 @@ export type Database = {
           sort_order?: number | null
           title: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
@@ -7962,7 +8660,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           icon?: string | null
@@ -7974,7 +8674,9 @@ export type Database = {
           sort_order?: number | null
           title?: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
@@ -7985,14 +8687,18 @@ export type Database = {
         Row: {
           badge_text: string | null
           badge_text_az: string | null
+          badge_text_de: string | null
           badge_text_en: string | null
+          badge_text_kk: string | null
           badge_text_ru: string | null
           badge_text_tr: string | null
           created_at: string | null
           currency: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           id: string
@@ -8000,7 +8706,9 @@ export type Database = {
           is_popular: boolean | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           plan_key: string
@@ -8012,14 +8720,18 @@ export type Database = {
         Insert: {
           badge_text?: string | null
           badge_text_az?: string | null
+          badge_text_de?: string | null
           badge_text_en?: string | null
+          badge_text_kk?: string | null
           badge_text_ru?: string | null
           badge_text_tr?: string | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -8027,7 +8739,9 @@ export type Database = {
           is_popular?: boolean | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           plan_key: string
@@ -8039,14 +8753,18 @@ export type Database = {
         Update: {
           badge_text?: string | null
           badge_text_az?: string | null
+          badge_text_de?: string | null
           badge_text_en?: string | null
+          badge_text_kk?: string | null
           badge_text_ru?: string | null
           badge_text_tr?: string | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -8054,7 +8772,9 @@ export type Database = {
           is_popular?: boolean | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           plan_key?: string
@@ -8113,19 +8833,25 @@ export type Database = {
       products: {
         Row: {
           category: string
+          category_de: string | null
           category_en: string | null
+          category_kk: string | null
           category_ru: string | null
           category_tr: string | null
           created_at: string
           description: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           id: string
           image_url: string | null
           is_active: boolean | null
           name: string
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           original_price: number | null
@@ -8136,19 +8862,25 @@ export type Database = {
         }
         Insert: {
           category: string
+          category_de?: string | null
           category_en?: string | null
+          category_kk?: string | null
           category_ru?: string | null
           category_tr?: string | null
           created_at?: string
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           name: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           original_price?: number | null
@@ -8159,19 +8891,25 @@ export type Database = {
         }
         Update: {
           category?: string
+          category_de?: string | null
           category_en?: string | null
+          category_kk?: string | null
           category_ru?: string | null
           category_tr?: string | null
           created_at?: string
           description?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
           name?: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           original_price?: number | null
@@ -8440,7 +9178,9 @@ export type Database = {
           life_stage: string | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           sort_order: number | null
@@ -8454,7 +9194,9 @@ export type Database = {
           life_stage?: string | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -8468,7 +9210,9 @@ export type Database = {
           life_stage?: string | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -8583,7 +9327,9 @@ export type Database = {
           is_active: boolean | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           sort_order: number | null
@@ -8596,7 +9342,9 @@ export type Database = {
           is_active?: boolean | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -8609,7 +9357,9 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -8622,7 +9372,9 @@ export type Database = {
           created_at: string
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           id: string
@@ -8633,7 +9385,9 @@ export type Database = {
           item_name_tr: string | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           notes: string | null
@@ -8647,7 +9401,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -8658,7 +9414,9 @@ export type Database = {
           item_name_tr?: string | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           notes?: string | null
@@ -8672,7 +9430,9 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -8683,7 +9443,9 @@ export type Database = {
           item_name_tr?: string | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           notes?: string | null
@@ -8726,7 +9488,9 @@ export type Database = {
       scheduled_notifications: {
         Row: {
           body: string
+          body_de: string | null
           body_en: string | null
+          body_kk: string | null
           body_ru: string | null
           body_tr: string | null
           created_at: string | null
@@ -8736,14 +9500,18 @@ export type Database = {
           priority: number | null
           target_audience: string
           title: string
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string | null
         }
         Insert: {
           body: string
+          body_de?: string | null
           body_en?: string | null
+          body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
           created_at?: string | null
@@ -8753,14 +9521,18 @@ export type Database = {
           priority?: number | null
           target_audience?: string
           title: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
         }
         Update: {
           body?: string
+          body_de?: string | null
           body_en?: string | null
+          body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
           created_at?: string | null
@@ -8770,7 +9542,9 @@ export type Database = {
           priority?: number | null
           target_audience?: string
           title?: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
@@ -8786,7 +9560,9 @@ export type Database = {
           is_active: boolean | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           sort_order: number | null
@@ -8799,7 +9575,9 @@ export type Database = {
           is_active?: boolean | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -8812,7 +9590,9 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -9016,7 +9796,9 @@ export type Database = {
           is_active: boolean | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           sort_order: number | null
@@ -9029,7 +9811,9 @@ export type Database = {
           is_active?: boolean | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -9042,7 +9826,9 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -9177,7 +9963,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           difficulty: string | null
@@ -9191,7 +9979,9 @@ export type Database = {
           surprise_key: string | null
           title: string
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
         }
@@ -9200,7 +9990,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           difficulty?: string | null
@@ -9214,7 +10006,9 @@ export type Database = {
           surprise_key?: string | null
           title: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -9223,7 +10017,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           difficulty?: string | null
@@ -9237,7 +10033,9 @@ export type Database = {
           surprise_key?: string | null
           title?: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
         }
@@ -9251,7 +10049,9 @@ export type Database = {
           is_active: boolean | null
           label: string
           label_az: string | null
+          label_de: string | null
           label_en: string | null
+          label_kk: string | null
           label_ru: string | null
           label_tr: string | null
           life_stages: string[] | null
@@ -9265,7 +10065,9 @@ export type Database = {
           is_active?: boolean | null
           label: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           life_stages?: string[] | null
@@ -9279,7 +10081,9 @@ export type Database = {
           is_active?: boolean | null
           label?: string
           label_az?: string | null
+          label_de?: string | null
           label_en?: string | null
+          label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
           life_stages?: string[] | null
@@ -9293,7 +10097,9 @@ export type Database = {
           category: string | null
           content: string
           content_az: string | null
+          content_de: string | null
           content_en: string | null
+          content_kk: string | null
           content_ru: string | null
           content_tr: string | null
           created_at: string | null
@@ -9303,7 +10109,9 @@ export type Database = {
           sort_order: number | null
           title: string
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string | null
@@ -9312,7 +10120,9 @@ export type Database = {
           category?: string | null
           content: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string | null
@@ -9322,7 +10132,9 @@ export type Database = {
           sort_order?: number | null
           title: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
@@ -9331,7 +10143,9 @@ export type Database = {
           category?: string | null
           content?: string
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string | null
@@ -9341,7 +10155,9 @@ export type Database = {
           sort_order?: number | null
           title?: string
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string | null
@@ -9353,7 +10169,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           emoji: string | null
@@ -9361,12 +10179,16 @@ export type Database = {
           is_active: boolean | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           relief_tips: string[] | null
           relief_tips_az: string[] | null
+          relief_tips_de: string | null
           relief_tips_en: string | null
+          relief_tips_kk: string | null
           relief_tips_ru: string | null
           relief_tips_tr: string | null
           severity: string | null
@@ -9377,7 +10199,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -9385,12 +10209,16 @@ export type Database = {
           is_active?: boolean | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           relief_tips?: string[] | null
           relief_tips_az?: string[] | null
+          relief_tips_de?: string | null
           relief_tips_en?: string | null
+          relief_tips_kk?: string | null
           relief_tips_ru?: string | null
           relief_tips_tr?: string | null
           severity?: string | null
@@ -9401,7 +10229,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -9409,12 +10239,16 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           relief_tips?: string[] | null
           relief_tips_az?: string[] | null
+          relief_tips_de?: string | null
           relief_tips_en?: string | null
+          relief_tips_kk?: string | null
           relief_tips_ru?: string | null
           relief_tips_tr?: string | null
           severity?: string | null
@@ -9532,7 +10366,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           display_name: string | null
@@ -9562,17 +10398,23 @@ export type Database = {
           mommy_order: number | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           partner_description: string | null
           partner_description_az: string | null
+          partner_description_de: string | null
           partner_description_en: string | null
+          partner_description_kk: string | null
           partner_description_ru: string | null
           partner_description_tr: string | null
           partner_name: string | null
           partner_name_az: string | null
+          partner_name_de: string | null
           partner_name_en: string | null
+          partner_name_kk: string | null
           partner_name_ru: string | null
           partner_name_tr: string | null
           premium_limit: number | null
@@ -9593,7 +10435,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           display_name?: string | null
@@ -9623,17 +10467,23 @@ export type Database = {
           mommy_order?: number | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           partner_description?: string | null
           partner_description_az?: string | null
+          partner_description_de?: string | null
           partner_description_en?: string | null
+          partner_description_kk?: string | null
           partner_description_ru?: string | null
           partner_description_tr?: string | null
           partner_name?: string | null
           partner_name_az?: string | null
+          partner_name_de?: string | null
           partner_name_en?: string | null
+          partner_name_kk?: string | null
           partner_name_ru?: string | null
           partner_name_tr?: string | null
           premium_limit?: number | null
@@ -9654,7 +10504,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           display_name?: string | null
@@ -9684,17 +10536,23 @@ export type Database = {
           mommy_order?: number | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           partner_description?: string | null
           partner_description_az?: string | null
+          partner_description_de?: string | null
           partner_description_en?: string | null
+          partner_description_kk?: string | null
           partner_description_ru?: string | null
           partner_description_tr?: string | null
           partner_name?: string | null
           partner_name_az?: string | null
+          partner_name_de?: string | null
           partner_name_en?: string | null
+          partner_name_kk?: string | null
           partner_name_ru?: string | null
           partner_name_tr?: string | null
           premium_limit?: number | null
@@ -9796,7 +10654,9 @@ export type Database = {
           is_active: boolean | null
           sort_order: number | null
           tip_text: string
+          tip_text_de: string | null
           tip_text_en: string | null
+          tip_text_kk: string | null
           tip_text_ru: string | null
           tip_text_tr: string | null
           trimester: number
@@ -9809,7 +10669,9 @@ export type Database = {
           is_active?: boolean | null
           sort_order?: number | null
           tip_text: string
+          tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
           trimester: number
@@ -9822,7 +10684,9 @@ export type Database = {
           is_active?: boolean | null
           sort_order?: number | null
           tip_text?: string
+          tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
           trimester?: number
@@ -10253,7 +11117,9 @@ export type Database = {
           is_active: boolean
           is_default: boolean
           name_az: string
+          name_de: string | null
           name_en: string
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           sort_order: number
@@ -10269,7 +11135,9 @@ export type Database = {
           is_active?: boolean
           is_default?: boolean
           name_az: string
+          name_de?: string | null
           name_en: string
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number
@@ -10285,7 +11153,9 @@ export type Database = {
           is_active?: boolean
           is_default?: boolean
           name_az?: string
+          name_de?: string | null
           name_en?: string
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number
@@ -10298,13 +11168,17 @@ export type Database = {
       vaccine_schedules: {
         Row: {
           age_label_az: string
+          age_label_de: string | null
           age_label_en: string | null
+          age_label_kk: string | null
           age_label_ru: string | null
           age_label_tr: string | null
           country_code: string
           created_at: string
           dose_label_az: string
+          dose_label_de: string | null
           dose_label_en: string | null
+          dose_label_kk: string | null
           dose_label_ru: string | null
           dose_label_tr: string | null
           dose_number: number
@@ -10312,7 +11186,9 @@ export type Database = {
           max_age_days: number | null
           min_age_days: number | null
           notes_az: string | null
+          notes_de: string | null
           notes_en: string | null
+          notes_kk: string | null
           notes_ru: string | null
           notes_tr: string | null
           recommended_age_days: number
@@ -10322,13 +11198,17 @@ export type Database = {
         }
         Insert: {
           age_label_az: string
+          age_label_de?: string | null
           age_label_en?: string | null
+          age_label_kk?: string | null
           age_label_ru?: string | null
           age_label_tr?: string | null
           country_code: string
           created_at?: string
           dose_label_az: string
+          dose_label_de?: string | null
           dose_label_en?: string | null
+          dose_label_kk?: string | null
           dose_label_ru?: string | null
           dose_label_tr?: string | null
           dose_number?: number
@@ -10336,7 +11216,9 @@ export type Database = {
           max_age_days?: number | null
           min_age_days?: number | null
           notes_az?: string | null
+          notes_de?: string | null
           notes_en?: string | null
+          notes_kk?: string | null
           notes_ru?: string | null
           notes_tr?: string | null
           recommended_age_days: number
@@ -10346,13 +11228,17 @@ export type Database = {
         }
         Update: {
           age_label_az?: string
+          age_label_de?: string | null
           age_label_en?: string | null
+          age_label_kk?: string | null
           age_label_ru?: string | null
           age_label_tr?: string | null
           country_code?: string
           created_at?: string
           dose_label_az?: string
+          dose_label_de?: string | null
           dose_label_en?: string | null
+          dose_label_kk?: string | null
           dose_label_ru?: string | null
           dose_label_tr?: string | null
           dose_number?: number
@@ -10360,7 +11246,9 @@ export type Database = {
           max_age_days?: number | null
           min_age_days?: number | null
           notes_az?: string | null
+          notes_de?: string | null
           notes_en?: string | null
+          notes_kk?: string | null
           notes_ru?: string | null
           notes_tr?: string | null
           recommended_age_days?: number
@@ -10383,36 +11271,50 @@ export type Database = {
           code: string
           color_hex: string | null
           contraindications_az: string | null
+          contraindications_de: string | null
           contraindications_en: string | null
+          contraindications_kk: string | null
           contraindications_ru: string | null
           contraindications_tr: string | null
           country_code: string
           created_at: string
           disease_az: string | null
+          disease_de: string | null
           disease_en: string | null
+          disease_kk: string | null
           disease_ru: string | null
           disease_tr: string | null
           full_description_az: string | null
+          full_description_de: string | null
           full_description_en: string | null
+          full_description_kk: string | null
           full_description_ru: string | null
           full_description_tr: string | null
           id: string
           is_active: boolean
           is_mandatory: boolean
           name_az: string
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           route_az: string | null
+          route_de: string | null
           route_en: string | null
+          route_kk: string | null
           route_ru: string | null
           route_tr: string | null
           short_description_az: string | null
+          short_description_de: string | null
           short_description_en: string | null
+          short_description_kk: string | null
           short_description_ru: string | null
           short_description_tr: string | null
           side_effects_az: string | null
+          side_effects_de: string | null
           side_effects_en: string | null
+          side_effects_kk: string | null
           side_effects_ru: string | null
           side_effects_tr: string | null
           sort_order: number
@@ -10423,36 +11325,50 @@ export type Database = {
           code: string
           color_hex?: string | null
           contraindications_az?: string | null
+          contraindications_de?: string | null
           contraindications_en?: string | null
+          contraindications_kk?: string | null
           contraindications_ru?: string | null
           contraindications_tr?: string | null
           country_code: string
           created_at?: string
           disease_az?: string | null
+          disease_de?: string | null
           disease_en?: string | null
+          disease_kk?: string | null
           disease_ru?: string | null
           disease_tr?: string | null
           full_description_az?: string | null
+          full_description_de?: string | null
           full_description_en?: string | null
+          full_description_kk?: string | null
           full_description_ru?: string | null
           full_description_tr?: string | null
           id?: string
           is_active?: boolean
           is_mandatory?: boolean
           name_az: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           route_az?: string | null
+          route_de?: string | null
           route_en?: string | null
+          route_kk?: string | null
           route_ru?: string | null
           route_tr?: string | null
           short_description_az?: string | null
+          short_description_de?: string | null
           short_description_en?: string | null
+          short_description_kk?: string | null
           short_description_ru?: string | null
           short_description_tr?: string | null
           side_effects_az?: string | null
+          side_effects_de?: string | null
           side_effects_en?: string | null
+          side_effects_kk?: string | null
           side_effects_ru?: string | null
           side_effects_tr?: string | null
           sort_order?: number
@@ -10463,36 +11379,50 @@ export type Database = {
           code?: string
           color_hex?: string | null
           contraindications_az?: string | null
+          contraindications_de?: string | null
           contraindications_en?: string | null
+          contraindications_kk?: string | null
           contraindications_ru?: string | null
           contraindications_tr?: string | null
           country_code?: string
           created_at?: string
           disease_az?: string | null
+          disease_de?: string | null
           disease_en?: string | null
+          disease_kk?: string | null
           disease_ru?: string | null
           disease_tr?: string | null
           full_description_az?: string | null
+          full_description_de?: string | null
           full_description_en?: string | null
+          full_description_kk?: string | null
           full_description_ru?: string | null
           full_description_tr?: string | null
           id?: string
           is_active?: boolean
           is_mandatory?: boolean
           name_az?: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           route_az?: string | null
+          route_de?: string | null
           route_en?: string | null
+          route_kk?: string | null
           route_ru?: string | null
           route_tr?: string | null
           short_description_az?: string | null
+          short_description_de?: string | null
           short_description_en?: string | null
+          short_description_kk?: string | null
           short_description_ru?: string | null
           short_description_tr?: string | null
           side_effects_az?: string | null
+          side_effects_de?: string | null
           side_effects_en?: string | null
+          side_effects_kk?: string | null
           side_effects_ru?: string | null
           side_effects_tr?: string | null
           sort_order?: number
@@ -10550,21 +11480,29 @@ export type Database = {
       vitamins: {
         Row: {
           benefits: string[] | null
+          benefits_de: string[] | null
           benefits_en: string[] | null
+          benefits_kk: string[] | null
           benefits_ru: string[] | null
           benefits_tr: string[] | null
           created_at: string
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           dosage: string | null
+          dosage_de: string | null
           dosage_en: string | null
+          dosage_kk: string | null
           dosage_ru: string | null
           dosage_tr: string | null
           food_sources: string[] | null
+          food_sources_de: string[] | null
           food_sources_en: string[] | null
+          food_sources_kk: string[] | null
           food_sources_ru: string[] | null
           food_sources_tr: string[] | null
           icon_emoji: string | null
@@ -10577,7 +11515,9 @@ export type Database = {
           life_stage: string | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           sort_order: number | null
@@ -10588,21 +11528,29 @@ export type Database = {
         }
         Insert: {
           benefits?: string[] | null
+          benefits_de?: string[] | null
           benefits_en?: string[] | null
+          benefits_kk?: string[] | null
           benefits_ru?: string[] | null
           benefits_tr?: string[] | null
           created_at?: string
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           dosage?: string | null
+          dosage_de?: string | null
           dosage_en?: string | null
+          dosage_kk?: string | null
           dosage_ru?: string | null
           dosage_tr?: string | null
           food_sources?: string[] | null
+          food_sources_de?: string[] | null
           food_sources_en?: string[] | null
+          food_sources_kk?: string[] | null
           food_sources_ru?: string[] | null
           food_sources_tr?: string[] | null
           icon_emoji?: string | null
@@ -10615,7 +11563,9 @@ export type Database = {
           life_stage?: string | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -10626,21 +11576,29 @@ export type Database = {
         }
         Update: {
           benefits?: string[] | null
+          benefits_de?: string[] | null
           benefits_en?: string[] | null
+          benefits_kk?: string[] | null
           benefits_ru?: string[] | null
           benefits_tr?: string[] | null
           created_at?: string
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           dosage?: string | null
+          dosage_de?: string | null
           dosage_en?: string | null
+          dosage_kk?: string | null
           dosage_ru?: string | null
           dosage_tr?: string | null
           food_sources?: string[] | null
+          food_sources_de?: string[] | null
           food_sources_en?: string[] | null
+          food_sources_kk?: string[] | null
           food_sources_ru?: string[] | null
           food_sources_tr?: string[] | null
           icon_emoji?: string | null
@@ -10653,7 +11611,9 @@ export type Database = {
           life_stage?: string | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           sort_order?: number | null
@@ -10703,7 +11663,9 @@ export type Database = {
       weekly_tips: {
         Row: {
           content: string
+          content_de: string | null
           content_en: string | null
+          content_kk: string | null
           content_ru: string | null
           content_tr: string | null
           created_at: string
@@ -10712,11 +11674,15 @@ export type Database = {
           is_active: boolean | null
           life_stage: string
           tips: Json | null
+          tips_de: Json | null
           tips_en: Json | null
+          tips_kk: Json | null
           tips_ru: Json | null
           tips_tr: Json | null
           title: string
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string
@@ -10724,7 +11690,9 @@ export type Database = {
         }
         Insert: {
           content: string
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string
@@ -10733,11 +11701,15 @@ export type Database = {
           is_active?: boolean | null
           life_stage?: string
           tips?: Json | null
+          tips_de?: Json | null
           tips_en?: Json | null
+          tips_kk?: Json | null
           tips_ru?: Json | null
           tips_tr?: Json | null
           title: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -10745,7 +11717,9 @@ export type Database = {
         }
         Update: {
           content?: string
+          content_de?: string | null
           content_en?: string | null
+          content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
           created_at?: string
@@ -10754,11 +11728,15 @@ export type Database = {
           is_active?: boolean | null
           life_stage?: string
           tips?: Json | null
+          tips_de?: Json | null
           tips_en?: Json | null
+          tips_kk?: Json | null
           tips_ru?: Json | null
           tips_tr?: Json | null
           title?: string
+          title_de?: string | null
           title_en?: string | null
+          title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
           updated_at?: string
@@ -10799,7 +11777,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           id: string
@@ -10814,7 +11794,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -10829,7 +11811,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           id?: string
@@ -10848,7 +11832,9 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           emoji: string | null
@@ -10856,7 +11842,9 @@ export type Database = {
           is_active: boolean | null
           name: string
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           noise_type: string | null
@@ -10868,7 +11856,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -10876,7 +11866,9 @@ export type Database = {
           is_active?: boolean | null
           name: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           noise_type?: string | null
@@ -10888,7 +11880,9 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_az?: string | null
+          description_de?: string | null
           description_en?: string | null
+          description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
           emoji?: string | null
@@ -10896,7 +11890,9 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           noise_type?: string | null
@@ -10947,7 +11943,9 @@ export type Database = {
         Row: {
           characteristics: string[] | null
           characteristics_az: string[] | null
+          characteristics_de: string | null
           characteristics_en: string | null
+          characteristics_kk: string | null
           characteristics_ru: string | null
           characteristics_tr: string | null
           color: string | null
@@ -10956,7 +11954,9 @@ export type Database = {
           id: string
           name: string
           name_az: string
+          name_de: string | null
           name_en: string | null
+          name_kk: string | null
           name_ru: string | null
           name_tr: string | null
           ruling_planet: string | null
@@ -10967,7 +11967,9 @@ export type Database = {
         Insert: {
           characteristics?: string[] | null
           characteristics_az?: string[] | null
+          characteristics_de?: string | null
           characteristics_en?: string | null
+          characteristics_kk?: string | null
           characteristics_ru?: string | null
           characteristics_tr?: string | null
           color?: string | null
@@ -10976,7 +11978,9 @@ export type Database = {
           id?: string
           name: string
           name_az: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           ruling_planet?: string | null
@@ -10987,7 +11991,9 @@ export type Database = {
         Update: {
           characteristics?: string[] | null
           characteristics_az?: string[] | null
+          characteristics_de?: string | null
           characteristics_en?: string | null
+          characteristics_kk?: string | null
           characteristics_ru?: string | null
           characteristics_tr?: string | null
           color?: string | null
@@ -10996,7 +12002,9 @@ export type Database = {
           id?: string
           name?: string
           name_az?: string
+          name_de?: string | null
           name_en?: string | null
+          name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
           ruling_planet?: string | null
@@ -11176,7 +12184,9 @@ export type Database = {
           created_at: string
           description: string | null
           description_az: string | null
+          description_de: string | null
           description_en: string | null
+          description_kk: string | null
           description_ru: string | null
           description_tr: string | null
           duration_days: number | null
@@ -11188,17 +12198,23 @@ export type Database = {
           sort_order: number
           symptoms: string[] | null
           symptoms_az: string[] | null
+          symptoms_de: string | null
           symptoms_en: string | null
+          symptoms_kk: string | null
           symptoms_ru: string | null
           symptoms_tr: string | null
           tips: string[] | null
           tips_az: string[] | null
+          tips_de: string | null
           tips_en: string | null
+          tips_kk: string | null
           tips_ru: string | null
           tips_tr: string | null
           title: string
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_kk: string | null
           title_ru: string | null
           title_tr: string | null
           updated_at: string
