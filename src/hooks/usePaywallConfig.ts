@@ -82,7 +82,12 @@ export interface BillingConfig {
   header_free_to: string;
 }
 
-export const defaultPaywallConfig: PaywallConfig = {
+/**
+ * LAZY defaults — tr() ÇAĞIRIŞ anında həll olunur.
+ * Əvvəllər modul-səviyyəli const idi → import anında (keş hidratasiyasından əvvəl)
+ * AZ-da donub qalırdı və paywall bütün dillərdə qarışıq görünürdü.
+ */
+export const getDefaultPaywallConfig = (): PaywallConfig => ({
   title: 'Anacan Premium',
   subtitle: tr("usepaywallconfig_tam_tecrube_sinirsiz_imkanlar_ce3376", "Tam təcrübə · Sınırsız imkanlar"),
   pills: [
@@ -115,9 +120,16 @@ export const defaultPaywallConfig: PaywallConfig = {
   gradient_from: '#d97706',
   gradient_via: '#ea580c',
   gradient_to: '#be123c'
-};
+});
 
-export const defaultBillingConfig: BillingConfig = {
+/** Geri uyğunluq (PaywallDesignerTab) — hər müraciətdə cari dillə hesablanır */
+export const defaultPaywallConfig: PaywallConfig = new Proxy({} as PaywallConfig, {
+  get: (_t, prop) => (getDefaultPaywallConfig() as any)[prop],
+  ownKeys: () => Reflect.ownKeys(getDefaultPaywallConfig()),
+  getOwnPropertyDescriptor: (_t, prop) => ({ enumerable: true, configurable: true, value: (getDefaultPaywallConfig() as any)[prop] }),
+});
+
+export const getDefaultBillingConfig = (): BillingConfig => ({
   page_title: tr("usepaywallconfig_abuneliyim_f6c8ed", "Abun\u0259liyim"),
   free_plan_name: tr("paywall_pulsuz_plan", 'Pulsuz Plan'),
   premium_monthly_name: tr("usepaywallconfig_premium_ayliq_7f604a", "Premium Ayl\u0131q"),
@@ -150,18 +162,63 @@ export const defaultBillingConfig: BillingConfig = {
   header_free_from: '#475569',
   header_free_via: '#334155',
   header_free_to: '#1e293b'
-};
+});
+
+/** Geri uyğunluq (BillingDesignerTab) */
+export const defaultBillingConfig: BillingConfig = new Proxy({} as BillingConfig, {
+  get: (_t, prop) => (getDefaultBillingConfig() as any)[prop],
+  ownKeys: () => Reflect.ownKeys(getDefaultBillingConfig()),
+  getOwnPropertyDescriptor: (_t, prop) => ({ enumerable: true, configurable: true, value: (getDefaultBillingConfig() as any)[prop] }),
+});
+
+/**
+ * Admin config sahələri üçün dinamik tr() sarğısı: admin nə vaxtsa config saxlasa
+ * (tək dildə mətnlər), tərcümələr `paywallcfg_<sahə>` / `billingcfg_<sahə>` açarları
+ * ilə AdminTranslations-dan idarə oluna bilir. Açar yoxdursa admin mətni olduğu kimi qalır.
+ */
+const localizeText = (prefix: string, field: string, value: unknown): string =>
+  typeof value === 'string' && value.trim() ? tr(`${prefix}_${field}`, value) : (value as string);
+
+const PAYWALL_TEXT_FIELDS: (keyof PaywallConfig)[] = [
+  'title', 'subtitle', 'cta_new_user', 'cta_upgrade', 'cta_switch_yearly',
+  'yearly_label', 'monthly_label', 'savings_badge', 'yearly_suffix', 'monthly_suffix',
+  'yearly_total_suffix', 'feature_lock_text', 'restore_text', 'terms_label', 'privacy_label',
+  'cancel_notice', 'native_notice', 'non_native_notice', 'free_trial_badge', 'free_trial_cta',
+  'free_trial_note', 'purchasing_text'];
+
+const BILLING_TEXT_FIELDS: (keyof BillingConfig)[] = [
+  'page_title', 'free_plan_name', 'premium_monthly_name', 'premium_yearly_name',
+  'active_badge', 'cancelled_badge', 'start_date_label', 'renewal_label', 'expiry_label',
+  'cancelled_notice', 'features_title', 'upgrade_cta', 'upgrade_savings', 'restore_cta',
+  'cancel_cta', 'get_premium_cta', 'payment_title', 'paid_label', 'support_text'];
 
 export const usePaywallConfig = (): PaywallConfig => {
   const raw = useAppSetting('premium_paywall_config');
-  if (!raw || typeof raw !== 'object') return defaultPaywallConfig;
-  return { ...defaultPaywallConfig, ...raw };
+  const defaults = getDefaultPaywallConfig();
+  if (!raw || typeof raw !== 'object') return defaults;
+  const merged: PaywallConfig = { ...defaults, ...raw };
+  for (const f of PAYWALL_TEXT_FIELDS) {
+    // Admin dəyəri defaultdan fərqlidirsə → dinamik açarla lokallaşdırıla bilər
+    if ((raw as any)[f] !== undefined) (merged as any)[f] = localizeText('paywallcfg', f as string, (merged as any)[f]);
+  }
+  if (Array.isArray((raw as any).pills)) {
+    merged.pills = merged.pills.map((p, i) => ({ ...p, text: localizeText('paywallcfg', `pill_${i + 1}`, p.text) }));
+  }
+  return merged;
 };
 
 export const useBillingConfig = (): BillingConfig => {
   const raw = useAppSetting('billing_page_config');
-  if (!raw || typeof raw !== 'object') return defaultBillingConfig;
-  return { ...defaultBillingConfig, ...raw };
+  const defaults = getDefaultBillingConfig();
+  if (!raw || typeof raw !== 'object') return defaults;
+  const merged: BillingConfig = { ...defaults, ...raw };
+  for (const f of BILLING_TEXT_FIELDS) {
+    if ((raw as any)[f] !== undefined) (merged as any)[f] = localizeText('billingcfg', f as string, (merged as any)[f]);
+  }
+  if (Array.isArray((raw as any).features)) {
+    merged.features = merged.features.map((p, i) => ({ ...p, text: localizeText('billingcfg', `feature_${i + 1}`, p.text) }));
+  }
+  return merged;
 };
 
 export const useUpdatePaywallConfig = () => {

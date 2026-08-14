@@ -16,6 +16,7 @@ Multilingual, SEO-perfect marketing website for the Anacan motherhood superapp.
 | `npm run build` | **Tam pipeline:** OG şəkillər → sayt build → SEO audit |
 | `npm run build:fast` | Yalnız Astro build (audit-siz) |
 | `npm run og` / `npm run og:force` | OG şəkillərini yaradır (force = hamısını yenidən) |
+| `npm run blog:sync` | **Bloqları app-in bazasından çəkir** (Supabase `blog_posts`) — sonra dev serveri restart edin |
 | `npm run seo:audit` | `dist/` üzərində SEO auditi → seo-report.json + SEO-REPORT.md |
 | `npm run add:lang -- <kod>` | Yeni dil skafoldu (məs. `npm run add:lang -- uz "Oʻzbekcha" Uzbek`) |
 | `npm run preview` | Build olunmuş saytın önizləməsi |
@@ -47,21 +48,27 @@ OG şəkillər, dil seçicisi, footer, SEO panel matrisi.
 
 ---
 
-## Bloq
+## Bloq — mənbə: app-in bazası
 
-Fayl düzümü: `src/content/blog/<dil>/<lokallaşdırılmış-slug>.md`
+Bloqlar **mobil app ilə eyni mənbədən** gəlir: Supabase `blog_posts` cədvəli.
 
-- **Fayl adı = URL slug** (hər dildə fərqli ola bilər)
-- **`translationKey`** eyni məqalənin tərcümələrini birləşdirir → hreflang + dil seçicisi
-- Frontmatter: `title, description, pubDate, updatedDate?, category, tags, translationKey, theme, emoji, featured?`
-- Post OG şəkli avtomatik yaranır: `public/og/blog/<dil>/<slug>.png`
+```bash
+npm run blog:sync     # 57 post × 5 dil → src/content/blog/<dil>/<slug>.md
+npm run og            # yeni postlar üçün OG kartları
+npm run build         # (dev server açıqdırsa restart edin!)
+```
 
-Məzmun qaydaları (SEO/AI üçün):
-- H2-lər mümkün olduqca sual formasında
-- Hər H2-dən sonra çıxarıla bilən cavab: 25–180 sözlük paraqraf, 3+ maddəlik siyahı və ya cədvəl
-- `<div class="takeaways">` — əsas məqamlar bloku
-- 2+ nüfuzlu xarici mənbə (ÜST/NHS/ACOG)
-- Daxili linklər həmin dilin öz yollarına
+Sync məntiqi (app ilə birəbir):
+- **az** → base sütunlar (`title/excerpt/content`) · **en/ru/tr** → `*_en/_ru/_tr`
+- **kk** → app-dəki kimi fallback: `kk → ru → base`
+- `life_stage` → sayt kateqoriyası: bump→hamiləlik, mommy→analıq, flow→tsikl, all→sağlamlıq
+- DB slug-ları ASCII-yə transliterasiya olunur (URL üçün), orijinal slug `translationKey`-də qalır
+- Cover şəkilləri (`cover_image_url`) kartlarda və məqalə başında göstərilir
+- Content sanitizasiya: script/style/onclick təmizlənir, h1→h2, şəkillərə lazy+ölçü əlavə olunur
+- Title tag 65 simvola qısaldılır (H1 tam qalır), description 70–160 simvola normallaşdırılır
+
+Yeni məqalə axını: **App admin CMS-də yaz → `npm run blog:sync` → build/deploy.**
+Generated fayllar `# generated: anacan-app-db` işarəlidir — əllə redaktə etməyin.
 
 ---
 

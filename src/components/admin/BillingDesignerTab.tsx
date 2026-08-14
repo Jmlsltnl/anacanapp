@@ -6,13 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { useBillingConfig, useUpdateBillingConfig, defaultBillingConfig, BillingConfig } from '@/hooks/usePaywallConfig';
+import { useBillingConfig, useUpdateBillingConfig, getDefaultBillingConfig, BillingConfig } from '@/hooks/usePaywallConfig';
 
 const BillingDesignerTab = () => {
   const billingConfig = useBillingConfig();
   const { update, isPending } = useUpdateBillingConfig();
   const { toast } = useToast();
-  const [config, setConfig] = useState<BillingConfig>(defaultBillingConfig);
+  const [config, setConfig] = useState<BillingConfig>(getDefaultBillingConfig());
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const BillingDesignerTab = () => {
   };
 
   const handleReset = () => {
-    setConfig(defaultBillingConfig);
+    setConfig(getDefaultBillingConfig());
     setHasChanges(true);
   };
 

@@ -2252,3 +2252,15 @@
     transform: translateY(0);
   }
 }
+
+/* ============================================================
+   ToolsHub ikonlari - iki rejimde de tam gorunurluk.
+   Dark: AG fon + korall (esas reng) ikon - BUTUN alet kartlari ucun eyni.
+   Inline pastel qradiyent style-larini ustelemek ucun !important.
+   Light: movcud pastel cipler oldugu kimi qalir (gorunurluk problemi yoxdur).
+   ============================================================ */
+.dark .a-tool-icon,
+.dark .a-trio-icon {
+  background: #ffffff !important;
+  color: var(--a-peach-2) !important;
+}

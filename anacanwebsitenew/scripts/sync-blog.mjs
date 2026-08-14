@@ -208,6 +208,10 @@ async function main() {
 
   console.log(`✓ Wrote ${written} files (${posts.length} posts × up to ${LANGS.length} languages) into src/content/blog/`);
   console.log('\nNext: npm run og   (post OG cards)  →  npm run build');
+  console.log(
+    '⚠ Dev server işləyirsə, onu RESTART edin — toplu content dəyişikliyi dev cache-ə tam düşmür.\n' +
+    '  (If the dev server is running, restart it — bulk content changes are not fully picked up by the dev cache.)',
+  );
 }
 
 main().catch((err) => {

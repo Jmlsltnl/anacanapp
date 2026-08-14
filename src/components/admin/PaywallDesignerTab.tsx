@@ -7,13 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { usePaywallConfig, useUpdatePaywallConfig, defaultPaywallConfig, PaywallConfig } from '@/hooks/usePaywallConfig';
+import { usePaywallConfig, useUpdatePaywallConfig, getDefaultPaywallConfig, PaywallConfig } from '@/hooks/usePaywallConfig';
 
 const PaywallDesignerTab = () => {
   const paywallConfig = usePaywallConfig();
   const { update, isPending } = useUpdatePaywallConfig();
   const { toast } = useToast();
-  const [config, setConfig] = useState<PaywallConfig>(defaultPaywallConfig);
+  const [config, setConfig] = useState<PaywallConfig>(getDefaultPaywallConfig());
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const PaywallDesignerTab = () => {
   };
 
   const handleReset = () => {
-    setConfig(defaultPaywallConfig);
+    setConfig(getDefaultPaywallConfig());
     setHasChanges(true);
   };
 
