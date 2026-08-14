@@ -19,6 +19,9 @@ export function getOrdinal(num: number, lang: string): string {
   if (lang === 'kk') {
     return `${num}-ші`;
   }
+  if (lang === 'de') {
+    return `${num}.`;
+  }
   
   // AZ by default
   const lastDigit = num % 10;

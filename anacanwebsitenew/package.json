@@ -1,0 +1,29 @@
+{
+  "name": "anacan-website",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Anacan marketing website — multilingual, SEO-perfect static site (anacan.az)",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "og": "node scripts/generate-og.mjs",
+    "og:force": "node scripts/generate-og.mjs --force",
+    "build": "npm run og && astro build && npm run seo:audit",
+    "build:fast": "astro build",
+    "seo:audit": "node scripts/seo-audit.mjs",
+    "add:lang": "node scripts/add-language.mjs",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.12",
+    "@fontsource-variable/lora": "^5.2.6",
+    "@fontsource-variable/nunito": "^5.2.6",
+    "astro": "^5.13.0"
+  },
+  "devDependencies": {
+    "node-html-parser": "^7.0.1",
+    "satori": "^0.13.2",
+    "sharp": "^0.34.3"
+  }
+}

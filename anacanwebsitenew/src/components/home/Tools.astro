@@ -1,0 +1,52 @@
+---
+import Marquee from '@/components/Marquee.astro';
+import { pagePath } from '@/config/pages';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  lang: string;
+  /** Show the "view all" CTA (hidden on the features page itself) */
+  showCta?: boolean;
+}
+
+const { lang, showCta = true } = Astro.props;
+const t = useTranslations(lang);
+
+const items = t<{ name: string; desc: string; stage: string }[]>('tools.items');
+const marquee = t<string[]>('tools.marquee');
+
+const emojis = ['⏱️', '👣', '📅', '🎒', '🌸', '📔', '📈', '😴', '💉', '🍼', '✨', '🧚', '🥗', '💊', '🫶', '⛑️'];
+---
+
+<section class="section" id="tools" style="padding-bottom:0">
+  <div class="container">
+    <div class="section-head center reveal">
+      <span class="eyebrow">{t('tools.eyebrow')}</span>
+      <h2>{t('tools.title')}</h2>
+      <p class="lede">{t('tools.subtitle')}</p>
+    </div>
+  </div>
+
+  <Marquee items={marquee} />
+
+  <div class="container" style="margin-top:2.6rem">
+    <div class="tool-grid">
+      {items.map((tool, i) => (
+        <div class="tool-card reveal" data-stage={tool.stage} style={`transition-delay:${(i % 4) * 60}ms`}>
+          <span class="t-ico" aria-hidden="true">{emojis[i % emojis.length]}</span>
+          <h3>{tool.name}</h3>
+          <p>{tool.desc}</p>
+        </div>
+      ))}
+    </div>
+    {
+      showCta && (
+        <div class="text-center mt-4">
+          <a href={pagePath('features', lang)} class="btn btn-dark">
+            {t('tools.viewAll')}
+          </a>
+        </div>
+      )
+    }
+  </div>
+</section>

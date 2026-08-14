@@ -162,22 +162,25 @@ Deno.serve(async (req) => {
       const isRu = userLang === 'ru';
       const isTr = userLang === 'tr';
       const isKk = userLang === 'kk';
+      const isDe = userLang === 'de';
       const vitaminNames = userVitamins.map((v: any) => `${v.icon_emoji} ${v.vitamin_name}`).join(', ');
       
       const title = body.manual
-        ? (isEn ? '[TEST] 💊 Vitamin reminder' : isRu ? '[TEST] 💊 Напоминание о витаминах' : isTr ? '[TEST] 💊 Vitamin hatırlatıcısı' : isKk ? '[TEST] 💊 Дәрумен туралы хабарлама' : '[TEST] 💊 Vitamin bildirişi')
-        : (isEn ? '💊 Time to take your vitamins!' : isRu ? '💊 Время принимать витамины!' : isTr ? '💊 Vitaminlerinizi alma zamanı!' : isKk ? '💊 Дәрумен қабылдайтын уақыт келді!' : '💊 Vitamin qəbulu vaxtıdır!');
+        ? (isEn ? '[TEST] 💊 Vitamin reminder' : isRu ? '[TEST] 💊 Напоминание о витаминах' : isTr ? '[TEST] 💊 Vitamin hatırlatıcısı' : isKk ? '[TEST] 💊 Дәрумен туралы хабарлама' : isDe ? '[TEST] 💊 Vitamin-Erinnerung' : '[TEST] 💊 Vitamin bildirişi')
+        : (isEn ? '💊 Time to take your vitamins!' : isRu ? '💊 Время принимать витамины!' : isTr ? '💊 Vitaminlerinizi alma zamanı!' : isKk ? '💊 Дәрумен қабылдайтын уақыт келді!' : isDe ? '💊 Zeit für deine Vitamine!' : '💊 Vitamin qəbulu vaxtıdır!');
       
       const bodyText = userVitamins.length === 1
         ? (isEn ? `Time to take ${userVitamins[0].vitamin_name}`
          : isRu ? `Время принимать ${userVitamins[0].vitamin_name}`
          : isTr ? `${userVitamins[0].vitamin_name} alma zamanı`
          : isKk ? `${userVitamins[0].vitamin_name} қабылдайтын уақыт келді`
+         : isDe ? `Es ist Zeit, ${userVitamins[0].vitamin_name} einzunehmen`
          : `${userVitamins[0].vitamin_name} qəbul etmə vaxtıdır`)
         : (isEn ? `Time to take ${userVitamins.length} vitamins: ${vitaminNames}`
          : isRu ? `Время принимать ${userVitamins.length} витаминов: ${vitaminNames}`
          : isTr ? `${userVitamins.length} vitamin alma zamanı: ${vitaminNames}`
          : isKk ? `${userVitamins.length} дәрумен қабылдайтын уақыт келді: ${vitaminNames}`
+         : isDe ? `Es ist Zeit, ${userVitamins.length} Vitamine einzunehmen: ${vitaminNames}`
          : `${userVitamins.length} vitamin qəbul etmə vaxtıdır: ${vitaminNames}`);
 
       // Store notification in DB (skip for test to avoid pollution)

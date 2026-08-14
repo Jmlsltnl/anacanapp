@@ -102,6 +102,20 @@ async function validateImage(imageBase64: string, _apiKey?: string, language: st
       'valid': 'Сурет жарамды',
       'failed': 'Суретті тексеру мүмкін болмады. Қайталап көріңіз.',
     },
+    de: {
+      'diaper_empty': 'Diese Windel ist leer, es ist kein Stuhl zu sehen. Fotografiere bitte eine Windel mit Stuhl.',
+      'baby_photo': 'Dies ist ein Foto eines Babys. Fotografiere bitte die Windel deines Babys.',
+      'adult_content': 'Auf diesem Bild ist keine Babywindel zu sehen. Wähle bitte das richtige Bild aus.',
+      'food': 'Dies ist ein Foto von Essen. Fotografiere bitte die Windel deines Babys.',
+      'animal': 'Dies ist ein Tierfoto. Fotografiere bitte die Windel deines Babys.',
+      'screenshot': 'Dies ist ein Screenshot. Nimm bitte ein echtes Foto von der Windel deines Babys auf.',
+      'landscape': 'Dies ist ein Landschaftsfoto. Fotografiere bitte die Windel deines Babys.',
+      'object': 'Dies ist ein Foto von einem Gegenstand. Fotografiere bitte die Windel deines Babys.',
+      'other': 'Dieses Bild ist für die Analyse ungeeignet. Fotografiere bitte den Stuhl in der Windel deines Babys.',
+      'unknown': 'Das Bild wurde nicht erkannt. Nimm bitte ein deutlicheres Foto auf.',
+      'valid': 'Das Bild ist geeignet',
+      'failed': 'Das Bild konnte nicht überprüft werden. Bitte versuche es erneut.',
+    },
   };
   const vmsg = VALIDATION_MESSAGES[language] ?? VALIDATION_MESSAGES.az;
   
@@ -199,8 +213,8 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
 // Stage 2: Analyze the poop
 async function analyzePoop(imageBase64: string, _apiKey?: string, userContext?: PoopAnalysisRequest['userContext'], language: string = 'az'): Promise<Response | null> {
   const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
-  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH' };
-  const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish', kk: 'Kazakh' };
+  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH', de: 'GERMAN' };
+  const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish', kk: 'Kazakh', de: 'German' };
   const outLang = OUT_LANG[language];
   
   // Build age context for prompt
@@ -405,6 +419,11 @@ Deno.serve(async (req) => {
           colorNameAz: 'Белгісіз',
           explanation: 'Сурет талданды. Анығырақ сурет түсіріп көріңіз.',
           recommendations: ['Бөпенің жалпы жағдайын бақылаңыз', 'Қандай да бір алаңдататын белгі болса, дәрігерге жүгініңіз'],
+        },
+        de: {
+          colorNameAz: 'Unbekannt',
+          explanation: 'Das Bild wurde analysiert. Versuche bitte, ein deutlicheres Foto aufzunehmen.',
+          recommendations: ['Beobachte den Allgemeinzustand deines Babys', 'Wende dich bei Beschwerden oder Bedenken an einen Arzt oder eine Ärztin'],
         },
       };
       const fb = FALLBACK[language] ?? FALLBACK.az;

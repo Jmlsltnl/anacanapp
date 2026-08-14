@@ -7,13 +7,14 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string; kk: string }> = {
+const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string; kk: string; de: string }> = {
   '0-2': {
     az: 'Çox sadə cümlələr (3-5 söz). Təkrarlanan ifadələr. Heyvan səsləri. Rənglər və formalar. Nağıl 1-2 dəqiqəlik olsun.',
     en: 'Very simple sentences (3-5 words). Repetitive phrases. Animal sounds. Colors and shapes. Story should be 1-2 minutes.',
     ru: 'Очень простые предложения (3-5 слов). Повторяющиеся фразы. Звуки животных. Цвета и формы. Сказка на 1-2 минуты.',
     tr: 'Çok basit cümleler (3-5 kelime). Tekrarlanan ifadeler. Hayvan sesleri. Renkler ve şekiller. Masal 1-2 dakika olsun.',
     kk: 'Өте қарапайым сөйлемдер (3-5 сөз). Қайталанатын тіркестер. Жануарлардың дыбыстары. Түстер мен пішіндер. Ертегі 1-2 минутқа созылсын.',
+    de: 'Sehr einfache Sätze (3–5 Wörter). Wiederkehrende Formulierungen. Tierlaute. Farben und Formen. Das Märchen sollte 1–2 Minuten lang sein.',
   },
   '3-5': {
     az: 'Sadə amma məzmunlu cümlələr. Dialoqlar olsun. Əyləncəli hadisələr. Tərbiyəvi mesaj aydın olsun. 3-4 dəqiqəlik nağıl.',
@@ -21,6 +22,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     ru: 'Простые, но содержательные предложения. Диалоги. Весёлые события. Ясный воспитательный посыл. Сказка на 3-4 минуты.',
     tr: 'Basit ama anlamlı cümleler. Diyaloglar olsun. Eğlenceli olaylar. Net eğitici mesaj. 3-4 dakikalık masal.',
     kk: 'Қарапайым, бірақ мағыналы сөйлемдер. Диалогтар болсын. Қызықты оқиғалар. Тәрбиелік ойы анық болсын. Ертегі 3-4 минутқа созылсын.',
+    de: 'Einfache, aber aussagekräftige Sätze. Mit Dialogen. Unterhaltsame Ereignisse. Die pädagogische Botschaft sollte klar sein. Ein 3–4-minütiges Märchen.',
   },
   '6-9': {
     az: 'Daha mürəkkəb süjet xətti. Problemin həlli prosesi göstərilsin. Uşağın düşünməsinə kömək edən suallar. 4-6 dəqiqəlik nağıl.',
@@ -28,6 +30,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     ru: 'Более сложный сюжет. Показать процесс решения проблем. Вопросы для размышления. Сказка на 4-6 минут.',
     tr: 'Daha karmaşık olay örgüsü. Problem çözme süreci gösterilsin. Çocuğun düşünmesine yardımcı sorular. 4-6 dakikalık masal.',
     kk: 'Күрделірек оқиға желісі. Мәселені шешу үдерісі көрсетілсін. Баланың ойлануына көмектесетін сұрақтар. Ертегі 4-6 минутқа созылсын.',
+    de: 'Eine komplexere Handlung. Zeige den Prozess der Problemlösung. Fragen, die das Kind zum Nachdenken anregen. Ein 4–6-minütiges Märchen.',
   },
   '10-12': {
     az: 'Zəngin süjet. Əxlaqi dilemma və seçimlər. Emosional dərinlik. Daha uzun dialoqlar. 5-7 dəqiqəlik nağıl.',
@@ -35,6 +38,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     ru: 'Богатый сюжет. Моральные дилеммы и выбор. Эмоциональная глубина. Длинные диалоги. Сказка на 5-7 минут.',
     tr: 'Zengin olay örgüsü. Ahlaki ikilemler ve seçimler. Duygusal derinlik. Daha uzun diyaloglar. 5-7 dakikalık masal.',
     kk: 'Мазмұнды оқиға желісі. Моральдық дилеммалар мен таңдау. Эмоциялық тереңдік. Ұзағырақ диалогтар. Ертегі 5-7 минутқа созылсын.',
+    de: 'Eine vielschichtige Handlung. Moralische Dilemmas und Entscheidungen. Emotionale Tiefe. Längere Dialoge. Ein 5–7-minütiges Märchen.',
   },
 };
 
@@ -147,6 +151,40 @@ Yapı:
 
 Format: İlk satırda başlık, sonra masal metni.`;
 
+    case 'de':
+      return `Du bist ein preisgekrönter Kinderbuchautor. Schreibe ein spannendes, hochwertiges Märchen für Kinder mit logisch aufgebauter Handlung und professionellem Erzählstil.
+
+ENTSCHEIDENDE QUALITÄTSREGELN:
+1. Das Kind heißt "${childName}". Verwende diesen Namen IMMER für die Hauptfigur.
+2. Das Märchen MUSS einen klaren Anfang, Mittelteil und Schluss haben. Es MUSS einen LOGISCHEN Zusammenhang zwischen Ursache und Wirkung geben.
+3. Jedes Ereignis muss einen GRUND haben — zufällige magische Lösungen sind NICHT ERLAUBT.
+4. Die Figuren müssen in ihren Charaktereigenschaften und Beweggründen stimmig bleiben.
+5. Die pädagogische Botschaft muss sich auf NATÜRLICHE Weise aus den Ereignissen ergeben — keine künstlichen Moralpredigten.
+6. Verwende eine lebendige, anschauliche Sprache (Farben, Geräusche, Gerüche).
+7. Baue bedeutungsvolle Dialoge ein, die den Charakter der Figuren zeigen.
+8. Das Problem muss durch die EIGENEN Bemühungen, den Verstand oder die persönliche Entwicklung der Hauptfigur gelöst werden.
+9. Klischees wie "Und sie lebten glücklich bis ans Ende ihrer Tage" sind VERBOTEN — schreibe einen konkreten, überzeugenden Schluss.
+10. Übertriebene, maßlose Beschreibungen sind VERBOTEN. Behalte einen warmen, aber realistischen Ton bei.
+
+VERBOTEN SIND:
+- Formulierungen wie "kleiner Freund" oder "magisches Wesen" ohne Namen
+- Zufällige magische Lösungen
+- Moralpredigten im belehrenden Stil
+- Übermäßig süße, künstliche Sprache
+- Handlungslücken oder unlogische Abläufe
+
+Aufbau des Märchens:
+1. Titel im Format "${childName} und [etwas]"
+2. Beschreibung des Schauplatzes (WO und WANN, mit sinnlichen Details)
+3. Vorstellung der Figuren (mit ihren Charaktereigenschaften)
+4. Problem/Herausforderung (logisch und für das Kind verständlich)
+5. 2–3 Versuche/Hindernisse (mit zunehmender Schwierigkeit)
+6. Höhepunkt — die Hauptfigur entwickelt sich weiter oder lernt etwas
+7. Eine Lösung, die sich logisch aus den Ereignissen ergibt
+8. Ein überzeugender Schluss und eine natürliche pädagogische Erkenntnis${ageInstruction}
+
+Format: In der ersten Zeile steht der Titel, danach folgt der Märchentext. Schreibe in Absätzen, nicht als Liste. Das Märchen muss auf DEUTSCH verfasst sein.`;
+
     case 'kk':
       return `Сіз марапатқа ие болған балалар кітабының авторысыз. Оқиға желісі қисынды дамитын әрі кәсіби баяндау мәнерімен жазылған қызықты, сапалы балалар ертегісін жазыңыз.
 
@@ -253,6 +291,19 @@ Eğitici mesaj: ${moralLesson || 'Dostluk ve iyilik'}
 ${styleText ? `Tarz: ${styleText}` : ''}
 
 "${childName}" hakkında PROFESYONEL, mantıklı bir masal yaz. Canlı betimlemeler ve tatmin edici bir son olsun.`;
+
+    case 'de':
+      return `Name des Kindes: ${childName}${ageText}
+Thema: ${theme || 'Abenteuer im Wald'}
+Nebenfigur: ${hero || 'Ein weises Waldtier'}
+Pädagogische Botschaft: ${moralLesson || 'Freundschaft und Güte'}
+${styleText ? `Stil: ${styleText}` : ''}
+
+WICHTIG:
+- Schreibe ein PROFESSIONELLES, LOGISCHES Märchen über "${childName}"
+- Verwende lebendige Beschreibungen und bedeutungsvolle Dialoge und schreibe einen überzeugenden Schluss
+- Die pädagogische Botschaft soll nicht künstlich wirken, sondern sich auf NATÜRLICHE Weise aus den Ereignissen ergeben
+- Halte dich sorgfältig an die deutsche Grammatik`;
 
     case 'kk':
       return `Баланың аты: ${childName}${ageText}
@@ -385,6 +436,7 @@ serve(async (req) => {
       ru: `Сказка ${actualChildName}`,
       tr: `${actualChildName}'in Masalı`,
       kk: `${actualChildName} туралы ертегі`,
+      de: `Das Märchen von ${actualChildName}`,
     };
     
     const title = rawTitle || defaultTitles[language] || defaultTitles['az'];

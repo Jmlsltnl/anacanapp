@@ -1,0 +1,25 @@
+---
+interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+const half = Math.ceil(items.length / 2);
+const rowA = items.slice(0, half);
+const rowB = items.slice(half);
+
+/* Each row is duplicated so the 50% translate loop is seamless. */
+---
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    {[...rowA, ...rowA].map((item, i) => (
+      <span class={`marquee-chip${i % 3 === 1 ? ' alt' : ''}`}>{item}</span>
+    ))}
+  </div>
+  <div class="marquee-track reverse">
+    {[...rowB, ...rowB].map((item, i) => (
+      <span class={`marquee-chip${i % 3 === 2 ? ' alt' : ''}`}>{item}</span>
+    ))}
+  </div>
+</div>

@@ -1,8 +1,15 @@
-// Qazax4: pregnancy/mommy_day_notifications kk tərcümələrindən SQL parçaları yaradır.
-// out/kk/*.json fayllarından yalnız bu 2 cədvəli yığır (VALUES-based bulk UPDATE — performans üçün).
-// İstifadə: node scripts/content-i18n/gen-qazax-daynotif-sql.cjs
+// Günə-özəl bildirişlərin seed SQL-i (istənilən dil): pregnancy/mommy_day_notifications.
+// out/<lang>/*.json fayllarından yalnız bu 2 cədvəli yığır (VALUES-based bulk UPDATE — performans üçün).
+// İstifadə: node gen-qazax-daynotif-sql.cjs [--lang kk] [--prefix Qazax4] [--outdir qazax]
+//           node gen-qazax-daynotif-sql.cjs --lang de --prefix Alman4 --outdir alman
 const fs = require('fs');
 const path = require('path');
+
+const args = process.argv.slice(2);
+const getOpt = (n, d) => { const i = args.indexOf(n); return i >= 0 ? String(args[i + 1]) : d; };
+const LANG = getOpt('--lang', 'kk');
+const PREFIX = getOpt('--prefix', 'Qazax4');
+const OUTDIR = getOpt('--outdir', 'qazax');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const TABLES = ['pregnancy_day_notifications', 'mommy_day_notifications'];
@@ -11,9 +18,9 @@ const ROWS_PER_STMT = 250;
 
 const esc = (s) => String(s).replace(/'/g, "''");
 
-// out/kk-dan yığ: { table: { id: {title, body} } }
+// out/<lang>-dan yığ: { table: { id: {title, body} } }
 const data = {};
-const dir = path.join(__dirname, 'out', 'kk');
+const dir = path.join(__dirname, 'out', LANG);
 for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json'))) {
   let d;
   try { d = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); } catch { continue; }
@@ -38,18 +45,18 @@ for (const t of TABLES) {
       `  ('${id}'${j === 0 ? '::uuid' : ''}, '${esc(v.title)}', '${esc(v.body)}')`
     ).join(',\n');
     statements.push(
-      `UPDATE public.${t} AS x SET title_kk = v.t, body_kk = v.b\nFROM (VALUES\n${values}\n) AS v(id, t, b)\nWHERE x.id = v.id;`
+      `UPDATE public.${t} AS x SET title_${LANG} = v.t, body_${LANG} = v.b\nFROM (VALUES\n${values}\n) AS v(id, t, b)\nWHERE x.id = v.id;`
     );
   }
-  console.log(`${t} → kk: ${rows.length} sətir`);
+  console.log(`${t} → ${LANG}: ${rows.length} sətir`);
 }
 
 // ≤800KB parçalara böl
 const header = (n, total) => [
   `-- ============================================================`,
-  `-- Qazax4${String.fromCharCode(96 + n)} (${n}/${total}): Günə-özəl push bildirişlərinin Qazax (kk) tərcüməsi`,
+  `-- ${PREFIX}${String.fromCharCode(96 + n)} (${n}/${total}): Günə-özəl push bildirişlərinin ${LANG.toUpperCase()} tərcüməsi`,
   `-- pregnancy_day_notifications + mommy_day_notifications — Azure/gpt-5.6-sol`,
-  `-- ƏVVƏL Qazax1.sql (sütunlar) işlədilməlidir.`,
+  `-- ƏVVƏL sxem faylı (sütunlar) işlədilməlidir.`,
   `-- ============================================================`,
   '', ''
 ].join('\n');
@@ -65,22 +72,22 @@ for (const st of statements) {
 }
 if (cur.length) parts.push(cur);
 
-const qazaxDir = path.join(ROOT, 'supabase', 'qazax');
-fs.mkdirSync(qazaxDir, { recursive: true });
-for (const f of fs.readdirSync(qazaxDir).filter((x) => /^Qazax4/.test(x))) fs.unlinkSync(path.join(qazaxDir, f));
+const outSqlDir = path.join(ROOT, 'supabase', OUTDIR);
+fs.mkdirSync(outSqlDir, { recursive: true });
+for (const f of fs.readdirSync(outSqlDir).filter((x) => x.startsWith(PREFIX))) fs.unlinkSync(path.join(outSqlDir, f));
 
 parts.forEach((stmts, i) => {
   let body = header(i + 1, parts.length) + stmts.join('\n\n') + '\n';
   if (i === parts.length - 1) {
     body += [
-      '', '-- Yoxlama: hər ikisi ~0 olmalıdır (10 boş-mənbə sətri istisna olmaqla)',
+      '', '-- Yoxlama: hər ikisi ~0 olmalıdır (boş-mənbə sətirləri istisna olmaqla)',
       `SELECT`,
-      `  (SELECT count(*) FROM public.pregnancy_day_notifications WHERE title_kk IS NULL) AS preg_kk_bos,`,
-      `  (SELECT count(*) FROM public.mommy_day_notifications WHERE title_kk IS NULL) AS mommy_kk_bos;`, ''
+      `  (SELECT count(*) FROM public.pregnancy_day_notifications WHERE title_${LANG} IS NULL) AS preg_${LANG}_bos,`,
+      `  (SELECT count(*) FROM public.mommy_day_notifications WHERE title_${LANG} IS NULL) AS mommy_${LANG}_bos;`, ''
     ].join('\n');
   }
-  const name = `Qazax4${String.fromCharCode(97 + i)}.sql`;
-  fs.writeFileSync(path.join(qazaxDir, name), body);
-  console.log(`✓ supabase/qazax/${name} — ${Math.round(Buffer.byteLength(body, 'utf8') / 1024)}KB, ${stmts.length} bəyanat`);
+  const name = `${PREFIX}${String.fromCharCode(97 + i)}.sql`;
+  fs.writeFileSync(path.join(outSqlDir, name), body);
+  console.log(`✓ supabase/${OUTDIR}/${name} — ${Math.round(Buffer.byteLength(body, 'utf8') / 1024)}KB, ${stmts.length} bəyanat`);
 });
 console.log(`Cəmi: ${totalRows} sətir, ${parts.length} fayl`);

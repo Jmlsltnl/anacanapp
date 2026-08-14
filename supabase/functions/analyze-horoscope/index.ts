@@ -258,8 +258,8 @@ serve(async (req) => {
       console.log(`Baby calculations: Sun=${babySun.signAz}, Moon=${babyMoon.signAz}, Rising=${babyRising?.signAz || 'N/A'}`);
     }
 
-    const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH' };
-    const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish', kk: 'Kazakh' };
+    const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH', de: 'GERMAN' };
+    const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish', kk: 'Kazakh', de: 'German' };
     const outLang = OUT_LANG[language];
 
     // Build comprehensive AI prompt with accurate calculations

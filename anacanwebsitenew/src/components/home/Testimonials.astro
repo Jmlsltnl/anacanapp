@@ -1,0 +1,42 @@
+---
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const items = t<{ quote: string; name: string; role: string }[]>('testimonials.items');
+const colors = ['var(--flow)', 'var(--bump)', 'var(--partner)', 'var(--mommy)'];
+---
+
+<section class="section" id="testimonials">
+  <div class="container">
+    <div class="section-head center reveal">
+      <span class="eyebrow">{t('testimonials.eyebrow')}</span>
+      <h2>{t('testimonials.title')}</h2>
+      <p class="lede">{t('testimonials.subtitle')}</p>
+    </div>
+
+    <div class="quote-grid">
+      {items.map((item, i) => (
+        <figure class="quote-card reveal" style={`transition-delay:${i * 70}ms`}>
+          <div>
+            <div class="stars" aria-hidden="true">★★★★★</div>
+            <blockquote class="mt-2">“{item.quote}”</blockquote>
+          </div>
+          <figcaption class="quote-who">
+            <span class="avatar" style={`background:${colors[i % colors.length]}`} aria-hidden="true">
+              {item.name.charAt(0)}
+            </span>
+            <div>
+              <b>{item.name}</b>
+              <span>{item.role}</span>
+            </div>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>

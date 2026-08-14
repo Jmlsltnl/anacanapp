@@ -1,7 +1,7 @@
 /**
- * Qazax (kk) content tərcüməsi — BÜTÜN reyestr cədvəllərini ardıcıl işlədir.
- * Hər cədvəl üçün azure-translate.cjs <table> kk çağırır (resume/dedupe daxilində var).
- * İstifadə: node scripts/content-i18n/run-kk-all.cjs [--conc 2]
+ * Content tərcüməsi — BÜTÜN reyestr cədvəllərini ardıcıl işlədir (istənilən dil).
+ * Hər cədvəl üçün azure-translate.cjs <table> <lang> çağırır (resume/dedupe daxilində var).
+ * İstifadə: node scripts/content-i18n/run-kk-all.cjs [--lang kk] [--conc 2]
  * Log-a yazır, sonda xülasə çap edir. Təkrar işə salmaq təhlükəsizdir.
  */
 const { spawnSync } = require('child_process');
@@ -11,6 +11,7 @@ const path = require('path');
 const args = process.argv.slice(2);
 const getOpt = (name, dflt) => { const i = args.indexOf(name); return i >= 0 ? String(args[i + 1]) : dflt; };
 const CONC = getOpt('--conc', '2');
+const LANG = getOpt('--lang', 'kk');
 
 // Prioritet sırası: istifadəçiyə ən çox görünən kiçik cədvəllər əvvəl, nəhənglər sonda
 const ORDER = [
@@ -56,10 +57,10 @@ for (const table of ORDER) {
     summary.push(`${table}: chunk yoxdur/boş — ötürüldü`);
     continue;
   }
-  console.log(`\n════════ ${table} → kk ════════`);
+  console.log(`\n════════ ${table} → ${LANG} ════════`);
   const rows = ROWS_OVERRIDE[table] || '6';
   const r = spawnSync('node', [
-    path.join(__dirname, 'azure-translate.cjs'), table, 'kk',
+    path.join(__dirname, 'azure-translate.cjs'), table, LANG,
     '--conc', CONC, '--rows', rows,
   ], { stdio: 'inherit' });
   summary.push(`${table}: exit=${r.status}`);

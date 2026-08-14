@@ -1,14 +1,15 @@
 /**
- * Qazax3+ generatoru — ümumi REGISTRY cədvəlləri üçün kk seed SQL (day-notifications İSTİSNA,
- * onlar ayrıca Qazax4-də VALUES-based bulk UPDATE ilə, performans üçün).
- * out/kk/*.json → guarded per-row UPDATE (COALESCE, idempotent) → supabase/qazax/Qazax3*.sql
+ * Content seed SQL generatoru — ümumi REGISTRY cədvəlləri (day-notifications İSTİSNA,
+ * onlar ayrıca VALUES-based bulk UPDATE ilə, performans üçün).
+ * out/<lang>/*.json → guarded per-row UPDATE (COALESCE, idempotent) → supabase/<outdir>/<Prefix>*.sql
+ * İstifadə: node gen-qazax-content-sql.cjs [--lang kk] [--prefix Qazax3] [--outdir qazax]
+ *           node gen-qazax-content-sql.cjs --lang de --prefix Alman3 --outdir alman
  */
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const OUT = path.join(__dirname, 'out');
-const QAZAX_DIR = path.join(ROOT, 'supabase', 'qazax');
 const EXCLUDE = new Set(['pregnancy_day_notifications', 'mommy_day_notifications']);
 
 // Sahə tipi təsnifatı (edge function + build-sql.cjs ilə sinxron)
@@ -52,8 +53,13 @@ function sqlValue(table, field, value) {
 }
 
 (async () => {
+  const args = process.argv.slice(2);
+  const getOpt = (n, d) => { const i = args.indexOf(n); return i >= 0 ? String(args[i + 1]) : d; };
+  const LANG = getOpt('--lang', 'kk');
+  const PREFIX = getOpt('--prefix', 'Qazax3');
+  const OUTDIR = getOpt('--outdir', 'qazax');
   const MAX_BYTES = 800 * 1024;
-  const dir = path.join(OUT, 'kk');
+  const dir = path.join(OUT, LANG);
   const tableData = {}; // table -> { id -> fields }
   for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.json')).sort()) {
     const data = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
@@ -79,14 +85,14 @@ function sqlValue(table, field, value) {
     const data = tableData[table];
     const ids = Object.keys(data);
     if (!ids.length) continue;
-    lines.push(`-- ── ${table} → kk (${ids.length} sətir) ──`);
+    lines.push(`-- ── ${table} → ${LANG} (${ids.length} sətir) ──`);
     for (const id of ids) {
       const fieldsObj = data[id];
       const sets = [];
       for (const [field, value] of Object.entries(fieldsObj)) {
         if (value === null || value === undefined) continue;
         if (typeof value === 'string' && !value.trim()) continue;
-        const col = `${field}_kk`;
+        const col = `${field}_${LANG}`;
         sets.push(`${col} = COALESCE(${col}, ${sqlValue(table, field, value)})`);
       }
       if (!sets.length) continue;
@@ -99,10 +105,10 @@ function sqlValue(table, field, value) {
 
   const header = (part, total) => [
     '-- ============================================================',
-    `-- Qazax3${total > 1 ? String.fromCharCode(96 + part) : ''} (${part}/${total}) — DB kontentinin Qazax (kk) tərcüməsi`,
+    `-- ${PREFIX}${total > 1 ? String.fromCharCode(96 + part) : ''} (${part}/${total}) — DB kontentinin ${LANG.toUpperCase()} tərcüməsi`,
     '-- COALESCE + guarded UPDATE — mövcud/əl tərcümələri qorunur (idempotent).',
-    `-- Cəmi: ${totalUpdates} UPDATE (day-notifications İSTİSNA — bax Qazax4)`,
-    '-- ƏVVƏL Qazax1.sql (sütunlar) işlədilməlidir.',
+    `-- Cəmi: ${totalUpdates} UPDATE (day-notifications İSTİSNA — ayrıca faylda)`,
+    `-- ƏVVƏL sxem faylı (sütunlar) işlədilməlidir.`,
     '-- ============================================================',
     '',
   ];
@@ -118,13 +124,14 @@ function sqlValue(table, field, value) {
   }
   if (cur.length) parts.push(cur);
 
-  fs.mkdirSync(QAZAX_DIR, { recursive: true });
-  for (const f of fs.readdirSync(QAZAX_DIR).filter((x) => /^Qazax3/.test(x))) fs.unlinkSync(path.join(QAZAX_DIR, f));
+  const OUT_SQL_DIR = path.join(ROOT, 'supabase', OUTDIR);
+  fs.mkdirSync(OUT_SQL_DIR, { recursive: true });
+  for (const f of fs.readdirSync(OUT_SQL_DIR).filter((x) => x.startsWith(PREFIX))) fs.unlinkSync(path.join(OUT_SQL_DIR, f));
 
   const files = [];
   parts.forEach((partLines, i) => {
-    const name = parts.length === 1 ? 'Qazax3.sql' : `Qazax3${String.fromCharCode(97 + i)}.sql`;
-    const p = path.join(QAZAX_DIR, name);
+    const name = parts.length === 1 ? `${PREFIX}.sql` : `${PREFIX}${String.fromCharCode(97 + i)}.sql`;
+    const p = path.join(OUT_SQL_DIR, name);
     fs.writeFileSync(p, header(i + 1, parts.length).concat(partLines).join('\n'), 'utf8');
     files.push({ name, kb: Math.round(fs.statSync(p).size / 1024) });
   });

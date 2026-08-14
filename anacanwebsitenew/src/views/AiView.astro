@@ -1,0 +1,98 @@
+---
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import AiSection from '@/components/home/AiSection.astro';
+import FaqList from '@/components/FaqList.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { pagePath } from '@/config/pages';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const capabilities = t<{ title: string; text: string }[]>('aiPage.capabilities');
+const how = t<{ title: string; text: string }[]>('aiPage.how');
+const faq = t<{ q: string; a: string }[]>('aiPage.faq');
+const emojis = ['🎯', '✅', '👂', '🩺', '🧚', '🌍'];
+
+const breadcrumbs = [
+  { name: t('breadcrumbs.home'), path: pagePath('home', lang) },
+  { name: t('nav.ai'), path: pagePath('ai', lang) },
+];
+---
+
+<Base
+  lang={lang}
+  title={t('meta.ai.title')}
+  description={t('meta.ai.description')}
+  pageKey="ai"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="container">
+    <div class="page-hero">
+      <Breadcrumbs items={breadcrumbs} />
+      <span class="eyebrow">{t('aiPage.eyebrow')} ✦</span>
+      <h1>{t('aiPage.title')}</h1>
+      <p class="lede">{t('aiPage.subtitle')}</p>
+      <div class="hero-ctas">
+        <a href={pagePath('download', lang)} class="btn btn-primary">{t('nav.download')}</a>
+      </div>
+    </div>
+    <p class="lede reveal" style="max-width:52em">{t('aiPage.intro')}</p>
+  </div>
+
+  <AiSection lang={lang} showCta={false} />
+
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <h2 class="reveal">{t('aiPage.capabilitiesTitle')}</h2>
+      <div class="tool-grid mt-3">
+        {capabilities.map((c, i) => (
+          <div class="tool-card reveal" data-stage="ai" style={`transition-delay:${(i % 3) * 60}ms`}>
+            <span class="t-ico" aria-hidden="true">{emojis[i]}</span>
+            <h3>{c.title}</h3>
+            <p>{c.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <h2 class="reveal">{t('aiPage.howTitle')}</h2>
+      <div class="steps-grid mt-3">
+        {how.map((s, i) => (
+          <div class="step-card reveal" style={`transition-delay:${i * 80}ms`}>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="ai-section">
+        <div class="ai-grid" style="align-items:start">
+          <div>
+            <h2>{t('aiPage.safetyTitle')}</h2>
+            <p class="lede mt-2">{t('aiPage.safety1')}</p>
+            <p class="lede mt-2">{t('aiPage.safety2')}</p>
+          </div>
+          <div>
+            <h2 class="visually-hidden">{t('aiPage.faqTitle')}</h2>
+            <FaqList items={faq} openFirst={false} />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} title={t('aiPage.ctaTitle')} subtitle={t('aiPage.ctaText')} />
+</Base>

@@ -1,0 +1,774 @@
+{
+  "meta": {
+    "home": {
+      "title": "Anacan — Hamiləlik, Analıq və Tsikl İzləyicisi Tətbiqi",
+      "description": "Azərbaycanın ilk analıq superappi: tsikl, hamiləlik və körpə izləyicisi, 30+ alət, 24/7 AI köməkçi və ata rejimi — hamısı bir tətbiqdə. Pulsuz yüklə."
+    },
+    "features": {
+      "title": "Funksiyalar — Bir Tətbiqdə 30+ Analıq Aləti",
+      "description": "Sancı sayğacından təpik sayğacına, ÜST böyümə əyrilərindən peyvənd təqviminə qədər — Anacan-ın 30+ alətinin tam siyahısı. Tsikl, hamiləlik və analıq üçün hər şey."
+    },
+    "flow": {
+      "title": "Tsikl və Ovulyasiya İzləyicisi — Flow rejimi",
+      "description": "Menstruasiya təqvimi, ovulyasiya proqnozu, simptom və əhval gündəliyi. Anacan Flow ilə tsiklinizi elmi əsaslarla izləyin, bədəninizi daha yaxşı tanıyın."
+    },
+    "bump": {
+      "title": "Hamiləlik İzləyicisi — 40 Həftəlik Bələdçi",
+      "description": "Həftə-həftə körpə inkişafı, sancı sayğacı, təpik sayğacı, doğuş çantası siyahısı və qidalanma bələdçisi. Anacan Bump ilə hamiləliyin hər həftəsini izləyin."
+    },
+    "mommy": {
+      "title": "Körpə İnkişafı İzləyicisi və Ana Köməkçisi",
+      "description": "Qidalanma, yuxu və bez jurnalı, ÜST böyümə əyriləri, peyvənd təqvimi, diş çıxarma və inkişaf mərhələləri. Anacan Mommy ilə analıq dövrünüz asanlaşır."
+    },
+    "partner": {
+      "title": "Ata Rejimi — Partnyor üçün Hamiləlik Dəstəyi",
+      "description": "Atalar üçün canlı hamiləlik xəbərləri, SOS bildirişləri, gündəlik xülasə, ad səsverməsi və partnyor AI məsləhətçisi. Anacan ilə bu yolda birlikdə olun."
+    },
+    "ai": {
+      "title": "Anacan.AI — 24/7 Hamiləlik və Analıq AI Köməkçisi",
+      "description": "Gecə 3-də belə cavab alan analıq köməkçisi: hamiləlik, körpə baxımı və tsikl suallarınıza elmə əsaslanan, azərbaycanca cavablar. Anacan.AI ilə tanış olun."
+    },
+    "premium": {
+      "title": "Anacan Premium — Planlar və Qiymətlər",
+      "description": "Anacan pulsuzdur — Premium isə limitsiz Anacan.AI, həftəlik PDF hesabatlar, AI foto çəkiliş və reklamsız təcrübə əlavə edir. Planları müqayisə edin."
+    },
+    "blog": {
+      "title": "Anacan Bloq — Hamiləlik və Analıq Məqalələri",
+      "description": "Hamiləlik həftələri, körpə yuxusu, tsikl sağlamlığı və ata dəstəyi haqqında elmə əsaslanan, azərbaycanca məqalələr — Anacan redaksiyasından."
+    },
+    "about": {
+      "title": "Haqqımızda — Anacan MMC və missiyamız",
+      "description": "Anacan Azərbaycanın ilk analıq superappidir. Missiyamız: hər ananın yanında elmə əsaslanan, qayğıkeş bir köməkçi olmaq. Hekayəmizlə tanış olun."
+    },
+    "download": {
+      "title": "Anacan-ı Yüklə — iOS və Android üçün Pulsuz",
+      "description": "Anacan-ı App Store və Google Play-dən pulsuz yükləyin. iOS 15+ və Android 8+ dəstəklənir. 5 dildə: Azərbaycan, English, Русский, Türkçe, Қазақша."
+    },
+    "contact": {
+      "title": "Əlaqə — Anacan Dəstək Komandası",
+      "description": "Suallarınız üçün Anacan komandası ilə əlaqə saxlayın: info@anacan.az. Dəstək, əməkdaşlıq və media sorğuları üçün bizə yazın."
+    },
+    "faq": {
+      "title": "Tez-tez Verilən Suallar — Anacan",
+      "description": "Anacan nədir, pulsuzdurmu, hansı dillərdə işləyir, məlumatlarım təhlükəsizdirmi? Anacan haqqında ən çox verilən 12 sualın cavabı."
+    },
+    "privacy": {
+      "title": "Məxfilik Siyasəti — Anacan",
+      "description": "Anacan məlumatlarınızı necə toplayır, istifadə edir və qoruyur. Sağlamlıq məlumatları, hüquqlarınız və əlaqə — tam məxfilik siyasəti."
+    },
+    "terms": {
+      "title": "İstifadə Şərtləri — Anacan",
+      "description": "Anacan tətbiqi və veb-saytının istifadə şərtləri: xidmətin təsviri, tibbi imtina, abunəliklər və istifadəçi öhdəlikləri."
+    },
+    "notFound": {
+      "title": "Səhifə tapılmadı — 404",
+      "description": "Axtardığınız səhifə mövcud deyil. Anacan ana səhifəsinə qayıdın və ya bloqa baxın."
+    }
+  },
+  "nav": {
+    "home": "Ana səhifə",
+    "features": "Funksiyalar",
+    "stages": "Mərhələlər",
+    "ai": "Anacan.AI",
+    "premium": "Premium",
+    "blog": "Bloq",
+    "about": "Haqqımızda",
+    "faq": "Suallar",
+    "contact": "Əlaqə",
+    "download": "Pulsuz yüklə",
+    "menu": "Menyu",
+    "close": "Bağla",
+    "language": "Dil",
+    "skipToContent": "Məzmuna keç"
+  },
+  "hero": {
+    "badge": "Azərbaycanın ilk analıq superappi",
+    "titleA": "Tsikldən analığa —",
+    "titleEm": "hər anında",
+    "titleB": "yanındayıq",
+    "subtitle": "Menstruasiya, hamiləlik, körpə baxımı və ata dəstəyi bir tətbiqdə. 30+ alət, 24/7 Anacan.AI köməkçisi və sizi anlayan icma — hamısı ana dilinizdə.",
+    "ctaPrimary": "Pulsuz yüklə",
+    "ctaSecondary": "Funksiyalara bax",
+    "ratingNote": "İlk gündən pulsuz · Kart tələb olunmur",
+    "stats": [
+      { "value": "30+", "label": "alət bir tətbiqdə" },
+      { "value": "5", "label": "dildə istifadə" },
+      { "value": "40", "label": "həftəlik izləmə" },
+      { "value": "24/7", "label": "AI dəstəyi" }
+    ]
+  },
+  "phone": {
+    "week": "Həftə",
+    "weekTitle": "Körpəniz mango boydadır",
+    "weekText": "Bu həftə eşitmə sürətlə inkişaf edir — ona nağıl danışın.",
+    "kicks": "Təpik sayğacı",
+    "kicksValue": "12 təpik · 42 dəq",
+    "contractions": "Sancı sayğacı",
+    "contractionsValue": "5-1-1 qaydası izlənilir",
+    "aiName": "Anacan.AI",
+    "aiMessage": "Salam, Aysel! 24-cü həftədə maqnezium üçün badam əla seçimdir 💛",
+    "cycleDay": "Tsiklin 14-cü günü",
+    "cyclePhase": "Ovulyasiya pəncərəsi",
+    "sleepLog": "Yuxu jurnalı",
+    "sleepValue": "3s 20dəq gündüz yuxusu"
+  },
+  "stages": {
+    "eyebrow": "Dörd mərhələ, bir tətbiq",
+    "title": "Həyatınızın hansı mərhələsindəsinizsə — Anacan uyğunlaşır",
+    "subtitle": "Anacan sizi tanıyır: rejimi seçin, tətbiq bütün alətləri, məsləhətləri və məzmunu mərhələnizə uyğunlaşdırsın.",
+    "more": "Ətraflı bax",
+    "flow": {
+      "name": "Flow",
+      "label": "Tsikl",
+      "tagline": "Bədənini tanı",
+      "desc": "Menstruasiya təqvimi, ovulyasiya proqnozu və simptom gündəliyi ilə tsiklinizi elmi əsaslarla izləyin.",
+      "bullets": ["Fərdi tsikl proqnozları", "Fazalara uyğun məsləhətlər", "Simptom və əhval gündəliyi"]
+    },
+    "bump": {
+      "name": "Bump",
+      "label": "Hamiləlik",
+      "tagline": "40 həftəlik səyahət",
+      "desc": "Həftə-həftə körpə inkişafı, sancı və təpik sayğacları, doğuş çantası — doğuşa tam hazırlıq.",
+      "bullets": ["Həftəlik inkişaf bələdçisi", "Sancı və təpik sayğacları", "Doğuş çantası siyahısı"]
+    },
+    "mommy": {
+      "name": "Mommy",
+      "label": "Analıq",
+      "tagline": "İlk illərin köməkçisi",
+      "desc": "Qidalanma, yuxu və bez jurnalları, ÜST böyümə əyriləri, peyvənd təqvimi və inkişaf mərhələləri.",
+      "bullets": ["ÜST böyümə əyriləri", "Yuxu və qidalanma jurnalı", "Peyvənd təqvimi"]
+    },
+    "partner": {
+      "name": "Partner",
+      "label": "Ata rejimi",
+      "tagline": "Bu yolda birlikdə",
+      "desc": "Atalar üçün canlı yeniliklər, SOS bildirişləri, gündəlik xülasə və partnyor AI məsləhətçisi.",
+      "bullets": ["Canlı hamiləlik xəbərləri", "SOS və \"xəstəxana vaxtı\" siqnalı", "Ad səsverməsi və sürprizlər"]
+    }
+  },
+  "tools": {
+    "eyebrow": "30+ alət",
+    "title": "Hər sual üçün bir alət — hamısı bir yerdə",
+    "subtitle": "Ayrı-ayrı tətbiqlərə ehtiyac yoxdur: sayğaclar, jurnallar, təqvimlər və AI alətləri Anacan-da birləşib.",
+    "viewAll": "Bütün funksiyalara bax",
+    "items": [
+      { "name": "Sancı sayğacı", "desc": "5-1-1 qaydası ilə doğuş vaxtını müəyyənləşdirin", "stage": "bump" },
+      { "name": "Təpik sayğacı", "desc": "Körpənin hərəkətlərini asanlıqla qeyd edin", "stage": "bump" },
+      { "name": "Həftəlik inkişaf", "desc": "40 həftə boyunca körpənizin böyüməsi", "stage": "bump" },
+      { "name": "Doğuş çantası", "desc": "Hazır siyahı ilə heç nəyi unutmayın", "stage": "bump" },
+      { "name": "Tsikl təqvimi", "desc": "Menstruasiya və ovulyasiya proqnozları", "stage": "flow" },
+      { "name": "Simptom gündəliyi", "desc": "Bədəninizin siqnallarını qeyd edin", "stage": "flow" },
+      { "name": "Böyümə əyriləri", "desc": "ÜST standartları ilə boy-çəki izləməsi", "stage": "mommy" },
+      { "name": "Yuxu jurnalı", "desc": "Körpənin yuxu rejimini formalaşdırın", "stage": "mommy" },
+      { "name": "Peyvənd təqvimi", "desc": "Ölkəyə uyğun peyvənd cədvəli və xatırlatmalar", "stage": "mommy" },
+      { "name": "Ağlama tərcüməçisi", "desc": "AI ilə ağlamanın səbəbini anlayın", "stage": "mommy" },
+      { "name": "Ad seçimi", "desc": "Minlərlə ad, mənaları və ata ilə səsvermə", "stage": "bump" },
+      { "name": "Nağıl generatoru", "desc": "AI ilə körpənizə özəl nağıllar", "stage": "mommy" },
+      { "name": "Qidalanma bələdçisi", "desc": "Trimestrə uyğun qida məsləhətləri", "stage": "bump" },
+      { "name": "Vitamin izləyicisi", "desc": "Gündəlik vitamin xatırlatmaları", "stage": "bump" },
+      { "name": "Mental sağlamlıq", "desc": "EPDS testi və əhval gündəliyi", "stage": "mommy" },
+      { "name": "İlk yardım bələdçisi", "desc": "Addım-addım təcili yardım ssenariləri", "stage": "mommy" }
+    ],
+    "marquee": [
+      "Sancı sayğacı", "Təpik sayğacı", "Tsikl təqvimi", "Ovulyasiya proqnozu", "Doğuş çantası",
+      "Ad seçimi", "Böyümə əyriləri", "Peyvənd təqvimi", "Yuxu jurnalı", "Qidalanma bələdçisi",
+      "Ağlama tərcüməçisi", "Nağıl generatoru", "AI foto çəkiliş", "Hava və geyim", "Təzyiq izləyicisi",
+      "Şəkər izləyicisi", "Çəki izləyicisi", "Vitaminlər", "Diş çıxarma", "Mental sağlamlıq",
+      "Reseptlər", "Məşqlər", "İlk yardım", "Təhlükə əlamətləri", "Analıq kalkulyatoru",
+      "Hamiləlik albomu", "Ağ səs", "Alış-veriş siyahısı", "Ana xəritəsi", "Həkim reytinqləri"
+    ]
+  },
+  "ai": {
+    "eyebrow": "Anacan.AI",
+    "title": "Gecə 3-də belə cavab alan köməkçiniz",
+    "subtitle": "Hamiləlik, körpə baxımı və tsikl suallarınıza elmə əsaslanan cavablar — ana dilinizdə, mühakiməsiz və 24/7.",
+    "bullets": [
+      "Mərhələnizə və gününüzə uyğun fərdi cavablar",
+      "Elmi mənbələrə əsaslanan məzmun",
+      "\"Bu təhlükəsizdirmi?\" — qida, dərman və kosmetika yoxlaması",
+      "Azərbaycan, ingilis, rus, türk və qazax dillərində"
+    ],
+    "chat": {
+      "userQ1": "Hamiləlikdə kofe içmək olar?",
+      "aiA1": "Gündə 200 mq-a qədər kofein (təxminən 1 fincan qəhvə) əksər hamilələr üçün təhlükəsiz sayılır. Yenə də həkiminizlə məsləhətləşin ☕",
+      "userQ2": "Körpəm gecə tez-tez oyanır, normaldır?",
+      "aiA2": "4 aylıqda bu çox normaldır — yuxu reqressiyası ola bilər. Yuxu jurnalında rejimi izləyək? 💤",
+      "placeholder": "Sualınızı yazın...",
+      "online": "Onlayn"
+    },
+    "disclaimer": "Anacan.AI tibbi diaqnoz qoymur — ciddi hallarda mütləq həkiminizə müraciət edin.",
+    "cta": "Anacan.AI ilə tanış ol"
+  },
+  "testimonials": {
+    "eyebrow": "Analar deyir",
+    "title": "Minlərlə ananın gündəlik yol yoldaşı",
+    "subtitle": "Real istifadəçilərimizin təcrübələri.",
+    "items": [
+      {
+        "quote": "Anacan sayəsində hamiləliyim stressiz keçdi. Həftəlik hesabatlar çox faydalıdır!",
+        "name": "Aysel",
+        "role": "Bakı · 24-cü həftə"
+      },
+      {
+        "quote": "AI köməkçi gecə 3-də belə suallarıma cavab verir. Əsl dost kimi!",
+        "name": "Nigar",
+        "role": "Gəncə · yeni ana"
+      },
+      {
+        "quote": "Ata rejimi ilə həyat yoldaşımın nə yaşadığını nəhayət həqiqətən anlayıram.",
+        "name": "Elvin",
+        "role": "Bakı · gələcək ata"
+      },
+      {
+        "quote": "Körpəmin yuxu rejimini qurmaqda ən böyük köməkçim oldu. Böyümə əyriləri də əla!",
+        "name": "Leyla",
+        "role": "Sumqayıt · 6 aylıq körpə anası"
+      }
+    ]
+  },
+  "faqHome": {
+    "eyebrow": "Suallar",
+    "title": "Tez-tez verilən suallar",
+    "subtitle": "Cavabını tapmadınız? Bizə yazın — komandamız kömək etsin.",
+    "moreLink": "Bütün suallara bax",
+    "items": [
+      {
+        "q": "Anacan nədir?",
+        "a": "Anacan — menstruasiya tsikli, hamiləlik və analıq dövrünü bir yerdə izləyən mobil tətbiqdir. Flow rejimi tsikl təqvimi və ovulyasiya proqnozu verir, Bump rejimi hamiləliyi 40 həftə boyunca izləyir, Mommy rejimi körpənin yuxusunu, qidalanmasını və böyüməsini qeyd edir, Partner rejimi isə ataları prosesə qoşur. Tətbiqdə 30+ alət, 24/7 Anacan.AI köməkçisi, analar icması və mütəxəssis məzmunu var."
+      },
+      {
+        "q": "Anacan pulsuzdur?",
+        "a": "Bəli. Anacan-ı pulsuz yükləyib əsas alətlərdən — tsikl təqvimi, həftəlik hamiləlik izləyicisi, sayğaclar və jurnallardan — ödənişsiz istifadə edə bilərsiniz. Premium abunəlik limitsiz Anacan.AI söhbəti, həftəlik PDF hesabatlar, AI foto çəkiliş və reklamsız təcrübə kimi əlavə imkanlar açır."
+      },
+      {
+        "q": "Anacan hansı dillərdə mövcuddur?",
+        "a": "Anacan hazırda 5 dildə işləyir: Azərbaycan, ingilis, rus, türk və qazax. Tətbiqin bütün məzmunu — alətlər, gündəlik məsləhətlər və Anacan.AI cavabları — seçdiyiniz dildə təqdim olunur. Yeni dillər mütəmadi əlavə edilir."
+      },
+      {
+        "q": "Anacan.AI tibbi məsləhət verirmi?",
+        "a": "Anacan.AI elmi mənbələrə əsaslanan ümumi məlumat verir, lakin tibbi diaqnoz qoymur və həkim müayinəsini əvəz etmir. Təcili və ya narahatedici vəziyyətlərdə mütləq həkiminizə müraciət edin. Tətbiqdəki \"Təhlükə əlamətləri\" bələdçisi hansı hallarda dərhal həkimə getməli olduğunuzu göstərir."
+      },
+      {
+        "q": "Məlumatlarım təhlükəsizdirmi?",
+        "a": "Bəli. Sağlamlıq məlumatlarınız şifrələnmiş şəkildə saxlanılır, üçüncü tərəflərə satılmır və reklam məqsədilə paylaşılmır. İstədiyiniz zaman hesabınızı və bütün məlumatlarınızı tətbiqdən birbaşa silə bilərsiniz. Ətraflı məlumat üçün Məxfilik Siyasətimizə baxın."
+      },
+      {
+        "q": "Anacan hansı cihazlarda işləyir?",
+        "a": "Anacan iOS 15 və daha yeni iPhone-larda, Android 8.0 və daha yeni telefonlarda işləyir. Tətbiqi App Store və Google Play-dən pulsuz yükləyə bilərsiniz."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Hər ananın yanında bir Anacan",
+    "subtitle": "Bu gün pulsuz başlayın — tsiklinizi, hamiləliyinizi və ya körpənizin ilk illərini birlikdə izləyək.",
+    "note": "Pulsuz yükləmə · Kart tələb olunmur · 5 dildə",
+    "appStoreAria": "App Store-dan yüklə",
+    "googlePlayAria": "Google Play-dən yüklə"
+  },
+  "badges": {
+    "downloadOnThe": "Yüklə",
+    "appStore": "App Store",
+    "getItOn": "Əldə et",
+    "googlePlay": "Google Play"
+  },
+  "footer": {
+    "tagline": "Tsikldən analığa — hər anında yanında.",
+    "description": "Anacan — menstruasiya, hamiləlik və analıq dövrü üçün Azərbaycanın ilk superappi. 30+ alət, AI köməkçi və sizi anlayan icma.",
+    "product": "Məhsul",
+    "company": "Şirkət",
+    "resources": "Resurslar",
+    "legal": "Hüquqi",
+    "language": "Dil",
+    "followUs": "Bizi izləyin",
+    "downloadTitle": "Tətbiqi yüklə",
+    "copyright": "Bütün hüquqlar qorunur.",
+    "madeWith": "Bakıda 💛 ilə hazırlanıb",
+    "rss": "RSS lenti",
+    "seoPanel": "SEO Panel"
+  },
+  "blog": {
+    "eyebrow": "Anacan Bloq",
+    "title": "Analıq yolunda bələdçiniz",
+    "subtitle": "Hamiləlik, körpə baxımı, tsikl sağlamlığı və ata dəstəyi haqqında elmə əsaslanan məqalələr — redaksiya komandamızdan.",
+    "readMore": "Oxu",
+    "minRead": "dəq oxunuş",
+    "published": "Dərc edilib",
+    "updated": "Yenilənib",
+    "author": "Müəllif",
+    "authorName": "Anacan Redaksiya Komandası",
+    "related": "Oxşar məqalələr",
+    "backToBlog": "Bloqa qayıt",
+    "all": "Hamısı",
+    "featured": "Seçilmiş məqalə",
+    "latest": "Son məqalələr",
+    "empty": "Bu dildə hələ məqalə yoxdur — tezliklə!",
+    "keyTakeaways": "Əsas məqamlar",
+    "sources": "Mənbələr",
+    "share": "Paylaş",
+    "inThisArticle": "Bu məqalədə",
+    "categories": {
+      "pregnancy": "Hamiləlik",
+      "motherhood": "Analıq",
+      "cycle": "Tsikl sağlamlığı",
+      "partner": "Ata dəstəyi",
+      "health": "Sağlamlıq"
+    },
+    "ctaTitle": "Oxuduqlarınızı tətbiqdə izləyin",
+    "ctaText": "Bloqdakı bələdçilərin hamısı Anacan tətbiqində interaktiv alətlərə çevrilir — pulsuz yükləyin."
+  },
+  "featuresPage": {
+    "eyebrow": "Funksiyalar",
+    "title": "Bir tətbiqdə 30+ alət — ayrı-ayrı tətbiqlərə son",
+    "subtitle": "Anacan tsikl, hamiləlik, analıq və partnyor dəstəyi üçün lazım olan hər şeyi bir yerə yığır. Aşağıda alətlərin tam xəritəsi.",
+    "aiGroupTitle": "AI ilə işləyən alətlər",
+    "aiGroupText": "Anacan.AI təkcə söhbət deyil — tətbiqin bir çox aləti süni intellektlə gücləndirilib:",
+    "aiTools": [
+      { "name": "Ağlama tərcüməçisi", "desc": "Körpənin ağlama səsini analiz edib mümkün səbəbi göstərir" },
+      { "name": "Bez analizi", "desc": "Foto ilə körpənin həzmi barədə ilkin fikir verir" },
+      { "name": "AI foto çəkiliş", "desc": "Körpə fotolarından sehrli çəkiliş səhnələri yaradır" },
+      { "name": "Nağıl generatoru", "desc": "Körpənizin adı ilə fərdi nağıllar yazır" },
+      { "name": "Təhlükəsizlik yoxlaması", "desc": "\"Bunu yemək olar?\" — qida, dərman, kosmetika cavabları" },
+      { "name": "Hava və geyim", "desc": "Havaya uyğun körpə geyimi məsləhəti" }
+    ],
+    "ctaTitle": "Hamısını özünüz yoxlayın",
+    "ctaText": "Bütün alətlər tətbiqdə — pulsuz yükləyin və mərhələnizi seçin."
+  },
+  "stagePages": {
+    "flow": {
+      "eyebrow": "Flow rejimi",
+      "title": "Tsiklinizi tanıyın, bədəninizi anlayın",
+      "subtitle": "Menstruasiya təqvimi, ovulyasiya proqnozu və fazalara uyğun məsləhətlər — hamısı elmi əsaslarla, ana dilinizdə.",
+      "intro": "Flow rejimi Anacan-ın tsikl izləmə mərkəzidir. Dövrünüzü qeyd etdikcə tətbiq fərdi proqnozlar qurur: növbəti menstruasiya, ovulyasiya pəncərəsi və fertil günlər. Simptom və əhval gündəliyi isə bədəninizin nümunələrini görməyə kömək edir.",
+      "featuresTitle": "Flow-da sizi nə gözləyir",
+      "features": [
+        { "title": "Tsikl təqvimi", "text": "Menstruasiya günlərinizi qeyd edin, tətbiq növbəti dövrü proqnozlaşdırsın." },
+        { "title": "Ovulyasiya proqnozu", "text": "Fertil pəncərənizi görün — planlaşdırma və ya izləmə üçün." },
+        { "title": "Simptom gündəliyi", "text": "Ağrı, qanaxma, enerji və 30+ simptomu bir toxunuşla qeyd edin." },
+        { "title": "Əhval gündəliyi", "text": "Əhvalınızı izləyin, tsikl fazaları ilə əlaqəsini kəşf edin." },
+        { "title": "Fazalara uyğun məsləhətlər", "text": "Follikulyar, ovulyasiya, luteal, menstruasiya — hər faza üçün qidalanma və idman tövsiyələri." },
+        { "title": "Hamiləliyə keçid", "text": "Müsbət test? Bir toxunuşla Bump rejiminə keçin — məlumatlarınız qorunur." }
+      ],
+      "stepsTitle": "Necə işləyir",
+      "steps": [
+        { "title": "Son menstruasiyanızı qeyd edin", "text": "Tarixi seçin — Anacan orta tsikl uzunluğunuzu öyrənməyə başlayır." },
+        { "title": "Simptomlarınızı əlavə edin", "text": "Gündə 30 saniyə: nə hiss etdiyinizi qeyd edin." },
+        { "title": "Proqnozları izləyin", "text": "Tsikl dəqiqliyi hər ay artır, məsləhətlər fazanıza uyğunlaşır." }
+      ],
+      "faqTitle": "Flow haqqında suallar",
+      "faq": [
+        { "q": "Tsikl proqnozları nə dərəcədə dəqiqdir?", "a": "Proqnozlar qeyd etdiyiniz məlumatlara əsaslanır və hər dövr ilə dəqiqləşir. Nizamsız tsikllərdə tətbiq bunu nəzərə alır və pəncərəni daha geniş göstərir. Proqnozlar kontrasepsiya vasitəsi deyil." },
+        { "q": "Ovulyasiya pəncərəsi necə hesablanır?", "a": "Orta tsikl uzunluğunuza və qeyd etdiyiniz simptomlara əsasən luteal faza standartları ilə hesablanır. Dəqiq təyin üçün ovulyasiya testləri ilə birlikdə istifadə edə bilərsiniz." },
+        { "q": "Məlumatlarım kiminlə paylaşılır?", "a": "Heç kimlə. Tsikl məlumatlarınız şifrələnir, reklam üçün istifadə olunmur və istəyinizlə tamamilə silinir." }
+      ],
+      "ctaTitle": "Tsiklinizi bu gün izləməyə başlayın",
+      "ctaText": "Flow rejimi pulsuzdur — yükləyin və ilk qeydiyyatınızı edin."
+    },
+    "bump": {
+      "eyebrow": "Bump rejimi",
+      "title": "40 həftəlik səyahətiniz üçün tam bələdçi",
+      "subtitle": "Körpənizin həftə-həftə inkişafı, doğuşa hazırlıq alətləri və hər gün üçün fərdi məsləhətlər.",
+      "intro": "Bump rejimi hamiləliyinizi ilk gündən doğuşa qədər müşayiət edir. Hər həftə körpənizin ölçüsünü, inkişaf mərhələlərini və bədəninizdəki dəyişiklikləri öyrənirsiniz. Sancı sayğacı, təpik sayğacı və doğuş çantası siyahısı isə finiş xəttinə hazır olmağınızı təmin edir.",
+      "featuresTitle": "Bump-da sizi nə gözləyir",
+      "features": [
+        { "title": "Həftəlik inkişaf bələdçisi", "text": "Hər həftə körpənin ölçüsü, yeni bacarıqları və sizin üçün məsləhətlər." },
+        { "title": "Sancı sayğacı", "text": "Sancıların tezliyini və müddətini izləyin — 5-1-1 qaydası ilə xəstəxana vaxtını bilin." },
+        { "title": "Təpik sayğacı", "text": "Gündəlik hərəkət sayını qeyd edin, azalmaları vaxtında görün." },
+        { "title": "Doğuş çantası siyahısı", "text": "Ana, körpə və partnyor üçün hazır siyahılar — heç nə unudulmasın." },
+        { "title": "Qidalanma və vitaminlər", "text": "Trimestrə uyğun qida bələdçisi, qadağalar siyahısı və vitamin xatırlatmaları." },
+        { "title": "Hamiləlik albomu", "text": "Qarın fotolarınızı həftə-həftə saxlayın, xatirə albomu yaradın." }
+      ],
+      "weeksTitle": "Həftə-həftə inkişaf",
+      "weeksSubtitle": "Hər ay körpəniz yeni mərhələyə çatır — Anacan hər həftəni sizin üçün izah edir.",
+      "weekLabel": "həftə",
+      "monthLabel": "ay",
+      "trimesters": ["I trimestr", "II trimestr", "III trimestr"],
+      "stepsTitle": "Necə işləyir",
+      "steps": [
+        { "title": "Son menstruasiya tarixinizi daxil edin", "text": "Və ya USM ilə təyin olunmuş doğuş tarixini — tətbiq həftənizi hesablayır." },
+        { "title": "Gündəlik məzmununuzu alın", "text": "Hər gün: körpənin inkişafı, bədən dəyişiklikləri, qidalanma məsləhəti." },
+        { "title": "Doğuşa hazırlaşın", "text": "III trimestrdə sancı sayğacı, çanta siyahısı və təhlükə əlamətləri bələdçisi aktivləşir." }
+      ],
+      "faqTitle": "Bump haqqında suallar",
+      "faq": [
+        { "q": "Doğuş tarixi necə hesablanır?", "a": "Standart Naegele qaydası ilə: son menstruasiyanın ilk günü + 280 gün. USM tarixi fərqlidirsə, onu daxil edə bilərsiniz — bütün məzmun yeni tarixə uyğunlaşır." },
+        { "q": "Təpik sayğacından nə vaxt istifadə etməliyəm?", "a": "Adətən 28-ci həftədən etibarən gündəlik izləmə tövsiyə olunur. Körpənin hərəkətlərində nəzərəçarpan azalma hiss etsəniz, dərhal həkiminizə müraciət edin." },
+        { "q": "Sancı sayğacındakı 5-1-1 qaydası nədir?", "a": "Sancılar 5 dəqiqədən bir gəlirsə, hər biri 1 dəqiqə çəkirsə və bu 1 saatdır davam edirsə — xəstəxanaya getmə vaxtıdır. Sayğac bunu avtomatik izləyir." }
+      ],
+      "ctaTitle": "Hamiləliyinizi bu gün izləməyə başlayın",
+      "ctaText": "Bump rejimi pulsuzdur — həftənizi daxil edin, fərdi bələdçiniz hazır olsun."
+    },
+    "mommy": {
+      "eyebrow": "Mommy rejimi",
+      "title": "Körpənizin ilk illərində etibarlı köməkçiniz",
+      "subtitle": "Yuxu, qidalanma, böyümə və peyvəndlər — analıq dövrünün bütün qeydləri bir yerdə.",
+      "intro": "Mommy rejimi doğuşdan sonrakı dövrü asanlaşdırır. Qidalanma, yuxu və bez jurnalları gündəlik rejimi formalaşdırmağa kömək edir; ÜST böyümə əyriləri körpənizin inkişafını həkim standartları ilə izləyir; peyvənd təqvimi isə heç bir vaxtı qaçırmamağınız üçün xatırladır.",
+      "featuresTitle": "Mommy-də sizi nə gözləyir",
+      "features": [
+        { "title": "Qidalanma jurnalı", "text": "Əmizdirmə, süd və əlavə qida — vaxt və miqdarla qeyd edin." },
+        { "title": "Yuxu jurnalı", "text": "Gündüz və gecə yuxularını izləyin, rejim qurun." },
+        { "title": "ÜST böyümə əyriləri", "text": "Boy, çəki və baş çevrəsi — beynəlxalq persentil əyrilərində." },
+        { "title": "Peyvənd təqvimi", "text": "Ölkənizə uyğun cədvəl, avtomatik xatırlatmalar." },
+        { "title": "Diş çıxarma və liplər", "text": "Diş xəritəsi və inkişaf sıçrayışları təqvimi — çətin dövrlərə hazır olun." },
+        { "title": "Ağlama tərcüməçisi", "text": "AI körpənin ağlama səsini analiz edib mümkün səbəbi göstərir." }
+      ],
+      "stepsTitle": "Necə işləyir",
+      "steps": [
+        { "title": "Körpənizin profilini yaradın", "text": "Ad, doğum tarixi — tətbiq yaş mərhələsinə uyğunlaşır." },
+        { "title": "Gündəlik qeydlərinizi aparın", "text": "Bir toxunuşla yuxu, qidalanma və bez qeydləri." },
+        { "title": "İnkişafı izləyin", "text": "Böyümə əyriləri, mərhələlər və aylıq hesabatlar avtomatik yaranır." }
+      ],
+      "faqTitle": "Mommy haqqında suallar",
+      "faq": [
+        { "q": "Böyümə əyriləri hansı standartlara əsaslanır?", "a": "Ümumdünya Səhiyyə Təşkilatının (ÜST) 0-5 yaş böyümə standartlarına. Körpənizin boy, çəki və baş çevrəsi persentillərlə göstərilir — pediatrınızla eyni dildə danışın." },
+        { "q": "Peyvənd təqvimi hansı ölkələri dəstəkləyir?", "a": "Azərbaycan milli təqvimi daxil olmaqla bir çox ölkənin rəsmi cədvəlləri mövcuddur. Ölkənizi seçin — tarixlər körpənizin doğum gününə görə avtomatik hesablanır." },
+        { "q": "Bir neçə uşaq əlavə edə bilərəm?", "a": "Bəli, hər uşaq üçün ayrıca profil yarada və aralarında asanlıqla keçid edə bilərsiniz." }
+      ],
+      "ctaTitle": "Analıq dövrünüzü asanlaşdırın",
+      "ctaText": "Mommy rejimi pulsuzdur — körpənizin profilini yaradın."
+    },
+    "partner": {
+      "eyebrow": "Partner rejimi",
+      "title": "Atalar üçün: bu yolda kənarda qalmayın",
+      "subtitle": "Canlı yeniliklər, SOS siqnalları və sizə özəl məsləhətlər — hamiləliyi birlikdə yaşayın.",
+      "intro": "Partner rejimi ataları (və dəstək olan hər kəsi) prosesin mərkəzinə gətirir. Partnyorunuzun tətbiqi ilə qoşalaşın: körpənin həftəlik inkişafını görün, gündəlik xülasə alın, \"bu gün ona necə dəstək olum?\" məsləhətləri oxuyun. Doğuş yaxınlaşanda SOS və \"xəstəxana vaxtı\" siqnalları sizi bir toxunuşla xəbərdar edir.",
+      "featuresTitle": "Partner-də sizi nə gözləyir",
+      "features": [
+        { "title": "Canlı hamiləlik lentası", "text": "Körpənin bu həftəki inkişafı — ata dilində, qısa və aydın." },
+        { "title": "Gündəlik xülasə", "text": "Partnyorunuzun əhvalı, simptomları və günün məsləhəti." },
+        { "title": "SOS və xəstəxana siqnalı", "text": "Sancılar başlayanda bir toxunuşla bildiriş alın." },
+        { "title": "Ad səsverməsi", "text": "Ad siyahıları yaradın, birlikdə səs verin." },
+        { "title": "Partnyor AI məsləhətçisi", "text": "\"Bu trimestrdə nə hədiyyə alım?\" — AI atalara da cavab verir." },
+        { "title": "Sürpriz planlayıcısı", "text": "Xüsusi günlər üçün xatırlatmalar və ideyalar." }
+      ],
+      "stepsTitle": "Necə işləyir",
+      "steps": [
+        { "title": "Dəvət kodu ilə qoşulun", "text": "Partnyorunuz tətbiqdən kod göndərir — 30 saniyəyə qoşalaşırsınız." },
+        { "title": "Öz lentanızı alın", "text": "Sizə özəl gündəlik yeniliklər və dəstək məsləhətləri." },
+        { "title": "Lazım olanda yanında olun", "text": "SOS siqnalları və doğuş planı həmişə əlinizin altında." }
+      ],
+      "faqTitle": "Partner haqqında suallar",
+      "faq": [
+        { "q": "Partnyorum nəyi görür, nəyi görmür?", "a": "Nəyin paylaşılacağına ana qərar verir: həftəlik inkişaf və ümumi əhval standart paylaşılır, şəxsi qeydlər isə yalnız özəl olaraq qalır. Məxfilik hər zaman ananın nəzarətindədir." },
+        { "q": "Partner rejimi ayrıca ödənişlidir?", "a": "Xeyr, əsas Partner funksiyaları pulsuzdur. Premium ailə planı hər iki tərəfə tam Premium imkanları açır." },
+        { "q": "Ata olmayan biri qoşula bilər?", "a": "Bəli — ana, bacı və ya yaxın dost da dəvət kodu ilə dəstək rolunda qoşula bilər." }
+      ],
+      "ctaTitle": "Birlikdə başlayın",
+      "ctaText": "Partner rejimi pulsuzdur — dəvət kodunuzu göndərin."
+    }
+  },
+  "aiPage": {
+    "eyebrow": "Anacan.AI",
+    "title": "Analıq suallarınız üçün 24/7 süni intellekt köməkçisi",
+    "subtitle": "Elmə əsaslanan, mühakiməsiz və ana dilinizdə — Anacan.AI hamiləlik, körpə baxımı və tsikl suallarınıza dəqiqələr yox, saniyələr içində cavab verir.",
+    "intro": "Anacan.AI adi çatbot deyil: o, mərhələnizi (tsikl, hamiləlik həftəsi və ya körpənizin yaşı), qeydlərinizi və dilinizi nəzərə alaraq fərdi cavablar verir. Gecə 3-də körpəniz ağlayanda və ya 24-cü həftədə qəribə bir ağrı hiss edəndə — cavab bir mesaj uzaqlığındadır.",
+    "capabilitiesTitle": "Anacan.AI nə bacarır",
+    "capabilities": [
+      { "title": "Mərhələyə uyğun cavablar", "text": "Hamiləliyin 12-ci həftəsi ilə körpənin 12-ci həftəsi fərqli dünyalardır — AI bunu bilir." },
+      { "title": "Təhlükəsizlik yoxlaması", "text": "\"Hamiləlikdə suşi olar?\" — qida, dərman və kosmetika üçün ani cavablar." },
+      { "title": "Ağlama analizi", "text": "Körpənin ağlama səsini yazın — AI mümkün səbəbi təxmin edir." },
+      { "title": "Simptom bələdçisi", "text": "Nə vaxt gözləmək, nə vaxt həkimə getmək — aydın istiqamət." },
+      { "title": "Nağıl və foto sehri", "text": "Körpənizə özəl nağıllar və AI foto çəkiliş səhnələri." },
+      { "title": "5 dildə ünsiyyət", "text": "Azərbaycan, ingilis, rus, türk və qazax dillərində eyni keyfiyyət." }
+    ],
+    "howTitle": "Necə işləyir",
+    "how": [
+      { "title": "Sualınızı yazın", "text": "Səsli və ya yazılı — necə rahatdırsa." },
+      { "title": "Kontekst avtomatik qoşulur", "text": "AI mərhələnizi və son qeydlərinizi nəzərə alır." },
+      { "title": "Elmə əsaslanan cavab alın", "text": "Aydın, qısa və mənbəyə söykənən — lazım olanda həkimə yönləndirir." }
+    ],
+    "safetyTitle": "Təhlükəsizlik və məsuliyyət",
+    "safety1": "Anacan.AI tibbi cihaz deyil və diaqnoz qoymur. Cavablar ümumi məlumat xarakteri daşıyır və həkim konsultasiyasını əvəz etmir.",
+    "safety2": "Təcili hallarda — güclü qanaxma, kəskin ağrı, körpənin hərəkətlərinin dayanması — AI sizi dərhal təcili yardıma yönləndirir. Söhbətləriniz məxfidir və üçüncü tərəflərlə paylaşılmır.",
+    "faqTitle": "Anacan.AI haqqında suallar",
+    "faq": [
+      { "q": "Anacan.AI hansı məlumatlara əsaslanır?", "a": "Cavablar beynəlxalq səhiyyə təşkilatlarının (ÜST, ACOG, NHS) açıq tövsiyələrinə və peer-review tibbi ədəbiyyata əsaslanan bilik bazası üzərində qurulur, mərhələnizə uyğunlaşdırılır." },
+      { "q": "Söhbətlərim kim tərəfindən görünür?", "a": "Söhbətləriniz şəxsidir: reklam üçün istifadə olunmur, satılmır. İstədiyiniz zaman söhbət tarixçənizi silə bilərsiniz." },
+      { "q": "AI səhv edə bilərmi?", "a": "Bəli, hər AI kimi. Buna görə Anacan.AI qeyri-müəyyən hallarda ehtiyatlı davranır və vacib qərarlar üçün həmişə həkimə müraciət etməyi tövsiyə edir." }
+    ],
+    "ctaTitle": "İlk sualınızı verin",
+    "ctaText": "Anacan.AI tətbiqdə sizi gözləyir — pulsuz başlayın."
+  },
+  "premiumPage": {
+    "eyebrow": "Premium",
+    "title": "Pulsuz başlayın, istəyəndə gücləndirin",
+    "subtitle": "Anacan-ın əsas alətləri həmişə pulsuzdur. Premium — limitsiz AI, dərin hesabatlar və reklamsız təcrübə istəyənlər üçündür.",
+    "billedMonthly": "aylıq ödəniş",
+    "billedYearly": "illik ödəniş",
+    "perMonth": "/ay",
+    "perYear": "/il",
+    "free": {
+      "name": "Pulsuz",
+      "price": "0 ₼",
+      "period": "həmişə",
+      "features": [
+        "Tsikl, hamiləlik və körpə izləmə",
+        "Əsas alətlər: sayğaclar, jurnallar, təqvimlər",
+        "Gündəlik məzmun və həftəlik bələdçi",
+        "Anacan.AI — gündəlik pulsuz limit",
+        "İcma və bloq"
+      ],
+      "cta": "Pulsuz başla"
+    },
+    "monthly": {
+      "name": "Premium Aylıq",
+      "price": "7.99 ₼",
+      "features": [
+        "Limitsiz Anacan.AI söhbəti",
+        "Həftəlik PDF hesabatlar (həkim üçün)",
+        "AI foto çəkiliş və nağıl generatoru",
+        "Reklamsız təcrübə",
+        "Prioritet dəstək"
+      ],
+      "cta": "Premium-a keç"
+    },
+    "yearly": {
+      "name": "Premium İllik",
+      "price": "49.99 ₼",
+      "badge": "Ən sərfəli — 48% qənaət",
+      "features": [
+        "Aylıq plandakı hər şey",
+        "İldə cəmi 49.99 ₼ (4.17 ₼/ay)",
+        "Ailə paylaşımı — Partner də Premium olur",
+        "Yeni funksiyalara erkən giriş",
+        "Hamiləlik albomu çapı endirimi"
+      ],
+      "cta": "İllik planı seç"
+    },
+    "compareTitle": "Planları müqayisə edin",
+    "compareFeature": "Funksiya",
+    "compare": [
+      { "f": "Tsikl, hamiləlik və körpə izləmə", "free": "✓", "prem": "✓" },
+      { "f": "30+ alət", "free": "Əsas alətlər", "prem": "Hamısı" },
+      { "f": "Anacan.AI söhbəti", "free": "Gündəlik limit", "prem": "Limitsiz" },
+      { "f": "Həftəlik PDF hesabat", "free": "—", "prem": "✓" },
+      { "f": "AI foto çəkiliş və nağıllar", "free": "—", "prem": "✓" },
+      { "f": "Partner rejimi", "free": "Əsas", "prem": "Tam + ailə planı" },
+      { "f": "Reklamsız təcrübə", "free": "—", "prem": "✓" },
+      { "f": "Prioritet dəstək", "free": "—", "prem": "✓" }
+    ],
+    "note": "Qiymətlər Azərbaycan mağazaları üçündür; digər regionlarda App Store / Google Play yerli qiymətləri tətbiq olunur. Abunəliyi istənilən vaxt mağaza parametrlərindən ləğv edə bilərsiniz.",
+    "faqTitle": "Premium haqqında suallar",
+    "faq": [
+      { "q": "Abunəliyi necə ləğv edə bilərəm?", "a": "İstənilən vaxt App Store və ya Google Play abunəlik parametrlərindən bir toxunuşla. Ləğvdən sonra ödənilmiş dövrün sonuna qədər Premium aktiv qalır." },
+      { "q": "Pulsuz versiya həmişə pulsuz qalacaq?", "a": "Bəli. Əsas izləmə alətləri, gündəlik məzmun və icma həmişə pulsuz olacaq — bu, Anacan-ın əsas prinsipidir." },
+      { "q": "Ailə paylaşımı necə işləyir?", "a": "İllik planda partnyorunuz da dəvət kodu ilə Premium imkanlara qovuşur — bir ödəniş, iki hesab." }
+    ]
+  },
+  "aboutPage": {
+    "eyebrow": "Haqqımızda",
+    "title": "Hər ananın yanında bir Anacan",
+    "subtitle": "Biz Azərbaycanın ilk analıq superappini qururuq — elmə əsaslanan, ana dilində və hər anaya əlçatan.",
+    "missionTitle": "Missiyamız",
+    "mission1": "Analıq — həyatın ən gözəl və ən çətin səyahətlərindən biridir. Bu səyahətdə hər qadının etibarlı, elmi və mühakiməsiz bir köməkçiyə ehtiyacı var. Anacan məhz bunun üçün yarandı: tsiklin ilk qeydindən körpənin ilk addımlarına qədər hər mərhələdə yanınızda olmaq.",
+    "mission2": "İnanırıq ki, keyfiyyətli analıq dəstəyi lüks deyil, hüquqdur. Buna görə Anacan-ın əsas alətləri həmişə pulsuz olacaq və məzmunumuz həmişə ana dilinizdə danışacaq.",
+    "visionTitle": "Vizyonumuz",
+    "vision": "Hər ananın cibində — suallarına cavab verən, qayğısını yüngülləşdirən və onu tək qoymayan bir Anacan.",
+    "valuesTitle": "Dəyərlərimiz",
+    "values": [
+      { "title": "Elmə əsaslanırıq", "text": "Məzmunumuz ÜST, ACOG və NHS kimi beynəlxalq mənbələrə söykənir — mif yox, fakt." },
+      { "title": "Məxfilik öndədir", "text": "Sağlamlıq məlumatlarınız satılmır, reklam üçün istifadə olunmur. Nöqtə." },
+      { "title": "Ana dilində danışırıq", "text": "5 dildə tam təcrübə — tərcümə kimi yox, doğma kimi." },
+      { "title": "Empatiya ilə qururuq", "text": "Hər funksiya real anaların real ehtiyaclarından doğur." }
+    ],
+    "storyTitle": "Hekayəmiz",
+    "story1": "Anacan 2024-cü ildə Bakıda sadə bir müşahidədən yarandı: dünyada minlərlə hamiləlik tətbiqi var, amma Azərbaycan dilində, yerli reallıqları bilən, tsikldən analığa qədər bütün yolu əhatə edən bir həll yox idi.",
+    "story2": "Biz ayrı-ayrı tətbiqlərin (tsikl izləyicisi, hamiləlik təqvimi, körpə jurnalı, ata bələdçisi) hamısını bir superappdə birləşdirdik və üzərinə 24/7 işləyən süni intellekt köməkçisi əlavə etdik.",
+    "story3": "Bu gün Anacan 5 dildə, 30+ alətlə minlərlə ailənin gündəlik həyatının bir parçasıdır — və bu, hələ başlanğıcdır.",
+    "factsTitle": "Faktlarla Anacan",
+    "facts": [
+      { "value": "2024", "label": "Bakıda təsis edilib" },
+      { "value": "30+", "label": "alət bir tətbiqdə" },
+      { "value": "5", "label": "dildə tam təcrübə" },
+      { "value": "4", "label": "həyat mərhələsi: Flow, Bump, Mommy, Partner" }
+    ],
+    "contactTitle": "Bizimlə əlaqə",
+    "contactText": "Əməkdaşlıq, media və ya sadəcə salam demək üçün:",
+    "ctaTitle": "Səyahətə bizimlə başlayın",
+    "ctaText": "Anacan-ı pulsuz yükləyin — hekayəmizin bir hissəsi olun."
+  },
+  "downloadPage": {
+    "eyebrow": "Yükləmə",
+    "title": "Anacan-ı pulsuz yükləyin",
+    "subtitle": "iOS və Android üçün — 30 saniyəyə qurulur, kart tələb olunmur.",
+    "stepsTitle": "3 addımda başlayın",
+    "steps": [
+      { "title": "Tətbiqi yükləyin", "text": "App Store və ya Google Play-dən pulsuz endirin." },
+      { "title": "Mərhələnizi seçin", "text": "Flow, Bump, Mommy və ya Partner — tətbiq sizə uyğunlaşır." },
+      { "title": "Fərdi bələdçinizi alın", "text": "Gündəlik məzmun, alətlər və AI köməkçiniz hazırdır." }
+    ],
+    "requirementsTitle": "Sistem tələbləri",
+    "requirements": "iOS 15.0 və ya daha yenisi · Android 8.0 və ya daha yenisi · Tam funksionallıq üçün internet bağlantısı",
+    "languagesTitle": "5 dildə tam təcrübə",
+    "languagesText": "Anacan Azərbaycan, ingilis, rus, türk və qazax dillərində işləyir — istənilən vaxt tətbiq daxilində dili dəyişə bilərsiniz.",
+    "securityTitle": "Təhlükəsiz və rəsmi",
+    "securityText": "Anacan yalnız rəsmi App Store və Google Play mağazalarından yüklənməlidir. Tətbiq Anacan MMC tərəfindən dərc edilir."
+  },
+  "contactPage": {
+    "eyebrow": "Əlaqə",
+    "title": "Sizi eşitmək istəyirik",
+    "subtitle": "Sual, təklif və ya əməkdaşlıq — komandamız hər mesajı oxuyur.",
+    "emailTitle": "E-poçt",
+    "emailText": "Ümumi suallar, dəstək və əməkdaşlıq üçün:",
+    "supportTitle": "Tətbiqdaxili dəstək",
+    "supportText": "Ən sürətli cavab üçün tətbiqdə Profil → Dəstək bölməsindən yazın — hesab məlumatlarınız avtomatik qoşulur.",
+    "pressTitle": "Media və tərəfdaşlıq",
+    "pressText": "Media sorğuları, həkim və klinika əməkdaşlıqları üçün mövzu sətrində \"Media\" və ya \"Partnership\" qeyd edin.",
+    "addressTitle": "Ünvan",
+    "addressText": "Anacan MMC · Bakı, Azərbaycan",
+    "responseNote": "Adətən 1-2 iş günü ərzində cavablandırırıq."
+  },
+  "faqPage": {
+    "eyebrow": "Suallar və cavablar",
+    "title": "Anacan haqqında hər şey",
+    "subtitle": "Ən çox verilən 12 sual — qısa və aydın cavablarla.",
+    "stillTitle": "Sualınız qaldı?",
+    "stillText": "Bizə yazın — adətən 1-2 iş günü ərzində cavab veririk.",
+    "stillCta": "Əlaqə saxla",
+    "items": [
+      {
+        "q": "Anacan nədir və kimlər üçündür?",
+        "a": "Anacan — menstruasiya tsikli, hamiləlik və analıq dövrünü bir yerdə izləyən superappdir. Tsiklini izləyən qadınlar, hamilələr, yeni analar və dəstək olmaq istəyən atalar üçün nəzərdə tutulub. Dörd rejim (Flow, Bump, Mommy, Partner) həyat mərhələnizə uyğunlaşır."
+      },
+      {
+        "q": "Anacan həqiqətən pulsuzdur?",
+        "a": "Bəli — yükləmə və əsas alətlər tamamilə pulsuzdur: tsikl təqvimi, həftəlik hamiləlik bələdçisi, sayğaclar, jurnallar, icma və gündəlik məzmun. Premium yalnız əlavə imkanlar (limitsiz AI, PDF hesabatlar, AI foto) istəyənlər üçündür."
+      },
+      {
+        "q": "Hansı dillər dəstəklənir?",
+        "a": "Hazırda 5 dil: Azərbaycan, ingilis, rus, türk və qazax. Dili istənilən vaxt tətbiq daxilində dəyişmək olar — bütün məzmun, alətlər və AI cavabları seçdiyiniz dilə keçir."
+      },
+      {
+        "q": "Anacan.AI necə işləyir və nəyə cavab verir?",
+        "a": "Anacan.AI mərhələnizi (tsikl günü, hamiləlik həftəsi, körpənin yaşı) nəzərə alaraq hamiləlik, körpə baxımı, qidalanma və təhlükəsizlik suallarına elmə əsaslanan cavablar verir. Tibbi diaqnoz qoymur — ciddi hallarda həkimə yönləndirir."
+      },
+      {
+        "q": "Məlumatlarım necə qorunur?",
+        "a": "Sağlamlıq məlumatlarınız şifrələnmiş saxlanılır, üçüncü tərəflərə satılmır və reklam hədəfləməsi üçün istifadə olunmur. Hesabınızı və bütün məlumatları tətbiqdən birbaşa silə bilərsiniz. Ətraflı: Məxfilik Siyasəti."
+      },
+      {
+        "q": "Hansı cihazlarda işləyir?",
+        "a": "iPhone (iOS 15+) və Android (8.0+) telefonlarda. Tətbiq App Store və Google Play-də \"Anacan\" adı ilə mövcuddur."
+      },
+      {
+        "q": "Partner rejimi necə qoşulur?",
+        "a": "Ana tətbiqdən dəvət kodu göndərir, partnyor öz telefonunda Anacan-ı yükləyib kodu daxil edir. Qoşalaşdıqdan sonra partnyor canlı yenilikləri, gündəlik xülasəni və SOS siqnallarını alır."
+      },
+      {
+        "q": "Tsikl proqnozları kontrasepsiya üçün istifadə oluna bilər?",
+        "a": "Xeyr. Proqnozlar məlumat xarakteri daşıyır və kontrasepsiya vasitəsi deyil. Ailə planlaması üçün həkiminizlə müvafiq üsulları müzakirə edin."
+      },
+      {
+        "q": "Hamiləliyi hansı həftədən izləməyə başlaya bilərəm?",
+        "a": "İstənilən həftədən. Son menstruasiya tarixini və ya USM ilə təyin olunmuş doğuş tarixini daxil edin — tətbiq cari həftənizi hesablayıb bütün məzmunu uyğunlaşdırır."
+      },
+      {
+        "q": "Bir neçə uşağı izləyə bilərəm?",
+        "a": "Bəli, Mommy rejimində hər uşaq üçün ayrıca profil yaradılır. Eyni zamanda hamiləlik və mövcud körpəni paralel izləmək də mümkündür."
+      },
+      {
+        "q": "Premium abunəliyi necə ləğv edim?",
+        "a": "App Store: Parametrlər → Apple ID → Abunəliklər. Google Play: Profil → Ödənişlər və abunəliklər. Ləğvdən sonra ödənilmiş dövrün sonuna qədər Premium aktiv qalır."
+      },
+      {
+        "q": "Hesabımı və məlumatlarımı necə silə bilərəm?",
+        "a": "Tətbiqdə Profil → Parametrlər → Hesabı sil. Bu, bütün şəxsi məlumatlarınızı serverlərimizdən qalıcı olaraq silir. Sualınız olsa info@anacan.az ünvanına yazın."
+      }
+    ]
+  },
+  "legalPrivacy": {
+    "title": "Məxfilik Siyasəti",
+    "updated": "Son yenilənmə: 1 avqust 2026",
+    "intro": "Bu Məxfilik Siyasəti Anacan MMC-nin (\"Anacan\", \"biz\") Anacan mobil tətbiqi və anacan.az veb-saytı vasitəsilə məlumatlarınızı necə topladığını, istifadə etdiyini və qoruduğunu izah edir. Tətbiqdən istifadə etməklə bu siyasətlə razılaşırsınız.",
+    "sections": [
+      {
+        "h": "1. Topladığımız məlumatlar",
+        "p": "Hesab məlumatları (ad, e-poçt), sizin daxil etdiyiniz sağlamlıq qeydləri (tsikl tarixləri, hamiləlik həftəsi, körpə qeydləri, simptomlar), cihaz məlumatları (model, əməliyyat sistemi, dil) və anonimləşdirilmiş istifadə statistikası."
+      },
+      {
+        "h": "2. Məlumatlardan istifadə",
+        "p": "Məlumatlarınızdan yalnız xidməti göstərmək üçün istifadə edirik: fərdi proqnozlar, mərhələyə uyğun məzmun, AI cavabları və texniki dəstək. Məlumatlarınızı reklamçılara satmırıq."
+      },
+      {
+        "h": "3. Sağlamlıq məlumatları",
+        "p": "Sağlamlıq qeydləriniz xüsusi kateqoriyalı məlumat sayılır və yalnız açıq razılığınızla emal olunur. Bu məlumatlar şifrələnmiş şəkildə saxlanılır və reklam hədəfləməsi üçün heç vaxt istifadə edilmir."
+      },
+      {
+        "h": "4. Saxlama və təhlükəsizlik",
+        "p": "Məlumatlar müasir şifrələmə standartları ilə qorunan serverlərdə saxlanılır. Ötürülmə TLS ilə şifrələnir. Yalnız xidmət üçün zəruri müddətdə saxlayırıq."
+      },
+      {
+        "h": "5. Üçüncü tərəf xidmətləri",
+        "p": "Xidmətin işləməsi üçün etibarlı infrastruktur tərəfdaşlarından (hostinq, analitika, ödəniş sistemləri, push bildirişlər) istifadə edirik. Bu tərəfdaşlar məlumatları yalnız bizim tapşırığımızla və müqavilə əsasında emal edir."
+      },
+      {
+        "h": "6. Hüquqlarınız",
+        "p": "İstənilən vaxt məlumatlarınıza giriş tələb edə, düzəliş edə, ixrac edə və ya tamamilə silə bilərsiniz. Hesabı silmək funksiyası tətbiqin Parametrlər bölməsindədir; sorğular üçün info@anacan.az."
+      },
+      {
+        "h": "7. Uşaqların məxfiliyi",
+        "p": "Anacan 16 yaşdan yuxarı istifadəçilər üçün nəzərdə tutulub. Valideynlərin körpələri haqqında daxil etdiyi qeydlər valideynin nəzarətindədir və yuxarıdakı qaydalarla qorunur."
+      },
+      {
+        "h": "8. Dəyişikliklər",
+        "p": "Siyasətdə əhəmiyyətli dəyişiklik olduqda tətbiq daxilində və bu səhifədə bildiriş veririk. Davamlı istifadə yenilənmiş siyasətlə razılıq deməkdir."
+      },
+      {
+        "h": "9. Əlaqə",
+        "p": "Məxfiliklə bağlı suallar üçün: info@anacan.az · Anacan MMC, Bakı, Azərbaycan."
+      }
+    ]
+  },
+  "legalTerms": {
+    "title": "İstifadə Şərtləri",
+    "updated": "Son yenilənmə: 1 avqust 2026",
+    "intro": "Bu İstifadə Şərtləri Anacan mobil tətbiqi və anacan.az veb-saytından istifadəni tənzimləyir. Xidmətdən istifadə etməklə bu şərtləri qəbul edirsiniz.",
+    "sections": [
+      {
+        "h": "1. Xidmətin təsviri",
+        "p": "Anacan menstruasiya tsikli, hamiləlik və analıq dövrü üçün izləmə alətləri, məlumat məzmunu və AI köməkçisi təqdim edən rifah (wellness) tətbiqidir."
+      },
+      {
+        "h": "2. Tibbi imtina",
+        "p": "Anacan tibbi cihaz deyil. Tətbiqdəki məzmun və AI cavabları yalnız məlumat xarakteri daşıyır, tibbi diaqnoz, müalicə və ya konsultasiyanı əvəz etmir. Sağlamlığınızla bağlı qərarlar üçün həmişə ixtisaslı həkimə müraciət edin. Təcili hallarda dərhal təcili yardıma zəng edin."
+      },
+      {
+        "h": "3. Hesab",
+        "p": "Hesab məlumatlarınızın doğruluğuna və gizliliyinə görə siz məsuliyyət daşıyırsınız. Xidmətdən yalnız şəxsi, qeyri-kommersiya məqsədləri ilə istifadə edilə bilər."
+      },
+      {
+        "h": "4. Abunəliklər və ödənişlər",
+        "p": "Premium abunəliklər App Store və Google Play vasitəsilə emal olunur və mağazaların qaydalarına tabedir. Abunəlik cari dövrün sonunda avtomatik yenilənir; ləğv mağaza parametrlərindən edilir. Qiymətlər regiona görə dəyişə bilər."
+      },
+      {
+        "h": "5. İstifadəçi məzmunu",
+        "p": "İcmada paylaşdığınız məzmuna görə siz məsuliyyət daşıyırsınız. Təhqiredici, aldadıcı və ya qanunsuz məzmun qadağandır və silinə bilər."
+      },
+      {
+        "h": "6. Qadağan olunan istifadə",
+        "p": "Xidməti tərsinə mühəndislik etmək, avtomatlaşdırılmış vasitələrlə kütləvi məlumat çıxarmaq, başqalarının hesablarına icazəsiz giriş cəhdi etmək qadağandır."
+      },
+      {
+        "h": "7. Məsuliyyətin məhdudlaşdırılması",
+        "p": "Xidmət \"olduğu kimi\" təqdim olunur. Qanunun icazə verdiyi maksimum həddə, Anacan MMC dolayı və ya nəticə etibarilə yaranan zərərlərə görə məsuliyyət daşımır."
+      },
+      {
+        "h": "8. Dəyişikliklər və xitam",
+        "p": "Şərtləri yeniləyə bilərik; əhəmiyyətli dəyişikliklər barədə bildiriş veririk. Şərtləri pozan hesabları dayandırmaq hüququmuz qorunur."
+      },
+      {
+        "h": "9. Tətbiq olunan hüquq və əlaqə",
+        "p": "Bu şərtlər Azərbaycan Respublikasının qanunvericiliyi ilə tənzimlənir. Suallar üçün: info@anacan.az · Anacan MMC, Bakı, Azərbaycan."
+      }
+    ]
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Bu səhifə tapılmadı",
+    "text": "Axtardığınız səhifə köçürülüb və ya heç mövcud olmayıb. Ana səhifədən davam edin — və ya bloqda faydalı bir məqalə tapın.",
+    "home": "Ana səhifəyə qayıt",
+    "blog": "Bloqa bax"
+  },
+  "breadcrumbs": {
+    "home": "Ana səhifə"
+  }
+}

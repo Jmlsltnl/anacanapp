@@ -27,6 +27,7 @@ export function defaultFeedLanguages(countryCode: string | null | undefined, uiL
   if (cc === 'AZ' || !cc) langs = ['az', 'ru', 'tr']; // AZ bazarı — ölkə seçməyənlər də bura
   else if (cc === 'TR') langs = ['tr'];
   else if (cc === 'KZ') langs = ['kk', 'ru']; // Qazaxıstan — qazax + rus
+  else if (cc === 'DE' || cc === 'AT' || cc === 'CH' || cc === 'LI') langs = ['de']; // almandilli region
   else if (RU_DEFAULT_COUNTRIES.has(cc)) langs = ['ru'];
   else langs = ['en'];
   if (!langs.includes(ui)) langs = [ui, ...langs];

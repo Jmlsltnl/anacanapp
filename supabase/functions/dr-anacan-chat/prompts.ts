@@ -26,7 +26,7 @@ export const getSystemPrompt = (
   // en/ru/tr share the English prompt body; `replyRule` + the langInstruction in index.ts
   // enforce the actual response language (reliable for LLMs), so ru/tr users get ru/tr answers.
   const isEn = language !== "az";
-  const REPLY_LANG: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh" };
+  const REPLY_LANG: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh", de: "German" };
   const replyRule = language === "az"
     ? "YALNIZ Azərbaycan dilində cavab ver"
     : `Reply ONLY in ${REPLY_LANG[language] ?? "English"}`;
@@ -38,6 +38,7 @@ export const getSystemPrompt = (
     ru: "⚠️ Эта информация носит общий характер. Перед любым лечением или приёмом лекарств обязательно проконсультируйтесь с врачом.",
     tr: "⚠️ Bu bilgiler genel niteliktedir. Herhangi bir tedavi veya ilaç kullanımından önce mutlaka doktora danışın.",
     kk: "⚠️ Бұл ақпарат жалпы сипатта берілген. Кез келген емді бастамас немесе дәрі қабылдамас бұрын міндетті түрде дәрігермен кеңесіңіз.",
+    de: "⚠️ Diese Informationen sind allgemeiner Natur. Sprich vor jeder Behandlung oder Einnahme von Medikamenten unbedingt mit deinem Arzt oder deiner Ärztin.",
   };
   const warnText = WARN_TEXT[language] ?? WARN_TEXT.en;
 
@@ -56,7 +57,7 @@ export const getSystemPrompt = (
 - Yəni hər cavabda deyil, YALNIZ tibbi/dərman mövsuzunda yazanda göstər.`;
 
   // Add current date dynamically (locale matches the user's language)
-  const dateLocale = language === "ru" ? "ru-RU" : language === "tr" ? "tr-TR" : language === "kk" ? "kk-KZ" : "en-US";
+  const dateLocale = language === "ru" ? "ru-RU" : language === "tr" ? "tr-TR" : language === "kk" ? "kk-KZ" : language === "de" ? "de-DE" : "en-US";
   const currentDateEn = new Date().toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
   const currentDateAz = new Date().toLocaleDateString("az-AZ", { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
   const dateContext = isEn ? `\nToday's Date: ${currentDateEn}\n` : `\nBugünkü tarix: ${currentDateAz}\n`;

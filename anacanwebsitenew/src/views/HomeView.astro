@@ -1,0 +1,44 @@
+---
+import Base from '@/layouts/Base.astro';
+import Hero from '@/components/home/Hero.astro';
+import Stages from '@/components/home/Stages.astro';
+import Tools from '@/components/home/Tools.astro';
+import AiSection from '@/components/home/AiSection.astro';
+import Testimonials from '@/components/home/Testimonials.astro';
+import FaqList from '@/components/FaqList.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { pagePath } from '@/config/pages';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const faqItems = t<{ q: string; a: string }[]>('faqHome.items');
+---
+
+<Base lang={lang} title={t('meta.home.title')} description={t('meta.home.description')} pageKey="home">
+  <Hero lang={lang} />
+  <Stages lang={lang} />
+  <Tools lang={lang} />
+  <AiSection lang={lang} />
+  <Testimonials lang={lang} />
+
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-head center reveal">
+        <span class="eyebrow">{t('faqHome.eyebrow')}</span>
+        <h2>{t('faqHome.title')}</h2>
+        <p class="lede">{t('faqHome.subtitle')}</p>
+      </div>
+      <FaqList items={faqItems} />
+      <div class="text-center mt-4">
+        <a href={pagePath('faq', lang)} class="btn btn-ghost">{t('faqHome.moreLink')}</a>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand lang={lang} />
+</Base>

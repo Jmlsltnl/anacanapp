@@ -66,7 +66,11 @@ export const useEPDSQuestionsDB = () => {
         ...q,
         options: (q.options as any[] || []).map((o) => ({
           value: o.value,
-          text: language === 'az' ? (o.text_az ?? o.text) : (o[`text_${language}`] ?? o.text_az ?? o.text),
+          // de üçün en (base `text` sahəsi ingiliscədir) körpüsü, kk üçün ru körpüsü
+          text: language === 'az' ? (o.text_az ?? o.text) :
+                language === 'de' ? (o.text_de ?? o.text ?? o.text_az) :
+                language === 'kk' ? (o.text_kk ?? o.text_ru ?? o.text_az ?? o.text) :
+                (o[`text_${language}`] ?? o.text_az ?? o.text),
           text_az: o.text_az
         }))
       })) as EPDSQuestion[];

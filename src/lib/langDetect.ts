@@ -1,20 +1,22 @@
 // ============================================================
-// langDetect — cəmiyyət postları üçün yüngül dil aşkarlama (az/en/ru/tr/kk).
+// langDetect — cəmiyyət postları üçün yüngül dil aşkarlama (az/en/ru/tr/kk/de).
 // Prinsip:
 //   1. Kiril mətnində qazax-spesifik hərflər (ә/ғ/қ/ң/ө/ұ/ү/һ/і) varsa → kk
 //   2. Qalan kiril üstünlüyü → ru
 //   3. "ə" hərfi varsa → az ("ə" az dilinin ən çox işlənən hərfidir; tr/en/ru-da yoxdur)
-//   4. "ə"-siz, amma türk-spesifik hərflər (ğ/ş/ı/ö/ü/ç) varsa:
+//   4. Alman-spesifik: ß varsa → de; ä varsa (ə-siz mətndə) → de
+//   5. "ə"-siz, amma türk-spesifik hərflər (ğ/ş/ı/ç) varsa:
 //        q/x da varsa → az (türk əlifbasında q/x yoxdur), yoxsa → tr
-//   5. Stop-söz sayğacı (tr vs en) → qalan latın mətnlər üçün
-//   6. Qısa/qeyri-müəyyən mətn → fallback (UI dili)
+//        (ö/ü tək başına türk sayılmır — almanda da var; stop-söz sayğacı həll edir)
+//   6. Stop-söz sayğacı (de vs tr vs en) → qalan latın mətnlər üçün
+//   7. Qısa/qeyri-müəyyən mətn → fallback (UI dili)
 // Qeyd: bu YALNIZ ilkin təxmindir — istifadəçi compose-da dil çipi ilə düzəldə bilər.
 // ============================================================
 
-export type FeedLang = 'az' | 'en' | 'ru' | 'tr' | 'kk';
+export type FeedLang = 'az' | 'en' | 'ru' | 'tr' | 'kk' | 'de';
 
 /** Feed linzasında göstərilən sıra ilə bütün dəstəklənən dillər */
-export const FEED_LANGS: FeedLang[] = ['az', 'ru', 'tr', 'kk', 'en'];
+export const FEED_LANGS: FeedLang[] = ['az', 'ru', 'tr', 'kk', 'de', 'en'];
 
 export function isFeedLang(v: unknown): v is FeedLang {
   return typeof v === 'string' && (FEED_LANGS as string[]).includes(v);
@@ -37,6 +39,12 @@ const EN_STOPWORDS = new Set([
   'the', 'and', 'is', 'are', 'was', 'were', 'to', 'of', 'in', 'on', 'my', 'your', 'for',
   'with', 'have', 'has', 'it', 'this', 'that', 'baby', 'you', 'i', 'am', 'be', 'not',
   'so', 'but', 'we', 'she', 'he', 'her', 'his', 'do', 'does', 'what', 'how',
+]);
+const DE_STOPWORDS = new Set([
+  'der', 'die', 'das', 'und', 'ist', 'nicht', 'ein', 'eine', 'ich', 'du', 'wir', 'ihr',
+  'mein', 'meine', 'dein', 'mit', 'für', 'fur', 'auf', 'aus', 'bei', 'nach', 'wenn',
+  'aber', 'auch', 'schon', 'noch', 'sehr', 'kann', 'hat', 'haben', 'sind', 'wird',
+  'schlafen', 'schläft', 'monate', 'wochen', 'stillen', 'schwanger', 'mütter', 'mutter',
 ]);
 
 export function detectLang(text: string, fallback: FeedLang = 'az'): FeedLang {
@@ -61,26 +69,35 @@ export function detectLang(text: string, fallback: FeedLang = 'az'): FeedLang {
   // 2) "ə" → az (praktikada hər az cümləsində var: və, mən, gələcək...)
   if (/[Əə]/.test(t)) return 'az';
 
-  // 3) Türk-spesifik hərflər ("ə"-siz). DİQQƏT: adi böyük "I" ingilis dilində də var —
+  // 3) Alman-spesifik: ß yalnız almandadır; ä (ə-siz mətndə) az/tr-də yoxdur
+  if (/[ßÄä]/.test(t)) return 'de';
+
+  // 4) Türk-spesifik hərflər ("ə"-siz). DİQQƏT: adi böyük "I" ingilis dilində də var —
   //    yalnız nöqtəsiz "ı" və nöqtəli böyük "İ" türk-spesifikdir.
-  const hasTurkicChars = /[ĞğıİÖöŞşÜüÇç]/.test(t);
+  //    ö/ü almanda da olduğu üçün tək başına türk sayılmır — ğ/ş/ı/ç/İ tələb olunur.
+  const hasStrongTurkic = /[ĞğıİŞşÇç]/.test(t);
   const hasQX = /[QqXx]/.test(t.replace(/[^A-Za-z]/g, ''));
-  if (hasTurkicChars) {
+  if (hasStrongTurkic) {
     // q/x türk əlifbasında yoxdur → az yazısıdır (ə-siz qısa az mətni)
     return hasQX ? 'az' : 'tr';
   }
 
-  // 4) Saf latın mətn — stop-söz sayğacı
-  const words = t.toLowerCase().split(/[^a-zçğıöşüə]+/i).filter(Boolean);
+  // 5) Saf latın mətn — stop-söz sayğacı (de vs tr vs en)
+  const words = t.toLowerCase().split(/[^a-zäöüßçğıə]+/i).filter(Boolean);
   let trHits = 0;
   let enHits = 0;
+  let deHits = 0;
   for (const w of words) {
     if (TR_STOPWORDS.has(w)) trHits++;
     if (EN_STOPWORDS.has(w)) enHits++;
+    if (DE_STOPWORDS.has(w)) deHits++;
   }
+  if (deHits > enHits && deHits > trHits && deHits >= 2) return 'de';
   if (enHits > trHits && enHits >= 1) return 'en';
   if (trHits > enHits && trHits >= 2) return 'tr';
+  // ö/ü var amma stop-söz həll etmədi → türkcəyə meyl (bölgə reallığı)
+  if (/[ÖöÜü]/.test(t) && trHits > 0) return 'tr';
 
-  // 5) Qeyri-müəyyən → UI dili
+  // 6) Qeyri-müəyyən → UI dili
   return fallback;
 }

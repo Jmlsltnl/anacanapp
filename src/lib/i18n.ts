@@ -16,7 +16,7 @@ translationCache['az'] = { ...(azStatic as Record<string, string>) };
 //   1) localStorage keşi: son uğurlu dəst sinxron hidratasiya olunur (aşağıda, modul yüklənən an)
 //   2) Lokal seed chunk-ları: ru/tr/kk seed-ləri bundle-ın hissəsidir (dynamic import, şəbəkəsiz)
 //   3) DB overlay: admin düzəlişləri arxa planda gəlir və keşə yazılır
-const SEED_LANGS = new Set(['ru', 'tr', 'kk']);
+const SEED_LANGS = new Set(['ru', 'tr', 'kk', 'de']);
 const LS_CACHE_PREFIX = 'anacan_i18n_cache:';
 
 function hydrateFromLocalStorage(lang: string): boolean {
@@ -56,7 +56,9 @@ async function loadLocalSeed(lang: string): Promise<void> {
       ? await import('../../scripts/i18n/ru.seed.json')
       : lang === 'kk'
         ? await import('../../scripts/i18n/kk.seed.json')
-        : await import('../../scripts/i18n/tr.seed.json');
+        : lang === 'de'
+          ? await import('../../scripts/i18n/de.seed.json')
+          : await import('../../scripts/i18n/tr.seed.json');
     const seed = (seedModule.default ?? seedModule) as Record<string, string>;
     // seed ALTDA — localStorage keşi / DB overlay dəyərləri üstün qalsın
     translationCache[lang] = { ...seed, ...(translationCache[lang] || {}) };
@@ -153,6 +155,7 @@ function withDevLanguages(list: AppLanguage[]): AppLanguage[] {
     { code: 'tr', name: 'Turkish', native_name: 'Türkçe' },
     { code: 'ru', name: 'Russian', native_name: 'Русский' },
     { code: 'kk', name: 'Kazakh', native_name: 'Қазақша' },
+    { code: 'de', name: 'German', native_name: 'Deutsch' },
   ];
   return [...list, ...extras.filter((e) => !have.has(e.code))];
 }
@@ -178,6 +181,7 @@ const LOCALE_TAGS: Record<string, string> = {
   ru: 'ru-RU',
   tr: 'tr-TR',
   kk: 'kk-KZ',
+  de: 'de-DE',
 };
 
 /**

@@ -481,6 +481,7 @@ const AdminLayout = ({ children, activeTab, onTabChange, onExit }: AdminLayoutPr
                   <SelectItem value="ru">🇷🇺 RU</SelectItem>
                   <SelectItem value="tr">🇹🇷 TR</SelectItem>
                   <SelectItem value="kk">🇰🇿 KK</SelectItem>
+                  <SelectItem value="de">🇩🇪 DE</SelectItem>
                 </SelectContent>
               </Select>
             </div>

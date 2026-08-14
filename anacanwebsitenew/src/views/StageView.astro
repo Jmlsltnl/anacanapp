@@ -1,0 +1,149 @@
+---
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import FaqList from '@/components/FaqList.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { pagePath, type PageKey } from '@/config/pages';
+import { useTranslations } from '@/i18n';
+
+import fetus1 from '@/assets/fetus/month-1.svg';
+import fetus2 from '@/assets/fetus/month-2.svg';
+import fetus3 from '@/assets/fetus/month-3.svg';
+import fetus4 from '@/assets/fetus/month-4.svg';
+import fetus5 from '@/assets/fetus/month-5.svg';
+import fetus6 from '@/assets/fetus/month-6.svg';
+import fetus7 from '@/assets/fetus/month-7.svg';
+import fetus8 from '@/assets/fetus/month-8.svg';
+import fetus9 from '@/assets/fetus/month-9.svg';
+
+type StageKey = 'flow' | 'bump' | 'mommy' | 'partner';
+
+interface Props {
+  lang: string;
+  stage: StageKey;
+}
+
+const { lang, stage } = Astro.props;
+const t = useTranslations(lang);
+const base = `stagePages.${stage}`;
+
+const features = t<{ title: string; text: string }[]>(`${base}.features`);
+const steps = t<{ title: string; text: string }[]>(`${base}.steps`);
+const faq = t<{ q: string; a: string }[]>(`${base}.faq`);
+
+const emojiByStage: Record<StageKey, string[]> = {
+  flow: ['📅', '🌸', '📝', '💭', '🌙', '🤍'],
+  bump: ['🗓️', '⏱️', '👣', '🎒', '🥗', '📸'],
+  mommy: ['🍼', '😴', '📈', '💉', '🦷', '🎧'],
+  partner: ['📡', '📋', '🚨', '🗳️', '🤖', '🎁'],
+};
+
+const fetusImages = [fetus1, fetus2, fetus3, fetus4, fetus5, fetus6, fetus7, fetus8, fetus9];
+const isBump = stage === 'bump';
+const trimesters = isBump ? t<string[]>(`${base}.trimesters`) : [];
+const monthLabel = isBump ? t(`${base}.monthLabel`) : '';
+const weekLabel = isBump ? t(`${base}.weekLabel`) : '';
+
+/* Pre-compute week cards (Astro's template parser dislikes `<=` inside JSX) */
+const weekCards = isBump
+  ? fetusImages.map((img, i) => {
+      const month = i + 1;
+      const trimester = month < 4 ? trimesters[0] : month < 7 ? trimesters[1] : trimesters[2];
+      return {
+        img,
+        month,
+        weekFrom: i * 4 + 1,
+        weekTo: month === 9 ? 40 : month * 4,
+        trimester,
+        delay: i * 40,
+      };
+    })
+  : [];
+
+const breadcrumbs = [
+  { name: t('breadcrumbs.home'), path: pagePath('home', lang) },
+  { name: t(`stages.${stage}.label`), path: pagePath(stage as PageKey, lang) },
+];
+---
+
+<Base
+  lang={lang}
+  title={t(`meta.${stage}.title`)}
+  description={t(`meta.${stage}.description`)}
+  pageKey={stage as PageKey}
+  breadcrumbs={breadcrumbs}
+>
+  <div class="container">
+    <div class="page-hero">
+      <Breadcrumbs items={breadcrumbs} />
+      <span class={`eyebrow ${stage}`}>{t(`${base}.eyebrow`)}</span>
+      <h1>{t(`${base}.title`)}</h1>
+      <p class="lede">{t(`${base}.subtitle`)}</p>
+      <div class="hero-ctas">
+        <a href={pagePath('download', lang)} class="btn btn-primary">{t('nav.download')}</a>
+        <a href={pagePath('features', lang)} class="btn btn-ghost">{t('nav.features')}</a>
+      </div>
+    </div>
+
+    <section class="section" style="padding-top:1rem">
+      <p class="lede reveal" style="max-width:52em">{t(`${base}.intro`)}</p>
+
+      <h2 class="mt-5 reveal">{t(`${base}.featuresTitle`)}</h2>
+      <div class="tool-grid mt-3">
+        {features.map((f, i) => (
+          <div class="tool-card reveal" data-stage={stage} style={`transition-delay:${(i % 3) * 60}ms`}>
+            <span class="t-ico" aria-hidden="true">{emojiByStage[stage][i]}</span>
+            <h3>{f.title}</h3>
+            <p>{f.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {
+      isBump && (
+        <section class="section" style="padding-top:0" aria-label={t(`${base}.weeksTitle`)}>
+          <div class="section-head reveal">
+            <span class="eyebrow bump">{t(`${base}.weeksTitle`)}</span>
+            <h2>{t(`${base}.weeksSubtitle`)}</h2>
+          </div>
+          <div class="weeks-scroller">
+            {weekCards.map((w) => (
+              <div class="week-card reveal" style={`transition-delay:${w.delay}ms`}>
+                <img src={w.img.src} alt="" width="92" height="92" loading="lazy" decoding="async" />
+                <b>
+                  {w.month}. {monthLabel}
+                </b>
+                <span>
+                  {w.weekFrom}–{w.weekTo} {weekLabel}
+                </span>
+                <span class="trim">{w.trimester}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <section class="section" style="padding-top:0">
+      <h2 class="reveal">{t(`${base}.stepsTitle`)}</h2>
+      <div class="steps-grid mt-3">
+        {steps.map((s, i) => (
+          <div class="step-card reveal" style={`transition-delay:${i * 80}ms`}>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <h2 class="text-center reveal">{t(`${base}.faqTitle`)}</h2>
+      <div class="mt-3">
+        <FaqList items={faq} openFirst={false} />
+      </div>
+    </section>
+  </div>
+
+  <CtaBand lang={lang} title={t(`${base}.ctaTitle`)} subtitle={t(`${base}.ctaText`)} />
+</Base>

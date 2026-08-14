@@ -1,0 +1,94 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { LANGUAGES } from '@/config/languages';
+import { PAGES, pagePath, type PageKey } from '@/config/pages';
+import { getPosts, type BlogPost } from '@/utils/blog';
+
+import HomeView from '@/views/HomeView.astro';
+import FeaturesView from '@/views/FeaturesView.astro';
+import StageView from '@/views/StageView.astro';
+import AiView from '@/views/AiView.astro';
+import PremiumView from '@/views/PremiumView.astro';
+import BlogIndexView from '@/views/BlogIndexView.astro';
+import BlogPostView from '@/views/BlogPostView.astro';
+import AboutView from '@/views/AboutView.astro';
+import DownloadView from '@/views/DownloadView.astro';
+import ContactView from '@/views/ContactView.astro';
+import FaqView from '@/views/FaqView.astro';
+import LegalView from '@/views/LegalView.astro';
+
+/**
+ * Single catch-all route that renders EVERY page in EVERY language.
+ * URL structure:
+ *   /                      az home (default language, no prefix)
+ *   /funksiyalar/          az features (localized slug)
+ *   /en/ /en/features/     English
+ *   /ru/ /tr/ /kk/ ...     other languages
+ *   /blog/<slug>/          blog posts (per-language slugs)
+ *
+ * Adding a language in `config/languages.ts` automatically adds its routes.
+ */
+type RouteProps =
+  | { type: 'page'; key: PageKey; lang: string }
+  | { type: 'post'; post: BlogPost };
+
+export const getStaticPaths = (async () => {
+  const paths: { params: { path: string | undefined }; props: RouteProps }[] = [];
+
+  const toParam = (p: string) => {
+    const trimmed = p.replace(/^\/|\/$/g, '');
+    return trimmed === '' ? undefined : trimmed;
+  };
+
+  for (const language of LANGUAGES) {
+    for (const page of PAGES) {
+      paths.push({
+        params: { path: toParam(pagePath(page.key, language.code)) },
+        props: { type: 'page', key: page.key, lang: language.code },
+      });
+    }
+  }
+
+  const posts = await getPosts();
+  for (const post of posts) {
+    paths.push({
+      params: { path: toParam(post.path) },
+      props: { type: 'post', post },
+    });
+  }
+
+  return paths;
+}) satisfies GetStaticPaths;
+
+const props = Astro.props as RouteProps;
+---
+
+{
+  props.type === 'post' ? (
+    <BlogPostView post={props.post} />
+  ) : props.key === 'home' ? (
+    <HomeView lang={props.lang} />
+  ) : props.key === 'features' ? (
+    <FeaturesView lang={props.lang} />
+  ) : props.key === 'flow' || props.key === 'bump' || props.key === 'mommy' || props.key === 'partner' ? (
+    <StageView lang={props.lang} stage={props.key} />
+  ) : props.key === 'ai' ? (
+    <AiView lang={props.lang} />
+  ) : props.key === 'premium' ? (
+    <PremiumView lang={props.lang} />
+  ) : props.key === 'blog' ? (
+    <BlogIndexView lang={props.lang} />
+  ) : props.key === 'about' ? (
+    <AboutView lang={props.lang} />
+  ) : props.key === 'download' ? (
+    <DownloadView lang={props.lang} />
+  ) : props.key === 'contact' ? (
+    <ContactView lang={props.lang} />
+  ) : props.key === 'faq' ? (
+    <FaqView lang={props.lang} />
+  ) : props.key === 'privacy' ? (
+    <LegalView lang={props.lang} doc="privacy" />
+  ) : (
+    <LegalView lang={props.lang} doc="terms" />
+  )
+}

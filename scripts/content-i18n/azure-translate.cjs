@@ -83,7 +83,7 @@ if (fs.existsSync(extraPath)) {
   for (const [t, cfg] of Object.entries(extra)) REGISTRY[t] = REGISTRY[t] || cfg;
 }
 
-const LANG_NAMES = { ru: 'Russian', tr: 'Turkish', en: 'English', kk: 'Kazakh' };
+const LANG_NAMES = { ru: 'Russian', tr: 'Turkish', en: 'English', kk: 'Kazakh', de: 'German' };
 
 function buildSystemPrompt(lang) {
   const target = LANG_NAMES[lang];
@@ -93,7 +93,9 @@ function buildSystemPrompt(lang) {
       ? 'Use the formal "siz" form when addressing the user. Use "regl" for period, "bebek" for baby, "DSÖ" for WHO. Emergency number is 112.'
       : lang === 'kk'
         ? 'Write natural modern Kazakh (Cyrillic script) as used in Kazakhstan. Use the formal «Сіз» form when addressing the user. Use «етеккір» for period/menstruation, «бөпе» for baby, «ДДСҰ» for WHO. Emergency number is 103.'
-        : 'Use a warm, professional tone.';
+        : lang === 'de'
+          ? 'Write natural German as used in German parenting apps. Use the informal "du" form when addressing the user (warm, familiar tone — standard in German motherhood apps). Use "Baby" for baby, "Periode" for period, "WHO" for WHO. Emergency number is 112.'
+          : 'Use a warm, professional tone.';
   return [
     `You are a professional medical/parenting content translator for a pregnancy & motherhood app (Anacan).`,
     `Translate the JSON values from Azerbaijani to ${target}.`,
@@ -101,7 +103,7 @@ function buildSystemPrompt(lang) {
     `1) Return ONLY valid JSON with EXACTLY the same keys and nested field names. No extra keys, no commentary, no markdown fences.`,
     `2) String values stay strings; array values stay arrays with the same length and order.`,
     `3) Preserve emojis, line breaks (\\n), HTML/Markdown formatting, numbers, units and placeholders like {x} exactly.`,
-    `4) Keep brand/product names unchanged: Anacan (app name), Premium, Dr.Anacan. EXCEPTION: when "Anacan" is an affectionate address to the mother (baby speaking to mom, e.g. "Anacan, ..."), translate it: ru «мамочка», tr "anneciğim", kk «анашым», en "Mommy" (capitalize at sentence start).`,
+    `4) Keep brand/product names unchanged: Anacan (app name), Premium, Dr.Anacan. EXCEPTION: when "Anacan" is an affectionate address to the mother (baby speaking to mom, e.g. "Anacan, ..."), translate it: ru «мамочка», tr "anneciğim", kk «анашым», de "Mami", en "Mommy" (capitalize at sentence start).`,
     `5) Translate meaning naturally (real sentences, not word-for-word); adapt idioms; medical accuracy over literal wording; warm tone for mothers. ${style}`,
   ].join('\n');
 }

@@ -1,0 +1,130 @@
+---
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import FaqList from '@/components/FaqList.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { pagePath } from '@/config/pages';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const compare = t<{ f: string; free: string; prem: string }[]>('premiumPage.compare');
+const faq = t<{ q: string; a: string }[]>('premiumPage.faq');
+const freeFeatures = t<string[]>('premiumPage.free.features');
+const monthlyFeatures = t<string[]>('premiumPage.monthly.features');
+const yearlyFeatures = t<string[]>('premiumPage.yearly.features');
+
+const breadcrumbs = [
+  { name: t('breadcrumbs.home'), path: pagePath('home', lang) },
+  { name: t('nav.premium'), path: pagePath('premium', lang) },
+];
+---
+
+<Base
+  lang={lang}
+  title={t('meta.premium.title')}
+  description={t('meta.premium.description')}
+  pageKey="premium"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="container">
+    <div class="page-hero center" style="justify-items:center;text-align:center;margin-inline:auto;max-width:52em">
+      <Breadcrumbs items={breadcrumbs} />
+      <span class="eyebrow">{t('premiumPage.eyebrow')} ✦</span>
+      <h1>{t('premiumPage.title')}</h1>
+      <p class="lede">{t('premiumPage.subtitle')}</p>
+    </div>
+
+    <section class="section" style="padding-top:1.5rem">
+      <div class="pricing-grid">
+        <div class="price-card reveal">
+          <div>
+            <div class="price-name">{t('premiumPage.free.name')}</div>
+            <div class="price-value">
+              <b>{t('premiumPage.free.price')}</b>
+              <span>{t('premiumPage.free.period')}</span>
+            </div>
+          </div>
+          <ul>
+            {freeFeatures.map((f) => (
+              <li>{f}</li>
+            ))}
+          </ul>
+          <a href={pagePath('download', lang)} class="btn btn-ghost">{t('premiumPage.free.cta')}</a>
+        </div>
+
+        <div class="price-card hot reveal" style="transition-delay:80ms">
+          <span class="price-badge">{t('premiumPage.yearly.badge')}</span>
+          <div>
+            <div class="price-name">{t('premiumPage.yearly.name')}</div>
+            <div class="price-value">
+              <b>{t('premiumPage.yearly.price')}</b>
+              <span>{t('premiumPage.perYear')}</span>
+            </div>
+          </div>
+          <ul>
+            {yearlyFeatures.map((f) => (
+              <li>{f}</li>
+            ))}
+          </ul>
+          <a href={pagePath('download', lang)} class="btn btn-primary">{t('premiumPage.yearly.cta')}</a>
+        </div>
+
+        <div class="price-card reveal" style="transition-delay:160ms">
+          <div>
+            <div class="price-name">{t('premiumPage.monthly.name')}</div>
+            <div class="price-value">
+              <b>{t('premiumPage.monthly.price')}</b>
+              <span>{t('premiumPage.perMonth')}</span>
+            </div>
+          </div>
+          <ul>
+            {monthlyFeatures.map((f) => (
+              <li>{f}</li>
+            ))}
+          </ul>
+          <a href={pagePath('download', lang)} class="btn btn-ghost">{t('premiumPage.monthly.cta')}</a>
+        </div>
+      </div>
+      <p class="ai-disclaimer mt-3 text-center reveal">{t('premiumPage.note')}</p>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <h2 class="text-center reveal">{t('premiumPage.compareTitle')}</h2>
+      <div class="mt-3 reveal" style="overflow-x:auto">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th scope="col">{t('premiumPage.compareFeature')}</th>
+              <th scope="col">{t('premiumPage.free.name')}</th>
+              <th scope="col">Premium</th>
+            </tr>
+          </thead>
+          <tbody>
+            {compare.map((row) => (
+              <tr>
+                <td>{row.f}</td>
+                <td>{row.free}</td>
+                <td>{row.prem}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <h2 class="text-center reveal">{t('premiumPage.faqTitle')}</h2>
+      <div class="mt-3">
+        <FaqList items={faq} openFirst={false} />
+      </div>
+    </section>
+  </div>
+
+  <CtaBand lang={lang} />
+</Base>

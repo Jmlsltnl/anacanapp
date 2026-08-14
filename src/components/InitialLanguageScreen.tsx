@@ -7,7 +7,7 @@ import { useState, useMemo, useEffect } from 'react';
 import countriesData from '../../countries.json';
 
 // flagcdn ölkə kodu xəritəsi (dil kodu → bayraq kodu)
-const FLAG_BY_CODE: Record<string, string> = { az: 'az', en: 'gb', ru: 'ru', tr: 'tr', kk: 'kz' };
+const FLAG_BY_CODE: Record<string, string> = { az: 'az', en: 'gb', ru: 'ru', tr: 'tr', kk: 'kz', de: 'de' };
 
 // İlkin/fallback siyahı — app_languages sorğusu gələnə qədər və ya offline halda.
 const FALLBACK_LANGS = [
@@ -88,13 +88,13 @@ export default function InitialLanguageScreen() {
   // Bu ekran tərcümə yüklənməzdən ƏVVƏL göstərilir — mətnlər inline saxlanır.
   const L = (m: Record<string, string>) => m[selectedLang] ?? m.az;
   const t = {
-    selectCountry: L({ az: 'Ölkə seçin', en: 'Select Country', ru: 'Выберите страну', tr: 'Ülke seçin', kk: 'Елді таңдаңыз' }),
+    selectCountry: L({ az: 'Ölkə seçin', en: 'Select Country', ru: 'Выберите страну', tr: 'Ülke seçin', kk: 'Елді таңдаңыз', de: 'Land auswählen' }),
     selectCountryCap: 'SELECT COUNTRY',
-    searchPlaceholder: L({ az: 'Axtar', en: 'Search', ru: 'Поиск', tr: 'Ara', kk: 'Іздеу' }),
-    noneFound: L({ az: 'Ölkə tapılmadı', en: 'No countries found', ru: 'Страны не найдены', tr: 'Ülke bulunamadı', kk: 'Ел табылмады' }),
-    selectLanguage: L({ az: 'Dil seçin', en: 'Select Language', ru: 'Выберите язык', tr: 'Dil seçin', kk: 'Тілді таңдаңыз' }),
+    searchPlaceholder: L({ az: 'Axtar', en: 'Search', ru: 'Поиск', tr: 'Ara', kk: 'Іздеу', de: 'Suchen' }),
+    noneFound: L({ az: 'Ölkə tapılmadı', en: 'No countries found', ru: 'Страны не найдены', tr: 'Ülke bulunamadı', kk: 'Ел табылмады', de: 'Kein Land gefunden' }),
+    selectLanguage: L({ az: 'Dil seçin', en: 'Select Language', ru: 'Выберите язык', tr: 'Dil seçin', kk: 'Тілді таңдаңыз', de: 'Sprache auswählen' }),
     selectLanguageCap: 'SELECT LANGUAGE',
-    continue: L({ az: 'Davam et', en: 'Continue', ru: 'Продолжить', tr: 'Devam et', kk: 'Жалғастыру' }),
+    continue: L({ az: 'Davam et', en: 'Continue', ru: 'Продолжить', tr: 'Devam et', kk: 'Жалғастыру', de: 'Weiter' }),
     continueEn: 'Continue',
   };
 
@@ -214,6 +214,7 @@ export default function InitialLanguageScreen() {
                   ru: 'Язык можно изменить позже в настройках',
                   tr: 'Dili daha sonra ayarlardan değiştirebilirsiniz',
                   kk: 'Тілді кейін баптаулардан өзгерте аласыз',
+                  de: 'Du kannst die Sprache später in den Einstellungen ändern',
                 })}
               </p>
             </motion.div>

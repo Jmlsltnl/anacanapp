@@ -1,0 +1,113 @@
+---
+import { pagePath } from '@/config/pages';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const stats = t<{ value: string; label: string }[]>('hero.stats');
+---
+
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <span class="hero-badge"><span class="dot" aria-hidden="true"></span>{t('hero.badge')}</span>
+      <h1>
+        {t('hero.titleA')}
+        <em class="accent">{t('hero.titleEm')}</em>
+        {t('hero.titleB')}
+      </h1>
+      <p class="lede">{t('hero.subtitle')}</p>
+      <div class="hero-ctas">
+        <a href={pagePath('download', lang)} class="btn btn-primary">{t('hero.ctaPrimary')}</a>
+        <a href={pagePath('features', lang)} class="btn btn-ghost">{t('hero.ctaSecondary')}</a>
+      </div>
+      <p class="hero-note">{t('hero.ratingNote')}</p>
+      <div class="hero-stats">
+        {stats.map((s) => (
+          <div class="stat">
+            <b>{s.value}</b>
+            <span>{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="phone-cluster" aria-hidden="true">
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+
+          <div class="p-card p-week">
+            <div class="p-week-ring"><span>24</span></div>
+            <div>
+              <div class="p-title">{t('phone.week')} 24 · {t('phone.weekTitle')}</div>
+              <div class="p-text">{t('phone.weekText')}</div>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="p-row">
+              <span class="p-ico violet">👣</span>
+              <div>
+                <div class="p-title">{t('phone.kicks')}</div>
+                <div class="p-text">{t('phone.kicksValue')}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-card">
+            <div class="p-row">
+              <span class="p-ico rose">⏱️</span>
+              <div>
+                <div class="p-title">{t('phone.contractions')}</div>
+                <div class="p-text">{t('phone.contractionsValue')}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-card p-ai">
+            <div class="p-ai-head">
+              💛 {t('phone.aiName')}
+              <span class="status">● {t('ai.chat.online')}</span>
+            </div>
+            <div class="p-ai-bubble">{t('phone.aiMessage')}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="float-chip c1">
+        <span class="p-ico rose" style="width:32px;height:32px;font-size:.95rem">🌷</span>
+        <div>
+          {t('phone.cycleDay')}
+          <small>{t('phone.cyclePhase')}</small>
+        </div>
+      </div>
+      <div class="float-chip c2">
+        <span class="p-ico teal" style="width:32px;height:32px;font-size:.95rem">😴</span>
+        <div>
+          {t('phone.sleepLog')}
+          <small>{t('phone.sleepValue')}</small>
+        </div>
+      </div>
+      <div class="float-chip c3">
+        <span class="p-ico amber" style="width:32px;height:32px;font-size:.95rem">🤖</span>
+        <div>
+          {t('phone.aiName')}
+          <small>24/7</small>
+        </div>
+      </div>
+      <div class="float-chip c4">
+        <span class="p-ico violet" style="width:32px;height:32px;font-size:.95rem">👣</span>
+        <div>
+          {t('phone.kicks')}
+          <small>{t('phone.kicksValue')}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

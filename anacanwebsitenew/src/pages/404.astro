@@ -1,0 +1,30 @@
+---
+import Base from '@/layouts/Base.astro';
+import { DEFAULT_LANG, LANGUAGES } from '@/config/languages';
+import { pagePath } from '@/config/pages';
+import { useTranslations } from '@/i18n';
+
+const lang = DEFAULT_LANG;
+const t = useTranslations(lang);
+---
+
+<Base lang={lang} title={t('meta.notFound.title')} description={t('meta.notFound.description')} noindex>
+  <div class="container">
+    <div class="nf">
+      <div class="code" aria-hidden="true">404</div>
+      <h1>{t('notFound.title')}</h1>
+      <p class="lede">{t('notFound.text')}</p>
+      <div class="hero-ctas" style="justify-content:center">
+        <a href={pagePath('home', lang)} class="btn btn-primary">{t('notFound.home')}</a>
+        <a href={pagePath('blog', lang)} class="btn btn-ghost">{t('notFound.blog')}</a>
+      </div>
+      <nav class="tag-row mt-3" aria-label="Languages" style="justify-content:center">
+        {LANGUAGES.map((l) => (
+          <a class="tag" href={pagePath('home', l.code)} lang={l.code} hreflang={l.code}>
+            {l.flag} {l.nativeName}
+          </a>
+        ))}
+      </nav>
+    </div>
+  </div>
+</Base>

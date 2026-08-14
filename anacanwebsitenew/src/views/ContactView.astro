@@ -1,0 +1,81 @@
+---
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import FaqList from '@/components/FaqList.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { SITE } from '@/config/site';
+import { pagePath } from '@/config/pages';
+import { useTranslations } from '@/i18n';
+
+interface Props {
+  lang: string;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+/* Quick answers before writing in — reduces support load, adds page depth */
+const quickFaq = t<{ q: string; a: string }[]>('faqHome.items').slice(0, 3);
+
+const breadcrumbs = [
+  { name: t('breadcrumbs.home'), path: pagePath('home', lang) },
+  { name: t('nav.contact'), path: pagePath('contact', lang) },
+];
+---
+
+<Base
+  lang={lang}
+  title={t('meta.contact.title')}
+  description={t('meta.contact.description')}
+  pageKey="contact"
+  breadcrumbs={breadcrumbs}
+>
+  <div class="container">
+    <div class="page-hero">
+      <Breadcrumbs items={breadcrumbs} />
+      <span class="eyebrow">{t('contactPage.eyebrow')}</span>
+      <h1>{t('contactPage.title')}</h1>
+      <p class="lede">{t('contactPage.subtitle')}</p>
+    </div>
+
+    <section class="section" style="padding-top:1rem">
+      <h2 class="visually-hidden">{t('contactPage.eyebrow')}</h2>
+      <div class="info-grid">
+        <div class="info-card reveal">
+          <span class="i-ico" aria-hidden="true">✉️</span>
+          <h3>{t('contactPage.emailTitle')}</h3>
+          <p>{t('contactPage.emailText')}</p>
+          <a class="link" href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </div>
+        <div class="info-card reveal" style="transition-delay:70ms">
+          <span class="i-ico" aria-hidden="true">💬</span>
+          <h3>{t('contactPage.supportTitle')}</h3>
+          <p>{t('contactPage.supportText')}</p>
+        </div>
+        <div class="info-card reveal" style="transition-delay:140ms">
+          <span class="i-ico" aria-hidden="true">📰</span>
+          <h3>{t('contactPage.pressTitle')}</h3>
+          <p>{t('contactPage.pressText')}</p>
+        </div>
+        <div class="info-card reveal" style="transition-delay:210ms">
+          <span class="i-ico" aria-hidden="true">📍</span>
+          <h3>{t('contactPage.addressTitle')}</h3>
+          <p>{t('contactPage.addressText')}</p>
+          <p class="ai-disclaimer">{t('contactPage.responseNote')}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0">
+      <h2 class="text-center reveal">{t('faqHome.title')}</h2>
+      <div class="mt-3">
+        <FaqList items={quickFaq} openFirst={false} />
+      </div>
+      <div class="text-center mt-3">
+        <a href={pagePath('faq', lang)} class="btn btn-ghost">{t('faqHome.moreLink')}</a>
+      </div>
+    </section>
+  </div>
+
+  <CtaBand lang={lang} />
+</Base>

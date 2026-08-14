@@ -1,0 +1,774 @@
+{
+  "meta": {
+    "home": {
+      "title": "Anacan — Gebelik, Annelik ve Döngü Takip Uygulaması",
+      "description": "Annelik süperuygulaması: döngü takibi, hafta hafta gebelik rehberi, bebek takibi, 30+ araç, 7/24 yapay zekâ asistanı ve baba modu — tek ücretsiz uygulamada."
+    },
+    "features": {
+      "title": "Özellikler — Tek Uygulamada 30+ Annelik Aracı",
+      "description": "Kasılma sayacından tekme sayacına, DSÖ büyüme eğrilerinden aşı takvimine — Anacan'ın döngü, gebelik ve annelik için 30+ aracının tam haritası."
+    },
+    "flow": {
+      "title": "Regl ve Yumurtlama Takibi — Flow Modu",
+      "description": "Regl takvimi, yumurtlama tahmini, semptom ve ruh hâli günlüğü. Anacan Flow ile döngünüzü bilimsel temellerle izleyin, bedeninizi daha iyi tanıyın."
+    },
+    "bump": {
+      "title": "Gebelik Takibi — 40 Haftalık Rehberiniz",
+      "description": "Hafta hafta bebek gelişimi, kasılma sayacı, tekme sayacı, hastane çantası listesi ve beslenme rehberi. Gebeliğinizin her haftasını Anacan Bump ile izleyin."
+    },
+    "mommy": {
+      "title": "Bebek Gelişim Takibi ve Anne Asistanı",
+      "description": "Beslenme, uyku ve bez kayıtları, DSÖ büyüme eğrileri, aşı takvimi, diş çıkarma takibi ve gelişim basamakları. Anacan Mommy ile annelik kolaylaşır."
+    },
+    "partner": {
+      "title": "Baba Modu — Partneriniz için Gebelik Desteği",
+      "description": "Babalar için canlı gebelik güncellemeleri, SOS bildirimleri, günlük özet, isim oylaması ve partner yapay zekâ danışmanı. Bu yolculuğu Anacan ile birlikte yaşayın."
+    },
+    "ai": {
+      "title": "Anacan.AI — 7/24 Gebelik ve Bebek Yapay Zekâ Asistanı",
+      "description": "Gece 3'te bile yanıt veren annelik asistanı: gebelik, bebek bakımı ve döngü sorularınıza 5 dilde bilimsel yanıtlar. Anacan.AI ile tanışın."
+    },
+    "premium": {
+      "title": "Anacan Premium — Planlar ve Fiyatlar",
+      "description": "Anacan ücretsizdir — Premium ise sınırsız Anacan.AI, haftalık PDF raporlar, yapay zekâ fotoğraf çekimleri ve reklamsız deneyim ekler. Planları karşılaştırın."
+    },
+    "blog": {
+      "title": "Anacan Blog — Gebelik ve Annelik Yazıları",
+      "description": "Gebelik haftaları, bebek uykusu, döngü sağlığı ve baba desteği üzerine bilimsel yazılar — Anacan editör ekibinden."
+    },
+    "about": {
+      "title": "Hakkımızda — Anacan LLC ve misyonumuz",
+      "description": "Anacan, Azerbaycan'ın ilk annelik süperuygulamasıdır. Misyonumuz: her annenin yanında bilimsel ve şefkatli bir yol arkadaşı olmak. Hikâyemizi okuyun."
+    },
+    "download": {
+      "title": "Anacan'ı İndir — iOS ve Android için Ücretsiz",
+      "description": "Anacan'ı App Store ve Google Play'den ücretsiz indirin. iOS 15+ ve Android 8+ desteklenir. 5 dilde: Azerbaycanca, İngilizce, Rusça, Türkçe, Kazakça."
+    },
+    "contact": {
+      "title": "İletişim — Anacan Destek Ekibi",
+      "description": "Anacan ekibiyle iletişime geçin: info@anacan.az. Destek, iş birliği ve basın soruları için bize yazın."
+    },
+    "faq": {
+      "title": "Sık Sorulan Sorular — Anacan",
+      "description": "Anacan nedir, ücretsiz mi, hangi dilleri destekliyor, verilerim güvende mi? Anacan hakkında en sık sorulan 12 sorunun yanıtı."
+    },
+    "privacy": {
+      "title": "Gizlilik Politikası — Anacan",
+      "description": "Anacan verilerinizi nasıl toplar, kullanır ve korur. Sağlık verileri, haklarınız ve iletişim — tam gizlilik politikası."
+    },
+    "terms": {
+      "title": "Kullanım Koşulları — Anacan",
+      "description": "Anacan uygulaması ve web sitesinin kullanım koşulları: hizmet tanımı, tıbbi sorumluluk reddi, abonelikler ve kullanıcı yükümlülükleri."
+    },
+    "notFound": {
+      "title": "Sayfa Bulunamadı — 404",
+      "description": "Aradığınız sayfa mevcut değil. Anacan ana sayfasına dönün veya bloga göz atın."
+    }
+  },
+  "nav": {
+    "home": "Ana sayfa",
+    "features": "Özellikler",
+    "stages": "Dönemler",
+    "ai": "Anacan.AI",
+    "premium": "Premium",
+    "blog": "Blog",
+    "about": "Hakkımızda",
+    "faq": "SSS",
+    "contact": "İletişim",
+    "download": "Ücretsiz indir",
+    "menu": "Menü",
+    "close": "Kapat",
+    "language": "Dil",
+    "skipToContent": "İçeriğe geç"
+  },
+  "hero": {
+    "badge": "Annelik süperuygulaması",
+    "titleA": "Döngüden anneliğe —",
+    "titleEm": "her anında",
+    "titleB": "yanındayız",
+    "subtitle": "Regl takibi, gebelik, bebek bakımı ve baba desteği tek uygulamada. 30+ araç, 7/24 Anacan.AI asistanı ve sizi anlayan bir topluluk — hepsi kendi dilinizde.",
+    "ctaPrimary": "Ücretsiz indir",
+    "ctaSecondary": "Özellikleri keşfet",
+    "ratingNote": "İlk günden ücretsiz · Kart gerekmez",
+    "stats": [
+      { "value": "30+", "label": "araç tek uygulamada" },
+      { "value": "5", "label": "dil desteği" },
+      { "value": "40", "label": "haftalık takip" },
+      { "value": "7/24", "label": "yapay zekâ desteği" }
+    ]
+  },
+  "phone": {
+    "week": "Hafta",
+    "weekTitle": "Bebeğiniz bir mango boyunda",
+    "weekText": "Bu hafta işitme hızla gelişiyor — ona bir masal anlatın.",
+    "kicks": "Tekme sayacı",
+    "kicksValue": "12 tekme · 42 dk",
+    "contractions": "Kasılma sayacı",
+    "contractionsValue": "5-1-1 kuralı izleniyor",
+    "aiName": "Anacan.AI",
+    "aiMessage": "Merhaba Ayşe! 24. haftada badem, magnezyum için harika bir seçim 💛",
+    "cycleDay": "Döngünün 14. günü",
+    "cyclePhase": "Yumurtlama penceresi",
+    "sleepLog": "Uyku günlüğü",
+    "sleepValue": "3s 20dk gündüz uykusu"
+  },
+  "stages": {
+    "eyebrow": "Dört dönem, tek uygulama",
+    "title": "Hayatınızın hangi dönemindeyseniz — Anacan uyum sağlar",
+    "subtitle": "Modunuzu seçin; uygulama tüm araçları, ipuçlarını ve içeriği döneminize göre yeniden şekillendirsin.",
+    "more": "Daha fazla",
+    "flow": {
+      "name": "Flow",
+      "label": "Döngü",
+      "tagline": "Bedenini tanı",
+      "desc": "Regl takvimi, yumurtlama tahmini ve semptom günlüğü ile döngünüzü bilimsel temellerle izleyin.",
+      "bullets": ["Kişisel döngü tahminleri", "Faza uygun günlük ipuçları", "Semptom ve ruh hâli günlüğü"]
+    },
+    "bump": {
+      "name": "Bump",
+      "label": "Gebelik",
+      "tagline": "40 haftalık yolculuk",
+      "desc": "Hafta hafta bebek gelişimi, kasılma ve tekme sayaçları, hastane çantası — doğuma tam hazırlık.",
+      "bullets": ["Haftalık gelişim rehberi", "Kasılma ve tekme sayaçları", "Hastane çantası listesi"]
+    },
+    "mommy": {
+      "name": "Mommy",
+      "label": "Annelik",
+      "tagline": "İlk yılların yardımcısı",
+      "desc": "Beslenme, uyku ve bez kayıtları, DSÖ büyüme eğrileri, aşı takvimi ve gelişim basamakları.",
+      "bullets": ["DSÖ büyüme eğrileri", "Uyku ve beslenme günlüğü", "Aşı takvimi"]
+    },
+    "partner": {
+      "name": "Partner",
+      "label": "Baba modu",
+      "tagline": "Bu yolda birlikte",
+      "desc": "Babalar için canlı güncellemeler, SOS bildirimleri, günlük özet ve partner yapay zekâ danışmanı.",
+      "bullets": ["Canlı gebelik güncellemeleri", "SOS ve \"hastane vakti\" uyarısı", "İsim oylaması ve sürprizler"]
+    }
+  },
+  "tools": {
+    "eyebrow": "30+ araç",
+    "title": "Her soru için bir araç — hepsi tek yerde",
+    "subtitle": "Ayrı ayrı uygulamalarla uğraşmaya son: sayaçlar, günlükler, takvimler ve yapay zekâ araçları Anacan'da bir arada.",
+    "viewAll": "Tüm özellikleri gör",
+    "items": [
+      { "name": "Kasılma sayacı", "desc": "5-1-1 kuralıyla doğum vaktini bilin", "stage": "bump" },
+      { "name": "Tekme sayacı", "desc": "Bebeğinizin hareketlerini tek dokunuşla kaydedin", "stage": "bump" },
+      { "name": "Haftalık gelişim", "desc": "40 hafta boyunca bebeğinizin büyümesi", "stage": "bump" },
+      { "name": "Hastane çantası", "desc": "Hazır listeyle hiçbir şey unutulmasın", "stage": "bump" },
+      { "name": "Döngü takvimi", "desc": "Regl ve yumurtlama tahminleri", "stage": "flow" },
+      { "name": "Semptom günlüğü", "desc": "Bedeninizin sinyallerini kaydedin", "stage": "flow" },
+      { "name": "Büyüme eğrileri", "desc": "DSÖ standartlarında boy-kilo takibi", "stage": "mommy" },
+      { "name": "Uyku günlüğü", "desc": "Bebeğinizin uyku düzenini oluşturun", "stage": "mommy" },
+      { "name": "Aşı takvimi", "desc": "Ülkeye özel takvim ve hatırlatmalar", "stage": "mommy" },
+      { "name": "Ağlama çevirmeni", "desc": "Yapay zekâ ile ağlamanın nedenini anlayın", "stage": "mommy" },
+      { "name": "Bebek isimleri", "desc": "Binlerce isim, anlamları ve babayla oylama", "stage": "bump" },
+      { "name": "Masal üretici", "desc": "Bebeğinize özel yapay zekâ masalları", "stage": "mommy" },
+      { "name": "Beslenme rehberi", "desc": "Trimestere uygun beslenme önerileri", "stage": "bump" },
+      { "name": "Vitamin takibi", "desc": "Günlük vitamin hatırlatmaları", "stage": "bump" },
+      { "name": "Ruh sağlığı", "desc": "EPDS testi ve ruh hâli günlüğü", "stage": "mommy" },
+      { "name": "İlk yardım rehberi", "desc": "Adım adım acil durum senaryoları", "stage": "mommy" }
+    ],
+    "marquee": [
+      "Kasılma sayacı", "Tekme sayacı", "Döngü takvimi", "Yumurtlama tahmini", "Hastane çantası",
+      "Bebek isimleri", "Büyüme eğrileri", "Aşı takvimi", "Uyku günlüğü", "Beslenme rehberi",
+      "Ağlama çevirmeni", "Masal üretici", "AI fotoğraf çekimi", "Hava ve giyim", "Tansiyon takibi",
+      "Kan şekeri", "Kilo takibi", "Vitaminler", "Diş çıkarma", "Ruh sağlığı",
+      "Tarifler", "Egzersizler", "İlk yardım", "Tehlike işaretleri", "Doğum izni hesaplayıcı",
+      "Gebelik albümü", "Beyaz gürültü", "Alışveriş listesi", "Anne dostu harita", "Doktor puanları"
+    ]
+  },
+  "ai": {
+    "eyebrow": "Anacan.AI",
+    "title": "Gece 3'te bile yanıt veren asistanınız",
+    "subtitle": "Gebelik, bebek bakımı ve döngü sorularınıza bilimsel yanıtlar — kendi dilinizde, yargısız ve 7/24.",
+    "bullets": [
+      "Döneminize ve gününüze göre kişisel yanıtlar",
+      "Bilimsel kaynaklara dayalı içerik",
+      "\"Bu güvenli mi?\" — yiyecek, ilaç ve kozmetik kontrolü",
+      "Azerbaycanca, İngilizce, Rusça, Türkçe ve Kazakça konuşur"
+    ],
+    "chat": {
+      "userQ1": "Hamilelikte kahve içebilir miyim?",
+      "aiA1": "Günde 200 mg'a kadar kafein (yaklaşık bir fincan kahve) çoğu gebelik için güvenli kabul edilir. Yine de doktorunuza danışın ☕",
+      "userQ2": "Bebeğim gece sık sık uyanıyor, normal mi?",
+      "aiA2": "4 aylıkken bu çok yaygın — uyku regresyonu olabilir. Uyku günlüğünde düzeni birlikte izleyelim mi? 💤",
+      "placeholder": "Sorunuzu yazın...",
+      "online": "Çevrimiçi"
+    },
+    "disclaimer": "Anacan.AI tıbbi tanı koymaz — ciddi durumlarda mutlaka doktorunuza başvurun.",
+    "cta": "Anacan.AI ile tanış"
+  },
+  "testimonials": {
+    "eyebrow": "Anneler diyor ki",
+    "title": "Binlerce annenin günlük yol arkadaşı",
+    "subtitle": "Gerçek kullanıcılarımızın deneyimleri.",
+    "items": [
+      {
+        "quote": "Anacan sayesinde gebeliğim stressiz geçti. Haftalık raporlar çok faydalı!",
+        "name": "Aysel",
+        "role": "Bakü · 24. hafta"
+      },
+      {
+        "quote": "Yapay zekâ asistanı gece 3'te bile sorularımı yanıtlıyor. Gerçek bir dost gibi!",
+        "name": "Nigar",
+        "role": "Gence · yeni anne"
+      },
+      {
+        "quote": "Baba moduyla eşimin ne yaşadığını sonunda gerçekten anlıyorum.",
+        "name": "Elvin",
+        "role": "Bakü · baba adayı"
+      },
+      {
+        "quote": "Bebeğimin uyku düzenini kurmakta en büyük yardımcım oldu. Büyüme eğrileri de harika!",
+        "name": "Leyla",
+        "role": "Sumqayıt · 6 aylık bebek annesi"
+      }
+    ]
+  },
+  "faqHome": {
+    "eyebrow": "Sorular",
+    "title": "Sık sorulan sorular",
+    "subtitle": "Yanıtı bulamadınız mı? Bize yazın — ekibimiz yardımcı olsun.",
+    "moreLink": "Tüm soruları gör",
+    "items": [
+      {
+        "q": "Anacan nedir?",
+        "a": "Anacan; regl döngüsü, gebelik ve annelik dönemini tek yerde takip eden bir mobil uygulamadır. Flow modu regl takvimi ve yumurtlama tahmini sunar, Bump modu gebeliği 40 hafta boyunca izler, Mommy modu bebeğin uykusunu, beslenmesini ve büyümesini kaydeder, Partner modu ise babaları sürece dâhil eder. Uygulamada 30+ araç, 7/24 Anacan.AI asistanı, anne topluluğu ve uzman içeriği bulunur."
+      },
+      {
+        "q": "Anacan ücretsiz mi?",
+        "a": "Evet. Anacan'ı ücretsiz indirebilir ve temel araçları — döngü takvimi, haftalık gebelik takibi, sayaçlar ve günlükler — ücretsiz kullanabilirsiniz. Premium abonelik; sınırsız Anacan.AI sohbeti, haftalık PDF raporlar, yapay zekâ fotoğraf çekimi ve reklamsız deneyim gibi ekstralar açar."
+      },
+      {
+        "q": "Anacan hangi dillerde kullanılabilir?",
+        "a": "Anacan şu anda 5 dilde çalışıyor: Azerbaycanca, İngilizce, Rusça, Türkçe ve Kazakça. Uygulamanın tüm içeriği — araçlar, günlük ipuçları ve Anacan.AI yanıtları — seçtiğiniz dilde sunulur. Yeni diller düzenli olarak ekleniyor."
+      },
+      {
+        "q": "Anacan.AI tıbbi tavsiye verir mi?",
+        "a": "Anacan.AI bilimsel kaynaklara dayalı genel bilgi verir; ancak tanı koymaz ve doktor muayenesinin yerini tutmaz. Acil veya endişe verici durumlarda mutlaka doktorunuza başvurun. Uygulamadaki \"Tehlike işaretleri\" rehberi ne zaman hemen doktora gitmeniz gerektiğini gösterir."
+      },
+      {
+        "q": "Verilerim güvende mi?",
+        "a": "Evet. Sağlık verileriniz şifreli olarak saklanır, üçüncü taraflara satılmaz ve reklam için paylaşılmaz. Hesabınızı ve tüm verilerinizi istediğiniz an doğrudan uygulamadan silebilirsiniz. Ayrıntılar için Gizlilik Politikamıza bakın."
+      },
+      {
+        "q": "Anacan hangi cihazlarda çalışır?",
+        "a": "Anacan; iOS 15 ve üzeri iPhone'larda, Android 8.0 ve üzeri telefonlarda çalışır. Uygulamayı App Store ve Google Play'den ücretsiz indirebilirsiniz."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Her annenin yanında bir Anacan",
+    "subtitle": "Bugün ücretsiz başlayın — döngünüzü, gebeliğinizi veya bebeğinizin ilk yıllarını birlikte izleyelim.",
+    "note": "Ücretsiz indirme · Kart gerekmez · 5 dil",
+    "appStoreAria": "App Store'dan indir",
+    "googlePlayAria": "Google Play'den indir"
+  },
+  "badges": {
+    "downloadOnThe": "İndirin",
+    "appStore": "App Store",
+    "getItOn": "Edinin",
+    "googlePlay": "Google Play"
+  },
+  "footer": {
+    "tagline": "Döngüden anneliğe — her adımda yanınızda.",
+    "description": "Anacan; döngü, gebelik ve bebek bakımı için annelik süperuygulamasıdır. 30+ araç, yapay zekâ asistanı ve sizi anlayan bir topluluk.",
+    "product": "Ürün",
+    "company": "Şirket",
+    "resources": "Kaynaklar",
+    "legal": "Yasal",
+    "language": "Dil",
+    "followUs": "Bizi takip edin",
+    "downloadTitle": "Uygulamayı indir",
+    "copyright": "Tüm hakları saklıdır.",
+    "madeWith": "Bakü'de 💛 ile yapıldı",
+    "rss": "RSS akışı",
+    "seoPanel": "SEO Paneli"
+  },
+  "blog": {
+    "eyebrow": "Anacan Blog",
+    "title": "Annelik yolculuğunda rehberiniz",
+    "subtitle": "Gebelik, bebek bakımı, döngü sağlığı ve baba desteği üzerine bilimsel yazılar — editör ekibimizden.",
+    "readMore": "Oku",
+    "minRead": "dk okuma",
+    "published": "Yayınlandı",
+    "updated": "Güncellendi",
+    "author": "Yazar",
+    "authorName": "Anacan Editör Ekibi",
+    "related": "Benzer yazılar",
+    "backToBlog": "Bloga dön",
+    "all": "Tümü",
+    "featured": "Öne çıkan yazı",
+    "latest": "Son yazılar",
+    "empty": "Bu dilde henüz yazı yok — çok yakında!",
+    "keyTakeaways": "Önemli noktalar",
+    "sources": "Kaynaklar",
+    "share": "Paylaş",
+    "inThisArticle": "Bu yazıda",
+    "categories": {
+      "pregnancy": "Gebelik",
+      "motherhood": "Annelik",
+      "cycle": "Döngü sağlığı",
+      "partner": "Baba desteği",
+      "health": "Sağlık"
+    },
+    "ctaTitle": "Okuduklarınızı uygulamada takip edin",
+    "ctaText": "Blogdaki her rehber, Anacan uygulamasında etkileşimli bir araca dönüşür — ücretsiz indirin."
+  },
+  "featuresPage": {
+    "eyebrow": "Özellikler",
+    "title": "Tek uygulamada 30+ araç — uygulama karmaşasına son",
+    "subtitle": "Anacan; döngü, gebelik, annelik ve baba desteği için gereken her şeyi tek yerde toplar. İşte tam harita.",
+    "aiGroupTitle": "Yapay zekâ destekli araçlar",
+    "aiGroupText": "Anacan.AI yalnızca sohbet değildir — uygulamadaki birçok araç yapay zekâ ile güçlendirilmiştir:",
+    "aiTools": [
+      { "name": "Ağlama çevirmeni", "desc": "Bebeğin ağlama sesini analiz edip olası nedeni gösterir" },
+      { "name": "Bez analizi", "desc": "Fotoğrafla bebeğin sindirimi hakkında ilk fikir verir" },
+      { "name": "AI fotoğraf çekimi", "desc": "Bebek fotoğraflarından büyülü çekim sahneleri üretir" },
+      { "name": "Masal üretici", "desc": "Bebeğinizin adıyla kişisel masallar yazar" },
+      { "name": "Güvenlik kontrolü", "desc": "\"Bunu yiyebilir miyim?\" — yiyecek, ilaç, kozmetik yanıtları" },
+      { "name": "Hava ve giyim", "desc": "Havaya uygun bebek giyim önerisi" }
+    ],
+    "ctaTitle": "Hepsini kendiniz deneyin",
+    "ctaText": "Tüm araçlar uygulamada — ücretsiz indirin ve döneminizi seçin."
+  },
+  "stagePages": {
+    "flow": {
+      "eyebrow": "Flow modu",
+      "title": "Döngünüzü tanıyın, bedeninizi anlayın",
+      "subtitle": "Regl takvimi, yumurtlama tahmini ve faza uygun ipuçları — hepsi bilimsel temelli, kendi dilinizde.",
+      "intro": "Flow modu, Anacan'ın döngü takip merkezidir. Reglinizi kaydettikçe uygulama kişisel tahminler oluşturur: bir sonraki regl, yumurtlama penceresi ve doğurgan günler. Semptom ve ruh hâli günlüğü ise bedeninizin örüntülerini net görmenizi sağlar.",
+      "featuresTitle": "Flow'da sizi neler bekliyor",
+      "features": [
+        { "title": "Döngü takvimi", "text": "Regl günlerinizi kaydedin, uygulama sonraki döngüyü tahmin etsin." },
+        { "title": "Yumurtlama tahmini", "text": "Doğurgan pencerenizi görün — planlama ya da sadece bilmek için." },
+        { "title": "Semptom günlüğü", "text": "Ağrı, kanama, enerji ve 30+ semptomu tek dokunuşla kaydedin." },
+        { "title": "Ruh hâli günlüğü", "text": "Ruh hâlinizi izleyin, döngü fazlarıyla ilişkisini keşfedin." },
+        { "title": "Faza uygun ipuçları", "text": "Foliküler, yumurtlama, luteal, regl — her faz için beslenme ve egzersiz önerileri." },
+        { "title": "Gebeliğe geçiş", "text": "Pozitif test mi? Tek dokunuşla Bump moduna geçin — verileriniz korunur." }
+      ],
+      "stepsTitle": "Nasıl çalışır",
+      "steps": [
+        { "title": "Son reglinizi kaydedin", "text": "Tarihi seçin — Anacan ortalama döngü uzunluğunuzu öğrenmeye başlar." },
+        { "title": "Semptomlarınızı ekleyin", "text": "Günde 30 saniye: nasıl hissettiğinizi not edin." },
+        { "title": "Tahminleri izleyin", "text": "Doğruluk her döngüde artar, ipuçları fazınıza uyum sağlar." }
+      ],
+      "faqTitle": "Flow hakkında sorular",
+      "faq": [
+        { "q": "Döngü tahminleri ne kadar doğru?", "a": "Tahminler kaydettiğiniz verilere dayanır ve her döngüde keskinleşir. Düzensiz döngülerde uygulama değişkenliği hesaba katar ve daha geniş bir pencere gösterir. Tahminler doğum kontrol yöntemi değildir." },
+        { "q": "Yumurtlama penceresi nasıl hesaplanır?", "a": "Ortalama döngü uzunluğunuza ve kaydettiğiniz semptomlara göre, standart luteal faz varsayımlarıyla hesaplanır. Kesin zamanlama için yumurtlama testleriyle birlikte kullanabilirsiniz." },
+        { "q": "Döngü verilerimi kim görebilir?", "a": "Hiç kimse. Döngü verileriniz şifrelenir, reklam için kullanılmaz ve istediğinizde tamamen silinir." }
+      ],
+      "ctaTitle": "Döngünüzü bugün izlemeye başlayın",
+      "ctaText": "Flow modu ücretsiz — indirin ve ilk kaydınızı yapın."
+    },
+    "bump": {
+      "eyebrow": "Bump modu",
+      "title": "40 haftalık yolculuğunuz için eksiksiz rehber",
+      "subtitle": "Hafta hafta bebek gelişimi, doğuma hazırlık araçları ve her gün için kişisel ipuçları.",
+      "intro": "Bump modu, ilk günden doğuma kadar sizinle yürür. Her hafta bebeğinizin boyutunu, yeni gelişim basamaklarını ve bedeninizdeki değişimleri öğrenirsiniz. Kasılma sayacı, tekme sayacı ve hastane çantası listesi bitiş çizgisine hazır olmanızı sağlar.",
+      "featuresTitle": "Bump'ta sizi neler bekliyor",
+      "features": [
+        { "title": "Haftalık gelişim rehberi", "text": "Her hafta bebeğin boyutu, yeni becerileri ve size özel ipuçları." },
+        { "title": "Kasılma sayacı", "text": "Sıklık ve süreyi izleyin — 5-1-1 kuralıyla hastane vaktini bilin." },
+        { "title": "Tekme sayacı", "text": "Günlük hareketleri kaydedin, azalmaları erken fark edin." },
+        { "title": "Hastane çantası listesi", "text": "Anne, bebek ve partner için hazır listeler — hiçbir şey unutulmasın." },
+        { "title": "Beslenme ve vitaminler", "text": "Trimestere uygun beslenme rehberi, kaçınılacaklar listesi ve vitamin hatırlatmaları." },
+        { "title": "Gebelik albümü", "text": "Haftalık karın fotoğraflarınızı saklayın, anı albümü oluşturun." }
+      ],
+      "weeksTitle": "Hafta hafta gelişim",
+      "weeksSubtitle": "Her ay bebeğiniz yeni bir aşamaya ulaşır — Anacan her haftayı sizin için açıklar.",
+      "weekLabel": "hafta",
+      "monthLabel": "ay",
+      "trimesters": ["1. trimester", "2. trimester", "3. trimester"],
+      "stepsTitle": "Nasıl çalışır",
+      "steps": [
+        { "title": "Son regl tarihinizi girin", "text": "Veya ultrasonla belirlenen doğum tarihini — uygulama haftanızı hesaplar." },
+        { "title": "Günlük içeriğinizi alın", "text": "Her gün: bebeğin gelişimi, beden değişimleri, beslenme ipucu." },
+        { "title": "Doğuma hazırlanın", "text": "3. trimesterde kasılma sayacı, çanta listesi ve tehlike işaretleri rehberi etkinleşir." }
+      ],
+      "faqTitle": "Bump hakkında sorular",
+      "faq": [
+        { "q": "Doğum tarihi nasıl hesaplanır?", "a": "Standart Naegele kuralıyla: son reglin ilk günü + 280 gün. Ultrason tarihi farklıysa onu girebilirsiniz — tüm içerik yeni tarihe uyum sağlar." },
+        { "q": "Tekme sayacını ne zaman kullanmalıyım?", "a": "Genellikle 28. haftadan itibaren günlük takip önerilir. Bebeğin hareketlerinde belirgin azalma fark ederseniz hemen doktorunuza başvurun." },
+        { "q": "Kasılma sayacındaki 5-1-1 kuralı nedir?", "a": "Kasılmalar 5 dakikada bir geliyorsa, her biri 1 dakika sürüyorsa ve bu 1 saattir devam ediyorsa — hastaneye gitme vaktidir. Sayaç bunu otomatik izler." }
+      ],
+      "ctaTitle": "Gebeliğinizi bugün izlemeye başlayın",
+      "ctaText": "Bump modu ücretsiz — haftanızı girin, kişisel rehberiniz hazır olsun."
+    },
+    "mommy": {
+      "eyebrow": "Mommy modu",
+      "title": "Bebeğinizin ilk yıllarında güvenilir yardımcınız",
+      "subtitle": "Uyku, beslenme, büyüme ve aşılar — annelik döneminin tüm kayıtları tek yerde.",
+      "intro": "Mommy modu doğum sonrası dönemi kolaylaştırır. Beslenme, uyku ve bez kayıtları günlük düzeni oluşturmanıza yardım eder; DSÖ büyüme eğrileri bebeğinizin gelişimini pediatrik standartlarla izler; aşı takvimi ise hiçbir tarihi kaçırmamanız için hatırlatır.",
+      "featuresTitle": "Mommy'de sizi neler bekliyor",
+      "features": [
+        { "title": "Beslenme günlüğü", "text": "Emzirme, biberon ve ek gıda — zaman ve miktarla kaydedin." },
+        { "title": "Uyku günlüğü", "text": "Gündüz ve gece uykularını izleyin, düzen kurun." },
+        { "title": "DSÖ büyüme eğrileri", "text": "Boy, kilo ve baş çevresi — uluslararası persentil eğrilerinde." },
+        { "title": "Aşı takvimi", "text": "Ülkenize uygun takvim, otomatik hatırlatmalar." },
+        { "title": "Diş çıkarma ve sıçramalar", "text": "Diş haritası ve gelişim sıçraması takvimi — zor haftalara hazır olun." },
+        { "title": "Ağlama çevirmeni", "text": "Yapay zekâ bebeğin ağlamasını analiz edip olası nedeni gösterir." }
+      ],
+      "stepsTitle": "Nasıl çalışır",
+      "steps": [
+        { "title": "Bebeğinizin profilini oluşturun", "text": "Ad ve doğum tarihi — uygulama yaşa göre uyarlanır." },
+        { "title": "Günlük kayıtlarınızı tutun", "text": "Tek dokunuşla uyku, beslenme ve bez kayıtları." },
+        { "title": "Gelişimi izleyin", "text": "Büyüme eğrileri, basamaklar ve aylık raporlar kendiliğinden oluşur." }
+      ],
+      "faqTitle": "Mommy hakkında sorular",
+      "faq": [
+        { "q": "Büyüme eğrileri hangi standartlara dayanıyor?", "a": "Dünya Sağlık Örgütü'nün (DSÖ) 0-5 yaş büyüme standartlarına. Bebeğinizin boyu, kilosu ve baş çevresi persentillerle gösterilir — çocuk doktorunuzla aynı dili konuşun." },
+        { "q": "Aşı takvimi hangi ülkeleri destekliyor?", "a": "Azerbaycan ulusal takvimi dâhil birçok ülkenin resmî takvimi mevcut. Ülkenizi seçin — tarihler bebeğinizin doğum gününe göre otomatik hesaplanır." },
+        { "q": "Birden fazla çocuk ekleyebilir miyim?", "a": "Evet, her çocuk için ayrı profil oluşturabilir ve aralarında kolayca geçiş yapabilirsiniz." }
+      ],
+      "ctaTitle": "Annelik döneminizi kolaylaştırın",
+      "ctaText": "Mommy modu ücretsiz — bebeğinizin profilini oluşturun."
+    },
+    "partner": {
+      "eyebrow": "Partner modu",
+      "title": "Babalar için: kenarda kalmayın",
+      "subtitle": "Canlı güncellemeler, SOS sinyalleri ve size özel öneriler — gebeliği birlikte yaşayın.",
+      "intro": "Partner modu babaları (ve destek olmak isteyen herkesi) sürecin merkezine getirir. Partnerinizin uygulamasıyla eşleşin: bebeğin haftalık gelişimini görün, günlük özet alın, \"bugün ona nasıl destek olabilirim?\" önerilerini okuyun. Doğum yaklaştığında SOS ve \"hastane vakti\" sinyalleri tek dokunuşla size ulaşır.",
+      "featuresTitle": "Partner'da sizi neler bekliyor",
+      "features": [
+        { "title": "Canlı gebelik akışı", "text": "Bebeğin bu haftaki gelişimi — baba dilinde, kısa ve net." },
+        { "title": "Günlük özet", "text": "Partnerinizin ruh hâli, semptomları ve günün önerisi." },
+        { "title": "SOS ve hastane sinyali", "text": "Kasılmalar başladığında tek dokunuşla bildirim alın." },
+        { "title": "İsim oylaması", "text": "İsim listeleri oluşturun, birlikte oylayın." },
+        { "title": "Partner yapay zekâ danışmanı", "text": "\"Bu trimesterde ne hediye alayım?\" — yapay zekâ babalara da yanıt verir." },
+        { "title": "Sürpriz planlayıcı", "text": "Özel günler için hatırlatmalar ve fikirler." }
+      ],
+      "stepsTitle": "Nasıl çalışır",
+      "steps": [
+        { "title": "Davet koduyla katılın", "text": "Partneriniz uygulamadan kod gönderir — 30 saniyede eşleşirsiniz." },
+        { "title": "Kendi akışınızı alın", "text": "Size özel günlük güncellemeler ve destek önerileri." },
+        { "title": "Gerektiğinde yanında olun", "text": "SOS sinyalleri ve doğum planı her zaman elinizin altında." }
+      ],
+      "faqTitle": "Partner hakkında sorular",
+      "faq": [
+        { "q": "Partnerim neyi görür, neyi görmez?", "a": "Neyin paylaşılacağına anne karar verir: haftalık gelişim ve genel ruh hâli varsayılan olarak paylaşılır, kişisel notlar ise özel kalır. Gizlilik her zaman annenin kontrolündedir." },
+        { "q": "Partner modu ayrıca ücretli mi?", "a": "Hayır, temel Partner özellikleri ücretsizdir. Premium aile planı her iki tarafa da tam Premium açar." },
+        { "q": "Baba olmayan biri katılabilir mi?", "a": "Evet — anne, kardeş veya yakın bir arkadaş da aynı davet koduyla destek rolünde katılabilir." }
+      ],
+      "ctaTitle": "Birlikte başlayın",
+      "ctaText": "Partner modu ücretsiz — davet kodunuzu gönderin."
+    }
+  },
+  "aiPage": {
+    "eyebrow": "Anacan.AI",
+    "title": "Annelik sorularınız için 7/24 yapay zekâ asistanı",
+    "subtitle": "Bilimsel, yargısız ve kendi dilinizde — Anacan.AI gebelik, bebek bakımı ve döngü sorularını günler değil, saniyeler içinde yanıtlar.",
+    "intro": "Anacan.AI sıradan bir sohbet botu değildir: döneminizi (döngü günü, gebelik haftası veya bebeğinizin yaşı), kayıtlarınızı ve dilinizi bilerek kişisel yanıtlar verir. Gece 3'te bebeğiniz ağladığında ya da 24. haftada tuhaf bir ağrı hissettiğinizde — yanıt bir mesaj uzaklıkta.",
+    "capabilitiesTitle": "Anacan.AI neler yapabilir",
+    "capabilities": [
+      { "title": "Döneme duyarlı yanıtlar", "text": "Gebeliğin 12. haftası ile bebeğin 12. haftası farklı dünyalardır — yapay zekâ bunu bilir." },
+      { "title": "Güvenlik kontrolü", "text": "\"Hamilelikte suşi yenir mi?\" — yiyecek, ilaç ve kozmetik için anında yanıt." },
+      { "title": "Ağlama analizi", "text": "Bebeğin ağlamasını kaydedin — yapay zekâ olası nedeni tahmin eder." },
+      { "title": "Semptom rehberi", "text": "Ne zaman beklemeli, ne zaman doktora gitmeli — net yönlendirme." },
+      { "title": "Masal ve fotoğraf sihri", "text": "Bebeğinize özel masallar ve yapay zekâ fotoğraf sahneleri." },
+      { "title": "5 dilde iletişim", "text": "Azerbaycanca, İngilizce, Rusça, Türkçe ve Kazakça'da aynı kalite." }
+    ],
+    "howTitle": "Nasıl çalışır",
+    "how": [
+      { "title": "Sorunuzu yazın", "text": "Sesli veya yazılı — nasıl rahatsanız." },
+      { "title": "Bağlam otomatik eklenir", "text": "Yapay zekâ döneminizi ve son kayıtlarınızı dikkate alır." },
+      { "title": "Bilimsel yanıt alın", "text": "Net, kısa ve kaynağa dayalı — gerektiğinde doktora yönlendirir." }
+    ],
+    "safetyTitle": "Güvenlik ve sorumluluk",
+    "safety1": "Anacan.AI tıbbi bir cihaz değildir ve tanı koymaz. Yanıtlar genel bilgi niteliğindedir ve doktor konsültasyonunun yerini tutmaz.",
+    "safety2": "Acil durumlarda — şiddetli kanama, keskin ağrı, bebek hareketlerinin azalması — yapay zekâ sizi derhâl acil yardıma yönlendirir. Konuşmalarınız gizlidir ve üçüncü taraflarla paylaşılmaz.",
+    "faqTitle": "Anacan.AI hakkında sorular",
+    "faq": [
+      { "q": "Anacan.AI hangi kaynaklara dayanıyor?", "a": "Yanıtlar; uluslararası sağlık kuruluşlarının (DSÖ, ACOG, NHS) açık önerilerine ve hakemli tıbbi literatüre dayalı bir bilgi tabanı üzerine kurulur, döneminize uyarlanır." },
+      { "q": "Konuşmalarımı kim görebilir?", "a": "Konuşmalarınız özeldir: reklam için kullanılmaz, satılmaz. Sohbet geçmişinizi istediğiniz zaman silebilirsiniz." },
+      { "q": "Yapay zekâ hata yapabilir mi?", "a": "Evet, her yapay zekâ gibi. Bu yüzden Anacan.AI belirsiz durumlarda temkinli davranır ve önemli kararlar için her zaman doktora başvurmayı önerir." }
+    ],
+    "ctaTitle": "İlk sorunuzu sorun",
+    "ctaText": "Anacan.AI uygulamada sizi bekliyor — ücretsiz başlayın."
+  },
+  "premiumPage": {
+    "eyebrow": "Premium",
+    "title": "Ücretsiz başlayın, isteyince güçlendirin",
+    "subtitle": "Anacan'ın temel araçları her zaman ücretsizdir. Premium; sınırsız yapay zekâ, derin raporlar ve reklamsız deneyim isteyenler içindir.",
+    "billedMonthly": "aylık ödeme",
+    "billedYearly": "yıllık ödeme",
+    "perMonth": "/ay",
+    "perYear": "/yıl",
+    "free": {
+      "name": "Ücretsiz",
+      "price": "0 ₼",
+      "period": "her zaman",
+      "features": [
+        "Döngü, gebelik ve bebek takibi",
+        "Temel araçlar: sayaçlar, günlükler, takvimler",
+        "Günlük içerik ve haftalık rehber",
+        "Anacan.AI — günlük ücretsiz limit",
+        "Topluluk ve blog"
+      ],
+      "cta": "Ücretsiz başla"
+    },
+    "monthly": {
+      "name": "Premium Aylık",
+      "price": "7.99 ₼",
+      "features": [
+        "Sınırsız Anacan.AI sohbeti",
+        "Haftalık PDF raporlar (doktorunuz için)",
+        "AI fotoğraf çekimi ve masal üretici",
+        "Reklamsız deneyim",
+        "Öncelikli destek"
+      ],
+      "cta": "Premium'a geç"
+    },
+    "yearly": {
+      "name": "Premium Yıllık",
+      "price": "49.99 ₼",
+      "badge": "En avantajlı — %48 tasarruf",
+      "features": [
+        "Aylık plandaki her şey",
+        "Yılda yalnızca 49.99 ₼ (4.17 ₼/ay)",
+        "Aile paylaşımı — Partner da Premium olur",
+        "Yeni özelliklere erken erişim",
+        "Gebelik albümü baskısında indirim"
+      ],
+      "cta": "Yıllık planı seç"
+    },
+    "compareTitle": "Planları karşılaştırın",
+    "compareFeature": "Özellik",
+    "compare": [
+      { "f": "Döngü, gebelik ve bebek takibi", "free": "✓", "prem": "✓" },
+      { "f": "30+ araç", "free": "Temel araçlar", "prem": "Tümü" },
+      { "f": "Anacan.AI sohbeti", "free": "Günlük limit", "prem": "Sınırsız" },
+      { "f": "Haftalık PDF rapor", "free": "—", "prem": "✓" },
+      { "f": "AI fotoğraf ve masallar", "free": "—", "prem": "✓" },
+      { "f": "Partner modu", "free": "Temel", "prem": "Tam + aile planı" },
+      { "f": "Reklamsız deneyim", "free": "—", "prem": "✓" },
+      { "f": "Öncelikli destek", "free": "—", "prem": "✓" }
+    ],
+    "note": "Fiyatlar Azerbaycan mağazaları içindir; diğer bölgelerde yerel App Store / Google Play fiyatları geçerlidir. Aboneliği istediğiniz an mağaza ayarlarından iptal edebilirsiniz.",
+    "faqTitle": "Premium hakkında sorular",
+    "faq": [
+      { "q": "Aboneliği nasıl iptal ederim?", "a": "İstediğiniz an, tek dokunuşla, App Store veya Google Play abonelik ayarlarından. İptalden sonra Premium, ödenen dönemin sonuna kadar aktif kalır." },
+      { "q": "Ücretsiz sürüm hep ücretsiz mi kalacak?", "a": "Evet. Temel takip araçları, günlük içerik ve topluluk her zaman ücretsiz olacak — bu Anacan'ın temel ilkesidir." },
+      { "q": "Aile paylaşımı nasıl çalışır?", "a": "Yıllık planda partneriniz davet koduyla Premium'a katılır — tek ödeme, iki hesap." }
+    ]
+  },
+  "aboutPage": {
+    "eyebrow": "Hakkımızda",
+    "title": "Her annenin yanında bir Anacan",
+    "subtitle": "Azerbaycan'ın ilk annelik süperuygulamasını inşa ediyoruz — bilimsel, ana dilinizde ve her anne için erişilebilir.",
+    "missionTitle": "Misyonumuz",
+    "mission1": "Annelik, hayatın en güzel ve en zorlu yolculuklarından biridir. Bu yolculukta her kadının güvenilir, bilimsel ve yargılamayan bir yol arkadaşına ihtiyacı var. Anacan tam da bunun için doğdu: ilk döngü kaydından bebeğin ilk adımlarına kadar yanınızda olmak.",
+    "mission2": "Kaliteli annelik desteğinin lüks değil, hak olduğuna inanıyoruz. Bu yüzden Anacan'ın temel araçları her zaman ücretsiz olacak ve içeriğimiz her zaman sizin dilinizde konuşacak.",
+    "visionTitle": "Vizyonumuz",
+    "vision": "Her annenin cebinde — sorularını yanıtlayan, yükünü hafifleten ve onu asla yalnız bırakmayan bir Anacan.",
+    "valuesTitle": "Değerlerimiz",
+    "values": [
+      { "title": "Önce bilim", "text": "İçeriğimiz DSÖ, ACOG ve NHS gibi uluslararası kaynaklara dayanır — mit değil, gerçek." },
+      { "title": "Varsayılan olarak gizlilik", "text": "Sağlık verileriniz satılmaz, reklam için kullanılmaz. Nokta." },
+      { "title": "Çeviri değil, ana dil", "text": "5 dilde eksiksiz deneyim — makine çevirisi değil, yerinde üretim." },
+      { "title": "Empatiyle inşa", "text": "Her özellik, gerçek annelerin gerçek ihtiyaçlarından doğar." }
+    ],
+    "storyTitle": "Hikâyemiz",
+    "story1": "Anacan, 2024'te Bakü'de basit bir gözlemle doğdu: dünyada binlerce gebelik uygulaması var; ama Azerbaycanca konuşan, yerel gerçekleri bilen ve döngüden anneliğe tüm yolu kapsayan bir çözüm yoktu.",
+    "story2": "Eskiden dört ayrı uygulama gerektiren her şeyi — döngü takibi, gebelik takvimi, bebek günlüğü ve baba rehberi — tek bir süperuygulamada birleştirdik ve üzerine 7/24 çalışan bir yapay zekâ asistanı ekledik.",
+    "story3": "Bugün Anacan, 5 dilde ve 30+ araçla binlerce ailenin günlük hayatının bir parçası — ve bu daha başlangıç.",
+    "factsTitle": "Rakamlarla Anacan",
+    "facts": [
+      { "value": "2024", "label": "Bakü'de kuruldu" },
+      { "value": "30+", "label": "araç tek uygulamada" },
+      { "value": "5", "label": "dilde eksiksiz deneyim" },
+      { "value": "4", "label": "yaşam dönemi: Flow, Bump, Mommy, Partner" }
+    ],
+    "contactTitle": "Bize ulaşın",
+    "contactText": "İş birliği, basın veya sadece merhaba demek için:",
+    "ctaTitle": "Yolculuğa bizimle başlayın",
+    "ctaText": "Anacan'ı ücretsiz indirin — hikâyemizin bir parçası olun."
+  },
+  "downloadPage": {
+    "eyebrow": "İndirme",
+    "title": "Anacan'ı ücretsiz indirin",
+    "subtitle": "iOS ve Android için — 30 saniyede kurulur, kart gerekmez.",
+    "stepsTitle": "3 adımda başlayın",
+    "steps": [
+      { "title": "Uygulamayı indirin", "text": "App Store veya Google Play'den ücretsiz edinin." },
+      { "title": "Döneminizi seçin", "text": "Flow, Bump, Mommy veya Partner — uygulama size uyum sağlar." },
+      { "title": "Kişisel rehberinizi alın", "text": "Günlük içerik, araçlar ve yapay zekâ asistanınız hazır." }
+    ],
+    "requirementsTitle": "Sistem gereksinimleri",
+    "requirements": "iOS 15.0 ve üzeri · Android 8.0 ve üzeri · Tam işlevsellik için internet bağlantısı",
+    "languagesTitle": "5 dilde eksiksiz deneyim",
+    "languagesText": "Anacan; Azerbaycanca, İngilizce, Rusça, Türkçe ve Kazakça çalışır — dili uygulama içinden istediğiniz an değiştirebilirsiniz.",
+    "securityTitle": "Güvenli ve resmî",
+    "securityText": "Anacan'ı yalnızca resmî App Store ve Google Play mağazalarından indirin. Uygulama Anacan LLC tarafından yayınlanmaktadır."
+  },
+  "contactPage": {
+    "eyebrow": "İletişim",
+    "title": "Sizi duymak isteriz",
+    "subtitle": "Soru, öneri veya iş birliği — ekibimiz her mesajı okur.",
+    "emailTitle": "E-posta",
+    "emailText": "Genel sorular, destek ve iş birliği için:",
+    "supportTitle": "Uygulama içi destek",
+    "supportText": "En hızlı yanıt için uygulamada Profil → Destek bölümünden yazın — hesap bilgileriniz otomatik eklenir.",
+    "pressTitle": "Basın ve ortaklıklar",
+    "pressText": "Basın soruları ile doktor/klinik iş birlikleri için konu satırına \"Media\" veya \"Partnership\" yazın.",
+    "addressTitle": "Adres",
+    "addressText": "Anacan LLC · Bakü, Azerbaycan",
+    "responseNote": "Genellikle 1-2 iş günü içinde yanıtlıyoruz."
+  },
+  "faqPage": {
+    "eyebrow": "Sorular ve yanıtlar",
+    "title": "Anacan hakkında her şey",
+    "subtitle": "En sık sorulan 12 soru — kısa ve net yanıtlarla.",
+    "stillTitle": "Sorunuz mu kaldı?",
+    "stillText": "Bize yazın — genellikle 1-2 iş günü içinde yanıtlıyoruz.",
+    "stillCta": "İletişime geç",
+    "items": [
+      {
+        "q": "Anacan nedir ve kimler için?",
+        "a": "Anacan; regl döngüsü, gebelik ve anneliği tek yerde izleyen bir süperuygulamadır. Döngüsünü izleyen kadınlar, anne adayları, yeni anneler ve destek olmak isteyen babalar için tasarlandı. Dört mod (Flow, Bump, Mommy, Partner) yaşam döneminize uyum sağlar."
+      },
+      {
+        "q": "Anacan gerçekten ücretsiz mi?",
+        "a": "Evet — indirme ve temel araçlar tamamen ücretsizdir: döngü takvimi, haftalık gebelik rehberi, sayaçlar, günlükler, topluluk ve günlük içerik. Premium yalnızca ekstralar (sınırsız yapay zekâ, PDF raporlar, AI fotoğraf) isteyenler içindir."
+      },
+      {
+        "q": "Hangi diller destekleniyor?",
+        "a": "Şu anda 5 dil: Azerbaycanca, İngilizce, Rusça, Türkçe ve Kazakça. Uygulama içinden istediğiniz an geçiş yapın — tüm içerik, araçlar ve yapay zekâ yanıtları seçtiğiniz dile geçer."
+      },
+      {
+        "q": "Anacan.AI nasıl çalışır, nelere yanıt verir?",
+        "a": "Anacan.AI döneminizi (döngü günü, gebelik haftası, bebeğin yaşı) dikkate alarak gebelik, bebek bakımı, beslenme ve güvenlik sorularına bilimsel yanıtlar verir. Tanı koymaz — ciddi durumlarda doktora yönlendirir."
+      },
+      {
+        "q": "Verilerim nasıl korunuyor?",
+        "a": "Sağlık verileri şifreli saklanır, üçüncü taraflara satılmaz ve reklam hedeflemesi için kullanılmaz. Hesabınızı ve tüm verileri doğrudan uygulamadan silebilirsiniz. Ayrıntılar: Gizlilik Politikası."
+      },
+      {
+        "q": "Hangi cihazlar destekleniyor?",
+        "a": "iPhone (iOS 15+) ve Android (8.0+). App Store ve Google Play'de \"Anacan\" olarak bulabilirsiniz."
+      },
+      {
+        "q": "Partner modu nasıl bağlanır?",
+        "a": "Anne, uygulamasından davet kodu gönderir; partner Anacan'ı indirip kodu girer. Eşleştikten sonra partner canlı güncellemeleri, günlük özeti ve SOS sinyallerini alır."
+      },
+      {
+        "q": "Döngü tahminleri doğum kontrolü için kullanılabilir mi?",
+        "a": "Hayır. Tahminler bilgilendirme amaçlıdır ve doğum kontrol yöntemi değildir. Aile planlaması için uygun yöntemleri doktorunuzla görüşün."
+      },
+      {
+        "q": "Gebeliği hangi haftadan itibaren izleyebilirim?",
+        "a": "Herhangi bir haftadan. Son regl tarihinizi veya ultrasonla belirlenen doğum tarihini girin — uygulama mevcut haftanızı hesaplar ve tüm içeriği uyarlar."
+      },
+      {
+        "q": "Birden fazla çocuğu izleyebilir miyim?",
+        "a": "Evet, Mommy modunda her çocuk için ayrı profil oluşturulur. Aynı anda gebelik ve mevcut bebeği paralel izlemek de mümkündür."
+      },
+      {
+        "q": "Premium aboneliği nasıl iptal ederim?",
+        "a": "App Store: Ayarlar → Apple ID → Abonelikler. Google Play: Profil → Ödemeler ve abonelikler. İptalden sonra Premium, ödenen dönemin sonuna kadar aktif kalır."
+      },
+      {
+        "q": "Hesabımı ve verilerimi nasıl silerim?",
+        "a": "Uygulamada: Profil → Ayarlar → Hesabı sil. Bu işlem tüm kişisel verilerinizi sunucularımızdan kalıcı olarak siler. Sorularınız için info@anacan.az."
+      }
+    ]
+  },
+  "legalPrivacy": {
+    "title": "Gizlilik Politikası",
+    "updated": "Son güncelleme: 1 Ağustos 2026",
+    "intro": "Bu Gizlilik Politikası, Anacan LLC'nin (\"Anacan\", \"biz\") Anacan mobil uygulaması ve anacan.az web sitesi aracılığıyla verilerinizi nasıl topladığını, kullandığını ve koruduğunu açıklar. Hizmeti kullanarak bu politikayı kabul etmiş olursunuz.",
+    "sections": [
+      {
+        "h": "1. Topladığımız veriler",
+        "p": "Hesap verileri (ad, e-posta), girdiğiniz sağlık kayıtları (döngü tarihleri, gebelik haftası, bebek kayıtları, semptomlar), cihaz verileri (model, işletim sistemi, dil) ve anonimleştirilmiş kullanım istatistikleri."
+      },
+      {
+        "h": "2. Verilerin kullanımı",
+        "p": "Verilerinizi yalnızca hizmeti sunmak için kullanırız: kişisel tahminler, döneme uygun içerik, yapay zekâ yanıtları ve teknik destek. Verilerinizi reklamverenlere satmayız."
+      },
+      {
+        "h": "3. Sağlık verileri",
+        "p": "Sağlık kayıtlarınız özel kategori veri sayılır ve yalnızca açık rızanızla işlenir. Şifreli saklanır ve asla reklam hedeflemesi için kullanılmaz."
+      },
+      {
+        "h": "4. Saklama ve güvenlik",
+        "p": "Veriler, modern şifreleme standartlarıyla korunan sunucularda saklanır. İletim TLS ile şifrelenir. Verileri yalnızca hizmet için gerekli süre boyunca tutarız."
+      },
+      {
+        "h": "5. Üçüncü taraf hizmetler",
+        "p": "Hizmetin çalışması için güvenilir altyapı ortakları (barındırma, analitik, ödeme sistemleri, anlık bildirimler) kullanırız. Bu ortaklar verileri yalnızca talimatımızla ve sözleşme kapsamında işler."
+      },
+      {
+        "h": "6. Haklarınız",
+        "p": "İstediğiniz an verilerinize erişim, düzeltme, dışa aktarma veya tamamen silme talep edebilirsiniz. Hesap silme, uygulamanın Ayarlar bölümündedir; talepler için info@anacan.az."
+      },
+      {
+        "h": "7. Çocukların gizliliği",
+        "p": "Anacan 16 yaş ve üzeri kullanıcılar içindir. Ebeveynlerin bebekleri hakkında tuttuğu kayıtlar ebeveynin kontrolündedir ve yukarıdaki kurallarla korunur."
+      },
+      {
+        "h": "8. Değişiklikler",
+        "p": "Politikada önemli bir değişiklik olursa uygulama içinde ve bu sayfada bildiririz. Kullanmaya devam etmek, güncellenmiş politikayı kabul anlamına gelir."
+      },
+      {
+        "h": "9. İletişim",
+        "p": "Gizlilikle ilgili sorular için: info@anacan.az · Anacan LLC, Bakü, Azerbaycan."
+      }
+    ]
+  },
+  "legalTerms": {
+    "title": "Kullanım Koşulları",
+    "updated": "Son güncelleme: 1 Ağustos 2026",
+    "intro": "Bu Kullanım Koşulları, Anacan mobil uygulaması ve anacan.az web sitesinin kullanımını düzenler. Hizmeti kullanarak bu koşulları kabul etmiş olursunuz.",
+    "sections": [
+      {
+        "h": "1. Hizmetin tanımı",
+        "p": "Anacan; regl döngüsü, gebelik ve annelik için takip araçları, bilgilendirici içerik ve yapay zekâ asistanı sunan bir sağlıklı yaşam (wellness) uygulamasıdır."
+      },
+      {
+        "h": "2. Tıbbi sorumluluk reddi",
+        "p": "Anacan tıbbi bir cihaz değildir. Uygulamadaki içerik ve yapay zekâ yanıtları yalnızca bilgilendirme amaçlıdır; tıbbi tanı, tedavi veya konsültasyonun yerini tutmaz. Sağlığınızla ilgili kararlar için her zaman nitelikli bir doktora başvurun. Acil durumlarda derhâl acil servisi arayın."
+      },
+      {
+        "h": "3. Hesap",
+        "p": "Hesap bilgilerinizin doğruluğundan ve gizliliğinden siz sorumlusunuz. Hizmet yalnızca kişisel, ticari olmayan amaçlarla kullanılabilir."
+      },
+      {
+        "h": "4. Abonelikler ve ödemeler",
+        "p": "Premium abonelikler App Store ve Google Play üzerinden işlenir ve mağaza kurallarına tabidir. Abonelik dönem sonunda otomatik yenilenir; iptal mağaza ayarlarından yapılır. Fiyatlar bölgeye göre değişebilir."
+      },
+      {
+        "h": "5. Kullanıcı içeriği",
+        "p": "Toplulukta paylaştığınız içerikten siz sorumlusunuz. Hakaret içeren, yanıltıcı veya yasa dışı içerik yasaktır ve kaldırılabilir."
+      },
+      {
+        "h": "6. Yasaklı kullanım",
+        "p": "Hizmeti tersine mühendislikle çözmek, otomatik araçlarla toplu veri çekmek ve başkalarının hesaplarına izinsiz erişim denemek yasaktır."
+      },
+      {
+        "h": "7. Sorumluluğun sınırlandırılması",
+        "p": "Hizmet \"olduğu gibi\" sunulur. Yasaların izin verdiği azami ölçüde, Anacan LLC dolaylı veya sonuçsal zararlardan sorumlu değildir."
+      },
+      {
+        "h": "8. Değişiklikler ve fesih",
+        "p": "Koşulları güncelleyebiliriz; önemli değişiklikleri bildiririz. Koşulları ihlal eden hesapları askıya alma hakkımız saklıdır."
+      },
+      {
+        "h": "9. Geçerli hukuk ve iletişim",
+        "p": "Bu koşullar Azerbaycan Cumhuriyeti yasalarına tabidir. Sorular: info@anacan.az · Anacan LLC, Bakü, Azerbaycan."
+      }
+    ]
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Sayfa bulunamadı",
+    "text": "Aradığınız sayfa taşınmış veya hiç var olmamış. Ana sayfadan devam edin — ya da blogda faydalı bir yazı bulun.",
+    "home": "Ana sayfaya dön",
+    "blog": "Bloga göz at"
+  },
+  "breadcrumbs": {
+    "home": "Ana sayfa"
+  }
+}
