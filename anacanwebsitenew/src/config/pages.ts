@@ -23,7 +23,10 @@ export type PageKey =
   | 'contact'
   | 'faq'
   | 'privacy'
-  | 'terms';
+  | 'terms'
+  | 'ovulation'
+  | 'symptoms'
+  | 'competitors';
 
 export interface PageDef {
   key: PageKey;
@@ -135,6 +138,41 @@ export const PAGES: PageDef[] = [
     priority: 0.3,
     changefreq: 'yearly',
     nav: 'footer-legal',
+  },
+  {
+    /* Exact URL requested — preserves the live indexed slug 1:1 for migration continuity */
+    key: 'ovulation',
+    slugs: {
+      en: 'ovulation-calculator',
+      az: 'ovulyasiya-kalkulyatoru',
+      ru: 'kalkulyator-ovulyacii',
+      tr: 'ovulasyon-hesaplayici',
+      kk: 'ovulyaciya-kalkulyatory',
+    },
+    priority: 0.9,
+    changefreq: 'monthly',
+    nav: 'footer-product',
+  },
+  {
+    /* Exact URL requested (kept as-given, including the shortened "elamtleri" spelling) */
+    key: 'symptoms',
+    slugs: {
+      en: 'pregnancy-symptoms',
+      az: 'hamilelik-elamtleri',
+      ru: 'priznaki-beremennosti',
+      tr: 'hamilelik-belirtileri',
+      kk: 'zhuktilik-belgileri',
+    },
+    priority: 0.9,
+    changefreq: 'monthly',
+    nav: 'footer-product',
+  },
+  {
+    key: 'competitors',
+    slugs: { en: 'compare', az: 'muqayise', ru: 'sravnenie', tr: 'karsilastirma', kk: 'salystyru' },
+    priority: 0.8,
+    changefreq: 'monthly',
+    nav: 'footer-resources',
   },
 ];
 

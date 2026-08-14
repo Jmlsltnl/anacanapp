@@ -276,7 +276,7 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
             <div className="flex gap-1.5 justify-end">
               <button onClick={() => setIsEditing(false)} className="a-tag" style={{ cursor: 'pointer' }}>{tr("postcard_legv_et_b5e49c", "Ləğv et")}</button>
               <button onClick={handleEditPost} disabled={!editContent.trim() || editPost.isPending} className="a-btn-solid">
-                {editPost.isPending ? '...' : 'Saxla'}
+                {editPost.isPending ? '...' : tr("common_saxla", "Saxla")}
               </button>
             </div>
           </div> :

@@ -4740,5 +4740,6 @@
   "dashboard_diger_ml_ph": "Другое (мл)",
   "dashboard_qida_ph": "Напр.: тыквенное пюре",
   "nutrition_kcal_ph": "напр., 350",
-  "games_user_fallback": "Пользователь Anacan"
+  "games_user_fallback": "Пользователь Anacan",
+  "common_saxla": "Сохранить"
 }

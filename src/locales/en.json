@@ -8472,5 +8472,6 @@
   "dashboard_diger_ml_ph": "Other (ml)",
   "dashboard_qida_ph": "e.g. pumpkin purée",
   "nutrition_kcal_ph": "e.g. 350",
-  "games_user_fallback": "Anacan user"
+  "games_user_fallback": "Anacan user",
+  "common_saxla": "Save"
 }

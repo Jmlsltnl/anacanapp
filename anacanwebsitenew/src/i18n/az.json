@@ -63,6 +63,18 @@
     "notFound": {
       "title": "Səhifə tapılmadı — 404",
       "description": "Axtardığınız səhifə mövcud deyil. Anacan ana səhifəsinə qayıdın və ya bloqa baxın."
+    },
+    "ovulation": {
+      "title": "Ovulyasiya Kalkulyatoru — Fertil Pəncərənizi Hesablayın",
+      "description": "Pulsuz ovulyasiya kalkulyatoru: son menstruasiya tarixinizi daxil edin, fertil pəncərənizi, ovulyasiya gününüzü və hamilə qalma ehtimalı ən yüksək günləri saniyələr içində öyrənin."
+    },
+    "symptoms": {
+      "title": "Hamiləlik Əlamətləri — 12 Erkən Siqnal və PMS Fərqi",
+      "description": "Hamiləliyin ilk əlamətləri hansılardır? 12 erkən siqnal, PMS-dən fərqləndirmə cədvəli, test vaxtı və həkimə müraciət məqamları — elmi əsaslı bələdçi."
+    },
+    "competitors": {
+      "title": "Anacan Müqayisələri — Flo, Clue, Ovia və Digərləri ilə",
+      "description": "Anacan dünyanın aparıcı hamiləlik və tsikl tətbiqləri ilə necə müqayisə olunur? Flo, Clue, Ovia Health, What to Expect, Pregnancy+ və digərləri ilə ətraflı müqayisə."
     }
   },
   "nav": {
