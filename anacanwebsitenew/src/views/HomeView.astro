@@ -9,6 +9,7 @@ import FaqList from '@/components/FaqList.astro';
 import CtaBand from '@/components/CtaBand.astro';
 import { pagePath } from '@/config/pages';
 import { useTranslations } from '@/i18n';
+import { getCompetitorPages } from '@/utils/competitors';
 
 interface Props {
   lang: string;
@@ -17,6 +18,14 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const faqItems = t<{ q: string; a: string }[]>('faqHome.items');
+
+/* Teaser: link to the 3 highest-recognition comparisons from the homepage
+   (strong internal-linking signal + user discovery for the comparison hub). */
+const allComparisons = await getCompetitorPages(lang);
+const featuredSlugs = ['flo', 'clue', 'ovia-health'];
+const comparisons = featuredSlugs
+  .map((slug) => allComparisons.find((c) => c.entry.data.competitorSlug === slug))
+  .filter((c): c is NonNullable<typeof c> => Boolean(c));
 ---
 
 <Base lang={lang} title={t('meta.home.title')} description={t('meta.home.description')} pageKey="home">
@@ -25,6 +34,37 @@ const faqItems = t<{ q: string; a: string }[]>('faqHome.items');
   <Tools lang={lang} />
   <AiSection lang={lang} />
   <Testimonials lang={lang} />
+
+  {
+    comparisons.length > 0 && (
+      <section class="section" id="compare-teaser" style="padding-top:0">
+        <div class="container">
+          <div class="section-head center reveal">
+            <span class="eyebrow">{t('compare.eyebrow')}</span>
+            <h2>{t('compare.hubTitle')}</h2>
+            <p class="lede">{t('compare.hubSubtitle')}</p>
+          </div>
+          <div class="post-grid">
+            {comparisons.map((c, i) => (
+              <a href={c.path} class="post-card reveal" style={`transition-delay:${i * 70}ms`}>
+                <div class="post-cover" data-theme={c.entry.data.theme}>
+                  <span aria-hidden="true">{c.entry.data.emoji}</span>
+                  <span class="cat">{t(`compare.categories.${c.entry.data.category}`)}</span>
+                </div>
+                <div class="post-body">
+                  <h3>Anacan {t('compare.vs')} {c.entry.data.competitor}</h3>
+                  <p>{c.entry.data.description}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+          <div class="text-center mt-4">
+            <a href={pagePath('competitors', lang)} class="btn btn-ghost">{t('compare.backToHub')}</a>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   <section class="section" id="faq">
     <div class="container">

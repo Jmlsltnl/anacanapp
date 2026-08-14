@@ -4,6 +4,7 @@ import { LANGUAGES } from '@/config/languages';
 import { PAGES, pagePath } from '@/config/pages';
 import { useTranslations } from '@/i18n';
 import { getPosts } from '@/utils/blog';
+import { getCompetitorPages } from '@/utils/competitors';
 
 /**
  * /llms-full.txt — the complete multilingual content index for LLMs:
@@ -34,6 +35,7 @@ export const GET: APIRoute = async ({ site }) => {
   ];
 
   const posts = await getPosts();
+  const competitorPages = await getCompetitorPages();
 
   for (const l of LANGUAGES) {
     const t = useTranslations(l.code);
@@ -52,6 +54,15 @@ export const GET: APIRoute = async ({ site }) => {
         lines.push(
           `- [${d.title}](${abs(post.path)}) (${d.pubDate.toISOString().split('T')[0]}, ${d.category}): ${d.description}`,
         );
+      }
+    }
+
+    const langCompetitors = competitorPages.filter((p) => p.lang === l.code);
+    if (langCompetitors.length > 0) {
+      lines.push('', `### ${l.englishName} — competitor comparisons`, '');
+      for (const cp of langCompetitors) {
+        const d = cp.entry.data;
+        lines.push(`- [Anacan vs ${d.competitor}](${abs(cp.path)}): ${d.description}`);
       }
     }
     lines.push('');

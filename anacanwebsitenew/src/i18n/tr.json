@@ -63,6 +63,18 @@
     "notFound": {
       "title": "Sayfa Bulunamadı — 404",
       "description": "Aradığınız sayfa mevcut değil. Anacan ana sayfasına dönün veya bloga göz atın."
+    },
+    "ovulation": {
+      "title": "Yumurtlama Hesaplayıcı — Doğurgan Pencerenizi Bulun",
+      "description": "Ücretsiz yumurtlama hesaplayıcı: son regl tarihinizi girin, doğurgan pencerenizi, tahmini yumurtlama gününüzü ve gebe kalmak için en iyi günleri saniyeler içinde öğrenin."
+    },
+    "symptoms": {
+      "title": "Hamilelik Belirtileri — 12 Erken Sinyal ve PMS Farkı",
+      "description": "Hamileliğin ilk belirtileri nelerdir? 12 erken belirti, PMS karşılaştırma tablosu, test zamanı ve doktora ne zaman başvurulmalı — bilimsel temelli rehber."
+    },
+    "competitors": {
+      "title": "Anacan Karşılaştırmaları — Flo, Clue, Ovia ve Diğerleri",
+      "description": "Anacan dünyanın önde gelen gebelik ve döngü takip uygulamalarıyla nasıl karşılaştırılır? Flo, Clue, Ovia Health, What to Expect, Pregnancy+ ile ayrıntılı karşılaştırmalar."
     }
   },
   "nav": {
@@ -770,5 +782,120 @@
   },
   "breadcrumbs": {
     "home": "Ana sayfa"
+  },
+  "ovulationPage": {
+    "eyebrow": "Ücretsiz araç",
+    "title": "Yumurtlama Hesaplayıcı",
+    "subtitle": "Son regl tarihinizi girin — doğurgan pencerenizi ve gebe kalma ihtimalinin en yüksek olduğu günleri saniyeler içinde öğrenin.",
+    "formLastPeriod": "Son reglinizin ilk günü",
+    "formCycleLength": "Ortalama döngü uzunluğu (gün)",
+    "formCycleLengthHint": "Çoğu kadında 21–35 gün arasında değişir (ortalama 28 gün)",
+    "calculate": "Hesapla",
+    "recalculate": "Yeniden hesapla",
+    "resultsTitle": "Sonuçlarınız",
+    "resultOvulation": "Tahmini yumurtlama günü",
+    "resultFertileWindow": "Doğurgan pencere",
+    "resultNextPeriod": "Sonraki beklenen regl",
+    "resultNote": "Bu günler gebe kalma ihtimalinin en yüksek olduğu dönemdir.",
+    "errorMsg": "Lütfen son regl tarihinizi seçin.",
+    "intro": "Yumurtlama, yumurtalıktan olgun bir yumurta hücresinin serbest bırakıldığı andır ve gebe kalmak için ayın en elverişli dönemidir. Aşağıdaki hesaplayıcı, son regl tarihiniz ve ortalama döngü uzunluğunuza göre doğurgan pencerenizi tahmin eder.",
+    "howTitle": "Hesaplayıcı nasıl çalışır?",
+    "howText": "Hesaplama takvim yöntemine dayanır: luteal faz (yumurtlamadan sonraki regle kadar olan süre) çoğu kadında oldukça sabittir — yaklaşık 14 gün. Hesaplayıcı, bir sonraki beklenen regl tarihinden 14 gün geriye sayarak yumurtlama gününü belirler, doğurgan pencereyi ise bu tarihten 5 gün önce ile 1 gün sonrası arasında hesaplar — çünkü spermler kadın vücudunda 5 güne kadar yaşayabilir.",
+    "accuracyTitle": "Bu sonuç ne kadar doğru?",
+    "accuracyText": "Takvim yöntemi, düzenli döngüsü olan kadınlar için yararlı bir tahmin sunar; ancak stres, hastalık, seyahat ve hormonal değişimler yumurtlama tarihini kaydırabilir. Daha kesin bir sonuç için yumurtlama testleri, bazal vücut sıcaklığı takibi veya servikal mukus gözlemiyle birleştirin.",
+    "signsTitle": "Yumurtlamanın belirtileri nelerdir?",
+    "signs": [
+      { "title": "Servikal mukusta değişim", "text": "Yumurta akına benzeyen şeffaf, esnek akıntı en doğurgan günlerin en net göstergesidir." },
+      { "title": "Bazal vücut sıcaklığında yükselme", "text": "Yumurtlamadan sonra sıcaklık 0.3–0.5°C artar ve sonraki regle kadar yüksek kalır." },
+      { "title": "Hafif tek taraflı karın ağrısı", "text": "Bazı kadınlar hafif bir sızı hisseder — buna \"mittelschmerz\" denir." },
+      { "title": "Cinsel isteğin artması", "text": "Cinsel istekteki doğal artış, bedeninizin doğurgan döneme hazırlandığının bir işareti olabilir." },
+      { "title": "Göğüs hassasiyeti", "text": "Hormonal değişimler göğüslerde hafif gerginlik veya hassasiyete yol açabilir." }
+    ],
+    "faqTitle": "Yumurtlama hesaplayıcı hakkında sorular",
+    "faq": [
+      { "q": "Yumurtlama hesaplayıcı doğum kontrol yöntemi olarak kullanılabilir mi?", "a": "Hayır. Hesaplayıcı istatistiksel bir tahmin sunar, korunma yöntemi değildir. Gebelikten korunmak istiyorsanız güvenilir doğum kontrol yöntemlerini doktorunuzla görüşün." },
+      { "q": "Döngüm düzensizse hesaplayıcı çalışır mı?", "a": "Düzensiz döngülerde tahmin daha az güvenilirdir, çünkü yöntem sabit bir döngü uzunluğuna dayanır. Bu durumda yumurtlama testleri veya doktor tavsiyesi daha güvenilirdir." },
+      { "q": "Yumurtlamadan kaç gün önce ve sonra gebe kalabilirim?", "a": "Doğurgan pencere yumurtlamadan yaklaşık 5 gün önce başlar ve yumurtlama gününden 1 gün sonra kapanır — çünkü spermler vücutta birkaç güne kadar hayatta kalabilir." },
+      { "q": "Yumurtlama her zaman ağrısız mı geçer?", "a": "Çoğu kadın hiçbir belirti hissetmez ve bu tamamen normaldir. Bazıları ise hafif karın ağrısı veya akıntı değişikliği fark eder." },
+      { "q": "Sonuçları zamanla nasıl daha kesin izleyebilirim?", "a": "Anacan'ın Flow modu kaydettiğiniz her döngüyle kişisel tahminlerinizi netleştirir; semptomlarınızı eklemek doğurgan pencereyi daha da daraltır." }
+    ],
+    "ctaTitle": "Tüm döngünüzü takip etmek ister misiniz?",
+    "ctaText": "Anacan'ın Flow modu her ay için kişisel yumurtlama tahmini, semptom günlüğü ve faza uygun öneriler sunar — tamamen ücretsiz."
+  },
+  "symptomsPage": {
+    "eyebrow": "Rehber",
+    "title": "Hamilelik Belirtileri: İlk Sinyaller Nasıl Tanınır?",
+    "subtitle": "Regl gecikmesinden önce bile hissedilebilen 12 erken hamilelik belirtisi — ve bunları PMS'den nasıl ayırt edeceğiniz.",
+    "intro": "Hamileliğin en erken belirtileri genellikle döllenmeden 6–12 gün sonra, implantasyon sırasında başlar. En sık görülenler: gecikmiş regl, göğüs hassasiyeti, yorgunluk, bulantı, sık idrara çıkma ve koku duyarlılığıdır. Bu belirtilerin hiçbiri tek başına %100 kanıt değildir — tek güvenilir yöntem hamilelik testidir.",
+    "listTitle": "12 erken hamilelik belirtisi",
+    "list": [
+      { "title": "Gecikmiş regl", "text": "En güvenilir erken sinyal, özellikle döngünüz genellikle düzenliyse." },
+      { "title": "Göğüs hassasiyeti ve şişkinlik", "text": "Hormonal değişimler göğüsleri ağrılı veya ağır hissettirebilir." },
+      { "title": "Yorgunluk", "text": "Progesteron seviyesinin hızlı artışı ilk haftalarda güçlü yorgunluğa yol açar." },
+      { "title": "Sabah bulantısı", "text": "Genellikle 6. hafta civarında başlar, günün her saatinde olabilir." },
+      { "title": "Sık idrara çıkma", "text": "Kan hacminin artması böbreklerin daha çok çalışmasına neden olur." },
+      { "title": "İmplantasyon kanaması veya kasılması", "text": "Döllenmiş yumurtanın rahim duvarına tutunması sırasında hafif lekelenme." },
+      { "title": "Koku ve tada karşı duyarlılık", "text": "Sıradan kokular aniden rahatsız edici gelebilir." },
+      { "title": "İştahta değişiklik", "text": "Belirli yiyeceklere karşı tiksinti veya güçlü istek ortaya çıkabilir." },
+      { "title": "Ruh hâli değişimleri", "text": "Hormonal dalgalanmalar duygusal hassasiyeti artırır." },
+      { "title": "Hafif şişkinlik", "text": "Progesteron sindirim sistemini yavaşlatır." },
+      { "title": "Baş dönmesi", "text": "Kan basıncı ve kan şekerindeki değişimlerden kaynaklanabilir." },
+      { "title": "Bazal vücut sıcaklığının yüksek kalması", "text": "Olağan luteal fazın aksine, sıcaklık beklenen regl tarihinden sonra da yüksek kalır." }
+    ],
+    "comparisonTitle": "Hamilelik belirtileri PMS'den nasıl ayrılır?",
+    "comparisonIntro": "Birçok erken hamilelik belirtisi PMS ile örtüşür ve bu da ilk haftalarda kafa karışıklığı yaratır. Aşağıdaki tablo temel farkları gösteriyor:",
+    "comparisonHead": ["Belirti", "Hamilelikte", "PMS'de"],
+    "comparison": [
+      { "s": "Göğüs hassasiyeti", "p": "Regl beklenen tarihten sonra da devam eder", "m": "Regl başlayınca azalır" },
+      { "s": "Yorgunluk", "p": "Giderek artar", "m": "Regl öncesi belirir, sonra geçer" },
+      { "s": "Kanama", "p": "Hafif, açık renkli lekelenme (implantasyon)", "m": "Normal regl akışı" },
+      { "s": "Bazal sıcaklık", "p": "Yüksek kalır", "m": "Regl öncesi düşer" },
+      { "s": "Bulantı", "p": "Vardır (özellikle sabahları)", "m": "Genellikle yoktur" }
+    ],
+    "whenTestTitle": "Hamilelik testi ne zaman yapılmalı?",
+    "whenTestText": "En doğru sonuç için gecikmiş reglin ilk gününden itibaren test yapmanız önerilir — bu noktada idrardaki hCG hormonu kolayca tespit edilebilir seviyeye ulaşır. Daha erken test yapmak isterseniz yüksek hassasiyetli (10 mIU/ml) bir test ile sabah ilk idrarınızı kullanın; negatif çıkarsa birkaç gün sonra tekrarlayın.",
+    "whenDoctorTitle": "Ne zaman doktora başvurulmalı?",
+    "whenDoctorText": "Test pozitifse, en kısa sürede kayıt için doktorunuzla iletişime geçin. Şiddetli karın ağrısı, aşırı kanama veya omuz ağrısı gibi belirtiler eşlik ediyorsa (dış gebelik işareti olabilir), beklemeden acil servise başvurun.",
+    "faqTitle": "Hamilelik belirtileri hakkında sorular",
+    "faq": [
+      { "q": "Tüm kadınlar aynı belirtileri yaşar mı?", "a": "Hayır. Her beden farklıdır — bazı kadınlar hiçbir belirti hissetmeden gebe kalabilir, bazıları ise birkaç belirtiyi aynı anda yaşar. Belirti olmaması hamile olmadığınız anlamına gelmez." },
+      { "q": "Belirtiler gecikmeden kaç gün önce başlayabilir?", "a": "Bazı kadınlar implantasyondan (döllenmeden 6–12 gün sonra) hemen sonra hafif belirtiler hissedebilir, ancak çoğunda regl gecikmesinden sonra daha belirgin hâle gelir." },
+      { "q": "Bulantı olmadan hamile kalmak mümkün mü?", "a": "Evet, tamamen mümkün ve normaldir. Hamilelerin yaklaşık üçte biri hiç bulantı yaşamaz." },
+      { "q": "İmplantasyon kanamasını regl kanamasından nasıl ayırt edebilirim?", "a": "İmplantasyon kanaması genellikle daha az, daha açık renkli ve 1–2 gün sürer; normal reglin aksine giderek artmaz." },
+      { "q": "Test negatif çıktı ama belirtiler devam ediyor — ne yapmalıyım?", "a": "3–5 gün sonra sabah ilk idrarınızla tekrar test yapın. Belirtiler devam ederse veya sizi endişelendiriyorsa doktorunuza başvurun." }
+    ],
+    "ctaTitle": "Bu belirtileri mi yaşıyorsunuz?",
+    "ctaText": "Anacan'ın Bump modu, testiniz pozitif çıktığı andan itibaren haftalık gelişiminizi izlemeye başlar — ücretsiz indirin."
+  },
+  "compare": {
+    "eyebrow": "Karşılaştırma",
+    "vs": "vs",
+    "hubTitle": "Anacan Nasıl Karşılaştırılıyor?",
+    "hubSubtitle": "Dünyanın önde gelen döngü, gebelik ve annelik uygulamalarıyla ayrıntılı, dürüst karşılaştırmalar — size en uygun uygulamaya karar vermenize yardımcı olmak için.",
+    "categories": {
+      "period-tracker": "Döngü takibi",
+      "pregnancy-tracker": "Gebelik takibi",
+      "parenting-community": "Ebeveyn topluluğu",
+      "fertility": "Doğurganlık"
+    },
+    "factLabel": "Özellik",
+    "factFounded": "Kuruluş yılı",
+    "factHq": "Merkez",
+    "factPlatforms": "Platformlar",
+    "factLanguages": "Diller",
+    "factStages": "Kapsam",
+    "factAi": "Yapay zekâ asistanı",
+    "factPartner": "Partner modu",
+    "factFree": "Ücretsiz temel sürüm",
+    "bakuHq": "Bakü, Azerbaycan",
+    "fourStages": "Döngü + Gebelik + Annelik + Partner",
+    "varies": "Değişken",
+    "unknown": "Bilinmiyor / sınırlı",
+    "freemium": "Freemium",
+    "factsNote": "Bilgiler makalenin güncellenme tarihine göre kamuya açık kaynaklardan derlenmiştir ve değişebilir. Güncel bilgi için resmî siteye bakın:",
+    "disclaimer": "Bu karşılaştırma kamuya açık genel bilgilere dayanır ve reklam içeriği değildir. Tüm marka adları kendi sahiplerine aittir. Güncel fiyat ve özellikleri her uygulamanın resmî mağaza sayfasından kontrol etmenizi öneririz.",
+    "backToHub": "Tüm karşılaştırmalara dön",
+    "ctaTitle": "Anacan'ı kendiniz deneyin",
+    "ctaText": "30+ araç, 7/24 yapay zekâ asistanı ve 5 dil desteğiyle — ücretsiz indirin, kendiniz görün."
   }
 }

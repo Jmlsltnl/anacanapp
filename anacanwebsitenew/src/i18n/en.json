@@ -63,6 +63,18 @@
     "notFound": {
       "title": "Page Not Found — 404",
       "description": "The page you are looking for does not exist. Return to the Anacan homepage or browse the blog."
+    },
+    "ovulation": {
+      "title": "Ovulation Calculator — Find Your Fertile Window",
+      "description": "Free ovulation calculator: enter your last period date and instantly find your fertile window, estimated ovulation day, and the best days to conceive."
+    },
+    "symptoms": {
+      "title": "Pregnancy Symptoms — 12 Early Signs vs. PMS",
+      "description": "What are the earliest signs of pregnancy? 12 early symptoms, a symptom-vs-PMS comparison table, when to test, and when to see a doctor — a science-based guide."
+    },
+    "competitors": {
+      "title": "Anacan Comparisons — vs. Flo, Clue, Ovia and More",
+      "description": "How does Anacan compare to the world's leading pregnancy and cycle-tracking apps? Detailed comparisons with Flo, Clue, Ovia Health, What to Expect, Pregnancy+ and more."
     }
   },
   "nav": {
@@ -770,5 +782,120 @@
   },
   "breadcrumbs": {
     "home": "Home"
+  },
+  "ovulationPage": {
+    "eyebrow": "Free tool",
+    "title": "Ovulation Calculator",
+    "subtitle": "Enter the date of your last period — find your fertile window and the days with the highest chance of conceiving in seconds.",
+    "formLastPeriod": "First day of your last period",
+    "formCycleLength": "Average cycle length (days)",
+    "formCycleLengthHint": "Typically 21–35 days for most women (28 on average)",
+    "calculate": "Calculate",
+    "recalculate": "Recalculate",
+    "resultsTitle": "Your results",
+    "resultOvulation": "Estimated ovulation day",
+    "resultFertileWindow": "Fertile window",
+    "resultNextPeriod": "Next expected period",
+    "resultNote": "These days carry the highest chance of conceiving.",
+    "errorMsg": "Please select the date of your last period.",
+    "intro": "Ovulation is the moment a mature egg is released from the ovary — the most fertile stretch of the month for conceiving. The calculator below estimates your fertile window from the date of your last period and your average cycle length.",
+    "howTitle": "How does the calculator work?",
+    "howText": "The calculation uses the calendar method: the luteal phase (the stretch from ovulation to the next period) is fairly stable for most women — about 14 days. The calculator counts back 14 days from your next expected period to estimate ovulation day, then sets the fertile window from 5 days before that date to 1 day after — because sperm can survive in the body for up to 5 days.",
+    "accuracyTitle": "How accurate is this?",
+    "accuracyText": "The calendar method gives a useful estimate for women with regular cycles, but stress, illness, travel and hormonal shifts can move ovulation earlier or later. For a more precise picture, combine it with ovulation tests, basal body temperature tracking, or cervical mucus observation.",
+    "signsTitle": "What are the signs of ovulation?",
+    "signs": [
+      { "title": "Changes in cervical mucus", "text": "Clear, stretchy discharge resembling egg white is the clearest sign of your most fertile days." },
+      { "title": "A rise in basal body temperature", "text": "Temperature rises by about 0.3–0.5°C after ovulation and stays elevated until your next period." },
+      { "title": "Mild one-sided pelvic pain", "text": "Some women feel a light twinge on one side, known as \"mittelschmerz\"." },
+      { "title": "Increased libido", "text": "A natural rise in sex drive can be your body's signal that it's preparing for a fertile window." },
+      { "title": "Breast tenderness", "text": "Hormonal shifts can make breasts feel slightly tender or fuller." }
+    ],
+    "faqTitle": "Ovulation calculator FAQ",
+    "faq": [
+      { "q": "Can an ovulation calculator be used as birth control?", "a": "No. The calculator gives a statistical estimate, not a contraception method. If you want to avoid pregnancy, discuss reliable contraception options with your doctor." },
+      { "q": "Will the calculator work if my cycle is irregular?", "a": "The estimate is less reliable for irregular cycles, since the method relies on a fairly stable cycle length. In that case, ovulation tests or a doctor's guidance are more reliable." },
+      { "q": "How many days before or after ovulation can I conceive?", "a": "The fertile window opens about 5 days before ovulation and closes 1 day after it, because sperm can survive in the body for several days." },
+      { "q": "Is ovulation always painless?", "a": "Most women feel no symptoms at all, and that's completely normal. Others notice mild pelvic pain or a change in discharge." },
+      { "q": "How can I track this more precisely over time?", "a": "Anacan's Flow mode sharpens your personal predictions with every cycle you log, and factoring in your symptoms narrows the fertile window further." }
+    ],
+    "ctaTitle": "Want to track your full cycle?",
+    "ctaText": "Anacan's Flow mode gives you a personal ovulation forecast every month, a symptom diary and phase-based tips — completely free."
+  },
+  "symptomsPage": {
+    "eyebrow": "Guide",
+    "title": "Pregnancy Symptoms: How to Recognize the First Signs",
+    "subtitle": "12 early pregnancy symptoms that can appear even before your missed period — and how to tell them apart from PMS.",
+    "intro": "The earliest pregnancy symptoms usually start 6–12 days after fertilization, around implantation. The most common are a missed period, breast tenderness, fatigue, nausea, frequent urination and heightened smell sensitivity. None of these symptoms is 100% conclusive on its own — a pregnancy test is the only reliable confirmation.",
+    "listTitle": "12 early pregnancy symptoms",
+    "list": [
+      { "title": "Missed period", "text": "The most reliable early signal, especially if your cycle is usually regular." },
+      { "title": "Breast tenderness and swelling", "text": "Hormonal shifts can make breasts feel sore or heavy." },
+      { "title": "Fatigue", "text": "A rapid rise in progesterone causes strong tiredness in the early weeks." },
+      { "title": "Morning sickness", "text": "Usually starts around week 6 and can strike at any time of day." },
+      { "title": "Frequent urination", "text": "Increased blood volume makes the kidneys work harder." },
+      { "title": "Implantation bleeding or cramping", "text": "Light spotting when the fertilized egg attaches to the uterine wall." },
+      { "title": "Sensitivity to smell and taste", "text": "Ordinary smells can suddenly feel overwhelming." },
+      { "title": "Changes in appetite", "text": "Sudden aversions to certain foods or strong cravings can appear." },
+      { "title": "Mood swings", "text": "Hormonal fluctuations heighten emotional sensitivity." },
+      { "title": "Mild bloating", "text": "Progesterone slows down digestion." },
+      { "title": "Dizziness", "text": "Can be caused by shifts in blood pressure and blood sugar." },
+      { "title": "Basal body temperature stays elevated", "text": "Unlike a typical luteal phase, temperature stays high past the expected period date." }
+    ],
+    "comparisonTitle": "How do pregnancy symptoms differ from PMS?",
+    "comparisonIntro": "Many early pregnancy symptoms overlap with PMS, which is exactly what makes the first weeks confusing. The table below highlights the key differences:",
+    "comparisonHead": ["Symptom", "In pregnancy", "In PMS"],
+    "comparison": [
+      { "s": "Breast tenderness", "p": "Continues after your period would have started", "m": "Eases once your period starts" },
+      { "s": "Fatigue", "p": "Keeps getting stronger", "m": "Appears before your period, then fades" },
+      { "s": "Bleeding", "p": "Light, pale spotting (implantation)", "m": "Normal period flow" },
+      { "s": "Basal temperature", "p": "Stays elevated", "m": "Drops before your period" },
+      { "s": "Nausea", "p": "Present (especially mornings)", "m": "Usually absent" }
+    ],
+    "whenTestTitle": "When should you take a pregnancy test?",
+    "whenTestText": "For the most accurate result, test on or after the first day of your missed period — by then hCG levels in urine are high enough to detect reliably. If you want to test earlier, choose a high-sensitivity test (10 mIU/ml) with your first morning urine, and repeat in a few days if the result is negative.",
+    "whenDoctorTitle": "When should you see a doctor?",
+    "whenDoctorText": "If your test is positive, contact your doctor as soon as possible to register your pregnancy. Seek emergency care immediately if you experience severe abdominal pain, heavy bleeding, or shoulder pain alongside these symptoms — these can be signs of an ectopic pregnancy.",
+    "faqTitle": "Pregnancy symptoms FAQ",
+    "faq": [
+      { "q": "Do all women experience the same symptoms?", "a": "No. Every body is different — some women conceive without noticing any symptoms at all, while others experience several at once. Having no symptoms does not mean you're not pregnant." },
+      { "q": "How many days before a missed period can symptoms start?", "a": "Some women notice mild symptoms shortly after implantation (6–12 days after fertilization), but most symptoms become clearer after the missed period." },
+      { "q": "Can you be pregnant without nausea?", "a": "Yes, completely possible and normal. Roughly a third of pregnant women never experience nausea at all." },
+      { "q": "How can I tell implantation bleeding apart from a period?", "a": "Implantation bleeding is usually lighter, paler in color, and lasts 1–2 days, without the increasing flow typical of a normal period." },
+      { "q": "My test was negative but symptoms continue — what should I do?", "a": "Retest in 3–5 days with your first morning urine. If symptoms persist or worry you, contact your doctor." }
+    ],
+    "ctaTitle": "Experiencing these symptoms?",
+    "ctaText": "Anacan's Bump mode starts tracking your weekly development the moment your test turns positive — download it free."
+  },
+  "compare": {
+    "eyebrow": "Comparison",
+    "vs": "vs",
+    "hubTitle": "How Does Anacan Compare?",
+    "hubSubtitle": "Detailed, honest comparisons with the world's leading cycle, pregnancy and motherhood apps — to help you decide which one fits you best.",
+    "categories": {
+      "period-tracker": "Period tracker",
+      "pregnancy-tracker": "Pregnancy tracker",
+      "parenting-community": "Parenting community",
+      "fertility": "Fertility"
+    },
+    "factLabel": "Feature",
+    "factFounded": "Founded",
+    "factHq": "Headquarters",
+    "factPlatforms": "Platforms",
+    "factLanguages": "Languages",
+    "factStages": "Coverage",
+    "factAi": "AI assistant",
+    "factPartner": "Partner mode",
+    "factFree": "Free core tier",
+    "bakuHq": "Baku, Azerbaijan",
+    "fourStages": "Cycle + Pregnancy + Motherhood + Partner",
+    "varies": "Varies",
+    "unknown": "Unknown / limited",
+    "freemium": "Freemium",
+    "factsNote": "Facts are compiled from public information as of the article's update date and may change. Check the official site for current details:",
+    "disclaimer": "This comparison is based on publicly available general information and is not sponsored content. All brand names belong to their respective owners. We recommend verifying current pricing and features on each app's official store listing.",
+    "backToHub": "Back to all comparisons",
+    "ctaTitle": "Try Anacan for yourself",
+    "ctaText": "30+ tools, a 24/7 AI assistant and support for 5 languages — download free and see for yourself."
   }
 }

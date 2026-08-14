@@ -181,8 +181,9 @@ async function analyzePage(file) {
     .map((l) => l.getAttribute('href'))
     .filter((h) => h && /^https?:\/\//.test(h) && !h.startsWith(SITE_URL));
 
-  const isBlogPost =
-    /\/blog\/.+/.test(path) || /\/(bloq|blog)\/.+/.test(path);
+  /* Long-form editorial content scored with the same citability/word-count
+     bar as blog posts: dated articles AND competitor comparison pages. */
+  const isBlogPost = /\/blog\/.+/.test(path) || /anacan-vs-/.test(path);
 
   const LEGAL_SLUGS = [
     'mexfilik', 'privacy', 'konfidencialnost', 'gizlilik', 'qupiyalylyq',

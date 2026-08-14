@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import { LANGUAGES } from '@/config/languages';
 import { PAGES, pagePath, type PageKey } from '@/config/pages';
 import { getPosts, type BlogPost } from '@/utils/blog';
+import { getCompetitorPages, type CompetitorPage } from '@/utils/competitors';
 
 import HomeView from '@/views/HomeView.astro';
 import FeaturesView from '@/views/FeaturesView.astro';
@@ -16,6 +17,10 @@ import DownloadView from '@/views/DownloadView.astro';
 import ContactView from '@/views/ContactView.astro';
 import FaqView from '@/views/FaqView.astro';
 import LegalView from '@/views/LegalView.astro';
+import OvulationCalculatorView from '@/views/OvulationCalculatorView.astro';
+import PregnancySymptomsView from '@/views/PregnancySymptomsView.astro';
+import CompetitorIndexView from '@/views/CompetitorIndexView.astro';
+import CompetitorPostView from '@/views/CompetitorPostView.astro';
 
 /**
  * Single catch-all route that renders EVERY page in EVERY language.
@@ -30,7 +35,8 @@ import LegalView from '@/views/LegalView.astro';
  */
 type RouteProps =
   | { type: 'page'; key: PageKey; lang: string }
-  | { type: 'post'; post: BlogPost };
+  | { type: 'post'; post: BlogPost }
+  | { type: 'competitor'; post: CompetitorPage };
 
 export const getStaticPaths = (async () => {
   const paths: { params: { path: string | undefined }; props: RouteProps }[] = [];
@@ -57,6 +63,14 @@ export const getStaticPaths = (async () => {
     });
   }
 
+  const competitorPages = await getCompetitorPages();
+  for (const post of competitorPages) {
+    paths.push({
+      params: { path: toParam(post.path) },
+      props: { type: 'competitor', post },
+    });
+  }
+
   return paths;
 }) satisfies GetStaticPaths;
 
@@ -66,6 +80,8 @@ const props = Astro.props as RouteProps;
 {
   props.type === 'post' ? (
     <BlogPostView post={props.post} />
+  ) : props.type === 'competitor' ? (
+    <CompetitorPostView page={props.post} />
   ) : props.key === 'home' ? (
     <HomeView lang={props.lang} />
   ) : props.key === 'features' ? (
@@ -78,6 +94,12 @@ const props = Astro.props as RouteProps;
     <PremiumView lang={props.lang} />
   ) : props.key === 'blog' ? (
     <BlogIndexView lang={props.lang} />
+  ) : props.key === 'ovulation' ? (
+    <OvulationCalculatorView lang={props.lang} />
+  ) : props.key === 'symptoms' ? (
+    <PregnancySymptomsView lang={props.lang} />
+  ) : props.key === 'competitors' ? (
+    <CompetitorIndexView lang={props.lang} />
   ) : props.key === 'about' ? (
     <AboutView lang={props.lang} />
   ) : props.key === 'download' ? (

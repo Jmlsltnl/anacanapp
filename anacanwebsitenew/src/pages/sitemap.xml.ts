@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { LANGUAGES, DEFAULT_LANG, getLanguage } from '@/config/languages';
 import { PAGES, pagePath } from '@/config/pages';
 import { getPosts, getAlternates } from '@/utils/blog';
+import { getCompetitorPages, getCompetitorAlternates } from '@/utils/competitors';
 
 /**
  * sitemap.xml with full hreflang alternate annotations (xhtml:link)
@@ -73,6 +74,38 @@ export const GET: APIRoute = async ({ site }) => {
       image: {
         loc: abs(`/og/blog/${post.lang}/${post.slug}.png`),
         title: post.entry.data.title,
+      },
+    });
+  }
+
+  /* Competitor comparison pages × languages (alternates via translationKey) */
+  const competitorPages = await getCompetitorPages();
+  const competitorAlternatesCache = new Map<string, { hreflang: string; href: string }[]>();
+
+  for (const cp of competitorPages) {
+    const key = cp.entry.data.translationKey;
+    let alternates = competitorAlternatesCache.get(key);
+    if (!alternates) {
+      const siblings = await getCompetitorAlternates(key);
+      alternates = siblings.map((p) => ({
+        hreflang: getLanguage(p.lang).bcp47,
+        href: abs(p.path),
+      }));
+      const xDefault = siblings.find((p) => p.lang === DEFAULT_LANG) ?? siblings[0];
+      if (xDefault) alternates.push({ hreflang: 'x-default', href: abs(xDefault.path) });
+      competitorAlternatesCache.set(key, alternates);
+    }
+
+    const lastmod = (cp.entry.data.updatedDate ?? cp.entry.data.pubDate).toISOString().split('T')[0];
+    entries.push({
+      loc: abs(cp.path),
+      lastmod,
+      changefreq: 'monthly',
+      priority: 0.7,
+      alternates,
+      image: {
+        loc: abs(`/og/blog/${cp.lang}/${cp.slug}.png`),
+        title: cp.entry.data.title,
       },
     });
   }
