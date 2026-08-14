@@ -16,7 +16,12 @@ export const routing = defineRouting({
   locales: ["az", "en", "ru"],
   defaultLocale: "az",
   localePrefix: "as-needed",
-  localeDetection: true,
+  // Deliberately disabled: with automatic detection, the root URL would
+  // 307-redirect based on Accept-Language, which makes "/" unstable for
+  // crawlers and users alike. Azerbaijani is always served at "/", and
+  // users switch languages explicitly (hreflang tells search engines
+  // about the alternates).
+  localeDetection: false,
   pathnames: {
     "/": "/",
 

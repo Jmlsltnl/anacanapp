@@ -146,7 +146,7 @@ async function classifyCryType(audioBase64: string, _apiKey?: string, userContex
     }
   }
 
-  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH', de: 'GERMAN' };
+  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH', de: 'GERMAN', ar: 'ARABIC (feminine address to the mother)' };
   const outLang = OUT_LANG[language];
 
   const response = await callGeminiSmart("gemini-2.5-flash", {
@@ -278,6 +278,8 @@ Deno.serve(async (req) => {
             ? 'Дыбыс тым қысқа. Нақтырақ талдау үшін кемінде 3 секундтық дыбыс қажет.'
             : language === 'de'
             ? 'Die Aufnahme ist zu kurz. Für eine genauere Analyse werden mindestens 3 Sekunden Audio benötigt.'
+            : language === 'ar'
+            ? 'التسجيل الصوتي قصير جدًا. يلزم تسجيل مدته ٣ ثوانٍ على الأقل لإجراء تحليل أدق.'
             : 'Səs çox qısadır. Daha dəqiq analiz üçün minimum 3 saniyə səs lazımdır.',
           recommendations: language === 'en'
             ? ['Record at least 3 seconds of audio', 'Hold the microphone close to the baby']
@@ -289,6 +291,8 @@ Deno.serve(async (req) => {
             ? ['Кемінде 3 секунд дыбыс жазыңыз', 'Бөпенің жылаған дауысын жақыннан жазыңыз']
             : language === 'de'
             ? ['Nimm mindestens 3 Sekunden Audio auf', 'Nimm das Weinen deines Babys aus der Nähe auf']
+            : language === 'ar'
+            ? ['سجّلي صوتًا لمدة ٣ ثوانٍ على الأقل', 'سجّلي بكاء رضيعكِ من مسافة قريبة']
             : ['Minimum 3 saniyə səs yazın', 'Körpənin ağlamasını yaxından yazın'],
           urgency: 'low',
           isCryDetected: false
@@ -385,11 +389,25 @@ Deno.serve(async (req) => {
         'baby_cooing': 'Dein Baby macht zufriedene Laute und weint nicht.',
         'unknown': 'Es wurde kein Babyweinen erkannt.'
       };
+      const soundTypeMessagesAr: Record<string, string> = {
+        'cough': 'هذا صوت سعال، وليس بكاء رضيع.',
+        'sneeze': 'هذا صوت عطاس، وليس بكاء رضيع.',
+        'adult_voice': 'هذا صوت شخص بالغ، وليس بكاء رضيع.',
+        'scream': 'هذا صوت صراخ أو صوت مرتفع، ولا يُصنَّف على أنه بكاء رضيع.',
+        'bang': 'هذا صوت ضربة أو ارتطام، وليس بكاء رضيع.',
+        'music_tv': 'هذا صوت تلفاز أو موسيقى أو وسائط، وليس بكاء رضيع.',
+        'animal': 'قد يكون هذا صوت حيوان، وليس بكاء رضيع.',
+        'silence': 'يحتوي الملف الصوتي على صمت في معظمه.',
+        'noise': 'هذه ضوضاء محيطة، وليست بكاء رضيع.',
+        'baby_cooing': 'رضيعكِ يصدر أصواتًا سعيدة ولا يبكي.',
+        'unknown': 'لم يُكتشف بكاء رضيع.'
+      };
       const messages = language === 'en' ? soundTypeMessagesEn
         : language === 'ru' ? soundTypeMessagesRu
         : language === 'tr' ? soundTypeMessagesTr
         : language === 'kk' ? soundTypeMessagesKk
         : language === 'de' ? soundTypeMessagesDe
+        : language === 'ar' ? soundTypeMessagesAr
         : soundTypeMessagesAz;
       const explanation = messages[detection.soundType] || messages['unknown'];
 
@@ -409,6 +427,8 @@ Deno.serve(async (req) => {
             ? ['Бөпе жылаған кезде қайталап көріңіз', 'Микрофонды бөпеге жақындатыңыз', 'Айналадағы дыбыстарды барынша азайтыңыз']
             : language === 'de'
             ? ['Versuche es erneut, wenn dein Baby weint', 'Halte das Mikrofon näher an dein Baby', 'Reduziere die Umgebungsgeräusche auf ein Minimum']
+            : language === 'ar'
+            ? ['حاولي مرة أخرى عندما يبكي رضيعكِ', 'قرّبي الميكروفون من رضيعكِ', 'قلّلي الأصوات المحيطة إلى أدنى حد']
             : ['Körpə ağladıqda yenidən cəhd edin', 'Mikrofonu körpəyə yaxınlaşdırın', 'Ətraf səsləri minimuma endirin'],
           urgency: 'low',
           isCryDetected: false,
@@ -441,6 +461,8 @@ Deno.serve(async (req) => {
           ? 'Бөпенің жылауы анықталды, бірақ оның нақты түрін анықтау мүмкін болмады.'
           : language === 'de'
           ? 'Babyweinen wurde erkannt, die genaue Art konnte jedoch nicht bestimmt werden.'
+          : language === 'ar'
+          ? 'اكتُشف بكاء رضيع، لكن تعذّر تحديد نوعه بدقة.'
           : 'Körpə ağlaması aşkar edildi, lakin dəqiq növü müəyyən edilə bilmədi.',
         recommendations: language === 'en'
           ? ["Check the baby's overall condition", 'Check the diaper', 'Check if the baby is hungry']
@@ -452,6 +474,8 @@ Deno.serve(async (req) => {
           ? ['Бөпенің жағдайын тексеріңіз', 'Жөргегін тексеріңіз', 'Қарны ашқан-ашпағанын тексеріңіз']
           : language === 'de'
           ? ['Überprüfe, wie es deinem Baby geht', 'Überprüfe die Windel', 'Prüfe, ob dein Baby hungrig ist']
+          : language === 'ar'
+          ? ['تحقّقي من حالة رضيعكِ', 'تحقّقي من حفاضه', 'تحقّقي مما إذا كان جائعًا']
           : ['Körpənin vəziyyətini yoxlayın', 'Bezini yoxlayın', 'Ac olub-olmadığını yoxlayın'],
         urgency: 'medium',
         isCryDetected: true

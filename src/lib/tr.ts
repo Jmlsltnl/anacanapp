@@ -52,6 +52,9 @@ export function mapRowTranslation<T extends Record<string, any>>(
     } else if (language === 'de') {
       // de üçün en körpüsü: de hələ tərcümə olunmayıbsa ingilis mətn az-dan daha faydalıdır
       val = row[`${field}_de`] ?? row[`${field}_en`] ?? row[field] ?? row[`${field}_az`];
+    } else if (language === 'ar') {
+      // ar üçün en körpüsü
+      val = row[`${field}_ar`] ?? row[`${field}_en`] ?? row[field] ?? row[`${field}_az`];
     } else {
       val = row[`${field}_${language}`] ?? row[field] ?? row[`${field}_az`];
     }

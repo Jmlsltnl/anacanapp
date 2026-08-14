@@ -57,7 +57,7 @@ function pickLang(row: Record<string, unknown>, field: string, lang: string): st
       const ru = row[`${field}_ru`];
       if (typeof ru === 'string' && ru.trim()) return ru;
     }
-    if (lang === 'de') {
+    if (lang === 'de' || lang === 'ar') {
       const en = row[`${field}_en`];
       if (typeof en === 'string' && en.trim()) return en;
     }

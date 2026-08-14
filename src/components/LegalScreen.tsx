@@ -58,6 +58,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
     if (language === 'tr') return d.title_tr || d.title_en || d.title || d.title_az;
     if (language === 'kk') return d.title_kk || d.title_ru || d.title_en || d.title || d.title_az;
     if (language === 'de') return d.title_de || d.title_en || d.title || d.title_az;
+    if (language === 'ar') return d.title_ar || d.title_en || d.title || d.title_az;
     return d.title_en || d.title || d.title_az;
   };
   const pickContent = (d: any): string => {
@@ -66,6 +67,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
     if (language === 'tr') return d.content_tr || d.content_en || d.content || d.content_az;
     if (language === 'kk') return d.content_kk || d.content_ru || d.content_en || d.content || d.content_az;
     if (language === 'de') return d.content_de || d.content_en || d.content || d.content_az;
+    if (language === 'ar') return d.content_ar || d.content_en || d.content || d.content_az;
     return d.content_en || d.content || d.content_az;
   };
 

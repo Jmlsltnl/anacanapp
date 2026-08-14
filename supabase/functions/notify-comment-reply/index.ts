@@ -60,6 +60,7 @@ Deno.serve(async (req) => {
     const isTr = userLang === 'tr';
     const isKk = userLang === 'kk';
     const isDe = userLang === 'de';
+    const isAr = userLang === 'ar';
 
     // Author name (respect anonymity)
     let authorName = 'Bir istifadəçi';
@@ -68,6 +69,7 @@ Deno.serve(async (req) => {
     if (isTr) authorName = 'Bir kullanıcı';
     if (isKk) authorName = 'Бір пайдаланушы';
     if (isDe) authorName = 'Ein Nutzer';
+    if (isAr) authorName = 'مستخدم';
     
     if (!reply.is_anonymous) {
       const { data: prof } = await supabase
@@ -83,6 +85,7 @@ Deno.serve(async (req) => {
                 : isTr ? `${authorName} yorumunuza yanıt verdi`
                 : isKk ? `${authorName} пікіріңізге жауап берді`
                 : isDe ? `${authorName} hat auf deinen Kommentar geantwortet`
+                : isAr ? `ردّ ${authorName} على تعليقكِ`
                 : `${authorName} rəyinizə cavab yazdı`;
     const body = (reply.content || '').slice(0, 120);
 

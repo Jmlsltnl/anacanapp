@@ -28,7 +28,7 @@ export function absoluteUrl(locale: AppLocale, path = "") {
   return `${SITE_URL}${localePath(locale)}${path}`;
 }
 
-export function organizationSchema(locale: AppLocale) {
+export function organizationSchema() {
   return {
     "@type": "Organization",
     "@id": `${SITE_URL}/#organization`,

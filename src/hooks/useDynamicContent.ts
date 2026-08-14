@@ -135,8 +135,8 @@ export const useBabyNames = () => {
       // Hər dil öz ad dəstini görür: az→Azərbaycan, tr→Türk, ru→Rus, en→beynəlxalq.
       // lang sütunu 20260813150020 migrasiyası ilə gəlir; köhnə DB-lərdə (sütun yoxdursa)
       // origin_en markerinə fallback edirik.
-      // Ad seqmentləri yalnız az/en/ru/tr-dir: kk→az (yerli bazar adları), de→en (beynəlxalq adlar)
-      const targetLang = ['az', 'en', 'ru', 'tr'].includes(language) ? language : language === 'de' ? 'en' : 'az';
+      // Ad seqmentləri yalnız az/en/ru/tr-dir: kk→az (yerli bazar adları), de/ar→en (beynəlxalq adlar)
+      const targetLang = ['az', 'en', 'ru', 'tr'].includes(language) ? language : language === 'de' || language === 'ar' ? 'en' : 'az';
       let { data, error } = await (supabase as any)
         .from('baby_names_db')
         .select('*')

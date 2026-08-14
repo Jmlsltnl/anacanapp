@@ -481,6 +481,8 @@ const FlowDashboard = () => {
                     (tip as any).title_kk || tip.title_ru || getTranslatedTip(tip.title_az || tip.title, language) :
                     language === 'de' ?
                     (tip as any).title_de || tip.title_en || getTranslatedTip(tip.title_az || tip.title, language) :
+                    language === 'ar' ?
+                    (tip as any).title_ar || tip.title_en || getTranslatedTip(tip.title_az || tip.title, language) :
                     tip.title_az || tip.title}
                       </p>
                       <span className="a-list-value" style={{ color: PHASE_INFO[currentPhase].color }}>
@@ -499,6 +501,8 @@ const FlowDashboard = () => {
                 (tip as any).content_kk || tip.content_ru || getTranslatedTip(tip.content_az || tip.content, language) :
                 language === 'de' ?
                 (tip as any).content_de || tip.content_en || getTranslatedTip(tip.content_az || tip.content, language) :
+                language === 'ar' ?
+                (tip as any).content_ar || tip.content_en || getTranslatedTip(tip.content_az || tip.content, language) :
                 tip.content_az || tip.content}
                   </p>
                 </motion.div>

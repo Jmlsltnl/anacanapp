@@ -13,10 +13,10 @@
 // Qeyd: bu YALNIZ ilkin təxmindir — istifadəçi compose-da dil çipi ilə düzəldə bilər.
 // ============================================================
 
-export type FeedLang = 'az' | 'en' | 'ru' | 'tr' | 'kk' | 'de';
+export type FeedLang = 'az' | 'en' | 'ru' | 'tr' | 'kk' | 'de' | 'ar';
 
 /** Feed linzasında göstərilən sıra ilə bütün dəstəklənən dillər */
-export const FEED_LANGS: FeedLang[] = ['az', 'ru', 'tr', 'kk', 'de', 'en'];
+export const FEED_LANGS: FeedLang[] = ['az', 'ru', 'tr', 'kk', 'de', 'ar', 'en'];
 
 export function isFeedLang(v: unknown): v is FeedLang {
   return typeof v === 'string' && (FEED_LANGS as string[]).includes(v);
@@ -53,12 +53,16 @@ export function detectLang(text: string, fallback: FeedLang = 'az'): FeedLang {
     .replace(/https?:\/\/\S+/gi, ' ')
     .replace(/[@#]\S+/g, ' ');
 
+  // 0) Ərəb qrafikası — ən etibarlı marker (başqa heç bir dəstəklənən dildə yoxdur)
+  const arb = (t.match(/[\u0600-\u06FF\u0750-\u077F]/g) || []).length;
   const cyr = (t.match(/[А-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі]/g) || []).length;
   const lat = (t.match(/[A-Za-zƏəĞğIıİÖöŞşÜüÇç]/g) || []).length;
-  const totalLetters = cyr + lat;
+  const totalLetters = arb + cyr + lat;
 
   // Çox qısa mətn (emoji, "ok" və s.) — təxmin etmə, UI dilini götür
   if (totalLetters < 6) return fallback;
+
+  if (arb > totalLetters * 0.3) return 'ar';
 
   // 1) Kiril üstünlüyü → kk (qazax-spesifik hərf varsa) və ya ru
   if (cyr > totalLetters * 0.4) {

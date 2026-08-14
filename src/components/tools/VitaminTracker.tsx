@@ -37,6 +37,7 @@ const getDayLabels = (language: string) => {
   if (language === 'tr') return ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
   if (language === 'kk') return ['Жс', 'Дс', 'Сс', 'Ср', 'Бс', 'Жм', 'Сб'];
   if (language === 'de') return ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+  if (language === 'ar') return ['أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
   return ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'];
 };
 
@@ -54,7 +55,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
     staleTime: 1000 * 60 * 60,
   });
 
-  // Vitamin adını istifadəçi dilində qaytar (kk üçün ru, de üçün en körpüsü)
+  // Vitamin adını istifadəçi dilində qaytar (kk→ru, de/ar→en körpüsü)
   const locVitName = (v: any): string =>
   language === 'az' ? (v.name_az || v.name) :
   (v[`name_${language}`] || (language === 'kk' ? v.name_ru : null) || v.name_en || v.name);

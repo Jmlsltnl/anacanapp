@@ -72,6 +72,20 @@ Generated fayllar `# generated: anacan-app-db` işarəlidir — əllə redaktə 
 
 ---
 
+## Alətlər və müqayisə səhifələri
+
+| Səhifə | URL (az) | Nə üçün |
+|---|---|---|
+| Ovulyasiya kalkulyatoru | `/ovulyasiya-kalkulyatoru/` | İnteraktiv alət (JS tarix hesablaması), yüksək axtarış həcmli açar söz |
+| Hamiləlik əlamətləri | `/hamilelik-elamtleri/` | 12 erkən əlamət + PMS müqayisə cədvəli, yüksək axtarış həcmli açar söz |
+| Müqayisələr hub-u | `/muqayise/` | Anacan vs 8 qlobal rəqib (Flo, Clue, Ovia Health, What to Expect, Pregnancy+, BabyCenter, Natural Cycles, Peanut) — hər biri 5 dildə |
+
+Hər iki alət səhifəsi **eyni URL-lə** köhnə saytdan köçürülüb (SEO davamlılığı üçün).
+Müqayisə səhifələri `src/content/competitors/<dil>/anacan-vs-<slug>.md` — yeni rəqib əlavə etmək üçün:
+1. `src/config/competitors.ts`-ə fakt qeydi əlavə edin
+2. 5 dildə `anacan-vs-<slug>.md` yazın (mövcud fayllardan birini şablon kimi istifadə edin)
+3. `npm run og && npm run build`
+
 ## SEO arxitekturası
 
 | Səth | Yer |

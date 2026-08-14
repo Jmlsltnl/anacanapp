@@ -77,7 +77,8 @@ const LANGUAGES = [
   { code: 'ru', label: 'Русский', flag: 'ru' },
   { code: 'tr', label: tr("fairytalegenerator_turkce_299adc", 'Türkçe'), flag: 'tr' },
   { code: 'kk', label: 'Қазақша', flag: 'kz' },
-  { code: 'de', label: 'Deutsch', flag: 'de' }];
+  { code: 'de', label: 'Deutsch', flag: 'de' },
+  { code: 'ar', label: 'العربية', flag: 'sa' }];
 
 
 // Shared select-pill styles (lav accent)

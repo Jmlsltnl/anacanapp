@@ -75,6 +75,7 @@ Deno.serve(async (req) => {
       tr: { geo: 'tr', unknown: 'Bilinmiyor', outLang: 'TURKISH' },
       kk: { geo: 'kk', unknown: 'Белгісіз', outLang: 'KAZAKH' },
       de: { geo: 'de', unknown: 'Unbekannt', outLang: 'GERMAN' },
+      ar: { geo: 'ar', unknown: 'غير معروف', outLang: 'ARABIC (feminine address to the mother)' },
     };
     const langConf = LANG_CONF[language] ?? LANG_CONF.az;
 

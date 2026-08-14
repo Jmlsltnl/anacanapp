@@ -7,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string; kk: string; de: string }> = {
+const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string; kk: string; de: string; ar: string }> = {
   '0-2': {
     az: 'Çox sadə cümlələr (3-5 söz). Təkrarlanan ifadələr. Heyvan səsləri. Rənglər və formalar. Nağıl 1-2 dəqiqəlik olsun.',
     en: 'Very simple sentences (3-5 words). Repetitive phrases. Animal sounds. Colors and shapes. Story should be 1-2 minutes.',
@@ -15,6 +15,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     tr: 'Çok basit cümleler (3-5 kelime). Tekrarlanan ifadeler. Hayvan sesleri. Renkler ve şekiller. Masal 1-2 dakika olsun.',
     kk: 'Өте қарапайым сөйлемдер (3-5 сөз). Қайталанатын тіркестер. Жануарлардың дыбыстары. Түстер мен пішіндер. Ертегі 1-2 минутқа созылсын.',
     de: 'Sehr einfache Sätze (3–5 Wörter). Wiederkehrende Formulierungen. Tierlaute. Farben und Formen. Das Märchen sollte 1–2 Minuten lang sein.',
+    ar: 'جمل بسيطة جدًا (٣-٥ كلمات). عبارات متكررة. أصوات الحيوانات. الألوان والأشكال. مدة الحكاية من دقيقة إلى دقيقتين.',
   },
   '3-5': {
     az: 'Sadə amma məzmunlu cümlələr. Dialoqlar olsun. Əyləncəli hadisələr. Tərbiyəvi mesaj aydın olsun. 3-4 dəqiqəlik nağıl.',
@@ -23,6 +24,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     tr: 'Basit ama anlamlı cümleler. Diyaloglar olsun. Eğlenceli olaylar. Net eğitici mesaj. 3-4 dakikalık masal.',
     kk: 'Қарапайым, бірақ мағыналы сөйлемдер. Диалогтар болсын. Қызықты оқиғалар. Тәрбиелік ойы анық болсын. Ертегі 3-4 минутқа созылсын.',
     de: 'Einfache, aber aussagekräftige Sätze. Mit Dialogen. Unterhaltsame Ereignisse. Die pädagogische Botschaft sollte klar sein. Ein 3–4-minütiges Märchen.',
+    ar: 'جمل بسيطة وذات معنى. تضمين حوارات وأحداث ممتعة. يجب أن تكون الرسالة التربوية واضحة. مدة الحكاية من ٣ إلى ٤ دقائق.',
   },
   '6-9': {
     az: 'Daha mürəkkəb süjet xətti. Problemin həlli prosesi göstərilsin. Uşağın düşünməsinə kömək edən suallar. 4-6 dəqiqəlik nağıl.',
@@ -31,6 +33,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     tr: 'Daha karmaşık olay örgüsü. Problem çözme süreci gösterilsin. Çocuğun düşünmesine yardımcı sorular. 4-6 dakikalık masal.',
     kk: 'Күрделірек оқиға желісі. Мәселені шешу үдерісі көрсетілсін. Баланың ойлануына көмектесетін сұрақтар. Ертегі 4-6 минутқа созылсын.',
     de: 'Eine komplexere Handlung. Zeige den Prozess der Problemlösung. Fragen, die das Kind zum Nachdenken anregen. Ein 4–6-minütiges Märchen.',
+    ar: 'حبكة أكثر تعقيدًا. توضيح عملية حل المشكلة. أسئلة تساعد الطفل على التفكير. مدة الحكاية من ٤ إلى ٦ دقائق.',
   },
   '10-12': {
     az: 'Zəngin süjet. Əxlaqi dilemma və seçimlər. Emosional dərinlik. Daha uzun dialoqlar. 5-7 dəqiqəlik nağıl.',
@@ -39,6 +42,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     tr: 'Zengin olay örgüsü. Ahlaki ikilemler ve seçimler. Duygusal derinlik. Daha uzun diyaloglar. 5-7 dakikalık masal.',
     kk: 'Мазмұнды оқиға желісі. Моральдық дилеммалар мен таңдау. Эмоциялық тереңдік. Ұзағырақ диалогтар. Ертегі 5-7 минутқа созылсын.',
     de: 'Eine vielschichtige Handlung. Moralische Dilemmas und Entscheidungen. Emotionale Tiefe. Längere Dialoge. Ein 5–7-minütiges Märchen.',
+    ar: 'حبكة غنية. معضلة أخلاقية وخيارات. عمق عاطفي. حوارات أطول. مدة الحكاية من ٥ إلى ٧ دقائق.',
   },
 };
 
@@ -150,6 +154,40 @@ Yapı:
 8. Tatmin edici son${ageInstruction}
 
 Format: İlk satırda başlık, sonra masal metni.`;
+
+    case 'ar':
+      return `أنت مؤلف حائز على جوائز في أدب الأطفال. اكتب حكاية ممتعة وعالية الجودة للأطفال، تتميز بتطور منطقي للحبكة وأسلوب سرد احترافي.
+
+قواعد الجودة الأساسية:
+1. اسم الطفل هو "${childName}". استخدم هذا الاسم دائمًا للشخصية الرئيسية.
+2. يجب أن يكون للحكاية بداية ووسط ونهاية واضحة، وأن تتضمن علاقات منطقية بين الأسباب والنتائج.
+3. يجب أن يكون لكل حدث سبب — ويُمنع استخدام حلول سحرية عشوائية.
+4. يجب أن تتمتع الشخصيات بصفات ودوافع متسقة.
+5. يجب أن تنبثق الرسالة التربوية من الأحداث بصورة طبيعية — من دون وعظ مصطنع.
+6. استخدم لغة حيوية ووصفية تتناول الألوان والأصوات والروائح.
+7. أدرج حوارات هادفة تكشف عن طباع الشخصيات.
+8. يجب أن تُحل المشكلة بجهد البطل أو ذكائه أو تطوره الشخصي.
+9. تُمنع النهايات المبتذلة مثل "وعاشوا بسعادة" — اكتب نهاية محددة ومُرضية.
+10. تُمنع الأوصاف المبالغ فيها. حافظ على نبرة دافئة وواقعية.
+
+يُمنع ما يلي:
+- عبارات مثل "الصديق الصغير" أو "الكائن السحري" من دون أسماء
+- الحلول السحرية العشوائية
+- الدروس الأخلاقية الوعظية
+- اللغة المصطنعة والمفرطة في التحبب
+- فجوات الحبكة أو تسلسل الأحداث غير المنطقي
+
+بنية الحكاية:
+1. العنوان بصيغة "${childName} و[شيء ما]"
+2. وصف المكان (أين ومتى، مع تفاصيل حسية)
+3. تقديم الشخصيات (مع صفاتها الشخصية)
+4. المشكلة/التحدي (منطقي ويمكن للطفل فهمه)
+5. محاولتان أو ٣ محاولات/عقبات (تزداد صعوبة)
+6. الذروة — تطور البطل أو تعلّمه
+7. حل ينبثق منطقيًا من الأحداث
+8. نهاية مُرضية ونتيجة تربوية طبيعية${ageInstruction}
+
+التنسيق: اكتب العنوان في السطر الأول، ثم نص الحكاية. استخدم فقرات لا قوائم. يجب أن تكون الحكاية باللغة العربية الفصحى.`;
 
     case 'de':
       return `Du bist ein preisgekrönter Kinderbuchautor. Schreibe ein spannendes, hochwertiges Märchen für Kinder mit logisch aufgebauter Handlung und professionellem Erzählstil.
@@ -291,6 +329,19 @@ Eğitici mesaj: ${moralLesson || 'Dostluk ve iyilik'}
 ${styleText ? `Tarz: ${styleText}` : ''}
 
 "${childName}" hakkında PROFESYONEL, mantıklı bir masal yaz. Canlı betimlemeler ve tatmin edici bir son olsun.`;
+
+    case 'ar':
+      return `اسم الطفل: ${childName}${ageText}
+الموضوع/الفكرة: ${theme || 'مغامرة في الغابة'}
+الشخصية المساعدة: ${hero || 'حيوان حكيم من حيوانات الغابة'}
+الرسالة التربوية: ${moralLesson || 'الصداقة وفعل الخير'}
+${styleText ? `الأسلوب: ${styleText}` : ''}
+
+مهم:
+- اكتب حكاية احترافية ومنطقية عن "${childName}"
+- استخدم أوصافًا حيوية وحوارات هادفة ونهاية مُرضية
+- اجعل الرسالة التربوية تنبثق من الأحداث بصورة طبيعية لا مصطنعة
+- التزم بدقة بقواعد اللغة العربية الفصحى`;
 
     case 'de':
       return `Name des Kindes: ${childName}${ageText}
@@ -437,6 +488,7 @@ serve(async (req) => {
       tr: `${actualChildName}'in Masalı`,
       kk: `${actualChildName} туралы ертегі`,
       de: `Das Märchen von ${actualChildName}`,
+      ar: `حكاية ${actualChildName}`,
     };
     
     const title = rawTitle || defaultTitles[language] || defaultTitles['az'];

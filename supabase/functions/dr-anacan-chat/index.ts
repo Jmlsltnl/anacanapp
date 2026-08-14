@@ -80,7 +80,7 @@ Deno.serve(async (req) => {
       resolvedLifeStage = "bump";
     }
 
-    const LANG_NAME: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh", de: "German" };
+    const LANG_NAME: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh", de: "German", ar: "Arabic (Modern Standard, addressing the mother in the FEMININE second person)" };
     const replyLangName = LANG_NAME[language];
 
     const langInstruction = replyLangName
@@ -112,6 +112,10 @@ Deno.serve(async (req) => {
       de: {
         unavailable: "Entschuldige, der Dienst ist vorübergehend nicht verfügbar. Bitte versuche es später noch einmal.",
         noAnswer: "Entschuldige, ich konnte keine Antwort erhalten. Bitte versuche es erneut.",
+      },
+      ar: {
+        unavailable: "عذرًا، الخدمة غير متاحة مؤقتًا. يُرجى المحاولة مرة أخرى بعد قليل.",
+        noAnswer: "عذرًا، تعذّر الحصول على إجابة. حاولي مرة أخرى.",
       },
     };
     const errTexts = ERR_TEXTS[language] ?? ERR_TEXTS.az;

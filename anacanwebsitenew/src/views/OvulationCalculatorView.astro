@@ -236,7 +236,25 @@ const breadcrumbs = [
   const resultsEl = document.getElementById('ovulation-results');
   const locale = (document.querySelector('.calc-card') as HTMLElement | null)?.dataset.locale || 'en-US';
 
-  const fmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+  /*
+   * Hardcoded month names instead of Intl.DateTimeFormat's `month: 'long'`.
+   * Some browser/WebView builds ship "small ICU" (a size-reduced locale
+   * database) that lacks full data for less-common locale tags like
+   * az-Latn-AZ or kk-KZ, silently falling back to a generic "2026 M07 17"
+   * format instead of real month names. A static lookup renders correctly
+   * on every device regardless of the host's ICU data completeness.
+   */
+  const MONTHS: Record<string, string[]> = {
+    az: ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avqust', 'sentyabr', 'oktyabr', 'noyabr', 'dekabr'],
+    ru: ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
+    tr: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'],
+    kk: ['қаңтар', 'ақпан', 'наурыз', 'сәуір', 'мамыр', 'маусым', 'шілде', 'тамыз', 'қыркүйек', 'қазан', 'қараша', 'желтоқсан'],
+    en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  };
+  const langCode = locale.split(/[-_]/)[0].toLowerCase();
+  const months = MONTHS[langCode] ?? MONTHS.en;
+
+  const fmt = { format: (d: Date) => `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}` };
   const addDays = (d: Date, n: number) => {
     const out = new Date(d);
     out.setDate(out.getDate() + n);

@@ -18,6 +18,8 @@ export const FEED_LANGS_CHANGED_EVENT = 'anacan:feed-langs-changed';
 
 // Rus dilinin default linzaya daxil edildiyi ölkələr
 const RU_DEFAULT_COUNTRIES = new Set(['RU', 'BY', 'UA', 'KG', 'UZ', 'TJ', 'TM', 'AM', 'GE', 'MD']);
+// Ərəbdilli ölkələr
+const AR_COUNTRIES = new Set(['SA', 'AE', 'EG', 'QA', 'KW', 'BH', 'OM', 'JO', 'IQ', 'SY', 'LB', 'PS', 'YE', 'LY', 'TN', 'DZ', 'MA', 'SD', 'MR', 'SO', 'DJ', 'KM']);
 
 /** Ölkə + UI dilinə görə ağıllı default linza */
 export function defaultFeedLanguages(countryCode: string | null | undefined, uiLang: string): FeedLang[] {
@@ -28,6 +30,7 @@ export function defaultFeedLanguages(countryCode: string | null | undefined, uiL
   else if (cc === 'TR') langs = ['tr'];
   else if (cc === 'KZ') langs = ['kk', 'ru']; // Qazaxıstan — qazax + rus
   else if (cc === 'DE' || cc === 'AT' || cc === 'CH' || cc === 'LI') langs = ['de']; // almandilli region
+  else if (AR_COUNTRIES.has(cc)) langs = ['ar']; // ərəbdilli region
   else if (RU_DEFAULT_COUNTRIES.has(cc)) langs = ['ru'];
   else langs = ['en'];
   if (!langs.includes(ui)) langs = [ui, ...langs];

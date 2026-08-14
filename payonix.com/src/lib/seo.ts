@@ -10,8 +10,6 @@ interface PageSeoInput {
   href: RouteKey;
   title: string;
   description: string;
-  /** Path to a representative OG image, defaults to the site-wide one. */
-  ogImage?: string;
   noIndex?: boolean;
 }
 
@@ -33,7 +31,6 @@ export function buildPageMetadata({
   href,
   title,
   description,
-  ogImage = "/og/og-default.svg",
   noIndex = false,
 }: PageSeoInput): Metadata {
   const languageAlternates: Record<string, string> = {};
@@ -79,13 +76,14 @@ export function buildPageMetadata({
         .filter((l) => l !== locale)
         .map((l) => ogLocaleMap[l]),
       type: "website",
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+      // og:image is injected automatically by the opengraph-image.tsx file
+      // convention under app/[locale]/ (a generated 1200x630 PNG), which
+      // cascades to all nested routes. X/Twitter falls back to og:image.
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [ogImage],
     },
   };
 }

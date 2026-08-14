@@ -129,6 +129,11 @@ Deno.serve(async (req) => {
       inApp: 'Dein Premium-Abo ist abgelaufen und die Verbindung zu deinem Partner wurde getrennt. Verlängere Premium, um sie wieder zu aktivieren.',
       push: 'Die Verbindung zu deinem Partner wurde getrennt. Verlängere Premium und verbinde dich erneut.',
     },
+    ar: {
+      title: 'انتهت مدة Premium',
+      inApp: 'انتهى اشتراككِ في Premium وتوقف الاتصال بالشريك. مدّدي اشتراك Premium لإعادة تفعيله.',
+      push: 'توقف اتصالكِ بالشريك. مدّدي اشتراك Premium وأعيدي الاتصال.',
+    },
   };
 
   if (detached.length > 0) {

@@ -25,6 +25,7 @@ const LANG_FIELD: Record<string, { meaning: string; origin: string }> = {
   tr: { meaning: 'meaning_tr', origin: 'origin_tr' },
   kk: { meaning: 'meaning_kk', origin: 'origin_kk' },
   de: { meaning: 'meaning_de', origin: 'origin_de' },
+  ar: { meaning: 'meaning_ar', origin: 'origin_ar' },
 };
 
 /** Adı bazadakı standart formaya salır: "aylin" → "Aylin" */
@@ -50,11 +51,11 @@ Deno.serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const { name: rawName, language = 'az' } = await req.json() as NameRequest;
-    const displayLang = ['az', 'en', 'ru', 'tr', 'kk', 'de'].includes(language) ? language : 'az';
+    const displayLang = ['az', 'en', 'ru', 'tr', 'kk', 'de', 'ar'].includes(language) ? language : 'az';
     // Siyahı seqmenti (baby_names_db.lang) yalnız az/en/ru/tr-dir — kk istifadəçisinin
-    // əlavə etdiyi ad az seqmentinə (yerli bazar), de istifadəçisininki en seqmentinə düşür;
+    // əlavə etdiyi ad az seqmentinə (yerli bazar), de/ar istifadəçisininki en seqmentinə düşür;
     // display isə öz dil sahələrindən oxunur
-    const lang = ['az', 'en', 'ru', 'tr'].includes(language) ? language : language === 'de' ? 'en' : 'az';
+    const lang = ['az', 'en', 'ru', 'tr'].includes(language) ? language : language === 'de' || language === 'ar' ? 'en' : 'az';
 
     const name = properCase(String(rawName || ''));
     if (name.length < 2 || name.length > 30 || !/^[\p{L}\s'-]+$/u.test(name)) {
@@ -82,14 +83,14 @@ Deno.serve(async (req) => {
         display: {
           name: existing.name,
           gender: existing.gender,
-          meaning: existing[f.meaning] || (displayLang === 'kk' ? existing.meaning_ru : null) || (displayLang === 'de' ? existing.meaning_en : null) || existing.meaning_az || existing.meaning,
-          origin: existing[f.origin] || (displayLang === 'kk' ? existing.origin_ru : null) || (displayLang === 'de' ? existing.origin_en : null) || existing.origin,
+          meaning: existing[f.meaning] || (displayLang === 'kk' ? existing.meaning_ru : null) || (displayLang === 'de' || displayLang === 'ar' ? existing.meaning_en : null) || existing.meaning_az || existing.meaning,
+          origin: existing[f.origin] || (displayLang === 'kk' ? existing.origin_ru : null) || (displayLang === 'de' || displayLang === 'ar' ? existing.origin_en : null) || existing.origin,
           popularity: existing.popularity || 0,
         },
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // 2) AI axtarışı — 6 dildə məna + mənşə
+    // 2) AI axtarışı — 7 dildə məna + mənşə
     const prompt = `Sən körpə adları üzrə etimoloji məlumat bazasısan.
 Ad: "${name}"
 
@@ -97,9 +98,9 @@ Bu adın həqiqi şəxs adı olub-olmadığını müəyyən et (Azərbaycan, tü
 
 QAYDALAR:
 1. YALNIZ aşağıdakı JSON formatında cavab ver (başqa heç nə yazma, markdown yox):
-{"found":true,"gender":"girl","origin_az":"Ərəb mənşəli","origin_en":"Arabic","origin_ru":"Арабское","origin_tr":"Arapça kökenli","origin_kk":"Араб тілінен","origin_de":"Arabischer Herkunft","meaning_az":"...","meaning_en":"...","meaning_ru":"...","meaning_tr":"...","meaning_kk":"...","meaning_de":"..."}
+{"found":true,"gender":"girl","origin_az":"Ərəb mənşəli","origin_en":"Arabic","origin_ru":"Арабское","origin_tr":"Arapça kökenli","origin_kk":"Араб тілінен","origin_de":"Arabischer Herkunft","origin_ar":"من أصل عربي","meaning_az":"...","meaning_en":"...","meaning_ru":"...","meaning_tr":"...","meaning_kk":"...","meaning_de":"...","meaning_ar":"..."}
 2. gender: "boy" | "girl" | "unisex"
-3. Hər meaning_* qısa və dəqiq olsun (maksimum 120 simvol), həmin dildə yazılsın (meaning_kk qazax dilində kiril, meaning_de alman dilində).
+3. Hər meaning_* qısa və dəqiq olsun (maksimum 120 simvol), həmin dildə yazılsın (meaning_kk qazax dilində kiril, meaning_de alman, meaning_ar ərəb dilində).
 4. Ad real şəxs adı deyilsə (təsadüfi söz, əşya, təhqir və s.): {"found":false}
 5. Uydurma etimologiya vermə — əmin deyilsənsə found:false qaytar.`;
 
@@ -142,6 +143,7 @@ QAYDALAR:
       origin_tr: clip(parsed.origin_tr, 80),
       origin_kk: clip(parsed.origin_kk, 80),
       origin_de: clip(parsed.origin_de, 80),
+      origin_ar: clip(parsed.origin_ar, 80),
       meaning: clip(parsed.meaning_az, 200),
       meaning_az: clip(parsed.meaning_az, 200),
       meaning_en: clip(parsed.meaning_en, 200),
@@ -149,6 +151,7 @@ QAYDALAR:
       meaning_tr: clip(parsed.meaning_tr, 200),
       meaning_kk: clip(parsed.meaning_kk, 200),
       meaning_de: clip(parsed.meaning_de, 200),
+      meaning_ar: clip(parsed.meaning_ar, 200),
       popularity: 25,
       is_active: true,
     };
