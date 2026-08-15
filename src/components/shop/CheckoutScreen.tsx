@@ -9,6 +9,7 @@ import { useCouponValidator } from '@/hooks/useCoupons';
 import CouponInput from './CouponInput';
 import { toast } from '@/hooks/use-toast';
 import { tr } from "@/lib/tr";
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 interface CheckoutScreenProps {
   onBack: () => void;
@@ -21,6 +22,7 @@ const inputStyle: React.CSSProperties = { background: 'var(--a-surface)', border
 const sectionTitleStyle: React.CSSProperties = { fontSize: 14, fontWeight: 700, color: 'var(--a-ink)' };
 
 const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount }: CheckoutScreenProps) => {
+  const isRtl = useIsRtl();
   const { items, totalPrice, createOrder } = useCart();
   const { couponCode, setCouponCode, appliedCoupon, validating, validateCoupon, removeCoupon, recordUsage } = useCouponValidator('shop');
   const [loading, setLoading] = useState(false);
@@ -70,9 +72,9 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, x: rtlX(20, isRtl) }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
+      exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
       className="a-scope min-h-screen"
       style={{ background: 'var(--a-bg)' }}>
 

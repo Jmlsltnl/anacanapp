@@ -27,6 +27,7 @@ import { format, subDays } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { toast } from 'sonner';
 import { tr } from "@/lib/tr";
+import { useIsRtl, rtlX } from '@/lib/rtl';
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 import { ToolPage, ToolHeader } from './anacan/ToolKit';
 
@@ -53,6 +54,7 @@ const riskStyles: Record<string, {bg: string;ink: string;}> = {
 const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   useScrollToTop();
   useScreenAnalytics('MentalHealthTracker', 'Tools');
+  const isRtl = useIsRtl();
 
   // Fetch data from database
   const { data: moodLevelsDB = [] } = useMoodLevelsDB();
@@ -688,9 +690,9 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
               {EPDS_QUESTIONS[currentQuestion] &&
               <motion.div
                 key={currentQuestion}
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: rtlX(20, isRtl) }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}>
+                exit={{ opacity: 0, x: rtlX(-20, isRtl) }}>
                 
                   <p className="font-bold mb-4 text-lg a-heading" style={{ color: 'var(--a-ink)' }}>{EPDS_QUESTIONS[currentQuestion].question}</p>
                   <div className="space-y-2">

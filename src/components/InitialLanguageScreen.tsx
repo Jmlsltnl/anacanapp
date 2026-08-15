@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { Check, Search, ChevronLeft, Globe } from 'lucide-react';
 import { clearTranslationCache, ensureLanguageReady, loadTranslations, fetchActiveLanguages } from '@/lib/i18n';
+import { isRtlLang, rtlX } from '@/lib/rtl';
 import logoImage from '@/assets/logo.png';
 import { useState, useMemo, useEffect } from 'react';
 import countriesData from '../../countries.json';
@@ -92,6 +93,10 @@ export default function InitialLanguageScreen() {
     return countriesData.filter(c => c.name.toLowerCase().includes(lowerQuery));
   }, [searchQuery]);
 
+  // Seçilmiş dilə görə addım keçidi istiqaməti (store/dir asinxron yenilənməzdən əvvəl
+  // dərhal məlumdur, çünki selectedLang lokal state-dir).
+  const isRtl = isRtlLang(selectedLang);
+
   // Bu ekran tərcümə yüklənməzdən ƏVVƏL göstərilir — mətnlər inline saxlanır.
   const L = (m: Record<string, string>) => m[selectedLang] ?? m.az;
   const t = {
@@ -129,7 +134,7 @@ export default function InitialLanguageScreen() {
               key="step-1"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -30 }}
+              exit={{ opacity: 0, x: rtlX(-30, isRtl) }}
               transition={{ duration: 0.35 }}
               className="flex-1 flex flex-col justify-center"
             >
@@ -229,9 +234,9 @@ export default function InitialLanguageScreen() {
           ) : (
             <motion.div
               key="step-2"
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: rtlX(30, isRtl) }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -30 }}
+              exit={{ opacity: 0, x: rtlX(-30, isRtl) }}
               transition={{ duration: 0.35 }}
               className="flex-1 flex flex-col h-full"
             >

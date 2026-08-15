@@ -5,8 +5,10 @@ import {
   TrendingDown, Minus, Flame } from
 'lucide-react';
 import { usePartnerWeeklyStats } from '@/hooks/usePartnerWeeklyStats';
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 const WeeklyStatsTab = () => {
+  const isRtl = useIsRtl();
   const { stats, loading } = usePartnerWeeklyStats();
 
   const getDayName = (dateStr: string) => {
@@ -63,9 +65,9 @@ const WeeklyStatsTab = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
+      initial={{ opacity: 0, x: rtlX(-20, isRtl) }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
+      exit={{ opacity: 0, x: rtlX(20, isRtl) }}
       className="space-y-4">
       
       <h2 className="font-bold text-lg">{tr("weeklystatstab_heftelik_statistika_292953", "Həftəlik Statistika")}</h2>

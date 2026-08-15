@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr, getPersistedLanguage } from "@/lib/tr";
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 interface HoroscopeCompatibilityProps {
   onBack: () => void;
@@ -102,6 +103,7 @@ const getScoreStyle = (score: number) => {
 
 const HoroscopeCompatibility = ({ onBack }: HoroscopeCompatibilityProps) => {
   useScreenAnalytics('HoroscopeCompatibility', 'Tools');
+  const isRtl = useIsRtl();
   const { profile } = useAuthContext();
   const [currentStep, setCurrentStep] = useState(1);
   const [momData, setMomData] = useState<PersonData>({
@@ -246,9 +248,9 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
         return (
           <motion.div
             key="step1"
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: rtlX(20, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
             className="space-y-4">
             
             <PersonInput
@@ -265,9 +267,9 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
         return (
           <motion.div
             key="step2"
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: rtlX(20, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
             className="space-y-4">
             
             <PersonInput
@@ -284,9 +286,9 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
         return (
           <motion.div
             key="step3"
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: rtlX(20, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
             className="space-y-4">
             
             <div className="a-card flex items-center justify-between" style={{ padding: '14px 16px' }}>

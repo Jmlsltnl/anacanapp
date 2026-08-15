@@ -4,12 +4,14 @@ import { Pill, AlertCircle, Leaf, Info } from 'lucide-react';
 import { useVitamins, Vitamin } from '@/hooks/useVitamins';
 import { useUserStore } from '@/store/userStore';
 import { getPregnancyWeek } from '@/lib/pregnancy-utils';
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 interface VitaminsTabProps {
   className?: string;
 }
 
 const VitaminsTab = ({ className }: VitaminsTabProps) => {
+  const isRtl = useIsRtl();
   const { lifeStage, lastPeriodDate } = useUserStore();
 
   // Calculate current pregnancy week
@@ -107,9 +109,9 @@ const VitaminsTab = ({ className }: VitaminsTabProps) => {
   return (
     <motion.div
       key="vitamins"
-      initial={{ opacity: 0, x: -20 }}
+      initial={{ opacity: 0, x: rtlX(-20, isRtl) }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
+      exit={{ opacity: 0, x: rtlX(20, isRtl) }}
       className={`space-y-4 ${className}`}>
       
       {/* Current Week Info */}

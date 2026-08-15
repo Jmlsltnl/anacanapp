@@ -1,6 +1,7 @@
 import { tr } from "@/lib/tr";import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { useIsRtl, rtlX } from '@/lib/rtl';
 import type { QuizQuestion } from '../funnelData';
 
 interface QuizStepProps {
@@ -9,6 +10,7 @@ interface QuizStepProps {
 }
 
 export default function QuizStep({ questions, onComplete }: QuizStepProps) {
+  const isRtl = useIsRtl();
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
@@ -44,9 +46,9 @@ export default function QuizStep({ questions, onComplete }: QuizStepProps) {
 
       <motion.div
         key={currentQ}
-        initial={{ opacity: 0, x: 30 }}
+        initial={{ opacity: 0, x: rtlX(30, isRtl) }}
         animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -30 }}
+        exit={{ opacity: 0, x: rtlX(-30, isRtl) }}
         transition={{ duration: 0.25 }}
         className="flex-1">
         

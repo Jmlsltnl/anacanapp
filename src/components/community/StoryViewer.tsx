@@ -7,6 +7,7 @@ import { useStoryViewers } from '@/hooks/useStoryViewers';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
+import { useIsRtl } from '@/lib/rtl';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +35,7 @@ const StoryViewer = ({
   onDelete
 }: StoryViewerProps) => {
   const { user } = useAuth();
+  const isRtl = useIsRtl();
   const [currentGroupIndex, setCurrentGroupIndex] = useState(initialGroupIndex);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -122,14 +124,15 @@ const StoryViewer = ({
       isLongPress.current = false;
       return;
     }
-    // Tap navigation
+    // Tap navigation — RTL-də oxu istiqamətinə uyğun güzgülənir (sağ tərəf = əvvəlki)
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const width = rect.width;
-    if (x < width / 3) {
-      goToPrevStory();
-    } else if (x > width / 3) {
-      goToNextStory();
+    const tappedFirstThird = x < width / 3;
+    if (tappedFirstThird) {
+      isRtl ? goToNextStory() : goToPrevStory();
+    } else if (!tappedFirstThird && x > width / 3) {
+      isRtl ? goToPrevStory() : goToNextStory();
     }
   };
 
@@ -137,9 +140,9 @@ const StoryViewer = ({
     if (Math.abs(info.offset.y) > 100 && info.offset.y > 0) {
       onClose(); // Swipe down to close
     } else if (info.offset.x > 80) {
-      goToPrevStory();
+      isRtl ? goToNextStory() : goToPrevStory();
     } else if (info.offset.x < -80) {
-      goToNextStory();
+      isRtl ? goToPrevStory() : goToNextStory();
     }
   };
 

@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAutoJoinGroups } from '@/hooks/useCommunity';
 import { supabase } from '@/integrations/supabase/client';
 import type { LifeStage } from '@/types/anacan';
+import { useIsRtl, rtlX } from '@/lib/rtl';
 import { tr } from '@/lib/tr';
 
 /**
@@ -221,6 +222,7 @@ const MULTI_QUESTIONS: Partial<Record<StepId, { emoji: string; title: string; su
 
 const PremiumOnboarding = () => {
   const isNative = Capacitor.isNativePlatform();
+  const isRtl = useIsRtl();
 
   const [stage, setStage] = useState<LifeStage | null>(null);
   const [stepIdx, setStepIdx] = useState(0);
@@ -582,9 +584,9 @@ const PremiumOnboarding = () => {
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
-              initial={{ opacity: 0, x: 60 }}
+              initial={{ opacity: 0, x: rtlX(60, isRtl) }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -60 }}
+              exit={{ opacity: 0, x: rtlX(-60, isRtl) }}
               transition={{ duration: 0.25 }}>
 
               {/* ── Mərhələ seçimi ── */}

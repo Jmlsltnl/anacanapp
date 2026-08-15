@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { isNative, nativeShare, saveImageToGallery, isIOS } from '@/lib/native';
 import { tr } from "@/lib/tr";
+import { useIsRtl } from '@/lib/rtl';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +43,7 @@ const PhotoGalleryViewer = ({
   onClose,
   onDelete
 }: PhotoGalleryViewerProps) => {
+  const isRtl = useIsRtl();
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isZoomed, setIsZoomed] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -83,9 +85,12 @@ const PhotoGalleryViewer = ({
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 50;
-    if (info.offset.x > threshold && hasPrev) {
+    // RTL: oxu istiqamətinə uyğun güzgülənir (sağa sürüşdürmə = növbəti)
+    const swipedToStart = isRtl ? info.offset.x < -threshold : info.offset.x > threshold;
+    const swipedToEnd = isRtl ? info.offset.x > threshold : info.offset.x < -threshold;
+    if (swipedToStart && hasPrev) {
       goToPrev();
-    } else if (info.offset.x < -threshold && hasNext) {
+    } else if (swipedToEnd && hasNext) {
       goToNext();
     }
   };
@@ -177,14 +182,15 @@ const PhotoGalleryViewer = ({
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') goToPrev();
-      if (e.key === 'ArrowRight') goToNext();
+      // Fiziki oxlar həmişə vizual istiqamətə gedir — RTL-də vizual-sol = "növbəti"
+      if (e.key === 'ArrowLeft') isRtl ? goToNext() : goToPrev();
+      if (e.key === 'ArrowRight') isRtl ? goToPrev() : goToNext();
       if (e.key === 'Escape') onClose();
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, goToNext, goToPrev, onClose]);
+  }, [isOpen, goToNext, goToPrev, onClose, isRtl]);
 
   if (!isOpen || !currentPhoto) return null;
 

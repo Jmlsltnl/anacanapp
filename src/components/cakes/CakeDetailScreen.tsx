@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { type Cake } from '@/hooks/useCakes';
 import { useCakeCart } from '@/hooks/useCakeCart';
 import { tr } from "@/lib/tr";
+import { useIsRtl } from '@/lib/rtl';
 
 interface CakeDetailScreenProps {
   cake: Cake;
@@ -14,6 +15,7 @@ interface CakeDetailScreenProps {
 
 const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) => {
   const { toast } = useToast();
+  const isRtl = useIsRtl();
   const { addToCart, totalItems } = useCakeCart();
   const [quantity, setQuantity] = useState(1);
   const [customFields, setCustomFields] = useState<Record<string, string>>({});
@@ -55,7 +57,9 @@ const CakeDetailScreen = ({ cake, onBack, onOpenCart }: CakeDetailScreenProps) =
   const handleTouchEnd = () => {
     const diff = touchStartX.current - touchEndX.current;
     if (Math.abs(diff) > 50) {
-      if (diff > 0) goToNext();else
+      // RTL: oxu istiqamətinə uyğun güzgülənir (sağa sürüşdürmə = növbəti)
+      const swipedForward = isRtl ? diff < 0 : diff > 0;
+      if (swipedForward) goToNext();else
       goToPrev();
     }
   };

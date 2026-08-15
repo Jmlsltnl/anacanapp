@@ -13,6 +13,7 @@ import { useLanguage } from '@/hooks/useLanguage';
 import { supabase } from '@/integrations/supabase/client';
 import type { LifeStage } from '@/types/anacan';
 import { tr } from "@/lib/tr";
+import { isRtlLang, rtlX } from '@/lib/rtl';
 
 // Icon mapping for dynamic stages
 const iconMap: Record<string, React.ComponentType<any>> = {
@@ -38,6 +39,7 @@ const OnboardingScreen = () => {
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();
   const { language } = useLanguage();
+  const isRtl = isRtlLang(language);
 
   // Fetch dynamic data from backend
   const { data: dbStages, isLoading: stagesLoading } = useOnboardingStages();
@@ -290,9 +292,9 @@ const OnboardingScreen = () => {
   };
 
   const pageVariants = {
-    initial: { opacity: 0, x: 100 },
+    initial: { opacity: 0, x: rtlX(100, isRtl) },
     animate: { opacity: 1, x: 0, transition: { type: "spring" as const, stiffness: 300, damping: 30 } },
-    exit: { opacity: 0, x: -100 }
+    exit: { opacity: 0, x: rtlX(-100, isRtl) }
   };
 
   const staggerChildren = {
@@ -424,8 +426,8 @@ const OnboardingScreen = () => {
                       {isSelected &&
                     <motion.div
                       className="absolute inset-0 bg-white/10"
-                      initial={{ x: '-100%' }}
-                      animate={{ x: '100%' }}
+                      initial={{ x: rtlX('-100%', isRtl) }}
+                      animate={{ x: rtlX('100%', isRtl) }}
                       transition={{ duration: 1, repeat: Infinity, repeatDelay: 1 }} />
 
                     }
@@ -691,7 +693,7 @@ const OnboardingScreen = () => {
             <>
                 {step === 1 ? tr("onboardingscreen_basla_4820bc", "Ba\u015Fla") : tr("onboardingscreen_davam_et_7bc3d8", "Davam et")}
                 <motion.div
-                animate={{ x: [0, 5, 0] }}
+                animate={{ x: [0, rtlX(5, isRtl), 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}>
 
                   <ArrowRight className="rtl:rotate-180 w-6 h-6" />

@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 interface HelpScreenProps {
   onBack: () => void;
@@ -24,6 +25,7 @@ const inputStyle: React.CSSProperties = { background: 'var(--a-surface)', border
 
 const HelpScreen = ({ onBack }: HelpScreenProps) => {
   useScrollToTop();
+  const isRtl = useIsRtl();
 
   const [activeTab, setActiveTab] = useState<'faq' | 'contact' | 'tickets'>('faq');
   const [showNewTicket, setShowNewTicket] = useState(false);
@@ -300,9 +302,9 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
             {activeTab === 'faq' &&
             <motion.div
               key="faq"
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: rtlX(-20, isRtl) }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}>
+              exit={{ opacity: 0, x: rtlX(20, isRtl) }}>
 
                 <div className="a-card">
                   <h3 className="a-card-title flex items-center gap-2" style={{ marginBottom: 12 }}>
@@ -337,9 +339,9 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
             {activeTab === 'contact' &&
             <motion.div
               key="contact"
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: rtlX(-20, isRtl) }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              exit={{ opacity: 0, x: rtlX(20, isRtl) }}
               className="space-y-3.5">
 
                 <div className="a-card">
@@ -396,9 +398,9 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
             {activeTab === 'tickets' &&
             <motion.div
               key="tickets"
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: rtlX(-20, isRtl) }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              exit={{ opacity: 0, x: rtlX(20, isRtl) }}
               className="space-y-3.5">
 
                 {/* New Ticket Button/Form */}

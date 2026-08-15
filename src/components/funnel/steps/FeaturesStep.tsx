@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { getDynamicIcon } from '@/lib/dynamicIcon';
+import { useIsRtl, rtlX } from '@/lib/rtl';
 import type { Feature } from '../funnelData';
 
 interface FeaturesStepProps {
@@ -12,7 +13,9 @@ interface FeaturesStepProps {
 }
 
 export default function FeaturesStep({ features, onContinue }: FeaturesStepProps) {
+  const isRtl = useIsRtl();
   const [active, setActive] = useState(0);
+  const [direction, setDirection] = useState(1);
 
   return (
     <div className="flex flex-col min-h-full px-6 py-8">
@@ -23,9 +26,9 @@ export default function FeaturesStep({ features, onContinue }: FeaturesStepProps
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: rtlX(direction * 40, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
+            exit={{ opacity: 0, x: rtlX(direction * -40, isRtl) }}
             className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl border border-primary/20 p-8 text-center"
           >
             {(() => {
@@ -42,7 +45,7 @@ export default function FeaturesStep({ features, onContinue }: FeaturesStepProps
 
         <div className="flex justify-center gap-4 mt-6">
           <button
-            onClick={() => setActive((active - 1 + features.length) % features.length)}
+            onClick={() => { setDirection(-1); setActive((active - 1 + features.length) % features.length); }}
             className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
           >
             <ChevronLeft className="rtl:rotate-180 w-4 h-4 text-muted-foreground" />
@@ -53,7 +56,7 @@ export default function FeaturesStep({ features, onContinue }: FeaturesStepProps
             ))}
           </div>
           <button
-            onClick={() => setActive((active + 1) % features.length)}
+            onClick={() => { setDirection(1); setActive((active + 1) % features.length); }}
             className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"
           >
             <ChevronRight className="rtl:rotate-180 w-4 h-4 text-muted-foreground" />

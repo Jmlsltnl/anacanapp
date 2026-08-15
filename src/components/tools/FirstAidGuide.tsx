@@ -7,6 +7,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 import { ToolPage, ToolHeader } from './anacan/ToolKit';
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 interface FirstAidGuideProps {
   onBack: () => void;
@@ -14,6 +15,7 @@ interface FirstAidGuideProps {
 
 const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
   useScrollToTop();
+  const isRtl = useIsRtl();
   useScreenAnalytics('FirstAidGuide', 'Tools');
 
   const [selectedScenario, setSelectedScenario] = useState<FirstAidScenario | null>(null);
@@ -152,9 +154,9 @@ const FirstAidGuide = ({ onBack }: FirstAidGuideProps) => {
         <motion.div
           key="steps"
           className="flex flex-col"
-          initial={{ opacity: 0, x: 30 }}
+          initial={{ opacity: 0, x: rtlX(30, isRtl) }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -30 }}>
+          exit={{ opacity: 0, x: rtlX(-30, isRtl) }}>
           
             {/* Progress */}
             <div className="flex items-center gap-1 mb-3">

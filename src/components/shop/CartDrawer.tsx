@@ -4,6 +4,7 @@ import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/useOrders';
 import { useCouponValidator } from '@/hooks/useCoupons';
+import { useIsRtl, rtlX } from '@/lib/rtl';
 import CouponInput from './CouponInput';
 
 interface CartDrawerProps {
@@ -13,6 +14,7 @@ interface CartDrawerProps {
 }
 
 const CartDrawer = ({ isOpen, onClose, onCheckout }: CartDrawerProps) => {
+  const isRtl = useIsRtl();
   const { items, loading, updateQuantity, removeFromCart, totalPrice } = useCart();
   const { couponCode, setCouponCode, appliedCoupon, validating, validateCoupon, removeCoupon } = useCouponValidator('shop');
 
@@ -31,9 +33,9 @@ const CartDrawer = ({ isOpen, onClose, onCheckout }: CartDrawerProps) => {
       
 
       <motion.div
-        initial={{ x: '100%' }}
+        initial={{ x: rtlX('100%', isRtl) }}
         animate={{ x: 0 }}
-        exit={{ x: '100%' }}
+        exit={{ x: rtlX('100%', isRtl) }}
         transition={{ type: 'spring', damping: 25 }}
         className="fixed end-0 top-0 h-full w-full max-w-md bg-background z-50 shadow-xl flex flex-col">
         
@@ -62,7 +64,7 @@ const CartDrawer = ({ isOpen, onClose, onCheckout }: CartDrawerProps) => {
             layout
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, x: -100 }}
+            exit={{ opacity: 0, x: rtlX(-100, isRtl) }}
             className="flex gap-3 bg-card rounded-xl p-3 border border-border">
             
                 <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center text-2xl shrink-0">

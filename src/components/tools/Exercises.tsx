@@ -1,5 +1,6 @@
 import { useState, forwardRef, useMemo } from 'react';
 import { tr } from '@/lib/tr';
+import { useIsRtl, rtlX } from '@/lib/rtl';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Clock, Flame, Check, ChevronRight, Star,
@@ -25,6 +26,7 @@ const levelStyles: Record<string, {bg: string;ink: string;}> = {
 
 const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) => {
   useScrollToTop();
+  const isRtl = useIsRtl();
   useScreenAnalytics('Exercises', 'Tools');
 
   const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
@@ -229,9 +231,9 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
 
           <motion.div
             key="detail"
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: rtlX(50, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}>
+            exit={{ opacity: 0, x: rtlX(-50, isRtl) }}>
             
               {/* Exercise Detail Card */}
               <div className="a-card overflow-hidden" style={{ padding: 0 }}>

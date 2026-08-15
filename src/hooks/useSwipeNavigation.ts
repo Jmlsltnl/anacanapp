@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useIsRtl } from '@/lib/rtl';
 
 interface SwipeNavigationOptions {
   onSwipeBack?: () => void;
@@ -11,6 +12,8 @@ interface SwipeNavigationOptions {
 /**
  * iOS-style edge swipe navigation.
  * Tracks touchmove continuously and also supports fast flicks where touchmove may not fire.
+ * RTL (ərəb): real iOS özü edge-swipe-back jestini RTL-də güzgüləyir (sağ kənardan sola
+ * sürüşdürmə = geri) — biz də eyni konvensiyanı tətbiq edirik.
  */
 export const useSwipeNavigation = ({
   onSwipeBack,
@@ -19,6 +22,7 @@ export const useSwipeNavigation = ({
   threshold = 40,
   enabled = true,
 }: SwipeNavigationOptions = {}) => {
+  const isRtl = useIsRtl();
   const onSwipeBackRef = useRef(onSwipeBack);
   const onSwipeForwardRef = useRef(onSwipeForward);
 
@@ -114,9 +118,16 @@ export const useSwipeNavigation = ({
 
       const effectiveDelta = absDeltaX >= threshold ? deltaX : (edge === 'left' ? maxDeltaX : -maxDeltaX);
 
-      if (edge === 'left' && effectiveDelta > 0) {
+      // LTR: sol kənardan sağa = geri, sağ kənardan sola = irəli.
+      // RTL: güzgülənir — sağ kənardan sola = geri, sol kənardan sağa = irəli (real iOS konvensiyası).
+      const backEdge = isRtl ? 'right' : 'left';
+      const forwardEdge = isRtl ? 'left' : 'right';
+      const backDelta = isRtl ? effectiveDelta < 0 : effectiveDelta > 0;
+      const forwardDelta = isRtl ? effectiveDelta > 0 : effectiveDelta < 0;
+
+      if (edge === backEdge && backDelta) {
         onSwipeBackRef.current?.();
-      } else if (edge === 'right' && effectiveDelta < 0) {
+      } else if (edge === forwardEdge && forwardDelta) {
         onSwipeForwardRef.current?.();
       }
 
@@ -134,7 +145,7 @@ export const useSwipeNavigation = ({
       document.removeEventListener('touchend', handleTouchEnd);
       document.removeEventListener('touchcancel', resetGesture);
     };
-  }, [edgeWidth, threshold, enabled]);
+  }, [edgeWidth, threshold, enabled, isRtl]);
 };
 
 export default useSwipeNavigation;

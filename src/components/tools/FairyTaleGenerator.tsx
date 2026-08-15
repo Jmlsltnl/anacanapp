@@ -13,6 +13,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import PremiumModal from '@/components/PremiumModal';
 import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr, getPersistedLanguage } from "@/lib/tr";
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 interface FairyTaleGeneratorProps {
   onBack: () => void;
@@ -87,6 +88,7 @@ const pillOff: CSSProperties = { background: 'var(--a-surface-soft)', color: 'va
 
 const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   useScreenAnalytics('FairyTaleGenerator', 'Tools');
+  const isRtl = useIsRtl();
   const [selectedTale, setSelectedTale] = useState<FairyTale | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [createMode, setCreateMode] = useState<'wizard' | 'direct'>('wizard');
@@ -485,9 +487,9 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 {createStep === 1 &&
                   <motion.div
                     key="step1"
-                    initial={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: rtlX(20, isRtl) }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
+                    exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
                     className="space-y-4">
 
                     <div>
@@ -552,9 +554,9 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 {createStep === 2 &&
                   <motion.div
                     key="step2"
-                    initial={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: rtlX(20, isRtl) }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
+                    exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
                     className="space-y-4">
 
                     <div>
@@ -614,9 +616,9 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 {createStep === 3 &&
                   <motion.div
                     key="step3"
-                    initial={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: rtlX(20, isRtl) }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
+                    exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
                     className="space-y-4">
 
                     <div>
@@ -657,9 +659,9 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 {createStep === 4 &&
                   <motion.div
                     key="step4"
-                    initial={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: rtlX(20, isRtl) }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
+                    exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
                     className="space-y-4">
 
                     <div>
@@ -694,9 +696,9 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 {createStep === 5 &&
                   <motion.div
                     key="step5"
-                    initial={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: rtlX(20, isRtl) }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
+                    exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
                     className="space-y-4">
 
                     <div className="rounded-2xl p-4 space-y-2" style={{ background: 'var(--a-surface-soft)' }}>

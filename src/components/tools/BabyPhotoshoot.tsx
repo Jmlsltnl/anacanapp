@@ -16,6 +16,7 @@ import { PremiumModal } from '@/components/PremiumModal';
 import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
 import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
+import { useIsRtl, rtlX } from '@/lib/rtl';
 import { useUserStore } from '@/store/userStore';
 import {
   usePhotoshootBackgrounds,
@@ -76,6 +77,7 @@ const optionOff: CSSProperties = { background: 'var(--a-surface-soft)', color: '
 const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack }, ref) => {
   useScrollToTop();
   useScreenAnalytics('BabyPhotoshoot', 'Tools');
+  const isRtl = useIsRtl();
 
   const [step, setStep] = useState(0);
   const [customization, setCustomization] = useState<CustomizationOptions>({
@@ -469,9 +471,9 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       case 0:
         return (
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: rtlX(20, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
             className="space-y-3">
             
             {/* Image Upload */}
@@ -568,9 +570,9 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       case 1:
         return (
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: rtlX(20, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
             className="space-y-3">
             
             {/* Image Style Selection */}
@@ -642,9 +644,9 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
       case 2:
         return (
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: rtlX(20, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
             className="space-y-3">
             
             {/* Eye Color */}

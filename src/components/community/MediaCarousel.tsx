@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 interface MediaItem {
   url: string;
@@ -13,7 +14,11 @@ interface MediaCarouselProps {
 }
 
 const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
+  const isRtl = useIsRtl();
   const [currentIndex, setCurrentIndex] = useState(0);
+  // Naviqasiya istiqaməti (1=irəli, -1=geri) — slayd animasiyasının hansı tərəfdən
+  // girib-çıxacağını təyin edir (RTL-də əlavə olaraq güzgülənir, aşağıda bax).
+  const [direction, setDirection] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -21,10 +26,12 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
   if (media.length === 0) return null;
 
   const goToPrevious = () => {
+    setDirection(-1);
     setCurrentIndex((prev) => (prev === 0 ? media.length - 1 : prev - 1));
   };
 
   const goToNext = () => {
+    setDirection(1);
     setCurrentIndex((prev) => (prev === media.length - 1 ? 0 : prev + 1));
   };
 
@@ -90,9 +97,9 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: rtlX(direction * 50, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
+            exit={{ opacity: 0, x: rtlX(direction * -50, isRtl) }}
             transition={{ duration: 0.2 }}
             className="absolute inset-0"
           >

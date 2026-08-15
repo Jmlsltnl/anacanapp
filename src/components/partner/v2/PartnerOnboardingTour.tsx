@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { HeartHandshake, Home, Users, BellRing, Shield, ChevronRight, X } from 'lucide-react';
 import { hapticFeedback } from '@/lib/native';
 import { tr } from '@/lib/tr';
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 /**
  * Partnyor Modulu 2.0 onboarding turu.
@@ -27,6 +28,7 @@ interface Props {
 }
 
 const PartnerOnboardingTour = ({ onClose }: Props) => {
+  const isRtl = useIsRtl();
   const [step, setStep] = useState(0);
 
   const steps: Step[] = [
@@ -122,9 +124,9 @@ const PartnerOnboardingTour = ({ onClose }: Props) => {
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
-              initial={{ opacity: 0, x: 24 }}
+              initial={{ opacity: 0, x: rtlX(24, isRtl) }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -24 }}
+              exit={{ opacity: 0, x: rtlX(-24, isRtl) }}
               transition={{ duration: 0.18 }}
               style={{ minHeight: 108 }}>
               

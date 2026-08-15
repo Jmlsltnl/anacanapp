@@ -9,6 +9,7 @@ import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
+import { useIsRtl, rtlX } from '@/lib/rtl';
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 import { ToolPage, ToolHeader, ToolLoading } from './anacan/ToolKit';
 
@@ -19,6 +20,7 @@ interface MoodDiaryProps {
 const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) => {
   useScrollToTop();
   useScreenAnalytics('MoodDiary', 'Tools');
+  const isRtl = useIsRtl();
 
   const [activeTab, setActiveTab] = useState<'log' | 'history' | 'insights'>('log');
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
@@ -172,9 +174,9 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
           {activeTab === 'log' &&
           <motion.div
             key="log"
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: rtlX(-20, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
+            exit={{ opacity: 0, x: rtlX(20, isRtl) }}
             className="space-y-3">
             
               {/* Mood Selection */}
@@ -255,9 +257,9 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
           {activeTab === 'history' &&
           <motion.div
             key="history"
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: rtlX(-20, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
+            exit={{ opacity: 0, x: rtlX(20, isRtl) }}
             className="space-y-3">
             
               <div className="a-section-head" style={{ marginBottom: 8 }}>
@@ -318,9 +320,9 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
           {activeTab === 'insights' &&
           <motion.div
             key="insights"
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: rtlX(-20, isRtl) }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
+            exit={{ opacity: 0, x: rtlX(20, isRtl) }}
             className="space-y-3">
             
               <div className="a-card">

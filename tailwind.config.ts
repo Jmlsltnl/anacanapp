@@ -15,6 +15,7 @@ export default {
     extend: {
       fontFamily: {
         nunito: ["Nunito", "system-ui", "sans-serif"],
+        arabic: ["Noto Sans Arabic", "Inter", "Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

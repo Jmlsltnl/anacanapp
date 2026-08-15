@@ -16,6 +16,7 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import VitaminsTab from './VitaminsTab';
 import { ToolPage, ToolHeader, ToolLoading } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 interface NutritionProps {
   onBack: () => void;
@@ -56,6 +57,7 @@ const mealIcons: Record<string, any> = {
 const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) => {
   useScrollToTop();
   useScreenAnalytics('Nutrition', 'Tools');
+  const isRtl = useIsRtl();
 
   const [activeTab, setActiveTab] = useState<'log' | 'tips' | 'vitamins' | 'water'>('log');
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
@@ -426,9 +428,9 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
             {activeTab === 'log' &&
             <motion.div
               key="log"
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: rtlX(-20, isRtl) }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}>
+              exit={{ opacity: 0, x: rtlX(20, isRtl) }}>
               
                 <div className="a-section-head">
                   <h2 className="a-section-title a-heading" style={{ fontSize: 15 }}>{tr("nutrition_bugunku_yemekler_25c273", "Bugünkü yeməklər")}</h2>
@@ -479,9 +481,9 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
             {activeTab === 'tips' &&
             <motion.div
               key="tips"
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: rtlX(-20, isRtl) }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              exit={{ opacity: 0, x: rtlX(20, isRtl) }}
               className="space-y-3">
               
                 <div className="flex items-center gap-2 mb-1">
@@ -538,9 +540,9 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
             {activeTab === 'water' &&
             <motion.div
               key="water"
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: rtlX(-20, isRtl) }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              exit={{ opacity: 0, x: rtlX(20, isRtl) }}
               className="space-y-3">
               
                 <div className="a-card text-center">

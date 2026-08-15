@@ -187,6 +187,11 @@
     overflow: hidden;
   }
 
+  /* Ərəb (ar): .a-scope xaricindəki mətnlər (nadir) üçün fallback override */
+  body:lang(ar) {
+    font-family: 'Noto Sans Arabic', 'Nunito', system-ui, sans-serif;
+  }
+
   #root {
     position: fixed;
     inset: 0;

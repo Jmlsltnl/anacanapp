@@ -17,6 +17,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { tr } from "@/lib/tr";
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 interface BirthOnboardingModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ type DeliveryType = 'natural' | 'cesarean' | 'assisted';
 type Gender = 'boy' | 'girl';
 
 const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingModalProps) => {
+  const isRtl = useIsRtl();
   const { user, profile } = useAuth();
   const { setLifeStage } = useUserStore();
   const { toast } = useToast();
@@ -196,9 +198,9 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
               {step === 1 &&
               <motion.div
                 key="step1"
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: rtlX(20, isRtl) }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
                 className="space-y-4">
                 
                   <div className="text-center mb-4">
@@ -240,9 +242,9 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
               {step === 2 &&
               <motion.div
                 key="step2"
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: rtlX(20, isRtl) }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
                 className="space-y-4">
                 
                   <div className="text-center mb-4">
@@ -289,9 +291,9 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
               {step === 3 &&
               <motion.div
                 key="step3"
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: rtlX(20, isRtl) }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
                 className="space-y-4">
                 
                   <div className="text-center mb-4">
@@ -332,9 +334,9 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
               {step === 4 &&
               <motion.div
                 key="step4"
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: rtlX(20, isRtl) }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                exit={{ opacity: 0, x: rtlX(-20, isRtl) }}
                 className="space-y-4">
                 
                   <div className="text-center mb-4">

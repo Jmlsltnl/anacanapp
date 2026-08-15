@@ -162,6 +162,11 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* Ərəb (ar): Noto Sans Arabic — Inter/Nunito hələ Latın/rəqəm/emoji üçün fallback qalır */
+.a-scope:lang(ar) {
+  font-family: 'Noto Sans Arabic', 'Inter', 'Nunito', ui-sans-serif, system-ui, sans-serif;
+}
+
 .a-scope button {
   -webkit-tap-highlight-color: transparent;
 }

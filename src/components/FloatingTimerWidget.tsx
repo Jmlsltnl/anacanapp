@@ -9,6 +9,7 @@ import { isNative } from '@/lib/native';
 import { processPendingStops, onNativeTimerStopped } from '@/lib/live-timer';
 import type { PendingTimerStop } from '@/plugins/LiveActivityPlugin';
 import { tr } from "@/lib/tr";
+import { useIsRtl, rtlX } from '@/lib/rtl';
 
 const timerConfig: Record<TimerType, {icon: typeof Moon;color: string;label: string;}> = {
   sleep: { icon: Moon, color: 'text-indigo-500', label: tr("common_yuxu", 'Yuxu') },
@@ -26,6 +27,7 @@ const formatTime = (totalSeconds: number) => {
 };
 
 const FloatingTimerWidget = () => {
+  const isRtl = useIsRtl();
   const { activeTimers, stopTimer, getElapsedSeconds } = useTimerStore();
   const whiteNoise = useWhiteNoiseStore();
   const { addLog } = useBabyLogs();
@@ -157,9 +159,9 @@ const FloatingTimerWidget = () => {
 
       <motion.div
         key="panel"
-        initial={{ x: 60, opacity: 0 }}
+        initial={{ x: rtlX(60, isRtl), opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 60, opacity: 0 }}
+        exit={{ x: rtlX(60, isRtl), opacity: 0 }}
         transition={{ type: 'spring', damping: 22, stiffness: 300 }}
         className="fixed end-3 z-[55] w-52"
         style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 5.75rem)' }}>

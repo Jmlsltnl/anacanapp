@@ -669,7 +669,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
               <span className="a-trio-icon" style={{ background: 'var(--a-grad-pink)', color: 'var(--a-berry-ink)' }}>
                 <Pill size={17} strokeWidth={2} />
               </span>
-              <p className="a-trio-label">Vitamin</p>
+              <p className="a-trio-label">{tr("dashboard_vitamin_8331ee", "Vitamin")}</p>
             </motion.button>
             <motion.button
               className="a-trio-item"

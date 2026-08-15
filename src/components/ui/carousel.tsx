@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useIsRtl } from "@/lib/rtl";
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
@@ -40,10 +41,14 @@ function useCarousel() {
 
 const Carousel = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & CarouselProps>(
   ({ orientation = "horizontal", opts, setApi, plugins, className, children, ...props }, ref) => {
+    const isRtl = useIsRtl();
     const [carouselRef, api] = useEmblaCarousel(
       {
         ...opts,
         axis: orientation === "horizontal" ? "x" : "y",
+        // RTL: embla-nın öz sürüşdürmə/scroll fizikasını düzgün istiqamətə keçirir
+        // (yalnız üfüqi carousel-lər üçün mənalıdır — şaquli üçün toxunulmaz qalır)
+        direction: orientation === "horizontal" ? (isRtl ? "rtl" : "ltr") : opts?.direction,
       },
       plugins,
     );
@@ -69,15 +74,16 @@ const Carousel = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 
     const handleKeyDown = React.useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {
+        // Fiziki oxlar vizual istiqamətə gedir — RTL-də vizual-sol embla üçün "next"-dir
         if (event.key === "ArrowLeft") {
           event.preventDefault();
-          scrollPrev();
+          isRtl ? scrollNext() : scrollPrev();
         } else if (event.key === "ArrowRight") {
           event.preventDefault();
-          scrollNext();
+          isRtl ? scrollPrev() : scrollNext();
         }
       },
-      [scrollPrev, scrollNext],
+      [scrollPrev, scrollNext, isRtl],
     );
 
     React.useEffect(() => {
