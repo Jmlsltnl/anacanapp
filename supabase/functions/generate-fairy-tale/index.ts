@@ -423,6 +423,11 @@ serve(async (req) => {
           topK: 30,
           topP: 0.9,
           maxOutputTokens: 8192,
+          // KRİTİK: gemini-2.5-* modelləri default "thinking" aparır (maxOutputTokens büdcəsindən
+          // sərf olunur) — uzun nağıl mətni (xüsusən ərəb kimi fərqli tokenləşməsi olan dillərdə)
+          // üçün bu, vizual mətn üçün HEÇ NƏ qalmamasına səbəb ola bilər (boş nəticə bug-u).
+          // Thinking-i deaktiv edirik ki, bütün büdcə birbaşa nağıl mətninə getsin.
+          thinkingConfig: { thinkingBudget: 0 },
         },
         safetySettings: [
           { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
@@ -467,7 +472,7 @@ serve(async (req) => {
     let rawTitle = lines[0]?.replace(/^#+\s*/, '').replace(/\*\*/g, '').trim() || '';
     
     rawTitle = rawTitle
-      .replace(/^(əlbəttə|buyurun|budur|bax|mən sizə|конечно|вот|here is|here's|tabii|buyrun|işte)[,!.\s]*/i, '')
+      .replace(/^(əlbəttə|buyurun|budur|bax|mən sizə|конечно|вот|here is|here's|tabii|buyrun|işte|بالتأكيد|إليك|تفضلي|هذه قصة)[,!.،\s]*/i, '')
       .replace(/^["«"""]?\s*/, '')
       .replace(/\s*["»"""]?\s*$/, '')
       .replace(new RegExp(`^.*üçün bir nağıl:\\s*`, 'i'), '')

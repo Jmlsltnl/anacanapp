@@ -138,10 +138,17 @@ Deno.serve(async (req) => {
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 8192,
+        // KRİTİK: gemini-2.5-* modelləri default olaraq "thinking" (daxili düşünmə) aparır və bu,
+        // maxOutputTokens büdcəsindən sərf olunur — bəzi sorğularda (uzun/az-tokenli dillərdə
+        // fərqli tokenləşmə səbəbindən, məs. ərəb skripti) düşünmə bütün büdcəni yeyib vizual
+        // mətn üçün HEÇ NƏ qalmır → candidates[0].content.parts boş qayıdır (bu, "AI cavab
+        // vermir" simptomunun ən mühtəməl kök səbəbidir). Thinking-i deaktiv edirik ki, bütün
+        // büdcə birbaşa görünən cavaba getsin.
+        thinkingConfig: { thinkingBudget: 0 },
       },
     };
 
-    const models = ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite"];
+    const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
     const endpoint = stream ? "streamGenerateContent" : "generateContent";
     
     let response: Response | null = null;
@@ -269,6 +276,16 @@ Deno.serve(async (req) => {
     const data = await response.json();
     const assistantMessage =
       data.candidates?.[0]?.content?.parts?.[0]?.text || errTexts.noAnswer;
+    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      // Diaqnostika: boş cavab niyə qayıtdı (safety block, MAX_TOKENS və s.) — dilə görə seçilmiş
+      // problemləri (məs. ar) gələcəkdə tez aşkarlamaq üçün.
+      console.error("dr-anacan-chat: empty response text", {
+        language,
+        finishReason: data.candidates?.[0]?.finishReason,
+        blockReason: data.promptFeedback?.blockReason,
+        safetyRatings: data.candidates?.[0]?.safetyRatings,
+      });
+    }
 
     return new Response(
       JSON.stringify({ message: assistantMessage, success: true }),

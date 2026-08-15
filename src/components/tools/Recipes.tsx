@@ -114,60 +114,63 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
         return match.name; // This is already translated by mapRowsTranslation
       }
 
-      // 2. Fallback local dictionary
-      const isEn = language === 'en';
-      const dictionary: Record<string, { en: string; az: string }> = {
-        'seher_yemeyi': { en: 'Breakfast', az: 'Səhər Yeməyi' },
-        'səhər yeməyi': { en: 'Breakfast', az: 'Səhər Yeməyi' },
-        'seher yemeyi': { en: 'Breakfast', az: 'Səhər Yeməyi' },
-        
-        'nahar': { en: 'Lunch', az: 'Nahar' },
-        
-        'sam_yemeyi': { en: 'Dinner', az: 'Şam Yeməyi' },
-        'şam yeməyi': { en: 'Dinner', az: 'Şam Yeməyi' },
-        'sam yemeyi': { en: 'Dinner', az: 'Şam Yeməyi' },
-        
-        'şorbalar': { en: 'Soups', az: 'Şorbalar' },
-        'sorbalar': { en: 'Soups', az: 'Şorbalar' },
-        
-        'pürelər': { en: 'Purees', az: 'Pürelər' },
-        'pureler': { en: 'Purees', az: 'Pürelər' },
-        
-        'əsas yeməklər': { en: 'Main dishes', az: 'Əsas yeməklər' },
-        'esas yemekler': { en: 'Main dishes', az: 'Əsas yeməklər' },
-        
-        'desertler': { en: 'Desserts', az: 'Desertlər' },
-        'desertlər': { en: 'Desserts', az: 'Desertlər' },
-        'desert': { en: 'Dessert', az: 'Desert' },
-        
-        'saglam ickiler': { en: 'Healthy Drinks', az: 'Sağlam içkilər' },
-        'sağlam içkilər': { en: 'Healthy Drinks', az: 'Sağlam içkilər' },
-        
-        'elave qida': { en: 'Supplementary Food', az: 'Əlavə qida' },
-        'əlavə qida': { en: 'Supplementary Food', az: 'Əlavə qida' },
-        
-        'qelyanaltilar': { en: 'Snacks', az: 'Qəlyanaltılar' },
-        'qəlyanaltılar': { en: 'Snacks', az: 'Qəlyanaltılar' },
-        'qelyanalti': { en: 'Snack', az: 'Qəlyanaltı' },
-        'qəlyanaltı': { en: 'Snack', az: 'Qəlyanaltı' },
-        
-        'sulu_yemekler': { en: 'Soups', az: 'Sulu Yeməklər' },
-        'sulu yeməklər': { en: 'Soups', az: 'Sulu Yeməklər' },
-        'sulu yemekler': { en: 'Soups', az: 'Sulu Yeməklər' },
-        
-        'korpe_qidasi': { en: 'Baby Food', az: 'Körpə Qidası' },
-        'körpə qidası': { en: 'Baby Food', az: 'Körpə Qidası' },
-        'korpe qidasi': { en: 'Baby Food', az: 'Körpə Qidası' },
-        
-        'populyar': { en: 'Popular', az: 'Populyar' },
-        
-        'all': { en: 'All', az: 'Hamısı' },
-        'hamısı': { en: 'All', az: 'Hamısı' },
-        'hamisi': { en: 'All', az: 'Hamısı' }
+      // 2. Fallback local dictionary — bütün 7 dil üçün (əvvəllər yalnız en/az var idi,
+      // ru/tr/kk/de/ar istifadəçiləri bu fallback-a düşəndə xam Azərbaycan mətni görürdü,
+      // məs. "hamısı" filtr çipi — bax Recipes.tsx-də category.id==='all' çağırışı).
+      type LangMap = { az: string; en: string; ru: string; tr: string; kk: string; de: string; ar: string };
+      const dictionary: Record<string, LangMap> = {
+        'seher_yemeyi': { az: 'Səhər Yeməyi', en: 'Breakfast', ru: 'Завтрак', tr: 'Kahvaltı', kk: 'Таңғы ас', de: 'Frühstück', ar: 'الإفطار' },
+        'səhər yeməyi': { az: 'Səhər Yeməyi', en: 'Breakfast', ru: 'Завтрак', tr: 'Kahvaltı', kk: 'Таңғы ас', de: 'Frühstück', ar: 'الإفطار' },
+        'seher yemeyi': { az: 'Səhər Yeməyi', en: 'Breakfast', ru: 'Завтрак', tr: 'Kahvaltı', kk: 'Таңғы ас', de: 'Frühstück', ar: 'الإفطار' },
+
+        'nahar': { az: 'Nahar', en: 'Lunch', ru: 'Обед', tr: 'Öğle yemeği', kk: 'Түскі ас', de: 'Mittagessen', ar: 'الغداء' },
+
+        'sam_yemeyi': { az: 'Şam Yeməyi', en: 'Dinner', ru: 'Ужин', tr: 'Akşam yemeği', kk: 'Кешкі ас', de: 'Abendessen', ar: 'العشاء' },
+        'şam yeməyi': { az: 'Şam Yeməyi', en: 'Dinner', ru: 'Ужин', tr: 'Akşam yemeği', kk: 'Кешкі ас', de: 'Abendessen', ar: 'العشاء' },
+        'sam yemeyi': { az: 'Şam Yeməyi', en: 'Dinner', ru: 'Ужин', tr: 'Akşam yemeği', kk: 'Кешкі ас', de: 'Abendessen', ar: 'العشاء' },
+
+        'şorbalar': { az: 'Şorbalar', en: 'Soups', ru: 'Супы', tr: 'Çorbalar', kk: 'Сорпалар', de: 'Suppen', ar: 'الشوربات' },
+        'sorbalar': { az: 'Şorbalar', en: 'Soups', ru: 'Супы', tr: 'Çorbalar', kk: 'Сорпалар', de: 'Suppen', ar: 'الشوربات' },
+
+        'pürelər': { az: 'Pürelər', en: 'Purees', ru: 'Пюре', tr: 'Püreler', kk: 'Пюрелер', de: 'Pürees', ar: 'البورية' },
+        'pureler': { az: 'Pürelər', en: 'Purees', ru: 'Пюре', tr: 'Püreler', kk: 'Пюрелер', de: 'Pürees', ar: 'البورية' },
+
+        'əsas yeməklər': { az: 'Əsas yeməklər', en: 'Main dishes', ru: 'Основные блюда', tr: 'Ana yemekler', kk: 'Негізгі тағамдар', de: 'Hauptgerichte', ar: 'الأطباق الرئيسية' },
+        'esas yemekler': { az: 'Əsas yeməklər', en: 'Main dishes', ru: 'Основные блюда', tr: 'Ana yemekler', kk: 'Негізгі тағамдар', de: 'Hauptgerichte', ar: 'الأطباق الرئيسية' },
+
+        'desertler': { az: 'Desertlər', en: 'Desserts', ru: 'Десерты', tr: 'Tatlılar', kk: 'Десерттер', de: 'Desserts', ar: 'الحلويات' },
+        'desertlər': { az: 'Desertlər', en: 'Desserts', ru: 'Десерты', tr: 'Tatlılar', kk: 'Десерттер', de: 'Desserts', ar: 'الحلويات' },
+        'desert': { az: 'Desert', en: 'Dessert', ru: 'Десерт', tr: 'Tatlı', kk: 'Десерт', de: 'Dessert', ar: 'حلوى' },
+
+        'saglam ickiler': { az: 'Sağlam içkilər', en: 'Healthy Drinks', ru: 'Полезные напитки', tr: 'Sağlıklı içecekler', kk: 'Пайдалы сусындар', de: 'Gesunde Getränke', ar: 'مشروبات صحية' },
+        'sağlam içkilər': { az: 'Sağlam içkilər', en: 'Healthy Drinks', ru: 'Полезные напитки', tr: 'Sağlıklı içecekler', kk: 'Пайдалы сусындар', de: 'Gesunde Getränke', ar: 'مشروبات صحية' },
+
+        'elave qida': { az: 'Əlavə qida', en: 'Supplementary Food', ru: 'Прикорм', tr: 'Ek gıda', kk: 'Қосымша тағам', de: 'Beikost', ar: 'الغذاء التكميلي' },
+        'əlavə qida': { az: 'Əlavə qida', en: 'Supplementary Food', ru: 'Прикорм', tr: 'Ek gıda', kk: 'Қосымша тағам', de: 'Beikost', ar: 'الغذاء التكميلي' },
+
+        'qelyanaltilar': { az: 'Qəlyanaltılar', en: 'Snacks', ru: 'Перекусы', tr: 'Ara öğünler', kk: 'Жеңіл тағамдар', de: 'Snacks', ar: 'وجبات خفيفة' },
+        'qəlyanaltılar': { az: 'Qəlyanaltılar', en: 'Snacks', ru: 'Перекусы', tr: 'Ara öğünler', kk: 'Жеңіл тағамдар', de: 'Snacks', ar: 'وجبات خفيفة' },
+        'qelyanalti': { az: 'Qəlyanaltı', en: 'Snack', ru: 'Перекус', tr: 'Ara öğün', kk: 'Жеңіл тағам', de: 'Snack', ar: 'وجبة خفيفة' },
+        'qəlyanaltı': { az: 'Qəlyanaltı', en: 'Snack', ru: 'Перекус', tr: 'Ara öğün', kk: 'Жеңіл тағам', de: 'Snack', ar: 'وجبة خفيفة' },
+
+        'sulu_yemekler': { az: 'Sulu Yeməklər', en: 'Soups', ru: 'Супы', tr: 'Sulu yemekler', kk: 'Сорпалы тағамдар', de: 'Suppen', ar: 'الأطباق ذات المرق' },
+        'sulu yeməklər': { az: 'Sulu Yeməklər', en: 'Soups', ru: 'Супы', tr: 'Sulu yemekler', kk: 'Сорпалы тағамдар', de: 'Suppen', ar: 'الأطباق ذات المرق' },
+        'sulu yemekler': { az: 'Sulu Yeməklər', en: 'Soups', ru: 'Супы', tr: 'Sulu yemekler', kk: 'Сорпалы тағамдар', de: 'Suppen', ar: 'الأطباق ذات المرق' },
+
+        'korpe_qidasi': { az: 'Körpə Qidası', en: 'Baby Food', ru: 'Детское питание', tr: 'Bebek maması', kk: 'Бөбек тағамы', de: 'Babynahrung', ar: 'طعام الرضيع' },
+        'körpə qidası': { az: 'Körpə Qidası', en: 'Baby Food', ru: 'Детское питание', tr: 'Bebek maması', kk: 'Бөбек тағамы', de: 'Babynahrung', ar: 'طعام الرضيع' },
+        'korpe qidasi': { az: 'Körpə Qidası', en: 'Baby Food', ru: 'Детское питание', tr: 'Bebek maması', kk: 'Бөбек тағамы', de: 'Babynahrung', ar: 'طعام الرضيع' },
+
+        'populyar': { az: 'Populyar', en: 'Popular', ru: 'Популярное', tr: 'Popüler', kk: 'Танымал', de: 'Beliebt', ar: 'الأكثر شيوعًا' },
+
+        'all': { az: 'Hamısı', en: 'All', ru: 'Все', tr: 'Hepsi', kk: 'Барлығы', de: 'Alle', ar: 'الكل' },
+        'hamısı': { az: 'Hamısı', en: 'All', ru: 'Все', tr: 'Hepsi', kk: 'Барлығы', de: 'Alle', ar: 'الكل' },
+        'hamisi': { az: 'Hamısı', en: 'All', ru: 'Все', tr: 'Hepsi', kk: 'Барлығы', de: 'Alle', ar: 'الكل' },
       };
 
       if (dictionary[normalized]) {
-        return isEn ? dictionary[normalized].en : dictionary[normalized].az;
+        const langKey = (['az', 'en', 'ru', 'tr', 'kk', 'de', 'ar'] as const).includes(language as any) ? (language as keyof LangMap) : 'az';
+        return dictionary[normalized][langKey];
       }
 
       // 3. Fallback to capitalization if nothing matches

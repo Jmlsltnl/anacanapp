@@ -10,6 +10,36 @@ import countriesData from '../../countries.json';
 // flagcdn ölkə kodu xəritəsi (dil kodu → bayraq kodu)
 const FLAG_BY_CODE: Record<string, string> = { az: 'az', en: 'gb', ru: 'ru', tr: 'tr', kk: 'kz', de: 'de', ar: 'sa' };
 
+/**
+ * Cihazın/brauzerin dil-regionundan ("ar-SA", "ru-RU", "de-DE" və s.) ölkə kodunu
+ * təxmin edir ki, ölkə seçimi ekranında istifadəçinin öz ölkəsi ƏVVƏLCƏDƏN
+ * qeyd olunsun (dəyişdirilə bilər, sadəcə default). Uyğun gəlməzsə/API yoxdursa null.
+ */
+function guessCountryFromLocale(countries: { isoAlpha2: string }[]): string | null {
+  try {
+    const locales = typeof navigator !== 'undefined' && navigator.languages?.length ?
+    navigator.languages : [typeof navigator !== 'undefined' ? navigator.language : ''];
+    for (const loc of locales) {
+      if (!loc) continue;
+      let region: string | null = null;
+      // Intl.Locale bütün brauzerlərdə yoxdur (məs. bəzi köhnə WebView-lar) — səssizcə keç
+      if (typeof (Intl as any).Locale === 'function') {
+        try {
+          const l = new (Intl as any).Locale(loc);
+          region = (l.maximize ? l.maximize() : l).region || l.region || null;
+        } catch {/* bu locale parse olunmadı, növbətiyə keç */}
+      }
+      if (!region) {
+        // Fallback: "ru-RU", "en-US" kimi teqin özündən regionu çıxar
+        const m = /-([A-Za-z]{2})(?:-|$)/.exec(loc);
+        if (m) region = m[1].toUpperCase();
+      }
+      if (region && countries.some((c) => c.isoAlpha2 === region)) return region;
+    }
+  } catch {/* naviqator/Intl əlçatan deyil (SSR və s.) */}
+  return null;
+}
+
 // İlkin/fallback siyahı — app_languages sorğusu gələnə qədər və ya offline halda.
 const FALLBACK_LANGS = [
   {
@@ -35,6 +65,9 @@ export default function InitialLanguageScreen() {
   const [isSwitching, setIsSwitching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [langs, setLangs] = useState(FALLBACK_LANGS);
+  // Cihaz dil-regionundan təxmin edilən ölkə — siyahının başında göstərilir və işarələnir,
+  // istifadəçi hələ toxunmasa da default kimi qeyd olunur (istənilən vaxt dəyişdirilə bilər).
+  const [guessedCountry] = useState<string | null>(() => guessCountryFromLocale(countriesData));
 
   // Aktiv dillər DB-dən (app_languages.is_active) — ru/tr açılışı app release tələb etmir.
   useEffect(() => {
@@ -88,10 +121,22 @@ export default function InitialLanguageScreen() {
   };
 
   const filteredCountries = useMemo(() => {
-    if (!searchQuery) return countriesData;
-    const lowerQuery = searchQuery.toLowerCase();
-    return countriesData.filter(c => c.name.toLowerCase().includes(lowerQuery));
-  }, [searchQuery]);
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      return countriesData.filter(c => c.name.toLowerCase().includes(lowerQuery));
+    }
+    // Axtarış yoxdursa təxmin edilən ölkəni siyahının başına çıxarırıq (görünən ilk seçim olsun).
+    if (guessedCountry) {
+      const idx = countriesData.findIndex(c => c.isoAlpha2 === guessedCountry);
+      if (idx > 0) {
+        const arr = [...countriesData];
+        const [guessed] = arr.splice(idx, 1);
+        arr.unshift(guessed);
+        return arr;
+      }
+    }
+    return countriesData;
+  }, [searchQuery, guessedCountry]);
 
   // Seçilmiş dilə görə addım keçidi istiqaməti (store/dir asinxron yenilənməzdən əvvəl
   // dərhal məlumdur, çünki selectedLang lokal state-dir).
@@ -277,7 +322,9 @@ export default function InitialLanguageScreen() {
               <div className="flex-1 overflow-hidden mb-4" style={{ background: 'var(--a-surface)', borderRadius: 20, boxShadow: 'var(--a-card-shadow)' }}>
                 <div className="h-full overflow-y-auto scrollbar-hide">
                   {filteredCountries.length > 0 ? (
-                    filteredCountries.map((country, idx) => (
+                    filteredCountries.map((country, idx) => {
+                      const isGuessed = !searchQuery && guessedCountry === country.isoAlpha2;
+                      return (
                       <motion.button
                         key={country.isoAlpha2}
                         initial={{ opacity: 0, y: 6 }}
@@ -285,7 +332,7 @@ export default function InitialLanguageScreen() {
                         transition={{ delay: Math.min(idx * 0.02, 0.3), duration: 0.25 }}
                         onClick={() => handleCountrySelect(country.isoAlpha2)}
                         className="w-full flex items-center px-4 py-3 transition-colors cursor-pointer"
-                        style={{ borderBottom: '1px solid var(--a-line)' }}
+                        style={{ borderBottom: '1px solid var(--a-line)', background: isGuessed ? 'var(--a-peach-soft, rgba(255,157,99,0.08))' : 'transparent' }}
                       >
                         <div className="w-6 h-4 me-3 overflow-hidden rounded-sm flex-shrink-0" style={{ border: '1px solid var(--a-line)' }}>
                           <img
@@ -297,9 +344,15 @@ export default function InitialLanguageScreen() {
                         <span className="text-start flex-1" style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--a-ink)' }}>
                           {country.name}
                         </span>
+                        {isGuessed && (
+                          <span className="flex items-center gap-1 me-2" style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--a-peach-2)' }}>
+                            <Check className="w-3.5 h-3.5" strokeWidth={3} />
+                          </span>
+                        )}
                         <ChevronLeft className="rtl:rotate-180 w-4 h-4 rotate-180" style={{ color: 'var(--a-ink-faint)' }} />
                       </motion.button>
-                    ))
+                      );
+                    })
                   ) : (
                     <div className="text-center py-12 px-4">
                       <Globe className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--a-ink-faint)' }} />

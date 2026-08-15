@@ -149,7 +149,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
     <ToolPage>
       <ToolHeader
         onBack={onBack}
-        eyebrow={<>{currentWeek}. {tr("weighttracker_ai_prompt_week", "həftə")} · {trimester}. trimestr</>}
+        eyebrow={<>{currentWeek}. {tr("weighttracker_ai_prompt_week", "həftə")} · {trimester}. {tr("weighttracker_trimestr_soz", "trimestr")}</>}
         title={tr("weighttracker_ceki_i_zleyici_9dfe43", "\xC7\u0259ki \u0130zl\u0259yici")}
         actions={
         <motion.button
@@ -531,7 +531,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             transition={{ type: 'spring', damping: 25 }}
             onClick={(e) => e.stopPropagation()}
             className="a-scope w-full overflow-hidden"
-            style={{ background: 'var(--a-surface)', borderRadius: '30px 30px 0 0', paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 20px)' }}>
+            style={{ background: 'var(--a-surface)', borderRadius: '30px 30px 0 0', paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 94px)' }}>
             
               <div className="h-20 flex items-center justify-center" style={{ background: 'var(--a-grad-peach)' }}>
                 <motion.div

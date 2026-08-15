@@ -96,7 +96,11 @@ export const useBlog = () => {
       let typedPosts = (data || []) as BlogPost[];
       // Ölkə hədəfləməsi (admin include/exclude)
       typedPosts = typedPosts.filter((p) => passesCountryFilter(p, userCountry));
-      typedPosts = mapRowsTranslation(typedPosts, language, ['title', 'content', 'excerpt', 'category', 'tags']);
+      // QEYD: 'category'/'tags' mapRowsTranslation-a verilmir — bu sahələr azure-translate.cjs
+      // REGISTRY-də tərcümə üçün qeydiyyatdan keçməyib (yalnız title/content/excerpt var);
+      // əvvəllər 'category' burda verildikdə mövcud olan stray category_en sütunu post-un
+      // slug-ını əvəz edirdi (yalnız EN istifadəçiləri üçün) və kateqoriya filtri/uyğunlaşması sınırdı.
+      typedPosts = mapRowsTranslation(typedPosts, language, ['title', 'content', 'excerpt']);
       setPosts(typedPosts);
       setFeaturedPosts(typedPosts.filter(p => p.is_featured));
     } catch (error) {
@@ -137,7 +141,7 @@ export const useBlog = () => {
         await supabase.rpc('increment_blog_view_count', { post_id: data.id });
       }
       
-      return data ? mapRowTranslation(data as BlogPost, language, ['title', 'content', 'excerpt', 'category', 'tags']) : null;
+      return data ? mapRowTranslation(data as BlogPost, language, ['title', 'content', 'excerpt']) : null;
     } catch (error) {
       console.error('Error fetching post:', error);
       return null;
@@ -195,7 +199,7 @@ export const useBlogAdmin = () => {
 
       if (error) throw error;
       let typedPosts = (data || []) as BlogPost[];
-      typedPosts = mapRowsTranslation(typedPosts, language, ['title', 'content', 'excerpt', 'category', 'tags']);
+      typedPosts = mapRowsTranslation(typedPosts, language, ['title', 'content', 'excerpt']);
       setPosts(typedPosts);
       return typedPosts;
     } catch (error) {

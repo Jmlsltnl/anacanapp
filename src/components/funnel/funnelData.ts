@@ -148,7 +148,7 @@ export const SYMPTOM_MAPPINGS: Record<string, SymptomMapping> = {
   bad: { painPoint: tr("funneldata_ciddi_yuxusuzluq_painpoint", "Ciddi yuxusuzluq"), solution: tr("funneldata_yuxu_sesleri_meditasiya_fb635f", "Yuxu S\u0259sl\u0259ri & Meditasiya"), emoji: '🌙', toolId: 'white-noise', isPremium: true },
   // support
   partial: { painPoint: tr("funneldata_destek_ehtiyaci_7b31a6", "D\u0259st\u0259k ehtiyac\u0131"), solution: tr("funneldata_ana_cemiyyeti_partnyor_baglant_f72b92", "Ana C\u0259miyy\u0259ti & Partnyor Ba\u011Flant\u0131s\u0131"), emoji: '🤝', toolId: 'community', isPremium: false },
-  no: { painPoint: tr("funneldata_destek_catismazligi_e5147a", "D\u0259st\u0259k \xE7at\u0131\u015Fmazl\u0131\u011F\u0131"), solution: '24/7 Anacan.AI Asistan', emoji: '🤖', toolId: 'ai-chat', isPremium: true },
+  no: { painPoint: tr("funneldata_destek_catismazligi_e5147a", "D\u0259st\u0259k \xE7at\u0131\u015Fmazl\u0131\u011F\u0131"), solution: tr("funneldata_24_7_anacan_ai_asistan", "24/7 Anacan.AI Asistan"), emoji: '🤖', toolId: 'ai-chat', isPremium: true },
   // stress
   high: { painPoint: tr("funneldata_yuksek_stres_a96d92", "Y\xFCks\u0259k stres"), solution: tr("funneldata_nefes_mesqleri_meditasiya_225210", "N\u0259f\u0259s M\u0259\u015Fql\u0259ri & Meditasiya"), emoji: '🧘', toolId: 'breathing', isPremium: true },
   very_high: { painPoint: tr("funneldata_cox_yuksek_stres_26e2b3", "\xC7ox y\xFCks\u0259k stres"), solution: tr("funneldata_ai_asistan_nefes_mesqleri_f00217", "AI Asistan & N\u0259f\u0259s M\u0259\u015Fql\u0259ri"), emoji: '🆘', toolId: 'ai-chat', isPremium: true },

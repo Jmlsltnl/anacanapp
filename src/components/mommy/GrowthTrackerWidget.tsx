@@ -288,7 +288,7 @@ const GrowthTrackerWidget = () => {
               <CircleDot size={14} />
             </span>
             <div style={{ minWidth: 0 }}>
-              <p className="a-stat-tile-label">{tr("growthtrackerwidget_bas_3cb8b6", "Baş")}</p>
+              <p className="a-stat-tile-label">{tr("growthtrackerwidget_bas_compact", "Baş")}</p>
               <p className="a-stat-tile-value" style={{ fontSize: 13 }}>
                 {latestEntry?.head_cm ? `${latestEntry.head_cm} ${tr('growthtrackerwidget_unit_cm', 'sm')}` : '—'}
               </p>

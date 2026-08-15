@@ -545,7 +545,6 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
 
           {/* App Version */}
           <div className="text-center pt-4">
-            <p style={{ fontSize: 11, color: 'var(--a-ink-faint)' }}>Anacan v1.0.0</p>
             <p style={{ fontSize: 11, color: 'var(--a-ink-faint)', marginTop: 4 }}>{tr("helpscreen_2025_anacan_butun_huquqlar_qorunur_c35c11", "© 2025 Anacan. Bütün hüquqlar qorunur.")}</p>
           </div>
         </div>

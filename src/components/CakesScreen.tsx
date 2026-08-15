@@ -17,6 +17,8 @@ interface CakesScreenProps {
 
 import { getOrdinal } from '@/lib/utils';
 import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/hooks/useAuth';
+import { isCakesAvailable } from '@/lib/freemium';
 
 const getMonthLabels = (language: string) => Array.from({ length: 12 }, (_, i) => ({
   id: i + 1,
@@ -26,9 +28,16 @@ const getMonthLabels = (language: string) => Array.from({ length: 12 }, (_, i) =
 
 const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
   const language = useUserStore((s) => s.language);
+  const storeCountryCode = useUserStore((s) => s.countryCode);
+  const { profile, isAdmin } = useAuth();
   const MONTHS = useMemo(() => getMonthLabels(language), [language]);
 
   useScreenAnalytics('Cakes', 'Shop');
+
+  // Müdafiə-dərinliyi: bu tool yalnız Azərbaycan üçündür (giriş nöqtəsindən asılı olmayaraq).
+  // QEYD: hook qaydalarına görə bu yoxlama BÜTÜN hook çağırışlarından sonra, yalnız
+  // render-dən əvvəl tətbiq olunur (aşağıda, `return` bloklarından əvvəl axtar).
+  const cakesOk = isAdmin || isCakesAvailable((profile as any)?.country_code || storeCountryCode, language);
   const { cakes, loading } = useCakes();
   const { totalItems } = useCakeCart();
 
@@ -57,6 +66,8 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
     }
     return filtered;
   }, [cakes, activeFilter, searchQuery]);
+
+  if (!cakesOk) return null;
 
   if (showOrderSuccess) {
     return (

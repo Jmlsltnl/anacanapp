@@ -119,13 +119,22 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
         if (m.meal_id === 'nursing') {
           mealName = language === 'en' ? 'Nursing' : language === 'ru' ? 'Грудное вскармливание' : language === 'tr' ? 'Emzirme' : language === 'kk' ? 'Емізу' : language === 'de' ? 'Stillen' : language === 'ar' ? 'رضاعة' : 'Əmizdirmə';
           mealTime = language === 'en' ? 'Anytime' : language === 'ru' ? 'В любое время' : language === 'tr' ? 'Her zaman' : language === 'kk' ? 'Кез келген уақытта' : language === 'de' ? 'Jederzeit' : language === 'ar' ? 'في أي وقت' : 'İstənilən vaxt';
-        } else if (language === 'en') {
-          if (mealName === 'Əlavə qida' || mealName === 'Qəlyanaltı') mealName = 'Snack';
-          if (mealName === 'Səhər yeməyi') mealName = 'Breakfast';
-          if (mealName === 'Nahar') mealName = 'Lunch';
-          if (mealName === 'Şam yeməyi') mealName = 'Dinner';
-          
-          if (mealTime === 'İstənilən vaxt') mealTime = 'Anytime';
+        } else {
+          // QEYD: bu düzəliş əvvəllər YALNIZ language==='en' üçün işləyirdi — digər dillərdə
+          // (ru/tr/kk/de/ar) DB-dən gələn xam Azərbaycan mətni (məs. "İstənilən vaxt") olduğu
+          // kimi göstərilirdi. İndi bütün dillər üçün ümumiləşdirilib.
+          const MEAL_NAME_TR: Record<string, Record<string, string>> = {
+            'Əlavə qida': { en: 'Snack', ru: 'Перекус', tr: 'Ara öğün', kk: 'Жеңіл тамақ', de: 'Snack', ar: 'وجبة خفيفة' },
+            'Qəlyanaltı': { en: 'Snack', ru: 'Перекус', tr: 'Ara öğün', kk: 'Жеңіл тамақ', de: 'Snack', ar: 'وجبة خفيفة' },
+            'Səhər yeməyi': { en: 'Breakfast', ru: 'Завтрак', tr: 'Kahvaltı', kk: 'Таңғы ас', de: 'Frühstück', ar: 'الإفطار' },
+            'Nahar': { en: 'Lunch', ru: 'Обед', tr: 'Öğle yemeği', kk: 'Түскі ас', de: 'Mittagessen', ar: 'الغداء' },
+            'Şam yeməyi': { en: 'Dinner', ru: 'Ужин', tr: 'Akşam yemeği', kk: 'Кешкі ас', de: 'Abendessen', ar: 'العشاء' },
+          };
+          const MEAL_TIME_TR: Record<string, string> = {
+            en: 'Anytime', ru: 'В любое время', tr: 'Her zaman', kk: 'Кез келген уақытта', de: 'Jederzeit', ar: 'في أي وقت',
+          };
+          if (MEAL_NAME_TR[mealName]?.[language]) mealName = MEAL_NAME_TR[mealName][language];
+          if (mealTime === 'İstənilən vaxt' && MEAL_TIME_TR[language]) mealTime = MEAL_TIME_TR[language];
         }
 
         return {

@@ -26,7 +26,7 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
     { id: 'tools', label: tr("bottomnav_aletler_4778b4", 'Alətlər'), icon: RiApps2AiLine },
 
     { id: 'community', label: tr("bottomnav_cemiyyet_2dc44d", 'Cəmiyyət'), icon: Users },
-    { id: 'ai', label: 'Anacan.AI', icon: Sparkles, special: true },
+    { id: 'ai', label: tr("bottomnav_anacan_ai", 'Anacan.AI'), icon: Sparkles, special: true },
     { id: 'profile', label: tr("bottomnav_profil", 'Profil'), icon: User },
   ];
 

@@ -26,6 +26,30 @@ const MENU_ICON_MAP: Record<string, any> = {
   Bell, Shield, HelpCircle, Settings, User
 };
 
+// DB-dəki achievement/menu/category cədvəllərində YALNIZ *_az sütunu var (çox-dilli
+// deyil) — məlum key-lər üçün eyni tr() açarlarını (FALLBACK massivlərində istifadə
+// olunanlarla EYNİ) təkrar istifadə edirik ki, DB-dən gəlsin, fallback-dan gəlsin,
+// nəticə həmişə cari dilə tərcümə olunsun. Naməlum/admin-in əlavə etdiyi xüsusi
+// key-lər üçün DB-nin özündəki (AZ) mətninə enirik.
+const ACHIEVEMENT_NAME_TR: Record<string, [string, string]> = {
+  first_love: ["usepartnerconfig_ilk_sevgi", "İlk Sevgi"],
+  supporter: ["usepartnerconfig_destekci_829677", "Dəstəkçi"],
+  caring: ["usepartnerconfig_qaygikes_c791ee", "Qayğıkeş"],
+  super_partner: ["partnerprofilescreen_super_partner", "Super Partner"],
+  family_hero: ["usepartnerconfig_aile_qehremani_62b00e", "Ailə Qəhrəmanı"],
+};
+const MENU_LABEL_TR: Record<string, [string, string]> = {
+  notifications: ["usepartnerconfig_bildirisler_54eb88", "Bildirişlər"],
+  "partner-privacy": ["usepartnerconfig_gizlilik", "Gizlilik"],
+  help: ["usepartnerconfig_yardim_da857a", "Yardım"],
+};
+const SURPRISE_CATEGORY_LABEL_TR: Record<string, [string, string]> = {
+  romantic: ["usepartnerconfig_romantik", "Romantik"],
+  care: ["usepartnerconfig_qaygi_868e7d", "Qayğı"],
+  adventure: ["usepartnerconfig_macera_bc3bdc", "Macəra"],
+  gift: ["usepartnerconfig_hediyye_8578f3", "Hədiyyə"],
+};
+
 interface PartnerProfileScreenProps {
   onNavigate?: (screen: string) => void;
 }
@@ -55,7 +79,9 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
     const source = dbAchievements.length > 0 ? dbAchievements : FALLBACK_ACHIEVEMENTS;
     return source.map((a) => ({
       id: a.achievement_key,
-      name: (a as any).name_az || (a as any).name || a.achievement_key,
+      name: ACHIEVEMENT_NAME_TR[a.achievement_key] ?
+      tr(...ACHIEVEMENT_NAME_TR[a.achievement_key]) :
+      (a as any).name_az || (a as any).name || a.achievement_key,
       emoji: a.emoji,
       unlocked: a.unlock_condition === 'always_unlocked' ||
       a.unlock_condition === 'completed_surprises' && completedSurprises.length >= a.unlock_threshold ||
@@ -69,7 +95,9 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
     return source.map((m) => ({
       id: (m as any).route || m.menu_key,
       icon: MENU_ICON_MAP[(m as any).icon_name || 'Settings'] || Settings,
-      label: (m as any).label_az || (m as any).label || m.menu_key
+      label: MENU_LABEL_TR[m.menu_key] ?
+      tr(...MENU_LABEL_TR[m.menu_key]) :
+      (m as any).label_az || (m as any).label || m.menu_key
     }));
   }, [dbMenuItems]);
 
@@ -80,7 +108,9 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
       const found = source.find((c) => c.category_key === category);
       if (found) {
         return {
-          label: found.label_az || category,
+          label: SURPRISE_CATEGORY_LABEL_TR[found.category_key] ?
+          tr(...SURPRISE_CATEGORY_LABEL_TR[found.category_key]) :
+          found.label_az || category,
           emoji: found.emoji,
           color: found.color_gradient
         };
@@ -381,10 +411,6 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
         {tr("partnerprofilescreen_cixis_c2de5c", "\xC7\u0131x\u0131\u015F")}
       </motion.button>
 
-      {/* Version */}
-      <p className="text-center text-xs text-muted-foreground mt-6">
-        {tr("partnerprofilescreen_anacan_partner_v1_0_0_azerbayc_23984e", "Anacan Partner v1.0.0 \u2022 Az\u0259rbaycan \uD83C\uDDE6\uD83C\uDDFF")}
-      </p>
     </div>);
 
 };

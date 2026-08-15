@@ -21,6 +21,7 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import MarkdownContent from '@/components/MarkdownContent';
 import { tr } from "@/lib/tr";
 import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/hooks/useAuth';
 
 import { maternityRules, MaternityRule } from '@/data/maternityRules';
 
@@ -34,15 +35,23 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
 
   const language = useUserStore((state) => state.language);
   const isAZ = language === 'az';
+  const storeCountryCode = useUserStore((state) => state.countryCode);
+  const { profile } = useAuth();
 
   const { config, guidelines: dbGuidelines, loading, calculateBenefit } = useMaternityBenefits();
   const [activeTab, setActiveTab] = useState('calculator');
   const [salary, setSalary] = useState('');
   const [pregnancyType, setPregnancyType] = useState<'normal' | 'complicated' | 'multiple'>('normal');
-  // Default ölkə tətbiq dilinə görə (tr→TR, ru/kk→RU, əks halda AZ); istifadəçi istənilən vaxt dəyişə bilər
-  const [selectedCountryCode, setSelectedCountryCode] = useState<string>(
-    language === 'tr' ? 'TR' : language === 'ru' || language === 'kk' ? 'RU' : 'AZ'
-  );
+  // Default ölkə İSTİFADƏÇİNİN HƏQİQİ ÖLKƏSİNƏ görə (əvvəllər səhvən UI dilinə görə seçilirdi,
+  // məs. rus dilində olan Almaniyada yaşayan istifadəçi səhvən RU görürdü). Kalkulyator yalnız
+  // 27 ölkəni dəstəklədiyi üçün siyahıda olmayan ölkələr üçün dilə-əsaslı təxminə enirik;
+  // istifadəçi istənilən vaxt açılan siyahıdan dəyişə bilər.
+  const [selectedCountryCode, setSelectedCountryCode] = useState<string>(() => {
+    const realCountry = (profile as any)?.country_code || storeCountryCode;
+    const supported = maternityRules.some((r) => r.code === realCountry);
+    if (realCountry && supported) return realCountry;
+    return language === 'tr' ? 'TR' : language === 'ru' || language === 'kk' ? 'RU' : language === 'de' ? 'DE' : language === 'ar' ? 'SA' : 'AZ';
+  });
   const [eddDate, setEddDate] = useState<string>('');
   const [role, setRole] = useState<'mother' | 'father'>('mother');
   

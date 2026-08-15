@@ -1146,14 +1146,17 @@
 
 .a-grid-2 {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-top: 14px;
 }
 
 .a-grid-3 {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* minmax(0,1fr) — uzun/qırılmaz sözlər (məs. alman "Kopfumfang") sütunu genişləndirib
+     kartdan daşmasın deyə; minmax olmadan grid track avtomatik minimum məzmunun tam
+     enini alır. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-top: 14px;
 }
@@ -1165,6 +1168,7 @@
   padding: 12px;
   border-radius: 16px;
   background: var(--a-surface-soft);
+  min-width: 0; /* flex/grid item-in özü də kiçilə bilsin — uzun etiketlər üçün müdafiə */
 }
 
 .a-stat-tile-icon {
@@ -1181,6 +1185,8 @@
   font-size: 10px;
   font-weight: 700;
   color: var(--a-ink-soft);
+  overflow-wrap: break-word; /* uzun/qırılmaz sözlər (alman və s.) kart hüdudundan daşmasın */
+  white-space: normal;
 }
 
 .a-stat-tile-value {

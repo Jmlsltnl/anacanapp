@@ -195,7 +195,7 @@ JSON CAVAB:
 {
   "cryType": "hungry|tired|pain|discomfort|colic|attention|overstimulated|sick|no_cry_detected|false_positive",
   "confidence": 70-100,
-  "explanation": "Nə eşitdiyin barədə və analiz haqqında valideynə çox professional, empatiyalı və sakitləşdirici tərzdə Azərbaycan dilində izahat${userContext?.babyName ? ` (${userContext.babyName} adını istifadə et)` : ''}. Əgər səbəb qazdırsa 'Eairh' səsini eşitdiyini vurğula.",
+  "explanation": "Nə eşitdiyin barədə və analiz haqqında valideynə çox professional, empatiyalı və sakitləşdirici tərzdə izahat${userContext?.babyName ? ` (${userContext.babyName} adını istifadə et)` : ''}. Əgər səbəb qazdırsa 'Eairh' səsini eşitdiyini vurğula. DİL: ${outLang || 'Azərbaycan'} (bax aşağıdakı QEYD).",
   "recommendations": ["Ayaqları qarına doğru hərəkət etdirərək qazı çıxarmağa kömək et (Bicycle legs)", "Dəri-dəriyə təmas qur (Skin-to-skin)", "Tövsiyə 3"],
   "urgency": "low|medium|high"
 }${outLang ? `\n\nIMPORTANT: Write the "explanation" and all "recommendations" entries in ${outLang} in a highly professional, empathetic, pediatric tone. Keep JSON keys and enum values exactly as shown.` : ''}`

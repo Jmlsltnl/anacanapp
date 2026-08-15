@@ -93,7 +93,7 @@ export const FALLBACK_ACHIEVEMENTS = [
 { achievement_key: 'first_love', name_az: tr("usepartnerconfig_ilk_sevgi", "İlk Sevgi"), emoji: '💕', unlock_condition: 'always_unlocked', unlock_threshold: 0 },
 { achievement_key: 'supporter', name_az: tr("usepartnerconfig_destekci_829677", "D\u0259st\u0259k\xE7i"), emoji: '🤝', unlock_condition: 'always_unlocked', unlock_threshold: 0 },
 { achievement_key: 'caring', name_az: tr("usepartnerconfig_qaygikes_c791ee", "Qay\u011F\u0131ke\u015F"), emoji: '🌟', unlock_condition: 'completed_surprises', unlock_threshold: 3 },
-{ achievement_key: 'super_partner', name_az: 'Super Partner', emoji: '🏆', unlock_condition: 'completed_surprises', unlock_threshold: 10 },
+{ achievement_key: 'super_partner', name_az: tr("partnerprofilescreen_super_partner", "Super Partnyor"), emoji: '🏆', unlock_condition: 'completed_surprises', unlock_threshold: 10 },
 { achievement_key: 'family_hero', name_az: tr("usepartnerconfig_aile_qehremani_62b00e", "Ail\u0259 Q\u0259hr\u0259man\u0131"), emoji: '👑', unlock_condition: 'surprise_points', unlock_threshold: 500 }];
 
 

@@ -427,12 +427,6 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
               <ChevronRight className="rtl:rotate-180" size={18} style={{ color: 'var(--a-alert-ink)' }} />
             </SettingRow>
           </SectionCard>
-
-          {/* App Info */}
-          <div className="text-center pt-4 pb-8">
-            <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--a-ink-soft)' }}>Anacan v1.0.0</p>
-            <p style={{ fontSize: 11, color: 'var(--a-ink-faint)', marginTop: 4 }}>Made with â¤ï¸ in Azerbaijan</p>
-          </div>
         </div>
       </div>
 

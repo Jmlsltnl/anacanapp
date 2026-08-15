@@ -21,6 +21,7 @@ import { resetAppScrollPosition } from '@/lib/scroll';
 import { initDeeplinkListener, ParsedDeeplink } from '@/lib/deeplink';
 import { pushBackHandler } from '@/lib/backButton';
 import { PUSH_NAV_EVENT, consumePendingPushNav, type PushNavIntent } from '@/lib/pushNav';
+import { isCakesAvailable } from '@/lib/freemium';
 
 // PremiumOnboarding.PENDING_FUNNEL_KEY ilə sinxron saxlanmalıdır
 // (lazy chunk-u pozmamaq üçün static import edilmir)
@@ -116,7 +117,7 @@ const Index = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
-  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, hasSelectedLanguage, setHasSelectedLanguage, lifeStage, hasCompletedFunnel, setFunnelCompleted } = useUserStore();
+  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, hasSelectedLanguage, setHasSelectedLanguage, lifeStage, hasCompletedFunnel, setFunnelCompleted, language, countryCode } = useUserStore();
   const { isAdmin, loading, profile, user, profileLoaded } = useAuth();
   const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
   // Premium onboarding (funnel ilə) — app_settings ilə idarə olunur; setting yoxdursa AKTİVDİR
@@ -420,12 +421,17 @@ const Index = () => {
             <ToolsHub key={toolsResetKey} initialTool={activeTool} onBack={handleToolBack} />
           </motion.div>
         );
-      case 'cakes':
+      case 'cakes': {
+        // Tortlar yalnız Azərbaycan üçündür — deeplink/başqa keçid yolları ilə bu yoxlamanı
+        // bypass etməsin deyə burda (ən üst səviyyə render nöqtəsi) da yoxlanılır.
+        const cakesOk = isAdmin || isCakesAvailable((profile as any)?.country_code || countryCode, language);
+        if (!cakesOk) return null;
         return (
           <motion.div key="cakes" variants={pageVariants} initial="initial" animate="animate" exit="exit">
             <CakesScreen />
           </motion.div>
         );
+      }
       case 'community':
         return (
           <motion.div key="community" variants={pageVariants} initial="initial" animate="animate" exit="exit">

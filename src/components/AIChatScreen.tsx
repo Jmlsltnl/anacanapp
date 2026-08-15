@@ -586,7 +586,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
             <Sparkles size={19} strokeWidth={2} />
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <h1 className="a-chat-header-name a-heading">Anacan.AI</h1>
+            <h1 className="a-chat-header-name a-heading">{tr("bottomnav_anacan_ai", 'Anacan.AI')}</h1>
             <div className="a-chat-header-status">
               <span className="a-chat-status-dot" />
               {tr("untranslated_onlayn_xfaffi", "Onlayn")} · {tr("aichatscreen_hekim_mesleheti_evezi_deyil_a1808c", "⚕️ Həkim məsləhəti əvəzi deyil").replace('⚕️ ', '')}

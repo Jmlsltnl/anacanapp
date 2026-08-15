@@ -124,8 +124,8 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
         const avg = dbHistoryRef.current.reduce((a, b) => a + b, 0) / dbHistoryRef.current.length;
         setAvgDb(Math.round(avg));
 
-        // Track maximum
-        setMaxDb((prev) => Math.max(prev, db));
+        // Track maximum (dəyirmiləşdirilmiş — 25.0446593493 kimi uzun onluq nömrələr əvəzinə "XX")
+        setMaxDb((prev) => Math.max(prev, Math.round(db)));
 
         // Check if too loud for baby sleep
         if (db > NOISE_THRESHOLDS.warning && !showWhiteNoisePrompt) {

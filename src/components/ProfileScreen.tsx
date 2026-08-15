@@ -693,13 +693,6 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
         </motion.div>
       </section>
 
-      {/* Version */}
-      <div className="flex flex-col items-center gap-2 mt-3">
-        <div className="text-center select-none px-6 py-2" style={{ fontSize: 11, color: 'var(--a-on-bg-soft)', fontWeight: 600 }}>
-          {tr("profilescreen_anacan_v1_0_0_azerbaycan_68472e", "Anacan v1.0.0 \u2022 Az\u0259rbaycan \uD83C\uDDE6\uD83C\uDDFF")}
-        </div>
-      </div>
-
       {/* Premium Modal */}
       <PremiumModal
         isOpen={showPremiumModal}
