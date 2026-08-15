@@ -43,6 +43,7 @@ interface HealthcareProvider {
   address: string | null;
   address_az: string | null;
   city: string | null;
+  country_code: string;
   phone: string | null;
   email: string | null;
   website: string | null;
@@ -51,8 +52,11 @@ interface HealthcareProvider {
   image_url: string | null;
   rating: number;
   review_count: number;
+  latitude: number | null;
+  longitude: number | null;
   is_featured: boolean;
   accepts_reservations: boolean;
+  sort_order?: number | null;
 }
 
 const providerTypeLabels: Record<string, {label: string;icon: typeof Stethoscope;}> = {

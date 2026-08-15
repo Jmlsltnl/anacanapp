@@ -52,10 +52,10 @@ Deno.serve(async (req) => {
 
     const { name: rawName, language = 'az' } = await req.json() as NameRequest;
     const displayLang = ['az', 'en', 'ru', 'tr', 'kk', 'de', 'ar'].includes(language) ? language : 'az';
-    // Siyahı seqmenti (baby_names_db.lang) yalnız az/en/ru/tr-dir — kk istifadəçisinin
-    // əlavə etdiyi ad az seqmentinə (yerli bazar), de/ar istifadəçisininki en seqmentinə düşür;
-    // display isə öz dil sahələrindən oxunur
-    const lang = ['az', 'en', 'ru', 'tr'].includes(language) ? language : language === 'de' || language === 'ar' ? 'en' : 'az';
+    // Siyahı seqmenti (baby_names_db.lang) — hər dilin öz seqmenti var (Duzelis2/3/4.sql
+    // ilə kk/de/ar üçün real yerli ad dəstləri əlavə olundu; əvvəllər kk→az, de/ar→en
+    // körpüsü ilə "yerli olmayan" adlar göstərilirdi).
+    const lang = displayLang;
 
     const name = properCase(String(rawName || ''));
     if (name.length < 2 || name.length > 30 || !/^[\p{L}\s'-]+$/u.test(name)) {

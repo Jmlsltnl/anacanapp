@@ -98,7 +98,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
-              <p className="a-eyebrow">{names.length} {tr("babynames_ad_count_3c7a2d", "ad")} · {language === 'en' ? '🇬🇧 English' : language === 'tr' ? '🇹🇷 Türkçe' : language === 'ru' ? '🇷🇺 Русские' : language === 'kk' ? '🇰🇿 Қазақша' : language === 'de' ? '🇩🇪 International' : language === 'ar' ? '🇸🇦 العربية' : `🇦🇿 ${tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan")}`}</p>
+              <p className="a-eyebrow">{names.length} {tr("babynames_ad_count_3c7a2d", "ad")} · {language === 'en' ? '🇬🇧 English' : language === 'tr' ? '🇹🇷 Türkçe' : language === 'ru' ? '🇷🇺 Русские' : language === 'kk' ? '🇰🇿 Қазақша' : language === 'de' ? '🇩🇪 Deutsch' : language === 'ar' ? '🇸🇦 العربية' : `🇦🇿 ${tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan")}`}</p>
               <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("babynames_korpe_adlari_357880", "Körpə Adları")}</p>
             </div>
           </div>

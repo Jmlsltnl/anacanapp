@@ -132,11 +132,12 @@ export const useBabyNames = () => {
   return useQuery({
     queryKey: ['baby_names', language],
     queryFn: async () => {
-      // Hər dil öz ad dəstini görür: az→Azərbaycan, tr→Türk, ru→Rus, en→beynəlxalq.
+      // Hər dil öz ad dəstini görür: az→Azərbaycan, tr→Türk, ru→Rus, en→beynəlxalq,
+      // kk→Qazax, de→Alman, ar→Ərəb (Duzelis2/3/4.sql ilə əlavə olundu — əvvəllər
+      // kk→az, de/ar→en körpüsü ilə "yerli olmayan" adlar göstərilirdi).
       // lang sütunu 20260813150020 migrasiyası ilə gəlir; köhnə DB-lərdə (sütun yoxdursa)
       // origin_en markerinə fallback edirik.
-      // Ad seqmentləri yalnız az/en/ru/tr-dir: kk→az (yerli bazar adları), de/ar→en (beynəlxalq adlar)
-      const targetLang = ['az', 'en', 'ru', 'tr'].includes(language) ? language : language === 'de' || language === 'ar' ? 'en' : 'az';
+      const targetLang = ['az', 'en', 'ru', 'tr', 'kk', 'de', 'ar'].includes(language) ? language : 'az';
       let { data, error } = await (supabase as any)
         .from('baby_names_db')
         .select('*')
