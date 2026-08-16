@@ -1,187 +1,117 @@
 /**
- * Mixpanel Analytics Integration for Anacan
- * Provides: autocapture, session replay, user identification,
- * super properties, and custom event tracking for Marketing/Product/Growth.
+ * Mixpanel Analytics — DISABLED (performance).
+ *
+ * Root-caused as a meaningful contributor to app slowness:
+ *  - `initMixpanel()` was called eagerly at module scope in main.tsx, BEFORE
+ *    React even renders. Because of that, Rollup statically bundled the full
+ *    `mixpanel-browser` SDK (~1.1MB raw / ~220KB gzip, including the rrweb
+ *    session-replay engine) into the app's ROOT entry chunk — every other
+ *    `import('@/lib/mixpanel')` call site elsewhere in the app only *looked*
+ *    lazy; Rollup rewrote them to read off the already-loaded main chunk, so
+ *    nothing was actually deferred. This added real parse/compile weight to
+ *    every cold start, on every device (incl. low-end Android WebViews).
+ *  - `record_sessions_percent: 100` ran full rrweb session-replay recording
+ *    (continuous DOM-mutation/mouse/scroll/input capture) on 100% of
+ *    sessions, for the app's entire lifetime — an ongoing main-thread/memory
+ *    cost layered on top of a framer-motion-heavy, feed-heavy UI.
+ *  - `autocapture: { click, input, scroll, submit }` added global window-level
+ *    listeners for every DOM interaction app-wide, for the whole session.
+ *
+ * All exported function SIGNATURES below are kept identical to before, so
+ * every existing call site (AuthContext.tsx, analytics.ts,
+ * useScreenAnalytics.ts) keeps working unchanged — they just become no-ops.
+ * The `mixpanel-browser` package is no longer imported anywhere in this file,
+ * so it is fully excluded from the production bundle (verify via build output
+ * — no `mixpanel`/`rrweb` chunk should appear).
+ *
+ * To re-enable: restore the previous implementation from git history
+ * (commit before this one), and strongly consider lowering
+ * `record_sessions_percent` well below 100 and dropping `autocapture` before
+ * doing so again.
  */
 
-import mixpanel from 'mixpanel-browser';
-import { Capacitor } from '@capacitor/core';
+const MIXPANEL_DISABLED_LOGGED = { done: false };
 
-const MIXPANEL_TOKEN = '84aa42d1034b562f06386aebea0f4bc4';
-
-let initialized = false;
+const noteDisabledOnce = () => {
+  if (import.meta.env.DEV && !MIXPANEL_DISABLED_LOGGED.done) {
+    MIXPANEL_DISABLED_LOGGED.done = true;
+    console.log('🔮 Mixpanel is disabled (performance) — see src/lib/mixpanel.ts');
+  }
+};
 
 /**
- * Initialize Mixpanel with autocapture + session replay
+ * Initialize Mixpanel — no-op (disabled for performance, see file header).
  */
 export const initMixpanel = () => {
-  if (initialized) return;
-
-  try {
-    mixpanel.init(MIXPANEL_TOKEN, {
-      // Autocapture all clicks, inputs, form submits
-      autocapture: {
-        pageview: 'full-url',
-        click: true,
-        input: true,
-        scroll: true,
-        submit: true,
-      },
-      // Session replay
-      record_sessions_percent: 100,
-      record_block_selector: '[data-mp-block]',
-      record_mask_text_selector: '[data-mp-mask]',
-      // Privacy & performance
-      persistence: 'localStorage',
-      ignore_dnt: false,
-      batch_requests: true,
-      api_host: 'https://api-eu.mixpanel.com',
-      // Debug in dev only
-      debug: import.meta.env.DEV,
-    });
-
-    // Register super properties (sent with every event)
-    mixpanel.register({
-      app_name: 'Anacan',
-      platform: Capacitor.isNativePlatform() ? Capacitor.getPlatform() : 'web',
-      app_version: '1.0.0',
-    });
-
-    initialized = true;
-
-    if (import.meta.env.DEV) {
-      console.log('🔮 Mixpanel initialized');
-    }
-  } catch (error) {
-    console.warn('Mixpanel initialization failed:', error);
-  }
+  noteDisabledOnce();
 };
 
 /**
- * Identify user and set profile properties
+ * Identify user and set profile properties — no-op (disabled).
  */
-export const identifyUser = (userId: string, properties?: Record<string, any>) => {
-  if (!initialized) return;
-
-  try {
-    mixpanel.identify(userId);
-
-    if (properties) {
-      mixpanel.people.set(properties);
-    }
-
-    // Set once properties (first time only)
-    mixpanel.people.set_once({
-      $created: new Date().toISOString(),
-      first_platform: Capacitor.isNativePlatform() ? Capacitor.getPlatform() : 'web',
-    });
-  } catch (error) {
-    console.warn('Mixpanel identify failed:', error);
-  }
+export const identifyUser = (_userId: string, _properties?: Record<string, any>) => {
+  noteDisabledOnce();
 };
 
 /**
- * Update user profile properties
+ * Update user profile properties — no-op (disabled).
  */
-export const setUserProfile = (properties: Record<string, any>) => {
-  if (!initialized) return;
-  try {
-    mixpanel.people.set(properties);
-  } catch {
-    // silent
-  }
+export const setUserProfile = (_properties: Record<string, any>) => {
+  noteDisabledOnce();
 };
 
 /**
- * Register super properties (attached to ALL future events)
+ * Register super properties (attached to ALL future events) — no-op (disabled).
  */
-export const setSuperProperties = (properties: Record<string, any>) => {
-  if (!initialized) return;
-  try {
-    mixpanel.register(properties);
-  } catch {
-    // silent
-  }
+export const setSuperProperties = (_properties: Record<string, any>) => {
+  noteDisabledOnce();
 };
 
 /**
- * Reset on logout
+ * Reset on logout — no-op (disabled).
  */
 export const resetMixpanel = () => {
-  if (!initialized) return;
-  try {
-    mixpanel.reset();
-  } catch {
-    // silent
-  }
+  noteDisabledOnce();
 };
 
 /**
- * Track custom event
+ * Track custom event — no-op (disabled).
  */
-export const trackMixpanelEvent = (eventName: string, properties?: Record<string, any>) => {
-  if (!initialized) return;
-  try {
-    mixpanel.track(eventName, properties);
-  } catch {
-    // silent
-  }
+export const trackMixpanelEvent = (_eventName: string, _properties?: Record<string, any>) => {
+  noteDisabledOnce();
 };
 
 /**
- * Track page/screen view
+ * Track page/screen view — no-op (disabled).
  */
-export const trackPageView = (pageName: string, properties?: Record<string, any>) => {
-  if (!initialized) return;
-  try {
-    mixpanel.track('Page View', {
-      page_name: pageName,
-      ...properties,
-    });
-  } catch {
-    // silent
-  }
+export const trackPageView = (_pageName: string, _properties?: Record<string, any>) => {
+  noteDisabledOnce();
 };
 
 /**
- * Increment a numeric user property (e.g. tool_uses, messages_sent)
+ * Increment a numeric user property (e.g. tool_uses, messages_sent) — no-op (disabled).
  */
-export const incrementUserProperty = (property: string, value: number = 1) => {
-  if (!initialized) return;
-  try {
-    mixpanel.people.increment(property, value);
-  } catch {
-    // silent
-  }
+export const incrementUserProperty = (_property: string, _value: number = 1) => {
+  noteDisabledOnce();
 };
 
 /**
- * Track revenue event
+ * Track revenue event — no-op (disabled).
  */
-export const trackRevenue = (amount: number, properties?: Record<string, any>) => {
-  if (!initialized) return;
-  try {
-    mixpanel.people.track_charge(amount, properties);
-    mixpanel.track('Revenue', { amount, ...properties });
-  } catch {
-    // silent
-  }
+export const trackRevenue = (_amount: number, _properties?: Record<string, any>) => {
+  noteDisabledOnce();
 };
 
 /**
- * Time an event (call before the action, then track normally after)
+ * Time an event (call before the action, then track normally after) — no-op (disabled).
  */
-export const timeEvent = (eventName: string) => {
-  if (!initialized) return;
-  try {
-    mixpanel.time_event(eventName);
-  } catch {
-    // silent
-  }
+export const timeEvent = (_eventName: string) => {
+  noteDisabledOnce();
 };
 
 // ─────────────────────────────────────────
 // Pre-built event helpers for Product/Growth/Marketing
+// (kept for API compatibility — all route through the no-ops above)
 // ─────────────────────────────────────────
 
 export const mpEvents = {
@@ -351,5 +281,3 @@ export const mpEvents = {
     trackRevenue(amount, { order_type: orderType });
   },
 };
-
-export default mixpanel;

@@ -21,7 +21,6 @@ window.addEventListener("unhandledrejection", (e) => {
 });
 import "./index.css";
 import { initializeNativeFeatures } from "./lib/native";
-import { initMixpanel } from "./lib/mixpanel";
 import { initCrashReporter } from "./lib/crashReporter";
 import { initFacebookEvents } from "./lib/facebook-events";
 import { restoreNativeSession, startNativeSessionSync } from "./lib/session-persistence";
@@ -33,8 +32,10 @@ import { applyDocumentDirection } from '@/lib/rtl';
 // Initialize crash reporter first (catches all errors from this point)
 initCrashReporter();
 
-// Initialize Mixpanel analytics
-initMixpanel();
+// Mixpanel is disabled for performance (see src/lib/mixpanel.ts header comment) —
+// it was eagerly bundling ~220KB gzip (SDK + rrweb session-replay) into this
+// boot-critical chunk and running 100%-sampled session recording + global
+// autocapture listeners for the whole app lifetime.
 
 // Initialize Facebook / Meta App Events (native-only, no-op on web)
 initFacebookEvents();
