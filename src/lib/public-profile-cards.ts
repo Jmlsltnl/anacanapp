@@ -12,20 +12,38 @@ export type PublicProfileCard = {
   created_at?: string;
 };
 
-const SELECT_FIELDS = "user_id, name, avatar_url, badge_type, life_stage, is_premium, is_verified, verified_until, created_at";
+// CORE_FIELDS mütləq mövcuddur (uzun müddətdir DB-də var). is_verified/
+// verified_until isə supabase/duzelis/Duzelis10.sql ilə əlavə olunur —
+// istifadəçi bu SQL-i işlətməyənə qədər live DB-də bu sütunlar OLMAYA bilər.
+// Postgres/PostgREST mövcud olmayan sütun seçildikdə BÜTÜN sorğunu xəta ilə
+// rədd edir (yalnız o sütun deyil) — nəticədə hər post/şərh üçün authorMap
+// boş qalır və HAMISI "İstifadəçi" fallback-inə düşür. Ona görə əvvəlcə tam
+// SELECT sınanır, xəta olarsa CORE_FIELDS ilə təhlükəsiz fallback edilir ki,
+// ad/avatar/nişan göstərilməsi migration-un vaxtından asılı olmasın.
+const CORE_FIELDS = "user_id, name, avatar_url, badge_type, life_stage, is_premium, created_at";
+const SELECT_FIELDS = `${CORE_FIELDS}, is_verified, verified_until`;
 
 export async function getPublicProfileCard(userId: string): Promise<PublicProfileCard | null> {
   if (!userId) return null;
 
-  const { data, error } = await (supabase as any)
+  let { data, error } = await (supabase as any)
     .from("public_profile_cards")
     .select(SELECT_FIELDS)
     .eq("user_id", userId)
     .maybeSingle();
 
   if (error) {
-    console.error("Public profile fetch error:", error);
-    return null;
+    // Fallback: Duzelis10.sql hələ işlədilməyib — köhnə sütunlarla təkrar cəhd
+    const fallback = await (supabase as any)
+      .from("public_profile_cards")
+      .select(CORE_FIELDS)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (fallback.error) {
+      console.error("Public profile fetch error:", fallback.error);
+      return null;
+    }
+    data = fallback.data;
   }
 
   return (data ?? null) as PublicProfileCard | null;
@@ -35,14 +53,22 @@ export async function getPublicProfileCards(userIds: string[]): Promise<Record<s
   const uniqueIds = Array.from(new Set((userIds || []).filter(Boolean)));
   if (uniqueIds.length === 0) return {};
 
-  const { data, error } = await (supabase as any)
+  let { data, error } = await (supabase as any)
     .from("public_profile_cards")
     .select(SELECT_FIELDS)
     .in("user_id", uniqueIds);
 
   if (error) {
-    console.error("Public profiles bulk fetch error:", error);
-    return {};
+    // Fallback: Duzelis10.sql hələ işlədilməyib — köhnə sütunlarla təkrar cəhd
+    const fallback = await (supabase as any)
+      .from("public_profile_cards")
+      .select(CORE_FIELDS)
+      .in("user_id", uniqueIds);
+    if (fallback.error) {
+      console.error("Public profiles bulk fetch error:", fallback.error);
+      return {};
+    }
+    data = fallback.data;
   }
 
   const map: Record<string, PublicProfileCard> = {};

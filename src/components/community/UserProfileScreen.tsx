@@ -8,6 +8,7 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import PostCard from './PostCard';
 import { CommunityPost } from '@/hooks/useCommunity';
 import { VerifiedTick, isVerifiedActive } from './UserBadge';
+import { getPublicProfileCard } from '@/lib/public-profile-cards';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
@@ -54,12 +55,11 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
     queryFn: async (): Promise<CommunityPost[]> => {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
 
-      const [{ data: cardData }, { data: postsData }] = await Promise.all([
-      (supabase as any).
-      from('public_profile_cards').
-      select('name, avatar_url, badge_type, is_verified, verified_until').
-      eq('user_id', userId).
-      maybeSingle(),
+      const [cardData, { data: postsData }] = await Promise.all([
+      // getPublicProfileCard: is_verified/verified_until sütunları hələ
+      // yaradılmayıbsa (Duzelis10.sql işlədilməyib) belə, ad/avatar/nişan
+      // göstərilməsini pozmayan təhlükəsiz fallback-lə gəlir.
+      getPublicProfileCard(userId),
       supabase.
       from('community_posts').
       select('*').
@@ -112,18 +112,10 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       setIsCurrentUser(currentUser?.id === userId);
 
-      // Fetch profile (public-safe projection for Community)
-      const { data: profileData, error: profileError } = await (supabase as any).
-      from('public_profile_cards').
-      select('user_id, name, avatar_url, life_stage, is_premium, badge_type, is_verified, verified_until, created_at').
-      eq('user_id', userId).
-      maybeSingle();
-
-      if (profileError) {
-        console.error('Profile fetch error:', profileError);
-        setLoading(false);
-        return;
-      }
+      // Fetch profile (public-safe projection for Community) — getPublicProfileCard
+      // özündə fallback var (is_verified/verified_until sütunları hələ mövcud
+      // olmasa belə, əsas profil sorğusu pozulmur).
+      const profileData = await getPublicProfileCard(userId);
 
       if (profileData) {
         setProfile(profileData as unknown as UserProfile);
