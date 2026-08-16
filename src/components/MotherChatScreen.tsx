@@ -99,7 +99,8 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
     scrollToBottom();
   }, [messages]);
 
-  // Realtime subscription
+  // Realtime subscription — mən göndərən VƏ YA qəbul edən olduğum sətirlərə
+  // filtrlənmiş iki handler (app-boyu bütün partner_messages-a yox).
   useEffect(() => {
     if (!user || !partnerProfile) return;
 
@@ -107,26 +108,25 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
     channel('mother_chat').
     on(
       'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'partner_messages'
-      },
+      { event: 'INSERT', schema: 'public', table: 'partner_messages', filter: `sender_id=eq.${user.id}` },
       (payload) => {
         const newMsg = payload.new as ChatMessage;
-        if (
-        newMsg.sender_id === user.id && newMsg.receiver_id === partnerProfile.user_id ||
-        newMsg.sender_id === partnerProfile.user_id && newMsg.receiver_id === user.id)
-        {
-          if (['text', 'love', 'image', 'audio'].includes(newMsg.message_type)) {
-            setMessages((prev) => [...prev, newMsg]);
-            if (newMsg.receiver_id === user.id) {
-              supabase.
-              from('partner_messages').
-              update({ is_read: true }).
-              eq('id', newMsg.id);
-            }
-          }
+        if (newMsg.receiver_id === partnerProfile.user_id && ['text', 'love', 'image', 'audio'].includes(newMsg.message_type)) {
+          setMessages((prev) => [...prev, newMsg]);
+        }
+      }
+    ).
+    on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'partner_messages', filter: `receiver_id=eq.${user.id}` },
+      (payload) => {
+        const newMsg = payload.new as ChatMessage;
+        if (newMsg.sender_id === partnerProfile.user_id && ['text', 'love', 'image', 'audio'].includes(newMsg.message_type)) {
+          setMessages((prev) => [...prev, newMsg]);
+          supabase.
+          from('partner_messages').
+          update({ is_read: true }).
+          eq('id', newMsg.id);
         }
       }
     ).

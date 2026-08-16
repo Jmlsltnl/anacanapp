@@ -148,19 +148,25 @@ export const useShoppingItems = () => {
     }
   };
 
-  // Set up realtime subscription
+  // Set up realtime subscription — siyahı user_id VƏ YA partner_id ilə paylaşılır
+  // (RLS eyni OR məntiqini işlədir), ona görə hər iki sütuna görə filtrlənmiş
+  // iki handler açırıq ki, dəyişiklik yalnız bu cütlüyə yayımlansın.
   useEffect(() => {
+    if (!user) return;
     fetchItems();
 
     const channel = supabase
       .channel('shopping_items_changes')
       .on(
         'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'shopping_items'
-        },
+        { event: '*', schema: 'public', table: 'shopping_items', filter: `user_id=eq.${user.id}` },
+        () => {
+          fetchItems();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'shopping_items', filter: `partner_id=eq.${user.id}` },
         () => {
           fetchItems();
         }

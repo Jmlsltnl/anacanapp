@@ -58,12 +58,11 @@ const PartnerBabyDayScreen = ({ onBack }: Props) => {
 
     fetchLogs();
 
-    // Realtime: ana qeyd etdikcÉ™ yenilÉ™nsin
+    // Realtime: ana qeyd etdikcÉ™ yenilÉ™nsin (server-side filtrlÉ™nir)
     const channel = supabase.
     channel(`partner-baby-day-${partnerProfile.user_id}`).
-    on('postgres_changes', { event: '*', schema: 'public', table: 'baby_logs' }, (payload: any) => {
-      const uid = payload?.new?.user_id || payload?.old?.user_id;
-      if (!uid || uid === partnerProfile.user_id) fetchLogs();
+    on('postgres_changes', { event: '*', schema: 'public', table: 'baby_logs', filter: `user_id=eq.${partnerProfile.user_id}` }, () => {
+      fetchLogs();
     }).
     subscribe();
 

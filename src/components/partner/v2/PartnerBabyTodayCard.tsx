@@ -62,9 +62,8 @@ const PartnerBabyTodayCard = ({ motherUserId, babyName, onOpen }: Props) => {
 
     const channel = supabase.
     channel(`partner-baby-strip-${motherUserId}`).
-    on('postgres_changes', { event: '*', schema: 'public', table: 'baby_logs' }, (payload: any) => {
-      const uid = payload?.new?.user_id || payload?.old?.user_id;
-      if (!uid || uid === motherUserId) fetchToday();
+    on('postgres_changes', { event: '*', schema: 'public', table: 'baby_logs', filter: `user_id=eq.${motherUserId}` }, () => {
+      fetchToday();
     }).
     subscribe();
 

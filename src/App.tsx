@@ -33,7 +33,12 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // Persist bərpası üçün gcTime ≥ maxAge olmalıdır, əks halda cache atılır
-      gcTime: CACHE_MAX_AGE
+      gcTime: CACHE_MAX_AGE,
+      // staleTime=0 default-u ilə hər focus/reconnect/mount HƏR sorğunu yenidən
+      // çəkir — yüzlərlə paralel istifadəçidə bu, server üzərinə refetch "storm"u
+      // yaradır. 30san bir çox ekran üçün kifayət qədər təzədir; daha tez-tez
+      // yenilənməli sorğular öz staleTime-larını override edə bilər (artıq edirlər).
+      staleTime: 30 * 1000
     }
   }
 });

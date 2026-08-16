@@ -213,25 +213,27 @@ export const useSOSAlert = () => {
     }
   };
 
-  // Set up realtime subscription for alerts
+  // Set up realtime subscription for alerts — mən göndərən VƏ YA qəbul edən
+  // olduğum sətirlərə filtrlənmiş iki handler (app-boyu bütün SOS-lara yox).
   useEffect(() => {
+    if (!user) return;
     fetchAlerts();
 
     const channel = supabase.
     channel('sos_alerts_changes').
     on(
       'postgres_changes',
-      {
-        event: '*',
-        schema: 'public',
-        table: 'sos_alerts'
-      },
+      { event: '*', schema: 'public', table: 'sos_alerts', filter: `sender_id=eq.${user.id}` },
+      () => {
+        fetchAlerts();
+      }
+    ).
+    on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'sos_alerts', filter: `receiver_id=eq.${user.id}` },
       async (payload) => {
-        // If new alert where I'm receiver, trigger haptic
-        if (
-        payload.eventType === 'INSERT' &&
-        (payload.new as SOSAlert).receiver_id === user?.id)
-        {
+        // Yeni siqnal və mən qəbul edənəm → haptic
+        if (payload.eventType === 'INSERT' && (payload.new as SOSAlert).receiver_id === user.id) {
           try {
             await Haptics.impact({ style: ImpactStyle.Heavy });
             await Haptics.impact({ style: ImpactStyle.Heavy });

@@ -106,23 +106,16 @@ export const usePartnerData = () => {
   useEffect(() => {
     fetchPartnerData();
 
-    // Set up realtime subscription for partner's daily logs (filtered to this partner only)
-    if (profile?.linked_partner_id) {
+    // Set up realtime subscription for partner's daily logs — server-side
+    // filtrlənir (partnerProfile.user_id məlum olan kimi), bütün daily_logs
+    // cədvəlinə yox.
+    if (profile?.linked_partner_id && partnerProfile?.user_id) {
       const channel = supabase.
       channel(`partner-logs-${profile.linked_partner_id}`).
       on(
         'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'daily_logs'
-        },
-        (payload: any) => {
-          // Client-side guard: only refetch when this partner's log changes
-          const changedUserId = payload?.new?.user_id || payload?.old?.user_id;
-          if (changedUserId && partnerProfile?.user_id && changedUserId !== partnerProfile.user_id) {
-            return;
-          }
+        { event: '*', schema: 'public', table: 'daily_logs', filter: `user_id=eq.${partnerProfile.user_id}` },
+        () => {
           fetchPartnerData();
         }
       ).

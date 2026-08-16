@@ -222,20 +222,26 @@ export const useDailySummary = () => {
 
   // Realtime subscriptions on summary + source tables
   useEffect(() => {
+    if (!user) return;
     fetchSummaries();
+
+    // daily_summaries sətri ya mənim (user_id) ya da partnyorumun mənə göndərdiyi
+    // (partner_user_id) sətridir — rol əsasında düzgün sütunu filtrləyirik ki,
+    // dəyişiklik yalnız bu iki nəfərə yayımlansın, bütün istifadəçilərə yox.
+    const filterColumn = profile?.life_stage === 'partner' ? 'partner_user_id' : 'user_id';
 
     const channel = supabase
       .channel('summary_and_sources')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_summaries' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_summaries', filter: `${filterColumn}=eq.${user.id}` }, () => {
         fetchSummaries();
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_logs', filter: user ? `user_id=eq.${user.id}` : undefined }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'daily_logs', filter: `user_id=eq.${user.id}` }, () => {
         debouncedUpdateSummary();
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'kick_sessions', filter: user ? `user_id=eq.${user.id}` : undefined }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'kick_sessions', filter: `user_id=eq.${user.id}` }, () => {
         debouncedUpdateSummary();
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'contractions', filter: user ? `user_id=eq.${user.id}` : undefined }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'contractions', filter: `user_id=eq.${user.id}` }, () => {
         debouncedUpdateSummary();
       })
       .subscribe();

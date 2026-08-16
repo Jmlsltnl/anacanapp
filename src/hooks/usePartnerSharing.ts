@@ -133,18 +133,35 @@ export const usePartnerSharedSettings = () => {
 
   useEffect(() => {
     fetchSharing();
+  }, [fetchSharing]);
 
+  useEffect(() => {
     if (!profile?.linked_partner_id) return;
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    // Ana toggle dəyişən kimi partnyor UI yenilənsin
-    const channel = supabase.
-    channel(`partner-sharing-${profile.linked_partner_id}`).
-    on('postgres_changes', { event: '*', schema: 'public', table: 'partner_sharing_settings' }, () => {
-      fetchSharing();
-    }).
-    subscribe();
+    (async () => {
+      // Ana toggle dəyişən kimi partnyor UI yenilənsin — yalnız ananın
+      // user_id-sinə filtrlənir, bütün partner_sharing_settings cədvəlinə yox.
+      const { data: motherProfile } = await supabase.
+      from('profiles').
+      select('user_id').
+      eq('id', profile.linked_partner_id).
+      single();
+      if (cancelled || !motherProfile?.user_id) return;
 
-    return () => {supabase.removeChannel(channel);};
+      channel = supabase.
+      channel(`partner-sharing-${profile.linked_partner_id}`).
+      on('postgres_changes', { event: '*', schema: 'public', table: 'partner_sharing_settings', filter: `user_id=eq.${motherProfile.user_id}` }, () => {
+        fetchSharing();
+      }).
+      subscribe();
+    })();
+
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
   }, [fetchSharing, profile?.linked_partner_id]);
 
   return { sharing, loading, refetch: fetchSharing };

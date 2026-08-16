@@ -171,29 +171,44 @@ export const useNameVoting = () => {
     return myVotes.find(v => v.name === name)?.vote || null;
   };
 
-  // Set up realtime subscription
+  // Set up realtime subscription — yalnız mənim öz səslərim + (linkli olsa)
+  // partnyorumun səslərinə filtrlənir, cədvəldəki bütün istifadəçilərə yox.
   useEffect(() => {
-    fetchVotes();
+    if (!user) return;
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    const channel = supabase
-      .channel('name_votes_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'name_votes'
-        },
-        () => {
-          fetchVotes();
-        }
-      )
-      .subscribe();
+    (async () => {
+      await fetchVotes();
+      const partnerUserId = await getPartnerUserId();
+      if (cancelled) return;
+
+      let ch = supabase
+        .channel('name_votes_changes')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'name_votes', filter: `user_id=eq.${user.id}` },
+          () => {
+            fetchVotes();
+          }
+        );
+      if (partnerUserId) {
+        ch = ch.on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'name_votes', filter: `user_id=eq.${partnerUserId}` },
+          () => {
+            fetchVotes();
+          }
+        );
+      }
+      channel = ch.subscribe();
+    })();
 
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
     };
-  }, [user, profile?.linked_partner_id]);
+  }, [user, profile?.linked_partner_id, getPartnerUserId]);
 
   return {
     myVotes,

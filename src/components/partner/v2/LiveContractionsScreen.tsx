@@ -58,9 +58,8 @@ const LiveContractionsScreen = ({ onBack }: Props) => {
 
     const channel = supabase.
     channel(`partner-contractions-${partnerProfile.user_id}`).
-    on('postgres_changes', { event: '*', schema: 'public', table: 'contractions' }, (payload: any) => {
-      const uid = payload?.new?.user_id || payload?.old?.user_id;
-      if (!uid || uid === partnerProfile.user_id) fetchContractions();
+    on('postgres_changes', { event: '*', schema: 'public', table: 'contractions', filter: `user_id=eq.${partnerProfile.user_id}` }, () => {
+      fetchContractions();
     }).
     subscribe();
 

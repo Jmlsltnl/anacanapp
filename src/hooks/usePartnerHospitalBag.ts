@@ -124,29 +124,33 @@ export const usePartnerHospitalBag = () => {
     return (checked / items.length) * 100;
   };
 
-  // Set up realtime subscription
+  // Set up realtime subscription — yalnız partnyorun user_id-sinə filtrlənir
   useEffect(() => {
-    fetchItems();
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
-    const channel = supabase
-      .channel('partner_hospital_bag_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'hospital_bag_items'
-        },
-        () => {
-          fetchItems();
-        }
-      )
-      .subscribe();
+    (async () => {
+      await fetchItems();
+      const partnerUserId = await getPartnerUserId();
+      if (cancelled || !partnerUserId) return;
+
+      channel = supabase
+        .channel('partner_hospital_bag_changes')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'hospital_bag_items', filter: `user_id=eq.${partnerUserId}` },
+          () => {
+            fetchItems();
+          }
+        )
+        .subscribe();
+    })();
 
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
     };
-  }, [user, profile?.linked_partner_id]);
+  }, [user, profile?.linked_partner_id, getPartnerUserId]);
 
   return {
     items,

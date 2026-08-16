@@ -1,4 +1,4 @@
-import { tr } from "@/lib/tr";import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { tr } from "@/lib/tr";import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { readCache, writeCache, clearAllCaches } from '@/lib/offlineCache';
 const isCapacitorNative = typeof (window as any)?.Capacitor?.isNativePlatform === 'function' &&
@@ -215,7 +215,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
   // ─────────────────────────────────────────
   // Auth actions
   // ─────────────────────────────────────────
-  const signUp = async (email: string, password: string, name: string, countryCode?: string | null) => {
+  const signUp = useCallback(async (email: string, password: string, name: string, countryCode?: string | null) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -232,9 +232,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       console.error('Sign up error:', error);
       return { data: null, error };
     }
-  };
+  }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
@@ -245,9 +245,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       console.error('Sign in error:', error);
       return { data: null, error };
     }
-  };
+  }, []);
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = useCallback(async () => {
     try {
       if (isCapacitorNative) {
         const { signInWithGoogleNative } = await import('@/lib/native-auth');
@@ -267,9 +267,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       console.error('Google sign in error:', error);
       return { data: null, error };
     }
-  };
+  }, []);
 
-  const signInWithApple = async () => {
+  const signInWithApple = useCallback(async () => {
     try {
       const platform = (window as any)?.Capacitor?.getPlatform?.();
       if (isCapacitorNative && platform === 'ios') {
@@ -290,9 +290,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       console.error('Apple sign in error:', error);
       return { data: null, error };
     }
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       const { error } = await supabase.auth.signOut();
       // Ignore AuthSessionMissingError - session already gone
@@ -316,9 +316,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       import('@/lib/mixpanel').then(({ resetMixpanel }) => resetMixpanel()).catch(() => {});
     }
     return { error: null };
-  };
+  }, [storeLogout]);
 
-  const updateProfile = async (updates: Partial<Profile>) => {
+  const updateProfile = useCallback(async (updates: Partial<Profile>) => {
     if (!user) return { data: null, error: 'No user logged in' };
     try {
       // .single() istifadə etmirik: 0 sətir (profil sətri yaranmayıb) və ya
@@ -351,9 +351,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       console.error('Error updating profile:', error);
       return { data: null, error };
     }
-  };
+  }, [user, syncProfileToStore]);
 
-  const linkPartner = async (partnerCode: string) => {
+  const linkPartner = useCallback(async (partnerCode: string) => {
     if (!user) return { error: 'No user logged in' };
     try {
       const { data: partnerProfile, error: findError } = await supabase.
@@ -384,7 +384,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       console.error('Link partner error:', error);
       return { error };
     }
-  };
+  }, [user, fetchProfile, syncProfileToStore]);
 
   const refreshProfile = useCallback(async () => {
     if (!user) return;
@@ -593,28 +593,35 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
   const isAdmin = userRole?.role === 'admin';
   const isModerator = userRole?.role === 'moderator' || isAdmin;
 
+  // Dəyər obyekti useMemo-suz hər render-də YENİ referans yaradırdı — bu context-i
+  // istehlak edən 130+ fayl (useAuth/useAuthContext) hər auth state dəyişikliyində
+  // (hətta uzaq bir componentin dövlət dəyişikliyi ilə) lazımsız yerə re-render olurdu.
+  const value = useMemo<AuthContextValue>(() => ({
+    user,
+    session,
+    profile,
+    userRole,
+    loading,
+    profileLoaded,
+    isAdmin,
+    isModerator,
+    signUp,
+    signIn,
+    signInWithGoogle,
+    signInWithApple,
+    signOut,
+    updateProfile,
+    linkPartner,
+    fetchProfile,
+    refreshProfile
+  }), [
+    user, session, profile, userRole, loading, profileLoaded, isAdmin, isModerator,
+    signUp, signIn, signInWithGoogle, signInWithApple, signOut, updateProfile, linkPartner,
+    fetchProfile, refreshProfile
+  ]);
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        session,
-        profile,
-        userRole,
-        loading,
-        profileLoaded,
-        isAdmin,
-        isModerator,
-        signUp,
-        signIn,
-        signInWithGoogle,
-        signInWithApple,
-        signOut,
-        updateProfile,
-        linkPartner,
-        fetchProfile,
-        refreshProfile
-      }}>
-      
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>);
 
