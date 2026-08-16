@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Reply, Send, X, Heart, Trash2, ChevronDown, ChevronUp, Crown, Shield, Sparkles } from 'lucide-react';
+import { Send, X, Heart, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { PostComment, useCreateComment, useToggleCommentLike } from '@/hooks/useCommunity';
@@ -11,6 +11,7 @@ import { hapticFeedback } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { UserBadge, VerifiedTick, isVerifiedActive } from './UserBadge';
 import { tr } from "@/lib/tr";
 
 interface CommentReplyProps {
@@ -23,23 +24,8 @@ interface CommentReplyProps {
   level?: number;
 }
 
-const UserBadge = ({ type }: {type: 'admin' | 'premium' | 'moderator' | null;}) => {
-  if (!type) return null;
-  const config = {
-    admin: { label: 'Admin', icon: Shield, className: 'bg-gradient-to-r from-red-500 to-orange-500 text-white' },
-    premium: { label: 'Premium', icon: Crown, className: 'bg-gradient-to-r from-amber-400 to-amber-600 text-white' },
-    moderator: { label: 'Mod', icon: Shield, className: 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' }
-  };
-  const b = config[type];
-  if (!b) return null;
-  const Icon = b.icon;
-  return (
-    <span className={`inline-flex items-center gap-[2px] px-1 py-[1px] rounded text-[7px] font-bold ${b.className}`}>
-      <Icon className="w-[7px] h-[7px]" />{b.label}
-    </span>);
-
-};
-
+// Instagram-tipli düz siyahı görünüşü: ad + mətn eyni paraqrafda axır, meta
+// sətri (vaxt · bəyənmə · Cavab ver) altında, ürək düyməsi sağda ayrıca.
 const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, onUserClick, level = 0 }: CommentReplyProps) => {
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [showReplies, setShowReplies] = useState(level === 0);
@@ -66,12 +52,11 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
         postId, content, parentCommentId: comment.id, postAuthorId,
         commenterName: profile?.name || user.user_metadata?.name || tr("commentreply_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")
       });
-      setReplyText('');setShowReplyInput(false);onRefetch();
+      setReplyText('');setShowReplyInput(false);setShowReplies(true);onRefetch();
     } catch (error: any) {
       toast({ title: tr("commentreply_xeta_3cdbb6", 'Xəta'), description: error.message || tr("commentreply_serh_elave_edile_bilmedi_8925d3", "\u015E\u0259rh \u0259lav\u0259 edil\u0259 bilm\u0259di"), variant: 'destructive' });
     }
   };
-
 
   const handleDelete = async () => {
     if (!confirm(tr("commentreply_bu_serhi_silmek_isteyirsiniz_fc50c9", "Bu \u015F\u0259rhi silm\u0259k ist\u0259yirsiniz?"))) return;
@@ -83,60 +68,62 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   const handleAvatarClick = () => {if (comment.user_id && onUserClick) onUserClick(comment.user_id);};
   const timeAgo = formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: getCurrentDateLocale() });
   const canReply = level < 2;
+  const authorBadge = (comment.author?.badge_type as 'admin' | 'premium' | 'moderator' | null) || null;
+  const authorVerified = isVerifiedActive(comment.author?.is_verified, comment.author?.verified_until);
+  const avatarSize = level === 0 ? 'w-8 h-8' : 'w-6 h-6';
 
   return (
-    <div className={`relative ${level > 0 ? 'ms-8' : ''}`}>
-      {/* Thread line */}
-      {level > 0 &&
-      <div className="absolute start-[-16px] top-0 bottom-0 w-[2px] bg-border/10 rounded-full" />
-      }
-      <div className="flex gap-2.5">
-        <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.95 }} className="flex-shrink-0 mt-1">
-          <Avatar className={`${level === 0 ? 'w-8 h-8' : 'w-6 h-6'} cursor-pointer`}>
+    <div className={level > 0 ? 'ms-[38px]' : ''}>
+      <div className="flex gap-2.5 items-start">
+        {/* Avatar */}
+        <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.94 }} className="flex-shrink-0">
+          <Avatar className={`${avatarSize} cursor-pointer`}>
             <AvatarImage src={comment.author?.avatar_url || undefined} />
-            <AvatarFallback className="bg-primary/8 text-primary font-bold text-[8px]">
+            <AvatarFallback className="bg-primary/8 text-primary font-bold text-[9px]">
               {comment.author?.name?.charAt(0) || tr("common_initial_i", "İ")}
             </AvatarFallback>
           </Avatar>
         </motion.button>
-        <div className="flex-1 min-w-0">
-          <div className="bg-muted/12 rounded-2xl px-3 py-2.5">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <motion.button onClick={handleAvatarClick} className="text-[11px] font-bold text-foreground hover:text-primary transition-colors" whileTap={{ scale: 0.98 }}>
-                {comment.author?.name || tr("commentreply_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}
-              </motion.button>
-              <UserBadge type={comment.author?.badge_type as any} />
-              <span className="text-[8px] text-muted-foreground/30">· {timeAgo}</span>
-              {isAdmin &&
-              <button onClick={handleDelete} className="ms-auto text-destructive/40 hover:text-destructive p-0.5">
-                  <Trash2 className="w-2.5 h-2.5" />
-                </button>
-              }
-            </div>
-            <p className="text-[12px] text-foreground/80 mt-1 leading-relaxed" dir="auto">
-              {comment.content}
-            </p>
-          </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-3 mt-1 ms-2">
+        {/* Content column: name+text flow together, meta row below */}
+        <div className="flex-1 min-w-0">
+          <p className="text-[12.5px] leading-[1.45] text-foreground" dir="auto">
             <motion.button
-              onClick={handleLikeComment}
-              className={`flex items-center gap-0.5 text-[9px] transition-colors ${comment.is_liked ? 'text-rose-500' : 'text-muted-foreground/30 active:text-rose-400'}`}
-              whileTap={{ scale: 0.85 }}>
-              
-              <Heart className={`w-3 h-3 ${comment.is_liked ? 'fill-current' : ''}`} />
-              {(comment.likes_count || 0) > 0 && <span>{comment.likes_count}</span>}
+              onClick={handleAvatarClick}
+              whileTap={{ scale: 0.98 }}
+              className="font-bold text-foreground align-baseline">
+              {comment.author?.name || tr("commentreply_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}
             </motion.button>
+            {authorVerified &&
+            <span className="inline-flex align-middle mx-1" style={{ transform: 'translateY(-1px)' }}>
+                <VerifiedTick size={11} />
+              </span>
+            }
+            {authorBadge &&
+            <span className="inline-flex align-middle ms-1 mb-0.5">
+                <UserBadge type={authorBadge} />
+              </span>
+            }
+            {' '}
+            <span className="text-foreground/85">{comment.content}</span>
+          </p>
+
+          {/* Meta row: time · likes · reply · (admin) delete */}
+          <div className="flex items-center gap-3 mt-1">
+            <span className="text-[10.5px] text-muted-foreground/45 font-medium">{timeAgo}</span>
+            {(comment.likes_count || 0) > 0 &&
+            <span className="text-[10.5px] text-muted-foreground/45 font-bold">
+                {comment.likes_count} {tr("commentreply_beyenme_sayi", "bəyənmə")}
+              </span>
+            }
             {canReply &&
-            <button onClick={() => setShowReplyInput(!showReplyInput)} className="text-[9px] text-muted-foreground/30 active:text-primary transition-colors font-semibold">
+            <button onClick={() => setShowReplyInput(!showReplyInput)} className="text-[10.5px] text-muted-foreground/45 active:text-primary transition-colors font-bold">
                 {tr("commentreply_action_reply", "Cavab")}
               </button>
             }
-            {replies.length > 0 &&
-            <button onClick={() => setShowReplies(!showReplies)} className="flex items-center gap-0.5 text-[9px] text-primary/60 font-bold">
-                {showReplies ? <ChevronUp className="w-2.5 h-2.5" /> : <ChevronDown className="w-2.5 h-2.5" />}
-                {replies.length} {tr("commentreply_reply_count", "cavab")}
+            {isAdmin &&
+            <button onClick={handleDelete} className="text-[10.5px] text-destructive/45 hover:text-destructive font-bold ms-auto flex items-center gap-1">
+                <Trash2 className="w-2.5 h-2.5" />
               </button>
             }
           </div>
@@ -159,11 +146,22 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
             }
           </AnimatePresence>
 
+          {/* "View N replies" toggle — Instagram-style short line + label */}
+          {replies.length > 0 &&
+          <button onClick={() => setShowReplies(!showReplies)} className="flex items-center gap-2.5 mt-2.5 text-[10.5px] text-muted-foreground/55 font-extrabold">
+              <span className="w-6 h-px bg-border/40" />
+              {showReplies ?
+            tr("commentreply_cavablari_gizle", "Cavabları gizlə") :
+            tr("commentreply_n_cavab_goster", "{n} cavab göstər").replace('{n}', String(replies.length))
+            }
+            </button>
+          }
+
           {/* Nested replies */}
           <AnimatePresence>
             {showReplies && replies.length > 0 &&
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                <div className="space-y-2 mt-2">
+                <div className="space-y-3 mt-3">
                   {replies.map((reply) =>
                 <CommentReply key={reply.id} comment={reply} postId={postId} postAuthorId={postAuthorId} allComments={allComments} onRefetch={onRefetch} onUserClick={onUserClick} level={level + 1} />
                 )}
@@ -172,9 +170,19 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
             }
           </AnimatePresence>
         </div>
-      </div>
-    </div>);
 
+        {/* Like heart — sağda, Instagram məntiqi */}
+        <motion.button
+          onClick={handleLikeComment}
+          whileTap={{ scale: 0.8 }}
+          className="flex-shrink-0 pt-1"
+          aria-label={tr("commentreply_beyen", "Bəyən")}>
+          <Heart
+            className={`w-3 h-3 transition-colors ${comment.is_liked ? 'text-rose-500 fill-current' : 'text-muted-foreground/30 active:text-rose-400'}`} />
+        </motion.button>
+      </div>
+    </div>
+  );
 };
 
 export default CommentReply;

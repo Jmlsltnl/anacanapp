@@ -1833,6 +1833,28 @@
   color: #1c5a80;
 }
 
+/* Instagram-tipli mavi tik — ad ilə birlikdə axan kiçik ikon */
+.a-verified-tick {
+  display: inline-flex;
+  flex-shrink: 0;
+  transform: translateY(0.5px);
+}
+
+/* Pinlənmiş post şeriti — feed-in ən üstündə görünən kart üçün */
+.a-post-pinned-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--a-accent-ink);
+  background: var(--a-peach-1);
+  border-radius: 999px;
+  padding: 5px 11px;
+  margin-bottom: 10px;
+  width: fit-content;
+}
+
 .a-post-time {
   display: block;
   font-size: 11px;

@@ -8491,5 +8491,14 @@
   "dashboard_qida_ph": "z. B. Kürbispüree",
   "nutrition_kcal_ph": "z. B. 350",
   "games_user_fallback": "Anacan-Nutzerin",
-  "common_saxla": "Speichern"
+  "common_saxla": "Speichern",
+  "postcard_pinlenmis_post": "Angeheftet",
+  "postcard_pini_gotur": "Lösen",
+  "postcard_pinle": "Anheften",
+  "usecommunity_post_pinlendi": "📌 Beitrag angeheftet",
+  "usecommunity_post_pini_goturuldu": "Beitrag gelöst",
+  "commentreply_beyenme_sayi": "Gefällt mir",
+  "commentreply_cavablari_gizle": "Antworten ausblenden",
+  "commentreply_n_cavab_goster": "{n} Antworten ansehen",
+  "commentreply_beyen": "Gefällt mir"
 }

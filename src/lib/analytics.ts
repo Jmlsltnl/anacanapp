@@ -8,11 +8,18 @@ import { supabase } from '@/integrations/supabase/client';
 
 // Firebase Analytics for web
 let firebaseAnalytics: any = null;
+let webAnalyticsHandle: { analytics: any; logEvent: any; setUserId: any; setUserProperties: any } | null = null;
+// Bir dəfə "konfiqurasiya yoxdur/init alınmadı" nəticəsi çıxsa, bunu keşləyirik —
+// əvvəllər hər tək analytics çağırışında (hər ekran keçidi, hər hadisə) firebase/app
+// və firebase/analytics YENİDƏN dinamik import olunur və konsola xəbərdarlıq yazılırdı.
+let webAnalyticsAttempted = false;
 
-// Initialize Firebase for web (lazy loaded)
+// Initialize Firebase for web (lazy loaded, attempted only once per session)
 const initWebAnalytics = async () => {
-  if (firebaseAnalytics) return firebaseAnalytics;
-  
+  if (webAnalyticsHandle) return webAnalyticsHandle;
+  if (webAnalyticsAttempted) return null;
+  webAnalyticsAttempted = true;
+
   try {
     const { initializeApp, getApps } = await import('firebase/app');
     const { getAnalytics, logEvent: firebaseLogEvent, setUserId: firebaseSetUserId, setUserProperties: firebaseSetUserProps } = await import('firebase/analytics');
@@ -28,7 +35,7 @@ const initWebAnalytics = async () => {
     };
     
     if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-      console.warn('Firebase Analytics not configured.');
+      console.warn('[Firebase Analytics] Web app not configured — set VITE_FIREBASE_* in .env (see .env.example). Native Android/iOS tracking is unaffected.');
       return null;
     }
     
@@ -36,7 +43,8 @@ const initWebAnalytics = async () => {
     firebaseAnalytics = getAnalytics(app);
     
     console.log('Firebase Analytics initialized for web');
-    return { analytics: firebaseAnalytics, logEvent: firebaseLogEvent, setUserId: firebaseSetUserId, setUserProperties: firebaseSetUserProps };
+    webAnalyticsHandle = { analytics: firebaseAnalytics, logEvent: firebaseLogEvent, setUserId: firebaseSetUserId, setUserProperties: firebaseSetUserProps };
+    return webAnalyticsHandle;
   } catch (error) {
     console.warn('Firebase Analytics initialization failed:', error);
     return null;

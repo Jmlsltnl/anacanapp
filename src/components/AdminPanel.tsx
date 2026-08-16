@@ -3,6 +3,7 @@ import { AdminLanguageProvider } from '@/contexts/AdminLanguageContext';
 import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
 import AdminUsers from './admin/AdminUsers';
+import AdminVerifiedBadges from './admin/AdminVerifiedBadges';
 import AdminProducts from './admin/AdminProducts';
 import AdminSettings from './admin/AdminSettings';
 import AdminData from './admin/AdminData';
@@ -84,6 +85,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminDashboard />;
       case 'users':
         return <AdminUsers />;
+      case 'verified-badges':
+        return <AdminVerifiedBadges />;
       case 'support':
         return <AdminSupport />;
       case 'blog':

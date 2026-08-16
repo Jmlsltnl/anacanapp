@@ -6988,5 +6988,14 @@
   "dashboard_qida_ph": "Məs: balkabaqlı püre",
   "nutrition_kcal_ph": "məs. 350",
   "games_user_fallback": "Anacan istifadəçisi",
-  "common_saxla": "Saxla"
+  "common_saxla": "Saxla",
+  "postcard_pinlenmis_post": "Pinlənmiş",
+  "postcard_pini_gotur": "Pini götür",
+  "postcard_pinle": "Pinlə",
+  "usecommunity_post_pinlendi": "📌 Post pinləndi",
+  "usecommunity_post_pini_goturuldu": "Post pindən çıxarıldı",
+  "commentreply_beyenme_sayi": "bəyənmə",
+  "commentreply_cavablari_gizle": "Cavabları gizlə",
+  "commentreply_n_cavab_goster": "{n} cavab göstər",
+  "commentreply_beyen": "Bəyən"
 }

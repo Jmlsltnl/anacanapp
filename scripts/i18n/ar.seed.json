@@ -8491,5 +8491,14 @@
   "group_desc_yeni_analar": "شاركي خبراتكِ في رعاية حديثي الولادة",
   "funneldata_reproduktiv_saglamliq_haqqinda_e1d680": "المعرفة بالصحة الإنجابية هي أساس مستقبل صحي.",
   "cakesscreen_ci_581209": "ـيّ",
-  "cakesscreen_cu_a8237f": "الـ"
+  "cakesscreen_cu_a8237f": "الـ",
+  "postcard_pinlenmis_post": "مثبّت",
+  "postcard_pini_gotur": "إلغاء التثبيت",
+  "postcard_pinle": "تثبيت",
+  "usecommunity_post_pinlendi": "📌 تم تثبيت المنشور",
+  "usecommunity_post_pini_goturuldu": "تم إلغاء تثبيت المنشور",
+  "commentreply_beyenme_sayi": "إعجاب",
+  "commentreply_cavablari_gizle": "إخفاء الردود",
+  "commentreply_n_cavab_goster": "عرض {n} من الردود",
+  "commentreply_beyen": "إعجاب"
 }

@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import PostCard from './PostCard';
 import { CommunityPost } from '@/hooks/useCommunity';
+import { VerifiedTick, isVerifiedActive } from './UserBadge';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
@@ -18,6 +19,8 @@ interface UserProfile {
   life_stage: string | null;
   is_premium: boolean;
   badge_type: string | null;
+  is_verified?: boolean | null;
+  verified_until?: string | null;
   created_at: string;
 }
 
@@ -54,7 +57,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
       const [{ data: cardData }, { data: postsData }] = await Promise.all([
       (supabase as any).
       from('public_profile_cards').
-      select('name, avatar_url, badge_type').
+      select('name, avatar_url, badge_type, is_verified, verified_until').
       eq('user_id', userId).
       maybeSingle(),
       supabase.
@@ -81,7 +84,9 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
         author: {
           name: cardData?.name || tr("userprofilescreen_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
           avatar_url: cardData?.avatar_url || null,
-          badge_type: cardData?.badge_type || null
+          badge_type: cardData?.badge_type || null,
+          is_verified: cardData?.is_verified || false,
+          verified_until: cardData?.verified_until || null
         },
         is_liked: likedSet.has(post.id)
       })) as CommunityPost[];
@@ -110,7 +115,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
       // Fetch profile (public-safe projection for Community)
       const { data: profileData, error: profileError } = await (supabase as any).
       from('public_profile_cards').
-      select('user_id, name, avatar_url, life_stage, is_premium, badge_type, created_at').
+      select('user_id, name, avatar_url, life_stage, is_premium, badge_type, is_verified, verified_until, created_at').
       eq('user_id', userId).
       maybeSingle();
 
@@ -194,6 +199,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
 
   const badge = getBadgeLabel(profile.badge_type);
   const lifeStage = getLifeStageLabel(profile.life_stage);
+  const verified = isVerifiedActive(profile.is_verified, profile.verified_until);
 
   return (
     <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
@@ -228,6 +234,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>{profile.name}</h2>
+                {verified && <VerifiedTick size={17} />}
                 {badge &&
                 <span className="inline-flex items-center gap-1"
                 style={{ background: badge.bg, color: badge.ink, borderRadius: 999, padding: '3px 10px', fontSize: 10.5, fontWeight: 800 }}>

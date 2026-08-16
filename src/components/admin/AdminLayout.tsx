@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Package, Settings, BarChart3, Shield,
   ChevronLeft, Menu, LogOut, Bell, Search,
-  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart, Brain, Calculator, Calendar, Stethoscope, Tag, CreditCard, ChevronDown, LayoutDashboard, PenTool, Cog, MapPinned, DollarSign, Palette, Globe, BookOpen, Syringe, Languages } from
+  Database, Key, MessageSquare, Home, Crown, FileText, AlertTriangle, Baby, Pill, Layers, Camera, Image, Scale, Send, ShoppingBag, Wrench, Store, ShieldAlert, BookHeart, MapPin, Gamepad2, Zap, Lightbulb, Megaphone, UtensilsCrossed, Heart, HelpCircle, Sparkles, ShoppingCart, Brain, Calculator, Calendar, Stethoscope, Tag, CreditCard, ChevronDown, LayoutDashboard, PenTool, Cog, MapPinned, DollarSign, Palette, Globe, BookOpen, Syringe, Languages, BadgeCheck } from
 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,6 +55,7 @@ const menuGroups: MenuGroup[] = [
   icon: Users,
   items: [
   { id: 'users', label: tr("adminlayout_istifadeciler_1dd7b9", "İstifadəçilər"), icon: Users },
+  { id: 'verified-badges', label: 'Mavi Tik', icon: BadgeCheck },
   { id: 'community', label: tr("adminlayout_cemiyyet_2dc44d", "Cəmiyyət"), icon: MessageSquare },
   { id: 'moderation', label: 'Moderasiya', icon: AlertTriangle },
   { id: 'support', label: tr("adminlayout_destek_muracietleri_f2b929", "Dəstək Müraciətləri"), icon: MessageSquare },

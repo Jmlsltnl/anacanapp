@@ -7,10 +7,12 @@ export type PublicProfileCard = {
   badge_type: string | null;
   life_stage?: string | null;
   is_premium?: boolean | null;
+  is_verified?: boolean | null;
+  verified_until?: string | null;
   created_at?: string;
 };
 
-const SELECT_FIELDS = "user_id, name, avatar_url, badge_type, life_stage, is_premium, created_at";
+const SELECT_FIELDS = "user_id, name, avatar_url, badge_type, life_stage, is_premium, is_verified, verified_until, created_at";
 
 export async function getPublicProfileCard(userId: string): Promise<PublicProfileCard | null> {
   if (!userId) return null;

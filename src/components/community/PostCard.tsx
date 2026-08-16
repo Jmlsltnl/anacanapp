@@ -1,9 +1,9 @@
 import { useState, useRef, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Crown, Shield, Flag, Pencil, EyeOff, Sparkles, Languages } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Flag, Pencil, EyeOff, Languages, Pin, PinOff } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
-import { CommunityPost, useToggleLike, usePostComments, useCreateComment, useEditPost, useDeletePost } from '@/hooks/useCommunity';
+import { CommunityPost, useToggleLike, usePostComments, useCreateComment, useEditPost, useDeletePost, useTogglePinPost } from '@/hooks/useCommunity';
 import { useUserStore } from '@/store/userStore';
 import { isFeedLang } from '@/lib/langDetect';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import MediaCarousel from './MediaCarousel';
 import CommentReply from './CommentReply';
+import { UserBadge, VerifiedTick, isVerifiedActive } from './UserBadge';
 import { tr } from "@/lib/tr";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from
@@ -33,24 +34,6 @@ interface PostCardProps {
 const getMediaType = (url: string): 'image' | 'video' => {
   const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
   return videoExtensions.some((ext) => url.toLowerCase().includes(ext)) ? 'video' : 'image';
-};
-
-const UserBadge = ({ type }: {type: 'admin' | 'premium' | 'moderator' | null;}) => {
-  if (!type) return null;
-  const config = {
-    admin: { label: 'Admin', icon: Shield, className: 'admin' },
-    premium: { label: 'Premium', icon: Sparkles, className: '' },
-    moderator: { label: 'Mod', icon: Shield, className: 'moderator' }
-  };
-  const b = config[type];
-  if (!b) return null;
-  const Icon = b.icon;
-  return (
-    <span className={`a-post-badge ${b.className}`}>
-      <Icon size={9} />
-      {b.label}
-    </span>);
-
 };
 
 // Sessiya-daxili tərcümə keşi — toggle təkrar sorğu atmır (server keşi ayrıca var)
@@ -91,6 +74,7 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
   const createComment = useCreateComment();
   const editPost = useEditPost();
   const deletePost = useDeletePost();
+  const togglePin = useTogglePinPost();
 
   const isOwnPost = user?.id === post.user_id;
   const isAnonymous = (post as any).is_anonymous === true;
@@ -129,6 +113,11 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
     if (!confirm(tr("postcard_bu_postu_silmek_isteyirsiniz_2fbc75", "Bu postu silm\u0259k ist\u0259yirsiniz?"))) return;
     hapticFeedback.medium();
     deletePost.mutate(post.id);
+  };
+
+  const handleTogglePin = () => {
+    hapticFeedback.light();
+    togglePin.mutate({ postId: post.id, pin: !post.is_pinned });
   };
 
   const handleEditPost = () => {
@@ -193,6 +182,7 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: getCurrentDateLocale() });
   const mediaItems = (post.media_urls || []).map((url) => ({ url, type: getMediaType(url) }));
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
+  const authorVerified = isVerifiedActive(post.author?.is_verified, post.author?.verified_until);
   const handleAvatarClick = () => {if (post.user_id && onUserClick && (!isAnonymous || isAdmin)) onUserClick(post.user_id);};
   const topLevelComments = comments.filter((c) => !c.parent_comment_id);
 
@@ -202,6 +192,14 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
         className="a-post a-fade-in"
         transition={{ duration: 0.1 }}>
         
+        {/* Pinlənmiş göstəricisi — yalnız feed-in ən üstündə görünən postlarda */}
+        {post.is_pinned &&
+        <div className="a-post-pinned-strip">
+            <Pin size={11} strokeWidth={2.4} fill="currentColor" />
+            {tr("postcard_pinlenmis_post", "Pinlənmiş")}
+          </div>
+        }
+
         {/* Author row */}
         <div className="a-post-head">
           <motion.button
@@ -241,6 +239,7 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
                 tr("untranslated_anonim_89j5l6", "Anonim") :
                 post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "İstifadəçi")}
               </motion.button>
+              {!isAnonymous && authorVerified && <VerifiedTick />}
               {!isAnonymous && <UserBadge type={authorBadge} />}
               {isAnonymous && isAdmin && <UserBadge type={authorBadge} />}
               {isAnonymous && <span className="a-post-anon">({tr("untranslated_anonim_89j5l6", "Anonim")})</span>}
@@ -263,6 +262,14 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
               {!isOwnPost &&
               <DropdownMenuItem onClick={() => setShowReportDialog(true)} className="text-amber-600 text-[11px] rounded-lg">
                   <Flag className="w-3 h-3 me-2" /> {tr("postcard_sikayet_et_e8b63a", "\u015Eikay\u0259t et")}
+                </DropdownMenuItem>
+              }
+              {isAdmin &&
+              <DropdownMenuItem onClick={handleTogglePin} className="text-foreground text-[11px] rounded-lg">
+                  {post.is_pinned ?
+                <><PinOff className="w-3 h-3 me-2" />{tr("postcard_pini_gotur", "Pini götür")}</> :
+                <><Pin className="w-3 h-3 me-2" />{tr("postcard_pinle", "Pinlə")}</>
+                }
                 </DropdownMenuItem>
               }
               {(isAdmin || isOwnPost) && <DropdownMenuSeparator className="bg-border/10" />}

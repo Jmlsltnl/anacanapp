@@ -8480,5 +8480,14 @@
   "dashboard_qida_ph": "e.g. pumpkin purée",
   "nutrition_kcal_ph": "e.g. 350",
   "games_user_fallback": "Anacan user",
-  "common_saxla": "Save"
+  "common_saxla": "Save",
+  "postcard_pinlenmis_post": "Pinned",
+  "postcard_pini_gotur": "Unpin",
+  "postcard_pinle": "Pin",
+  "usecommunity_post_pinlendi": "📌 Post pinned",
+  "usecommunity_post_pini_goturuldu": "Post unpinned",
+  "commentreply_beyenme_sayi": "likes",
+  "commentreply_cavablari_gizle": "Hide replies",
+  "commentreply_n_cavab_goster": "View {n} replies",
+  "commentreply_beyen": "Like"
 }

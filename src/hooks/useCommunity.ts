@@ -39,6 +39,8 @@ export interface CommunityPost {
     name: string;
     avatar_url: string | null;
     badge_type?: string;
+    is_verified?: boolean | null;
+    verified_until?: string | null;
   };
   is_liked?: boolean;
 }
@@ -56,6 +58,8 @@ export interface PostComment {
     name: string;
     avatar_url: string | null;
     badge_type?: string;
+    is_verified?: boolean | null;
+    verified_until?: string | null;
   };
   is_liked?: boolean;
 }
@@ -169,10 +173,16 @@ const enrichPosts = async (posts: any[], userId?: string | null): Promise<Commun
       ...post,
       is_anonymous: isAnon,
       author: isAnon ?
-      { name: 'Anonim', avatar_url: null, badge_type: null } :
+      { name: 'Anonim', avatar_url: null, badge_type: null, is_verified: false, verified_until: null } :
       authorData ?
-      { name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null } :
-      { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
+      {
+        name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
+        avatar_url: authorData.avatar_url || null,
+        badge_type: authorData.badge_type || null,
+        is_verified: authorData.is_verified || false,
+        verified_until: authorData.verified_until || null
+      } :
+      { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null, is_verified: false, verified_until: null },
       is_liked: likedSet.has(post.id)
     };
   }) as CommunityPost[];
@@ -336,6 +346,40 @@ export const useDeletePost = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-posts'] });
       toast({ title: tr("usecommunity_post_silindi", 'Post silindi') + ' 🗑️' });
+    },
+    onError: () => {
+      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    }
+  });
+};
+
+/**
+ * Post pin/unpin — YALNIZ admin RLS-də icazəlidir ("Admins can manage all
+ * posts" FOR ALL policy, community_posts). Pinlənmiş post feed sorğusunda
+ * artıq `.order('is_pinned', {ascending:false})` sayəsində avtomatik ən
+ * üstdə görünür — VƏ filtr (dil/qrup) sıralamadan ƏVVƏL tətbiq olunduğu üçün
+ * pin yalnız postun öz dilinin/qrupunun feed-i daxilində ən üstə çıxır.
+ */
+export const useTogglePinPost = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ postId, pin }: { postId: string; pin: boolean }) => {
+      const { error } = await supabase.
+      from('community_posts').
+      update({ is_pinned: pin }).
+      eq('id', postId);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, { pin }) => {
+      queryClient.invalidateQueries({ queryKey: ['group-posts'] });
+      toast({
+        title: pin ?
+        tr("usecommunity_post_pinlendi", "📌 Post pinləndi") :
+        tr("usecommunity_post_pini_goturuldu", "Post pindən çıxarıldı")
+      });
     },
     onError: () => {
       toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
@@ -512,10 +556,16 @@ export const usePostComments = (postId: string) => {
         return {
           ...comment,
           author: isAnon ?
-          { name: 'Anonim', avatar_url: null, badge_type: null } :
+          { name: 'Anonim', avatar_url: null, badge_type: null, is_verified: false, verified_until: null } :
           authorData ?
-          { name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null, badge_type: authorData.badge_type || null } :
-          { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null },
+          {
+            name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
+            avatar_url: authorData.avatar_url || null,
+            badge_type: authorData.badge_type || null,
+            is_verified: authorData.is_verified || false,
+            verified_until: authorData.verified_until || null
+          } :
+          { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null, is_verified: false, verified_until: null },
           is_liked: likedSet.has(comment.id)
         };
       });

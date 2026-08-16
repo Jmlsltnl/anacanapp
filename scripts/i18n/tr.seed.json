@@ -8491,5 +8491,14 @@
   "untranslated_vacib_lmdvyt": "Önemli",
   "untranslated_validation_m01uia": "Doğrulama",
   "untranslated_valyuta_6kqif9": "Para Birimi",
-  "untranslated_valyuta_9tj7rw": "Para Birimi"
+  "untranslated_valyuta_9tj7rw": "Para Birimi",
+  "postcard_pinlenmis_post": "Sabitlendi",
+  "postcard_pini_gotur": "Sabitlemeyi kaldır",
+  "postcard_pinle": "Sabitle",
+  "usecommunity_post_pinlendi": "📌 Gönderi sabitlendi",
+  "usecommunity_post_pini_goturuldu": "Gönderinin sabitlemesi kaldırıldı",
+  "commentreply_beyenme_sayi": "beğenme",
+  "commentreply_cavablari_gizle": "Yanıtları gizle",
+  "commentreply_n_cavab_goster": "{n} yanıtı gör",
+  "commentreply_beyen": "Beğen"
 }

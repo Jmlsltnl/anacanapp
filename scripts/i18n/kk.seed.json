@@ -8491,5 +8491,14 @@
   "dashboard_qida_ph": "Мыс.: асқабақ езбесі",
   "nutrition_kcal_ph": "мыс. 350",
   "games_user_fallback": "Anacan пайдаланушысы",
-  "common_saxla": "Сақтау"
+  "common_saxla": "Сақтау",
+  "postcard_pinlenmis_post": "Бекітілген",
+  "postcard_pini_gotur": "Бекітуден шығару",
+  "postcard_pinle": "Бекіту",
+  "usecommunity_post_pinlendi": "📌 Жазба бекітілді",
+  "usecommunity_post_pini_goturuldu": "Жазба бекітуден шығарылды",
+  "commentreply_beyenme_sayi": "лайк",
+  "commentreply_cavablari_gizle": "Жауаптарды жасыру",
+  "commentreply_n_cavab_goster": "{n} жауапты көру",
+  "commentreply_beyen": "Лайк қою"
 }
