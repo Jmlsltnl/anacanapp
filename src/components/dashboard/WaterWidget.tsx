@@ -18,7 +18,7 @@ interface WaterWidgetProps {
 
 export default function WaterWidget({ variant = 'default' }: WaterWidgetProps) {
   const { todayLog, updateWaterIntake } = useDailyLogs();
-  const { lifeStage } = useUserStore();
+  const lifeStage = useUserStore((s) => s.lifeStage);
   
   const waterGlasses = todayLog?.water_intake || 0;
   const stage = lifeStage || 'flow';

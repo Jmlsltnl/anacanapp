@@ -14,6 +14,7 @@ import {
 'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 const SafetyLookup = lazy(() => import('./tools/SafetyLookup'));
@@ -163,7 +164,9 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
     }
     openTool(toolId);
   };
-  const { lifeStage, getPregnancyData } = useUserStore();
+  const { lifeStage, getPregnancyData } = useUserStore(
+    useShallow((s) => ({ lifeStage: s.lifeStage, getPregnancyData: s.getPregnancyData }))
+  );
   const { profile, isAdmin } = useAuth();
   const { isPremium } = useSubscription();
   const { toast } = useToast();

@@ -9,6 +9,7 @@ import {
 import { useRecipes, Recipe } from '@/hooks/useDynamicContent';
 import { useRecipeCategories } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { resetAppScrollPosition } from '@/lib/scroll';
@@ -32,7 +33,9 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const { data: recipes = [], isLoading: recipesLoading } = useRecipes();
-  const { lifeStage, language } = useUserStore();
+  const { lifeStage, language } = useUserStore(
+    useShallow((s) => ({ lifeStage: s.lifeStage, language: s.language }))
+  );
   const { isPremium, loading: subscriptionLoading } = useSubscription();
 
   // Dynamic data from database

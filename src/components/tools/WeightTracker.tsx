@@ -24,7 +24,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
 
   const { entries, loading, addEntry, getStats, deleteEntry, deleteAllEntries } = useWeightEntries();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const { getPregnancyData } = useUserStore();
+  const getPregnancyData = useUserStore((s) => s.getPregnancyData);
   const [newWeight, setNewWeight] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { usePregnancyContentByDay } from '@/hooks/usePregnancyContent';
 import { useFruitImages, getDynamicFruitData } from '@/hooks/useFruitData';
 import { useAIChatHistory } from '@/hooks/useAIChatHistory';
@@ -168,7 +169,20 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   // Kopyalama feedback-i
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const { lifeStage, getPregnancyData, name, dueDate, babyName, babyBirthDate, lastPeriodDate, cycleLength, periodLength, language } = useUserStore();
+  const { lifeStage, getPregnancyData, name, dueDate, babyName, babyBirthDate, lastPeriodDate, cycleLength, periodLength, language } = useUserStore(
+    useShallow((s) => ({
+      lifeStage: s.lifeStage,
+      getPregnancyData: s.getPregnancyData,
+      name: s.name,
+      dueDate: s.dueDate,
+      babyName: s.babyName,
+      babyBirthDate: s.babyBirthDate,
+      lastPeriodDate: s.lastPeriodDate,
+      cycleLength: s.cycleLength,
+      periodLength: s.periodLength,
+      language: s.language,
+    }))
+  );
   const { user } = useAuth();
   const { messages: savedMessages, addMessage, clearHistory, loading: historyLoading } = useAIChatHistory('woman');
   const { toast } = useToast();

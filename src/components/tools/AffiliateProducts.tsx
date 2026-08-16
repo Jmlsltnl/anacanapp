@@ -30,7 +30,7 @@ const AffiliateProducts = ({ onBack }: AffiliateProductsProps) => {
   useScrollToTop();
   useScreenAnalytics('AffiliateProducts', 'Tools');
 
-  const { lifeStage } = useUserStore();
+  const lifeStage = useUserStore((s) => s.lifeStage);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<AffiliateProduct | null>(null);

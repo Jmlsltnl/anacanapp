@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { Check, Search, ChevronLeft, Globe } from 'lucide-react';
 import { clearTranslationCache, ensureLanguageReady, loadTranslations, fetchActiveLanguages } from '@/lib/i18n';
 import { isRtlLang, rtlX } from '@/lib/rtl';
@@ -59,7 +60,9 @@ const FALLBACK_LANGS = [
 ];
 
 export default function InitialLanguageScreen() {
-  const { setLanguage, setHasSelectedLanguage, setCountryCode } = useUserStore();
+  const { setLanguage, setHasSelectedLanguage, setCountryCode } = useUserStore(
+    useShallow((s) => ({ setLanguage: s.setLanguage, setHasSelectedLanguage: s.setHasSelectedLanguage, setCountryCode: s.setCountryCode }))
+  );
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedLang, setSelectedLang] = useState<string>(useUserStore.getState().language || 'az');
   const [isSwitching, setIsSwitching] = useState(false);

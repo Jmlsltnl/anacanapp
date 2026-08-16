@@ -11,6 +11,7 @@ import { useAppBranding, getBrandingUrl } from '@/hooks/useAppBranding';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { tr } from "@/lib/tr";
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Globe } from 'lucide-react';
 import CountrySelect from '@/components/CountrySelect';
@@ -81,7 +82,9 @@ const AuthScreen = () => {
   const { data: branding = [] } = useAppBranding();
   const socialLoginEnabled = useAppSetting('social_login_enabled');
   const isSocialLoginEnabled = socialLoginEnabled === true || socialLoginEnabled === 'true';
-  const { countryCode, setCountryCode } = useUserStore();
+  const { countryCode, setCountryCode } = useUserStore(
+    useShallow((s) => ({ countryCode: s.countryCode, setCountryCode: s.setCountryCode }))
+  );
 
   // Get custom login logo from database
   const customLoginLogo = getBrandingUrl(branding, 'login_logo');

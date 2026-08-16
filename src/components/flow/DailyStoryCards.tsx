@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useFlowInsights } from '@/hooks/useFlowData';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { getPhaseInfoForDate } from '@/lib/cycle-utils';
 import { format } from 'date-fns';
 import { getTranslatedTip } from '@/lib/tip-translations';
@@ -30,7 +31,9 @@ const PHASE_GRADIENT: Record<string, string> = {
 };
 
 const DailyStoryCards = () => {
-  const { lastPeriodDate, cycleLength, periodLength, userId, language } = useUserStore();
+  const { lastPeriodDate, cycleLength, periodLength, userId, language } = useUserStore(
+    useShallow((s) => ({ lastPeriodDate: s.lastPeriodDate, cycleLength: s.cycleLength, periodLength: s.periodLength, userId: s.userId, language: s.language }))
+  );
   const today = new Date();
   const phase = lastPeriodDate ?
   getPhaseInfoForDate(today, new Date(lastPeriodDate), cycleLength || 28, periodLength || 5).phase :

@@ -9,6 +9,7 @@ import {
   Mail } from
 'lucide-react';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useToast } from '@/hooks/use-toast';
 import { useHealthReport } from '@/hooks/useHealthReport';
 import { useChildren } from '@/hooks/useChildren';
@@ -36,7 +37,9 @@ interface BabyCareStats {
 }
 
 const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
-  const { name, lifeStage, getCycleData, getPregnancyData, language } = useUserStore();
+  const { name, lifeStage, getCycleData, getPregnancyData, language } = useUserStore(
+    useShallow((s) => ({ name: s.name, lifeStage: s.lifeStage, getCycleData: s.getCycleData, getPregnancyData: s.getPregnancyData, language: s.language }))
+  );
   const { selectedChild, getChildAge } = useChildren();
   const { user } = useAuth();
   const { toast } = useToast();

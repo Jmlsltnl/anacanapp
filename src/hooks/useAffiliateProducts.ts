@@ -43,24 +43,23 @@ export const useAffiliateProducts = (lifeStage?: string) => {
   return useQuery({
     queryKey: ['affiliate-products', lifeStage, language],
     queryFn: async () => {
-      const { data, error } = await supabase.
+      let query = supabase.
       from('affiliate_products').
       select('*').
       eq('is_active', true).
       order('is_featured', { ascending: false }).
       order('sort_order', { ascending: true });
 
-      if (error) throw error;
-
-      const mapped = mapRowsTranslation(data, language, ['name', 'description', 'category', 'review_summary']) as AffiliateProduct[];
-      let products = mapped;
-
-      // Filter by life stage if provided
+      // life_stages massivi ilə server-side üst-üstə düşmə (overlap) yoxlanışı —
+      // əvvəllər BÜTÜN aktiv məhsullar çəkilib client-side filtrlənirdi.
       if (lifeStage) {
-        products = products.filter((p) => p.life_stages?.includes(lifeStage));
+        query = query.overlaps('life_stages', [lifeStage]);
       }
 
-      return products;
+      const { data, error } = await query;
+      if (error) throw error;
+
+      return mapRowsTranslation(data, language, ['name', 'description', 'category', 'review_summary']) as AffiliateProduct[];
     }
   });
 };

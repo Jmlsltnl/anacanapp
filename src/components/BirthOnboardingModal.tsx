@@ -31,7 +31,7 @@ type Gender = 'boy' | 'girl';
 const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingModalProps) => {
   const isRtl = useIsRtl();
   const { user, profile } = useAuth();
-  const { setLifeStage } = useUserStore();
+  const setLifeStage = useUserStore((s) => s.setLifeStage);
   const { toast } = useToast();
 
   const [step, setStep] = useState(1);

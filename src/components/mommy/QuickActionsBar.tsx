@@ -29,7 +29,7 @@ interface QuickActionsBarProps {
  */
 const QuickActionsBar = ({ onNavigateToTool }: QuickActionsBarProps) => {
   const { selectedChild, getChildAge } = useChildren();
-  const { lifeStage } = useUserStore();
+  const lifeStage = useUserStore((s) => s.lifeStage);
   const { isPremium } = useSubscription();
   const { data: toolConfigs = [] } = useToolConfigs(lifeStage);
   const [showPremiumModal, setShowPremiumModal] = useState(false);

@@ -66,30 +66,50 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
 
     const lastSeenAt = (prefData as any)?.community_last_seen_at ?? null;
 
-    const { data: readRows, error: readsError } = await supabase
-      .from('community_post_reads')
-      .select('post_id')
-      .eq('user_id', userId);
-
-    if (readsError) throw readsError;
-
-    const serverSeenPostIds = Object.fromEntries(
-      ((readRows || []) as Array<{ post_id: string }>).map((row) => [row.post_id, true])
-    ) as SeenPostMap;
-    const seenPostIds = { ...localSeenPostIds, ...serverSeenPostIds } satisfies SeenPostMap;
-    writeSeenPostIds(userId, seenPostIds);
-
-    // Feed dil linzası — qlobal feed ilə EYNİ filtr (yoxsa badge yalan sayır)
-    const { data: posts, error } = await supabase
+    // Feed dil linzası — qlobal feed ilə EYNİ filtr (yoxsa badge yalan sayır).
+    // KRİTİK PERF DÜZƏLİŞİ: server-side `created_at` sərhədi ilə yalnız son
+    // baxışdan bəri olan postlar çəkilir — əvvəllər BÜTÜN tarix boyu postlar
+    // (limitsiz!) çəkilib client-side filtrlənirdi; community_posts böyüdükcə
+    // bu sorğu hər istifadəçi üçün getdikcə ağırlaşırdı (bu hook BottomNav-da
+    // daim mount olunur).
+    let postsQuery = supabase
       .from('community_posts')
       .select('id, created_at, user_id')
       .or(feedLangsOrExpr(getFeedLanguagesSnapshot()))
       .eq('is_active', true)
       .is('group_id', null)
       .neq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(500); // təhlükəsizlik həddi (çox uzun müddət açılmayan tətbiq üçün)
 
+    if (lastSeenAt) {
+      postsQuery = postsQuery.gt('created_at', lastSeenAt);
+    }
+
+    const { data: posts, error } = await postsQuery;
     if (error) throw error;
+
+    const postIds = (posts || []).map((p: any) => p.id);
+
+    // Yalnız yuxarıdakı (artıq sərhədlənmiş) post dəstinin read-sətirləri —
+    // əvvəllər istifadəçinin BÜTÜN read-tarixçəsi (limitsiz, əbədi böyüyən) çəkilirdi.
+    let serverSeenPostIds: SeenPostMap = {};
+    if (postIds.length > 0) {
+      const { data: readRows, error: readsError } = await supabase
+        .from('community_post_reads')
+        .select('post_id')
+        .eq('user_id', userId)
+        .in('post_id', postIds);
+
+      if (readsError) throw readsError;
+
+      serverSeenPostIds = Object.fromEntries(
+        ((readRows || []) as Array<{ post_id: string }>).map((row) => [row.post_id, true])
+      ) as SeenPostMap;
+    }
+
+    const seenPostIds = { ...localSeenPostIds, ...serverSeenPostIds } satisfies SeenPostMap;
+    writeSeenPostIds(userId, seenPostIds);
 
     const unreadCount = (posts || []).filter((post: any) => {
       if (seenPostIds[post.id]) return false;
@@ -135,14 +155,27 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
   },
 
   markCommunitySeen: async (userId: string) => {
-    const { data: posts } = await supabase
+    // Eyni bounded strategiya: yalnız (indiyədək bilinən) son baxışdan bəri
+    // olan postlar çəkilir — 500 həddindən artıq olsa belə, DESC sıralama
+    // sayəsində ən son postun created_at-ı düzgün qalır (community_last_seen_at
+    // düzgün irəliləyir, geridəki köhnə postlar isə onsuz da "oxunmuş" sayılır).
+    const prevLastSeenAt = get().lastSeenAt;
+
+    let postsQuery = supabase
       .from('community_posts')
       .select('id, created_at, user_id')
       .or(feedLangsOrExpr(getFeedLanguagesSnapshot()))
       .eq('is_active', true)
       .is('group_id', null)
       .neq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(500);
+
+    if (prevLastSeenAt) {
+      postsQuery = postsQuery.gt('created_at', prevLastSeenAt);
+    }
+
+    const { data: posts } = await postsQuery;
 
     const seenPostIds = {
       ...get().seenPostIds,

@@ -11,6 +11,7 @@ import { useNutritionTips } from '@/hooks/useDynamicContent';
 import { useCommonFoods } from '@/hooks/useDynamicConfig';
 import { useMealTypes, useNutritionTargets } from '@/hooks/useDynamicTools';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import VitaminsTab from './VitaminsTab';
@@ -87,7 +88,9 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   const { loading: mealLoading, addMealLog, deleteMealLog, getTodayStats, getMealsByType } = useMealLogs();
   const { data: nutritionTips = [], isLoading: tipsLoading } = useNutritionTips();
   const { data: dbFoods = [], isLoading: foodsLoading } = useCommonFoods();
-  const { lifeStage, language } = useUserStore();
+  const { lifeStage, language } = useUserStore(
+    useShallow((s) => ({ lifeStage: s.lifeStage, language: s.language }))
+  );
 
   // Dynamic data from database
   const { data: dbMealTypes = [] } = useMealTypes(lifeStage || 'flow');

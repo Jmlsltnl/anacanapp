@@ -1,6 +1,7 @@
 import { tr } from "@/lib/tr";import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { QUIZ_QUESTIONS, SYMPTOM_MAPPINGS, RESULTS_TEMPLATES, REVIEWS, FEATURES, PLAN_MILESTONES } from './funnelData';
 import QuizStep from './steps/QuizStep';
 import AnalysisStep from './steps/AnalysisStep';
@@ -23,7 +24,9 @@ interface ReverseTrialFunnelProps {
 }
 
 export default function ReverseTrialFunnel({ onComplete }: ReverseTrialFunnelProps) {
-  const { name, lifeStage, getPregnancyData, getBabyData, cycleLength } = useUserStore();
+  const { name, lifeStage, getPregnancyData, getBabyData, cycleLength } = useUserStore(
+    useShallow((s) => ({ name: s.name, lifeStage: s.lifeStage, getPregnancyData: s.getPregnancyData, getBabyData: s.getBabyData, cycleLength: s.cycleLength }))
+  );
   const [step, setStep] = useState<FunnelStep>('quiz');
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
 

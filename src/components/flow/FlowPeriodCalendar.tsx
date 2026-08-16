@@ -4,6 +4,7 @@ import { Calendar, ChevronLeft, ChevronRight, Droplets } from 'lucide-react';
 import { format, addDays, subDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isAfter } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { usePeriodDayLogs, useTogglePeriodDay } from '@/hooks/usePeriodDayLogs';
 import { getPhaseInfoForDate } from '@/lib/cycle-utils';
 import { toast } from 'sonner';
@@ -16,7 +17,9 @@ const FLOW_OPTIONS = [
 
 
 const FlowPeriodCalendar = () => {
-  const { cycleLength, periodLength, getCycleData } = useUserStore();
+  const { cycleLength, periodLength, getCycleData } = useUserStore(
+    useShallow((s) => ({ cycleLength: s.cycleLength, periodLength: s.periodLength, getCycleData: s.getCycleData }))
+  );
   const cycleData = getCycleData();
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);

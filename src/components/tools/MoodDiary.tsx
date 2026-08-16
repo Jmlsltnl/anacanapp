@@ -6,6 +6,7 @@ import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { hapticFeedback } from '@/lib/native';
 import { useMoodOptions, useSymptoms } from '@/hooks/useDynamicConfig';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
@@ -28,7 +29,9 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   const [notes, setNotes] = useState('');
 
   const { logs, todayLog, loading: logsLoading, addLog } = useDailyLogs();
-  const { lifeStage, language } = useUserStore();
+  const { lifeStage, language } = useUserStore(
+    useShallow((s) => ({ lifeStage: s.lifeStage, language: s.language }))
+  );
   const { data: dbMoods, isLoading: moodsLoading } = useMoodOptions();
   const { data: dbSymptoms, isLoading: symptomsLoading } = useSymptoms(lifeStage);
 

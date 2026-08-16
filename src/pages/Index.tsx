@@ -11,6 +11,7 @@ import BottomNav from '@/components/BottomNav';
 import AppRatingPrompt from '@/components/AppRatingPrompt';
 import FloatingTimerWidget from '@/components/FloatingTimerWidget';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { isNative } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppSetting } from '@/hooks/useAppSettings';
@@ -117,7 +118,22 @@ const Index = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
-  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, hasSelectedLanguage, setHasSelectedLanguage, lifeStage, hasCompletedFunnel, setFunnelCompleted, language, countryCode } = useUserStore();
+  const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, hasSelectedLanguage, setHasSelectedLanguage, lifeStage, hasCompletedFunnel, setFunnelCompleted, language, countryCode } = useUserStore(
+    useShallow((s) => ({
+      isAuthenticated: s.isAuthenticated,
+      isOnboarded: s.isOnboarded,
+      role: s.role,
+      hasSeenIntro: s.hasSeenIntro,
+      setHasSeenIntro: s.setHasSeenIntro,
+      hasSelectedLanguage: s.hasSelectedLanguage,
+      setHasSelectedLanguage: s.setHasSelectedLanguage,
+      lifeStage: s.lifeStage,
+      hasCompletedFunnel: s.hasCompletedFunnel,
+      setFunnelCompleted: s.setFunnelCompleted,
+      language: s.language,
+      countryCode: s.countryCode,
+    }))
+  );
   const { isAdmin, loading, profile, user, profileLoaded } = useAuth();
   const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
   // Premium onboarding (funnel ilə) — app_settings ilə idarə olunur; setting yoxdursa AKTİVDİR

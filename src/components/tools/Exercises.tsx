@@ -32,7 +32,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
   const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const { loading: logsLoading, addLog, isCompletedToday, getTodayStats, getStreak } = useExerciseLogs();
-  const { getPregnancyData } = useUserStore();
+  const getPregnancyData = useUserStore((s) => s.getPregnancyData);
   const { data: dbExercises, isLoading: exercisesLoading } = useExercises();
 
   const pregnancyData = getPregnancyData();

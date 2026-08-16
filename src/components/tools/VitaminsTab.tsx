@@ -3,6 +3,7 @@ import { tr } from '@/lib/tr';
 import { Pill, AlertCircle, Leaf, Info } from 'lucide-react';
 import { useVitamins, Vitamin } from '@/hooks/useVitamins';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { getPregnancyWeek } from '@/lib/pregnancy-utils';
 import { useIsRtl, rtlX } from '@/lib/rtl';
 
@@ -12,7 +13,9 @@ interface VitaminsTabProps {
 
 const VitaminsTab = ({ className }: VitaminsTabProps) => {
   const isRtl = useIsRtl();
-  const { lifeStage, lastPeriodDate } = useUserStore();
+  const { lifeStage, lastPeriodDate } = useUserStore(
+    useShallow((s) => ({ lifeStage: s.lifeStage, lastPeriodDate: s.lastPeriodDate }))
+  );
 
   // Calculate current pregnancy week
   const currentWeek =

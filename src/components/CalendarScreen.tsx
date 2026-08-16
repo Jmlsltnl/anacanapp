@@ -5,6 +5,7 @@ import {
   Droplets, Sparkles, Calendar as CalendarIcon } from
 'lucide-react';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppointments } from '@/hooks/useAppointments';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
@@ -37,7 +38,15 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
   useScrollToTop();
   useScreenAnalytics('Calendar', 'Calendar');
 
-  const { lifeStage, getCycleData, getPregnancyData, cycleLength, periodLength } = useUserStore();
+  const { lifeStage, getCycleData, getPregnancyData, cycleLength, periodLength } = useUserStore(
+    useShallow((s) => ({
+      lifeStage: s.lifeStage,
+      getCycleData: s.getCycleData,
+      getPregnancyData: s.getPregnancyData,
+      cycleLength: s.cycleLength,
+      periodLength: s.periodLength,
+    }))
+  );
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);

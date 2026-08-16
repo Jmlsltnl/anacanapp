@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { getCurrentPosition, requestLocationPermission } from '@/lib/permissions';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { differenceInMonths, differenceInDays } from 'date-fns';
 import { getPregnancyWeek } from '@/lib/pregnancy-utils';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
@@ -49,7 +50,9 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
 
   const { toast } = useToast();
   const { profile } = useAuthContext();
-  const { lifeStage, babyBirthDate, lastPeriodDate } = useUserStore();
+  const { lifeStage, babyBirthDate, lastPeriodDate } = useUserStore(
+    useShallow((s) => ({ lifeStage: s.lifeStage, babyBirthDate: s.babyBirthDate, lastPeriodDate: s.lastPeriodDate }))
+  );
 
   // Calculate user context data
   const getUserContext = () => {

@@ -89,7 +89,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
   const { data: existingLog, isLoading } = useFlowDailyLog(dateStr);
   const { data: symptoms = [] } = useFlowSymptoms();
   const saveLog = useSaveFlowDailyLog();
-  const { language } = useUserStore();
+  const language = useUserStore((s) => s.language);
 
   const [expanded, setExpanded] = useState(!compact);
   const [formData, setFormData] = useState<Partial<FlowDailyLog>>({

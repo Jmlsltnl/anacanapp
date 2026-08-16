@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Droplets, Heart, Sparkles, AlertCircle, Plus, Calendar as CalendarIcon, Beaker, Pill, Droplet, Moon, Activity, Baby, Sparkle, Wind, CheckCircle2, XCircle, ArrowRight, TrendingUp, Flame, Apple, Dumbbell, Brain, CircleDot } from 'lucide-react';
 import { getTranslatedTip } from '@/lib/tip-translations';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
 import { format, differenceInDays } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
@@ -42,7 +43,9 @@ import { computeAdaptiveCycleStats, refineOvulation } from '@/lib/cycle-predicti
 import { useFlowDailyLogs } from '@/hooks/useFlowDailyLogs';
 import PremiumGate from '@/components/premium/PremiumGate';
 const FlowDashboard = () => {
-  const { getCycleData, cycleLength, periodLength, setLastPeriodDate, language } = useUserStore();
+  const { getCycleData, cycleLength, periodLength, setLastPeriodDate, language } = useUserStore(
+    useShallow((s) => ({ getCycleData: s.getCycleData, cycleLength: s.cycleLength, periodLength: s.periodLength, setLastPeriodDate: s.setLastPeriodDate, language: s.language }))
+  );
   const cycleData = getCycleData();
   const { user } = useAuth();
   const queryClient = useQueryClient();

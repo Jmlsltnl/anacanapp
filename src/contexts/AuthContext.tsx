@@ -4,6 +4,7 @@ import { readCache, writeCache, clearAllCaches } from '@/lib/offlineCache';
 const isCapacitorNative = typeof (window as any)?.Capacitor?.isNativePlatform === 'function' &&
   (window as any).Capacitor.isNativePlatform();
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import type { User, Session } from '@supabase/supabase-js';
 
 const PROFILE_CACHE_KEY = 'profile';
@@ -77,6 +78,10 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
   const [loading, setLoading] = useState(true);
   const [profileLoaded, setProfileLoaded] = useState(false);
 
+  // useShallow: bu 12 sahə userStore-un action funksiyalarıdır (referansları
+  // stabildir), amma seçicisiz useUserStore() BÜTÜN store obyektinə abunə
+  // yazır — dilin/cycle-in/hər hansı sahənin dəyişməsi AuthProvider-i (bütün
+  // ağacın kökü) lazımsız yerə yenidən render edirdi.
   const {
     setAuth,
     setRole,
@@ -90,7 +95,22 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
     setPartnerCode,
     setLinkedPartnerId,
     logout: storeLogout
-  } = useUserStore();
+  } = useUserStore(
+    useShallow((s) => ({
+      setAuth: s.setAuth,
+      setRole: s.setRole,
+      setLifeStage: s.setLifeStage,
+      setOnboarded: s.setOnboarded,
+      setLastPeriodDate: s.setLastPeriodDate,
+      setCycleLength: s.setCycleLength,
+      setPeriodLength: s.setPeriodLength,
+      setDueDate: s.setDueDate,
+      setBabyData: s.setBabyData,
+      setPartnerCode: s.setPartnerCode,
+      setLinkedPartnerId: s.setLinkedPartnerId,
+      logout: s.logout
+    }))
+  );
 
   // ─────────────────────────────────────────
   // Helpers

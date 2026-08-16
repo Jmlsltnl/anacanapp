@@ -203,6 +203,12 @@ export const useGroupPosts = (groupId: string | null) => {
         query = query.is('group_id', null).or(feedLangsOrExpr(feedLangs));
       }
 
+      // Sərhədsiz idi — cəmiyyət/paylaşım sayı vaxtla böyüdükcə bu sorğu
+      // (hər feed açılışında!) getdikcə ağırlaşırdı. Son 150 paylaşım kifayət
+      // qədər dolğun feed verir; tam "daha çox yüklə" pagination gələcək
+      // təkmilləşdirmə kimi qeyd olunub.
+      query = query.limit(150);
+
       const { data: posts, error } = await query;
       if (error) throw error;
 

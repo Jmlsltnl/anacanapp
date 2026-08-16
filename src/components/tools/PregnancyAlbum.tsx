@@ -62,7 +62,7 @@ const PregnancyAlbum = ({ onBack }: PregnancyAlbumProps) => {
   useScreenAnalytics('PregnancyAlbum', 'Tools');
 
   const { user } = useAuth();
-  const { getPregnancyData } = useUserStore();
+  const getPregnancyData = useUserStore((s) => s.getPregnancyData);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);

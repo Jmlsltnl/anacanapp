@@ -10,6 +10,7 @@ import {
 'lucide-react';
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useTimerStore } from '@/store/timerStore';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { hapticFeedback } from '@/lib/native';
@@ -155,7 +156,9 @@ const ProgressRing = ({ progress, size = 100, strokeWidth = 8, color = "stroke-p
 
 
 const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) => void;}) => {
-  const { getPregnancyData, setLifeStage, language } = useUserStore();
+  const { getPregnancyData, setLifeStage, language } = useUserStore(
+    useShallow((s) => ({ getPregnancyData: s.getPregnancyData, setLifeStage: s.setLifeStage, language: s.language }))
+  );
   const { toast } = useToast();
   const pregData = getPregnancyData();
   const { todayLog, updateWaterIntake, updateMood } = useDailyLogs();
@@ -788,7 +791,7 @@ const getBabyDailyFunFact = (ageInDays: number): string => {
 
 const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (tool: string) => void;onNavigate?: (screen: string) => void;}) => {
   const { toast } = useToast();
-  const { language } = useUserStore();
+  const language = useUserStore((s) => s.language);
   const { profile: mommyProfile } = useAuth();
   const { isMilestoneAchieved, toggleMilestone, getMilestoneDate, MILESTONES } = useBabyMilestones();
   const { unlockAchievement, getTotalPoints } = useAchievements();
@@ -1818,7 +1821,9 @@ interface DashboardProps {
 }
 
 const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps) => {
-  const { lifeStage, name } = useUserStore();
+  const { lifeStage, name } = useUserStore(
+    useShallow((s) => ({ lifeStage: s.lifeStage, name: s.name }))
+  );
   const { profile } = useAuth();
   const { unreadCount: partnerUnread } = useUnreadMessages();
   const { conversations } = useDirectMessages();

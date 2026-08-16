@@ -6,6 +6,7 @@ import { getDangerSignsForStage, type DangerSign } from '@/lib/redFlags';
 import { getEmergencyNumber } from '@/lib/emergency';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useSOSAlert } from '@/hooks/useSOSAlert';
 import { hapticFeedback } from '@/lib/native';
 import { toast } from 'sonner';
@@ -21,7 +22,9 @@ interface Props {
 }
 
 const DangerSignsScreen = ({ onBack }: Props) => {
-  const { lifeStage, countryCode } = useUserStore();
+  const { lifeStage, countryCode } = useUserStore(
+    useShallow((s) => ({ lifeStage: s.lifeStage, countryCode: s.countryCode }))
+  );
   const { profile } = useAuth();
   // Təcili nömrə İSTİFADƏÇİNİN ÖLKƏSİNƏ görə (dil yox)
   const emergencyNum = getEmergencyNumber((profile as any)?.country_code || countryCode);

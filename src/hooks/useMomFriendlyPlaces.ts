@@ -57,7 +57,10 @@ export const useMomFriendlyPlaces = (filters?: {
   return useQuery({
     queryKey: ['mom-friendly-places', filters, language],
     queryFn: async () => {
-      let query = supabase.
+      // NOT: `query` qəsdən `any` tipləndirilib — dinamik .eq() loop-u ilə
+      // Supabase-in generic filter-builder tipi TS-də "excessively deep"
+      // instantiation xətası verir (məlum supabase-js + TS məhdudiyyəti).
+      let query: any = supabase.
       from('mom_friendly_places').
       select('*').
       eq('is_active', true).
@@ -67,19 +70,20 @@ export const useMomFriendlyPlaces = (filters?: {
         query = query.eq('category', filters.category as MomFriendlyPlace['category']);
       }
 
+      // Amenity boolean sütunları server-side filtrlənir (hər tələb olunan
+      // amenity üçün .eq(..., true) — hamısı AND məntiqi ilə birləşir, əvvəlki
+      // .every() semantikasının eynisi) — əvvəllər BÜTÜN aktiv məkanlar çəkilib
+      // client-side yoxlanılırdı.
+      if (filters?.amenities?.length) {
+        for (const amenity of filters.amenities) {
+          query = query.eq(amenity as any, true);
+        }
+      }
+
       const { data, error } = await query;
       if (error) throw error;
 
-      let places = mapRowsTranslation(data, language, ['name', 'description', 'address']) as unknown as MomFriendlyPlace[];
-
-      // Filter by amenities client-side for flexibility
-      if (filters?.amenities?.length) {
-        places = places.filter((place) =>
-        filters.amenities!.every((amenity) => (place as any)[amenity] === true)
-        );
-      }
-
-      return places;
+      return mapRowsTranslation(data, language, ['name', 'description', 'address']) as unknown as MomFriendlyPlace[];
     },
     staleTime: 1000 * 60 * 5
   });

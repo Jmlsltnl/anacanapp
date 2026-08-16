@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Baby, Bell, BellOff, Calendar, Check, Droplets, Heart, Loader2, Minus, Plus, Sparkles } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useAutoJoinGroups } from '@/hooks/useCommunity';
@@ -246,7 +247,19 @@ const PremiumOnboarding = () => {
     setLifeStage, setLastPeriodDate, setBabyData, setOnboarded, setDueDate,
     setCycleLength: setStoreCycleLength, setPeriodLength: setStorePeriodLength,
     setFunnelCompleted, setMultiplesData
-  } = useUserStore();
+  } = useUserStore(
+    useShallow((s) => ({
+      setLifeStage: s.setLifeStage,
+      setLastPeriodDate: s.setLastPeriodDate,
+      setBabyData: s.setBabyData,
+      setOnboarded: s.setOnboarded,
+      setDueDate: s.setDueDate,
+      setCycleLength: s.setCycleLength,
+      setPeriodLength: s.setPeriodLength,
+      setFunnelCompleted: s.setFunnelCompleted,
+      setMultiplesData: s.setMultiplesData,
+    }))
+  );
   const { updateProfile } = useAuth();
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();

@@ -24,10 +24,13 @@ export const useShoppingItems = () => {
     if (!user) return;
 
     try {
+      // Təbii olaraq kiçik (istifadəçi + partnyorun siyahısı) cədvəldir, amma
+      // illər boyu yığılan işarələnməmiş elementlərə qarşı təhlükəsizlik həddi.
       const { data, error } = await supabase
         .from('shopping_items')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(300);
 
       if (error) throw error;
       

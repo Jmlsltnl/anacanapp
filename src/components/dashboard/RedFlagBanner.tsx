@@ -15,7 +15,7 @@ interface Props {
 }
 
 const RedFlagBanner = ({ onOpenTool }: Props) => {
-  const { lifeStage } = useUserStore();
+  const lifeStage = useUserStore((s) => s.lifeStage);
   const { data: logs = [] } = useBloodPressureLogs();
 
   const latest = logs[0];

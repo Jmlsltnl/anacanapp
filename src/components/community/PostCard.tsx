@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Crown, Shield, Flag, Pencil, EyeOff, Sparkles, Languages } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -64,7 +64,12 @@ const avatarGradFor = (seed: string) => {
   return AVATAR_GRADS[Math.abs(h) % AVATAR_GRADS.length];
 };
 
-const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
+// memo(): community feed hər post üçün ayrıca bu komponenti render edir —
+// props (post/groupId/onUserClick) dəyişməyəndə belə, valideynin (GroupFeed)
+// istənilən re-render-i bütün görünən postları yenidən render edirdi.
+// Effektiv olması üçün onUserClick CommunityScreen-də useCallback ilə sabitlənib,
+// post obyekt referansı isə react-query-nin struktur paylaşımı ilə sabitdir.
+const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [commentAnonymous, setCommentAnonymous] = useState(false);
@@ -417,6 +422,8 @@ const PostCard = ({ post, groupId, onUserClick }: PostCardProps) => {
       </Dialog>
     </>);
 
-};
+});
+
+PostCard.displayName = 'PostCard';
 
 export default PostCard;

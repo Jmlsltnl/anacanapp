@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Sparkles, Lock } from 'lucide-react';
 import { useFlowDailyLogs, useFlowSymptoms } from '@/hooks/useFlowDailyLogs';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useSubscription } from '@/hooks/useSubscription';
 import { getCycleDayForDate, getPhaseInfoForDate } from '@/lib/cycle-utils';
 import { format, subDays } from 'date-fns';
@@ -21,7 +22,9 @@ const PHASE_LABEL: Record<string, {label: string;emoji: string;}> = {
 
 const SymptomPatternReport = ({ onUpgrade }: Props) => {
   const { isPremium } = useSubscription();
-  const { lastPeriodDate, cycleLength, periodLength } = useUserStore();
+  const { lastPeriodDate, cycleLength, periodLength } = useUserStore(
+    useShallow((s) => ({ lastPeriodDate: s.lastPeriodDate, cycleLength: s.cycleLength, periodLength: s.periodLength }))
+  );
   const start = format(subDays(new Date(), 90), 'yyyy-MM-dd');
   const end = format(new Date(), 'yyyy-MM-dd');
   const { data: logs = [], isLoading } = useFlowDailyLogs(start, end);

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Send, MessageCircle, BookOpen, Sparkles } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useAuth } from '@/hooks/useAuth';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { usePartnerMessages } from '@/hooks/usePartnerMessages';
@@ -41,7 +42,9 @@ interface Props {
 const PartnerHomeScreen = ({ onNavigate, onOpenChat }: Props) => {
   useScrollToTop();
 
-  const { name, language } = useUserStore();
+  const { name, language } = useUserStore(
+    useShallow((s) => ({ name: s.name, language: s.language }))
+  );
   const { profile } = useAuth();
   const { toast } = useToast();
   const {

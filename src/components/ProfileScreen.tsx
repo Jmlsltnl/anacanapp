@@ -8,6 +8,7 @@ import {
   FileText, Scale, AlertCircle, RotateCcw, Database, Sparkles } from
 'lucide-react';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -34,7 +35,9 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   useScrollToTop();
   useScreenAnalytics('Profile', 'Profile');
 
-  const { name, email, lifeStage, role } = useUserStore();
+  const { name, email, lifeStage, role } = useUserStore(
+    useShallow((s) => ({ name: s.name, email: s.email, lifeStage: s.lifeStage, role: s.role }))
+  );
   const { signOut, profile, isAdmin } = useAuth();
   const { toast } = useToast();
   const { unreadCount } = useNotifications();

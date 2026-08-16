@@ -85,11 +85,17 @@ export const useBlog = () => {
 
   const fetchPosts = useCallback(async () => {
     try {
+      // Sərhədsiz idi (bütün nəşr olunmuş məqalələr) — təhlükəsizlik həddi
+      // əlavə olunub; ölkə/kateqoriya/axtarış filtri hələ də client-side-dır
+      // (bu cədvəl admin-idarəli məzmundur, community_posts kimi istifadəçi
+      // sayı ilə mütənasib böyümür, ona görə server-side array-overlap
+      // filtrinə keçid bu keçiddə prioritet deyil).
       const { data, error } = await supabase
         .from('blog_posts')
         .select('*')
         .eq('is_published', true)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(200);
 
       if (error) throw error;
       

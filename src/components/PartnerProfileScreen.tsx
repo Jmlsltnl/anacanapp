@@ -7,6 +7,7 @@ import {
   Trophy, Target, Star, Gift, TrendingUp, BarChart3 } from
 'lucide-react';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import { useToast } from '@/hooks/use-toast';
 import { usePartnerStats } from '@/hooks/usePartnerStats';
 import { usePartnerMissions } from '@/hooks/usePartnerMissions';
@@ -57,7 +58,9 @@ interface PartnerProfileScreenProps {
 const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
   useScrollToTop();
 
-  const { name, email, partnerWomanData, logout } = useUserStore();
+  const { name, email, partnerWomanData, logout } = useUserStore(
+    useShallow((s) => ({ name: s.name, email: s.email, partnerWomanData: s.partnerWomanData, logout: s.logout }))
+  );
   const { toast } = useToast();
   const { stats, loading: statsLoading } = usePartnerStats();
   const { level, levelProgress, pointsToNextLevel } = usePartnerMissions();

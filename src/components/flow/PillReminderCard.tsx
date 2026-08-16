@@ -18,7 +18,7 @@ const PillReminderCard = () => {
   const toggle = useToggleReminder();
   const pill = reminders.find((r) => r.reminder_type === 'pill');
 
-  const { language } = useUserStore();
+  const language = useUserStore((s) => s.language);
   const defaultTitleAz = "Həbinizi qəbul edin";
   
   const getPillTitle = () => {

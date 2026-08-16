@@ -1,4 +1,4 @@
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef, useCallback } from 'react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen, MessageCircle } from 'lucide-react';
@@ -49,7 +49,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   // Note: do NOT auto mark-all-seen here. Posts are marked individually as
   // they enter the viewport in GroupFeed via the SeenObserver wrapper.
 
-  const { lifeStage } = useUserStore();
+  const lifeStage = useUserStore((s) => s.lifeStage);
   const headerKey = `community_header_${lifeStage || 'mommy'}`;
   const dynamicHeader = useAppSetting(headerKey);
   const defaultHeader = tr("communityscreen_diger_analar_ile_elaqede_olun_4830a3", "Dig\u0259r analar il\u0259 \u0259laq\u0259d\u0259 olun");
@@ -65,13 +65,15 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   const myGroups = groups.filter((g) => memberGroupIds.has(g.id));
   const selectedGroup = groups.find((g) => g.id === selectedGroupId);
 
-  const handleUserClick = (userId: string) => setSelectedUserId(userId);
+  // useCallback: PostCard artıq memo() ilə saramalanıb — bu referansın hər
+  // render-də dəyişməsi feed-dəki bütün post kartlarının memo-sunu boşa çıxarardı.
+  const handleUserClick = useCallback((userId: string) => setSelectedUserId(userId), []);
 
-  const handleOpenDmChat = (userId: string, name: string, avatar: string | null) => {
+  const handleOpenDmChat = useCallback((userId: string, name: string, avatar: string | null) => {
     setDmChat({ userId, name, avatar });
     setSelectedUserId(null);
     setShowConversations(false);
-  };
+  }, []);
 
   // DM Chat screen
   if (dmChat) {

@@ -5,6 +5,7 @@ import { ArrowLeft, Camera, Save, User, Calendar, Loader2, CalendarDays, Baby, S
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
+import { useShallow } from 'zustand/react/shallow';
 import countriesData from '../../countries.json';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
@@ -32,7 +33,25 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
   useScrollToTop();
 
   const { user, profile, updateProfile } = useAuth();
-  const { countryCode, setCountryCode, lifeStage, babyName, dueDate, lastPeriodDate, cycleLength, setLifeStage, setDueDate, setLastPeriodDate, setCycleLength, setBabyData, babyGender, babyBirthDate, language } = useUserStore();
+  const { countryCode, setCountryCode, lifeStage, babyName, dueDate, lastPeriodDate, cycleLength, setLifeStage, setDueDate, setLastPeriodDate, setCycleLength, setBabyData, babyGender, babyBirthDate, language } = useUserStore(
+    useShallow((s) => ({
+      countryCode: s.countryCode,
+      setCountryCode: s.setCountryCode,
+      lifeStage: s.lifeStage,
+      babyName: s.babyName,
+      dueDate: s.dueDate,
+      lastPeriodDate: s.lastPeriodDate,
+      cycleLength: s.cycleLength,
+      setLifeStage: s.setLifeStage,
+      setDueDate: s.setDueDate,
+      setLastPeriodDate: s.setLastPeriodDate,
+      setCycleLength: s.setCycleLength,
+      setBabyData: s.setBabyData,
+      babyGender: s.babyGender,
+      babyBirthDate: s.babyBirthDate,
+      language: s.language,
+    }))
+  );
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 

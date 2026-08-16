@@ -20,7 +20,7 @@ interface Props {
 }
 
 const BloodPressureTracker = ({ onBack }: Props) => {
-  const { lifeStage } = useUserStore();
+  const lifeStage = useUserStore((s) => s.lifeStage);
   const isPregnant = lifeStage === 'bump';
 
   const { data: logs = [], isLoading } = useBloodPressureLogs();
