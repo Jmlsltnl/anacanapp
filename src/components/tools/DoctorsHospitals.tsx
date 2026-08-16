@@ -141,47 +141,45 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
   const language = useUserStore((state) => state.language);
   const storeCountry = useUserStore((state) => state.countryCode);
   const { profile: dhProfile } = useAuth();
-  const userCountry = ((dhProfile as any)?.country_code || storeCountry || 'AZ') as string;
-  // Seçilmiş ölkə — default: istifadəçinin ölkəsi (data varsa), yoxsa AZ
-  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  // İstifadəçinin QEYDİYYATDA seçdiyi ÖLKƏSİ — bu siyahı YALNIZ bununla təyin olunur.
+  // Dil (language) siyahının HANSI ölkə göstərəcəyinə TƏSİR ETMİR, yalnız mövcud
+  // sətirlərin ad/ixtisas/təsvir mətnini tərcümə edir. Bu səhifədə əl ilə ölkə
+  // dəyişmək mümkün deyil (bilərəkdən) — dəyişmək üçün Ayarlar/Profil-dən ölkəni
+  // yeniləmək lazımdır.
+  const activeCountry = ((dhProfile as any)?.country_code || storeCountry || 'AZ') as string;
 
   const { data: providers = [], isLoading } = useQuery({
-    queryKey: ['healthcare-providers', language],
+    // QEYD: queryKey-də `language` YOXDUR — dil dəyişəndə sorğu YENİDƏN getmir,
+    // yalnız aşağıdakı mapRowsTranslation həmin renderdə mətni tərcümə edir.
+    // Bununla siyahının tərkibi (hansı provider-lər göstərilir) heç vaxt dilə bağlı olmur.
+    queryKey: ['healthcare-providers', activeCountry],
     queryFn: async () => {
       const { data, error } = (await supabase.
       from('healthcare_providers').
       select('*').
       eq('is_active', true).
+      eq('country_code', activeCountry).
       order('is_featured', { ascending: false }).
       order('rating', { ascending: false })) as {data: HealthcareProvider[] | null;error: unknown;};
       if (error) throw error;
-      
-      const translated = mapRowsTranslation(data, language, ['name', 'specialty', 'description', 'address']) as HealthcareProvider[];
-      return translated.map(p => {
-        let services = p.services;
-        if (Array.isArray(services)) {
-          services = services.map((s: any) => ({
-            ...s,
-            name: language === 'az' ? (s.name_az ?? s.name) : (s[`name_${language}`] ?? s.name_az ?? s.name)
-          }));
-        }
-        return {
-          ...p,
-          services
-        };
-      });
+      return data || [];
     }
   });
 
-  // Data olan ölkələr (country_code sütunu hələ yoxdursa hamısı AZ sayılır)
-  const providerCountry = (p: HealthcareProvider) => ((p as any).country_code || 'AZ') as string;
-  const availableCountries = [...new Set(providers.map(providerCountry))].sort();
-  // Aktiv ölkə: istifadəçinin ölkəsində data varsa o, yoxsa siyahıdakı ilk
-  const activeCountry = selectedCountry ||
-  (availableCountries.includes(userCountry) ? userCountry : availableCountries[0] || 'AZ');
+  // Tərcümə render zamanı, cari dilə görə — providers massivinin özü (server sorğusu)
+  // dildən asılı deyil, yalnız bu massivin GÖSTƏRİLƏN mətni dilə görə dəyişir.
+  const translatedProviders = mapRowsTranslation(providers, language, ['name', 'specialty', 'description', 'address']).map((p: any) => {
+    let services = p.services;
+    if (Array.isArray(services)) {
+      services = services.map((s: any) => ({
+        ...s,
+        name: language === 'az' ? (s.name_az ?? s.name) : (s[`name_${language}`] ?? s.name_az ?? s.name)
+      }));
+    }
+    return { ...p, services };
+  }) as HealthcareProvider[];
 
-  const filteredProviders = providers.filter((provider) => {
-    if (providerCountry(provider) !== activeCountry) return false;
+  const filteredProviders = translatedProviders.filter((provider) => {
     const matchesSearch = (provider.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     (provider.specialty || '').toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -256,21 +254,6 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
           
         </div>
 
-        {/* Ölkə seçimi — yalnız data olan ölkələr göstərilir */}
-        {availableCountries.length > 1 &&
-        <div className="a-tag-row hide-scrollbar" style={{ flexWrap: 'nowrap', overflowX: 'auto', marginTop: 12, marginBottom: 0, paddingBottom: 4 }}>
-            {availableCountries.map((cc) =>
-          <button
-            key={cc}
-            onClick={() => setSelectedCountry(cc)}
-            className={`a-tag${activeCountry === cc ? ' on' : ''}`}
-            style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
-                🌍 {cc}
-              </button>
-          )}
-          </div>
-        }
-
         {/* Filter chips */}
         <div className="a-tag-row hide-scrollbar" style={{ flexWrap: 'nowrap', overflowX: 'auto', marginTop: 12, marginBottom: 0, paddingBottom: 4 }}>
           {specialtyCategories.map((filter) =>
@@ -304,7 +287,11 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
           filteredProviders.length === 0 ?
           <div className="a-card" style={{ textAlign: 'center', padding: '32px 18px' }}>
               <Building2 size={40} style={{ color: 'var(--a-ink-faint)', margin: '0 auto 10px' }} />
-              <p className="a-list-sub" style={{ margin: 0 }}>{tr("doctorshospitals_hec_bir_netice_tapilmadi_5745d9", "Heç bir nəticə tapılmadı")}</p>
+              <p className="a-list-sub" style={{ margin: 0 }}>
+                {providers.length === 0 ?
+              tr("doctorshospitals_bu_olke_ucun_helelik_siyahi_yoxdur", "Ölkəniz üçün hələlik siyahı yoxdur — tezliklə əlavə olunacaq") :
+              tr("doctorshospitals_hec_bir_netice_tapilmadi_5745d9", "Heç bir nəticə tapılmadı")}
+              </p>
             </div> :
 
           filteredProviders.map((provider, index) =>
