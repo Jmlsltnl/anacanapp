@@ -2,8 +2,9 @@ import { useState, useEffect, useRef, forwardRef } from 'react';
 import { getLocaleTag } from '@/lib/i18n';
 import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
-import { Play, Pause, RotateCcw, Footprints } from 'lucide-react';
+import { Play, Pause, RotateCcw, Footprints, Info } from 'lucide-react';
 import { useKickSessions } from '@/hooks/useKickSessions';
+import { useAuth } from '@/hooks/useAuth';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { hapticFeedback } from '@/lib/native';
@@ -18,10 +19,20 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
   useScrollToTop();
   useScreenAnalytics('KickCounter', 'Tools');
 
+  const { profile } = useAuth();
+  // Əkiz/üçüz/dördüz hamiləlikdə YALNIZI göstərilir — tək hamiləlikdə bu bölmə
+  // heç görünmür, UI əvvəlki kimi tam eyni qalır.
+  const isMultiple = !!profile?.multiples_type && profile.multiples_type !== 'single';
+
   const [kicks, setKicks] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [time, setTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Mövqeyə-əsaslı İXTİYARİ ayırma (yalnız əkiz/üçüz) — kimlik deyil, mövqedir
+  // (ana hansı körpənin təpik atdığını dəqiq bilə bilməz, yalnız tərəfi hiss edə bilər)
+  const [trackPosition, setTrackPosition] = useState(false);
+  const [selectedPosition, setSelectedPosition] = useState<'left' | 'right' | null>(null);
 
   const { sessions, addSession, getTodayStats, loading } = useKickSessions();
 
@@ -59,14 +70,16 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
   const handleStop = async () => {
     setIsActive(false);
     if (kicks > 0) {
-      await addSession(kicks, time);
+      await addSession(kicks, time, trackPosition ? selectedPosition : null);
     }
+    setSelectedPosition(null);
   };
 
   const handleReset = () => {
     setIsActive(false);
     setKicks(0);
     setTime(0);
+    setSelectedPosition(null);
   };
 
   const getKickMessage = () => {
@@ -85,12 +98,90 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
         eyebrow={<>{tr("kickcounter_bugunku_umumi_bc878f", "Bugünkü ümumi")}: {todayStats.totalKicks}{tr("kickcounter_10_tepik_c7e77f", "/10 t\u0259pik")}</>}
         title={tr("kickcounter_tepik_saygaci_85e455", "Təpik Sayğacı")} />
 
+      {/* Əkiz/üçüz üçün təhsil banneri — ÜMUMİ hərəkətə fikir vermək vacibdir,
+          hansı körpənin təpik atdığını dəqiq ayırmaq həmişə mümkün deyil */}
+      {isMultiple &&
+      <motion.div
+        className="a-card a-fade-in"
+        style={{ display: 'flex', gap: 10, alignItems: 'flex-start', background: 'var(--a-blue-1)' }}
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}>
+        
+          <Info size={16} style={{ color: 'var(--a-blue-ink)', flexShrink: 0, marginTop: 2 }} />
+          <div>
+            <p className="a-today-info-eyebrow" style={{ margin: 0, color: 'var(--a-blue-ink)' }}>{tr("kickcounter_multiples_info_title", "Əkiz/üçüz hamiləlikdə təpiklər")}</p>
+            <p className="a-list-sub" style={{ whiteSpace: 'normal', marginTop: 4 }}>
+              {tr("kickcounter_multiples_info_desc", "Hansı körpənin təpik atdığını dəqiq ayırmaq həmişə mümkün deyil. Buna görə ÜMUMİ hərəkət nümunənizə fikir verin — adi vəziyyətinizlə müqayisədə azalma hiss etsəniz, hansı tərəfdən asılı olmayaraq dərhal həkiminizlə əlaqə saxlayın.")}
+            </p>
+          </div>
+        </motion.div>
+      }
+
       {/* Main Counter Card */}
       <motion.div
         className="a-card a-fade-in"
+        style={{ marginTop: isMultiple ? 10 : 0 }}
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}>
         
+        {/* Mövqeyə görə İXTİYARİ ayırma — yalnız əkiz/üçüz */}
+        {isMultiple &&
+        <div style={{ marginBottom: 14 }}>
+            <button
+            type="button"
+            onClick={() => {
+              setTrackPosition((v) => !v);
+              setSelectedPosition(null);
+            }}
+            className="a-tag"
+            style={{ cursor: 'pointer' }}>
+            
+              <span style={{ width: 12, height: 12, borderRadius: 999, border: trackPosition ? '1px solid var(--a-peach-2)' : '1px solid var(--a-ink-faint)', background: trackPosition ? 'var(--a-peach-2)' : 'transparent' }} />
+              {tr("kickcounter_position_toggle_label", "Mövqeyə görə qeyd et")}
+            </button>
+            <p className="a-list-sub" style={{ marginTop: 4, whiteSpace: 'normal' }}>
+              {tr("kickcounter_position_toggle_desc", "Hansı tərəfdən hiss etdiyinizi ayıra bilirsinizsə")}
+            </p>
+
+            {trackPosition &&
+          <div className="flex gap-2" style={{ marginTop: 10 }}>
+                <button
+              type="button"
+              onClick={() => setSelectedPosition('left')}
+              className="flex-1"
+              style={{
+                height: 40,
+                borderRadius: 12,
+                fontWeight: 700,
+                fontSize: 13,
+                border: selectedPosition === 'left' ? '2px solid var(--a-peach-2)' : '1px solid var(--a-line-strong)',
+                background: selectedPosition === 'left' ? 'var(--a-peach-1)' : 'var(--a-surface)',
+                color: selectedPosition === 'left' ? 'var(--a-accent-ink)' : 'var(--a-ink-soft)'
+              }}>
+              
+                  {tr("kickcounter_position_left", "Sol tərəf")}
+                </button>
+                <button
+              type="button"
+              onClick={() => setSelectedPosition('right')}
+              className="flex-1"
+              style={{
+                height: 40,
+                borderRadius: 12,
+                fontWeight: 700,
+                fontSize: 13,
+                border: selectedPosition === 'right' ? '2px solid var(--a-peach-2)' : '1px solid var(--a-line-strong)',
+                background: selectedPosition === 'right' ? 'var(--a-peach-1)' : 'var(--a-surface)',
+                color: selectedPosition === 'right' ? 'var(--a-accent-ink)' : 'var(--a-ink-soft)'
+              }}>
+              
+                  {tr("kickcounter_position_right", "Sağ tərəf")}
+                </button>
+              </div>
+          }
+          </div>
+        }
+
         {/* Timer */}
         <div className="text-center mb-4">
           <p className="a-today-info-eyebrow" style={{ marginBottom: 2 }}>{tr("kickcounter_kecen_vaxt_0258bf", "Keçən vaxt")}</p>
@@ -231,7 +322,14 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
                         <Footprints size={17} strokeWidth={2} />
                       </span>
                       <div>
-                        <p className="a-list-title">{session.kick_count} {tr("kickcounter_tepik_6483fe", "t\u0259pik")}</p>
+                        <p className="a-list-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          {session.kick_count} {tr("kickcounter_tepik_6483fe", "t\u0259pik")}
+                          {session.position &&
+                      <span className="a-rank-tag" style={{ background: 'var(--a-blue-1)', color: 'var(--a-blue-ink)', fontSize: 10 }}>
+                              {session.position === 'left' ? tr("kickcounter_position_chip_left", "◀ Sol") : tr("kickcounter_position_chip_right", "Sağ ▶")}
+                            </span>
+                      }
+                        </p>
                         <p className="a-list-sub">
                           {new Date(session.created_at).toLocaleTimeString(getLocaleTag(), { hour: '2-digit', minute: '2-digit' })}
                         </p>

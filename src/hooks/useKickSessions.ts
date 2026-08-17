@@ -11,6 +11,8 @@ export interface KickSession {
   duration_seconds: number;
   session_date: string;
   created_at: string;
+  /** İxtiyari mövqe etiketi — əkiz/üçüz hamiləlikdə ana ayıra bilirsə ('left'/'right'). Kimlik deyil, mövqedir. */
+  position?: 'left' | 'right' | null;
 }
 
 export const useKickSessions = () => {
@@ -46,7 +48,7 @@ export const useKickSessions = () => {
     }
   };
 
-  const addSession = async (kickCount: number, durationSeconds: number) => {
+  const addSession = async (kickCount: number, durationSeconds: number, position?: 'left' | 'right' | null) => {
     if (!user) return null;
 
     try {
@@ -56,7 +58,8 @@ export const useKickSessions = () => {
           user_id: user.id,
           kick_count: kickCount,
           duration_seconds: durationSeconds,
-        })
+          ...(position ? { position } : {}),
+        } as any)
         .select()
         .single();
 

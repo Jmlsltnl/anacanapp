@@ -8562,5 +8562,13 @@
   "fetalgrowth_scan_date_label": "تاريخ الموجات فوق الصوتية",
   "fetalgrowth_efw_label": "الوزن التقديري (جرام)",
   "fetalgrowth_scan_saved": "تم حفظ سجل الموجات فوق الصوتية! 🤰",
-  "fetalgrowth_error": "حدث خطأ"
+  "fetalgrowth_error": "حدث خطأ",
+  "kickcounter_position_toggle_label": "وضع علامة حسب الموضع",
+  "kickcounter_position_toggle_desc": "إذا كنت تستطيعين تمييز الجانب الذي تشعرين منه",
+  "kickcounter_position_left": "الجانب الأيسر",
+  "kickcounter_position_right": "الجانب الأيمن",
+  "kickcounter_position_chip_left": "يسار ◀",
+  "kickcounter_position_chip_right": "▶ يمين",
+  "kickcounter_multiples_info_title": "الركلات في حمل التوأم/الثلاثة توائم",
+  "kickcounter_multiples_info_desc": "ليس من الممكن دائمًا تحديد أي طفل يركل بالضبط. لذا انتبهي لنمط حركتك العام — إذا لاحظتِ انخفاضًا مقارنة بنمطك المعتاد، تواصلي مع طبيبك فورًا بغض النظر عن الجانب."
 }

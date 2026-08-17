@@ -7059,5 +7059,13 @@
   "fetalgrowth_scan_date_label": "USM tarixi",
   "fetalgrowth_efw_label": "Təxmini çəki (qram)",
   "fetalgrowth_scan_saved": "USM qeydi yadda saxlandı! 🤰",
-  "fetalgrowth_error": "Xəta baş verdi"
+  "fetalgrowth_error": "Xəta baş verdi",
+  "kickcounter_position_toggle_label": "Mövqeyə görə qeyd et",
+  "kickcounter_position_toggle_desc": "Hansı tərəfdən hiss etdiyinizi ayıra bilirsinizsə",
+  "kickcounter_position_left": "Sol tərəf",
+  "kickcounter_position_right": "Sağ tərəf",
+  "kickcounter_position_chip_left": "◀ Sol",
+  "kickcounter_position_chip_right": "Sağ ▶",
+  "kickcounter_multiples_info_title": "Əkiz/üçüz hamiləlikdə təpiklər",
+  "kickcounter_multiples_info_desc": "Hansı körpənin təpik atdığını dəqiq ayırmaq həmişə mümkün deyil. Buna görə ÜMUMİ hərəkət nümunənizə fikir verin — adi vəziyyətinizlə müqayisədə azalma hiss etsəniz, hansı tərəfdən asılı olmayaraq dərhal həkiminizlə əlaqə saxlayın."
 }

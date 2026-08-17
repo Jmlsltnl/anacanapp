@@ -8562,5 +8562,13 @@
   "fetalgrowth_scan_date_label": "Дата УЗИ",
   "fetalgrowth_efw_label": "Предполагаемый вес (грамм)",
   "fetalgrowth_scan_saved": "Запись УЗИ сохранена! 🤰",
-  "fetalgrowth_error": "Произошла ошибка"
+  "fetalgrowth_error": "Произошла ошибка",
+  "kickcounter_position_toggle_label": "Отмечать по стороне",
+  "kickcounter_position_toggle_desc": "Если можете различить, с какой стороны чувствуете",
+  "kickcounter_position_left": "Левая сторона",
+  "kickcounter_position_right": "Правая сторона",
+  "kickcounter_position_chip_left": "◀ Левая",
+  "kickcounter_position_chip_right": "Правая ▶",
+  "kickcounter_multiples_info_title": "Шевеления при беременности двойней/тройней",
+  "kickcounter_multiples_info_desc": "Не всегда можно точно определить, какой ребёнок шевелится. Поэтому обращайте внимание на ОБЩИЙ характер движений — при снижении по сравнению с обычным уровнем сразу обращайтесь к врачу, независимо от стороны."
 }

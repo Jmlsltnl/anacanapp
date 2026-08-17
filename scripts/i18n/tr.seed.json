@@ -8562,5 +8562,13 @@
   "fetalgrowth_scan_date_label": "USG tarihi",
   "fetalgrowth_efw_label": "Tahmini ağırlık (gram)",
   "fetalgrowth_scan_saved": "USG kaydı kaydedildi! 🤰",
-  "fetalgrowth_error": "Bir hata oluştu"
+  "fetalgrowth_error": "Bir hata oluştu",
+  "kickcounter_position_toggle_label": "Konuma göre etiketle",
+  "kickcounter_position_toggle_desc": "Hangi taraftan hissettiğinizi ayırt edebiliyorsanız",
+  "kickcounter_position_left": "Sol taraf",
+  "kickcounter_position_right": "Sağ taraf",
+  "kickcounter_position_chip_left": "◀ Sol",
+  "kickcounter_position_chip_right": "Sağ ▶",
+  "kickcounter_multiples_info_title": "İkiz/üçüz gebelikte tekmeler",
+  "kickcounter_multiples_info_desc": "Hangi bebeğin tekme attığını her zaman kesin olarak ayırt etmek mümkün değildir. Bu yüzden GENEL hareket düzeninize dikkat edin — normal düzeninize göre bir azalma fark ederseniz, hangi taraftan olduğuna bakılmaksızın hemen doktorunuzla iletişime geçin."
 }

@@ -8562,5 +8562,13 @@
   "fetalgrowth_scan_date_label": "Ultraschalldatum",
   "fetalgrowth_efw_label": "Geschätztes Gewicht (Gramm)",
   "fetalgrowth_scan_saved": "Ultraschall-Eintrag gespeichert! 🤰",
-  "fetalgrowth_error": "Ein Fehler ist aufgetreten"
+  "fetalgrowth_error": "Ein Fehler ist aufgetreten",
+  "kickcounter_position_toggle_label": "Nach Position markieren",
+  "kickcounter_position_toggle_desc": "Falls Sie unterscheiden können, von welcher Seite Sie es spüren",
+  "kickcounter_position_left": "Linke Seite",
+  "kickcounter_position_right": "Rechte Seite",
+  "kickcounter_position_chip_left": "◀ Links",
+  "kickcounter_position_chip_right": "Rechts ▶",
+  "kickcounter_multiples_info_title": "Tritte bei Zwillings-/Drillingsschwangerschaft",
+  "kickcounter_multiples_info_desc": "Es ist nicht immer möglich, genau zu unterscheiden, welches Baby tritt. Achten Sie daher auf Ihr GESAMTES Bewegungsmuster — wenn Sie im Vergleich zu Ihrem üblichen Muster eine Abnahme bemerken, wenden Sie sich unabhängig von der Seite sofort an Ihren Arzt."
 }

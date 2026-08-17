@@ -8551,5 +8551,13 @@
   "fetalgrowth_scan_date_label": "Ultrasound date",
   "fetalgrowth_efw_label": "Estimated weight (grams)",
   "fetalgrowth_scan_saved": "Ultrasound entry saved! 🤰",
-  "fetalgrowth_error": "An error occurred"
+  "fetalgrowth_error": "An error occurred",
+  "kickcounter_position_toggle_label": "Tag by position",
+  "kickcounter_position_toggle_desc": "If you can tell which side you feel it from",
+  "kickcounter_position_left": "Left side",
+  "kickcounter_position_right": "Right side",
+  "kickcounter_position_chip_left": "◀ Left",
+  "kickcounter_position_chip_right": "Right ▶",
+  "kickcounter_multiples_info_title": "Kicks in twin/triplet pregnancy",
+  "kickcounter_multiples_info_desc": "It is not always possible to tell exactly which baby is kicking. So pay attention to your OVERALL movement pattern — if you notice a decrease compared to your usual pattern, contact your doctor right away regardless of which side."
 }

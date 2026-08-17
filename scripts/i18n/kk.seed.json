@@ -8562,5 +8562,13 @@
   "fetalgrowth_scan_date_label": "УДЗ күні",
   "fetalgrowth_efw_label": "Болжамды салмақ (грамм)",
   "fetalgrowth_scan_saved": "УДЗ жазбасы сақталды! 🤰",
-  "fetalgrowth_error": "Қате орын алды"
+  "fetalgrowth_error": "Қате орын алды",
+  "kickcounter_position_toggle_label": "Орналасуы бойынша белгілеу",
+  "kickcounter_position_toggle_desc": "Қай жақтан сезінетініңізді ажырата алсаңыз",
+  "kickcounter_position_left": "Сол жақ",
+  "kickcounter_position_right": "Оң жақ",
+  "kickcounter_position_chip_left": "◀ Сол",
+  "kickcounter_position_chip_right": "Оң ▶",
+  "kickcounter_multiples_info_title": "Егіз/үшем жүктілікте тебулер",
+  "kickcounter_multiples_info_desc": "Қай баланың тебетінін дәл ажырату әрқашан мүмкін емес. Сондықтан ЖАЛПЫ қозғалыс үлгіңізге назар аударыңыз — әдеттегі деңгейіңізбен салыстырғанда азаюды байқасаңыз, қай жақтан екеніне қарамастан дереу дәрігеріңізбен байланысыңыз."
 }
