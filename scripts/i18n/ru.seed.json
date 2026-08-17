@@ -8511,5 +8511,8 @@
   "mother_sleep_logged_tap_edit": "Отмечено сегодня · нажмите, чтобы изменить",
   "mother_sleep_cta": "Отметьте свой сон",
   "mother_sleep_hint": "Сегодняшняя продолжительность и качество сна",
-  "common_saxlanilir": "Сохранение..."
+  "common_saxlanilir": "Сохранение...",
+  "vitals_write_title": "Записывать мои показатели в Health",
+  "vitals_write_desc": "Ваши записи веса, давления и сахара в крови добавляются в Apple Health / Health Connect",
+  "vitals_write_on_desc": "Ваши записи веса, давления и сахара в крови теперь будут записываться в Health"
 }

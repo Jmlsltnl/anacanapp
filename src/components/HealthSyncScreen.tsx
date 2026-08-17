@@ -14,6 +14,10 @@ import {
   isCycleWriteEnabled, setCycleWriteEnabled,
   isCycleWriteAvailable, requestCycleWritePermission } from
 '@/lib/healthCycle';
+import {
+  isVitalsWriteEnabled, setVitalsWriteEnabled,
+  isVitalsWriteAvailable, requestVitalsWritePermission } from
+'@/lib/healthVitals';
 import { Switch } from '@/components/ui/switch';
 import { useUserStore } from '@/store/userStore';
 import { useHealthAvailability, useHealthDaily, useHealthWorkouts } from '@/hooks/useHealthData';
@@ -66,6 +70,39 @@ const HealthSyncScreen = ({ onBack }: Props) => {
       setCycleWriteEnabled(true);
       setCycleWrite(true);
       toast({ title: tr('hc_write_on', 'Aktiv edildi ✓'), description: tr('hc_write_on_desc', 'Period qeydləri bundan sonra Health-ə yazılacaq') });
+    } else {
+      toast({ title: tr('hc_write_denied', 'İcazə verilmədi'), description: tr('hc_write_denied_desc', 'Sistem ayarlarından icazə verə bilərsiniz'), variant: 'destructive' });
+    }
+  };
+
+  // Çəki / qan təzyiqi / qan şəkəri yazma toggle-u — bütün mərhələlərdə göstərilir
+  // (WeightTracker/BloodPressureTracker hər 3 mərhələdə, BloodSugarTracker bump+mommy-də var)
+  const [vitalsWrite, setVitalsWrite] = useState(isVitalsWriteEnabled());
+  const [vitalsWriteBusy, setVitalsWriteBusy] = useState(false);
+
+  const toggleVitalsWrite = async (on: boolean) => {
+    if (!on) {
+      setVitalsWriteEnabled(false);
+      setVitalsWrite(false);
+      return;
+    }
+    setVitalsWriteBusy(true);
+    const available = await isVitalsWriteAvailable();
+    if (!available) {
+      setVitalsWriteBusy(false);
+      toast({
+        title: tr('hc_write_unavailable', 'Mövcud deyil'),
+        description: tr('hc_write_unavailable_desc', 'Yazma üçün tətbiqin yeni native build-i lazımdır'),
+        variant: 'destructive'
+      });
+      return;
+    }
+    const granted = await requestVitalsWritePermission();
+    setVitalsWriteBusy(false);
+    if (granted) {
+      setVitalsWriteEnabled(true);
+      setVitalsWrite(true);
+      toast({ title: tr('hc_write_on', 'Aktiv edildi ✓'), description: tr('vitals_write_on_desc', 'Çəki, qan təzyiqi və qan şəkəri qeydləriniz bundan sonra Health-ə yazılacaq') });
     } else {
       toast({ title: tr('hc_write_denied', 'İcazə verilmədi'), description: tr('hc_write_denied_desc', 'Sistem ayarlarından icazə verə bilərsiniz'), variant: 'destructive' });
     }
@@ -304,6 +341,25 @@ const HealthSyncScreen = ({ onBack }: Props) => {
               onCheckedChange={toggleCycleWrite} />
               </div>
           }
+
+            {/* Çəki/QT/QŞ yazma — bütün mərhələlərdə (WeightTracker/BloodPressureTracker/
+                BloodSugarTracker-in mövcud olduğu yerlərdə) */}
+            <div className="a-card flex items-center gap-3" style={{ marginTop: 12, padding: '14px 16px' }}>
+              <span className="a-list-icon shrink-0" style={{ background: 'var(--a-blue-1)', color: 'var(--a-blue-ink)' }}>
+                <HeartPulse size={16} strokeWidth={2} />
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="a-list-title" style={{ fontSize: 14 }}>{tr('vitals_write_title', 'Ölçmələrimi Health-ə yaz')}</p>
+                <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>
+                  {tr('vitals_write_desc', 'Çəki, qan təzyiqi və qan şəkəri qeydləriniz Apple Health / Health Connect-ə əlavə olunur')}
+                </p>
+              </div>
+              <Switch
+                className="data-[state=checked]:bg-[var(--a-peach-2)]"
+                checked={vitalsWrite}
+                disabled={vitalsWriteBusy}
+                onCheckedChange={toggleVitalsWrite} />
+            </div>
 
             {/* İdarəetmə */}
             <div className="a-list-card" style={{ marginTop: 12 }}>

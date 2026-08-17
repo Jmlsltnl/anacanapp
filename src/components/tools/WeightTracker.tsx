@@ -141,6 +141,8 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
         await addEntry(weight);
         setNewWeight('');
         setShowAddForm(false);
+        // Health inteqrasiyası aktivdirsə → Apple Health / Health Connect-ə də yaz (arxa planda)
+        import('@/lib/healthVitals').then((m) => m.writeWeightToHealth(weight)).catch(() => {});
       }
     }
   };

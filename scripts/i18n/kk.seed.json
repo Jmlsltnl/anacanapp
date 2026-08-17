@@ -8511,5 +8511,8 @@
   "mother_sleep_logged_tap_edit": "Бүгін тіркелді · өзгерту үшін түртіңіз",
   "mother_sleep_cta": "Ұйқыңызды тіркеңіз",
   "mother_sleep_hint": "Бүгінгі ұйқы ұзақтығы мен сапасы",
-  "common_saxlanilir": "Сақталуда..."
+  "common_saxlanilir": "Сақталуда...",
+  "vitals_write_title": "Көрсеткіштерімді Health-ке жаз",
+  "vitals_write_desc": "Салмақ, қан қысымы және қандағы қант жазбаларыңыз Apple Health / Health Connect-ке қосылады",
+  "vitals_write_on_desc": "Салмақ, қан қысымы және қандағы қант жазбаларыңыз бұдан былай Health-ке жазылады"
 }

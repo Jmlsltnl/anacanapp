@@ -8511,5 +8511,8 @@
   "mother_sleep_logged_tap_edit": "تم التسجيل اليوم · اضغط للتعديل",
   "mother_sleep_cta": "سجّلي نومك",
   "mother_sleep_hint": "مدة وجودة نومك اليوم",
-  "common_saxlanilir": "جارٍ الحفظ..."
+  "common_saxlanilir": "جارٍ الحفظ...",
+  "vitals_write_title": "كتابة قياساتي في Health",
+  "vitals_write_desc": "تُضاف سجلات الوزن وضغط الدم وسكر الدم إلى Apple Health / Health Connect",
+  "vitals_write_on_desc": "ستتم الآن كتابة سجلات الوزن وضغط الدم وسكر الدم في Health"
 }

@@ -8511,5 +8511,8 @@
   "mother_sleep_logged_tap_edit": "Bugün kaydedildi · düzenlemek için dokunun",
   "mother_sleep_cta": "Uykunuzu kaydedin",
   "mother_sleep_hint": "Bugünkü uyku süresi ve kalitesi",
-  "common_saxlanilir": "Kaydediliyor..."
+  "common_saxlanilir": "Kaydediliyor...",
+  "vitals_write_title": "Ölçümlerimi Health'e yaz",
+  "vitals_write_desc": "Kilo, tansiyon ve kan şekeri kayıtlarınız Apple Health / Health Connect'e eklenir",
+  "vitals_write_on_desc": "Kilo, tansiyon ve kan şekeri kayıtlarınız artık Health'e yazılacak"
 }

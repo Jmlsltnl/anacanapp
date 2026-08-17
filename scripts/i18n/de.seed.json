@@ -8511,5 +8511,8 @@
   "mother_sleep_logged_tap_edit": "Heute erfasst · zum Bearbeiten tippen",
   "mother_sleep_cta": "Erfassen Sie Ihren Schlaf",
   "mother_sleep_hint": "Heutige Schlafdauer und -qualität",
-  "common_saxlanilir": "Wird gespeichert..."
+  "common_saxlanilir": "Wird gespeichert...",
+  "vitals_write_title": "Meine Werte in Health schreiben",
+  "vitals_write_desc": "Ihre Gewichts-, Blutdruck- und Blutzuckereinträge werden zu Apple Health / Health Connect hinzugefügt",
+  "vitals_write_on_desc": "Ihre Gewichts-, Blutdruck- und Blutzuckereinträge werden ab jetzt in Health geschrieben"
 }

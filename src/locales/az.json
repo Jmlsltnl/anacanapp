@@ -7008,5 +7008,8 @@
   "mother_sleep_logged_tap_edit": "Bu gün qeyd olundu · dəyişmək üçün toxunun",
   "mother_sleep_cta": "Yuxunuzu qeyd edin",
   "mother_sleep_hint": "Bugünkü yuxu müddəti və keyfiyyəti",
-  "common_saxlanilir": "Saxlanılır..."
+  "common_saxlanilir": "Saxlanılır...",
+  "vitals_write_title": "Ölçmələrimi Health-ə yaz",
+  "vitals_write_desc": "Çəki, qan təzyiqi və qan şəkəri qeydləriniz Apple Health / Health Connect-ə əlavə olunur",
+  "vitals_write_on_desc": "Çəki, qan təzyiqi və qan şəkəri qeydləriniz bundan sonra Health-ə yazılacaq"
 }

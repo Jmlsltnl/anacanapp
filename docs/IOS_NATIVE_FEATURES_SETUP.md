@@ -31,10 +31,11 @@ Bu sənəd iki müstəqil, lakin hər ikisi eyni səbəbdən "yarımçıq" qalan
 - `src/hooks/useHealthData.ts` — bu funksiyaların React Query hook-ları (`useHealthAvailability`, `useHealthDaily`, `useHealthWorkouts`).
 - `src/components/HealthSyncScreen.tsx` — tam UI: qoşulma düyməsi, bugünkü addım/kalori/məşq triosu, 7-günlük bar chart, son 5 məşq, "Cycle-ı Apple Health-ə yaz" toggle-i (yalnız `flow` mərhələsində), parametrlər/ayır düymələri.
 - `src/lib/healthCycle.ts` + `ios/App/App/HealthCyclePlugin.swift` + `android/.../HealthCyclePlugin.kt` — **ayrıca, əl ilə yazılmış custom plugin** (`capacitor-health`-dən fərqli) — istifadəçi period başladanda `HKCategorySample` (menstrualFlow) yaradıb Apple Health-ə/Health Connect-ə YAZIR. Kodun özü izah edir: bütün Health datası **yalnız cihazda qalır, serverə (Supabase-ə) heç vaxt göndərilmir**.
+- `src/lib/healthVitals.ts` + `ios/App/App/HealthVitalsPlugin.swift` + `android/.../HealthVitalsPlugin.kt` — **YENİ (eyni nümunə ilə)** — Çəki/Qan Təzyiqi/Qan Şəkəri Tracker-lərində qeyd olunan ölçmələri Apple Health-ə/Health Connect-ə YAZIR (`capacitor-health` paketi bu tipləri dəstəkləmir). `HealthSyncScreen.tsx`-də "Ölçmələrimi Health-ə yaz" tək toggle-i ilə idarə olunur (bütün mərhələlərdə görünür, Flow-a xas deyil).
 - `Info.plist` — `NSHealthShareUsageDescription` və `NSHealthUpdateUsageDescription` artıq düzgün mətnlə var (`ios/App/App/Info.plist:113-117`).
 - `App.entitlements` / `App.Debug.entitlements` — `com.apple.developer.healthkit = true` artıq hər ikisində var.
 - `PrivacyInfo.xcprivacy` — Health data bəyanatı məzmunu düzgün yazılıb (sadəcə hələ target-ə bağlanmayıb, aşağı A.2-yə bax).
-- Android tərəfi tam bağlıdır: `HealthCyclePlugin.kt` `MainActivity.java`-da qeydiyyatdan keçib, `AndroidManifest.xml`-də bütün Health Connect icazələri var.
+- Android tərəfi tam bağlıdır: `HealthCyclePlugin.kt` + `HealthVitalsPlugin.kt` `MainActivity.java`-da qeydiyyatdan keçib, `AndroidManifest.xml`-də bütün Health Connect icazələri var (`androidx.health.connect:connect-client` asılılığı `WeightRecord`/`BloodPressureRecord`/`BloodGlucoseRecord`-u da əhatə edir, əlavə Gradle dəyişikliyi lazım deyil).
 
 ### A.2 — Xcode-da tamamlanmalı addımlar (bir dəfəlik)
 
@@ -47,10 +48,10 @@ npx cap sync ios
 ```
 işlətmək kifayətdir — Capacitor CLI `CapApp-SPM/Package.swift`-i avtomatik yeniləyib `capacitor-health`-i əlavə edəcək (bu fayl "DO NOT MODIFY — managed by Capacitor CLI" başlığı ilə işarələnib, əl ilə redaktə etmə). Eyni səbəbdən Android üçün də `npx cap sync android` işlət.
 
-**2) `HealthCyclePlugin.swift`-i App target-inə əlavə et**
-Bu fayl artıq `ios/App/App/HealthCyclePlugin.swift`-də mövcuddur, amma Xcode layihəsi onu tanımır (heç bir target-in Sources fazasında deyil — özü də faylın başında bunu qeyd edir).
+**2) `HealthCyclePlugin.swift` və `HealthVitalsPlugin.swift`-i App target-inə əlavə et**
+Bu fayllar artıq `ios/App/App/HealthCyclePlugin.swift` və `ios/App/App/HealthVitalsPlugin.swift`-də mövcuddur, amma Xcode layihəsi onları tanımır (heç bir target-in Sources fazasında deyil — özü də faylın başında bunu qeyd edir).
 - Xcode-da Project Navigator-da `App` qovluğuna sağ klik → **Add Files to "App"…**
-- `HealthCyclePlugin.swift`-i seç
+- Hər iki faylı (`HealthCyclePlugin.swift`, `HealthVitalsPlugin.swift`) birlikdə seç
 - Aşağıdakı dialoqda **Target Membership: App** ✅ işarəli olduğundan əmin ol
 - Add et
 
@@ -82,6 +83,7 @@ Entitlements faylında `com.apple.developer.healthkit` artıq var, amma bunu **S
 - Cihazda ilk dəfə "Qoşul" düyməsinə basanda standart Apple Health icazə ekranı çıxacaq — hər data növü (addım, aktiv enerji, məşq, ürək ritmi) üçün ayrıca aç.
 - Apple Health app-ında əl ilə bir neçə addım/məşq qeydi olduğundan əmin ol ki, oxuma yolu test edilə bilsin.
 - Period yazma funksiyasını yoxlamaq üçün: Flow mərhələsində "Cycle-ı Apple Health-ə yaz" toggle-ni aç → period başlat → Apple Health app-ında Cycle Tracking bölməsində həmin qeydin göründüyünü yoxla.
+- Çəki/QT/QŞ yazma funksiyasını yoxlamaq üçün: "Ölçmələrimi Health-ə yaz" toggle-ni aç → Weight/Blood Pressure/Blood Sugar Tracker-lərdən birində yeni ölçmə qeyd et → Apple Health app-ında müvafiq bölmədə (Body Measurements → Weight, Heart → Blood Pressure, Nutrition → Blood Glucose) qeydin göründüyünü yoxla. Qan təzyiqi `HKCorrelation` kimi yazılır (sistolik+diastolik BİRGƏ) — Health app-ında tək cüt dəyər kimi görünməlidir, 2 ayrı qeyd kimi yox.
 
 ### A.5 — Mağaza təqdimatı (App Store Review)
 
@@ -164,6 +166,8 @@ Bax `docs/STORE_COMPLIANCE.md` — Health inteqrasiyası üçün tam Play Store 
 |---|---|
 | `Health.isHealthAvailable()` həmişə `false`/xəta qaytarır | `npx cap sync ios` işlədilməyib və ya `CapApp-SPM/Package.swift`-də `capacitor-health` görünmür — yenidən sync et, Xcode-u bağlayıb aç |
 | Build zamanı "Cannot find HealthCyclePlugin in scope" | `HealthCyclePlugin.swift` App target-inin Sources fazasına əlavə edilməyib (A.2 addım 2) |
+| Build zamanı "Cannot find HealthVitalsPlugin in scope" | `HealthVitalsPlugin.swift` App target-inin Sources fazasına əlavə edilməyib (A.2 addım 2, `HealthCyclePlugin.swift` ilə eyni addımda birlikdə edilməlidir) |
+| "Ölçmələrimi Health-ə yaz" aktiv olmur, "Mövcud deyil" xətası | Yuxarıdakı səbəblə eyni — plugin hələ Xcode target-inə əlavə edilməyib, ya da köhnə (sync edilməmiş) native build işlədilir |
 | Archive/sign zamanı "doesn't support HealthKit capability" | Developer Portal-da App ID-də HealthKit hələ aktivləşdirilməyib (A.3) |
 | Live Activity heç görünmür | Settings → Anacan → Live Activities bağlıdır, YA DA Widget Extension target hələ yaradılmayıb (B.2 addım 1) |
 | Widget-dəki "Dayandır" düyməsi sessiyanı tətbiqə çatdırmır | App Groups capability hər iki target-də yoxdur/fərqli ID-dədir (B.3) |
@@ -176,5 +180,6 @@ Bax `docs/STORE_COMPLIANCE.md` — Health inteqrasiyası üçün tam Play Store 
 - `.agents/workflows/ios-build.md` — standart iOS build axını (pull → build → sync → Xcode aç)
 - `src/lib/health.ts`, `src/hooks/useHealthData.ts`, `src/components/HealthSyncScreen.tsx` — Health JS/TS qatı
 - `src/lib/healthCycle.ts`, `ios/App/App/HealthCyclePlugin.swift`, `android/app/src/main/java/com/atlasoon/anacan/HealthCyclePlugin.kt` — period yazma custom plugin-i
+- `src/lib/healthVitals.ts`, `ios/App/App/HealthVitalsPlugin.swift`, `android/app/src/main/java/com/atlasoon/anacan/HealthVitalsPlugin.kt` — çəki/qan təzyiqi/qan şəkəri yazma custom plugin-i (`WeightTracker.tsx`, `BloodPressureTracker.tsx`, `BloodSugarTracker.tsx` uğurlu qeyddən sonra çağırır)
 - `src/lib/live-timer.ts`, `src/plugins/LiveActivityPlugin.ts`, `src/store/timerStore.ts`, `src/components/FloatingTimerWidget.tsx` — Widget/Live Activity JS/TS qatı
 - `ios/App/AnacanTimerWidget/*.swift`, `ios/App/App/Plugins/LiveActivityPlugin.swift(.m)` — Widget native Swift kodu

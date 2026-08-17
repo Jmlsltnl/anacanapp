@@ -56,6 +56,8 @@ const BloodPressureTracker = ({ onBack }: Props) => {
       setSystolic('');
       setDiastolic('');
       setPulse('');
+      // Health inteqrasiyası aktivdirsə → Apple Health / Health Connect-ə də yaz (arxa planda)
+      import('@/lib/healthVitals').then((m) => m.writeBloodPressureToHealth(sys, dia)).catch(() => {});
     } catch (e) {
       console.error(e);
       toast.error(tr('bp_save_error', 'Saxlanılmadı — bazanın hazır olduğundan əmin olun'));

@@ -8500,5 +8500,8 @@
   "mother_sleep_logged_tap_edit": "Logged today · tap to edit",
   "mother_sleep_cta": "Log your sleep",
   "mother_sleep_hint": "Today's sleep duration and quality",
-  "common_saxlanilir": "Saving..."
+  "common_saxlanilir": "Saving...",
+  "vitals_write_title": "Write my vitals to Health",
+  "vitals_write_desc": "Your weight, blood pressure and blood sugar entries are added to Apple Health / Health Connect",
+  "vitals_write_on_desc": "Your weight, blood pressure and blood sugar entries will now be written to Health"
 }

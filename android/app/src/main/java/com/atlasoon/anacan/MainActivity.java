@@ -16,6 +16,8 @@ public class MainActivity extends BridgeActivity {
         disableProblematicAndroidPlugins();
         // Lokal plugin: menstruasiya → Health Connect yazısı
         registerPlugin(HealthCyclePlugin.class);
+        // Lokal plugin: çəki / qan təzyiqi / qan şəkəri → Health Connect yazısı
+        registerPlugin(HealthVitalsPlugin.class);
         // Lokal plugin: Facebook App Events (köhnə plugin crash-lərinə görə
         // söndürülüb — bu minimal versiya load()-da heç nə etmir)
         registerPlugin(FbEventsPlugin.class);
