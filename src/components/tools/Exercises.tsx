@@ -4,7 +4,7 @@ import { useIsRtl, rtlX } from '@/lib/rtl';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Clock, Flame, Check, ChevronRight, Star,
-  Award, Dumbbell, Sparkles, Play, Trophy } from
+  Award, Dumbbell, Sparkles, Play, Trophy, HeartPulse } from
 'lucide-react';
 import { useExerciseLogs } from '@/hooks/useExerciseLogs';
 import { useUserStore } from '@/store/userStore';
@@ -12,6 +12,8 @@ import { useExercises } from '@/hooks/useDynamicConfig';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { ToolPage, ToolHeader, ToolLoading } from './anacan/ToolKit';
+import { isHealthConnected } from '@/lib/health';
+import { useHealthWorkouts } from '@/hooks/useHealthData';
 
 interface ExercisesProps {
   onBack: () => void;
@@ -57,6 +59,15 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
   const selectedExercise = exercises.find((e) => e.id === selectedExerciseId) || null;
   const todayStats = getTodayStats();
   const streak = getStreak();
+
+  // Bu ekrandakı "Bitirdim" qeydləri sabit/təxmini dəyərlərdir (məsələn "Yoqa = 20 kal"),
+  // Health-dən oxunan həqiqi məşqlər isə tamamilə ayrı, ölçülmüş məlumatdır. Avtomatik
+  // uyğunlaşdırmaq (vaxt-əsaslı matching) etibarsız olduğu üçün, sadəcə hər ikisini
+  // görünən edirik ki, istifadəçi real fəaliyyətini də bir yerdə görsün.
+  const healthConnected = isHealthConnected();
+  const { data: healthWorkouts = [] } = useHealthWorkouts(7, healthConnected);
+  const weekRealMinutes = Math.round(healthWorkouts.reduce((sum, w) => sum + (w.duration || 0), 0) / 60);
+  const weekRealCalories = healthWorkouts.reduce((sum, w) => sum + (w.calories || 0), 0);
 
   const handleComplete = async () => {
     if (selectedExercise) {
@@ -150,6 +161,30 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                   </span>
                 </div>
               </motion.div>
+
+              {/* Health-dən real fəaliyyət — yuxarıdakı "Bitirdim" qeydlərindən ayrı,
+                  faktiki ölçülmüş Apple Health / Health Connect məlumatı */}
+              {healthConnected && healthWorkouts.length > 0 &&
+            <motion.div
+              className="a-card mb-4"
+              style={{ background: 'var(--a-lav-1)' }}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.05 }}>
+              
+                  <div className="flex items-center gap-3">
+                    <span className="a-list-icon" style={{ background: 'var(--a-grad-lav)', flexShrink: 0 }}>
+                      <HeartPulse size={17} strokeWidth={2.2} style={{ color: 'var(--a-lav-ink)' }} />
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="a-list-title" style={{ margin: 0 }}>{tr('exercises_health_real_activity', 'Bu həftə real fəaliyyətiniz (Health-dən)')}</h3>
+                      <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>
+                        {healthWorkouts.length} {tr('health_workouts_week', 'Məşq (7 gün)').toLowerCase()} · {weekRealMinutes} {tr('health_min', 'dəq')} · {weekRealCalories} kcal
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+            }
 
               {/* Exercise List */}
               <div className="a-section-head">

@@ -8500,5 +8500,16 @@
   "commentreply_beyenme_sayi": "Gefällt mir",
   "commentreply_cavablari_gizle": "Antworten ausblenden",
   "commentreply_n_cavab_goster": "{n} Antworten ansehen",
-  "commentreply_beyen": "Gefällt mir"
+  "commentreply_beyen": "Gefällt mir",
+  "health_mindfulness_title": "Entspannung (diese Woche)",
+  "health_mindfulness_desc": "Ihre Achtsamkeitssitzungen aus Apple Health / Health Connect",
+  "mh_health_mindfulness_bridge": "Diese Woche wurden {min} Minuten Entspannung in Apple Health / Health Connect erfasst",
+  "exercises_health_real_activity": "Ihre tatsächliche Aktivität diese Woche (aus Health)",
+  "mother_sleep_title": "Mein Schlaf",
+  "mother_sleep_week_avg": "Wochendurchschn.",
+  "health_hour_short": "Std",
+  "mother_sleep_logged_tap_edit": "Heute erfasst · zum Bearbeiten tippen",
+  "mother_sleep_cta": "Erfassen Sie Ihren Schlaf",
+  "mother_sleep_hint": "Heutige Schlafdauer und -qualität",
+  "common_saxlanilir": "Wird gespeichert..."
 }

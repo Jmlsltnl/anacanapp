@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { getLocaleTag } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -54,6 +54,18 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
   });
   const [eddDate, setEddDate] = useState<string>('');
   const [role, setRole] = useState<'mother' | 'father'>('mother');
+
+  // Profildə artıq bilinən doğum tarixini yenidən soruşmaq əvəzinə avtomatik doldur
+  // (əvvəllər hər dəfə boş başlayırdı, halbuki WeightTracker kimi digər alətlər
+  // artıq eyni profil məlumatını istifadə edir). İstifadəçi istənilən vaxt dəyişə bilər.
+  useEffect(() => {
+    if (eddDate) return;
+    const knownDueDate = (profile as any)?.due_date;
+    if (knownDueDate) {
+      setEddDate(new Date(knownDueDate).toISOString().split('T')[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id]);
   
   const [result, setResult] = useState<any>(null);
   const [expandedGuideline, setExpandedGuideline] = useState<string | null>(null);

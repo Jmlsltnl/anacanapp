@@ -14,6 +14,10 @@ export interface DailyLog {
   bleeding: string | null;
   notes: string | null;
   created_at: string;
+  /** Ananın öz yuxu müddəti (saat) — supabase/duzelis/Duzelis11.sql ilə əlavə olunub */
+  sleep_hours?: number | null;
+  /** Ananın öz yuxu keyfiyyəti (1-5) — flow_daily_logs.sleep_quality ilə eyni miqyas */
+  sleep_quality?: number | null;
 }
 
 export const useDailyLogs = () => {
@@ -133,6 +137,23 @@ export const useDailyLogs = () => {
     });
   };
 
+  /** Ananın öz yuxusunu qeyd et (Mommy/Bump — Flow-da bunun ekvivalenti flow_daily_logs-dadır) */
+  const updateSleep = async (sleepHours: number, sleepQuality: number | null) => {
+    const today = new Date().toISOString().split('T')[0];
+
+    return addLog({
+      log_date: today,
+      sleep_hours: sleepHours,
+      sleep_quality: sleepQuality,
+      mood: todayLog?.mood || null,
+      water_intake: todayLog?.water_intake || 0,
+      symptoms: todayLog?.symptoms || null,
+      temperature: todayLog?.temperature || null,
+      bleeding: todayLog?.bleeding || null,
+      notes: todayLog?.notes || null
+    });
+  };
+
   useEffect(() => {
     fetchLogs();
   }, [user]);
@@ -145,6 +166,7 @@ export const useDailyLogs = () => {
     updateWaterIntake,
     updateMood,
     updateSymptoms,
+    updateSleep,
     refetch: fetchLogs
   };
 };

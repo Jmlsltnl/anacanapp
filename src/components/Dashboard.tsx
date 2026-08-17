@@ -60,6 +60,7 @@ import WinBackCard from '@/components/WinBackCard';
 import FlowDashboard from '@/components/flow/FlowDashboard';
 import BirthOnboardingModal from '@/components/BirthOnboardingModal';
 import WaterWidget from '@/components/dashboard/WaterWidget';
+import MotherSleepWidget from '@/components/dashboard/MotherSleepWidget';
 
 // Fetus images by month
 import FetusMonth1 from '@/assets/fetus/month-1.svg';
@@ -1173,6 +1174,9 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
           <span className="a-section-link">{tr('mommy_log_today_hint', 'Toxun və əlavə et')}</span>
         </div>
         <WaterWidget variant="anacan" />
+        <div style={{ marginTop: 10 }}>
+          <MotherSleepWidget />
+        </div>
       </section>
 
       {/* Sleep Tracker */}

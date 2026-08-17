@@ -30,6 +30,9 @@ import { tr } from "@/lib/tr";
 import { useIsRtl, rtlX } from '@/lib/rtl';
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 import { ToolPage, ToolHeader } from './anacan/ToolKit';
+import { analytics } from '@/lib/analytics';
+import { isHealthConnected } from '@/lib/health';
+import { useHealthDaily } from '@/hooks/useHealthData';
 
 interface MentalHealthTrackerProps {
   onBack: () => void;
@@ -143,6 +146,11 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   const submitEPDS = useSubmitEPDS();
   const shouldShowEPDSPrompt = useShouldShowEPDSPrompt();
 
+  // Health-dən mindfulness dəqiqələri — nəfəs məşqi ilə eyni mövzu, "körpü" kimi göstərilir
+  const healthConnected = isHealthConnected();
+  const { data: healthDaily } = useHealthDaily(7, healthConnected);
+  const weekMindfulnessMin = (healthDaily?.mindfulness || []).reduce((sum, s) => sum + s.value, 0);
+
   const handleMoodSelect = async (level: number) => {
     await addMoodCheckin.mutateAsync({ mood_level: level, notes: notes || undefined });
     setNotes('');
@@ -201,6 +209,8 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           setBreathingPhase('idle');
           setBreathingCount(0);
           toast.success(tr("mentalhealthtracker_tamamlandi_ozunuzu_nece_hiss_e_9a2212", "Tamamland\u0131! \xD6z\xFCn\xFCz\xFC nec\u0259 hiss edirsiniz?"));
+          // Analitika üçün qeyd — funksiya artıq mövcud idi, amma heç bir yerdən çağırılmırdı
+          analytics.logBreathingExercise(selectedExercise.name);
         }
       }
     }, durations[breathingPhase]);
@@ -599,6 +609,14 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           <div className="space-y-6">
             {breathingPhase === 'idle' ?
             <>
+                {healthConnected && weekMindfulnessMin > 0 &&
+              <div className="flex items-center gap-2.5 p-3 rounded-2xl" style={{ background: 'var(--a-lav-1)' }}>
+                    <Wind size={15} style={{ color: 'var(--a-lav-ink)', flexShrink: 0 }} />
+                    <p style={{ fontSize: 11.5, color: 'var(--a-lav-ink)', fontWeight: 600 }}>
+                      {tr('mh_health_mindfulness_bridge', 'Bu həftə Apple Health / Health Connect-də {min} dəqiqə rahatlama qeydə alınıb').replace('{min}', String(weekMindfulnessMin))}
+                    </p>
+                  </div>
+              }
                 <div className="space-y-3">
                   {BREATHING_EXERCISES.map((ex, i) =>
                 <motion.button

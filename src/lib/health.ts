@@ -17,7 +17,10 @@ const PERMISSIONS: HealthPermission[] = [
 'READ_ACTIVE_CALORIES',
 'READ_DISTANCE',
 'READ_WORKOUTS',
-'READ_HEART_RATE'];
+'READ_HEART_RATE',
+// Rahatlama/nəfəs məşqləri (MentalHealthTracker) ilə əlaqəli — Apple Health/Health
+// Connect-dəki mindfulness dəqiqələrini oxumaq üçün (əvvəllər soruşulmurdu belə).
+'READ_MINDFULNESS'];
 
 
 export const isNativeHealthPlatform = (): boolean => Capacitor.isNativePlatform();
@@ -67,8 +70,8 @@ export interface DailyHealthSample {
   value: number;
 }
 
-/** Günlük bucket-lərlə aqreqasiya (addım və ya aktiv kalori). */
-async function queryDaily(dataType: 'steps' | 'active-calories', days: number): Promise<DailyHealthSample[]> {
+/** Günlük bucket-lərlə aqreqasiya (addım, aktiv kalori və ya mindfulness dəqiqəsi). */
+async function queryDaily(dataType: 'steps' | 'active-calories' | 'mindfulness', days: number): Promise<DailyHealthSample[]> {
   if (!isNativeHealthPlatform()) return [];
   const end = new Date();
   const start = new Date();
@@ -94,6 +97,10 @@ async function queryDaily(dataType: 'steps' | 'active-calories', days: number): 
 
 export const getDailySteps = (days = 7) => queryDaily('steps', days);
 export const getDailyCalories = (days = 7) => queryDaily('active-calories', days);
+/** Mindfulness (rahatlama/meditasiya) dəqiqələri — Apple-ın öz Mindfulness app-ı,
+ *  Health Connect-ə yazan digər tətbiqlər və s. mənbələrdən. Yalnız OXUMA —
+ *  bu paket mindfulness YAZMAĞI dəstəkləmir (native tərəfdən API yoxdur). */
+export const getDailyMindfulness = (days = 7) => queryDaily('mindfulness', days);
 
 export async function getTodaySteps(): Promise<number> {
   const samples = await getDailySteps(1);
@@ -105,6 +112,13 @@ export async function getTodayCalories(): Promise<number> {
   return samples.reduce((sum, s) => sum + s.value, 0);
 }
 
+export async function getWeekMindfulnessMinutes(): Promise<number> {
+  const samples = await getDailyMindfulness(7);
+  // Native tərəf saniyə/dəqiqə vahidini bucket-in özündə "value" kimi qaytarır —
+  // steps/calories ilə eyni struktur, vahid mindful "sessiyaların cəm müddəti (dəq)".
+  return samples.reduce((sum, s) => sum + s.value, 0);
+}
+
 export interface HealthWorkout {
   startDate: string;
   endDate: string;
@@ -112,9 +126,15 @@ export interface HealthWorkout {
   duration: number;
   calories: number;
   sourceName: string;
+  /** km — READ_DISTANCE icazəsi ilə (mövcud olduqda). Package.distance metrdə qaytarır. */
+  distanceKm?: number;
+  /** Ortalama nəbz (bpm) — READ_HEART_RATE icazəsi ilə (mövcud olduqda). */
+  avgHeartRate?: number;
 }
 
-/** Son N günün məşqləri. */
+/** Son N günün məşqləri — indi məsafə (READ_DISTANCE) və ortalama nəbz (READ_HEART_RATE)
+ *  də daxil edilir; əvvəllər bu iki icazə istifadəçidən soruşulurdu, amma heç vaxt
+ *  faktiki oxunmurdu. */
 export async function getRecentWorkouts(days = 7): Promise<HealthWorkout[]> {
   if (!isNativeHealthPlatform()) return [];
   const end = new Date();
@@ -125,18 +145,26 @@ export async function getRecentWorkouts(days = 7): Promise<HealthWorkout[]> {
     const { workouts } = await Health.queryWorkouts({
       startDate: start.toISOString(),
       endDate: end.toISOString(),
-      includeHeartRate: false,
+      includeHeartRate: true,
       includeRoute: false,
       includeSteps: false
     });
-    return (workouts || []).map((w) => ({
-      startDate: w.startDate,
-      endDate: w.endDate,
-      workoutType: w.workoutType || 'workout',
-      duration: w.duration || 0,
-      calories: Math.round(w.calories || 0),
-      sourceName: w.sourceName || ''
-    }));
+    return (workouts || []).map((w) => {
+      const hrSamples = w.heartRate || [];
+      const avgHeartRate = hrSamples.length > 0 ?
+      Math.round(hrSamples.reduce((sum, s) => sum + (s.bpm || 0), 0) / hrSamples.length) :
+      undefined;
+      return {
+        startDate: w.startDate,
+        endDate: w.endDate,
+        workoutType: w.workoutType || 'workout',
+        duration: w.duration || 0,
+        calories: Math.round(w.calories || 0),
+        sourceName: w.sourceName || '',
+        distanceKm: typeof w.distance === 'number' && w.distance > 0 ? Math.round(w.distance / 100) / 10 : undefined,
+        avgHeartRate
+      };
+    });
   } catch (e) {
     console.error('Health workouts query failed:', e);
     return [];

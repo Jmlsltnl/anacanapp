@@ -8489,5 +8489,16 @@
   "commentreply_beyenme_sayi": "likes",
   "commentreply_cavablari_gizle": "Hide replies",
   "commentreply_n_cavab_goster": "View {n} replies",
-  "commentreply_beyen": "Like"
+  "commentreply_beyen": "Like",
+  "health_mindfulness_title": "Relaxation (this week)",
+  "health_mindfulness_desc": "Your mindfulness sessions from Apple Health / Health Connect",
+  "mh_health_mindfulness_bridge": "This week, {min} minutes of relaxation were recorded in Apple Health / Health Connect",
+  "exercises_health_real_activity": "Your real activity this week (from Health)",
+  "mother_sleep_title": "My sleep",
+  "mother_sleep_week_avg": "weekly avg.",
+  "health_hour_short": "hr",
+  "mother_sleep_logged_tap_edit": "Logged today · tap to edit",
+  "mother_sleep_cta": "Log your sleep",
+  "mother_sleep_hint": "Today's sleep duration and quality",
+  "common_saxlanilir": "Saving..."
 }

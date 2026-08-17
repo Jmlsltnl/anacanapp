@@ -8500,5 +8500,16 @@
   "commentreply_beyenme_sayi": "лайков",
   "commentreply_cavablari_gizle": "Скрыть ответы",
   "commentreply_n_cavab_goster": "Посмотреть ответы: {n}",
-  "commentreply_beyen": "Нравится"
+  "commentreply_beyen": "Нравится",
+  "health_mindfulness_title": "Расслабление (за неделю)",
+  "health_mindfulness_desc": "Ваши сеансы осознанности из Apple Health / Health Connect",
+  "mh_health_mindfulness_bridge": "На этой неделе в Apple Health / Health Connect зафиксировано {min} минут релаксации",
+  "exercises_health_real_activity": "Ваша реальная активность за неделю (из Health)",
+  "mother_sleep_title": "Мой сон",
+  "mother_sleep_week_avg": "средн. за нед.",
+  "health_hour_short": "ч",
+  "mother_sleep_logged_tap_edit": "Отмечено сегодня · нажмите, чтобы изменить",
+  "mother_sleep_cta": "Отметьте свой сон",
+  "mother_sleep_hint": "Сегодняшняя продолжительность и качество сна",
+  "common_saxlanilir": "Сохранение..."
 }

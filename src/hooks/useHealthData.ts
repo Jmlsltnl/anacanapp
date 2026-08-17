@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import {
   isHealthAvailable, isHealthConnected, isNativeHealthPlatform,
-  getDailySteps, getDailyCalories, getRecentWorkouts } from
+  getDailySteps, getDailyCalories, getDailyMindfulness, getRecentWorkouts } from
 '@/lib/health';
 
 /**
@@ -22,11 +22,12 @@ export const useHealthDaily = (days = 7, connected = isHealthConnected()) => {
   return useQuery({
     queryKey: ['health-daily', days],
     queryFn: async () => {
-      const [steps, calories] = await Promise.all([
+      const [steps, calories, mindfulness] = await Promise.all([
       getDailySteps(days),
-      getDailyCalories(days)]
+      getDailyCalories(days),
+      getDailyMindfulness(days)]
       );
-      return { steps, calories };
+      return { steps, calories, mindfulness };
     },
     enabled: isNativeHealthPlatform() && connected,
     staleTime: 5 * 60 * 1000,

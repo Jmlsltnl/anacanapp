@@ -8500,5 +8500,16 @@
   "commentreply_beyenme_sayi": "лайк",
   "commentreply_cavablari_gizle": "Жауаптарды жасыру",
   "commentreply_n_cavab_goster": "{n} жауапты көру",
-  "commentreply_beyen": "Лайк қою"
+  "commentreply_beyen": "Лайк қою",
+  "health_mindfulness_title": "Демалу (осы аптада)",
+  "health_mindfulness_desc": "Apple Health / Health Connect-тегі зейін сессияларыңыз",
+  "mh_health_mindfulness_bridge": "Осы аптада Apple Health / Health Connect-те {min} минут демалу тіркелді",
+  "exercises_health_real_activity": "Осы аптадағы нақты белсенділігіңіз (Health-тен)",
+  "mother_sleep_title": "Менің ұйқым",
+  "mother_sleep_week_avg": "апталық орт.",
+  "health_hour_short": "сағ",
+  "mother_sleep_logged_tap_edit": "Бүгін тіркелді · өзгерту үшін түртіңіз",
+  "mother_sleep_cta": "Ұйқыңызды тіркеңіз",
+  "mother_sleep_hint": "Бүгінгі ұйқы ұзақтығы мен сапасы",
+  "common_saxlanilir": "Сақталуда..."
 }

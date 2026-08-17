@@ -148,6 +148,18 @@ async function syncPeriodLogsToProfile(userId: string, queryClient: any) {
     if (currentLPD !== periodStart || store.periodLength !== periodLength) {
       store.setLastPeriodDate(new Date(periodStart));
       store.setPeriodLength(periodLength);
+
+      // Health inteqrasiyası aktivdirsə → Apple Health / Health Connect-ə yaz (arxa planda).
+      // QEYD: FlowDashboard-ın "Periodum başladı" düyməsi bunu artıq çağırır, amma təqvimdə
+      // günə toxunaraq period qeyd etmə yolu (bu funksiya) bunu HEÇ vaxt çağırmırdı — nəticədə
+      // istifadəçi yalnız təqvimdən istifadə edirdisə, "Health-ə yaz" toggle-i aktiv olsa belə
+      // heç nə yazılmırdı. Yalnız period başlanğıcı həqiqətən dəyişəndə (yeni/fərqli gün) yazırıq,
+      // sadəcə uzunluq redaktəsində təkrar yazmırıq.
+      if (currentLPD !== periodStart) {
+        import('@/lib/healthCycle').then((m) =>
+          m.writePeriodToHealth(new Date(periodStart), periodLength || 5)
+        ).catch(() => {});
+      }
     }
 
     // Update or insert cycle_history for this period

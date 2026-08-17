@@ -8500,5 +8500,16 @@
   "commentreply_beyenme_sayi": "إعجاب",
   "commentreply_cavablari_gizle": "إخفاء الردود",
   "commentreply_n_cavab_goster": "عرض {n} من الردود",
-  "commentreply_beyen": "إعجاب"
+  "commentreply_beyen": "إعجاب",
+  "health_mindfulness_title": "الاسترخاء (هذا الأسبوع)",
+  "health_mindfulness_desc": "جلسات اليقظة الذهنية الخاصة بك من Apple Health / Health Connect",
+  "mh_health_mindfulness_bridge": "تم تسجيل {min} دقيقة من الاسترخاء في Apple Health / Health Connect هذا الأسبوع",
+  "exercises_health_real_activity": "نشاطك الفعلي هذا الأسبوع (من Health)",
+  "mother_sleep_title": "نومي",
+  "mother_sleep_week_avg": "متوسط أسبوعي",
+  "health_hour_short": "سا",
+  "mother_sleep_logged_tap_edit": "تم التسجيل اليوم · اضغط للتعديل",
+  "mother_sleep_cta": "سجّلي نومك",
+  "mother_sleep_hint": "مدة وجودة نومك اليوم",
+  "common_saxlanilir": "جارٍ الحفظ..."
 }

@@ -6997,5 +6997,16 @@
   "commentreply_beyenme_sayi": "bəyənmə",
   "commentreply_cavablari_gizle": "Cavabları gizlə",
   "commentreply_n_cavab_goster": "{n} cavab göstər",
-  "commentreply_beyen": "Bəyən"
+  "commentreply_beyen": "Bəyən",
+  "health_mindfulness_title": "Rahatlama (bu həftə)",
+  "health_mindfulness_desc": "Apple Health / Health Connect-dəki mindfulness sessiyalarınız",
+  "mh_health_mindfulness_bridge": "Bu həftə Apple Health / Health Connect-də {min} dəqiqə rahatlama qeydə alınıb",
+  "exercises_health_real_activity": "Bu həftə real fəaliyyətiniz (Health-dən)",
+  "mother_sleep_title": "Mənim yuxum",
+  "mother_sleep_week_avg": "həftəlik ort.",
+  "health_hour_short": "saat",
+  "mother_sleep_logged_tap_edit": "Bu gün qeyd olundu · dəyişmək üçün toxunun",
+  "mother_sleep_cta": "Yuxunuzu qeyd edin",
+  "mother_sleep_hint": "Bugünkü yuxu müddəti və keyfiyyəti",
+  "common_saxlanilir": "Saxlanılır..."
 }
