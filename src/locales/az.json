@@ -7085,5 +7085,8 @@
   "lifestage_flow_short": "🌸 Dövr",
   "lifestage_bump_short": "🤰 Hamiləlik",
   "lifestage_mommy_short": "👶 Analıq",
-  "lifestage_partner_short": "💑 Partnyor"
+  "lifestage_partner_short": "💑 Partnyor",
+  "minigames_crash_title": "Oyunda gözlənilməz xəta baş verdi",
+  "minigames_crash_desc": "Narahat olmayın, irəliləyişiniz saxlanılıb. Səviyyələrə qayıdıb yenidən cəhd edə bilərsiniz.",
+  "minigames_crash_back_button": "Səviyyələrə qayıt"
 }

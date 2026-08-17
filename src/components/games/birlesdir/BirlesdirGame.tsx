@@ -69,9 +69,34 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
   // cascade (resolveFrom awaits) from a previous round can detect it is stale
   // and stop touching the fresh board/score.
   const genRef = useRef(0);
+  // One-shot guard: onLevelComplete must fire at most once per round,
+  // structurally — independent of how many times the win/lose effect below
+  // happens to re-run (e.g. due to a parent re-render recreating the
+  // onLevelComplete prop reference right as a round ends).
+  const completedRef = useRef(false);
+  // Pending window.setTimeout ids (bonus banner / shuffle notice auto-clear)
+  // so they can be cancelled on unmount instead of firing setState on a
+  // component that's no longer mounted (e.g. player exits mid-animation).
+  const pendingTimeoutsRef = useRef<number[]>([]);
+  const trackTimeout = useCallback((id: number) => {
+    pendingTimeoutsRef.current.push(id);
+    return id;
+  }, []);
   useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
+
+  // Unmount cleanup: invalidate any in-flight async cascade and cancel any
+  // still-pending timeouts so nothing touches state after this instance is
+  // gone (relevant since `key={selectedLevel}` fully remounts this component
+  // on "next level", and onExit fully unmounts it on "menu").
+  useEffect(() => {
+    return () => {
+      genRef.current += 1;
+      pendingTimeoutsRef.current.forEach((id) => window.clearTimeout(id));
+      pendingTimeoutsRef.current = [];
+    };
+  }, []);
 
   useEffect(() => {
     const measure = () => {
@@ -86,16 +111,21 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
     return () => window.removeEventListener('resize', measure);
   }, [phase]);
 
-  const triggerBonusBanner = useCallback((events: SpecialEvent[]) => {
-    if (!events.length) return;
-    const first = events[0];
-    const info = BONUS_NAMES[first.kind];
-    const key = `${Date.now()}-${Math.random()}`;
-    setBonusBanner({ label: tr(info.key, info.name), emoji: info.emoji, key });
-    window.setTimeout(() => {
-      setBonusBanner((prev) => (prev?.key === key ? null : prev));
-    }, 850);
-  }, []);
+  const triggerBonusBanner = useCallback(
+    (events: SpecialEvent[]) => {
+      if (!events.length) return;
+      const first = events[0];
+      const info = BONUS_NAMES[first.kind];
+      const key = `${Date.now()}-${Math.random()}`;
+      setBonusBanner({ label: tr(info.key, info.name), emoji: info.emoji, key });
+      trackTimeout(
+        window.setTimeout(() => {
+          setBonusBanner((prev) => (prev?.key === key ? null : prev));
+        }, 850)
+      );
+    },
+    [trackTimeout]
+  );
 
   const resolveFrom = useCallback(
     async (
@@ -147,14 +177,14 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
         current = reshuffleBoard(current, typeCount);
         setBoard(current);
         setShuffleNotice(true);
-        window.setTimeout(() => setShuffleNotice(false), 1400);
+        trackTimeout(window.setTimeout(() => setShuffleNotice(false), 1400));
         await sleep(500);
         if (isStale()) return;
       }
 
       setBusy(false);
     },
-    [typeCount, triggerBonusBanner, config.scoreMultiplier]
+    [typeCount, triggerBonusBanner, config.scoreMultiplier, trackTimeout]
   );
 
   const attemptSwap = useCallback(
@@ -261,6 +291,7 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
 
   const resetGame = useCallback(() => {
     genRef.current += 1; // cancel any in-flight cascade from the previous round
+    completedRef.current = false; // allow onLevelComplete to fire again for the new round
     const newBoard = createBoard(BOARD_ROWS, BOARD_COLS, typeCount);
     setBoard(newBoard);
     setScore(0);
@@ -299,7 +330,10 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
       setScore(finalScore);
       setFinalStars(stars);
       setPhase('won');
-      onLevelComplete({ level, score: finalScore, stars, passed: true });
+      if (!completedRef.current) {
+        completedRef.current = true;
+        onLevelComplete({ level, score: finalScore, stars, passed: true });
+      }
       hapticFeedback.medium();
       return;
     }
@@ -309,7 +343,8 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
   }, [score, movesLeft, busy, phase, config.targetScore, config.scoreMultiplier, level, onLevelComplete]);
 
   useEffect(() => {
-    if (phase === 'lost') {
+    if (phase === 'lost' && !completedRef.current) {
+      completedRef.current = true;
       onLevelComplete({ level, score, stars: 0, passed: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

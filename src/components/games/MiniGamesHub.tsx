@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ShoppingBasket, ChevronRight, Trophy, Gamepad2, Sparkles, Puzzle } from 'lucide-react';
+import { ArrowLeft, ShoppingBasket, ChevronRight, Trophy, Gamepad2, Sparkles, Puzzle, RotateCcw } from 'lucide-react';
 import { tr } from '@/lib/tr';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { useLocalGameProgress } from '@/hooks/useLocalGameProgress';
 import { useSubmitGameScore } from '@/hooks/useGameScores';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import SaglamSebetLevels from './saglam-sebet/SaglamSebetLevels';
 import SaglamSebetGame from './saglam-sebet/SaglamSebetGame';
 import { TOTAL_LEVELS as SAGLAM_SEBET_TOTAL_LEVELS } from './saglam-sebet/levelConfig';
@@ -70,47 +71,95 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
   const submitScore = isSaglamSebet ? submitSaglamSebetScore : submitBirlesdirScore;
   const totalLevelsForSelected = isSaglamSebet ? SAGLAM_SEBET_TOTAL_LEVELS : BIRLESDIR_TOTAL_LEVELS;
 
-  const openGame = (gameId: string) => {
+  // Memoized so child games' win/lose-watcher effects (which list these as
+  // dependencies) don't re-fire on every parent re-render — e.g. the score
+  // mutation's pending→success transition used to recreate this on every
+  // render right at the moment a level ends.
+  const openGame = useCallback((gameId: string) => {
     setSelectedGameId(gameId);
     setView('levels');
-  };
+  }, []);
 
-  const handleSelectLevel = (level: number) => {
-    setSelectedLevel(level);
-    setView('game');
-    trackEvent('minigame_level_started', { game_id: selectedGameId, level });
-  };
+  const handleSelectLevel = useCallback(
+    (level: number) => {
+      setSelectedLevel(level);
+      setView('game');
+      trackEvent('minigame_level_started', { game_id: selectedGameId, level });
+    },
+    [selectedGameId]
+  );
 
-  const handleLevelComplete = (result: { level: number; score: number; stars: 0 | 1 | 2 | 3; passed: boolean }) => {
-    progress.recordLevelResult(result.level, result.score, result.stars, result.passed);
-    submitScore.mutate({ score: result.score, level: result.level });
-    trackEvent(result.passed ? 'minigame_level_won' : 'minigame_level_lost', {
-      game_id: selectedGameId,
-      level: result.level,
-      score: result.score,
-    });
-  };
+  const handleLevelComplete = useCallback(
+    (result: { level: number; score: number; stars: 0 | 1 | 2 | 3; passed: boolean }) => {
+      progress.recordLevelResult(result.level, result.score, result.stars, result.passed);
+      submitScore.mutate({ score: result.score, level: result.level });
+      trackEvent(result.passed ? 'minigame_level_won' : 'minigame_level_lost', {
+        game_id: selectedGameId,
+        level: result.level,
+        score: result.score,
+      });
+    },
+    // progress/submitScore are re-derived every render from one of two stable
+    // hook instances (see comment above) — their .recordLevelResult/.mutate
+    // values stay referentially stable for as long as selectedGameId doesn't
+    // change, which is always true for the duration of a single game session.
+    [progress.recordLevelResult, submitScore.mutate, selectedGameId]
+  );
+
+  const handleExitToLevels = useCallback(() => setView('levels'), []);
+  const handleNextSaglamSebetLevel = useCallback(
+    () => setSelectedLevel((prev) => Math.min(prev + 1, SAGLAM_SEBET_TOTAL_LEVELS)),
+    []
+  );
+  const handleNextBirlesdirLevel = useCallback(
+    () => setSelectedLevel((prev) => Math.min(prev + 1, BIRLESDIR_TOTAL_LEVELS)),
+    []
+  );
 
   if (view === 'game') {
+    // Local failure domain: if the (animation/timer-heavy, portal-rendered)
+    // game screen ever throws, contain it to this screen instead of taking
+    // down the entire app via the root ErrorBoundary in App.tsx.
+    const gameCrashFallback = (
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center gap-3 p-6 text-center" style={{ background: 'var(--a-bg)' }}>
+        <p className="text-lg font-semibold text-foreground">
+          {tr('minigames_crash_title', 'Oyunda gözlənilməz xəta baş verdi')}
+        </p>
+        <p className="text-sm text-muted-foreground max-w-[280px]">
+          {tr('minigames_crash_desc', 'Narahat olmayın, irəliləyişiniz saxlanılıb. Səviyyələrə qayıdıb yenidən cəhd edə bilərsiniz.')}
+        </p>
+        <button
+          onClick={handleExitToLevels}
+          className="mt-2 px-5 py-2.5 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm flex items-center gap-2"
+        >
+          <RotateCcw className="w-4 h-4" /> {tr('minigames_crash_back_button', 'Səviyyələrə qayıt')}
+        </button>
+      </div>
+    );
+
     if (isSaglamSebet) {
       return (
-        <SaglamSebetGame
-          key={selectedLevel}
-          level={selectedLevel}
-          onExit={() => setView('levels')}
-          onLevelComplete={handleLevelComplete}
-          onNextLevel={() => setSelectedLevel((prev) => Math.min(prev + 1, SAGLAM_SEBET_TOTAL_LEVELS))}
-        />
+        <ErrorBoundary fallback={gameCrashFallback}>
+          <SaglamSebetGame
+            key={selectedLevel}
+            level={selectedLevel}
+            onExit={handleExitToLevels}
+            onLevelComplete={handleLevelComplete}
+            onNextLevel={handleNextSaglamSebetLevel}
+          />
+        </ErrorBoundary>
       );
     }
     return (
-      <BirlesdirGame
-        key={selectedLevel}
-        level={selectedLevel}
-        onExit={() => setView('levels')}
-        onLevelComplete={handleLevelComplete}
-        onNextLevel={() => setSelectedLevel((prev) => Math.min(prev + 1, BIRLESDIR_TOTAL_LEVELS))}
-      />
+      <ErrorBoundary fallback={gameCrashFallback}>
+        <BirlesdirGame
+          key={selectedLevel}
+          level={selectedLevel}
+          onExit={handleExitToLevels}
+          onLevelComplete={handleLevelComplete}
+          onNextLevel={handleNextBirlesdirLevel}
+        />
+      </ErrorBoundary>
     );
   }
 

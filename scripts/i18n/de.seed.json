@@ -8588,5 +8588,8 @@
   "lifestage_flow_short": "🌸 Zyklus",
   "lifestage_bump_short": "🤰 Schwangerschaft",
   "lifestage_mommy_short": "👶 Mutterschaft",
-  "lifestage_partner_short": "💑 Partner"
+  "lifestage_partner_short": "💑 Partner",
+  "minigames_crash_title": "Im Spiel ist ein unerwarteter Fehler aufgetreten",
+  "minigames_crash_desc": "Keine Sorge, Ihr Fortschritt wurde gespeichert. Sie können zu den Levels zurückkehren und es erneut versuchen.",
+  "minigames_crash_back_button": "Zurück zu den Levels"
 }

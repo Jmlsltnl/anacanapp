@@ -8588,5 +8588,8 @@
   "lifestage_flow_short": "🌸 Циклы",
   "lifestage_bump_short": "🤰 Жүктілік",
   "lifestage_mommy_short": "👶 Аналық",
-  "lifestage_partner_short": "💑 Серіктес"
+  "lifestage_partner_short": "💑 Серіктес",
+  "minigames_crash_title": "Ойында күтпеген қате орын алды",
+  "minigames_crash_desc": "Уайымдамаңыз, прогресс сақталды. Деңгейлерге оралып, қайта көре аласыз.",
+  "minigames_crash_back_button": "Деңгейлерге оралу"
 }

@@ -8588,5 +8588,8 @@
   "lifestage_flow_short": "🌸 الدورة",
   "lifestage_bump_short": "🤰 الحمل",
   "lifestage_mommy_short": "👶 الأمومة",
-  "lifestage_partner_short": "💑 الشريك"
+  "lifestage_partner_short": "💑 الشريك",
+  "minigames_crash_title": "حدث خطأ غير متوقع في اللعبة",
+  "minigames_crash_desc": "لا تقلقي، تم حفظ تقدمك. يمكنك العودة إلى المستويات والمحاولة مرة أخرى.",
+  "minigames_crash_back_button": "العودة إلى المستويات"
 }

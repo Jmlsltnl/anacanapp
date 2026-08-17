@@ -90,10 +90,33 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
   // single state snapshot per frame. Catch side-effects (score, lives, haptics)
   // are applied OUTSIDE any setState updater so they can never double-fire.
   const objectsRef = useRef<FallingObject[]>([]);
+  // One-shot guard: onLevelComplete must fire at most once per round,
+  // structurally — independent of how many times the win/lose effect below
+  // happens to re-run (e.g. due to a parent re-render recreating the
+  // onLevelComplete prop reference right as a round ends).
+  const completedRef = useRef(false);
+  // Pending window.setTimeout ids (floating +/- text, catch pulse, shake)
+  // so they can be cancelled on unmount instead of firing setState on a
+  // component that's no longer mounted (e.g. player exits mid-animation).
+  const pendingTimeoutsRef = useRef<number[]>([]);
+  const trackTimeout = useCallback((id: number) => {
+    pendingTimeoutsRef.current.push(id);
+    return id;
+  }, []);
 
   useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
+
+  // Unmount cleanup: cancel any still-pending timeouts so nothing touches
+  // state after this instance is gone (relevant since `key={level}` fully
+  // remounts this component on "next level", and onExit fully unmounts it).
+  useEffect(() => {
+    return () => {
+      pendingTimeoutsRef.current.forEach((id) => window.clearTimeout(id));
+      pendingTimeoutsRef.current = [];
+    };
+  }, []);
 
   useEffect(() => {
     basketXRef.current = basketX;
@@ -133,13 +156,18 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
     };
   }, [config.badChance, config.fallSpeed, config.speedVariance, containerSize.width]);
 
-  const addFloatingText = useCallback((x: number, y: number, text: string, color: string) => {
-    const id = ++floatingIdCounter;
-    setFloatingTexts((prev) => [...prev, { id, x, y, text, color }]);
-    window.setTimeout(() => {
-      setFloatingTexts((prev) => prev.filter((f) => f.id !== id));
-    }, 750);
-  }, []);
+  const addFloatingText = useCallback(
+    (x: number, y: number, text: string, color: string) => {
+      const id = ++floatingIdCounter;
+      setFloatingTexts((prev) => [...prev, { id, x, y, text, color }]);
+      trackTimeout(
+        window.setTimeout(() => {
+          setFloatingTexts((prev) => prev.filter((f) => f.id !== id));
+        }, 750)
+      );
+    },
+    [trackTimeout]
+  );
 
   const handleCatchGood = useCallback(
     (obj: FallingObject) => {
@@ -147,10 +175,10 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
       setScore(scoreRef.current);
       addFloatingText(obj.x, containerSize.height - BASKET_HEIGHT - BASKET_BOTTOM_MARGIN - 20, `+${obj.def.points}`, 'text-primary');
       setCatchPulse(true);
-      window.setTimeout(() => setCatchPulse(false), 180);
+      trackTimeout(window.setTimeout(() => setCatchPulse(false), 180));
       hapticFeedback.light();
     },
-    [addFloatingText, containerSize.height]
+    [addFloatingText, containerSize.height, trackTimeout]
   );
 
   const handleCatchBad = useCallback(
@@ -159,10 +187,10 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
       setLives(livesRef.current);
       addFloatingText(obj.x, containerSize.height - BASKET_HEIGHT - BASKET_BOTTOM_MARGIN - 20, tr('saglamsebet_life_lost_text', '-1 ❤️'), 'text-destructive');
       setShake(true);
-      window.setTimeout(() => setShake(false), 320);
+      trackTimeout(window.setTimeout(() => setShake(false), 320));
       hapticFeedback.heavy();
     },
-    [addFloatingText, containerSize.height]
+    [addFloatingText, containerSize.height, trackTimeout]
   );
 
   // Main game loop — pure simulation on objectsRef, one state snapshot per frame,
@@ -259,7 +287,10 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
         const stars = getStarsForScore(score, config.targetScore);
         setFinalStars(stars);
         setPhase('won');
-        onLevelComplete({ level, score, stars, passed: true });
+        if (!completedRef.current) {
+          completedRef.current = true;
+          onLevelComplete({ level, score, stars, passed: true });
+        }
         hapticFeedback.medium();
       } else {
         setPhase('lost');
@@ -268,7 +299,8 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
   }, [lives, score, timeLeft, phase, config.targetScore, level, onLevelComplete]);
 
   useEffect(() => {
-    if (phase === 'lost') {
+    if (phase === 'lost' && !completedRef.current) {
+      completedRef.current = true;
       onLevelComplete({ level, score, stars: 0, passed: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -295,6 +327,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
     scoreRef.current = 0;
     livesRef.current = config.lives;
     objectsRef.current = [];
+    completedRef.current = false; // allow onLevelComplete to fire again for the new round
     setScore(0);
     setLives(config.lives);
     setTimeLeft(config.duration);
