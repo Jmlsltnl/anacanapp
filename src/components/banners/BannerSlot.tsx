@@ -1,4 +1,5 @@
-import { useBanners, BannerPlacement, Banner, useIncrementBannerClick } from '@/hooks/useBanners';
+import { useEffect, useRef } from 'react';
+import { useBanners, BannerPlacement, Banner, useIncrementBannerClick, useIncrementBannerImpression } from '@/hooks/useBanners';
 import { useSubscription } from '@/hooks/useSubscription';
 import { ExternalLink, ChevronRight, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -14,11 +15,27 @@ const BannerSlot = ({ placement, onNavigate, onToolOpen, className = '' }: Banne
   const { data: banners, isLoading } = useBanners(placement);
   const { isPremium } = useSubscription();
   const incrementClick = useIncrementBannerClick();
+  const incrementImpression = useIncrementBannerImpression();
+  const firedImpressions = useRef<Set<string>>(new Set());
+
+  // Premium-only bannerləri qeyri-premium istifadəçilər üçün filtrləmək — hook qaydalarına
+  // uyğun olsun deyə (heç bir early return-dan ƏVVƏL) hesablanır, yüklənərkən boş massivə düşür
+  const visibleBanners = (banners || []).filter((b) => !b.is_premium_only || isPremium);
+  const visibleIds = visibleBanners.map((b) => b.id).join(',');
+
+  // Hər banner faktiki göründükdə (bu slot render olunanda) BİR DƏFƏ görüntülənmə qeyd olunur
+  // (view_count + banner_impressions.seen_count — admin hədəfləmədə "maks. göstərilmə" üçün)
+  useEffect(() => {
+    visibleBanners.forEach((banner) => {
+      if (!firedImpressions.current.has(banner.id)) {
+        firedImpressions.current.add(banner.id);
+        incrementImpression.mutate(banner.id);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleIds]);
 
   if (isLoading || !banners?.length) return null;
-
-  // Filter out premium-only banners for non-premium users
-  const visibleBanners = banners.filter(b => !b.is_premium_only || isPremium);
   if (!visibleBanners.length) return null;
 
   const handleBannerClick = (banner: Banner) => {

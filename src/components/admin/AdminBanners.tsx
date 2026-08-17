@@ -1,20 +1,38 @@
 import { useState } from 'react';
 import { tr } from '@/lib/tr';
-import { useAllBanners, useCreateBanner, useUpdateBanner, useDeleteBanner, Banner, BannerPlacement, BannerType, LinkType } from '@/hooks/useBanners';
+import { useAllBanners, useCreateBanner, useUpdateBanner, useDeleteBanner, Banner, BannerPlacement, BannerType, LinkType, LifeStageTarget } from '@/hooks/useBanners';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { Plus, Pencil, Trash2, Image, Layout, Eye, EyeOff, ExternalLink, MousePointer, BarChart3 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Image, Layout, Eye, EyeOff, ExternalLink, MousePointer, BarChart3, Target, X, Globe2, Languages } from 'lucide-react';
 import { LocalizedInput } from "./ui/LocalizedInput";
 import { LocalizedTextarea } from "./ui/LocalizedTextarea";
 import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
+import countriesData from '../../../countries.json';
+
+const LIFE_STAGES: {value: LifeStageTarget;labelKey: string;fallback: string;}[] = [
+{ value: 'flow', labelKey: 'lifestage_flow_short', fallback: '🌸 Dövr' },
+{ value: 'bump', labelKey: 'lifestage_bump_short', fallback: '🤰 Hamiləlik' },
+{ value: 'mommy', labelKey: 'lifestage_mommy_short', fallback: '👶 Analıq' },
+{ value: 'partner', labelKey: 'lifestage_partner_short', fallback: '💑 Partnyor' }];
+
+
+const APP_LANGUAGES: {value: string;label: string;}[] = [
+{ value: 'az', label: 'Azərbaycan' },
+{ value: 'en', label: 'English' },
+{ value: 'ru', label: 'Русский' },
+{ value: 'tr', label: 'Türkçe' },
+{ value: 'kk', label: 'Қазақша' },
+{ value: 'de', label: 'Deutsch' },
+{ value: 'ar', label: 'العربية' }];
 
 const PLACEMENTS: {value: BannerPlacement;label: string;}[] = [
 { value: 'home_top', label: tr("adminbanners_ana_sehife_ust_67d37b", "Ana Səhifə - Üst") },
@@ -52,6 +70,7 @@ const AdminBanners = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [activeTab, setActiveTab] = useState<string>('all');
+  const [countrySearch, setCountrySearch] = useState('');
   const [formData, setFormData] = useState<Partial<Banner>>({
     title: '',
     title_az: '',
@@ -68,7 +87,13 @@ const AdminBanners = () => {
     button_text_az: '',
     is_active: true,
     is_premium_only: false,
-    sort_order: 0
+    sort_order: 0,
+    target_life_stages: [],
+    target_languages: [],
+    target_countries: [],
+    max_impressions_per_user: null,
+    start_date: '',
+    end_date: ''
   });
 
   const resetForm = () => {
@@ -88,18 +113,40 @@ const AdminBanners = () => {
       button_text_az: '',
       is_active: true,
       is_premium_only: false,
-      sort_order: 0
+      sort_order: 0,
+      target_life_stages: [],
+      target_languages: [],
+      target_countries: [],
+      max_impressions_per_user: null,
+      start_date: '',
+      end_date: ''
     });
     setEditingBanner(null);
+    setCountrySearch('');
+  };
+
+  /** target_life_stages / target_languages / target_countries üçün ortaq toggle */
+  const toggleArrayValue = (field: 'target_life_stages' | 'target_languages' | 'target_countries', value: string) => {
+    setFormData((prev) => {
+      const current = (prev[field] as string[] | null) || [];
+      const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
+      return { ...prev, [field]: next };
+    });
   };
 
   const handleOpenDialog = (banner?: Banner) => {
     if (banner) {
       setEditingBanner(banner);
-      setFormData(banner);
+      setFormData({
+        ...banner,
+        // timestamptz -> <input type="date"> üçün "YYYY-MM-DD" formatı
+        start_date: banner.start_date ? banner.start_date.split('T')[0] : '',
+        end_date: banner.end_date ? banner.end_date.split('T')[0] : ''
+      });
     } else {
       resetForm();
     }
+    setCountrySearch('');
     setIsDialogOpen(true);
   };
 
@@ -109,12 +156,23 @@ const AdminBanners = () => {
       return;
     }
 
+    // Boş massivlər NULL kimi göndərilir ("hədəf yoxdur" = hamısına göstər sorğu məntiqi ilə uyğun)
+    const payload: Partial<Banner> = {
+      ...formData,
+      target_life_stages: formData.target_life_stages?.length ? formData.target_life_stages : null,
+      target_languages: formData.target_languages?.length ? formData.target_languages : null,
+      target_countries: formData.target_countries?.length ? formData.target_countries : null,
+      max_impressions_per_user: formData.max_impressions_per_user || null,
+      start_date: formData.start_date || null,
+      end_date: formData.end_date || null
+    };
+
     try {
       if (editingBanner) {
-        await updateBanner.mutateAsync({ id: editingBanner.id, ...formData });
+        await updateBanner.mutateAsync({ id: editingBanner.id, ...payload });
         toast({ title: tr("adminbanners_banner_yenilendi_6d2ad8", "Banner yeniləndi") });
       } else {
-        await createBanner.mutateAsync(formData);
+        await createBanner.mutateAsync(payload);
         toast({ title: tr("adminbanners_banner_yaradildi_8ba9bd", "Banner yaradıldı") });
       }
       setIsDialogOpen(false);
@@ -270,7 +328,7 @@ const AdminBanners = () => {
                         <p className="text-sm text-muted-foreground truncate">
                           {localize(banner, 'description') || tr("adminbanners_tesvir_yoxdur_12f487", "T\u0259svir yoxdur")}
                         </p>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground flex-wrap">
                           <span className="bg-muted px-2 py-0.5 rounded">{getPlacementLabel(banner.placement)}</span>
                           <span>{banner.banner_type === 'native' ? 'Native' : tr("adminbanners_sekil_43e2e3", "\u015E\u0259kil")}</span>
                           {banner.link_url &&
@@ -280,7 +338,40 @@ const AdminBanners = () => {
                             </span>
                       }
                           <span>Klik: {banner.click_count || 0}</span>
+                          <span>{banner.view_count || 0} {tr("adminbanners_gorunme_qisa", "göstərilmə")}</span>
                         </div>
+                        {/* Hədəfləmə xülasəsi — heç biri yoxdursa "hamısına göstərilir" ipucu görünmür */}
+                        {((banner.target_life_stages?.length || 0) > 0 ||
+                    (banner.target_languages?.length || 0) > 0 ||
+                    (banner.target_countries?.length || 0) > 0 ||
+                    banner.max_impressions_per_user) &&
+                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                            {(banner.target_life_stages?.length || 0) > 0 &&
+                      <span className="inline-flex items-center gap-1 text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full">
+                                <Target className="w-3 h-3" />
+                                {banner.target_life_stages!.map((ls) => LIFE_STAGES.find((l) => l.value === ls)?.fallback || ls).join(', ')}
+                              </span>
+                      }
+                            {(banner.target_languages?.length || 0) > 0 &&
+                      <span className="inline-flex items-center gap-1 text-xs bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full">
+                                <Languages className="w-3 h-3" />
+                                {banner.target_languages!.join(', ').toUpperCase()}
+                              </span>
+                      }
+                            {(banner.target_countries?.length || 0) > 0 &&
+                      <span className="inline-flex items-center gap-1 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+                                <Globe2 className="w-3 h-3" />
+                                {banner.target_countries!.length} {tr("adminbanners_hedef_olkeler", "Hədəf ölkələr")}
+                              </span>
+                      }
+                            {banner.max_impressions_per_user &&
+                      <span className="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                                <Eye className="w-3 h-3" />
+                                {tr("adminbanners_maks_gorunme", "Maksimum göstərilmə sayı (istifadəçi başına)")}: {banner.max_impressions_per_user}
+                              </span>
+                      }
+                          </div>
+                    }
                       </div>
 
                       {/* Actions */}
@@ -485,6 +576,118 @@ const AdminBanners = () => {
                   onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
                   placeholder={formData.link_type === 'external' ? 'https://...' : formData.link_type === 'internal' ? '/billing' : 'baby-names'} />
                 
+              </div>
+            </div>
+
+            {/* 🎯 Hədəfləmə (Targeting) */}
+            <div className="rounded-lg border border-dashed p-4 space-y-4 bg-muted/20">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-primary" />
+                <h4 className="font-semibold text-sm">{tr("adminbanners_hedefleme_basligi", "🎯 Hədəfləmə (Targeting)")}</h4>
+              </div>
+
+              {/* Mərhələ (life stage) */}
+              <div>
+                <Label>{tr("adminbanners_hedef_merheleler", "Hədəf mərhələlər")}</Label>
+                <p className="text-xs text-muted-foreground mb-2">{tr("adminbanners_hedef_merheleler_desc", "Heç biri seçilməzsə, bütün mərhələlərə göstərilir")}</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {LIFE_STAGES.map((ls) =>
+                  <label key={ls.value} className="flex items-center gap-2 text-sm rounded-md border px-2.5 py-2 cursor-pointer hover:bg-muted/60">
+                      <Checkbox
+                      checked={(formData.target_life_stages || []).includes(ls.value)}
+                      onCheckedChange={() => toggleArrayValue('target_life_stages', ls.value)} />
+                    
+                      {tr(ls.labelKey, ls.fallback)}
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Dillər */}
+              <div>
+                <Label>{tr("adminbanners_hedef_diller", "Hədəf dillər")}</Label>
+                <p className="text-xs text-muted-foreground mb-2">{tr("adminbanners_hedef_diller_desc", "Heç biri seçilməzsə, bütün dillərə göstərilir")}</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {APP_LANGUAGES.map((l) =>
+                  <label key={l.value} className="flex items-center gap-2 text-sm rounded-md border px-2.5 py-2 cursor-pointer hover:bg-muted/60">
+                      <Checkbox
+                      checked={(formData.target_languages || []).includes(l.value)}
+                      onCheckedChange={() => toggleArrayValue('target_languages', l.value)} />
+                    
+                      {l.label}
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Ölkələr */}
+              <div>
+                <Label>{tr("adminbanners_hedef_olkeler", "Hədəf ölkələr")}</Label>
+                <p className="text-xs text-muted-foreground mb-2">{tr("adminbanners_hedef_olkeler_desc", "Heç biri seçilməzsə, bütün ölkələrə göstərilir")}</p>
+                {(formData.target_countries?.length || 0) > 0 &&
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                    {formData.target_countries!.map((code) => {
+                    const c = countriesData.find((c: any) => c.isoAlpha2 === code);
+                    return (
+                      <span key={code} className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                          {c?.name || code}
+                          <button type="button" onClick={() => toggleArrayValue('target_countries', code)}>
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>);
+
+                  })}
+                  </div>
+                }
+                <Input
+                  value={countrySearch}
+                  onChange={(e) => setCountrySearch(e.target.value)}
+                  placeholder={tr("adminbanners_olke_axtar", "Ölkə axtar...")}
+                  className="mb-2" />
+                
+                <div className="max-h-[180px] overflow-y-auto border rounded-md p-2 space-y-0.5">
+                  {countriesData.
+                  filter((c: any) => c.name.toLowerCase().includes(countrySearch.toLowerCase())).
+                  map((c: any) =>
+                  <label key={c.isoAlpha2} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted/50 rounded px-1.5 py-1">
+                      <Checkbox
+                      checked={(formData.target_countries || []).includes(c.isoAlpha2)}
+                      onCheckedChange={() => toggleArrayValue('target_countries', c.isoAlpha2)} />
+                    
+                      {c.name}
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* İmpression limiti + tarix aralığı */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <Label>{tr("adminbanners_maks_gorunme", "Maksimum göstərilmə sayı (istifadəçi başına)")}</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={formData.max_impressions_per_user ?? ''}
+                    onChange={(e) => setFormData({ ...formData, max_impressions_per_user: e.target.value ? parseInt(e.target.value) : null })}
+                    placeholder={tr("adminbanners_maks_gorunme_placeholder", "Limitsiz")} />
+                  
+                </div>
+                <div>
+                  <Label>{tr("adminbanners_baslama_tarixi", "Başlama tarixi (istəyə bağlı)")}</Label>
+                  <Input
+                    type="date"
+                    value={formData.start_date as string || ''}
+                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} />
+                  
+                </div>
+                <div>
+                  <Label>{tr("adminbanners_bitme_tarixi", "Bitmə tarixi (istəyə bağlı)")}</Label>
+                  <Input
+                    type="date"
+                    value={formData.end_date as string || ''}
+                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} />
+                  
+                </div>
               </div>
             </div>
 
