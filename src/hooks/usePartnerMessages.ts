@@ -15,6 +15,19 @@ export interface PartnerMessage {
   created_at: string;
 }
 
+// Modul-səviyyəli PAYLAŞILAN realtime kanal — bir neçə komponent (BottomNav, Dashboard,
+// PartnerCareCard, PartnerActivityFeed və s.) eyni anda bu hook-u çağırır. ƏVVƏLKİ BUG:
+// hər instansiya öz kanalını açıb-bağlayırdı — Supabase JS eyni topic üçün TƏK obyekt
+// qaytarsa da, İSTƏNİLƏN instansiyanın unmount təmizləməsi (`removeChannel`) HAMISI üçün
+// server-side abunəliyi öldürürdü. Konkret nəticə: BottomNav həmişə mount olunub qalsa da,
+// Dashboard (Home tab-dan çıxanda unmount olur) təmizləyəndə BottomNav-ın "oxunmamış"
+// nişanı bir daha CANLI yenilənmirdi (yalnız ilk yükləmə statik qalırdı). İndi YALNIZ
+// son mount olunmuş instansiya real təmizləmə edir + toast/push bildirişi TƏK dəfə
+// (kanalın .on() callback-i artıq YALNIZ bir dəfə — ilk yaradılışda — təyin olunur).
+let partnerMsgsSharedChannel: ReturnType<typeof supabase.channel> | null = null;
+let partnerMsgsSubscriberCount = 0;
+const partnerMsgsRefreshCallbacks = new Set<() => void>();
+
 export const usePartnerMessages = () => {
   const [messages, setMessages] = useState<PartnerMessage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -135,11 +148,15 @@ export const usePartnerMessages = () => {
     fetchMessages();
   }, [user]);
 
-  // Realtime subscription
+  // Realtime subscription — ref-sayğaclı paylaşılan kanal (bax fayl başındakı modul-səviyyəli dəyişənlər)
   useEffect(() => {
     if (!user) return;
 
-    const channel = supabase.
+    partnerMsgsSubscriberCount++;
+    partnerMsgsRefreshCallbacks.add(fetchMessages);
+
+    if (!partnerMsgsSharedChannel) {
+    partnerMsgsSharedChannel = supabase.
     channel('partner_messages_changes').
     on(
       'postgres_changes',
@@ -150,7 +167,8 @@ export const usePartnerMessages = () => {
         filter: `receiver_id=eq.${user.id}`
       },
       (payload) => {
-        fetchMessages();
+        // Bütün mount olunmuş instansiyaların öz siyahısını təzələ (hər birinin öz local state-i var)
+        partnerMsgsRefreshCallbacks.forEach((cb) => cb());
         const newMessage = payload.new as any;
 
         if (newMessage) {
@@ -224,9 +242,15 @@ export const usePartnerMessages = () => {
       }
     ).
     subscribe();
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      partnerMsgsRefreshCallbacks.delete(fetchMessages);
+      partnerMsgsSubscriberCount = Math.max(0, partnerMsgsSubscriberCount - 1);
+      if (partnerMsgsSubscriberCount === 0 && partnerMsgsSharedChannel) {
+        supabase.removeChannel(partnerMsgsSharedChannel);
+        partnerMsgsSharedChannel = null;
+      }
     };
   }, [user, toast]);
 

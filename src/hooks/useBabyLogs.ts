@@ -26,6 +26,15 @@ export interface FeedingHistoryItem {
   notes: string | null;
 }
 
+// Modul-səviyyəli PAYLAŞILAN realtime kanal — bir neçə komponent (MommyDashboard,
+// FloatingTimerWidget, FeedingHistoryPanel, QuickStatsWidget, AIChatScreen) eyni anda
+// bu hook-u çağıra bilər. Ref-sayğac təmin edir ki, YALNIZ son mount olunmuş instansiya
+// real `removeChannel` edir — əvvəlki kimi istənilən instansiyanın unmount-u qalan
+// bacıları/qardaşları "yetim" qoymur.
+let babyLogsSharedChannel: ReturnType<typeof supabase.channel> | null = null;
+let babyLogsSubscriberCount = 0;
+const babyLogsRefreshCallbacks = new Set<() => void>();
+
 export const useBabyLogs = () => {
   const { user } = useAuth();
   const { selectedChild } = useChildren();
@@ -299,28 +308,45 @@ export const useBabyLogs = () => {
     fetchLogs();
   }, [fetchLogs]);
 
-  // Setup realtime subscription
+  // Realtime abunəliyi — REF-SAYĞACLI PAYLAŞILAN kanal (bax fayl sonundakı modul-səviyyəli
+  // dəyişənlər). Bu hook eyni zamanda bir neçə komponentdə mount olunur (MommyDashboard,
+  // FloatingTimerWidget — qlobal, FeedingHistoryPanel, QuickStatsWidget, AIChatScreen).
+  // ƏVVƏLKİ BUG: hər instansiya öz `supabase.channel('baby_logs_changes')` çağırırdı —
+  // Supabase JS eyni topic üçün TƏK obyekt qaytarsa da (join təkrarlanmır), HƏR HANSI BİR
+  // instansiyanın unmount təmizləməsi (`removeChannel`) HAMISI üçün server-side abunəliyi
+  // ÖLDÜRÜRDÜ — nəticədə, məs. Home-dan çıxıb-girəndə qlobal FloatingTimerWidget artıq
+  // canlı yeniləmə almırdı. İndi YALNIZ son mount olunmuş instansiya real təmizləmə edir.
   useEffect(() => {
     if (!user) return;
 
-    const channel = supabase
-      .channel('baby_logs_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'baby_logs',
-          filter: `user_id=eq.${user.id}`
-        },
-        () => {
-          fetchLogs();
-        }
-      )
-      .subscribe();
+    babyLogsSubscriberCount++;
+    babyLogsRefreshCallbacks.add(fetchLogs);
+
+    if (!babyLogsSharedChannel) {
+      babyLogsSharedChannel = supabase
+        .channel('baby_logs_changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'baby_logs',
+            filter: `user_id=eq.${user.id}`
+          },
+          () => {
+            babyLogsRefreshCallbacks.forEach((cb) => cb());
+          }
+        )
+        .subscribe();
+    }
 
     return () => {
-      supabase.removeChannel(channel);
+      babyLogsRefreshCallbacks.delete(fetchLogs);
+      babyLogsSubscriberCount = Math.max(0, babyLogsSubscriberCount - 1);
+      if (babyLogsSubscriberCount === 0 && babyLogsSharedChannel) {
+        supabase.removeChannel(babyLogsSharedChannel);
+        babyLogsSharedChannel = null;
+      }
     };
   }, [user, fetchLogs]);
 
