@@ -264,7 +264,7 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
         <Star key={i} size={13} style={{ fill: '#ffc94d', color: '#ffc94d' }} />
         )}
         <span className="ms-1.5" style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--a-ink-soft)' }}>
-          {tr('pw_social_proof', '10,000+ Azərbaycanlı ana bizi seçib')}
+          {tr('pw_social_proof', '10,000+ qadın bizi seçib')}
         </span>
       </div>
 
