@@ -74,7 +74,13 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     cycle_length: cycleLength || 28,
     baby_birth_date: babyBirthDate ? new Date(babyBirthDate).toISOString().split('T')[0] : '',
     baby_gender: babyGender || '' as 'boy' | 'girl' | '',
-    country_code: (profile as any)?.country_code || countryCode || ''
+    country_code: (profile as any)?.country_code || countryCode || '',
+    // Çoxdöllü hamiləlik (əkiz/üçüz/dördüz) — onboarding-də yazılır, amma
+    // sonradan (USM-dən sonra, ya da dəqiqləşdiriləndə) burada dəyişdirilə bilər
+    multiples_type: (profile?.multiples_type || 'single') as 'single' | 'twins' | 'triplets' | 'quadruplets',
+    // Xorionluq (plasenta növü) — yalnız çoxdöllü hamiləlikdə mənalıdır, adətən
+    // 10-14-cü həftə USM-dən sonra məlum olur
+    chorionicity: (profile as any)?.chorionicity || ''
   });
 
   // Compute the calculated date based on mode
@@ -192,6 +198,9 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
       if (formData.life_stage === 'bump') {
         updateData.due_date = effectiveDueDate;
         updateData.last_period_date = effectiveLMP;
+        updateData.multiples_type = formData.multiples_type;
+        updateData.baby_count = formData.multiples_type === 'twins' ? 2 : formData.multiples_type === 'triplets' ? 3 : formData.multiples_type === 'quadruplets' ? 4 : 1;
+        updateData.chorionicity = formData.multiples_type === 'single' ? null : formData.chorionicity || null;
       } else if (formData.life_stage === 'flow') {
         updateData.last_period_date = formData.last_period_date || null;
         updateData.due_date = null;
@@ -520,6 +529,58 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                   placeholder={tr("profileeditscreen_korpenin_adi_8a4e9e", "Körpənin adı")} />
 
               </div>
+
+              {/* Çoxdöllü hamiləlik */}
+              <div className="space-y-2">
+                <label style={labelStyle}>{tr("profile_multiples_label", "Neçə körpə gözləyirsiniz?")}</label>
+                <Select
+                  value={formData.multiples_type}
+                  onValueChange={(v) => setFormData((prev) => ({
+                    ...prev,
+                    multiples_type: v as 'single' | 'twins' | 'triplets' | 'quadruplets',
+                    chorionicity: v === 'single' ? '' : prev.chorionicity
+                  }))}>
+
+                  <SelectTrigger className={`w-full ${inputCls}`} style={inputStyle}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="a-scope">
+                    <SelectItem value="single">👶 {tr("profile_multiples_single", "Tək körpə")}</SelectItem>
+                    <SelectItem value="twins">👶👶 {tr("profile_multiples_twins", "Əkiz")}</SelectItem>
+                    <SelectItem value="triplets">👶👶👶 {tr("profile_multiples_triplets", "Üçüz")}</SelectItem>
+                    <SelectItem value="quadruplets">👶👶👶👶 {tr("profile_multiples_quadruplets", "Dördüz")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Xorionluq — yalnız çoxdöllü hamiləlikdə göstərilir. TTTS riski
+                  (əkiz-əkizə transfuziya sindromu) plasentanın ortaq olub-olmamasından
+                  asılıdır — DangerSignsScreen bu sahəyə görə xəbərdarlıq göstərir. */}
+              {formData.multiples_type !== 'single' &&
+              <div className="space-y-2">
+                  <label style={labelStyle}>{tr("chorionicity_label", "Plasenta növü (Xorionluq)")}</label>
+                  <Select
+                  value={formData.chorionicity || 'unknown'}
+                  onValueChange={(v) => setFormData((prev) => ({ ...prev, chorionicity: v }))}>
+
+                    <SelectTrigger className={`w-full ${inputCls}`} style={inputStyle}>
+                      <SelectValue placeholder={tr("chorionicity_placeholder", "Seçin (USM-də məlum olur)")} />
+                    </SelectTrigger>
+                    <SelectContent className="a-scope">
+                      <SelectItem value="unknown">{tr("chorionicity_unknown", "Hələ bilmirəm / USM gözləyirəm")}</SelectItem>
+                      <SelectItem value="dichorionic">{tr("chorionicity_dichorionic", "Ayrı-ayrı plasentalar (Dixorionik)")}</SelectItem>
+                      <SelectItem value="monochorionic_diamniotic">{tr("chorionicity_mcda", "Ortaq plasenta, ayrı kisələr (Monoxorionik-Diamniotik)")}</SelectItem>
+                      <SelectItem value="monochorionic_monoamniotic">{tr("chorionicity_mcma", "Ortaq plasenta və ortaq kisə (Monoxorionik-Monoamniotik)")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs" style={{ color: 'var(--a-ink-faint)', lineHeight: 1.5 }}>
+                    {formData.chorionicity === 'dichorionic' && tr("chorionicity_help_dichorionic", "Hər körpənin öz plasentası var — ən aşağı riskli növdür, əkiz doğuşların əksəriyyəti bu qrupdadır.")}
+                    {formData.chorionicity === 'monochorionic_diamniotic' && tr("chorionicity_help_mcda", "Körpələr eyni plasentanı paylaşır (adətən eyniz əkizlərdə) — TTTS (əkiz-əkizə transfuziya sindromu) riskinə görə USM-lər daha tez-tez təyin olunur.")}
+                    {formData.chorionicity === 'monochorionic_monoamniotic' && tr("chorionicity_help_mcma", "Körpələr həm plasentanı, həm kisəni paylaşır — nadir haldır, ən yaxın izləmə tələb edir (göbək ciyəsi dolaşması riski də var).")}
+                    {(!formData.chorionicity || formData.chorionicity === 'unknown') && tr("chorionicity_help_unknown", "Adətən 10-14-cü həftə USM-də (dating scan) müəyyən olunur — həkiminiz sizə deyəcək. Ortaq plasenta olduqda USM-lər daha tez-tez planlaşdırılır.")}
+                  </p>
+                </div>
+              }
             </>
             }
 

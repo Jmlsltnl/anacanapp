@@ -32,7 +32,9 @@ const DangerSignsScreen = ({ onBack }: Props) => {
   const [openId, setOpenId] = useState<string | null>(null);
   const [notifiedIds, setNotifiedIds] = useState<Set<string>>(new Set());
 
-  const signs = getDangerSignsForStage(lifeStage);
+  // Əkiz/üçüz/dördüz hamiləlikdə TTTS kimi çoxdöllüyə-xas əlamətlər də əlavə olunur
+  const isMultiplesPregnancy = !!profile?.multiples_type && profile.multiples_type !== 'single';
+  const signs = getDangerSignsForStage(lifeStage, isMultiplesPregnancy);
   const urgentSigns = signs.filter((s) => s.severity === 'urgent');
   const soonSigns = signs.filter((s) => s.severity === 'soon');
 

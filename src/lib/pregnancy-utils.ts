@@ -117,6 +117,25 @@ export const getPregnancyWeek = (lastPeriodDate: Date | string | null): number =
 };
 
 /**
+ * Hamiləlik həftəsini İSTƏNİLƏN tarixdə hesablayır (bugün deyil) — LMP-dən həmin
+ * tarixə qədər neçə gün keçib. Fetal Growth Tracker-də USM tarixinə görə həftə
+ * göstərmək üçün (yuxarıdakı getPregnancyWeek həmişə BUGÜNKÜ tarixi istifadə edir).
+ */
+export const getPregnancyWeekAtDate = (
+  lastPeriodDate: Date | string | null,
+  atDate: Date | string
+): number => {
+  if (!lastPeriodDate) return 0;
+
+  const lmp = startOfDay(new Date(lastPeriodDate));
+  const target = startOfDay(new Date(atDate));
+
+  const daysSinceLMP = Math.floor((target.getTime() - lmp.getTime()) / MS_PER_DAY);
+
+  return Math.max(0, Math.min(42, Math.floor(daysSinceLMP / 7)));
+};
+
+/**
  * Calculate day within current week (0-6, where 0 = first day of week)
  */
 export const getDayInWeek = (lastPeriodDate: Date | string | null): number => {

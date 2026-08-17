@@ -15,6 +15,8 @@ export interface DangerSign {
   desc: string;
   severity: DangerSeverity;
   stages: DangerStage[];
+  /** true = yalnız əkiz/üçüz/dördüz hamiləliklərdə göstərilir (profiles.multiples_type !== 'single') */
+  multiplesOnly?: boolean;
 }
 
 export const DANGER_SIGNS: DangerSign[] = [
@@ -66,6 +68,17 @@ export const DANGER_SIGNS: DangerSign[] = [
   desc: tr('rf_abdominal_desc', 'Keçməyən, kəskin və ya birtərəfli qarın ağrısı.'),
   severity: 'urgent',
   stages: ['bump']
+},
+{
+  // Yalnız çoxdöllü (əkiz/üçüz) hamiləliklərdə göstərilir — ortaq plasenta
+  // (monoxorionik) olduqda TTTS riski əhəmiyyətli dərəcədə yüksəkdir.
+  id: 'ttts_signs',
+  emoji: '👯',
+  title: tr('rf_ttts_title', 'Əkizlərdə qeyri-bərabər böyümə əlamətləri (TTTS)'),
+  desc: tr('rf_ttts_desc', 'Qarının gözlənilməzdən sürətli/qeyri-bərabər böyüməsi, nəfəs darlığının qəfil artması, ayaqlarda qəfil şişkinlik və ya bir körpənin hərəkətinin digərinə nisbətən azalması — ortaq plasentalı (monoxorionik) əkiz/üçüzlərdə TTTS (əkiz-əkizə transfuziya sindromu) əlaməti ola bilər. Bu, tez aşkarlanıb müalicə edildikdə yaxşı idarə oluna bilən, amma vaxtında həkimə çatdırılması vacib olan bir vəziyyətdir.'),
+  severity: 'urgent',
+  stages: ['bump'],
+  multiplesOnly: true
 },
 {
   id: 'fever_38',
@@ -143,8 +156,14 @@ export const DANGER_SIGNS: DangerSign[] = [
 }];
 
 
-export const getDangerSignsForStage = (stage: string | null | undefined): DangerSign[] => {
+/**
+ * @param isMultiplesPregnancy — profiles.multiples_type !== 'single' olanda true ötürülür,
+ * yalnız onda `multiplesOnly` işarəli qeydlər (məs. TTTS) siyahıya daxil olur.
+ */
+export const getDangerSignsForStage = (stage: string | null | undefined, isMultiplesPregnancy?: boolean): DangerSign[] => {
   const s: DangerStage = stage === 'mommy' ? 'mommy' : 'bump';
-  return DANGER_SIGNS.filter((d) => d.stages.includes(s)).
+  return DANGER_SIGNS.
+  filter((d) => d.stages.includes(s)).
+  filter((d) => !d.multiplesOnly || isMultiplesPregnancy).
   sort((a, b) => a.severity === b.severity ? 0 : a.severity === 'urgent' ? -1 : 1);
 };

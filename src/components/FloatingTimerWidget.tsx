@@ -215,6 +215,7 @@ const FloatingTimerWidget = () => {
                     <Icon className={`w-3.5 h-3.5 ${tc.color} shrink-0`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] font-semibold text-foreground truncate leading-tight">
+                        {timer.childName ? `${timer.childName} — ` : ''}
                         {timer.label || tc.label}
                         {timer.feedType ? ` (${timer.feedType === 'left' ? tr("dashboard_sol", 'Sol') : tr("floatingtimerwidget_sag_edbe12", "Sağ")})` : ''}
                       </p>

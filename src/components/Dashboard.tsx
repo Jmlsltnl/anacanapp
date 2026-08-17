@@ -852,8 +852,14 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
     babyData ? { id: babyData.id, ageMonths: babyData.ageInMonths, ageDays: babyData.ageInDays, gender: babyData.gender } : null
   );
 
+  // Əkiz/üçüzlərdə hər körpənin MÜSTƏQİL taymeri olsun deyə — seçilmiş uşağın id-si
+  // taymer sorğularına ötürülür (əvvəllər qlobal idi, uşaq dəyişəndə data qarışırdı)
+  const selectedChildId = selectedChild?.id;
+  // UI-də uşaq adı yalnız BİRDƏN ÇOX uşaq olanda göstərilir (tək uşaqlı ailələrdə əlavə söz olmasın)
+  const timerChildName = hasMultipleChildren ? selectedChild?.name : undefined;
+
   // Sleep tracking
-  const sleepTimer = getActiveTimer('sleep');
+  const sleepTimer = getActiveTimer('sleep', undefined, selectedChildId);
 
   // Feeding tracking with live timer
   const [showFeedingModal, setShowFeedingModal] = useState(false);
@@ -862,8 +868,8 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
   const formulaMLPresets = [30, 60, 90, 120, 150, 180];
   const [showSolidFoodInput, setShowSolidFoodInput] = useState(false);
   const [solidFoodName, setSolidFoodName] = useState('');
-  const leftFeedTimer = getActiveTimer('feeding', 'left');
-  const rightFeedTimer = getActiveTimer('feeding', 'right');
+  const leftFeedTimer = getActiveTimer('feeding', 'left', selectedChildId);
+  const rightFeedTimer = getActiveTimer('feeding', 'right', selectedChildId);
 
   // Diaper tracking
   const [showDiaperModal, setShowDiaperModal] = useState(false);
@@ -948,7 +954,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
       }
     } else {
       // Start sleep
-      startTimer('sleep');
+      startTimer('sleep', undefined, undefined, selectedChildId, timerChildName);
       toast({ title: tr("dashboard_yuxu_basladi_b503f7", "Yuxu başladı! 😴"), description: tr("dashboard_bitirmek_ucun_yeniden_basin_37b592", "Bitirmək üçün yenidən basın") });
     }
   };
@@ -979,7 +985,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
       }
     } else {
       // Start feeding
-      startTimer('feeding', type);
+      startTimer('feeding', type, undefined, selectedChildId, timerChildName);
       setShowFeedingModal(false);
     }
   };

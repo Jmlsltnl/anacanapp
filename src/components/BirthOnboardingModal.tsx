@@ -28,6 +28,13 @@ interface BirthOnboardingModalProps {
 type DeliveryType = 'natural' | 'cesarean' | 'assisted';
 type Gender = 'boy' | 'girl';
 
+interface BabyEntry {
+  name: string;
+  gender: Gender;
+  weight: string;
+  height: string;
+}
+
 const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingModalProps) => {
   const isRtl = useIsRtl();
   const { user, profile } = useAuth();
@@ -37,13 +44,28 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  // Əkiz/üçüz/dördüz hamiləlik onboarding-də seçilibsə (profiles.baby_count,
+  // hamiləlik mərhələsində doldurulur) — doğuş anında HƏR körpə üçün ayrıca
+  // ad/cins/çəki/boy toplanır. Tək körpəli ailələrdə (əksəriyyət) UI əvvəlki
+  // kimi tam eyni qalır — heç bir vizual dəyişiklik yoxdur.
+  const babyCount = Math.max(1, Math.min(4, profile?.baby_count || 1));
+  const isMultiple = babyCount > 1;
+
   // Form data
   const [birthDate, setBirthDate] = useState<Date | undefined>(new Date());
-  const [babyName, setBabyName] = useState(profile?.baby_name || '');
-  const [gender, setGender] = useState<Gender>('boy');
-  const [birthWeight, setBirthWeight] = useState('');
-  const [birthHeight, setBirthHeight] = useState('');
+  const [babies, setBabies] = useState<BabyEntry[]>(() =>
+  Array.from({ length: babyCount }, (_, i) => ({
+    name: i === 0 ? profile?.baby_name || '' : '',
+    gender: 'boy' as Gender,
+    weight: '',
+    height: ''
+  }))
+  );
   const [deliveryType, setDeliveryType] = useState<DeliveryType>('natural');
+
+  const updateBaby = (index: number, updates: Partial<BabyEntry>) => {
+    setBabies((prev) => prev.map((b, i) => i === index ? { ...b, ...updates } : b));
+  };
 
   const totalSteps = 4;
 
@@ -54,7 +76,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
 
 
   const handleComplete = async () => {
-    if (!user || !birthDate || !babyName.trim()) {
+    if (!user || !birthDate || babies.some((b) => !b.name.trim())) {
       toast({ title: tr("birthonboardingmodal_xeta_3cdbb6", 'Xəta'), description: tr("birthonboardingmodal_zeruri_saheleri_doldurun_ab6828", 'Zəruri sahələri doldurun'), variant: 'destructive' });
       return;
     }
@@ -63,17 +85,21 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
 
     try {
       const birthDateStr = format(birthDate, 'yyyy-MM-dd');
+      const firstBaby = babies[0];
+      const deliveryLabel = deliveryOptions.find((d) => d.value === deliveryType)?.label || deliveryType;
 
-      // Update profile to mommy mode
+      // Köhnə tək-körpəli profil sahələri (profiles.baby_name və s.) — geriyə
+      // uyğunluq üçün İLK körpənin datası ilə doldurulur (partner ekranları və
+      // bəzi köhnə kod yolları hələ birbaşa bu sahələri oxuyur).
       const { error: profileError } = await supabase.
       from('profiles').
       update({
         life_stage: 'mommy',
-        baby_name: babyName.trim(),
+        baby_name: firstBaby.name.trim(),
         baby_birth_date: birthDateStr,
-        baby_gender: gender,
-        birth_weight_kg: birthWeight ? parseFloat(birthWeight) : null,
-        birth_height_cm: birthHeight ? parseFloat(birthHeight) : null,
+        baby_gender: firstBaby.gender,
+        birth_weight_kg: firstBaby.weight ? parseFloat(firstBaby.weight) : null,
+        birth_height_cm: firstBaby.height ? parseFloat(firstBaby.height) : null,
         delivery_type: deliveryType,
         updated_at: new Date().toISOString()
       }).
@@ -81,31 +107,37 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
 
       if (profileError) throw profileError;
 
-      // Create child record in user_children (idempotent — dublikat yaratmır)
-      const { error: childError } = await supabase.
-      from('user_children').
-      upsert({
-        user_id: user.id,
-        name: babyName.trim(),
-        birth_date: birthDateStr,
-        gender: gender,
-        avatar_emoji: gender === 'girl' ? '👧' : '👦',
-        is_active: true,
-        sort_order: 0,
-        notes: tr("birthonboardingmodal_notes_template", "Doğum çəkisi: {weight} {weightUnit}, Boy: {height} {heightUnit}, Doğum tipi: {type}").replace("{weight}", birthWeight || '-').replace("{weightUnit}", tr('unit_kg', 'kq')).replace("{height}", birthHeight || '-').replace("{heightUnit}", tr('unit_cm', 'sm')).replace("{type}", deliveryOptions.find(d => d.value === deliveryType)?.label || deliveryType)
-      }, { onConflict: 'user_id,name,birth_date', ignoreDuplicates: true });
+      // Hər körpə üçün AYRICA user_children qeydi (idempotent — dublikat yaratmır).
+      // Əkiz/üçüzlərdə bu, hər körpənin öz böyümə qrafiki/peyvənd təqvimi/taymeri
+      // olmasını təmin edir (əvvəllər vergüllə yazılan tək ad tək sətrə düşürdü).
+      for (let i = 0; i < babies.length; i++) {
+        const baby = babies[i];
+        const { error: childError } = await supabase.
+        from('user_children').
+        upsert({
+          user_id: user.id,
+          name: baby.name.trim(),
+          birth_date: birthDateStr,
+          gender: baby.gender,
+          avatar_emoji: baby.gender === 'girl' ? '👧' : '👦',
+          is_active: true,
+          sort_order: i,
+          notes: tr("birthonboardingmodal_notes_template", "Doğum çəkisi: {weight} {weightUnit}, Boy: {height} {heightUnit}, Doğum tipi: {type}").replace("{weight}", baby.weight || '-').replace("{weightUnit}", tr('unit_kg', 'kq')).replace("{height}", baby.height || '-').replace("{heightUnit}", tr('unit_cm', 'sm')).replace("{type}", deliveryLabel)
+        }, { onConflict: 'user_id,name,birth_date', ignoreDuplicates: true });
 
-      // Ignore if child already exists
-      if (childError && !childError.message.includes('duplicate')) {
-        console.error('Child creation error:', childError);
+        // Ignore if child already exists
+        if (childError && !childError.message.includes('duplicate')) {
+          console.error('Child creation error:', childError);
+        }
       }
 
       // Update local store
       setLifeStage('mommy');
 
+      const namesJoined = babies.map((b) => b.name.trim()).join(' & ');
       toast({
         title: tr("birthonboardingmodal_tebrik_edirik_4dc427", 'Təbrik edirik! 🎉'),
-        description: `${babyName} ${tr("birth_welcome_world", "dünyaya xoş gəldi! Analıq səyahətinizə başlayırıq.")}`
+        description: `${namesJoined} ${tr("birth_welcome_world", "dünyaya xoş gəldi! Analıq səyahətinizə başlayırıq.")}`
       });
 
       onComplete();
@@ -124,8 +156,8 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
   const canProceed = () => {
     switch (step) {
       case 1:return !!birthDate;
-      case 2:return babyName.trim().length >= 2;
-      case 3:return !!gender;
+      case 2:return babies.every((b) => b.name.trim().length >= 2);
+      case 3:return true;
       case 4:return true; // Optional fields
       default:return false;
     }
@@ -174,7 +206,11 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
               </div>
               <div>
                 <h2 className="text-xl font-bold">{tr("birthonboardingmodal_tebrik_edirik_4dc427", "Təbrik edirik! 🎉")}</h2>
-                <p className="text-white/80 text-sm">{tr("birthonboardingmodal_korpeniz_haqqinda_melumat_verin_7560c6", "Körpəniz haqqında məlumat verin")}</p>
+                <p className="text-white/80 text-sm">
+                  {isMultiple ?
+                  tr("birthonboardingmodal_korpeleriniz_haqqinda_melumat", "Körpələriniz haqqında məlumat verin") :
+                  tr("birthonboardingmodal_korpeniz_haqqinda_melumat_verin_7560c6", "Körpəniz haqqında məlumat verin")}
+                </p>
               </div>
             </div>
             
@@ -208,7 +244,11 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                       <Calendar className="w-8 h-8 text-pink-500" />
                     </div>
                     <h3 className="text-lg font-bold text-foreground">{tr("birthonboardingmodal_dogum_tarixi_d96907", "Doğum tarixi")}</h3>
-                    <p className="text-sm text-muted-foreground">{tr("birthonboardingmodal_korpeniz_ne_vaxt_doguldu_165d80", "Körpəniz nə vaxt doğuldu?")}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {isMultiple ?
+                    tr("birthonboardingmodal_korpeleriniz_ne_vaxt_doguldu", "Körpələriniz nə vaxt doğuldu?") :
+                    tr("birthonboardingmodal_korpeniz_ne_vaxt_doguldu_165d80", "Körpəniz nə vaxt doğuldu?")}
+                    </p>
                   </div>
                   
                   <Popover>
@@ -238,7 +278,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                 </motion.div>
               }
               
-              {/* Step 2: Baby Name */}
+              {/* Step 2: Baby Name(s) — birdən çox körpə varsa hər biri üçün ayrıca kart */}
               {step === 2 &&
               <motion.div
                 key="step2"
@@ -251,37 +291,54 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                     <div className="w-16 h-16 rounded-full bg-pink-100 dark:bg-pink-950/50 flex items-center justify-center mx-auto mb-3">
                       <Heart className="w-8 h-8 text-pink-500" />
                     </div>
-                    <h3 className="text-lg font-bold text-foreground">{tr("birthonboardingmodal_korpenin_adi_8a4e9e", "Körpənin adı")}</h3>
-                    <p className="text-sm text-muted-foreground">{tr("birthonboardingmodal_balaca_mocuzenizin_adi_nedir_d5c071", "Balaca möcüzənizin adı nədir?")}</p>
+                    <h3 className="text-lg font-bold text-foreground">
+                      {isMultiple ? tr("birthonboardingmodal_korpelerin_adlari", "Körpələrin adları") : tr("birthonboardingmodal_korpenin_adi_8a4e9e", "Körpənin adı")}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {isMultiple ?
+                    tr("birthonboardingmodal_balaca_mocuzelerinizin_adlari_nedir", "Balaca möcüzələrinizin adları nədir?") :
+                    tr("birthonboardingmodal_balaca_mocuzenizin_adi_nedir_d5c071", "Balaca möcüzənizin adı nədir?")}
+                    </p>
                   </div>
                   
-                  <Input
-                  value={babyName}
-                  onChange={(e) => setBabyName(e.target.value)}
-                  placeholder={tr("birthonboardingmodal_korpenin_adini_daxil_edin_7deaac", "Körpənin adını daxil edin")}
-                  className="h-14 text-lg text-center font-medium"
-                  autoFocus />
-                
-                  
-                  {/* Gender Selection */}
-                  <div className="grid grid-cols-2 gap-3 mt-4">
-                    {[
-                  { value: 'boy', label: tr("birthonboardingmodal_oglan_e9715e", 'Oğlan'), emoji: '👦', color: 'bg-blue-100 dark:bg-blue-950/50 border-blue-300' },
-                  { value: 'girl', label: tr("birthonboardingmodal_qiz_79bf6b", 'Qız'), emoji: '👧', color: 'bg-pink-100 dark:bg-pink-950/50 border-pink-300' }].
-                  map((option) =>
-                  <motion.button
-                    key={option.value}
-                    onClick={() => setGender(option.value as Gender)}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                    gender === option.value ?
-                    `${option.color} border-current` :
-                    'bg-muted/50 border-transparent'}`
+                  <div className={isMultiple ? "space-y-3 max-h-[320px] overflow-y-auto pe-1" : ""}>
+                    {babies.map((baby, i) =>
+                  <div key={i} className={isMultiple ? "rounded-2xl border border-border/60 p-3" : ""}>
+                        {isMultiple &&
+                    <p className="text-xs font-bold text-pink-500 mb-2">
+                            {tr("birthonboardingmodal_n_ci_korpe", "{n}-ci körpə").replace('{n}', String(i + 1))}
+                          </p>
                     }
-                    whileTap={{ scale: 0.95 }}>
+                        <Input
+                      value={baby.name}
+                      onChange={(e) => updateBaby(i, { name: e.target.value })}
+                      placeholder={tr("birthonboardingmodal_korpenin_adini_daxil_edin_7deaac", "Körpənin adını daxil edin")}
+                      className={isMultiple ? "h-12 text-base text-center font-medium" : "h-14 text-lg text-center font-medium"}
+                      autoFocus={i === 0} />
                     
-                        <span className="text-3xl mb-2 block">{option.emoji}</span>
-                        <span className="font-medium text-sm">{option.label}</span>
-                      </motion.button>
+                        
+                        {/* Gender Selection */}
+                        <div className={`grid grid-cols-2 gap-3 ${isMultiple ? 'mt-3' : 'mt-4'}`}>
+                          {[
+                      { value: 'boy', label: tr("birthonboardingmodal_oglan_e9715e", 'Oğlan'), emoji: '👦', color: 'bg-blue-100 dark:bg-blue-950/50 border-blue-300' },
+                      { value: 'girl', label: tr("birthonboardingmodal_qiz_79bf6b", 'Qız'), emoji: '👧', color: 'bg-pink-100 dark:bg-pink-950/50 border-pink-300' }].
+                      map((option) =>
+                      <motion.button
+                        key={option.value}
+                        onClick={() => updateBaby(i, { gender: option.value as Gender })}
+                        className={`p-4 rounded-xl border-2 transition-all ${
+                        baby.gender === option.value ?
+                        `${option.color} border-current` :
+                        'bg-muted/50 border-transparent'}`
+                        }
+                        whileTap={{ scale: 0.95 }}>
+                        
+                              <span className={isMultiple ? "text-2xl mb-1 block" : "text-3xl mb-2 block"}>{option.emoji}</span>
+                              <span className="font-medium text-sm">{option.label}</span>
+                            </motion.button>
+                      )}
+                        </div>
+                      </div>
                   )}
                   </div>
                 </motion.div>
@@ -330,7 +387,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                 </motion.div>
               }
               
-              {/* Step 4: Birth Stats */}
+              {/* Step 4: Birth Stats — hər körpə üçün ayrıca çəki/boy */}
               {step === 4 &&
               <motion.div
                 key="step4"
@@ -347,39 +404,50 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                     <p className="text-sm text-muted-foreground">{tr("birthonboardingmodal_isteye_bagli_sonra_da_elave_ede_bilersin_ade2f0", "İstəyə bağlı - sonra da əlavə edə bilərsiniz")}</p>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-xs text-muted-foreground mb-1 block">{tr("birthonboardingmodal_ceki_kq_2f7555", "Çəki (kq)")}</Label>
-                      <div className="relative">
-                        <Scale className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <Input
-                        type="number"
-                        step="0.1"
-                        min="1"
-                        max="6"
-                        value={birthWeight}
-                        onChange={(e) => setBirthWeight(e.target.value)}
-                        placeholder="3.5"
-                        className="ps-10 h-12" />
-                      
+                  <div className={isMultiple ? "space-y-3 max-h-[240px] overflow-y-auto pe-1" : ""}>
+                    {babies.map((baby, i) =>
+                  <div key={i} className={isMultiple ? "rounded-2xl border border-border/60 p-3" : ""}>
+                        {isMultiple &&
+                    <p className="text-xs font-bold text-pink-500 mb-2">
+                            {baby.name.trim() || tr("birthonboardingmodal_n_ci_korpe", "{n}-ci körpə").replace('{n}', String(i + 1))}
+                          </p>
+                    }
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-xs text-muted-foreground mb-1 block">{tr("birthonboardingmodal_ceki_kq_2f7555", "Çəki (kq)")}</Label>
+                            <div className="relative">
+                              <Scale className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                              <Input
+                            type="number"
+                            step="0.1"
+                            min="1"
+                            max="6"
+                            value={baby.weight}
+                            onChange={(e) => updateBaby(i, { weight: e.target.value })}
+                            placeholder="3.5"
+                            className="ps-10 h-12" />
+                          
+                            </div>
+                          </div>
+                          <div>
+                            <Label className="text-xs text-muted-foreground mb-1 block">{tr("birthonboardingmodal_boy_sm_3bc841", "Boy (sm)")}</Label>
+                            <div className="relative">
+                              <Ruler className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                              <Input
+                            type="number"
+                            step="1"
+                            min="30"
+                            max="60"
+                            value={baby.height}
+                            onChange={(e) => updateBaby(i, { height: e.target.value })}
+                            placeholder="50"
+                            className="ps-10 h-12" />
+                          
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground mb-1 block">{tr("birthonboardingmodal_boy_sm_3bc841", "Boy (sm)")}</Label>
-                      <div className="relative">
-                        <Ruler className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <Input
-                        type="number"
-                        step="1"
-                        min="30"
-                        max="60"
-                        value={birthHeight}
-                        onChange={(e) => setBirthHeight(e.target.value)}
-                        placeholder="50"
-                        className="ps-10 h-12" />
-                      
-                      </div>
-                    </div>
+                  )}
                   </div>
                   
                   {/* Summary */}
@@ -388,9 +456,22 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
                       <Baby className="w-4 h-4 text-pink-500" />
                       {tr("birthonboardingmodal_xulase_029c8a", "X\xFClas\u0259")}
                     </h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <p className="text-muted-foreground">{tr("untranslated_ad_w3td2c", "Ad:")}<span className="text-foreground font-medium">{babyName}</span></p>
-                      <p className="text-muted-foreground">Cins: <span className="text-foreground font-medium">{gender === 'boy' ? tr("birthonboardingmodal_oglan_e9715e", "O\u011Flan") : tr("birthonboardingmodal_qiz_79bf6b", "Q\u0131z")}</span></p>
+                    {babies.map((baby, i) =>
+                  <div key={i} className={i > 0 ? "mt-2.5 pt-2.5 border-t border-pink-200/50 dark:border-pink-800/30" : ""}>
+                        {isMultiple &&
+                    <p className="text-xs font-bold text-pink-600 dark:text-pink-400 mb-1">
+                            {baby.name.trim() || tr("birthonboardingmodal_n_ci_korpe", "{n}-ci körpə").replace('{n}', String(i + 1))}
+                          </p>
+                    }
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <p className="text-muted-foreground">{tr("untranslated_ad_w3td2c", "Ad:")}<span className="text-foreground font-medium">{baby.name}</span></p>
+                          <p className="text-muted-foreground">Cins: <span className="text-foreground font-medium">{baby.gender === 'boy' ? tr("birthonboardingmodal_oglan_e9715e", "O\u011Flan") : tr("birthonboardingmodal_qiz_79bf6b", "Q\u0131z")}</span></p>
+                          <p className="text-muted-foreground">{tr("birthonboardingmodal_ceki_kq_2f7555", "Çəki (kq)")}: <span className="text-foreground font-medium">{baby.weight || '-'}</span></p>
+                          <p className="text-muted-foreground">{tr("birthonboardingmodal_boy_sm_3bc841", "Boy (sm)")}: <span className="text-foreground font-medium">{baby.height || '-'}</span></p>
+                        </div>
+                      </div>
+                  )}
+                    <div className="grid grid-cols-2 gap-2 text-sm mt-2.5 pt-2.5 border-t border-pink-200/50 dark:border-pink-800/30">
                       <p className="text-muted-foreground">{tr("untranslated_tarix_15qhck", "Tarix:")}<span className="text-foreground font-medium">{birthDate ? format(birthDate, 'd MMM yyyy', { locale: getCurrentDateLocale() }) : '-'}</span></p>
                       <p className="text-muted-foreground">{tr("untranslated_tip_5d1vhb", "Tip:")}<span className="text-foreground font-medium">{deliveryOptions.find((d) => d.value === deliveryType)?.label}</span></p>
                     </div>

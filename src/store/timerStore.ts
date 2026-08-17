@@ -11,14 +11,20 @@ export interface ActiveTimer {
   type: TimerType;
   feedType?: 'left' | 'right';
   label?: string;
+  /** Hansı uşağa aiddir (əkiz/üçüzlərdə hər körpənin öz MÜSTƏQİL taymeri olsun deyə).
+   *  undefined = tək uşaqlı ailələr / uşaq seçilməyib (əvvəlki davranışla tam uyğundur). */
+  childId?: string;
+  /** Yalnız GÖRÜNTÜ üçün (FloatingTimerWidget + kilid ekranı) — "Əli — 😴 Yuxu" kimi
+   *  fərqləndirmək üçün. Bir uşaqlı ailələrdə ötürülmür (UI-də əlavə qarışıqlıq olmasın). */
+  childName?: string;
   startTime: number; // timestamp
 }
 
 interface TimerState {
   activeTimers: ActiveTimer[];
-  startTimer: (type: TimerType, feedType?: 'left' | 'right', label?: string) => string;
+  startTimer: (type: TimerType, feedType?: 'left' | 'right', label?: string, childId?: string, childName?: string) => string;
   stopTimer: (id: string) => { durationSeconds: number } | null;
-  getActiveTimer: (type: TimerType, feedType?: 'left' | 'right') => ActiveTimer | undefined;
+  getActiveTimer: (type: TimerType, feedType?: 'left' | 'right', childId?: string) => ActiveTimer | undefined;
   getElapsedSeconds: (id: string) => number;
   hasAnyActiveTimer: () => boolean;
   clearAllTimers: () => void;
@@ -29,13 +35,15 @@ export const useTimerStore = create<TimerState>()(
     (set, get) => ({
       activeTimers: [],
       
-      startTimer: (type, feedType, label) => {
-        const id = `${type}-${feedType || 'main'}-${Date.now()}`;
+      startTimer: (type, feedType, label, childId, childName) => {
+        const id = `${type}-${feedType || 'main'}-${childId || 'nochild'}-${Date.now()}`;
         const timer: ActiveTimer = {
           id,
           type,
           feedType,
           label,
+          childId,
+          childName,
           startTime: Date.now(),
         };
         
@@ -65,10 +73,14 @@ export const useTimerStore = create<TimerState>()(
         return { durationSeconds };
       },
       
-      getActiveTimer: (type, feedType) => {
+      // childId veriləndə YALNIZ o uşağın taymeri qaytarılır — əkiz A üçün başladılan
+      // yuxu taymeri əkiz B seçiləndə "davam edir" kimi görünməsin deyə (əvvəlki bug).
+      // childId verilməyəndə (tək uşaqlı ailələr) əvvəlki davranış dəyişməz qalır.
+      getActiveTimer: (type, feedType, childId) => {
         return get().activeTimers.find(t => 
           t.type === type && 
-          (feedType === undefined || t.feedType === feedType)
+          (feedType === undefined || t.feedType === feedType) &&
+          (t.childId ?? undefined) === (childId ?? undefined)
         );
       },
       

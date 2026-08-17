@@ -48,6 +48,7 @@ const FirstAidGuide = lazy(() => import('./tools/FirstAidGuide'));
 const FairyTaleGenerator = lazy(() => import('./tools/FairyTaleGenerator'));
 const HoroscopeCompatibility = lazy(() => import('./tools/HoroscopeCompatibility'));
 const BabyGrowthTracker = lazy(() => import('./tools/BabyGrowthTracker'));
+const FetalGrowthTracker = lazy(() => import('./tools/FetalGrowthTracker'));
 const MaternityCalculator = lazy(() => import('./tools/MaternityCalculator'));
 const TeethingTracker = lazy(() => import('./tools/TeethingTracker'));
 const VitaminTracker = lazy(() => import('./tools/VitaminTracker'));
@@ -110,7 +111,8 @@ const iconMap: Record<string, LucideIcon> = {
   'Stars': Stars,
   'Calculator': Calculator,
   'Pill': Pill,
-  'Syringe': Syringe
+  'Syringe': Syringe,
+  'TrendingUp': TrendingUp
 };
 
 // Import Calculator icon
@@ -379,6 +381,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       case 'fairy-tale':return <FairyTaleGenerator onBack={handleBack} />;
       case 'horoscope':return <HoroscopeCompatibility onBack={handleBack} />;
       case 'baby-growth':case 'growth-tracker':return <BabyGrowthTracker onBack={handleBack} />;
+      case 'fetal-growth':return <FetalGrowthTracker onBack={handleBack} />;
       case 'affiliate':case 'affiliate-products':return <AffiliateProducts onBack={handleBack} />;
       case 'maternity-calculator':case 'maternity':return <MaternityCalculator onBack={handleBack} />;
       case 'teething':case 'teething-tracker':return <TeethingTracker onBack={handleBack} />;

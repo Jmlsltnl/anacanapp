@@ -26,11 +26,14 @@ export async function startNativeTimer(timer: ActiveTimer): Promise<void> {
   const feedSuffix = timer.feedType
     ? ` (${timer.feedType === 'left' ? tr('timernotifications_sol', 'Sol') : tr('timernotifications_sag_edbe12', 'Sağ')})`
     : '';
+  // Əkiz/üçüzlərdə hansı körpəyə aid olduğunu kilid ekranında da göstər (yalnız
+  // birdən çox uşaq olanda childName ötürülür — bax Dashboard.tsx timerChildName)
+  const childPrefix = timer.childName ? `${timer.childName} — ` : '';
   try {
     await LiveActivity.startActivity({
       id: timer.id,
       type: timer.type,
-      label: `${base}${feedSuffix}`,
+      label: `${childPrefix}${base}${feedSuffix}`,
       subLabel: tr('livetimer_davam_edir', 'Davam edir — dayandırmaq üçün düyməyə basın'),
       stopLabel: tr('livetimer_dayandir', 'Dayandır'),
       startTime: timer.startTime,
@@ -42,7 +45,7 @@ export async function startNativeTimer(timer: ActiveTimer): Promise<void> {
   } catch (e) {
     // Live Activity mümkün deyil → köhnə davamlı bildiriş
     console.warn('LiveActivity start fallback:', e);
-    showTimerNotification(timer.id, timer.type, timer.label, timer.feedType);
+    showTimerNotification(timer.id, timer.type, `${childPrefix}${base}`, timer.feedType);
   }
 }
 
