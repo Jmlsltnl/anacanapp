@@ -61,11 +61,11 @@ Deno.serve(async (req) => {
 
     let profilesQuery = supabase.from('profiles').select('user_id, life_stage, role');
     if (notification.target_audience !== 'all') {
-      if (notification.target_audience === 'partner') {
-        profilesQuery = profilesQuery.eq('role', 'partner');
-      } else {
-        profilesQuery = profilesQuery.eq('life_stage', notification.target_audience);
-      }
+      // QEYD (bug düzəlişi): 'partner' profiles.role-da HEÇ VAXT olmur (role yalnız
+      // admin/user/moderator ola bilər — bax profiles CHECK constraint) — 'partner'
+      // əslində life_stage sütununun dəyəridir. Əvvəlki `.eq('role','partner')` HƏMİŞƏ
+      // 0 sətir qaytarırdı, yəni "Hədəf auditoriya: Partnyor" seçimi heç kimə çatmırdı.
+      profilesQuery = profilesQuery.eq('life_stage', notification.target_audience);
     }
 
     const { data: profiles } = await profilesQuery;
