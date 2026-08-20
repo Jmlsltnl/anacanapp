@@ -108,14 +108,20 @@ Bu xüsusiyyət üçün **`docs/LIVE_TIMER_SETUP.md`** faylı artıq mövcuddur 
 - `Info.plist` — `NSSupportsLiveActivities = true` artıq var.
 - Android tərəfi **tam bağlıdır**, heç bir manual addım lazım deyil (`TimerForegroundService.kt`, `TimerWidgetPlugin.kt`, `MainActivity.java` qeydiyyatı, manifest icazələri — hamısı hazır). Sadəcə `npx cap sync android` + build.
 
-### B.2 — `docs/LIVE_TIMER_SETUP.md`-dəki 6 addım (xülasə — tam mətn üçün o sənədə bax)
+### B.2 — `docs/LIVE_TIMER_SETUP.md`-dəki addımlar (xülasə — tam mətn üçün o sənədə bax)
 
-1. Xcode → File → New → Target… → **Widget Extension**, adı `AnacanTimerWidget`, "Include Live Activity" ✅
+> ⚠️ **Target-in adını `AnacanTimerWidget` YOX, `AnacanTimerWidgetExt` qoy** — real hadisədə
+> tapılıb ki, `ios/App/AnacanTimerWidget/` qovluğu ilə eyni adlı target Xcode-a öz şablon
+> fayllarını həmin qovluğa yazdırır, bizim real 4 Swift faylımızla ad toqquşması yaradır
+> (tam izah `LIVE_TIMER_SETUP.md`-də).
+
+1. Xcode → File → New → Target… → **Widget Extension**, adı `AnacanTimerWidgetExt`, "Include Live Activity" ✅
 2. Xcode-un yaratdığı şablon Swift fayllarını sil
-3. Repo-dakı 4 faylı düzgün target-lərə sürüklə (cədvəl o sənəddə var — 2 fayl HƏR İKİ target-ə, 2 fayl yalnız widget target-inə)
-4. **App Groups** capability-ni HƏR İKİ target-ə əlavə et: `group.com.atlasoon.anacan`
-5. Widget target-in Minimum Deployment-ini **iOS 16.1** et
-6. `npx cap sync ios` + build
+3. Repo-dakı 4 faylı (`ios/App/AnacanTimerWidget/` qovluğundan) düzgün target-lərə əlavə et (cədvəl o sənəddə var — 2 fayl HƏR İKİ target-ə, 2 fayl yalnız widget target-inə)
+4. Əgər build zamanı "missing import of defining module 'AppIntents'" xətası çıxarsa: `AnacanTimerWidgetLiveActivity.swift`-in başında `import AppIntents` olduğunu yoxla (repo-da artıq düzəldilib)
+5. **App Groups** capability-ni HƏR İKİ target-ə əlavə et: `group.com.atlasoon.anacan`
+6. Widget target-in Minimum Deployment-ini **iOS 16.1** et
+7. `npx cap sync ios` + build (App scheme ilə)
 
 ### B.3 — `LIVE_TIMER_SETUP.md`-də AÇIQ QALAN, əlavə diqqət tələb edən məqamlar
 
@@ -142,7 +148,7 @@ Hər iki xüsusiyyət eyni Mac/Xcode sessiyasında tamamlana bilər, çünki bir
 1. `git pull --rebase --autostash && npm install && npm run build && npx cap sync ios && npx cap open ios`
 2. **[Health]** `HealthCyclePlugin.swift` və `PrivacyInfo.xcprivacy`-ni App target-inə əlavə et (A.2, addım 2-3)
 3. **[Health]** Signing & Capabilities → HealthKit capability əlavə et (A.2, addım 4)
-4. **[Widget]** File → New → Target → Widget Extension yarat, şablonları sil, 4 faylı doğru target-lərə əlavə et (B.2, addım 1-3)
+4. **[Widget]** File → New → Target → Widget Extension yarat (adı `AnacanTimerWidgetExt` — `AnacanTimerWidget` YOX, ad toqquşması üçün), şablonları sil, 4 faylı doğru target-lərə əlavə et (B.2, addım 1-3)
 5. **[Widget]** Signing & Capabilities → hər iki target-ə App Groups əlavə et (B.2, addım 4 + B.3)
 6. **[Widget]** Widget target-in Minimum Deployment-ini iOS 16.1 et (B.2, addım 5)
 7. Build et (⌘B), xətaları düzəlt (adətən: unudulmuş target membership və ya HealthKit.framework link problemi)
@@ -171,6 +177,8 @@ Bax `docs/STORE_COMPLIANCE.md` — Health inteqrasiyası üçün tam Play Store 
 | Archive/sign zamanı "doesn't support HealthKit capability" | Developer Portal-da App ID-də HealthKit hələ aktivləşdirilməyib (A.3) |
 | Live Activity heç görünmür | Settings → Anacan → Live Activities bağlıdır, YA DA Widget Extension target hələ yaradılmayıb (B.2 addım 1) |
 | Widget-dəki "Dayandır" düyməsi sessiyanı tətbiqə çatdırmır | App Groups capability hər iki target-də yoxdur/fərqli ID-dədir (B.3) |
+| Build: "initializer 'init(intent:label:)' is not available due to missing import of defining module 'AppIntents'" | `AnacanTimerWidgetLiveActivity.swift`-in başında `import AppIntents` yoxdur (repo-da düzəldilib, yoxla) |
+| Widget Extension target yaradılandan sonra `ios/App/AnacanTimerWidget/`-dəki real fayllar yoxa çıxıb/qarışıb | Target `AnacanTimerWidget` adı ilə yaradılıb (eyni adlı qovluqla toqquşub) — `git fetch origin && git reset --hard origin/main` ilə bərpa et, target-i `AnacanTimerWidgetExt` adı ilə yenidən yarat |
 | Simulator-da heç nə işləmir (Health və ya Live Activity) | Gözlənilən — hər ikisi üçün fiziki cihaz və ya müvafiq minimum versiyalı simulator lazımdır (A.4, B.4) |
 
 ## İstinad edilən fayllar
