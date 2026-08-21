@@ -334,8 +334,8 @@ npx cap sync
 
 | Product ID | Tip | Qiymət |
 |------------|-----|--------|
-| `com.atlasoon.anacan.premium.monthly` | Auto-Renewable | $9.99/ay |
-| `com.atlasoon.anacan.premium.yearly` | Auto-Renewable | $79.99/il |
+| `com.atlasoon.anacan.premium.monthly` | Auto-Renewable | $3.99/ay |
+| `com.atlasoon.anacan.premium.yearly` | Auto-Renewable | $29.99/il |
 
 5. Hər məhsul üçün:
    - Display Name: "Aylıq Premium" / "İllik Premium"
@@ -354,8 +354,8 @@ npx cap sync
 
 | Product ID | Base Plan ID | Qiymət |
 |------------|--------------|--------|
-| `com.atlasoon.anacan.premium.monthly` | `monthly-plan` | $9.99/ay |
-| `com.atlasoon.anacan.premium.yearly` | `yearly-plan` | $79.99/il |
+| `com.atlasoon.anacan.premium.monthly` | `monthly-plan` | $3.99/ay |
+| `com.atlasoon.anacan.premium.yearly` | `yearly-plan` | $29.99/il |
 
 4. **Testing** → **Internal testing** → Test hesabları əlavə edin
 

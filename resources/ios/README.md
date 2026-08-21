@@ -30,12 +30,12 @@ npx @capacitor/assets generate --ios
 
 1. **Aylıq Premium**: `com.atlasoon.anacan.premium.monthly`
    - Tip: Auto-Renewable Subscription
-   - Qiymət: $9.99 / ay
+   - Qiymət: $3.99 / ay
    - Subscription Group: Premium
 
 2. **İllik Premium**: `com.atlasoon.anacan.premium.yearly`
    - Tip: Auto-Renewable Subscription
-   - Qiymət: $79.99 / il
+   - Qiymət: $29.99 / il
    - Subscription Group: Premium
 
 ### Lazımi addımlar:

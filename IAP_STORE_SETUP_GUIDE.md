@@ -5,6 +5,13 @@
 - Aylıq: `com.atlasoon.anacan.premium.monthly`
 - İllik: `com.atlasoon.anacan.premium.yearly`
 
+> ⚠️ **Cari qiymətlər (2026, "pricing_2026" rollout)**: Aylıq **$3.99**, İllik **$29.99**
+> (aşağıdakı $9.99/$79.99 köhnədir, ilk lansmandan qalıb). RevenueCat tərəfində
+> entitlement adı **`Anacan LLC Pro`**, offering ID **`pricing_2026`**-dır
+> (bax `src/lib/revenuecat.ts`). Product ID-lərin özü dəyişməyib — yalnız
+> qiymət yenilənib, əgər siz fərqli SKU yaratmısınızsa RevenueCat dashboard-da
+> həmin ID-ni bu sənədə də əlavə edin.
+
 ---
 
 ## 📱 iOS - App Store Connect Quraşdırması
@@ -40,7 +47,7 @@
    - **Reference Name:** Premium Monthly
    - **Product ID:** `com.atlasoon.anacan.premium.monthly`
    - **Subscription Duration:** 1 Month
-   - **Subscription Price:** $9.99 (və ya uyğun AZN)
+   - **Subscription Price:** $3.99 (və ya uyğun AZN)
 3. **Localization** əlavə edin:
    - **Display Name:** Premium Aylıq
    - **Description:** Bütün premium funksiyalara limitsiz giriş
@@ -51,7 +58,7 @@
    - **Reference Name:** Premium Yearly
    - **Product ID:** `com.atlasoon.anacan.premium.yearly`
    - **Subscription Duration:** 1 Year
-   - **Subscription Price:** $79.99 (və ya uyğun AZN)
+   - **Subscription Price:** $29.99 (və ya uyğun AZN)
 3. **Localization** əlavə edin:
    - **Display Name:** Premium İllik
    - **Description:** Bütün premium funksiyalara limitsiz giriş - 33% qənaət!
@@ -124,7 +131,7 @@
    - **Base plan ID:** `monthly-plan`
    - **Renewal type:** Auto-renewing
    - **Billing period:** 1 month
-   - **Price:** $9.99
+   - **Price:** $3.99
 
 #### İllik Abunəlik:
 1. **Product ID:** `com.atlasoon.anacan.premium.yearly`
@@ -134,7 +141,7 @@
    - **Base plan ID:** `yearly-plan`
    - **Renewal type:** Auto-renewing
    - **Billing period:** 1 year
-   - **Price:** $79.99
+   - **Price:** $29.99
 
 5. Hər subscription üçün **Activate** edin
 

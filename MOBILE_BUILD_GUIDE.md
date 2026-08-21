@@ -81,9 +81,9 @@ Xcode-da:
 
 1. App Store Connect → Subscriptions
 2. Subscription Group yaradın: "Anacan Premium"
-3. Məhsullar əlavə edin:
-   - `com.atlasoon.anacan.premium.monthly` - $9.99/ay
-   - `com.atlasoon.anacan.premium.yearly` - $79.99/il
+3. Məhsullar əlavə edin (cari qiymətlər, "pricing_2026"):
+   - `com.atlasoon.anacan.premium.monthly` - $3.99/ay
+   - `com.atlasoon.anacan.premium.yearly` - $29.99/il
 4. Sandbox testçilər əlavə edin
 
 ---
@@ -113,11 +113,11 @@ Android Studio-da:
 2. Məhsullar əlavə edin:
    - Product ID: `com.atlasoon.anacan.premium.monthly`
    - Base Plan ID: `monthly-plan`
-   - Qiymət: $9.99/ay
+   - Qiymət: $3.99/ay
    
    - Product ID: `com.atlasoon.anacan.premium.yearly`
    - Base Plan ID: `yearly-plan`
-   - Qiymət: $79.99/il
+   - Qiymət: $29.99/il
 3. Internal Testing track-ə testçilər əlavə edin
 
 ---

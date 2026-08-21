@@ -36,12 +36,12 @@ npx @capacitor/assets generate --android
 
 1. **Aylıq Premium**: `com.atlasoon.anacan.premium.monthly`
    - Tip: Subscription
-   - Qiymət: $9.99 / ay
+   - Qiymət: $3.99 / ay
    - Base Plan ID: `monthly-plan`
 
 2. **İllik Premium**: `com.atlasoon.anacan.premium.yearly`
    - Tip: Subscription
-   - Qiymət: $79.99 / il
+   - Qiymət: $29.99 / il
    - Base Plan ID: `yearly-plan`
 
 ### Lazımi addımlar:

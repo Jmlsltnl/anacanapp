@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useBillingConfig } from '@/hooks/usePaywallConfig';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
-import { getPlatform, isNativePlatform } from '@/lib/revenuecat';
+import { getPlatform, isNativePlatform, REVENUECAT_CONFIG } from '@/lib/revenuecat';
 import { getDynamicIcon } from '@/lib/dynamicIcon';
 import WinBackCard from '@/components/WinBackCard';
 import { format } from 'date-fns';
@@ -48,6 +48,11 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const [isRestoring, setIsRestoring] = useState(false);
   const [payments, setPayments] = useState<PaymentEntry[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
+  // Real, store-accurate price string (məs. "€3.99", "₼6.99") — RevenueCat-dan
+  // aktiv entitlement-in real product-una görə çəkilir. Hardcode "$3.99"/"$29.99"
+  // (aşağı, planPrice-da) yalnız bu hələ yüklənməyibsə/native olmayan platformada
+  // fallback kimi qalır.
+  const [realPriceString, setRealPriceString] = useState<string | null>(null);
   const isAndroidNative = isNativePlatform() && getPlatform() === 'android';
 
   const fetchPaymentHistory = async () => {
@@ -60,6 +65,22 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
       const allPurchases = (customerInfo as any).allPurchaseDatesByProduct || {};
       const allExpirations = (customerInfo as any).allExpirationDatesByProduct || {};
       const activeEntitlements = customerInfo.entitlements?.active || {};
+
+      // Aktiv Pro entitlement-in real product-undan DƏQİQ qiyməti çək (istifadəçinin
+      // real ödədiyi valyuta/məbləğ — country/promo-ya görə fərqli ola bilər).
+      const proEntitlement = activeEntitlements[REVENUECAT_CONFIG.ENTITLEMENT_ID];
+      if (proEntitlement?.productIdentifier) {
+        try {
+          const { products } = await Purchases.getProducts({
+            productIdentifiers: [proEntitlement.productIdentifier]
+          });
+          if (products?.[0]?.priceString) {
+            setRealPriceString(products[0].priceString);
+          }
+        } catch (priceErr) {
+          console.error('Failed to load real product price:', priceErr);
+        }
+      }
 
       const original = (customerInfo as any).originalPurchaseDate;
       if (original) {
@@ -132,7 +153,10 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const hasPremiumSub = subscription && (subscription.plan_type === 'premium' || subscription.plan_type === 'premium_plus');
   const isPremiumPlus = subscription?.plan_type === 'premium_plus';
   const planName = !hasPremiumSub && !isPremium ? config.free_plan_name : isPremiumPlus ? config.premium_yearly_name : config.premium_monthly_name;
-  const planPrice = !hasPremiumSub && !isPremium ? '$0' : isPremiumPlus ? '$29.99' : '$3.99';
+  // Mümkünsə RevenueCat-dan çəkilən REAL qiymət (real valyuta/məbləğ) göstərilir;
+  // yalnız hələ yüklənməyibsə (native olmayan platforma, ya da fetch uğursuz olub)
+  // fallback olaraq "rəsmi" pricing_2026 dəyərləri göstərilir.
+  const planPrice = !hasPremiumSub && !isPremium ? '$0' : realPriceString || (isPremiumPlus ? '$29.99' : '$3.99');
   const planPeriod = !hasPremiumSub && !isPremium ? '' : isPremiumPlus ? tr("common_per_year", "/year") : tr("common_per_month", "/month");
 
   const renderIcon = (iconName: string, className: string) => {
