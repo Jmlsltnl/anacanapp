@@ -7088,5 +7088,10 @@
   "lifestage_partner_short": "💑 Partnyor",
   "minigames_crash_title": "Oyunda gözlənilməz xəta baş verdi",
   "minigames_crash_desc": "Narahat olmayın, irəliləyişiniz saxlanılıb. Səviyyələrə qayıdıb yenidən cəhd edə bilərsiniz.",
-  "minigames_crash_back_button": "Səviyyələrə qayıt"
+  "minigames_crash_back_button": "Səviyyələrə qayıt",
+  "dashboard_hero_fruit_tpl_multiple": "Körpələriniz təxminən {fruit} boydadır",
+  "kickcounter_ela_gedir_korpeleriniz_aktivdir": "Əla gedir! Körpələriniz aktivdir 💪",
+  "partnerv2_hefte_korpeleriniz": "həftə — körpələriniz",
+  "partnerv2_her_korpe_texminen": "Hər körpə təxminən",
+  "aichat_welcome_bump_3_multiple": "Hazırda hamiləliyin {0}-ci həftəsindəsiniz; körpələriniz təxminən {1} böyüklüyündədir. "
 }

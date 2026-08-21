@@ -12,6 +12,10 @@ interface UserProfile {
   recentMotherMeals?: any[];
   latestWeight?: number | null;
   todayKickSessions?: any[];
+  // Əkiz/üçüz və s. — modelin "your baby"/"körpəniz" (tək) əvəzinə
+  // "your babies"/"körpələriniz" (cəm) kimi düzgün say-uzlaşmalı danışması üçün
+  multiplesType?: string;
+  babyCount?: number;
 }
 
 export const getSystemPrompt = (
@@ -80,6 +84,7 @@ ${userProfile.recentBabyLogs?.length ? `- Baby's today logs (feeding/sleep/diape
 ${userProfile.recentMotherMeals?.length ? `- Mother's today meals: ${JSON.stringify(userProfile.recentMotherMeals)}` : ""}
 ${userProfile.latestWeight ? `- Latest logged weight: ${userProfile.latestWeight} kg` : ""}
 ${userProfile.todayKickSessions?.length ? `- Today's baby kick sessions: ${JSON.stringify(userProfile.todayKickSessions)}` : ""}
+${userProfile.multiplesType && userProfile.multiplesType !== "single" ? `- IMPORTANT: this is a MULTIPLE pregnancy (${userProfile.multiplesType}${userProfile.babyCount ? `, ${userProfile.babyCount} babies` : ""}) — always say "your babies"/"they" (plural), NEVER "your baby"/"it" (singular), when referring to the baby/babies.` : ""}
 `
       : `${dateContext}
 İstifadəçi məlumatları:
@@ -96,6 +101,7 @@ ${userProfile.recentBabyLogs?.length ? `- Körpənin bugünkü fəaliyyət qeydl
 ${userProfile.recentMotherMeals?.length ? `- Ananın bugünkü qidalanması: ${JSON.stringify(userProfile.recentMotherMeals)}` : ""}
 ${userProfile.latestWeight ? `- Son qeyd edilən çəki: ${userProfile.latestWeight} kq` : ""}
 ${userProfile.todayKickSessions?.length ? `- Bugünkü təpik sayımları: ${JSON.stringify(userProfile.todayKickSessions)}` : ""}
+${userProfile.multiplesType && userProfile.multiplesType !== "single" ? `- VACİB: bu ÇOXDÖLLÜ hamiləlikdir (${userProfile.multiplesType}${userProfile.babyCount ? `, ${userProfile.babyCount} körpə` : ""}) — həmişə "körpəniz/onun" (tək) əvəzinə "körpələriniz/onların" (cəm) kimi düzgün say-uzlaşmalı danış.` : ""}
 `
     : "";
 

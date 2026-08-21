@@ -8591,5 +8591,10 @@
   "lifestage_partner_short": "💑 Серіктес",
   "minigames_crash_title": "Ойында күтпеген қате орын алды",
   "minigames_crash_desc": "Уайымдамаңыз, прогресс сақталды. Деңгейлерге оралып, қайта көре аласыз.",
-  "minigames_crash_back_button": "Деңгейлерге оралу"
+  "minigames_crash_back_button": "Деңгейлерге оралу",
+  "dashboard_hero_fruit_tpl_multiple": "Сәбилеріңіз шамамен {fruit} мөлшерінде",
+  "kickcounter_ela_gedir_korpeleriniz_aktivdir": "Керемет! Сәбилеріңіз белсенді 💪",
+  "partnerv2_hefte_korpeleriniz": "апта — сәбилеріңіз",
+  "partnerv2_her_korpe_texminen": "Әр сәби шамамен",
+  "aichat_welcome_bump_3_multiple": "Қазір сіз жүктіліктің {0}-аптасындасыз; сәбилеріңіз шамамен {1} мөлшерінде. "
 }

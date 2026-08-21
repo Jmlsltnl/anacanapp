@@ -110,6 +110,4 @@ export const getFallbackStages = () => [
 
 export const getFallbackMultiples = () => [
 { option_id: 'single', label_az: tr("usedynamiconboarding_tek_usaq_9b99b4", "Tək uşaq"), emoji: '👶', baby_count: 1 },
-{ option_id: 'twins', label_az: tr("usedynamiconboarding_ekiz_680a49", "Əkiz"), emoji: '👶👶', baby_count: 2 },
-{ option_id: 'triplets', label_az: tr("usedynamiconboarding_ucuz_45679e", "Üçüz"), emoji: '👶👶👶', baby_count: 3 },
-{ option_id: 'quadruplets', label_az: tr("usedynamiconboarding_dorduz_88f390", "Dördüz"), emoji: '👶👶👶👶', baby_count: 4 }];
+{ option_id: 'twins', label_az: tr("usedynamiconboarding_ekiz_680a49", "Əkiz"), emoji: '👶👶', baby_count: 2 }];

@@ -547,8 +547,6 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
                   <SelectContent className="a-scope">
                     <SelectItem value="single">👶 {tr("profile_multiples_single", "Tək körpə")}</SelectItem>
                     <SelectItem value="twins">👶👶 {tr("profile_multiples_twins", "Əkiz")}</SelectItem>
-                    <SelectItem value="triplets">👶👶👶 {tr("profile_multiples_triplets", "Üçüz")}</SelectItem>
-                    <SelectItem value="quadruplets">👶👶👶👶 {tr("profile_multiples_quadruplets", "Dördüz")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

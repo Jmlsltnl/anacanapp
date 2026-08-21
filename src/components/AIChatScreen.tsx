@@ -183,7 +183,9 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       language: s.language,
     }))
   );
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  // Əkiz/üçüz və s. — qarşılama mesajı və AI-a göndərilən kontekst buna görə uyğunlaşır
+  const isMultiplePregnancy = !!(profile as any)?.multiples_type && (profile as any).multiples_type !== 'single';
   const { messages: savedMessages, addMessage, clearHistory, loading: historyLoading } = useAIChatHistory('woman');
   const { toast } = useToast();
 
@@ -234,7 +236,11 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     baby_name: babyName || undefined,
     baby_birth_date: babyBirthDate ? new Date(babyBirthDate).toISOString().split('T')[0] : undefined,
     last_period_date: lastPeriodDate ? new Date(lastPeriodDate).toISOString().split('T')[0] : undefined,
-    cycle_length: cycleLength
+    cycle_length: cycleLength,
+    // Əkiz/üçüz və s. — Dr. Anacan-a göndərilir ki, cavablarında "körpəniz" əvəzinə
+    // "körpələriniz" kimi düzgün say-uzlaşmalı danışsın (bax prompts.ts)
+    multiples_type: (profile as any)?.multiples_type || undefined,
+    baby_count: (profile as any)?.baby_count || undefined
   };
 
   // Load saved messages on mount
@@ -273,7 +279,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
         case 'flow':
           return `Hello${userName}. I'm Anacan.AI. I'm ready to professionally answer your questions about menstrual cycles, symptoms, and general health.`;
         case 'bump':
-          return `Hello${userName}. I'm Anacan.AI. ${pregnancyData ? `You're currently in week ${pregnancyData.currentWeek} of pregnancy; your baby is about the size of a ${dynamicFruit || pregnancyData.babySize.fruit}. ` : ''}You can ask any questions about your pregnancy.`;
+          return `Hello${userName}. I'm Anacan.AI. ${pregnancyData ? `You're currently in week ${pregnancyData.currentWeek} of pregnancy; ${isMultiplePregnancy ? 'your babies are' : 'your baby is'} about the size of a ${dynamicFruit || pregnancyData.babySize.fruit}. ` : ''}You can ask any questions about your pregnancy.`;
         case 'mommy':
           return `Hello${userName}. I'm Anacan.AI. I'm here to support you with questions about baby care, breastfeeding, sleep routines and postpartum recovery.`;
         default:
@@ -285,7 +291,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       case 'flow':
         return `${tr("aichat_welcome_flow_1", "Salam")}${userName}. ${tr("aichat_welcome_flow_2", "Mən Anacan.AI. Menstrual tsikl, simptomlar və ümumi sağlamlıq üzrə suallarınıza peşəkar cavab verməyə hazıram.")}`;
       case 'bump':
-        return `${tr("aichat_welcome_bump_1", "Salam")}${userName}. ${tr("aichat_welcome_bump_2", "Mən Anacan.AI.")} ${pregnancyData ? tr("aichat_welcome_bump_3", "Hazırda hamiləliyin {0}-ci həftəsindəsiniz; körpəniz təxminən {1} böyüklüyündədir. ").replace('{0}', String(pregnancyData.currentWeek)).replace('{1}', dynamicFruit || pregnancyData.babySize.fruit) : ''}${tr("aichat_welcome_bump_4", "Hamiləlik dövrü ilə bağlı suallarınızı verə bilərsiniz.")}`;
+        return `${tr("aichat_welcome_bump_1", "Salam")}${userName}. ${tr("aichat_welcome_bump_2", "Mən Anacan.AI.")} ${pregnancyData ? (isMultiplePregnancy ? tr("aichat_welcome_bump_3_multiple", "Hazırda hamiləliyin {0}-ci həftəsindəsiniz; körpələriniz təxminən {1} böyüklüyündədir. ") : tr("aichat_welcome_bump_3", "Hazırda hamiləliyin {0}-ci həftəsindəsiniz; körpəniz təxminən {1} böyüklüyündədir. ")).replace('{0}', String(pregnancyData.currentWeek)).replace('{1}', dynamicFruit || pregnancyData.babySize.fruit) : ''}${tr("aichat_welcome_bump_4", "Hamiləlik dövrü ilə bağlı suallarınızı verə bilərsiniz.")}`;
       case 'mommy':
         return `${tr("aichat_welcome_mommy_1", "Salam")}${userName}. ${tr("aichat_welcome_mommy_2", "Mən Anacan.AI. Körpə baxımı, əmizdirmə, yuxu rejimi və doğuşdan sonrakı bərpa ilə bağlı suallarınıza dəstək olmağa hazıram.")}`;
       default:
@@ -389,6 +395,8 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
             babyBirthDate: userProfile.baby_birth_date,
             lastPeriodDate: userProfile.last_period_date,
             cycleLength: userProfile.cycle_length,
+            multiplesType: userProfile.multiples_type,
+            babyCount: userProfile.baby_count,
             selectedChildDetails: selectedChild ? {
               name: selectedChild.name,
               gender: selectedChild.gender,

@@ -8591,5 +8591,10 @@
   "lifestage_partner_short": "💑 Partner",
   "minigames_crash_title": "Im Spiel ist ein unerwarteter Fehler aufgetreten",
   "minigames_crash_desc": "Keine Sorge, Ihr Fortschritt wurde gespeichert. Sie können zu den Levels zurückkehren und es erneut versuchen.",
-  "minigames_crash_back_button": "Zurück zu den Levels"
+  "minigames_crash_back_button": "Zurück zu den Levels",
+  "dashboard_hero_fruit_tpl_multiple": "Ihre Babys sind etwa so groß wie {fruit}",
+  "kickcounter_ela_gedir_korpeleriniz_aktivdir": "Läuft super! Ihre Babys sind aktiv 💪",
+  "partnerv2_hefte_korpeleriniz": "Woche — Ihre Babys",
+  "partnerv2_her_korpe_texminen": "Jedes Baby ist etwa",
+  "aichat_welcome_bump_3_multiple": "Sie sind aktuell in der {0}. Schwangerschaftswoche; Ihre Babys sind etwa so groß wie {1}. "
 }

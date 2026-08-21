@@ -318,7 +318,8 @@ const PartnerHomeScreen = ({ onNavigate, onOpenChat }: Props) => {
             currentWeek={currentWeek}
             weekData={weekData}
             dayContent={dayContent}
-            language={language} />
+            language={language}
+            isMultiple={!!partnerProfile?.multiples_type && partnerProfile.multiples_type !== 'single'} />
           }
 
           {/* ── Körpə bu gün + Kriz dövrü (mommy) ── */}

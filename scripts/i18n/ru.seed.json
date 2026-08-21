@@ -8591,5 +8591,10 @@
   "lifestage_partner_short": "💑 Партнёр",
   "minigames_crash_title": "В игре произошла непредвиденная ошибка",
   "minigames_crash_desc": "Не волнуйтесь, ваш прогресс сохранён. Вы можете вернуться к уровням и попробовать снова.",
-  "minigames_crash_back_button": "Вернуться к уровням"
+  "minigames_crash_back_button": "Вернуться к уровням",
+  "dashboard_hero_fruit_tpl_multiple": "Ваши малыши сейчас размером примерно с {fruit}",
+  "kickcounter_ela_gedir_korpeleriniz_aktivdir": "Отлично! Ваши малыши активны 💪",
+  "partnerv2_hefte_korpeleriniz": "неделя — ваши малыши",
+  "partnerv2_her_korpe_texminen": "Каждый малыш примерно",
+  "aichat_welcome_bump_3_multiple": "Сейчас у вас {0}-я неделя беременности; ваши малыши сейчас примерно размером с {1}. "
 }

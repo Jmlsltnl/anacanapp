@@ -8580,5 +8580,9 @@
   "lifestage_partner_short": "💑 Partner",
   "minigames_crash_title": "An unexpected error occurred in the game",
   "minigames_crash_desc": "Don't worry, your progress has been saved. You can go back to levels and try again.",
-  "minigames_crash_back_button": "Back to levels"
+  "minigames_crash_back_button": "Back to levels",
+  "dashboard_hero_fruit_tpl_multiple": "Your babies are about {fruit}-sized",
+  "kickcounter_ela_gedir_korpeleriniz_aktivdir": "Going great! Your babies are active 💪",
+  "partnerv2_hefte_korpeleriniz": "week — your babies",
+  "partnerv2_her_korpe_texminen": "Each baby is about"
 }

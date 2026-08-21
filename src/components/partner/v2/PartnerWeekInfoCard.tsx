@@ -21,9 +21,11 @@ interface Props {
   weekData: FruitDataLike | null;
   dayContent: any;
   language: string;
+  /** Əkiz/üçüz və s. hamiləlik — "körpəniz" əvəzinə "körpələriniz" göstərilir */
+  isMultiple?: boolean;
 }
 
-const PartnerWeekInfoCard = ({ currentWeek, weekData, dayContent, language }: Props) => {
+const PartnerWeekInfoCard = ({ currentWeek, weekData, dayContent, language, isMultiple = false }: Props) => {
   const [expanded, setExpanded] = useState(false);
 
   if (!currentWeek || currentWeek <= 0) return null;
@@ -49,11 +51,13 @@ const PartnerWeekInfoCard = ({ currentWeek, weekData, dayContent, language }: Pr
         </div>
         <div className="flex-1 min-w-0">
           <h3 style={{ fontSize: 14.5, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>
-            {currentWeek}. {tr('partnerv2_hefte_korpeniz', 'həftə — körpəniz')}
+            {currentWeek}. {isMultiple ? tr('partnerv2_hefte_korpeleriniz', 'həftə — körpələriniz') : tr('partnerv2_hefte_korpeniz', 'həftə — körpəniz')}
           </h3>
           {weekData?.fruit &&
           <p style={{ fontSize: 11.5, color: 'var(--a-ink-soft)' }}>
-              {tr('partnerv2_texminen', 'Təxminən')} {weekData.fruit} {tr('partnerv2_boyukluyunde', 'böyüklüyündə')}
+              {isMultiple ?
+            `${tr('partnerv2_her_korpe_texminen', 'Hər körpə təxminən')} ${weekData.fruit} ${tr('partnerv2_boyukluyunde', 'böyüklüyündə')}` :
+            `${tr('partnerv2_texminen', 'Təxminən')} ${weekData.fruit} ${tr('partnerv2_boyukluyunde', 'böyüklüyündə')}`}
             </p>
           }
         </div>

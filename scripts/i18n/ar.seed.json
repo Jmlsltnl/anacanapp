@@ -8591,5 +8591,10 @@
   "lifestage_partner_short": "💑 الشريك",
   "minigames_crash_title": "حدث خطأ غير متوقع في اللعبة",
   "minigames_crash_desc": "لا تقلقي، تم حفظ تقدمك. يمكنك العودة إلى المستويات والمحاولة مرة أخرى.",
-  "minigames_crash_back_button": "العودة إلى المستويات"
+  "minigames_crash_back_button": "العودة إلى المستويات",
+  "dashboard_hero_fruit_tpl_multiple": "أطفالك بحجم {fruit} تقريباً",
+  "kickcounter_ela_gedir_korpeleriniz_aktivdir": "ممتاز! أطفالك نشيطون 💪",
+  "partnerv2_hefte_korpeleriniz": "أسبوع — أطفالك",
+  "partnerv2_her_korpe_texminen": "كل طفل بحجم",
+  "aichat_welcome_bump_3_multiple": "أنتِ حالياً في الأسبوع {0} من الحمل؛ أطفالك بحجم {1} تقريباً. "
 }

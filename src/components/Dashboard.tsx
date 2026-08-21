@@ -161,6 +161,9 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
     useShallow((s) => ({ getPregnancyData: s.getPregnancyData, setLifeStage: s.setLifeStage, language: s.language }))
   );
   const { toast } = useToast();
+  const { profile } = useAuth();
+  // Əkiz/üçüz və s. — hero başlığı və digər "körpəniz" mətnləri buna görə uyğunlaşır
+  const isMultiple = !!(profile as any)?.multiples_type && (profile as any).multiples_type !== 'single';
   const pregData = getPregnancyData();
   const { todayLog, updateWaterIntake, updateMood } = useDailyLogs();
   const { getTodayStats, addSession } = useKickSessions();
@@ -365,8 +368,13 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
 
         <h1 className="a-hero-headline a-heading">
           {(() => {
-            // Şablon: {fruit} yerinə meyvə adı — hər dildə təbii söz sırası
-            const tpl = tr("dashboard_hero_fruit_tpl", "Anacan, hazırda {fruit} boydayam");
+            // Tək körpədə "mən danışıram" (1-ci şəxs) səsi təbiidir; əkiz/üçüzdə
+            // isə hər körpə fərqli ölçüdə ola bilər — ona görə fərqli, ana-yönümlü
+            // (2-ci şəxs cəm) şablona keçirik ki, "mən alma boydayam" kimi TƏK
+            // körpə iddiası yaranmasın.
+            const tpl = isMultiple ?
+            tr("dashboard_hero_fruit_tpl_multiple", "Körpələriniz təxminən {fruit} boydadır") :
+            tr("dashboard_hero_fruit_tpl", "Anacan, hazırda {fruit} boydayam");
             const [before, after] = tpl.split('{fruit}');
             return <>{before}<em>{weekData.fruit}</em>{after ?? ''}</>;
           })()}

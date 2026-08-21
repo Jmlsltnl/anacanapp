@@ -8591,5 +8591,10 @@
   "lifestage_partner_short": "💑 Partner",
   "minigames_crash_title": "Oyunda beklenmedik bir hata oluştu",
   "minigames_crash_desc": "Endişelenmeyin, ilerlemeniz kaydedildi. Seviyelere dönüp tekrar deneyebilirsiniz.",
-  "minigames_crash_back_button": "Seviyelere dön"
+  "minigames_crash_back_button": "Seviyelere dön",
+  "dashboard_hero_fruit_tpl_multiple": "Bebekleriniz yaklaşık {fruit} büyüklüğünde",
+  "kickcounter_ela_gedir_korpeleriniz_aktivdir": "Harika gidiyor! Bebekleriniz aktif 💪",
+  "partnerv2_hefte_korpeleriniz": "hafta — bebekleriniz",
+  "partnerv2_her_korpe_texminen": "Her bebek yaklaşık",
+  "aichat_welcome_bump_3_multiple": "Şu anda hamileliğinizin {0}. haftasındasınız; bebekleriniz yaklaşık {1} büyüklüğünde. "
 }

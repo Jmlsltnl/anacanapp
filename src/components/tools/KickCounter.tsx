@@ -85,7 +85,7 @@ const KickCounter = forwardRef<HTMLDivElement, KickCounterProps>(({ onBack }, re
   const getKickMessage = () => {
     if (kicks === 0) return tr("kickcounter_baslamaq_ucun_duymeye_toxunun_38b541", "Ba\u015Flamaq \xFC\xE7\xFCn d\xFCym\u0259y\u0259 toxunun");
     if (kicks < 5) return tr("kickcounter_davam_edin_izleyirsiniz_815868", "Davam edin, izl\u0259yirsiniz! \uD83D\uDC76");
-    if (kicks < 10) return tr("kickcounter_ela_gedir_korpeniz_aktivdir_b54853", "\u018Fla gedir! K\xF6rp\u0259niz aktivdir \uD83D\uDCAA");
+    if (kicks < 10) return isMultiple ? tr("kickcounter_ela_gedir_korpeleriniz_aktivdir", "Əla gedir! Körpələriniz aktivdir 💪") : tr("kickcounter_ela_gedir_korpeniz_aktivdir_b54853", "\u018Fla gedir! K\xF6rp\u0259niz aktivdir \uD83D\uDCAA");
     return tr("kickcounter_super_10_tepike_catdiniz_22fdc0", "Super! 10 t\u0259pik\u0259 \xE7atd\u0131n\u0131z! \uD83C\uDF89");
   };
 

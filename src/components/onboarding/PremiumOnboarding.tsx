@@ -114,8 +114,7 @@ const SINGLE_QUESTIONS: Partial<Record<StepId, { emoji: string; title: string; s
     subtitle: tr('ponb2_multiples_sub', 'Bələdçi və icma qrupları buna görə seçilir'),
     options: [
     { id: 'single', label: tr('ponb2_multiples_single', 'Tək körpə'), emoji: '👶' },
-    { id: 'twins', label: tr('ponb2_multiples_twins', 'Əkiz'), emoji: '👶👶' },
-    { id: 'triplets', label: tr('ponb2_multiples_triplets', 'Üçəm və ya çox'), emoji: '👶👶👶' }]
+    { id: 'twins', label: tr('ponb2_multiples_twins', 'Əkiz'), emoji: '👶👶' }]
   },
   firstPregnancy: {
     emoji: '🌱',
@@ -331,7 +330,7 @@ const PremiumOnboarding = () => {
     setSaving(true);
     try {
       const multiplesId = (finalAnswers['multiples'] as string) || 'single';
-      const babyCount = multiplesId === 'twins' ? 2 : multiplesId === 'triplets' ? 3 : 1;
+      const babyCount = multiplesId === 'twins' ? 2 : 1;
       const answersPayload = { ...finalAnswers, notifications: notifChoice ?? finalAnswers['notifications'] ?? null, v: 2 };
 
       if (stage === 'bump') {

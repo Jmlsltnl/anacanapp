@@ -21,6 +21,9 @@ export interface PartnerWomanData {
   baby_gender: 'boy' | 'girl' | null;
   cycle_length: number;
   period_length: number;
+  // Əkiz/üçüz və s. — partnyor ekranlarında "körpəniz"/"körpələriniz" mətnini
+  // düzgün seçmək üçün (bax PartnerHomeScreen.tsx, PartnerWeekInfoCard.tsx)
+  multiples_type: string | null;
 }
 
 export interface PartnerDailyLog {
@@ -61,7 +64,7 @@ export const usePartnerData = () => {
       // Fetch partner's profile using the linked_partner_id
       const { data: partnerData, error: profileError } = await supabase.
       from('profiles').
-      select('id, user_id, name, life_stage, last_period_date, due_date, baby_birth_date, baby_name, baby_gender, cycle_length, period_length').
+      select('id, user_id, name, life_stage, last_period_date, due_date, baby_birth_date, baby_name, baby_gender, cycle_length, period_length, multiples_type').
       eq('id', profile.linked_partner_id).
       maybeSingle();
 

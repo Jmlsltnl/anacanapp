@@ -28,6 +28,10 @@ interface ChatRequest {
     lastPeriodDate?: string;
     cycleLength?: number;
     partnerName?: string;
+    // Əkiz/üçüz və s. — sistem promptuna ötürülür ki, AI "körpəniz" əvəzinə
+    // "körpələriniz" kimi düzgün say-uzlaşmalı cavab versin (bax prompts.ts)
+    multiplesType?: string;
+    babyCount?: number;
   };
 }
 

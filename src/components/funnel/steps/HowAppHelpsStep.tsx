@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { tr } from '@/lib/tr';
 import { Button } from '@/components/ui/button';
 import { Crown, ArrowRight, Users, Wrench, Globe2, ShieldCheck } from 'lucide-react';
+import { fetchActiveLanguages } from '@/lib/i18n';
 import type { SymptomMapping } from '../funnelData';
 
 interface HowAppHelpsStepProps {
@@ -10,11 +12,22 @@ interface HowAppHelpsStepProps {
 }
 
 export default function HowAppHelpsStep({ mappings, onContinue }: HowAppHelpsStepProps) {
+  // Dil sayı hardcode DEYİL — tətbiqdə aktiv olan dillərin real sayı DB-dən
+  // (app_languages, is_active=true) çəkilir, əlavə/silinən dil olsa da bu
+  // ədəd özü-özünə düzgün qalır. Fetch bitənə qədər indiki bilinən sayı (7)
+  // fallback kimi göstərilir ki, rəqəm sıfır/boş görünməsin.
+  const [langCount, setLangCount] = useState(7);
+  useEffect(() => {
+    fetchActiveLanguages()
+      .then((list) => { if (list.length > 0) setLangCount(list.length); })
+      .catch(() => {});
+  }, []);
+
   // Etibar statistikaları — həllərin altında ümumi dəyər xülasəsi
   const stats = [
   { icon: Wrench, value: '40+', label: tr('howapphelps_stat_tools', 'Peşəkar alət') },
   { icon: Users, value: '5000+', label: tr('howapphelps_stat_moms', 'Ana icmada') },
-  { icon: Globe2, value: '4', label: tr('howapphelps_stat_langs', 'Dil dəstəyi') }];
+  { icon: Globe2, value: String(langCount), label: tr('howapphelps_stat_langs', 'Dil dəstəyi') }];
 
   return (
     <div className="flex flex-col min-h-full px-6 py-8">
