@@ -531,7 +531,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
               <h2 className="a-list-title mb-3" style={{ margin: '0 0 12px' }}>{tr("babyphotoshoot_cinsiyyet_secin_186992", "Cinsiyyət Seçin")}</h2>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                { id: 'boy', name: tr("babyphotoshoot_oglan_e9715e", "Oğlan"), emoji: '👦', grad: 'var(--a-grad-blue)', ink: '#153e57' },
+                { id: 'boy', name: tr("babyphotoshoot_oglan_e9715e", "Oğlan"), emoji: '👦', grad: 'var(--a-grad-blue)', ink: 'var(--a-blue-ink)' },
                 { id: 'girl', name: tr("babyphotoshoot_qiz_79bf6b", "Qız"), emoji: '👧', grad: 'var(--a-grad-pink)', ink: 'var(--a-alert-ink)' }].
                 map((option) =>
                 <motion.button
@@ -589,7 +589,7 @@ const BabyPhotoshoot = forwardRef<HTMLDivElement, BabyPhotoshootProps>(({ onBack
                   onClick={() => setCustomization((prev) => ({ ...prev, imageStyle: style.id }))}
                   className="p-3 rounded-xl flex flex-col items-center gap-1.5 transition-all"
                   style={customization.imageStyle === style.id ?
-                  { background: 'var(--a-grad-lav)', color: '#3c2e5c', boxShadow: 'var(--a-card-shadow)', transform: 'scale(1.03)', cursor: 'pointer' } :
+                  { background: 'var(--a-grad-lav)', color: 'var(--a-lav-ink)', boxShadow: 'var(--a-card-shadow)', transform: 'scale(1.03)', cursor: 'pointer' } :
                   optionOff}
                   whileTap={{ scale: 0.95 }}>
                   

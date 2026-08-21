@@ -229,7 +229,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           
             <div className="flex items-start gap-3">
               <span className="a-list-icon" style={{ background: 'var(--a-grad-lav)', flexShrink: 0 }}>
-                <Package size={17} strokeWidth={2.2} style={{ color: '#3c2e5c' }} />
+                <Package size={17} strokeWidth={2.2} style={{ color: 'var(--a-lav-ink)' }} />
               </span>
               <div className="flex-1">
                 <h3 className="a-list-title" style={{ margin: 0, color: 'var(--a-lav-ink)' }}>
@@ -260,8 +260,8 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
           
             <div className="p-5" style={{ background: 'var(--a-grad-lav)' }}>
               <div className="flex items-center gap-2 mb-3">
-                <Trophy className="h-5 w-5" style={{ color: '#3c2e5c' }} />
-                <span className="font-bold a-heading" style={{ color: '#3c2e5c' }}>{tr("smartplaybox_bugunku_tovsiye_ec6c3a", "Bugünkü Tövsiyə")}</span>
+                <Trophy className="h-5 w-5" style={{ color: 'var(--a-lav-ink)' }} />
+                <span className="font-bold a-heading" style={{ color: 'var(--a-lav-ink)' }}>{tr("smartplaybox_bugunku_tovsiye_ec6c3a", "Bugünkü Tövsiyə")}</span>
               </div>
               <div className="flex items-start gap-4">
                 <motion.div
@@ -272,8 +272,8 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                   {getActivityEmoji(todaysActivity.skill_tags || [])}
                 </motion.div>
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-1 a-heading" style={{ color: '#3c2e5c' }}>{todaysActivity.title}</h3>
-                  <p className="text-sm" style={{ margin: 0, color: '#3c2e5c', opacity: 0.85 }}>{todaysActivity.description}</p>
+                  <h3 className="text-xl font-bold mb-1 a-heading" style={{ color: 'var(--a-lav-ink)' }}>{todaysActivity.title}</h3>
+                  <p className="text-sm" style={{ margin: 0, color: 'var(--a-lav-ink)', opacity: 0.85 }}>{todaysActivity.description}</p>
                 </div>
               </div>
             </div>
@@ -410,8 +410,8 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
                     {getActivityEmoji(selectedActivity.skill_tags || [])}
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold a-heading" style={{ margin: 0, color: '#3c2e5c' }}>{selectedActivity.title}</h2>
-                    <div className="flex items-center gap-2 mt-1 text-sm" style={{ color: '#3c2e5c', opacity: 0.8 }}>
+                    <h2 className="text-xl font-bold a-heading" style={{ margin: 0, color: 'var(--a-lav-ink)' }}>{selectedActivity.title}</h2>
+                    <div className="flex items-center gap-2 mt-1 text-sm" style={{ color: 'var(--a-lav-ink)', opacity: 0.8 }}>
                       <Clock className="h-4 w-4" />
                       <span>{selectedActivity.duration_minutes} {tr("smartplaybox_deqiqe_94641a", "d\u0259qiq\u0259")}</span>
                     </div>

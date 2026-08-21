@@ -127,7 +127,7 @@ const NameVotingScreen: React.FC<NameVotingScreenProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="a-scope min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope min-h-screen pb-24 overflow-y-auto overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       <div className="a-shell">
         {/* Top bar */}
         <header className="a-topbar" style={{ paddingTop: 'max(env(safe-area-inset-top), 14px)' }}>

@@ -265,7 +265,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           transition={{ delay: 0.1 }}>
           
           <Smile className="w-5 h-5 mx-auto mb-1" style={{ color: 'var(--a-green-ink)' }} />
-          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#14532d' }}>{moodCheckins.length}</p>
+          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: 'var(--a-green-ink)' }}>{moodCheckins.length}</p>
           <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-green-ink)', opacity: 0.8 }}>{tr("untranslated_qeyd_z0999u", "Qeyd")}</p>
         </motion.div>
         <motion.div
@@ -276,7 +276,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           transition={{ delay: 0.15 }}>
           
           <Activity className="w-5 h-5 mx-auto mb-1" style={{ color: 'var(--a-blue-ink)' }} />
-          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#153e57' }}>{moodTrend ? moodTrend.toFixed(1) : '—'}</p>
+          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: 'var(--a-blue-ink)' }}>{moodTrend ? moodTrend.toFixed(1) : '—'}</p>
           <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-blue-ink)', opacity: 0.8 }}>{tr("untranslated_ortalama_qxgps6", "Ortalama")}</p>
         </motion.div>
         <motion.div
@@ -287,7 +287,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           transition={{ delay: 0.2 }}>
           
           <Calendar className="w-5 h-5 mx-auto mb-1" style={{ color: 'var(--a-lav-ink)' }} />
-          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#3c2e5c' }}>{epdsAssessments.length}</p>
+          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: 'var(--a-lav-ink)' }}>{epdsAssessments.length}</p>
           <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-lav-ink)', opacity: 0.8 }}>EPDS</p>
         </motion.div>
       </div>
@@ -330,7 +330,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           animate={{ opacity: 1, y: 0 }}>
           
           <div className="p-4" style={{ background: 'var(--a-grad-green)' }}>
-            <h3 className="font-bold flex items-center gap-2 a-heading" style={{ margin: 0, color: '#14532d' }}>
+            <h3 className="font-bold flex items-center gap-2 a-heading" style={{ margin: 0, color: 'var(--a-green-ink)' }}>
               <Smile className="w-5 h-5" />
               {tr("mentalhealthtracker_bu_gun_necesen_26ad26", "Bu g\xFCn nec\u0259s\u0259n?")}
             </h3>
@@ -427,7 +427,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
           <div className="mt-4 p-4 rounded-2xl" style={{ background: 'var(--a-green-1)' }}>
                 <div className="flex items-center justify-center gap-3 mb-2">
                   <span className="text-3xl">{MOOD_LEVELS.find((m) => m.value === Math.round(moodTrend))?.emoji}</span>
-                  <span className="font-bold text-lg" style={{ color: '#14532d' }}>Ortalama: {moodTrend.toFixed(1)}/5</span>
+                  <span className="font-bold text-lg" style={{ color: 'var(--a-green-ink)' }}>Ortalama: {moodTrend.toFixed(1)}/5</span>
                 </div>
                 <p className="text-xs text-center" style={{ margin: 0, color: 'var(--a-green-ink)' }}>
                   {moodTrend >= 4 ? tr("mentalhealthtracker_ela_gedir_ozunuze_qaygi_goster_f76926", "\uD83C\uDF1F \u018Fla gedir! \xD6z\xFCn\xFCz\u0259 qay\u011F\u0131 g\xF6st\u0259rm\u0259y\u0259 davam edin.") :
@@ -451,7 +451,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
             whileTap={{ scale: 0.98 }}>
             
             <span className="a-list-icon mb-3" style={{ background: 'var(--a-grad-blue)', marginBottom: 12 }}>
-              <Wind size={17} strokeWidth={2.2} style={{ color: '#153e57' }} />
+              <Wind size={17} strokeWidth={2.2} style={{ color: 'var(--a-blue-ink)' }} />
             </span>
             <h3 className="a-list-title" style={{ margin: 0 }}>{tr("mentalhealthtracker_nefes_mesqi_8d98bb", "Nəfəs Məşqi")}</h3>
             <p className="a-list-sub mt-1" style={{ margin: '4px 0 0', whiteSpace: 'normal' }}>{tr("mentalhealthtracker_rahatlama_ve_stress_azaltma_1a97bc", "Rahatlama və stress azaltma")}</p>
@@ -467,7 +467,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
             whileTap={{ scale: 0.98 }}>
             
             <span className="a-list-icon mb-3" style={{ background: 'var(--a-grad-green)', marginBottom: 12 }}>
-              <Brain size={17} strokeWidth={2.2} style={{ color: '#14532d' }} />
+              <Brain size={17} strokeWidth={2.2} style={{ color: 'var(--a-green-ink)' }} />
             </span>
             <h3 className="a-list-title" style={{ margin: 0 }}>{tr("mentalhealthtracker_epds_testi_3c7a2d", "EPDS Testi")}</h3>
             <p className="a-list-sub mt-1" style={{ margin: '4px 0 0', whiteSpace: 'normal' }}>{tr("mentalhealthtracker_depressiya_riski_qiymetlendirme_2729fe", "Depressiya riski qiymətləndirmə")}</p>

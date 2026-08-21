@@ -498,7 +498,7 @@ const MomFriendlyMap = ({ onBack }: MomFriendlyMapProps) => {
                       <Star className="w-6 h-6 fill-current" style={{ color: 'var(--a-warn-ink)' }} />
                     </div>
                     <div>
-                      <p className="a-heading" style={{ margin: 0, fontSize: 24, color: '#5a3d00' }}>{selectedPlace.avg_rating?.toFixed(1) || '–'}</p>
+                      <p className="a-heading" style={{ margin: 0, fontSize: 24, color: 'var(--a-warn-ink)' }}>{selectedPlace.avg_rating?.toFixed(1) || '–'}</p>
                       <p className="text-sm" style={{ margin: 0, color: 'var(--a-warn-ink)', opacity: 0.8 }}>{selectedPlace.review_count} {tr("momfriendlymap_rey_bd4873", "rəy")}</p>
                     </div>
                   </div>

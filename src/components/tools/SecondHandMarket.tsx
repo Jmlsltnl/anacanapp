@@ -40,9 +40,9 @@ const categories = [
 { id: 'clothing', label: 'Geyim', emoji: '👕', grad: 'var(--a-grad-pink)', ink: 'var(--a-alert-ink)' },
 { id: 'toys', label: 'Oyuncaqlar', emoji: '🧸', grad: 'var(--a-grad-yellow)', ink: 'var(--a-warn-ink)' },
 { id: 'furniture', label: tr("secondhandmarket_mebel_3c7a2d", "Mebel"), emoji: '🛏️', grad: 'var(--a-grad-peach)', ink: 'var(--a-accent-ink)' },
-{ id: 'stroller', label: tr("secondhandmarket_araba_3c7a2d", "Araba"), emoji: '👶', grad: 'var(--a-grad-lav)', ink: '#3c2e5c' },
-{ id: 'feeding', label: tr("secondhandmarket_qidalanma_3c7a2d", "Qidalanma"), emoji: '🍼', grad: 'var(--a-grad-green)', ink: '#14532d' },
-{ id: 'hygiene', label: tr("secondhandmarket_gigiyena_3c7a2d", "Gigiyena"), emoji: '🛁', grad: 'var(--a-grad-blue)', ink: '#153e57' },
+{ id: 'stroller', label: tr("secondhandmarket_araba_3c7a2d", "Araba"), emoji: '👶', grad: 'var(--a-grad-lav)', ink: 'var(--a-lav-ink)' },
+{ id: 'feeding', label: tr("secondhandmarket_qidalanma_3c7a2d", "Qidalanma"), emoji: '🍼', grad: 'var(--a-grad-green)', ink: 'var(--a-green-ink)' },
+{ id: 'hygiene', label: tr("secondhandmarket_gigiyena_3c7a2d", "Gigiyena"), emoji: '🛁', grad: 'var(--a-grad-blue)', ink: 'var(--a-blue-ink)' },
 { id: 'other', label: tr("secondhandmarket_diger_293b3a", 'Digər'), emoji: '📦', grad: 'linear-gradient(135deg, var(--a-surface-soft), var(--a-line-strong))', ink: 'var(--a-ink-soft)' }];
 
 
@@ -349,7 +349,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}>
           
-          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#14532d' }}>{listings.length}</p>
+          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: 'var(--a-green-ink)' }}>{listings.length}</p>
           <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-green-ink)', opacity: 0.8 }}>{tr("untranslated_elan_voiz8p", "Elan")}</p>
         </motion.div>
         <motion.div
@@ -369,7 +369,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}>
           
-          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#3c2e5c' }}>{categories.length}</p>
+          <p className="a-heading" style={{ margin: 0, fontSize: 22, color: 'var(--a-lav-ink)' }}>{categories.length}</p>
           <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-lav-ink)', opacity: 0.8 }}>{tr("untranslated_kateqoriya_d7bf4y", "Kateqoriya")}</p>
         </motion.div>
       </div>
@@ -441,7 +441,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
         filteredListings.length === 0 ?
         <div className="rounded-[26px] p-8 text-center" style={{ background: 'var(--a-surface)', border: '2px dashed var(--a-line-strong)' }}>
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'var(--a-grad-green)' }}>
-              <Package className="w-8 h-8" style={{ color: '#14532d' }} />
+              <Package className="w-8 h-8" style={{ color: 'var(--a-green-ink)' }} />
             </div>
             <h3 className="a-list-title mb-1" style={{ margin: '0 0 4px' }}>{tr("secondhandmarket_hele_elan_yoxdur_89fb8c", "Hələ elan yoxdur")}</h3>
             <p className="a-list-sub mb-4" style={{ margin: '0 0 16px', whiteSpace: 'normal' }}>
@@ -542,7 +542,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 a-heading" style={{ color: 'var(--a-ink)' }}>
               <span className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--a-grad-green)' }}>
-                <Plus className="w-4 h-4" style={{ color: '#14532d' }} />
+                <Plus className="w-4 h-4" style={{ color: 'var(--a-green-ink)' }} />
               </span>
               {tr("secondhandmarket_yeni_elan_yarat_3c7a2d", "Yeni elan yarat")}
             </DialogTitle>
@@ -805,7 +805,7 @@ const SecondHandMarket = ({ onBack }: SecondHandMarketProps) => {
                 style={{ background: selectedListing.is_free ? 'var(--a-green-1)' : 'var(--a-surface-soft)' }}>
                   <div>
                     <p className="text-sm" style={{ margin: 0, color: selectedListing.is_free ? 'var(--a-green-ink)' : 'var(--a-ink-soft)', opacity: 0.8 }}>{tr("secondhandmarket_qiymet_54c4f3", "Qiymət")}</p>
-                    <p className="a-heading" style={{ margin: 0, fontSize: 24, color: selectedListing.is_free ? '#14532d' : 'var(--a-ink)' }}>
+                    <p className="a-heading" style={{ margin: 0, fontSize: 24, color: selectedListing.is_free ? 'var(--a-green-ink)' : 'var(--a-ink)' }}>
                       {selectedListing.is_free ? tr("secondhandmarket_pulsuz", 'Pulsuz') : `${selectedListing.price} ₼`}
                     </p>
                   </div>

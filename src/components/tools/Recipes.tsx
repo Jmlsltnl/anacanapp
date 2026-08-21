@@ -347,10 +347,10 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
               style={{ padding: 0 }}>
               
                 <div className="px-4 py-3 flex items-center justify-between" style={{ background: 'var(--a-grad-green)' }}>
-                  <h3 className="font-bold a-heading flex items-center gap-2" style={{ margin: 0, color: '#14532d' }}>
+                  <h3 className="font-bold a-heading flex items-center gap-2" style={{ margin: 0, color: 'var(--a-green-ink)' }}>
                     <span className="text-lg">🥗</span> {tr("recipes_i_nqrediyentler_4c0854", "\u0130nqrediyentl\u0259r")}
                   </h3>
-                  <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: 'rgba(255,255,255,0.45)', color: '#14532d' }}>
+                  <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: 'rgba(255,255,255,0.45)', color: 'var(--a-green-ink)' }}>
                     {selectedRecipe.ingredients.length}
                   </span>
                 </div>

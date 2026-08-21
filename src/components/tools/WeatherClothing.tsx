@@ -191,7 +191,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
               {userContext.babyAgeMonths !== undefined ?
             <>
                   <span className="a-list-icon" style={{ background: 'var(--a-grad-blue)' }}>
-                    <Baby size={17} strokeWidth={2.2} style={{ color: '#153e57' }} />
+                    <Baby size={17} strokeWidth={2.2} style={{ color: 'var(--a-blue-ink)' }} />
                   </span>
                   <div>
                     <p className="a-list-title" style={{ margin: 0 }}>{tr("weatherclothing_korpenin_yasi_1dfff9", "Körpənin yaşı")}</p>
@@ -285,17 +285,17 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                     <div className="rounded-xl p-3 text-center" style={{ background: 'var(--a-blue-1)' }}>
                       <Droplets className="w-5 h-5 mx-auto" style={{ color: 'var(--a-blue-ink)' }} />
                       <p className="text-xs mt-1" style={{ margin: '4px 0 0', color: 'var(--a-blue-ink)', opacity: 0.8 }}>{tr("weatherclothing_rutubet_3d8e74", "Rütubət")}</p>
-                      <p className="font-bold text-sm" style={{ margin: 0, color: '#153e57' }}>{advice.humidity}%</p>
+                      <p className="font-bold text-sm" style={{ margin: 0, color: 'var(--a-blue-ink)' }}>{advice.humidity}%</p>
                     </div>
                     <div className="rounded-xl p-3 text-center" style={{ background: 'var(--a-green-1)' }}>
                       <Wind className="w-5 h-5 mx-auto" style={{ color: 'var(--a-green-ink)' }} />
                       <p className="text-xs mt-1" style={{ margin: '4px 0 0', color: 'var(--a-green-ink)', opacity: 0.8 }}>{tr("weatherclothing_kulek_cc8bf6", "Külək")}</p>
-                      <p className="font-bold text-sm" style={{ margin: 0, color: '#14532d' }}>{Math.round(advice.windSpeed)} km/h</p>
+                      <p className="font-bold text-sm" style={{ margin: 0, color: 'var(--a-green-ink)' }}>{Math.round(advice.windSpeed)} km/h</p>
                     </div>
                     <div className="rounded-xl p-3 text-center" style={{ background: 'var(--a-yellow-1)' }}>
                       <Sun className="w-5 h-5 mx-auto" style={{ color: 'var(--a-warn-ink)' }} />
                       <p className="text-xs mt-1" style={{ margin: '4px 0 0', color: 'var(--a-warn-ink)', opacity: 0.8 }}>UV</p>
-                      <p className="font-bold text-sm" style={{ margin: 0, color: '#5a3d00' }}>{advice.uvIndex}</p>
+                      <p className="font-bold text-sm" style={{ margin: 0, color: 'var(--a-warn-ink)' }}>{advice.uvIndex}</p>
                     </div>
                   </div>
                 </div>
@@ -330,7 +330,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
               {/* Indoor Clothing & Room Temperature */}
               {(advice.indoorClothingAdvice || advice.idealRoomTemperature) &&
             <div className="a-card" style={{ background: 'var(--a-lav-1)', border: 'none' }}>
-                  <h3 className="font-bold flex items-center gap-2 mb-3 a-heading" style={{ margin: '0 0 12px', color: '#3c2e5c' }}>
+                  <h3 className="font-bold flex items-center gap-2 mb-3 a-heading" style={{ margin: '0 0 12px', color: 'var(--a-lav-ink)' }}>
                     <Home className="w-5 h-5" style={{ color: 'var(--a-lav-ink)' }} />
                     {tr("weatherclothing_ev_daxilinde_d10128", "Ev daxilind\u0259")}
                   </h3>
@@ -342,7 +342,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                         <Thermometer className="w-4 h-4" style={{ color: 'var(--a-lav-ink)' }} />
                         <span className="font-bold text-sm" style={{ color: 'var(--a-lav-ink)' }}>{tr("weatherclothing_ideal_otaq_temperaturu_6bf977", "İdeal otaq temperaturu")}</span>
                       </div>
-                      <p className="a-heading" style={{ margin: 0, fontSize: 24, color: '#3c2e5c' }}>{advice.idealRoomTemperature}</p>
+                      <p className="a-heading" style={{ margin: 0, fontSize: 24, color: 'var(--a-lav-ink)' }}>{advice.idealRoomTemperature}</p>
                       {advice.roomTemperatureAdvice &&
                 <p className="text-xs mt-1" style={{ margin: '4px 0 0', color: 'var(--a-lav-ink)', opacity: 0.8 }}>{advice.roomTemperatureAdvice}</p>
                 }
@@ -352,7 +352,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
                   {/* Indoor Clothing */}
                   {advice.indoorClothingAdvice &&
               <>
-                      <p className="text-sm mb-3" style={{ margin: '0 0 12px', color: '#3c2e5c', opacity: 0.85 }}>{advice.indoorClothingAdvice}</p>
+                      <p className="text-sm mb-3" style={{ margin: '0 0 12px', color: 'var(--a-lav-ink)', opacity: 0.85 }}>{advice.indoorClothingAdvice}</p>
                       {advice.indoorClothingItems && advice.indoorClothingItems.length > 0 &&
                 <div className="flex flex-wrap gap-2">
                           {advice.indoorClothingItems.map((item, idx) =>
@@ -376,7 +376,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
 
               {/* Outdoor Advice */}
               <div className="a-card" style={{ background: advice.safeToGoOut ? 'var(--a-green-1)' : 'var(--a-peach-1)', border: 'none' }}>
-                <h3 className="font-bold flex items-center gap-2 mb-2 a-heading" style={{ margin: '0 0 8px', color: advice.safeToGoOut ? '#14532d' : 'var(--a-accent-ink)' }}>
+                <h3 className="font-bold flex items-center gap-2 mb-2 a-heading" style={{ margin: '0 0 8px', color: advice.safeToGoOut ? 'var(--a-green-ink)' : 'var(--a-accent-ink)' }}>
                   <CloudSun className="w-5 h-5" />
                   {tr("weatherclothing_bayirda_gezme_0ae215", "Bay\u0131rda g\u0259zm\u0259")}
                 </h3>

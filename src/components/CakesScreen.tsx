@@ -71,7 +71,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
 
   if (showOrderSuccess) {
     return (
-      <div className="a-scope min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center px-6 text-center overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }} className="text-8xl mb-6">🎂</motion.div>
         <h2 className="a-heading" style={{ margin: '0 0 8px', fontSize: 22, color: 'var(--a-on-bg)' }}>{tr("cakesscreen_sifarisiniz_qebul_edildi_ae5b9e", "Sifarişiniz qəbul edildi!")}</h2>
         <p className="a-list-sub" style={{ margin: '0 0 28px', whiteSpace: 'normal' }}>{tr("cakesscreen_tezlikle_sizinle_elaqe_saxlanilacaq_806311", "Tezliklə sizinlə əlaqə saxlanılacaq")}</p>
@@ -113,7 +113,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
 
   if (loading) {
     return (
-      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex items-center justify-center overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--a-peach-2)' }} />
       </div>);
 
@@ -174,7 +174,7 @@ const CakesScreen = ({ onBack, initialMonth }: CakesScreenProps) => {
         <div className="relative z-10">
           <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-alert-ink)' }}>🎂 {tr("cakesscreen_xususi_tortlar_ba1400", "Xüsusi Tortlar")}</span>
           <h3 className="a-cta-title a-heading" style={{ color: 'var(--a-alert-ink)', margin: '12px 0 6px', fontSize: 18 }}>{tr("cakesscreen_korpenizin_xususi_gunu_ucun_c2d99a", "Körpənizin xüsusi günü üçün!")}</h3>
-          <p className="a-cta-text" style={{ color: 'rgba(122, 31, 52, 0.75)' }}>{tr("cakesscreen_her_ay_ve_milestone_ucun_unikal_dizaynla_39bdf9", "Hər ay və milestone üçün unikal dizaynlar")}</p>
+          <p className="a-cta-text" style={{ color: 'color-mix(in srgb, var(--a-alert-ink) 75%, transparent)' }}>{tr("cakesscreen_her_ay_ve_milestone_ucun_unikal_dizaynla_39bdf9", "Hər ay və milestone üçün unikal dizaynlar")}</p>
         </div>
       </motion.div>
 

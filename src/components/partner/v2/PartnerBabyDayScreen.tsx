@@ -107,14 +107,16 @@ const PartnerBabyDayScreen = ({ onBack }: Props) => {
     };
   };
 
+  // Dark mode düzəlişi: 3 hardcoded hex dark modda uyğun --a-*-1 tünd
+  // tint-lərinə qarşı demək olar oxunmurdu — CSS dəyişənlərinə keçirilib.
   const stats = [
-  { emoji: 'ðŸ¼', value: String(feedings.length), sub: totalMl > 0 ? `${totalMl} ml` : tr('partnerv2_qidalanma', 'Qidalanma'), bg: 'var(--a-green-1)', ink: '#14532d' },
-  { emoji: 'ðŸ˜´', value: totalSleepMin > 0 ? `${sleepH}s ${sleepM}d` : String(sleeps.length), sub: tr('partnerv2_yuxu', 'Yuxu'), bg: 'var(--a-lav-1)', ink: '#3c2e5c' },
-  { emoji: 'ðŸ§·', value: String(diapers.length), sub: tr('partnerv2_bez', 'Bez'), bg: 'var(--a-yellow-1)', ink: '#5a3d00' }];
+  { emoji: 'ðŸ¼', value: String(feedings.length), sub: totalMl > 0 ? `${totalMl} ml` : tr('partnerv2_qidalanma', 'Qidalanma'), bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' },
+  { emoji: 'ðŸ˜´', value: totalSleepMin > 0 ? `${sleepH}s ${sleepM}d` : String(sleeps.length), sub: tr('partnerv2_yuxu', 'Yuxu'), bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' },
+  { emoji: 'ðŸ§·', value: String(diapers.length), sub: tr('partnerv2_bez', 'Bez'), bg: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)' }];
 
 
   return (
-    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       <div className="a-shell">
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

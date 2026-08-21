@@ -20,7 +20,7 @@ const ForceUpdateScreen = ({ title, message, androidUrl, iosUrl }: ForceUpdateSc
 
   return (
     <motion.div
-      className="a-scope fixed inset-0 z-[9999] flex flex-col items-center justify-center px-6"
+      className="a-scope fixed inset-0 z-[9999] flex flex-col items-center justify-center px-6 overflow-x-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       style={{

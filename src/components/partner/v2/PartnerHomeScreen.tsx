@@ -31,7 +31,9 @@ import PartnerBabyTodayCard from './PartnerBabyTodayCard';
  */
 
 const MOOD_EMOJIS = ['😢', '😔', '😐', '🙂', '😊'];
-const BLUE_INK = '#153e57';
+// Dark mode düzəlişi: hardcode #153e57 dark modda --a-grad-blue/--a-blue-1-in
+// tünd tint-inə qarşı demək olar oxunmurdu (icon/mətn görünmürdü).
+const BLUE_INK = 'var(--a-blue-ink)';
 const BLUE_SOFT = 'var(--a-blue-ink)';
 
 interface Props {
@@ -161,7 +163,7 @@ const PartnerHomeScreen = ({ onNavigate, onOpenChat }: Props) => {
 
   if (loading) {
     return (
-      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex items-center justify-center overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <motion.div className="w-14 h-14 rounded-full"
         style={{ border: '4px solid var(--a-blue-2)', borderTopColor: 'transparent' }}
         animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} />
@@ -171,7 +173,7 @@ const PartnerHomeScreen = ({ onNavigate, onOpenChat }: Props) => {
   // Bağlantı yoxdur
   if (!partnerProfile) {
     return (
-      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-8 text-center relative" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-8 text-center relative overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <div className="a-sky" aria-hidden>
           <span className="a-cloud c1" /><span className="a-cloud c2" /><span className="a-cloud c3" />
         </div>
@@ -199,7 +201,7 @@ const PartnerHomeScreen = ({ onNavigate, onOpenChat }: Props) => {
   }
 
   return (
-    <div className="a-scope pb-6 min-h-screen relative" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope pb-6 min-h-screen relative overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       {/* Watercolor sky */}
       <div className="a-sky" aria-hidden>
         <span className="a-cloud c1" /><span className="a-cloud c2" /><span className="a-cloud c3" />

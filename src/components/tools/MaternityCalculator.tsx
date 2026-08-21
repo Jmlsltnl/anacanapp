@@ -443,14 +443,16 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                   <div className="a-cta" style={{ background: 'var(--a-grad-green)' }}>
                     <span className="a-cta-shape" style={{ width: 120, height: 120, top: -40, insetInlineEnd: -30, background: 'rgba(255,255,255,0.35)' }} />
                     <div className="a-cta-top">
-                      <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: '#14532d' }}>
+                      <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-green-ink)' }}>
                         {result.rule.flag} {isAZ ? result.rule.name_az : result.rule.name_en} · {tr("maternitycalculator_cemi_mezuniyyet_93196a", "Cəmi məzuniyyət")}
                       </span>
                     </div>
-                    <h2 className="a-cta-title a-heading" style={{ color: '#14532d', fontSize: 30, margin: '14px 0 4px' }}>
+                    {/* Dark mode düzəlişi: #14532d/rgba(20,83,45,x) dark modda
+                        --a-grad-green-in tünd tint-inə qarşı oxunmurdu. */}
+                    <h2 className="a-cta-title a-heading" style={{ color: 'var(--a-green-ink)', fontSize: 30, margin: '14px 0 4px' }}>
                       {result.totalDays} {tr("maternitycalculator_gun_54e78d", "gün")}
                     </h2>
-                    <p className="a-cta-text" style={{ color: 'rgba(20, 83, 45, 0.75)' }}>
+                    <p className="a-cta-text" style={{ color: 'color-mix(in srgb, var(--a-green-ink) 75%, transparent)' }}>
                       {result.daysBefore} {tr("days_before", "gün əvvəl")} + {result.daysAfter} {tr("days_after", "gün sonra")}
                     </p>
                   </div>
@@ -515,7 +517,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                           </div>
                         )}
                         <div className="flex justify-between items-center" style={{ padding: '14px 18px', borderTop: '1px solid var(--a-line)', background: 'var(--a-green-1)' }}>
-                          <span className="a-list-title" style={{ color: '#14532d' }}>{tr("total_payment", "Yekun Ödəniş")}</span>
+                          <span className="a-list-title" style={{ color: 'var(--a-green-ink)' }}>{tr("total_payment", "Yekun Ödəniş")}</span>
                           <span className="a-heading" style={{ fontSize: 19, fontWeight: 800, color: 'var(--a-green-ink)' }}>
                             {result.benefitResult.totalBenefit.toLocaleString(getLocaleTag(), {maximumFractionDigits: 2})} {result.benefitResult.currency}
                           </span>

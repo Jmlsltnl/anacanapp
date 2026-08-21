@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles, Users, Droplets } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DateField } from '@/components/ui/date-field';
 import { useUserStore } from '@/store/userStore';
 import { useShallow } from 'zustand/react/shallow';
 import { useAuth } from '@/hooks/useAuth';
@@ -671,12 +672,12 @@ const OnboardingScreen = () => {
                   <label className="mb-3 block" style={{ fontSize: 13, fontWeight: 700, color: 'var(--a-ink)' }}>
                     {selectedStage === 'mommy' ? tr("onboardingscreen_dogum_tarixi_d96907", "Do\u011Fum tarixi") : selectedStage === 'bump' ? tr("onboardingscreen_son_menstruasiya_tarixi_9f3b8a", "Son menstruasiya tarixi") : tr("onboardingscreen_son_dovr_tarixi_4dc91e", "Son d\xF6vr tarixi")}
                   </label>
-                  <Input
-                  type="date"
+                  <DateField
                   value={dateInput}
-                  onChange={(e) => setDateInput(e.target.value)}
+                  onChange={setDateInput}
                   className="h-14 rounded-2xl border-2 border-transparent text-lg px-5 bg-[var(--a-surface)] text-[var(--a-ink)] focus:border-[var(--a-peach-2)] focus-visible:ring-0"
                   style={{ boxShadow: 'var(--a-card-shadow)' }}
+                  placeholderInset={20}
                   max={new Date().toISOString().split('T')[0]} />
 
                 </motion.div>

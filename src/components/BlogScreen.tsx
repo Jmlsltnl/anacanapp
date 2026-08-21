@@ -103,7 +103,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
 
   if (loading) {
     return (
-      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex items-center justify-center overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center animate-pulse" style={{ background: 'var(--a-grad-lav)' }}>
             <BookOpen size={28} style={{ color: 'var(--a-lav-ink)' }} />
@@ -239,7 +239,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
 
 
                 <div style={{ width: '100%', height: 120, background: 'var(--a-grad-lav)', display: 'grid', placeItems: 'center' }}>
-                        <BookOpen size={32} style={{ color: 'rgba(75, 47, 138, 0.5)' }} />
+                        <BookOpen size={32} style={{ color: 'color-mix(in srgb, var(--a-lav-ink) 50%, transparent)' }} />
                       </div>
                 }
                     <span className="a-cta-badge" style={{ position: 'absolute', top: 8, insetInlineStart: 8, padding: '4px 9px', fontSize: 9.5 }}>

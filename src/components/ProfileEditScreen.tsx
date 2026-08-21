@@ -11,6 +11,7 @@ import countriesData from '../../countries.json';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
+import { DateField } from '@/components/ui/date-field';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -499,23 +500,23 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               {dateInputMode === 'lmp' ?
               <div className="space-y-2">
                   <label style={labelStyle}>{tr("profileeditscreen_son_menstruasiyan_ilk_gunu_c79f76", "Son menstruasiyanın ilk günü")}</label>
-                  <Input
+                  <DateField
                   className={inputCls}
                   style={inputStyle}
-                  type="date"
+                  placeholderInset={12}
                   value={formData.last_period_date}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, last_period_date: e.target.value }))} />
+                  onChange={(v) => setFormData((prev) => ({ ...prev, last_period_date: v }))} />
 
                 </div> :
 
               <div className="space-y-2">
                   <label style={labelStyle}>{tr("profileeditscreen_texmini_dogus_tarixi_a8b543", "Təxmini doğuş tarixi")}</label>
-                  <Input
+                  <DateField
                   className={inputCls}
                   style={inputStyle}
-                  type="date"
+                  placeholderInset={12}
                   value={formData.due_date}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, due_date: e.target.value }))} />
+                  onChange={(v) => setFormData((prev) => ({ ...prev, due_date: v }))} />
 
                 </div>
               }
@@ -621,12 +622,12 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
             <>
               <div className="space-y-2">
                 <label style={labelStyle}>{tr("untranslated_son_menstruasiya_tarixi_fgz9t7", "Son menstruasiya tarixi")}</label>
-                <Input
+                <DateField
                   className={inputCls}
                   style={inputStyle}
-                  type="date"
+                  placeholderInset={12}
                   value={formData.last_period_date}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, last_period_date: e.target.value }))} />
+                  onChange={(v) => setFormData((prev) => ({ ...prev, last_period_date: v }))} />
 
               </div>
               <div className="space-y-2">
@@ -659,12 +660,12 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
               </div>
               <div className="space-y-2">
                 <label style={labelStyle}>{tr("profileeditscreen_dogus_tarixi_e2caea", "Doğuş tarixi")}</label>
-                <Input
+                <DateField
                   className={inputCls}
                   style={inputStyle}
-                  type="date"
+                  placeholderInset={12}
                   value={formData.baby_birth_date}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, baby_birth_date: e.target.value }))} />
+                  onChange={(v) => setFormData((prev) => ({ ...prev, baby_birth_date: v }))} />
 
               </div>
               <div className="space-y-2">

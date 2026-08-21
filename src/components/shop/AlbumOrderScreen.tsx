@@ -286,7 +286,7 @@ const AlbumOrderScreen = ({ albumType, onBack }: AlbumOrderScreenProps) => {
             <Package size={19} style={{ color: 'var(--a-blue-ink)' }} />
           </div>
           <div>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#153e57' }}>{tr("albumorderscreen_catdirilma_e955cf", "Çatdırılma")}</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--a-blue-ink)' }}>{tr("albumorderscreen_catdirilma_e955cf", "Çatdırılma")}</p>
             <p style={{ fontSize: 11, color: 'var(--a-blue-ink)' }}>{tr("albumorderscreen_baki_daxili_pulsuz_catdirilma_regionlar__2851a6", "Bakı daxili pulsuz çatdırılma. Regionlar üçün əlavə haqqı bildiriləcək.")}</p>
           </div>
         </div>

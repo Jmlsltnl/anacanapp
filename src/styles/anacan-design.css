@@ -1820,17 +1820,20 @@
   padding: 2px 7px;
   border-radius: 999px;
   background: var(--a-grad-yellow);
-  color: #7a5200;
+  /* Dark mode düzəlişi: hardcode #7a5200 dark-da --a-grad-yellow-in tünd
+     tint-inə (#4a4028) qarşı ~1.5:1 kontrast verirdi (oxunmurdu). İnki
+     var(--a-warn-ink) dark-da avtomatik ağa çevrilir. */
+  color: var(--a-warn-ink);
 }
 
 .a-post-badge.admin {
   background: var(--a-grad-pink);
-  color: #7a1f34;
+  color: var(--a-alert-ink);
 }
 
 .a-post-badge.moderator {
   background: var(--a-grad-blue);
-  color: #1c5a80;
+  color: var(--a-blue-ink);
 }
 
 /* Instagram-tipli mavi tik — ad ilə birlikdə axan kiçik ikon */
@@ -1925,7 +1928,9 @@
   display: grid;
   place-items: center;
   background: var(--a-grad-lav);
-  color: #4b2f8a;
+  /* Dark mode düzəlişi: #4b2f8a dark-da --a-grad-lav-in tünd tint-inə
+     (#3d3450) qarşı ~1.15:1 kontrast verirdi (demək olar görünmürdü). */
+  color: var(--a-lav-ink);
   flex-shrink: 0;
 }
 
@@ -2008,7 +2013,8 @@
   display: grid;
   place-items: center;
   background: var(--a-grad-lav);
-  color: #4b2f8a;
+  /* Dark mode düzəlişi: bax yuxarı .a-chat-header-avatar-dəki eyni şərh */
+  color: var(--a-lav-ink);
   flex-shrink: 0;
 }
 

@@ -54,8 +54,10 @@ const SafetyLookup = forwardRef<HTMLDivElement, SafetyLookupProps>(({ onBack }, 
   // Safety level → anacan palette
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case 'safe':return { grad: 'var(--a-grad-green)', soft: 'var(--a-green-1)', ink: 'var(--a-green-ink)', deepInk: '#14532d', icon: ShieldCheck, label: tr("safetylookup_tehlukesiz_1f31cb", 'Təhlükəsiz'), emoji: '✅' };
-      case 'warning':return { grad: 'var(--a-grad-yellow)', soft: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)', deepInk: '#5a3d00', icon: ShieldAlert, label: tr("safetylookup_ehtiyatli_ba7ebe", 'Ehtiyatlı'), emoji: '⚠️' };
+      // Dark mode düzəlişi: hardcode #14532d/#5a3d00 dark modda uyğun
+      // --a-grad-*-in tünd tint-inə qarşı demək olar oxunmurdu.
+      case 'safe':return { grad: 'var(--a-grad-green)', soft: 'var(--a-green-1)', ink: 'var(--a-green-ink)', deepInk: 'var(--a-green-ink)', icon: ShieldCheck, label: tr("safetylookup_tehlukesiz_1f31cb", 'Təhlükəsiz'), emoji: '✅' };
+      case 'warning':return { grad: 'var(--a-grad-yellow)', soft: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)', deepInk: 'var(--a-warn-ink)', icon: ShieldAlert, label: tr("safetylookup_ehtiyatli_ba7ebe", 'Ehtiyatlı'), emoji: '⚠️' };
       case 'danger':return { grad: 'var(--a-grad-pink)', soft: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)', deepInk: 'var(--a-alert-ink)', icon: ShieldX, label: tr("safetylookup_tehlukeli_056934", 'Təhlükəli'), emoji: '🚫' };
       default:return { grad: 'linear-gradient(135deg, var(--a-surface-soft), var(--a-line-strong))', soft: 'var(--a-surface-soft)', ink: 'var(--a-ink-soft)', deepInk: 'var(--a-ink)', icon: Shield, label: tr("safetylookup_namelum_134662", 'Naməlum'), emoji: '❓' };
     }

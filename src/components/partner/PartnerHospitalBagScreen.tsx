@@ -78,7 +78,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
 
   if (loading) {
     return (
-      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex items-center justify-center overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <RefreshCw className="w-8 h-8 animate-spin" style={{ color: 'var(--a-blue-2)' }} />
       </div>);
 
@@ -86,7 +86,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
 
   if (items.length === 0) {
     return (
-      <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <div className="a-shell">
           <header className="a-topbar">
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -115,7 +115,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
   }
 
   return (
-    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       <div className="a-shell">
         {/* Top bar */}
         <header className="a-topbar">

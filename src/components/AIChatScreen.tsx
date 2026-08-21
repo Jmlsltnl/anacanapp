@@ -600,7 +600,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
 
   return (
-    <div ref={ref} className="a-scope fixed inset-x-0 top-0 flex flex-col" style={{ bottom: 'calc(94px + env(safe-area-inset-bottom, 0px))', background: 'var(--a-bg)' }}>
+    <div ref={ref} className="a-scope fixed inset-x-0 top-0 flex flex-col overflow-x-hidden" style={{ bottom: 'calc(94px + env(safe-area-inset-bottom, 0px))', background: 'var(--a-bg)' }}>
       {/* Chat header (anacan-demo) */}
       <div className="safe-area-top" style={{ paddingInlineStart: 20, paddingInlineEnd: 20, flexShrink: 0 }}>
         <div className="a-chat-header">

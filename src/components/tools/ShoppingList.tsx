@@ -305,7 +305,7 @@ const ShoppingList = ({ onBack }: ShoppingListProps) => {
       <div className="a-card flex items-start gap-3" style={{ background: 'var(--a-blue-1)', border: 'none' }}>
           <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: 'var(--a-blue-ink)' }} />
           <div>
-            <p className="text-sm font-bold" style={{ margin: 0, color: '#153e57' }}>{tr("shoppinglist_ortaq_siyahi_e10fff", "Ortaq siyahı")}</p>
+            <p className="text-sm font-bold" style={{ margin: 0, color: 'var(--a-blue-ink)' }}>{tr("shoppinglist_ortaq_siyahi_e10fff", "Ortaq siyahı")}</p>
             <p className="text-xs" style={{ margin: 0, color: 'var(--a-blue-ink)' }}>
               {tr("shoppinglist_bu_siyahiya_elave_etdiyiniz_me_0ba1c1", "Bu siyah\u0131ya \u0259lav\u0259 etdiyiniz m\u0259hsullar partnyorunuz t\u0259r\u0259find\u0259n d\u0259 g\xF6r\xFCn\xFCr v\u0259 real vaxtda sinxronla\u015F\u0131r.")}
             </p>

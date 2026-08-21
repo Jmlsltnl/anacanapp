@@ -417,10 +417,13 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const TILE_INKS = ['var(--a-accent-ink)', 'var(--a-berry-ink)', 'var(--a-lav-ink)', 'var(--a-blue-ink)', 'var(--a-green-ink)', 'var(--a-warn-ink)'];
   // Featured (hero) banner backgrounds cycle
   const HERO_BGS = ['var(--a-grad-lav)', 'var(--a-grad-peach)', 'var(--a-grad-green)', 'var(--a-grad-blue)'];
-  const HERO_INKS = ['#3c2e5c', 'var(--a-cta-ink)', '#14532d', '#153e57'];
+  // Dark mode düzəlişi: 3 hardcoded hex (#3c2e5c/#14532d/#153e57) dark modda
+  // öz uyğun --a-grad-* fonlarının tünd tint-lərinə qarşı ~1:1 kontrast
+  // verirdi (oxunmurdu) — TILE_INKS-dəki kimi CSS dəyişənlərinə keçirilib.
+  const HERO_INKS = ['var(--a-lav-ink)', 'var(--a-cta-ink)', 'var(--a-green-ink)', 'var(--a-blue-ink)'];
 
   return (
-    <div className="a-scope pb-8" style={{ background: 'var(--a-bg)', minHeight: '100%' }}>
+    <div className="a-scope pb-8 overflow-x-hidden" style={{ background: 'var(--a-bg)', minHeight: '100%' }}>
       <div className="a-shell">
         {/* Search header */}
         <div style={{ paddingTop: 14 }}>
@@ -455,7 +458,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
               label: tr("toolshub_minigames_title", "Mini Oyunlar"),
               icon: Gamepad2,
               bg: 'var(--a-grad-green)',
-              ink: '#14532d',
+              ink: 'var(--a-green-ink)',
               premium: !isToolFree('mini-games'),
               onClick: () => gatedOpenTool('mini-games')
             });

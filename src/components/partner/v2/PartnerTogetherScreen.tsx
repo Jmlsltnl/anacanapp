@@ -132,7 +132,7 @@ const PartnerTogetherScreen = ({ onNavigate }: Props) => {
   const visibleFeatures = features.filter((f) => f.visible);
 
   return (
-    <div className="a-scope pb-6 min-h-screen relative" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope pb-6 min-h-screen relative overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       <div className="a-sky" aria-hidden>
         <span className="a-cloud c1" /><span className="a-cloud c2" /><span className="a-cloud c3" />
       </div>

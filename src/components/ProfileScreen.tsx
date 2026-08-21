@@ -22,6 +22,7 @@ import BannerSlot from '@/components/banners/BannerSlot';
 import LanguageSelector from '@/components/LanguageSelector';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { DateField } from '@/components/ui/date-field';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import countriesData from '../../countries.json';
@@ -175,7 +176,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   };
 
   return (
-    <div className="a-scope pb-8" style={{ background: 'var(--a-bg)', minHeight: '100%' }}>
+    <div className="a-scope pb-8 overflow-x-hidden" style={{ background: 'var(--a-bg)', minHeight: '100%' }}>
       <div className="a-shell">
       {/* Top bar */}
       <motion.header
@@ -555,10 +556,9 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
             </div>
             <div>
               <label className="text-sm font-medium">{tr("profilescreen_dogum_tarixi_d96907", "Doğum tarixi")}</label>
-              <Input
-                type="date"
+              <DateField
                 value={childForm.birth_date}
-                onChange={(e) => setChildForm((p) => ({ ...p, birth_date: e.target.value }))}
+                onChange={(v) => setChildForm((p) => ({ ...p, birth_date: v }))}
                 max={new Date().toISOString().split('T')[0]} />
               
             </div>

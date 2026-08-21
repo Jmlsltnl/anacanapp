@@ -10,7 +10,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="a-scope flex min-h-screen items-center justify-center relative" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope flex min-h-screen items-center justify-center relative overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       {/* Watercolor sky */}
       <div className="a-sky" aria-hidden>
         <span className="a-cloud c1" />

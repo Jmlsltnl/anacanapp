@@ -272,7 +272,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
   };
 
   return (
-    <div className="a-scope safe-top min-h-screen pb-28 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope safe-top min-h-screen pb-28 overflow-y-auto overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       <div className="a-shell">
         {/* Top bar */}
         <header className="a-topbar">

@@ -300,7 +300,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                 className="p-6 text-center relative"
                 style={{ background: selectedName.gender === 'boy' ? 'var(--a-grad-blue)' : selectedName.gender === 'girl' ? 'var(--a-grad-pink)' : 'var(--a-grad-lav)' }}>
                 {(() => {
-                  const ink = selectedName.gender === 'boy' ? '#153e57' : selectedName.gender === 'girl' ? 'var(--a-alert-ink)' : '#3c2e5c';
+                  const ink = selectedName.gender === 'boy' ? 'var(--a-blue-ink)' : selectedName.gender === 'girl' ? 'var(--a-alert-ink)' : 'var(--a-lav-ink)';
                   return (
                     <>
                       <button

@@ -8,7 +8,7 @@ import { PremiumModal } from '@/components/PremiumModal';
 const AIChatScreen = lazy(() => import('@/components/AIChatScreen'));
 
 const fallback =
-<div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+<div className="a-scope min-h-screen flex items-center justify-center overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
     <div className="w-8 h-8 rounded-full animate-spin" style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
   </div>;
 
@@ -28,7 +28,7 @@ const PartnerAIPremiumGate = () => {
   }
 
   return (
-    <div className="a-scope min-h-screen px-5 pt-8 pb-28 relative" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope min-h-screen px-5 pt-8 pb-28 relative overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       {/* Watercolor sky */}
       <div className="a-sky" aria-hidden>
         <span className="a-cloud c1" />

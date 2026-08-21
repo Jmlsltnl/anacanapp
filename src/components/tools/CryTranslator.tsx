@@ -34,7 +34,7 @@ const cryTypeLabels: Record<string, {label: string;emoji: string;grad: string;in
   tired: { label: tr("crytranslator_yuxulu_90ba1f", 'Yuxulu'), emoji: '😴', grad: 'var(--a-grad-lav)', ink: 'var(--a-lav-ink)' },
   pain: { label: tr("crytranslator_agri_76d612", 'Ağrı'), emoji: '😢', grad: 'var(--a-grad-pink)', ink: 'var(--a-alert-ink)' },
   discomfort: { label: tr("crytranslator_narahatliq_33f05c", 'Narahatlıq'), emoji: '😣', grad: 'var(--a-grad-yellow)', ink: 'var(--a-warn-ink)' },
-  colic: { label: tr("crytranslator_kolik_29d81f", 'Kolik'), emoji: '😫', grad: 'var(--a-grad-lav)', ink: '#3c2e5c' },
+  colic: { label: tr("crytranslator_kolik_29d81f", 'Kolik'), emoji: '😫', grad: 'var(--a-grad-lav)', ink: 'var(--a-lav-ink)' },
   attention: { label: tr("crytranslator_diqqet_isteyir_d50473", 'Diqqət istəyir'), emoji: '🤗', grad: 'var(--a-grad-blue)', ink: 'var(--a-blue-ink)' },
   overstimulated: { label: tr("crytranslator_hedden_artiq_yorulub_7849bb", 'Həddən artıq yorulub'), emoji: '🥱', grad: 'linear-gradient(135deg, var(--a-surface-soft), var(--a-line-strong))', ink: 'var(--a-ink-soft)' },
   sick: { label: tr("crytranslator_xestelik_7c06be", 'Xəstəlik'), emoji: '🤒', grad: 'var(--a-grad-pink)', ink: 'var(--a-alert-ink)' },

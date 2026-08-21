@@ -125,7 +125,7 @@ const SleepHistoryPanel = ({ isExpanded: externalExpanded, onToggle, defaultExpa
       >
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'var(--a-grad-lav)' }}>
-            <Moon className="w-4 h-4" style={{ color: '#3c2e5c' }} />
+            <Moon className="w-4 h-4" style={{ color: 'var(--a-lav-ink)' }} />
           </div>
           <div className="text-start">
             <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-ink)' }}>{tr("sleephistorypanel_yuxu_xulasesi_b2dc87", "Yuxu xülasəsi")}</p>

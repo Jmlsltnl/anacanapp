@@ -194,14 +194,17 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
         
         <span className="a-cta-shape" style={{ width: 110, height: 110, top: -40, insetInlineEnd: -30, background: 'rgba(255,255,255,0.35)' }} />
         <div className="a-cta-top">
-          <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: '#14532d' }}>
+          <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-green-ink)' }}>
             💊 {tr("vitamintracker_bugunku_qebul_ae152d", "Bugünkü qəbul")}
           </span>
-          <span className="a-cta-deco" style={{ background: 'var(--a-chip-overlay)', color: '#14532d' }}>
+          <span className="a-cta-deco" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-green-ink)' }}>
             <Pill size={18} strokeWidth={2} />
           </span>
         </div>
-        <h2 className="a-cta-title a-heading" style={{ color: '#14532d', fontSize: 28, margin: '12px 0 10px' }}>{takenCount}/{totalCount}</h2>
+        {/* Dark mode düzəlişi: #14532d/rgba(20,83,45,x) hardcode-ları dark modda
+            --a-grad-green-in tünd tint-inə qarşı demək olar oxunmurdu —
+            var(--a-green-ink) istifadə olunur (dark-da avtomatik ağ olur). */}
+        <h2 className="a-cta-title a-heading" style={{ color: 'var(--a-green-ink)', fontSize: 28, margin: '12px 0 10px' }}>{takenCount}/{totalCount}</h2>
         <div className="relative" style={{ height: 8, borderRadius: 999, background: 'rgba(255,255,255,0.4)', overflow: 'hidden' }}>
           <motion.div
             style={{ height: '100%', borderRadius: 999, background: 'var(--a-green-ink)' }}
@@ -211,7 +214,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
           
         </div>
         {totalCount > 0 && takenCount === totalCount &&
-        <p className="a-cta-text" style={{ position: 'relative', marginTop: 10, color: 'rgba(20, 83, 45, 0.85)', fontWeight: 600 }}>{tr("vitamintracker_butun_vitaminler_qebul_edildi_87d9d1", "🎉 Bütün vitaminlər qəbul edildi!")}</p>
+        <p className="a-cta-text" style={{ position: 'relative', marginTop: 10, color: 'color-mix(in srgb, var(--a-green-ink) 85%, transparent)', fontWeight: 600 }}>{tr("vitamintracker_butun_vitaminler_qebul_edildi_87d9d1", "🎉 Bütün vitaminlər qəbul edildi!")}</p>
         }
       </motion.div>
 

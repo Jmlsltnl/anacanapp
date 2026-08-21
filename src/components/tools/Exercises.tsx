@@ -107,7 +107,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
             transition={{ delay: 0.1 }}>
             
             <Check className="w-5 h-5 mx-auto mb-1" style={{ color: 'var(--a-blue-ink)' }} />
-            <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#153e57' }}>{todayStats.completedCount}</p>
+            <p className="a-heading" style={{ margin: 0, fontSize: 22, color: 'var(--a-blue-ink)' }}>{todayStats.completedCount}</p>
             <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-blue-ink)', opacity: 0.8 }}>{tr("exercises_bu_gun_786fd4", "Bu gün")}</p>
           </motion.div>
           <motion.div
@@ -230,8 +230,8 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                           {isCompleted ? '✅' : exercise.icon}
                         </div>
                         <div className="flex-1 text-start min-w-0">
-                          <h3 className="a-list-title" style={{ margin: 0, color: isCompleted ? '#14532d' : undefined }}>{exercise.name}</h3>
-                          <p className="a-list-sub line-clamp-1" style={{ margin: 0, whiteSpace: 'normal', color: isCompleted ? 'rgba(20, 83, 45, 0.7)' : undefined }}>{exercise.description}</p>
+                          <h3 className="a-list-title" style={{ margin: 0, color: isCompleted ? 'var(--a-green-ink)' : undefined }}>{exercise.name}</h3>
+                          <p className="a-list-sub line-clamp-1" style={{ margin: 0, whiteSpace: 'normal', color: isCompleted ? 'color-mix(in srgb, var(--a-green-ink) 70%, transparent)' : undefined }}>{exercise.description}</p>
                           <div className="flex gap-3 mt-1 items-center flex-wrap">
                             <span className="text-xs flex items-center gap-1 font-semibold" style={{ color: isCompleted ? 'var(--a-green-ink)' : 'var(--a-blue-ink)' }}>
                               <Clock className="w-3.5 h-3.5" /> {exercise.duration} {tr("exercises_deq_780a5c", "d\u0259q")}
@@ -341,7 +341,7 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
                         </div>
                         <span
                       className="text-sm pt-0.5"
-                      style={{ color: i === currentStep ? '#153e57' : 'var(--a-ink-soft)', fontWeight: i === currentStep ? 600 : 400 }}>
+                      style={{ color: i === currentStep ? 'var(--a-blue-ink)' : 'var(--a-ink-soft)', fontWeight: i === currentStep ? 600 : 400 }}>
                           {step}
                         </span>
                       </motion.div>

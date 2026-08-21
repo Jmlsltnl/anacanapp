@@ -266,12 +266,14 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
         
         <span className="a-cta-shape" style={{ width: 110, height: 110, top: -40, right: -30, background: 'rgba(255,255,255,0.35)' }} />
         <div className="a-cta-top">
-          <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: '#14532d' }}>
+          {/* Dark mode düzəlişi: #14532d/rgba(20,83,45,x) dark modda
+              --a-grad-green-in tünd tint-inə qarşı oxunmurdu. */}
+          <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: 'var(--a-green-ink)' }}>
             <Sparkles size={11} strokeWidth={2.4} /> {tr("weighttracker_ai_analiz_41639d", "AI Analiz")}
           </span>
-          {aiLoading && <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#14532d' }} />}
+          {aiLoading && <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--a-green-ink)' }} />}
         </div>
-        <p className="a-cta-text" style={{ position: 'relative', marginTop: 12, color: 'rgba(20, 83, 45, 0.85)', fontWeight: 500 }}>
+        <p className="a-cta-text" style={{ position: 'relative', marginTop: 12, color: 'color-mix(in srgb, var(--a-green-ink) 85%, transparent)', fontWeight: 500 }}>
           {aiLoading ? tr("weighttracker_analiz_edilir_e11d27", "Analiz edilir...") : aiAdvice || tr("weighttracker_melumat_yuklenir_355722", "Məlumat yüklənir...")}
         </p>
       </motion.div>

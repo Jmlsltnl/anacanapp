@@ -158,7 +158,7 @@ const CheckoutScreen = ({ onBack, onSuccess, initialCouponCode, initialDiscount 
             <CreditCard size={19} style={{ color: 'var(--a-green-ink)' }} />
           </div>
           <div>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#14532d' }}>{tr("checkoutscreen_qapida_odenis_312926", "Qapıda Ödəniş")}</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--a-green-ink)' }}>{tr("checkoutscreen_qapida_odenis_312926", "Qapıda Ödəniş")}</p>
             <p style={{ fontSize: 11.5, color: 'var(--a-green-ink)' }}>{tr("checkoutscreen_nagd_ve_ya_kartla_c4ddd7", "Nağd və ya kartla")}</p>
           </div>
         </div>

@@ -86,7 +86,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
 
   if (selectedDoc) {
     return (
-      <div className="a-scope flex flex-col h-full" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope flex flex-col h-full overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <div className="flex items-center gap-3 p-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)', background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
           <motion.button onClick={() => setSelectedDoc(null)} className="a-icon-btn shrink-0" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
@@ -114,7 +114,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
   }
 
   return (
-    <div className="a-scope flex flex-col h-full" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope flex flex-col h-full overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       <div className="flex items-center gap-3 p-4"
       style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)', background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
         <motion.button onClick={onBack} className="a-icon-btn shrink-0" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>

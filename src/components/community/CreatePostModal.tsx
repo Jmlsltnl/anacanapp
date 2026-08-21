@@ -275,7 +275,10 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                 <div className="relative w-full h-full">
                           <video src={preview.url} className="w-full h-full object-cover" />
                           <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"><Play className="w-5 h-5 text-foreground ms-0.5" /></div>
+                            {/* Dairə HƏMİŞƏ açıq/ağ qalır (bg-white/90) — text-foreground
+                                dark modda ağ olur və ağ dairə üzərində itir, ona görə
+                                sabit tünd rəng istifadə olunur. */}
+                            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center"><Play className="w-5 h-5 ms-0.5" style={{ color: '#333333' }} /></div>
                           </div>
                         </div> :
 

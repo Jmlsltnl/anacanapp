@@ -416,7 +416,7 @@ const AuthScreen = () => {
   if (mainView === 'partner') {
     return (
       <div
-        className="a-scope fixed inset-0 flex flex-col"
+        className="a-scope fixed inset-0 flex flex-col overflow-x-hidden"
         style={{
           background: 'var(--a-bg)',
           paddingTop: 'env(safe-area-inset-top)',
@@ -445,7 +445,7 @@ const AuthScreen = () => {
             <div className="flex items-center gap-3 flex-1">
               <div className="w-10 h-10 flex items-center justify-center shrink-0"
               style={{ borderRadius: 14, background: 'var(--a-grad-blue)', boxShadow: '0 10px 20px -10px rgba(99, 172, 223, 0.6)' }}>
-                <Users size={18} style={{ color: '#153e57' }} />
+                <Users size={18} style={{ color: 'var(--a-blue-ink)' }} />
               </div>
               <div>
                 <h1 style={{ fontSize: 15.5, fontWeight: 800, lineHeight: 1.2, color: 'var(--a-ink)' }}>
@@ -635,7 +635,7 @@ const AuthScreen = () => {
   // Main Auth View
   return (
     <div
-      className="a-scope fixed inset-0 flex flex-col"
+      className="a-scope fixed inset-0 flex flex-col overflow-x-hidden"
       style={{
         background: 'var(--a-bg)',
         paddingTop: 'env(safe-area-inset-top)',
@@ -919,7 +919,7 @@ const AuthScreen = () => {
                     <Users size={18} className="text-white" />
                   </div>
                   <div className="text-start">
-                    <p style={{ fontSize: 13.5, fontWeight: 800, color: '#153e57' }}>{tr("authscreen_partnyor_bolmesi_ed393a", "Partnyor Bölməsi")}</p>
+                    <p style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--a-blue-ink)' }}>{tr("authscreen_partnyor_bolmesi_ed393a", "Partnyor Bölməsi")}</p>
                     <p style={{ fontSize: 11, color: 'var(--a-blue-ink)' }}>{tr("authscreen_xaniminizla_baglanmaq_ucun_d7b234", "Xanımınızla bağlanmaq üçün")}</p>
                   </div>
                 </div>

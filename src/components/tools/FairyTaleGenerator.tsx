@@ -228,11 +228,11 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
               animate={{ rotate: [0, 5, -5, 0] }}
               transition={{ duration: 4, repeat: Infinity }}>
 
-              <Sparkles className="h-10 w-10" style={{ color: '#3c2e5c' }} />
+              <Sparkles className="h-10 w-10" style={{ color: 'var(--a-lav-ink)' }} />
             </motion.div>
             <div>
-              <h2 className="text-2xl font-bold mb-1 a-heading" style={{ margin: '0 0 4px', color: '#3c2e5c' }}>{tr("fairytalegenerator_yeni_nagil_yarat_081219", "Yeni Nağıl Yarat")}</h2>
-              <p className="text-sm" style={{ margin: 0, color: '#3c2e5c', opacity: 0.8 }}>{tr("fairytalegenerator_usaginizin_adi_ile_sehrli_bir_hekaye_7896ac", "Uşağınızın adı ilə sehrli bir hekayə")}</p>
+              <h2 className="text-2xl font-bold mb-1 a-heading" style={{ margin: '0 0 4px', color: 'var(--a-lav-ink)' }}>{tr("fairytalegenerator_yeni_nagil_yarat_081219", "Yeni Nağıl Yarat")}</h2>
+              <p className="text-sm" style={{ margin: 0, color: 'var(--a-lav-ink)', opacity: 0.8 }}>{tr("fairytalegenerator_usaginizin_adi_ile_sehrli_bir_hekaye_7896ac", "Uşağınızın adı ilə sehrli bir hekayə")}</p>
             </div>
           </div>
         </div>
@@ -242,7 +242,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
       {tales.length > 0 &&
         <div className="grid grid-cols-3 gap-3 mb-4">
           <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-lav-1)' }}>
-            <p className="a-heading" style={{ margin: 0, fontSize: 22, color: '#3c2e5c' }}>{tales.length}</p>
+            <p className="a-heading" style={{ margin: 0, fontSize: 22, color: 'var(--a-lav-ink)' }}>{tales.length}</p>
             <p className="text-xs font-semibold" style={{ margin: 0, color: 'var(--a-lav-ink)', opacity: 0.8 }}>{tr("fairytalegenerator_nagil_1f5665", "Nağıl")}</p>
           </div>
           <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-pink-1)' }}>
@@ -464,7 +464,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 {generateTale.isPending ?
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    {tr("fairytalegenerator_sehr_hazirlanir_04519a", "Sehr haz\u0131rlan\u0131r...")}
+                    {tr("fairytalegenerator_sehr_hazirlanir_04519a", "Nağıl hazırlanır...")}
                   </> :
 
                   <>
@@ -572,7 +572,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                             whileTap={{ scale: 0.95 }}
                             className="p-4 rounded-xl text-center transition-all"
                             style={formData.theme === theme.name ?
-                            { background: 'var(--a-grad-lav)', color: '#3c2e5c', boxShadow: 'var(--a-card-shadow)', cursor: 'pointer', border: 'none' } :
+                            { background: 'var(--a-grad-lav)', color: 'var(--a-lav-ink)', boxShadow: 'var(--a-card-shadow)', cursor: 'pointer', border: 'none' } :
                             pillOff}>
 
                             <span className="text-3xl block mb-1">{theme.emoji}</span>
@@ -755,7 +755,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                         {generateTale.isPending ?
                           <>
                             <Loader2 className="h-4 w-4 animate-spin" />
-                            {tr("fairytalegenerator_sehr_hazirlanir_04519a", "Sehr haz\u0131rlan\u0131r...")}
+                            {tr("fairytalegenerator_sehr_hazirlanir_04519a", "Nağıl hazırlanır...")}
                           </> :
 
                           <>
@@ -788,7 +788,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   className="absolute top-3 end-3 z-30 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
                   style={{ background: 'rgba(255,255,255,0.35)' }}>
 
-                  <X className="h-5 w-5" style={{ color: '#3c2e5c' }} />
+                  <X className="h-5 w-5" style={{ color: 'var(--a-lav-ink)' }} />
                 </button>
 
                 <div className="flex items-center gap-3 mb-4 relative z-20 pe-8">
@@ -796,12 +796,12 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     {themes.find((t) => t.name === selectedTale.theme)?.emoji || '📖'}
                   </div>
                   <div>
-                    <h2 className="font-bold text-lg a-heading" style={{ margin: 0, color: '#3c2e5c' }}>{selectedTale.title}</h2>
-                    <p className="text-sm" style={{ margin: 0, color: '#3c2e5c', opacity: 0.8 }}>{selectedTale.child_name} {tr("fairytalegenerator_ucun_0b2db5", "\xFC\xE7\xFCn")}</p>
+                    <h2 className="font-bold text-lg a-heading" style={{ margin: 0, color: 'var(--a-lav-ink)' }}>{selectedTale.title}</h2>
+                    <p className="text-sm" style={{ margin: 0, color: 'var(--a-lav-ink)', opacity: 0.8 }}>{selectedTale.child_name} {tr("fairytalegenerator_ucun_0b2db5", "\xFC\xE7\xFCn")}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm" style={{ color: '#3c2e5c', opacity: 0.8 }}>
+                <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--a-lav-ink)', opacity: 0.8 }}>
                   <Clock className="h-4 w-4" />
                   <span>{getReadingTime(selectedTale.content)} {tr("fairytalegenerator_deqiqelik_oxu_1896a5", "d\u0259qiq\u0259lik oxu")}</span>
                   <span className="mx-2">•</span>

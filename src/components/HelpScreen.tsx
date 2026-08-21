@@ -132,7 +132,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
     const canReply = selectedTicket.status !== 'closed';
 
     return (
-      <div className="a-scope min-h-screen flex flex-col" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex flex-col overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         {/* Header */}
         <div className="shrink-0 px-4 pb-3" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)', background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>
           <div className="flex items-center gap-3">
@@ -264,7 +264,7 @@ const HelpScreen = ({ onBack }: HelpScreenProps) => {
   }
 
   return (
-    <div className="a-scope min-h-screen pb-28 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope min-h-screen pb-28 overflow-y-auto overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       <div className="a-shell">
         {/* Top bar */}
         <header className="a-topbar">

@@ -195,7 +195,7 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
 
   if (loading) {
     return (
-      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex items-center justify-center overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <div className="w-8 h-8 rounded-full animate-spin"
         style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
       </div>);
@@ -203,7 +203,7 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
   }
 
   return (
-    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       <div className="a-shell">
         {/* Top bar */}
         <header className="a-topbar">
@@ -227,7 +227,7 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
               <Smartphone size={18} style={{ color: 'var(--a-warn-ink)' }} className="shrink-0" />
               <div>
                 <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--a-warn-ink)' }}>{tr("settingsscreen_web_rejiminde_calisirsiniz_157028", "Web rejimindÉ™ Ã§alÄ±ÅŸÄ±rsÄ±nÄ±z")}</p>
-                <p style={{ fontSize: 11, color: '#8a6b1f' }}>{tr("settingsscreen_bildirisler_yalniz_mobil_tetbiqde_isleyi_64cd56", "BildiriÅŸlÉ™r yalnÄ±z mobil tÉ™tbiqdÉ™ iÅŸlÉ™yir")}</p>
+                <p style={{ fontSize: 11, color: 'var(--a-warn-ink)', opacity: 0.8 }}>{tr("settingsscreen_bildirisler_yalniz_mobil_tetbiqde_isleyi_64cd56", "BildiriÅŸlÉ™r yalnÄ±z mobil tÉ™tbiqdÉ™ iÅŸlÉ™yir")}</p>
               </div>
             </motion.div>
           }

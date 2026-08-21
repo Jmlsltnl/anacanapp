@@ -1900,7 +1900,7 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
   // ——— Anacan redesign (github.com/Jmlsltnl/anacan-demo-app): mommy + bump + flow home ———
   if (lifeStage === 'mommy' || lifeStage === 'bump' || lifeStage === 'flow') {
     return (
-      <div className="a-scope a-dash pb-6">
+      <div className="a-scope a-dash pb-6 overflow-x-hidden">
         {/* Watercolor sky behind topbar + hero */}
         <div className="a-sky" aria-hidden>
           <span className="a-cloud c1" />

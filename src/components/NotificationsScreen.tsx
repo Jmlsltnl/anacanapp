@@ -75,7 +75,7 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
 
 
   return (
-    <div className="a-scope safe-top h-[100dvh] overflow-y-auto pb-24" style={{ background: 'var(--a-bg)' }} data-scroll-container>
+    <div className="a-scope safe-top h-[100dvh] overflow-y-auto overflow-x-hidden pb-24" style={{ background: 'var(--a-bg)' }} data-scroll-container>
       <div className="a-shell">
         {/* Top bar */}
         <header className="a-topbar">

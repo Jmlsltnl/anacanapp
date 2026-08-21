@@ -289,8 +289,8 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
             style={{ background: 'var(--a-grad-green)', boxShadow: 'var(--a-card-shadow)' }}
           >
             <div className="text-4xl mb-2">🎉</div>
-            <h3 className="text-lg font-bold a-heading" style={{ margin: 0, color: '#14532d' }}>{tr("hospitalbag_tebrik_edirik_ba71c0", "Təbrik edirik!")}</h3>
-            <p className="mt-1 text-sm" style={{ margin: '4px 0 0', color: '#14532d', opacity: 0.85 }}>{tr("hospitalbag_cantaniz_hazirdir_xosbext_dogus_279a30", "Çantanız hazırdır. Xoşbəxt doğuş!")}</p>
+            <h3 className="text-lg font-bold a-heading" style={{ margin: 0, color: 'var(--a-green-ink)' }}>{tr("hospitalbag_tebrik_edirik_ba71c0", "Təbrik edirik!")}</h3>
+            <p className="mt-1 text-sm" style={{ margin: '4px 0 0', color: 'var(--a-green-ink)', opacity: 0.85 }}>{tr("hospitalbag_cantaniz_hazirdir_xosbext_dogus_279a30", "Çantanız hazırdır. Xoşbəxt doğuş!")}</p>
           </motion.div>
         )}
       </ToolPage>

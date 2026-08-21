@@ -244,7 +244,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
 
   if (!profile?.linked_partner_id) {
     return (
-      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -269,7 +269,7 @@ const MotherChatScreen = ({ onBack }: MotherChatScreenProps) => {
   }
 
   return (
-    <div className="a-scope min-h-screen flex flex-col" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope min-h-screen flex flex-col overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       {/* Header */}
       <div className="px-4 pt-3 pb-2.5 safe-top"
       style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>

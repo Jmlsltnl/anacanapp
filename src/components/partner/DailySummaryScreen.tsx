@@ -47,14 +47,14 @@ const DailySummaryScreen: React.FC<DailySummaryScreenProps> = ({ onBack }) => {
 
   if (loading) {
     return (
-      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex items-center justify-center overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <RefreshCw className="w-8 h-8 animate-spin" style={{ color: 'var(--a-blue-2)' }} />
       </div>);
 
   }
 
   return (
-    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       <div className="a-shell">
         {/* Top bar */}
         <header className="a-topbar">
@@ -168,7 +168,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
         <div className="grid grid-cols-3 gap-2.5">
           <div className="text-center" style={{ background: 'var(--a-blue-1)', borderRadius: 14, padding: 12 }}>
             <Droplets size={18} className="mx-auto mb-1" style={{ color: 'var(--a-blue-ink)' }} />
-            <div style={{ fontSize: 16, fontWeight: 800, color: '#153e57' }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--a-blue-ink)' }}>
               {summary.water_intake}ml
             </div>
             <div style={{ fontSize: 10.5, color: 'var(--a-blue-ink)' }}>{tr("untranslated_su_yvcozn", "Su")}</div>
@@ -184,7 +184,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
 
           <div className="text-center" style={{ background: 'var(--a-lav-1)', borderRadius: 14, padding: 12 }}>
             <Activity size={18} className="mx-auto mb-1" style={{ color: 'var(--a-lav-ink)' }} />
-            <div style={{ fontSize: 16, fontWeight: 800, color: '#3c2e5c' }}>
+            <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--a-lav-ink)' }}>
               {summary.contraction_count}
             </div>
             <div style={{ fontSize: 10.5, color: 'var(--a-lav-ink)' }}>{tr("dailysummaryscreen_sanci_350c2d", "SancÄ±")}</div>

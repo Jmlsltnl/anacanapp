@@ -92,7 +92,7 @@ const LiveContractionsScreen = ({ onBack }: Props) => {
   Math.floor((Date.now() - new Date(lastContraction.start_time).getTime()) / 60000) : null;
 
   return (
-    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       <div className="a-shell">
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

@@ -95,7 +95,7 @@ const STEPS = [
 
 // Score → anacan palette
 const getScoreStyle = (score: number) => {
-  if (score >= 80) return { grad: 'var(--a-grad-green)', ink: '#14532d' };
+  if (score >= 80) return { grad: 'var(--a-grad-green)', ink: 'var(--a-green-ink)' };
   if (score >= 60) return { grad: 'var(--a-grad-yellow)', ink: 'var(--a-warn-ink)' };
   if (score >= 40) return { grad: 'var(--a-grad-peach)', ink: 'var(--a-accent-ink)' };
   return { grad: 'var(--a-grad-pink)', ink: 'var(--a-alert-ink)' };
@@ -512,14 +512,14 @@ ${tr("horoscope_share_footer", "Anacan tətbiqi ilə yaradılıb 💜")}`;
             <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-blue-1)' }}>
                 <CalendarIcon className="h-6 w-6 mx-auto mb-2" style={{ color: 'var(--a-blue-ink)' }} />
                 <p className="text-xs mb-1" style={{ margin: '0 0 4px', color: 'var(--a-blue-ink)', opacity: 0.8 }}>{tr("horoscopecompatibility_ugurlu_gunler_6caab8", "Uğurlu günlər")}</p>
-                <p className="text-xs font-bold" style={{ margin: 0, color: '#153e57' }}>{analysisResult.analysis.luckyDays.join(', ')}</p>
+                <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-blue-ink)' }}>{analysisResult.analysis.luckyDays.join(', ')}</p>
               </div>
             }
             {analysisResult.analysis.luckyNumbers.length > 0 &&
             <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-green-1)' }}>
                 <Hash className="h-6 w-6 mx-auto mb-2" style={{ color: 'var(--a-green-ink)' }} />
                 <p className="text-xs mb-1" style={{ margin: '0 0 4px', color: 'var(--a-green-ink)', opacity: 0.8 }}>{tr("horoscopecompatibility_xosbext_reqemler_4d0da9", "Xoşbəxt rəqəmlər")}</p>
-                <p className="text-xs font-bold" style={{ margin: 0, color: '#14532d' }}>{analysisResult.analysis.luckyNumbers.join(', ')}</p>
+                <p className="text-xs font-bold" style={{ margin: 0, color: 'var(--a-green-ink)' }}>{analysisResult.analysis.luckyNumbers.join(', ')}</p>
               </div>
             }
           </div>

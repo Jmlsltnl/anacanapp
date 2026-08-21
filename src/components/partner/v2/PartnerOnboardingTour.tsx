@@ -13,7 +13,9 @@ import { useIsRtl, rtlX } from '@/lib/rtl';
 
 export const PARTNER_TOUR_KEY = 'anacan_partner_tour_v1';
 
-const BLUE_INK = '#153e57';
+// Dark mode düzəlişi: hardcode #153e57 dark modda --a-grad-blue-in tünd
+// tint-inə qarşı demək olar oxunmurdu (icon görünmürdü).
+const BLUE_INK = 'var(--a-blue-ink)';
 const BLUE_SOFT = 'var(--a-blue-ink)';
 
 interface Step {

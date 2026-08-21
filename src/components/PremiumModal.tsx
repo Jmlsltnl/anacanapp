@@ -84,7 +84,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="a-scope fixed inset-0 z-[100] flex flex-col"
+        className="a-scope fixed inset-0 z-[100] flex flex-col overflow-x-hidden"
         style={{ background: 'var(--a-bg)' }}
         role="presentation">
 

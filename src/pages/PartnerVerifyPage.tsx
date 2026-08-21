@@ -77,7 +77,7 @@ export default function PartnerVerifyPage() {
 
   if (loading) {
     return (
-      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex items-center justify-center overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--a-peach-2)' }} />
       </div>);
 
@@ -85,7 +85,7 @@ export default function PartnerVerifyPage() {
 
   if (verified) {
     return (
-      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 text-center"
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 text-center overflow-x-hidden"
       style={{ background: 'linear-gradient(160deg, #63bd8b 0%, #4aa876 100%)', color: '#ffffff' }}>
         <CheckCircle2 className="w-24 h-24 mb-4" strokeWidth={2.5} />
         <h1 style={{ fontSize: 36, fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 8 }}>{tr("partnerverifypage_tesdi_qlendi_7e7c87", "T\u018FSD\u0130QL\u018FND\u0130")}</h1>
@@ -108,7 +108,7 @@ export default function PartnerVerifyPage() {
 
   if (status?.status === 'expired' || error === tr("partnerverifypage_qr_in_muddeti_bitib_fc3d41", "QR-\u0131n m\xFCdd\u0259ti bitib")) {
     return (
-      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 text-center"
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 text-center overflow-x-hidden"
       style={{ background: 'linear-gradient(160deg, #e0526e 0%, var(--a-pink-ink) 100%)', color: '#ffffff' }}>
         <XCircle className="w-20 h-20 mb-4" />
         <h1 style={{ fontSize: 28, fontWeight: 800 }}>{tr("partnerverifypage_muddeti_bitib_68fc0e", "M\xFCdd\u0259ti bitib")}</h1>
@@ -119,7 +119,7 @@ export default function PartnerVerifyPage() {
 
   if (status?.status === 'cancelled') {
     return (
-      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 text-center" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 text-center overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
         <XCircle className="w-20 h-20 mb-4" style={{ color: 'var(--a-ink-faint)' }} />
         <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--a-ink)' }}>{tr("partnerverifypage_legv_edilib_24db12", "L\u0259\u011Fv edilib")}</h1>
       </div>);
@@ -127,7 +127,7 @@ export default function PartnerVerifyPage() {
   }
 
   return (
-    <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 relative" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope min-h-screen flex flex-col items-center justify-center p-6 relative overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       {/* Watercolor sky */}
       <div className="a-sky" aria-hidden>
         <span className="a-cloud c1" />

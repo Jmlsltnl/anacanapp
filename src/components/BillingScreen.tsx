@@ -183,7 +183,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const allFeaturesList = dbFeatures.filter((f) => f.is_included_premium);
 
   return (
-    <div className="a-scope safe-top min-h-screen pb-safe overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope safe-top min-h-screen pb-safe overflow-y-auto overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       {/* Header */}
       <div className="sticky top-0 z-50 px-4 py-2.5 flex items-center gap-3"
       style={{ background: 'var(--a-nav-bg)', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)', borderBottom: '1px solid var(--a-line)' }}>

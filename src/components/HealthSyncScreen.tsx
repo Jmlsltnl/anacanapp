@@ -150,7 +150,7 @@ const HealthSyncScreen = ({ onBack }: Props) => {
   };
 
   return (
-    <div className="a-scope min-h-screen safe-top pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope min-h-screen safe-top pb-24 overflow-y-auto overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
       <div className="a-sky" aria-hidden>
         <span className="a-cloud c1" />
         <span className="a-cloud c2" />
@@ -204,7 +204,7 @@ const HealthSyncScreen = ({ onBack }: Props) => {
         !connected ?
         <motion.div className="a-card text-center" style={{ padding: '26px 18px' }} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
               <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center" style={{ borderRadius: 20, background: 'var(--a-grad-green)' }}>
-                <HeartPulse size={28} style={{ color: '#14532d' }} />
+                <HeartPulse size={28} style={{ color: 'var(--a-green-ink)' }} />
               </div>
               <h2 className="a-heading" style={{ fontSize: 18, color: 'var(--a-ink)', margin: '0 0 6px' }}>
                 {`${platformName} ${tr('health_connect_title', 'ilə qoşulun')}`}

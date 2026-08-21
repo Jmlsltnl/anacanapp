@@ -609,7 +609,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 </div>
 
                 <div className="rounded-2xl p-3" style={{ background: 'var(--a-blue-1)' }}>
-                  <h3 className="font-bold mb-1 text-sm" style={{ margin: '0 0 4px', color: '#153e57' }}>{tr("nutrition_meslehet_f594cf", "💡 Məsləhət")}</h3>
+                  <h3 className="font-bold mb-1 text-sm" style={{ margin: '0 0 4px', color: 'var(--a-blue-ink)' }}>{tr("nutrition_meslehet_f594cf", "💡 Məsləhət")}</h3>
                   <p className="text-xs" style={{ margin: 0, color: 'var(--a-blue-ink)' }}>
                     {lifeStage === 'bump' ? tr("nutrition_hamilelik_zamani_gunde_en_azi__d70ce9", "Hamil\u0259lik zaman\u0131 g\xFCnd\u0259 \u0259n az\u0131 10 st\u0259kan su i\xE7m\u0259k t\xF6vsiy\u0259 olunur. Yet\u0259rli su i\xE7m\u0259k k\xF6rp\u0259nin inki\u015Faf\u0131na k\xF6m\u0259k edir.") :
 

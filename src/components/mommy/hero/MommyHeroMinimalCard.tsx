@@ -47,18 +47,23 @@ const MommyHeroMinimalCard = ({ babyData, exactMonths, remainingDays, babyIllust
           <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-[hsl(15,80%,55%)]">
             {tr("mommyherominimalcard_menim_korpem_1dd673", "Mənim körpəm")}
           </p>
-          <h2 className="text-2xl font-black text-foreground tracking-tight leading-tight mt-0.5 truncate">
+          {/* Dark mode düzəlişi: kart HƏMİŞƏ ağ (bg-white) qalır, amma
+              text-foreground/text-muted-foreground dark modda ağ/açıq
+              rəngə çevrilir — nəticədə ağ kart üzərində ağ mətn itirdi.
+              Bu kartın mətn rəngləri buna görə HƏMİŞƏ tünd (light-mode
+              foreground/muted-foreground HSL dəyərləri ilə) sabitlənib. */}
+          <h2 className="text-2xl font-black text-[hsl(20,30%,15%)] tracking-tight leading-tight mt-0.5 truncate">
             {babyData.name}
           </h2>
 
           {/* Big age number */}
           <div className="flex items-baseline gap-1.5 mt-1">
-            <span className="text-[44px] font-black text-foreground leading-none tracking-tighter tabular-nums">
+            <span className="text-[44px] font-black text-[hsl(20,30%,15%)] leading-none tracking-tighter tabular-nums">
               {primary}
             </span>
-            <span className="text-sm font-bold text-muted-foreground">{primaryUnit}</span>
+            <span className="text-sm font-bold text-[hsl(20,20%,45%)]">{primaryUnit}</span>
             {exactMonths > 0 && remainingDays > 0 && (
-              <span className="text-xs font-medium text-muted-foreground/70 ms-1">
+              <span className="text-xs font-medium text-[hsl(20,20%,45%)]/70 ms-1">
                 {remainingDays} {remainingDays > 1 ? tr("time_days", "gün") : tr("time_day", "gün")}
               </span>
             )}
@@ -67,7 +72,7 @@ const MommyHeroMinimalCard = ({ babyData, exactMonths, remainingDays, babyIllust
       </div>
       {/* Subtle footer with single complementary metric */}
       <div className="relative flex items-center justify-between px-4 py-2.5 border-t border-black/5 bg-[hsl(15,30%,98%)]">
-        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[hsl(20,20%,45%)]/70">
           <TrendingUp className="w-3 h-3 text-[hsl(15,80%,55%)]" />
           {Math.floor(babyData.ageInDays / 7)} {tr("mommyherominimalcard_heftelik_seyahet_a5b053", "h\u0259ft\u0259lik s\u0259yah\u0259t")}
         </div>
