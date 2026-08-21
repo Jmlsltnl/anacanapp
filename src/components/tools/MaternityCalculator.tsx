@@ -66,6 +66,15 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.id]);
+
+  // Profildə çoxdöllü hamiləlik (əkiz/üçüz/dördüz) varsa, hamiləlik növünü
+  // avtomatik "Çoxdöllü" seç — istifadəçi istənilən vaxt əl ilə dəyişə bilər
+  // (bəzi ölkələrdə hüquqi tərif tam üst-üstə düşməyə bilər).
+  useEffect(() => {
+    const isMultiples = !!profile?.multiples_type && profile.multiples_type !== 'single';
+    if (isMultiples) setPregnancyType('multiple');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id]);
   
   const [result, setResult] = useState<any>(null);
   const [expandedGuideline, setExpandedGuideline] = useState<string | null>(null);

@@ -36,6 +36,7 @@ export interface DoctorReportData {
   trends: TrendRow[];
   bpRows?: BpRow[];
   babyCareRows?: StageRow[]; // körpə qulluq statistikası (yuxu/qida/bez)
+  fetalGrowthRows?: StageRow[]; // hər körpənin son EFW-si (əkiz/çoxdöllüdə hər biri ayrı sətir)
   notes?: string;
   periodLabel: string;
 }
@@ -275,6 +276,13 @@ export const generateDoctorReportPdf = async (data: DoctorReportData): Promise<j
   if (data.stageRows.length > 0) {
     sectionTitle(tr('pdf_section_basics', 'Əsas Məlumatlar'));
     drawTwoColGrid(data.stageRows);
+  }
+
+  // ── Fetal böyümə (hər körpənin son EFW-si — əkiz/çoxdöllüdə diskordantlığı
+  //    həkimin bir baxışda görməsi üçün ayrı-ayrı sətirlərdə) ──
+  if (data.fetalGrowthRows && data.fetalGrowthRows.length > 0) {
+    sectionTitle(tr('pdf_section_fetalgrowth', 'Fetal Böyümə'));
+    drawTwoColGrid(data.fetalGrowthRows);
   }
 
   // ── Sağlamlıq trendləri ──

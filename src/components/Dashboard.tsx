@@ -585,8 +585,10 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
         }
 
           {/* Əkiz/çoxdöllü hamiləliyə xas məsləhət — YALNIZ isMultiple=true olanlara,
-              yalnız məzmun mövcud olan günlərdə (bax Duzelis29.sql) */}
-          {isMultiple && (dayContent as any).multiples_tip_az &&
+              yalnız məzmun mövcud olan günlərdə (bax Duzelis29/32.sql). applyLanguage()
+              (usePregnancyContent.ts) UI dilinə uyğun multiples_tip_{lang} dəyərini
+              artıq multiples_tip sahəsinə köçürüb — burda UI dilindən asılı deyil. */}
+          {isMultiple && (dayContent as any).multiples_tip &&
         <section className="a-section">
             <motion.div
             className="a-card a-fade-in"
@@ -601,7 +603,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
                 </h3>
               </div>
               <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.65, color: 'var(--a-ink-soft)' }}>
-                {(dayContent as any).multiples_tip_az}
+                {(dayContent as any).multiples_tip}
               </p>
             </motion.div>
           </section>

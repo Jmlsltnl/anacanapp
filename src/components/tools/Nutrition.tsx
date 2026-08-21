@@ -5,6 +5,7 @@ import {
   Plus, Star, X, Check, Trash2, Heart } from
 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useMealLogs } from '@/hooks/useMealLogs';
 import { useNutritionTips } from '@/hooks/useDynamicContent';
@@ -91,6 +92,9 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   const { lifeStage, language } = useUserStore(
     useShallow((s) => ({ lifeStage: s.lifeStage, language: s.language }))
   );
+  const { profile } = useAuth();
+  const isMultiple = !!profile?.multiples_type && profile.multiples_type !== 'single';
+  const babyCount = Math.max(1, Math.min(4, profile?.baby_count || 1));
 
   // Dynamic data from database
   const { data: dbMealTypes = [] } = useMealTypes(lifeStage || 'flow');
@@ -159,19 +163,25 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
   }, [dbMealTypes]);
 
   // Get targets from DB or use fallback
+  // Əkiz/çoxdöllü hamiləlikdə ACOG-a görə hər əlavə körpə üçün təxminən +300
+  // kkal/gün əlavə tələb olunur (yəni əkiz +300, üçüz +600 və s. tək-hamiləlik
+  // bazasının üzərinə). Yalnız hamiləlik (bump) mərhələsi üçün tətbiq olunur —
+  // əmizdirmə/analıq üçün fərqli, ayrıca tədqiq olunmamış tövsiyələr var.
+  const extraKcalForMultiples = lifeStage === 'bump' && isMultiple ? (babyCount - 1) * 300 : 0;
+
   const targets = useMemo(() => {
     const stage = lifeStage || 'flow';
     const dbTarget = dbTargets.find((t) => t.life_stage === stage);
     if (dbTarget) {
       return {
-        calories: dbTarget.calories,
+        calories: dbTarget.calories + extraKcalForMultiples,
         water: dbTarget.water_glasses,
         description: dbTarget.description || ''
       };
     }
     const fallback = fallbackTargets[stage as keyof typeof fallbackTargets] || fallbackTargets.flow;
-    return { calories: fallback.calories, water: fallback.water_glasses, description: fallback.description };
-  }, [dbTargets, lifeStage]);
+    return { calories: fallback.calories + extraKcalForMultiples, water: fallback.water_glasses, description: fallback.description };
+  }, [dbTargets, lifeStage, extraKcalForMultiples]);
 
   const waterGlasses = todayLog?.water_intake || 0;
   const stats = getTodayStats();
@@ -400,6 +410,11 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                 <p className="a-heading" style={{ margin: 0, fontSize: 24 }}>
                   {todayCalories} <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--a-ink-soft)' }}>/ {targets.calories}</span>
                 </p>
+                {extraKcalForMultiples > 0 &&
+                <p className="text-[10px] font-semibold" style={{ margin: '2px 0 0', color: 'var(--a-ink-soft)' }}>
+                    {tr("nutrition_ekiz_ucun_elave_kalori", "+{n} kkal əkiz/çoxdöllü üçün daxildir").replace('{n}', String(extraKcalForMultiples))}
+                  </p>
+                }
               </div>
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: 'var(--a-surface-soft)' }}>
                 <span className="text-2xl">🍽️</span>

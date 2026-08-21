@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getLocaleTag } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -13,6 +13,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useToast } from '@/hooks/use-toast';
 import { useHealthReport } from '@/hooks/useHealthReport';
 import { useChildren } from '@/hooks/useChildren';
+import { useFetalGrowthScans } from '@/hooks/useFetalGrowthScans';
 import { useBloodPressureLogs } from '@/hooks/useBloodPressure';
 import { classifyBp } from '@/lib/bloodPressure';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -41,7 +42,8 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
     useShallow((s) => ({ name: s.name, lifeStage: s.lifeStage, getCycleData: s.getCycleData, getPregnancyData: s.getPregnancyData, language: s.language }))
   );
   const { selectedChild, getChildAge } = useChildren();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const { scans: fetalScans } = useFetalGrowthScans();
   const { toast } = useToast();
   const [selectedPeriod, setSelectedPeriod] = useState('1month');
   const [notes, setNotes] = useState('');
@@ -150,6 +152,30 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
   { label: tr('pdf_bc_total', 'Cəmi qeyd'), value: `${babyCare.totalLogs} (${babyCare.days} ${tr("common_gun", "gün")})` }] :
   [];
 
+  // Əkiz/çoxdöllü hamiləlikdə hər körpənin son EFW-si (Fetal Böyümə Tracker-dən)
+  // ayrı-ayrı sətir kimi — həkim PDF-də diskordantlığı bir baxışda görə bilsin.
+  // Tək hamiləlikdə də (baby_label='A' tək sətir) faydalıdır — sadəcə "Son EFW".
+  const isMultiplePregnancy = !!profile?.multiples_type && profile.multiples_type !== 'single';
+  const fetalGrowthRows = useMemo(() => {
+    if (lifeStage !== 'bump' || fetalScans.length === 0) return [];
+    const latestByBaby: Record<string, typeof fetalScans[number]> = {};
+    fetalScans.forEach((s) => {
+      const existing = latestByBaby[s.baby_label];
+      if (!existing || new Date(s.scan_date) >= new Date(existing.scan_date)) {
+        latestByBaby[s.baby_label] = s;
+      }
+    });
+    return Object.entries(latestByBaby).
+    sort(([a], [b]) => a.localeCompare(b)).
+    map(([label, s]) => ({
+      // Eyni açarlar FetalGrowthTracker.tsx-də artıq bütün 7 dildə var — təkrar yaradılmır.
+      label: isMultiplePregnancy ?
+      tr('fetalgrowth_baby_label_n', 'Körpə {n}').replace('{n}', label) :
+      tr('fetalgrowth_latest_efw', 'Son EFW'),
+      value: `${s.efw_grams} q (${new Date(s.scan_date).toLocaleDateString(getLocaleTag())})`
+    }));
+  }, [fetalScans, lifeStage, isMultiplePregnancy]);
+
 
   // ── REAL PDF generasiyası (əvvəllər stub idi) ──
   const buildAndDeliver = async (mode: 'download' | 'share') => {
@@ -189,6 +215,7 @@ const DoctorReportScreen = ({ onBack }: DoctorReportScreenProps) => {
         trends: (healthData || []).map((t: any) => ({ label: t.label, value: String(t.value ?? ''), trend: String(t.trend ?? '') })),
         bpRows,
         babyCareRows: babyCareRows.length > 0 ? babyCareRows : undefined,
+        fetalGrowthRows: fetalGrowthRows.length > 0 ? fetalGrowthRows : undefined,
         notes
       });
 

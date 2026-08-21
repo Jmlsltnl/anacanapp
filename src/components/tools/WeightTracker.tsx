@@ -6,6 +6,7 @@ import { differenceInDays } from 'date-fns';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useWeightEntries } from '@/hooks/useWeightEntries';
 import { useWeightRecommendations } from '@/hooks/useDynamicTools';
+import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
@@ -18,17 +19,48 @@ interface WeightTrackerProps {
   onBack: () => void;
 }
 
+// IOM (Institute of Medicine, 2009) hamiləlik çəki artımı tövsiyələri, normal BMI
+// üçün — [həftə, min kq, max kq] "anker" nöqtələri, aralarında xətti interpolyasiya.
+// Tək hamiləlikdə mövcud DB/hardcode dəyərlərlə (13/26/40-cı həftə) UYĞUNDUR —
+// dəyişməyib. Əkiz/çoxdöllü hamiləlikdə İOM-un ayrıca, DAHA YÜKSƏK məcmu tövsiyəsi
+// var (normal BMI üçün ~16.8-24.5 kq) VƏ "tam vaxtında" 40 yox, ~37-ci həftədir
+// (bax Duzelis29.sql-in "Həftə 36" qeydi — eyni mənbə, ACOG/İOM).
+const SINGLE_GAIN_ANCHORS: [number, number, number][] = [[0, 0, 0], [13, 0.5, 2], [26, 4, 8], [40, 8, 14]];
+const MULTIPLE_GAIN_ANCHORS: [number, number, number][] = [[0, 0, 0], [13, 0.5, 2], [26, 6, 10], [37, 16.8, 24.5]];
+
+function interpolateGain(week: number, anchors: [number, number, number][]): [number, number] {
+  const lastWeek = anchors[anchors.length - 1][0];
+  const last = anchors[anchors.length - 1];
+  if (week <= 0) return [0, 0];
+  if (week >= lastWeek) return [last[1], last[2]];
+  for (let i = 1; i < anchors.length; i++) {
+    if (week <= anchors[i][0]) {
+      const [w0, min0, max0] = anchors[i - 1];
+      const [w1, min1, max1] = anchors[i];
+      const t = (week - w0) / (w1 - w0);
+      return [min0 + t * (min1 - min0), max0 + t * (max1 - max0)];
+    }
+  }
+  return [last[1], last[2]];
+}
+
 const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }, ref) => {
   useScrollToTop();
   useScreenAnalytics('WeightTracker', 'Tools');
 
   const { entries, loading, addEntry, getStats, deleteEntry, deleteAllEntries } = useWeightEntries();
+  const { profile } = useAuth();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const getPregnancyData = useUserStore((s) => s.getPregnancyData);
   const [newWeight, setNewWeight] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+
+  // Əkiz/çoxdöllü hamiləlikdə İOM çəki artım tövsiyəsi tək hamiləlikdən DAHA
+  // YÜKSƏKDİR — bunu nəzərə almasaq, əkiz ana normal artımla belə "Çox artırırsınız"
+  // kimi SƏHV xəbərdarlıq görər (bax MULTIPLE_GAIN_ANCHORS yuxarıda).
+  const isMultiple = !!profile?.multiples_type && profile.multiples_type !== 'single';
 
   const pregData = getPregnancyData();
   const currentWeek = pregData?.currentWeek || 20;
@@ -42,6 +74,12 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   const { data: recommendations } = useWeightRecommendations(trimester);
 
   const recommended = useMemo(() => {
+    // Əkiz/çoxdöllü: DB/hardcode tək-hamiləlik dəyərlərini KEÇ, real İOM əkiz
+    // ankerlərindən cari həftəyə görə interpolyasiya et.
+    if (isMultiple) {
+      const [min, max] = interpolateGain(currentWeek, MULTIPLE_GAIN_ANCHORS);
+      return { min: Math.round(min * 10) / 10, max: Math.round(max * 10) / 10 };
+    }
     const rec = recommendations?.find((r) => r.bmi_category === 'normal');
     if (rec) {
       return { min: Number(rec.min_gain_kg), max: Number(rec.max_gain_kg) };
@@ -49,7 +87,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
     if (trimester === 1) return { min: 0.5, max: 2 };
     if (trimester === 2) return { min: 4, max: 8 };
     return { min: 8, max: 14 };
-  }, [recommendations, trimester]);
+  }, [recommendations, trimester, isMultiple, currentWeek]);
 
   // Status → anacan design palette (bg gradient + ink color)
   const getStatus = () => {
@@ -61,28 +99,16 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
   const status = getStatus();
 
   // ── Hamiləlik həftə qrafiki (İOM tövsiyə zolağı ilə) ──
-  // Anker nöqtələri: hf13 [0.5-2], hf26 [4-8], hf40 [8-14] kq kumulyativ artım
-  // (weight_recommendations fallback dəyərləri ilə uyğun).
+  // Tək hamiləlikdə: hf13 [0.5-2], hf26 [4-8], hf40 [8-14] kq kumulyativ artım.
+  // Əkiz/çoxdöllü: MULTIPLE_GAIN_ANCHORS (yuxarı bax) — daha yüksək, 37-ci həftəyə
+  // qədər hesablanan İOM anker nöqtələri istifadə olunur.
   const lmpDate = pregData?.lastPeriodDate ? new Date(pregData.lastPeriodDate) : null;
 
   const pregnancyChartData = useMemo(() => {
     if (!lmpDate || entries.length < 2) return null;
 
-    const gainAt = (week: number): [number, number] => {
-      const anchors: [number, number, number][] = [
-      [0, 0, 0], [13, 0.5, 2], [26, 4, 8], [40, 8, 14]];
-      if (week <= 0) return [0, 0];
-      if (week >= 40) return [anchors[3][1], anchors[3][2]];
-      for (let i = 1; i < anchors.length; i++) {
-        if (week <= anchors[i][0]) {
-          const [w0, min0, max0] = anchors[i - 1];
-          const [w1, min1, max1] = anchors[i];
-          const t = (week - w0) / (w1 - w0);
-          return [min0 + t * (min1 - min0), max0 + t * (max1 - max0)];
-        }
-      }
-      return [anchors[3][1], anchors[3][2]];
-    };
+    const anchors = isMultiple ? MULTIPLE_GAIN_ANCHORS : SINGLE_GAIN_ANCHORS;
+    const gainAt = (week: number): [number, number] => interpolateGain(week, anchors);
 
     // Hər həftə üçün son çəki qeydi (entries DESC sıralıdır → xronoloji gedişat üçün tərsinə)
     const weekWeight = new Map<number, number>();
@@ -102,7 +128,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
       });
     }
     return data;
-  }, [entries, lmpDate, startWeight]);
+  }, [entries, lmpDate, startWeight, isMultiple]);
 
   useEffect(() => {
     const fetchAIAdvice = async () => {
@@ -201,7 +227,7 @@ const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }
             <Target size={17} strokeWidth={2} />
           </span>
           <p className="a-trio-value" style={{ fontSize: 17 }}>{recommended.min}-{recommended.max}</p>
-          <p className="a-trio-label">{tr("weighttracker_tovsiye_kg_6a77a1", "Tövsiyə (kg)")}</p>
+          <p className="a-trio-label">{isMultiple ? tr("weighttracker_tovsiye_kg_ekiz", "Tövsiyə (kg) · əkiz üçün") : tr("weighttracker_tovsiye_kg_6a77a1", "Tövsiyə (kg)")}</p>
         </motion.div>
       </div>
 

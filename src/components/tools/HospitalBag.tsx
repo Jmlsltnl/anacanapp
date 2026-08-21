@@ -4,6 +4,7 @@ import { Check, Info, ChevronDown, Package, Baby, FileText } from 'lucide-react'
 import { useHospitalBag } from '@/hooks/useHospitalBag';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
+import { useAuth } from '@/hooks/useAuth';
 import { ToolPage, ToolHeader, ToolLoading } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
 import { useUserStore } from '@/store/userStore';
@@ -32,6 +33,14 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
   const { items, loading, toggleItem, getProgress, checkedCount, totalCount } = useHospitalBag();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const { profile } = useAuth();
+  // Siyahının özü (hospital_bag_items) hər istifadəçi üçün TƏK dəst şablon
+  // sətirləridir — say sütunu yoxdur. Şablonu əkiz/çoxdöllüyə görə ikiqat/üçqat
+  // çoxaltmaq əvəzinə (bu, DB miqrasiyası + mövcud "checked" vəziyyətini poza
+  // bilər), sadəcə körpə əşyalarının neçə dəst lazım olduğunu bildirən bir
+  // şəffaflıq banneri göstəririk.
+  const isMultiple = !!profile?.multiples_type && profile.multiples_type !== 'single';
+  const babyCount = Math.max(1, Math.min(4, profile?.baby_count || 1));
 
   const categories = [
     { id: 'all', label: tr("hospitalbag_hamisi_c73c4d", 'Hamısı'), emoji: '👜' },
@@ -213,6 +222,16 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
             <span className="text-[10px] font-bold" style={{ color: 'var(--a-accent-ink)' }}>{progress.toFixed(0)}%</span>
           </div>
         </div>
+
+        {/* Əkiz/çoxdöllü şəffaflıq banneri */}
+        {isMultiple && (
+          <div className="a-card mb-3 flex items-start gap-2.5" style={{ padding: '12px 14px', background: 'var(--a-blue-1)' }}>
+            <span className="text-lg flex-shrink-0">👶👶</span>
+            <p className="text-xs leading-relaxed font-semibold" style={{ margin: 0, color: 'var(--a-blue-ink)' }}>
+              {tr("hospitalbag_ekiz_banner", "Əkiz/çoxdöllü gözləyirsiniz — 'Körpə üçün' bölməsindəki geyim, bez və s. əşyalarını {n} dəst götürməyi unutmayın.").replace('{n}', String(babyCount))}
+            </p>
+          </div>
+        )}
 
         {/* Category Tabs */}
         <div className="flex gap-1.5 pb-3 overflow-x-auto hide-scrollbar">

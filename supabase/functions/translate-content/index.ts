@@ -35,7 +35,10 @@ const REGISTRY: Record<string, TableCfg> = {
   pregnancy_daily_content: {
     text: ['baby_development', 'baby_message', 'baby_size_fruit', 'body_changes', 'daily_tip',
       'doctor_visit_tip', 'emotional_tip', 'exercise_tip', 'mother_tips', 'mother_warnings',
-      'nutrition_tip', 'partner_tip'],
+      'nutrition_tip', 'partner_tip',
+      // Əkiz/çoxdöllü hamiləliyə xas məsləhət (Duzelis29/32) — əksər sətirlərdə NULL-dur
+      // (yalnız ~12 mərhələ günündə dolu), digər sətirlərdə tərcümə ediləcək heç nə yoxdur.
+      'multiples_tip'],
     arr: ['foods_to_avoid', 'mother_symptoms', 'recommended_exercises', 'recommended_foods', 'tests_to_do'],
   },
   weekly_tips: { text: ['title', 'content'], json: ['tips'] },

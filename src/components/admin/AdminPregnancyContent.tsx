@@ -57,7 +57,7 @@ const AdminPregnancyContent = () => {
     recommended_foods: [],
     emotional_tip: '',
     partner_tip: '',
-    multiples_tip_az: '',
+    multiples_tip: '',
     is_active: true
   });
 
@@ -102,7 +102,7 @@ const AdminPregnancyContent = () => {
       recommended_foods: [],
       emotional_tip: '',
       partner_tip: '',
-      multiples_tip_az: '',
+      multiples_tip: '',
       is_active: true
     });
     setModalOpen(true);
@@ -802,10 +802,10 @@ const AdminPregnancyContent = () => {
               
             </div>
             <div className="col-span-2 space-y-2">
-              <Label>👶👶 {tr("adminpregnancycontent_ekiz_coxdollu_tovsiye", "Əkiz/çoxdöllü hamiləlik üçün məsləhət (yalnız AZ — YALNIZ isMultiple istifadəçilərə göstərilir)")}</Label>
+              <Label>👶👶 {tr("adminpregnancycontent_ekiz_coxdollu_tovsiye", "Əkiz/çoxdöllü hamiləlik üçün məsləhət (AZ — digər dillər 'Kontent Tərcüməsi (AI)' alətindən tərcümə olunur, YALNIZ isMultiple istifadəçilərə göstərilir)")}</Label>
               <Textarea
-                value={(formData as any).multiples_tip_az || ''}
-                onChange={(e) => setFormData({ ...formData, multiples_tip_az: e.target.value } as any)}
+                value={(formData as any).multiples_tip || ''}
+                onChange={(e) => setFormData({ ...formData, multiples_tip: e.target.value } as any)}
                 rows={3} />
               
             </div>
