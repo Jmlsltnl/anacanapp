@@ -70,7 +70,10 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
   const uiLang = useUserStore((s) => s.language) || 'az';
 
   const toggleLike = useToggleLike();
-  const { data: comments = [], isLoading: commentsLoading, refetch: refetchComments } = usePostComments(post.id);
+  // showComments ötürülür — panel açılmayınca sorğu/realtime kanal yaranmır
+  // (əvvəllər feed-dəki HƏR post üçün qeyd-şərtsiz çağırılırdı, 150 posta
+  // qədər paralel sorğu/kanal — N+1 performans problemi idi).
+  const { data: comments = [], isLoading: commentsLoading, refetch: refetchComments } = usePostComments(post.id, showComments);
   const createComment = useCreateComment();
   const editPost = useEditPost();
   const deletePost = useDeletePost();
@@ -101,12 +104,16 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
     const content = commentText.trim();
     if (!content) return;
     hapticFeedback.light();
+    // Dərhal təmizlə (optimistic UX) — createComment artıq özü optimistic
+    // əlavə edir və uğursuz olarsa geri qaytarır + toast göstərir
+    // (əvvəllər burada heç bir xəta idarəetməsi yox idi, uğursuz olsa belə
+    // input sükutla təmizlənirdi, şərh isə görünmürdü).
+    setCommentText('');
     createComment.mutate({
       postId: post.id, content, postAuthorId: post.user_id,
       commenterName: profile?.name || user?.user_metadata?.name || tr("postcard_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
       isAnonymous: commentAnonymous
     });
-    setCommentText('');
   };
 
   const handleDeletePost = () => {

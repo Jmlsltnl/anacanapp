@@ -2,7 +2,6 @@ import { useCallback, useEffect } from 'react';
 import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { getFeedLanguagesSnapshot, feedLangsOrExpr, FEED_LANGS_CHANGED_EVENT } from '@/hooks/useFeedLanguages';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 type SeenPostMap = Record<string, boolean>;
@@ -66,7 +65,10 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
 
     const lastSeenAt = (prefData as any)?.community_last_seen_at ?? null;
 
-    // Feed dil linzası — qlobal feed ilə EYNİ filtr (yoxsa badge yalan sayır).
+    // QEYD: əvvəllər burada "feed dil linzası" filtri var idi (yalnız
+    // istifadəçinin seçdiyi dillərdəki postlar sayılırdı) — indi HEÇ bir dil
+    // filtri yoxdur, bütün qlobal postlar sayılır (dil yalnız sıralama üçün
+    // istifadə olunur, bax useCommunity.ts).
     // KRİTİK PERF DÜZƏLİŞİ: server-side `created_at` sərhədi ilə yalnız son
     // baxışdan bəri olan postlar çəkilir — əvvəllər BÜTÜN tarix boyu postlar
     // (limitsiz!) çəkilib client-side filtrlənirdi; community_posts böyüdükcə
@@ -75,7 +77,6 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
     let postsQuery = supabase
       .from('community_posts')
       .select('id, created_at, user_id')
-      .or(feedLangsOrExpr(getFeedLanguagesSnapshot()))
       .eq('is_active', true)
       .is('group_id', null)
       .neq('user_id', userId)
@@ -164,7 +165,6 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
     let postsQuery = supabase
       .from('community_posts')
       .select('id, created_at, user_id')
-      .or(feedLangsOrExpr(getFeedLanguagesSnapshot()))
       .eq('is_active', true)
       .is('group_id', null)
       .neq('user_id', userId)
@@ -270,21 +270,14 @@ export const useUnreadCommunityPosts = () => {
         .channel(`community-unread-${user.id}`)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, (payload) => {
           const newRow: any = payload.new;
-          // Hydrate ilə EYNİ semantika: yalnız qlobal feed + linzadakı dillər
-          // (əvvəllər filtr yox idi — yad dilli/qrup postları badge-i yalandan artırırdı)
+          // Hydrate ilə EYNİ semantika: yalnız qlobal feed (dil filtri artıq
+          // yoxdur — bütün yeni qlobal postlar badge-ə daxildir).
           if (newRow.group_id) return;
-          const rowLang = newRow.language || 'az';
-          if (!getFeedLanguagesSnapshot().includes(rowLang)) return;
           registerNewPost({ userId: user.id, postId: newRow.id, createdAt: newRow.created_at, postUserId: newRow.user_id });
         })
         .subscribe();
       activeUnreadChannelUserId = user.id;
     }
-
-    // Linza dəyişəndə unread yenidən hesablanır
-    const onFeedLangsChanged = () => { void hydrateForUser(user.id); };
-    window.addEventListener(FEED_LANGS_CHANGED_EVENT, onFeedLangsChanged);
-    return () => window.removeEventListener(FEED_LANGS_CHANGED_EVENT, onFeedLangsChanged);
   }, [user?.id, hydrateForUser, initializedUserId, registerNewPost, reset]);
 
   const refresh = useCallback(async () => {

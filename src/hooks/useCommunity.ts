@@ -5,8 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getPublicProfileCards } from '@/lib/public-profile-cards';
 import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/hooks/useAuth';
 import { detectLang, isFeedLang, FeedLang } from '@/lib/langDetect';
-import { useFeedLanguages, feedLangsOrExpr } from '@/hooks/useFeedLanguages';
+import { defaultFeedLanguages } from '@/hooks/useFeedLanguages';
 
 export interface CommunityGroup {
   id: string;
@@ -188,12 +189,68 @@ const enrichPosts = async (posts: any[], userId?: string | null): Promise<Commun
   }) as CommunityPost[];
 };
 
+/**
+ * Qlobal feed üçün post-siyahısını istifadəçinin ölkəsinə görə dil PRİORİTETİ
+ * ilə sıralayır (FİLTR DEYİL — heç bir post gizlədilmir). Pinlənmiş postlar
+ * həmişə əvvəl qalır; hər iki qrup (pinlənmiş/adi) daxilində əvvəl prioritet
+ * dildəki postlar, sonra digərləri (öz aralarında tarix sırası ilə).
+ */
+function sortByLanguagePriority<T extends { is_pinned?: boolean; language?: string | null; created_at: string }>(
+  posts: T[],
+  priorityLangs: string[]
+): T[] {
+  const rank = (lang: string | null | undefined) => {
+    const idx = priorityLangs.indexOf(lang || 'az');
+    return idx === -1 ? priorityLangs.length : idx;
+  };
+  return [...posts].sort((a, b) => {
+    if (!!a.is_pinned !== !!b.is_pinned) return a.is_pinned ? -1 : 1;
+    const rankDiff = rank(a.language) - rank(b.language);
+    if (rankDiff !== 0) return rankDiff;
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+}
+
 export const useGroupPosts = (groupId: string | null) => {
-  const { feedLangs } = useFeedLanguages();
+  const { profile } = useAuth();
+  const uiLang = useUserStore((s) => s.language) || 'az';
+  const countryCode = profile?.country_code || useUserStore.getState().countryCode;
+  const queryClient = useQueryClient();
+  const queryKey = ['group-posts', groupId] as const;
+
+  // Real-time: yeni/redaktə/silinmiş postlar gələn kimi feed-i yenilə —
+  // əvvəllər BUNUN ƏVƏZİNƏ heç nə yox idi, ona görə yeni postlar/dəyişikliklər
+  // yalnız tam ekran remount-unda (tab dəyişəndə) və ya 30san staleTime
+  // keçəndə görünürdü ("hard refresh olmadan gəlmir" şikayətinin əsas səbəbi).
+  useEffect(() => {
+    if (groupId === undefined) return;
+    const channel = supabase
+      .channel(`community-posts-${groupId ?? 'global'}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'community_posts',
+          // Qrup feedi üçün server-side filtr; qlobal feed üçün (group_id IS NULL)
+          // Realtime "is.null" filtrini etibarlı dəstəkləmədiyinə görə client-side yoxlanılır.
+          ...(groupId ? { filter: `group_id=eq.${groupId}` } : {})
+        },
+        (payload) => {
+          if (!groupId) {
+            const row: any = payload.new || payload.old;
+            if (row?.group_id) return; // bu qlobal feed — qrup postlarını atla
+          }
+          queryClient.invalidateQueries({ queryKey });
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupId, queryClient]);
 
   return useQuery({
-    // Qrup feedi linzadan asılı deyil — açara 'all' yazılır ki, linza dəyişəndə boş yerə refetch olmasın
-    queryKey: ['group-posts', groupId, groupId ? 'all' : feedLangs.join(',')],
+    queryKey,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -205,12 +262,10 @@ export const useGroupPosts = (groupId: string | null) => {
       order('created_at', { ascending: false });
 
       if (groupId) {
-        // Qrup feedi dil filtrindən AZADDIR — kiçik hovuzu dillərə bölmək aktivliyi öldürür;
-        // başqa dildəki postlar üçün kartda "Tərcüməni gör" düyməsi var.
         query = query.eq('group_id', groupId);
       } else {
-        // Qlobal feed — istifadəçinin dil linzası (feed_languages)
-        query = query.is('group_id', null).or(feedLangsOrExpr(feedLangs));
+        // Qlobal feed — HEÇ BİR dil filtri yoxdur, bütün postlar gəlir.
+        query = query.is('group_id', null);
       }
 
       // Sərhədsiz idi — cəmiyyət/paylaşım sayı vaxtla böyüdükcə bu sorğu
@@ -222,35 +277,13 @@ export const useGroupPosts = (groupId: string | null) => {
       const { data: posts, error } = await query;
       if (error) throw error;
 
-      return enrichPosts(posts || [], user?.id);
+      const enriched = await enrichPosts(posts || [], user?.id);
+      if (groupId) return enriched; // qrup feedi dil prioritetindən azaddır
+
+      const priorityLangs = defaultFeedLanguages(countryCode, uiLang);
+      return sortByLanguagePriority(enriched, priorityLangs);
     },
     enabled: groupId !== undefined
-  });
-};
-
-/**
- * Linzadan KƏNAR dillərdəki son qlobal postlar — feed az dolduqda
- * "Digər dillərdə" bölməsi üçün (boş ekran qadağası).
- */
-export const useOtherLanguagePosts = (excludeLangs: string[], enabled: boolean) => {
-  return useQuery({
-    queryKey: ['other-lang-posts', excludeLangs.join(',')],
-    enabled,
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      const { data: posts, error } = await supabase.
-      from('community_posts').
-      select('*').
-      eq('is_active', true).
-      is('group_id', null).
-      not('language', 'in', `(${excludeLangs.join(',')})`).
-      order('created_at', { ascending: false }).
-      limit(10);
-
-      if (error) throw error;
-      return enrichPosts(posts || [], user?.id);
-    }
   });
 };
 
@@ -522,9 +555,35 @@ export const useToggleCommentLike = () => {
   });
 };
 
-export const usePostComments = (postId: string) => {
+/**
+ * @param enabled Şərhlər panelinin AÇIQ olub-olmadığı (PostCard.showComments).
+ *   Əvvəllər BU HOOK hər feed-də görünən post üçün QEYD-ŞƏRTSİZ çağırılırdı
+ *   (150 posta qədər feed-də = 150 paralel sorğu, N+1 performans problemi) —
+ *   indi yalnız istifadəçi "Şərhlər" panelini açanda sorğu/kanal yaranır.
+ */
+export const usePostComments = (postId: string, enabled: boolean = true) => {
+  const queryClient = useQueryClient();
+  const isEnabled = !!postId && enabled;
+
+  // Real-time: yeni/redaktə/silinmiş şərhlər gələn kimi paneli yenilə —
+  // əvvəllər post_comments üçün HEÇ bir realtime abunəlik yox idi, başqa
+  // istifadəçinin şərhi yalnız tam remount/30san staleTime-da görünürdü.
+  useEffect(() => {
+    if (!isEnabled) return;
+    const channel = supabase
+      .channel(`post-comments-${postId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'post_comments', filter: `post_id=eq.${postId}` },
+        () => { queryClient.invalidateQueries({ queryKey: ['post-comments', postId] }); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [isEnabled, postId, queryClient]);
+
   return useQuery({
     queryKey: ['post-comments', postId],
+    enabled: isEnabled,
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -571,13 +630,13 @@ export const usePostComments = (postId: string) => {
       });
 
       return commentsWithDetails as PostComment[];
-    },
-    enabled: !!postId
+    }
   });
 };
 
 export const useCreateComment = () => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async ({
@@ -626,6 +685,40 @@ export const useCreateComment = () => {
           });
         } catch (e) {console.error('Comment notification error:', e);}
       }
+    },
+    // Optimistic insert — əvvəllər BUNUN ƏVƏZİNƏ heç nə yox idi ("insert →
+    // invalidate → şəbəkə round-trip gözlə") — buna görə öz şərhin bəzən
+    // gecikirdi/heç görünmürdü. İndi dərhal (server cavabını gözləmədən)
+    // panelə əlavə olunur; uğursuz olarsa onError geri qaytarır.
+    onMutate: async (vars) => {
+      await queryClient.cancelQueries({ queryKey: ['post-comments', vars.postId] });
+      const prev = queryClient.getQueryData<PostComment[]>(['post-comments', vars.postId]);
+
+      const optimisticComment: PostComment = {
+        id: `optimistic-${Date.now()}`,
+        post_id: vars.postId,
+        user_id: 'optimistic',
+        parent_comment_id: vars.parentCommentId ?? null,
+        content: vars.content,
+        likes_count: 0,
+        created_at: new Date().toISOString(),
+        is_anonymous: vars.isAnonymous || false,
+        author: vars.isAnonymous ?
+        { name: 'Anonim', avatar_url: null, badge_type: null, is_verified: false, verified_until: null } :
+        { name: vars.commenterName || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: null, badge_type: null, is_verified: false, verified_until: null },
+        is_liked: false
+      };
+
+      queryClient.setQueryData<PostComment[]>(
+        ['post-comments', vars.postId],
+        (old) => [...(old || []), optimisticComment]
+      );
+
+      return { prev };
+    },
+    onError: (err: any, vars, ctx) => {
+      if (ctx?.prev !== undefined) queryClient.setQueryData(['post-comments', vars.postId], ctx.prev);
+      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), description: err?.message, variant: 'destructive' });
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['post-comments', variables.postId] });

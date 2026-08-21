@@ -25,11 +25,12 @@
 --    olduğu üçün ISTƏNILƏN İSTİFADƏÇİ bütün istifadəçi bazasına təkrar
 --    mass-bildiriş göndərə bilərdi. İndi yeganə etibarlı yol x-cron-secret
 --    başlığıdır (bax _shared/auth.ts kod dəyişikliyi).
---    !!! DİQQƏT: Bu migrasiyanı tətbiq etdikdən sonra Supabase Edge Function
---    Secrets-də CRON_SECRET = 45d1febf0ad52a5bd764e24afa46051f477b1be1ac77305f3be9265f91e57ae1
---    olaraq TƏYİN EDİLMƏLİDİR, əks halda planlaşdırılan push-lar 401 ilə
---    uğursuz olacaq (supabase secrets set CRON_SECRET=... və ya Dashboard →
---    Edge Functions → Secrets).
+--    !!! DİQQƏT: Aşağıda 3 yerdə '__CRON_SECRET__' yerinə Supabase Edge
+--    Function Secrets-də ARTIQ MÖVCUD OLAN (və ya hazırladığınız YENİ) real
+--    CRON_SECRET dəyərini tap-dəyiş edin — bu SQL-i işlətməzdən ƏVVƏL. Əks
+--    halda planlaşdırılan push-lar 401 ilə uğursuz olacaq. Dəyər hər ikisində
+--    (bu fayl + Supabase Dashboard → Edge Functions → Secrets → CRON_SECRET)
+--    EYNİ olmalıdır.
 --
 -- Idempotent — safe to re-run.
 -- ============================================================
@@ -159,33 +160,30 @@ $$;
 -- ────────────────────────────────────────────────────────────
 -- 3) CRON AUTH: bütün planlaşdırılmış push job-larını x-cron-secret ilə
 --    yenidən qur (anon key-lə işləyən bütün köhnə variantları ləğv et)
+--
+-- !!! ÖNƏMLİ: '__CRON_SECRET__' yerinə TƏTBİQDƏ ARTIQ MÖVCUD OLAN real
+-- CRON_SECRET dəyərini yaz (Supabase Edge Function Secrets-də görə bilərsən)
+-- — bu SQL-i işlətməzdən ƏVVƏL 3 yerdə (aşağıda) tap-dəyiş et. Əgər hazırda
+-- HEÇ bir CRON_SECRET yoxdursa, yenisini yarat və HƏM buraya, HƏM Supabase
+-- Secrets-ə eyni dəyəri yaz.
+--
+-- Aşağıdakı unschedule bloku KONKRET tarixi ad siyahısı ƏVƏZİNƏ, bu 3
+-- funksiyanı (istənilən köhnə ad altında olsa belə) çağıran BÜTÜN cron.job
+-- sətirlərini dinamik tapıb silir — bilmədiyimiz/adı fərqli olan köhnə
+-- cron-lar da təmizlənir, təkrar/münaqişəli çağırış riski qalmır.
 -- ────────────────────────────────────────────────────────────
 DO $$
+DECLARE
+  r RECORD;
 BEGIN
-  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'send-daily-notifications-0900-baku') THEN
-    PERFORM cron.unschedule('send-daily-notifications-0900-baku');
-  END IF;
-  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'send-daily-notifications-1400-baku') THEN
-    PERFORM cron.unschedule('send-daily-notifications-1400-baku');
-  END IF;
-  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'send-daily-notifications-3x-daily') THEN
-    PERFORM cron.unschedule('send-daily-notifications-3x-daily');
-  END IF;
-  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'send-daily-notifications-morning') THEN
-    PERFORM cron.unschedule('send-daily-notifications-morning');
-  END IF;
-  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'send-daily-notifications-afternoon') THEN
-    PERFORM cron.unschedule('send-daily-notifications-afternoon');
-  END IF;
-  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'send-daily-notifications-slots') THEN
-    PERFORM cron.unschedule('send-daily-notifications-slots');
-  END IF;
-  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'send-flow-reminders-every-hour') THEN
-    PERFORM cron.unschedule('send-flow-reminders-every-hour');
-  END IF;
-  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'send-vitamin-reminders-every-5min') THEN
-    PERFORM cron.unschedule('send-vitamin-reminders-every-5min');
-  END IF;
+  FOR r IN
+    SELECT jobid FROM cron.job
+    WHERE command ILIKE '%send-daily-notifications%'
+       OR command ILIKE '%send-flow-reminders%'
+       OR command ILIKE '%send-vitamin-reminders%'
+  LOOP
+    PERFORM cron.unschedule(r.jobid);
+  END LOOP;
 END $$;
 
 SELECT cron.schedule(
@@ -194,7 +192,7 @@ SELECT cron.schedule(
   $$
   SELECT net.http_post(
     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-daily-notifications',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "45d1febf0ad52a5bd764e24afa46051f477b1be1ac77305f3be9265f91e57ae1"}'::jsonb,
+    headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
     body:=concat('{"time": "', now(), '"}')::jsonb
   ) as request_id;
   $$
@@ -206,7 +204,7 @@ SELECT cron.schedule(
   $$
   SELECT net.http_post(
     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-flow-reminders',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "45d1febf0ad52a5bd764e24afa46051f477b1be1ac77305f3be9265f91e57ae1"}'::jsonb,
+    headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
     body:=concat('{"time": "', now(), '"}')::jsonb
   ) as request_id;
   $$
@@ -218,7 +216,7 @@ SELECT cron.schedule(
   $$
   SELECT net.http_post(
     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-vitamin-reminders',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "45d1febf0ad52a5bd764e24afa46051f477b1be1ac77305f3be9265f91e57ae1"}'::jsonb,
+    headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
     body:=concat('{"time": "', now(), '"}')::jsonb
   ) as request_id;
   $$

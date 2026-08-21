@@ -36,6 +36,9 @@ export interface Profile {
   premium_until: string | null;
   badge_type: string | null;
   bio: string | null;
+  // Əvvəllər burada elan edilməmişdi (sütun DB-də var idi, HƏR YERDƏ `as any`
+  // ilə oxunurdu — məs. useCommunity.ts, useBanners.ts, useBlog.ts).
+  country_code: string | null;
   created_at: string;
   updated_at: string;
 }
