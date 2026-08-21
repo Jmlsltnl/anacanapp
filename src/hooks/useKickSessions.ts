@@ -36,11 +36,16 @@ export const useKickSessions = () => {
 
       if (error) throw error;
 
-      setSessions(data || []);
+      // DB sütununda CHECK məhdudiyyəti yoxdur (plain TEXT) — generasiya olunan
+      // tip 'string' verir, KickSession.position isə 'left'|'right'|null literal
+      // union-dur (bax yuxarı şərh) — cast təhlükəsizdir, addKickSession/insert
+      // özü heç vaxt bu ikisindən başqa dəyər yazmır.
+      const typedData = (data || []) as KickSession[];
+      setSessions(typedData);
       
       // Filter today's sessions
       const today = new Date().toISOString().split('T')[0];
-      setTodaySessions((data || []).filter(s => s.session_date === today));
+      setTodaySessions(typedData.filter(s => s.session_date === today));
     } catch (error: any) {
       console.error('Error fetching kick sessions:', error);
     } finally {
