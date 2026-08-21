@@ -5,7 +5,7 @@ import {
   ChevronRight, Crown, Copy, Share2,
   Heart, Calendar, Palette, ShieldCheck, Edit, CreditCard, Info, ArrowLeft, X,
   MessageCircle, Baby, ShoppingCart, TrendingUp, Gift, Plus, Trash2, Users,
-  FileText, Scale, AlertCircle, RotateCcw, Database, Sparkles } from
+  FileText, Scale, AlertCircle, RotateCcw, Database, Sparkles, HeartPulse } from
 'lucide-react';
 import { useUserStore } from '@/store/userStore';
 import { useShallow } from 'zustand/react/shallow';
@@ -106,6 +106,7 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   { id: 'partners', icon: Sparkles, label: tr("profilescreen_partnyor_endirimleri_e44036", "Partnyor Endirimləri"), badge: tr("profilescreen_badge_yeni", "Yeni") },
   { id: 'notifications', icon: Bell, label: tr("profilescreen_bildirisler_54eb88", 'Bildirişlər'), badge: unreadCount > 0 ? String(unreadCount) : undefined },
   { id: 'doctor-report', icon: FileText, label: tr("profilescreen_hekim_hesabati", 'Həkim Hesabatı (PDF)') },
+  { id: 'health-sync', icon: HeartPulse, label: tr("settingsscreen_health_sync", "Sağlamlıq inteqrasiyası") },
   { id: 'appearance', icon: Palette, label: tr("profilescreen_gorunus_165fe3", 'Görünüş') },
   { id: 'calendar', icon: Calendar, label: tr("profilescreen_teqvim_ayarlari_012790", 'Təqvim Ayarları') },
   { id: 'privacy', icon: Shield, label: tr("profilescreen_gizlilik", "Gizlilik") },

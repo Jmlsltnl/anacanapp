@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useAuth } from '@/hooks/useAuth';
 import PostCard from './PostCard';
 import { CommunityPost } from '@/hooks/useCommunity';
 import { VerifiedTick, isVerifiedActive } from './UserBadge';
@@ -40,6 +41,7 @@ interface UserProfileScreenProps {
 
 const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenProps) => {
   useScrollToTop();
+  const { isAdmin } = useAuth();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stories, setStories] = useState<UserStory[]>([]);
@@ -49,23 +51,30 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
 
   // Postlar react-query-dÉ™ â€” useToggleLike-Ä±n optimistic patch-i ['user-posts']
   // cache-ini yenilÉ™diyi Ã¼Ã§Ã¼n Ã¼rÉ™k burada da dÉ™rhal iÅŸlÉ™yir.
-  // (ÆvvÉ™llÉ™r is_liked: false hardcode idi vÉ™ local state heÃ§ vaxt yenilÉ™nmirdi.)
+  // (ÆvvÉ™llÉ™r is_liked: false hardcode idi vÉ™ local state heÃ§ vaxt yenilÉ™nmirdi.)
   const { data: posts = [], isLoading: postsLoading } = useQuery({
-    queryKey: ['user-posts', userId],
+    queryKey: ['user-posts', userId, isAdmin],
     queryFn: async (): Promise<CommunityPost[]> => {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+      // Anonim yazılan postlar profil səhifəsində göstərilmir (admin istisna) —
+      // əks halda profilə keçid edəndə "kim yazıb" birbaşa aydın olur, anonimliyin
+      // mənası qalmır. Admin moderasiya üçün görməyə davam edir.
+      let postsQuery = supabase.
+      from('community_posts').
+      select('*').
+      eq('user_id', userId).
+      eq('is_active', true);
+      if (!isAdmin) {
+        postsQuery = postsQuery.eq('is_anonymous', false);
+      }
 
       const [cardData, { data: postsData }] = await Promise.all([
       // getPublicProfileCard: is_verified/verified_until sütunları hələ
       // yaradılmayıbsa (Duzelis10.sql işlədilməyib) belə, ad/avatar/nişan
       // göstərilməsini pozmayan təhlükəsiz fallback-lə gəlir.
       getPublicProfileCard(userId),
-      supabase.
-      from('community_posts').
-      select('*').
-      eq('user_id', userId).
-      eq('is_active', true).
-      order('created_at', { ascending: false })]
+      postsQuery.order('created_at', { ascending: false })]
       );
 
       // Cari istifadÉ™Ã§inin bÉ™yÉ™ndiklÉ™ri â€” tÉ™k batch sorÄŸu

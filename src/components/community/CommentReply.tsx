@@ -45,6 +45,7 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [showReplies, setShowReplies] = useState(true);
   const [replyText, setReplyText] = useState('');
+  const [replyAnonymous, setReplyAnonymous] = useState(false);
   const replyInputRef = useRef<HTMLInputElement>(null);
   const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
@@ -104,9 +105,10 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
     try {
       await createComment.mutateAsync({
         postId, content, parentCommentId: comment.id, postAuthorId,
-        commenterName: profile?.name || user.user_metadata?.name || tr("commentreply_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")
+        commenterName: profile?.name || user.user_metadata?.name || tr("commentreply_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
+        isAnonymous: replyAnonymous
       });
-      setReplyText('');setShowReplyInput(false);setShowReplies(true);onRefetch();
+      setReplyText('');setReplyAnonymous(false);setShowReplyInput(false);setShowReplies(true);onRefetch();
     } catch (error: any) {
       toast({ title: tr("commentreply_xeta_3cdbb6", 'Xəta'), description: error.message || tr("commentreply_serh_elave_edile_bilmedi_8925d3", "\u015E\u0259rh \u0259lav\u0259 edil\u0259 bilm\u0259di"), variant: 'destructive' });
     }
@@ -196,6 +198,14 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
                     <X className="w-3 h-3" />
                   </Button>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setReplyAnonymous((v) => !v)}
+                  className={`a-tag${replyAnonymous ? ' on' : ''}`}
+                  style={{ cursor: 'pointer', marginTop: 6 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: 999, border: replyAnonymous ? '1px solid var(--a-peach-2)' : '1px solid var(--a-ink-faint)', background: replyAnonymous ? 'var(--a-peach-2)' : 'transparent' }} />
+                  {tr("postcard_anonim_olaraq_yaz_abc123", "Anonim olaraq yaz")}
+                </button>
               </motion.div>
             }
           </AnimatePresence>

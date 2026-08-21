@@ -589,7 +589,7 @@ const Index = () => {
   // Sub-screens
   if (activeScreen === 'notifications') return <Suspense fallback={suspenseFallback}><NotificationsScreen onBack={() => setActiveScreen(null)} onNavigateToCommunity={() => { setActiveScreen(null); setActiveTab('community'); }} /></Suspense>;
   if (activeScreen === 'settings') return <Suspense fallback={suspenseFallback}><SettingsScreen onBack={() => setActiveScreen(null)} onNavigate={setActiveScreen} /></Suspense>;
-  if (activeScreen === 'health-sync') return <Suspense fallback={suspenseFallback}><HealthSyncScreen onBack={() => setActiveScreen('settings')} /></Suspense>;
+  if (activeScreen === 'health-sync') return <Suspense fallback={suspenseFallback}><HealthSyncScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'referral') return <Suspense fallback={suspenseFallback}><ReferralScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'doctor-report') return <Suspense fallback={suspenseFallback}><DoctorReportScreen onBack={() => setActiveScreen(null)} /></Suspense>;
   if (activeScreen === 'calendar') return <Suspense fallback={suspenseFallback}><CalendarScreen onBack={() => setActiveScreen(null)} /></Suspense>;
