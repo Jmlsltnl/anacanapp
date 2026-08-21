@@ -59,8 +59,6 @@ export const useChildren = () => {
       // create the first child automatically so Profile/Tools can show it.
       // Guard modul-səviyyəlidir + upsert ignoreDuplicates → paralel instansiyalar dublikat yarada bilməz.
       if (rows.length === 0 && !seedAttemptedUsers.has(user.id)) {
-        seedAttemptedUsers.add(user.id);
-
         const { data: profileRow, error: profileError } = await supabase
           .from('profiles')
           .select('baby_name, baby_birth_date, baby_gender')
@@ -68,6 +66,12 @@ export const useChildren = () => {
           .maybeSingle();
 
         if (!profileError && profileRow?.baby_name && profileRow?.baby_birth_date) {
+          // Guard YALNIZ həqiqətən seed cəhdi ediləndə "yandırılır" — profil
+          // məlumatı hələ boşdursa (istifadəçi baby_name/baby_birth_date-i
+          // sonra dolduracaqsa), guard qoyulmur ki, növbəti fetchChildren()
+          // çağırışında YENIDƏN sınansın (əvvəllər guard buradan ƏVVƏL
+          // qoyulurdu — sessiya boyu əbədi bloklanırdı).
+          seedAttemptedUsers.add(user.id);
           const normalizedGender: 'boy' | 'girl' =
             profileRow.baby_gender === 'girl' || profileRow.baby_gender === 'boy'
               ? profileRow.baby_gender

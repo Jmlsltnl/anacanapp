@@ -1218,6 +1218,18 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
         </div>
       </section>
 
+      {/* Qulluq izləmə alətləri (Yuxu/Qidalanma/Bez/Bugünkü xülasə) — Premium.
+          Tək PremiumBlurGate-lə əhatə olunub (4 ayrı overlay yerinə BİR
+          səliqəli overlay — hər kartın başlığı/ikonu blur arxasından görünür,
+          amma tıklana bilmir). Timer-lər (yuxu/qidalanma) YALNIZ bu kartların
+          düymələrindən başladılır (bax toggleSleep/toggleFeeding) — pointer-
+          events:none blur-u bu düymələri də əhatə etdiyi üçün premium
+          olmayan istifadəçi heç vaxt taymer başlada bilmir. */}
+      <PremiumBlurGate
+        feature="baby_care_tracking"
+        title={tr('premiumgate_babycare_title', 'Qulluq izləmə alətləri')}
+        subtitle={tr('premiumgate_babycare_sub', 'Yuxu, qidalanma və bez dəyişmə qeydləri Premium-da')}
+      >
       {/* Sleep Tracker */}
       <motion.div
         className="a-card a-fade-in"
@@ -1694,6 +1706,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
           </button>
         </div>
       </motion.div>
+      </PremiumBlurGate>
 
       {/* Weekly review — Premium (Flo-stil blur teaser) */}
       <PremiumBlurGate

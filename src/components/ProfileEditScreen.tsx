@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Camera, Save, User, Calendar, Loader2, CalendarDays, Baby, Sparkles } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useChildren } from '@/hooks/useChildren';
 import { useUserStore } from '@/store/userStore';
 import { useShallow } from 'zustand/react/shallow';
 import countriesData from '../../countries.json';
@@ -54,6 +55,14 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
   );
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // KRİTİK BUG DÜZƏLİŞİ: bu ekran əvvəllər uşaq məlumatını (ad/doğuş
+  // tarixi/cins) YALNIZ köhnə profiles.baby_* sütunlarına yazırdı və
+  // user_children-ə (Dashboard/alətlərin HƏQİQƏTƏN oxuduğu mənbə) ya heç
+  // toxunmurdu, ya da "sort_order-a görə birinci uşaq" kimi səhv/kövrək
+  // bir "güzgü" yazısı edirdi (çox-uşaqlı valideyndə səhv uşağı yeniləyirdi,
+  // uşaq hələ yaranmayıbsa sükutla heç nə etmirdi). İndi birbaşa
+  // useChildren().updateChild/addChild ilə DOĞRU sətrə yazılır.
+  const { selectedChild, hasChildren, updateChild, addChild } = useChildren();
 
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -68,12 +77,16 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     bio: '',
     avatar_url: profile?.avatar_url || '',
     life_stage: (lifeStage || 'bump') as LifeStage,
-    baby_name: babyName || '',
+    // Körpə sahələri əvvəlcə HƏQİQİ mənbədən (user_children.selectedChild) —
+    // köhnə Zustand/profiles dəyərləri (babyName/babyBirthDate/babyGender)
+    // köhnəlmiş ola bilər, yalnız hələ heç bir user_children sətri yoxdursa
+    // fallback kimi istifadə olunur.
+    baby_name: selectedChild?.name || babyName || '',
     due_date: dueDate ? new Date(dueDate).toISOString().split('T')[0] : '',
     last_period_date: lastPeriodDate ? new Date(lastPeriodDate).toISOString().split('T')[0] : '',
     cycle_length: cycleLength || 28,
-    baby_birth_date: babyBirthDate ? new Date(babyBirthDate).toISOString().split('T')[0] : '',
-    baby_gender: babyGender || '' as 'boy' | 'girl' | '',
+    baby_birth_date: selectedChild?.birth_date || (babyBirthDate ? new Date(babyBirthDate).toISOString().split('T')[0] : ''),
+    baby_gender: (selectedChild?.gender === 'girl' ? 'girl' : selectedChild?.gender === 'boy' ? 'boy' : babyGender) || '' as 'boy' | 'girl' | '',
     country_code: (profile as any)?.country_code || countryCode || '',
     // Çoxdöllü hamiləlik (əkiz/üçüz/dördüz) — onboarding-də yazılır, amma
     // sonradan (USM-dən sonra, ya da dəqiqləşdiriləndə) burada dəyişdirilə bilər
@@ -82,6 +95,22 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     // 10-14-cü həftə USM-dən sonra məlum olur
     chorionicity: (profile as any)?.chorionicity || ''
   });
+
+  // useChildren() asinxron yüklənir — mount anında selectedChild hələ hazır
+  // olmaya bilər (yuxarıdakı useState ilkin dəyəri o zaman köhnə Zustand
+  // fallback-ına düşür). Data gələn kimi BİR DƏFƏ sahələri sinxronlaşdırırıq
+  // (ref-guard sayəsində istifadəçinin sonrakı əl ilə redaktəsini əzmir).
+  const babyFieldsSyncedRef = useRef(false);
+  useEffect(() => {
+    if (babyFieldsSyncedRef.current || !selectedChild) return;
+    babyFieldsSyncedRef.current = true;
+    setFormData((prev) => ({
+      ...prev,
+      baby_name: selectedChild.name,
+      baby_birth_date: selectedChild.birth_date,
+      baby_gender: selectedChild.gender === 'girl' ? 'girl' : 'boy'
+    }));
+  }, [selectedChild]);
 
   // Compute the calculated date based on mode
   const calculatedDates = useMemo(() => {
@@ -243,32 +272,37 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
           formData.baby_gender as 'boy' | 'girl'
         );
 
-        // KRİTİK: user_children əsas sətrini də yenilə — dashboard/alətlər
-        // yaş məlumatını oradan oxuyur (əvvəllər yalnız profiles yenilənirdi
-        // → "aktual məlumat dəyişmir" bugı)
-        try {
-          const { data: children } = await supabase.
-          from('user_children').
-          select('id').
-          eq('user_id', user.id).
-          eq('is_active', true).
-          order('sort_order').
-          limit(1);
-          if (children && children[0]) {
-            await supabase.
-            from('user_children').
-            update({
-              name: formData.baby_name || tr("profileeditscreen_korpe_fa2b51", "K\xF6rp\u0259"),
-              birth_date: formData.baby_birth_date,
-              gender: formData.baby_gender
-            }).
-            eq('id', children[0].id);
-          }
-          // Bütün useChildren instansiyalarına xəbər ver → dərhal təzələnsin
-          window.dispatchEvent(new CustomEvent('anacan:children-updated'));
-        } catch (e) {
-          console.warn('user_children sync failed:', e);
+        // KRİTİK BUG DÜZƏLİŞİ: Dashboard/alətlər yaş/ad məlumatını
+        // user_children-dən oxuyur (profiles.baby_* YOX) — bax useChildren.ts.
+        // Əvvəllər burada "sort_order-a görə BİRİNCİ uşağı" seçib sükutla
+        // yeniləyirdik (çox-uşaqlı valideyndə səhv uşağı dəyişirdi, xəta
+        // olsa belə heç bir bildiriş yox idi). İndi HƏQİQİ seçilmiş uşağı
+        // (selectedChild) doğru useChildren() funksiyaları ilə yeniləyirik,
+        // uşaq hələ yoxdursa yenisini yaradırıq, xəta olsa toast göstəririk.
+        const babyDisplayName = formData.baby_name || tr("profileeditscreen_korpe_fa2b51", "K\xF6rp\u0259");
+        const childUpdates = {
+          name: babyDisplayName,
+          birth_date: formData.baby_birth_date,
+          gender: formData.baby_gender as 'boy' | 'girl',
+          avatar_emoji: formData.baby_gender === 'girl' ? '👧' : '👦'
+        };
+
+        const childSynced = selectedChild ?
+        await updateChild(selectedChild.id, childUpdates) :
+        !!(await addChild(childUpdates));
+
+        if (!childSynced) {
+          toast({
+            title: tr("profileeditscreen_xeta_3cdbb6", 'Xəta'),
+            description: tr("profileeditscreen_korpe_melumati_yenilenmedi", "Körpə məlumatı yenilənmədi — yenidən cəhd edin"),
+            variant: 'destructive'
+          });
         }
+
+        // Digər useChildren instansiyalarına da xəbər ver (updateChild/addChild
+        // öz instansiyasını artıq refetch edir, bu köhnə hook-un özündən asılı
+        // qalan digər ekranlar üçün əlavə təhlükəsizlik toru).
+        window.dispatchEvent(new CustomEvent('anacan:children-updated'));
       } else if (formData.baby_name && babyBirthDate && babyGender) {
         setBabyData(new Date(babyBirthDate), formData.baby_name, babyGender);
       }
