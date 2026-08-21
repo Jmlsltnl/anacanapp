@@ -8584,5 +8584,7 @@
   "dashboard_hero_fruit_tpl_multiple": "Your babies are about {fruit}-sized",
   "kickcounter_ela_gedir_korpeleriniz_aktivdir": "Going great! Your babies are active 💪",
   "partnerv2_hefte_korpeleriniz": "week — your babies",
-  "partnerv2_her_korpe_texminen": "Each baby is about"
+  "partnerv2_her_korpe_texminen": "Each baby is about",
+  "dashboard_ekiz_hameleliyiniz_ucun": "For Your Twin Pregnancy",
+  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Twin/multiple pregnancy tip (AZ only — shown only to multiples users)"
 }

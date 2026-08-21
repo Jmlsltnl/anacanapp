@@ -584,6 +584,29 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
           </section>
         }
 
+          {/* Əkiz/çoxdöllü hamiləliyə xas məsləhət — YALNIZ isMultiple=true olanlara,
+              yalnız məzmun mövcud olan günlərdə (bax Duzelis29.sql) */}
+          {isMultiple && (dayContent as any).multiples_tip_az &&
+        <section className="a-section">
+            <motion.div
+            className="a-card a-fade-in"
+            style={{ background: 'var(--a-blue-1)' }}
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.42 }}>
+            
+              <div className="a-card-head" style={{ marginBottom: 10 }}>
+                <h3 className="a-card-title a-heading" style={{ fontSize: 15 }}>
+                  👶👶 {tr("dashboard_ekiz_hameleliyiniz_ucun", "Əkiz Hamiləliyiniz üçün")}
+                </h3>
+              </div>
+              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.65, color: 'var(--a-ink-soft)' }}>
+                {(dayContent as any).multiples_tip_az}
+              </p>
+            </motion.div>
+          </section>
+        }
+
           {/* Daily Tip Card */}
           {dayContent.daily_tip &&
         <section className="a-section">

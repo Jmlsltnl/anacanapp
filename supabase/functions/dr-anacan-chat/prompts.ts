@@ -381,7 +381,21 @@ ${
 }`
     : ""
 }
-
+${
+  userProfile?.multiplesType && userProfile.multiplesType !== "single"
+    ? `
+👶👶 MULTIPLE PREGNANCY (${userProfile.multiplesType}${userProfile.babyCount ? `, ${userProfile.babyCount} babies` : ""}) — IMPORTANT MEDICAL CONTEXT (source: ACOG):
+- Standard singleton growth charts/milestones do NOT directly apply — twins/multiples commonly measure smaller in size/weight than singleton babies from roughly 28-30 weeks onward; this is normal, NOT automatically a growth problem (only a >20% size discordance between babies needs medical evaluation).
+- Chorionicity (shared vs. separate placenta) determines monitoring frequency — monochorionic twins need more frequent scans (often every 2 weeks starting ~16 weeks) due to twin-to-twin transfusion syndrome (TTTS) risk. Ask if her chorionicity is known.
+- Blood-based screening tests (NT/combined screening) are LESS accurate for multiples than for singletons.
+- Higher risk of: gestational diabetes, preeclampsia (often earlier onset and more severe), and preterm birth (over half of twins are born before 37 weeks — this is NORMAL for twins, not automatically "high-risk" the way early singleton birth would be).
+- "Full-term" for twins is generally ~36-38 weeks (NOT 40 like a singleton pregnancy).
+- An extra ~300 kcal/day is needed PER baby.
+- Higher chance of cesarean delivery, though vaginal birth is possible depending on position and health.
+- Always frame reassurance/expectations in multiples-appropriate terms — never apply singleton benchmarks directly without noting the difference.
+`
+    : ""
+}
 💡 KEY TOPICS:
 - Interesting facts about weekly baby development
 - Pregnancy symptoms and how to manage them
@@ -410,7 +424,21 @@ ${
 }`
     : ""
 }
-
+${
+  userProfile?.multiplesType && userProfile.multiplesType !== "single"
+    ? `
+👶👶 ÇOXDÖLLÜ HAMİLƏLİK (${userProfile.multiplesType}${userProfile.babyCount ? `, ${userProfile.babyCount} körpə` : ""}) — VACİB TİBBİ KONTEKST (mənbə: ACOG):
+- Standart tək-hamiləlik böyümə qrafikləri/mərhələləri BİRBAŞA tətbiq olunmur — əkiz/çoxdöllü körpələr adətən ~28-30-cu həftədən sonra tək hamiləlikdəkindən kiçik ölçü/çəki göstərir; bu normaldır, avtomatik böyümə problemi DEYİL (yalnız körpələr arasında 20%-dən çox ölçü fərqi tibbi qiymətləndirmə tələb edir).
+- Xorionluq (ortaq və ya ayrı plasenta) monitorinq tezliyini müəyyənləşdirir — monoxorionik əkizlərdə TTTS (əkiz-əkizə transfuziya sindromu) riskinə görə daha tez-tez USM lazımdır (adətən ~16-cı həftədən hər 2 həftədə bir). Xorionluğu bilinmirsə, soruş.
+- Qan testi əsaslı skrininqlər (NT/kombinə test) çoxdöllü hamiləlikdə tək hamiləlikdəkindən AZ dəqiqdir.
+- Daha yüksək risk: hestasiya diabeti, preeklampsiya (adətən daha erkən başlayır və daha ağır keçir), erkən doğuş (əkizlərin yarıdan çoxu 37-ci həftədən əvvəl doğulur — bu, əkizlər üçün NORMALDIR, tək hamiləlikdəki kimi mütləq "yüksək-risk" demək deyil).
+- Əkizlər üçün "tam vaxtında" adətən ~36-38-ci həftə sayılır (tək hamiləlikdəki 40-cı həftə YOX).
+- Hər körpə üçün gündə əlavə ~300 kkal lazımdır.
+- Seziryyə ehtimalı yüksəkdir, amma körpələrin mövqeyi/sağlamlığından asılı olaraq təbii doğuş da mümkündür.
+- Arxayınlaşdırma və gözləntiləri HƏMİŞƏ çoxdöllü-uyğun çərçivədə ver — tək-hamiləlik meyarlarını fərqi qeyd etmədən birbaşa tətbiq ETMƏ.
+`
+    : ""
+}
 💡 ƏSAS MÖVZULAR:
 - Həftəlik körpə inkişafı haqqında maraqlı faktlar
 - Hamiləlik simptomları və onlarla mübarizə

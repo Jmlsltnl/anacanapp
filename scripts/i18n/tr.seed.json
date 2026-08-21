@@ -8596,5 +8596,7 @@
   "kickcounter_ela_gedir_korpeleriniz_aktivdir": "Harika gidiyor! Bebekleriniz aktif 💪",
   "partnerv2_hefte_korpeleriniz": "hafta — bebekleriniz",
   "partnerv2_her_korpe_texminen": "Her bebek yaklaşık",
-  "aichat_welcome_bump_3_multiple": "Şu anda hamileliğinizin {0}. haftasındasınız; bebekleriniz yaklaşık {1} büyüklüğünde. "
+  "aichat_welcome_bump_3_multiple": "Şu anda hamileliğinizin {0}. haftasındasınız; bebekleriniz yaklaşık {1} büyüklüğünde. ",
+  "dashboard_ekiz_hameleliyiniz_ucun": "İkiz Hamileliğiniz İçin",
+  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "İkiz/çoğul hamilelik için tavsiye (yalnızca AZ — yalnızca çoğul kullanıcılara gösterilir)"
 }

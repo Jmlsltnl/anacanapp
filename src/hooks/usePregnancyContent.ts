@@ -64,6 +64,11 @@ export interface PregnancyContent {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  // Əkiz/çoxdöllü hamiləliyə xas əlavə məsləhət — YALNIZ isMultiple=true olanlara
+  // göstərilir (bax Dashboard.tsx). Hələlik yalnız AZ (tərcümələr sonra əlavə
+  // olunacaq), ona görə TRANSLATABLE_FIELDS-ə salınmayıb — applyLanguage() bu
+  // sahəyə toxunmur, dəyər UI dilindən asılı olmayaraq olduğu kimi qalır.
+  multiples_tip_az: string | null;
 }
 
 // Fetch content by pregnancy day (1-280)
@@ -247,6 +252,7 @@ export const usePregnancyContentAdmin = () => {
           recommended_foods: content.recommended_foods || null,
           emotional_tip: content.emotional_tip || null,
           partner_tip: content.partner_tip || null,
+          multiples_tip_az: content.multiples_tip_az || null,
           is_active: content.is_active !== false,
         };
 

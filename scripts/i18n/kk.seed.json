@@ -8596,5 +8596,7 @@
   "kickcounter_ela_gedir_korpeleriniz_aktivdir": "Керемет! Сәбилеріңіз белсенді 💪",
   "partnerv2_hefte_korpeleriniz": "апта — сәбилеріңіз",
   "partnerv2_her_korpe_texminen": "Әр сәби шамамен",
-  "aichat_welcome_bump_3_multiple": "Қазір сіз жүктіліктің {0}-аптасындасыз; сәбилеріңіз шамамен {1} мөлшерінде. "
+  "aichat_welcome_bump_3_multiple": "Қазір сіз жүктіліктің {0}-аптасындасыз; сәбилеріңіз шамамен {1} мөлшерінде. ",
+  "dashboard_ekiz_hameleliyiniz_ucun": "Егіз жүктілігіңіз үшін",
+  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Егіз/көп жүктілік үшін кеңес (тек AZ — тек көп жүктілік пайдаланушыларына көрсетіледі)"
 }

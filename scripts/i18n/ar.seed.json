@@ -8596,5 +8596,7 @@
   "kickcounter_ela_gedir_korpeleriniz_aktivdir": "ممتاز! أطفالك نشيطون 💪",
   "partnerv2_hefte_korpeleriniz": "أسبوع — أطفالك",
   "partnerv2_her_korpe_texminen": "كل طفل بحجم",
-  "aichat_welcome_bump_3_multiple": "أنتِ حالياً في الأسبوع {0} من الحمل؛ أطفالك بحجم {1} تقريباً. "
+  "aichat_welcome_bump_3_multiple": "أنتِ حالياً في الأسبوع {0} من الحمل؛ أطفالك بحجم {1} تقريباً. ",
+  "dashboard_ekiz_hameleliyiniz_ucun": "لحملك بتوأم",
+  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "نصيحة لحمل التوأم/المتعدد (بالأذربيجانية فقط — تظهر فقط لمستخدمات الحمل المتعدد)"
 }

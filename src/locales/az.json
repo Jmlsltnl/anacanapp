@@ -7093,5 +7093,7 @@
   "kickcounter_ela_gedir_korpeleriniz_aktivdir": "Əla gedir! Körpələriniz aktivdir 💪",
   "partnerv2_hefte_korpeleriniz": "həftə — körpələriniz",
   "partnerv2_her_korpe_texminen": "Hər körpə təxminən",
-  "aichat_welcome_bump_3_multiple": "Hazırda hamiləliyin {0}-ci həftəsindəsiniz; körpələriniz təxminən {1} böyüklüyündədir. "
+  "aichat_welcome_bump_3_multiple": "Hazırda hamiləliyin {0}-ci həftəsindəsiniz; körpələriniz təxminən {1} böyüklüyündədir. ",
+  "dashboard_ekiz_hameleliyiniz_ucun": "Əkiz Hamiləliyiniz üçün",
+  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Əkiz/çoxdöllü hamiləlik üçün məsləhət (yalnız AZ — YALNIZ isMultiple istifadəçilərə göstərilir)"
 }
