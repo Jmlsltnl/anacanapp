@@ -1463,6 +1463,41 @@ export type Database = {
         }
         Relationships: []
       }
+      banner_impressions: {
+        Row: {
+          banner_id: string
+          first_seen_at: string
+          id: string
+          last_seen_at: string
+          seen_count: number
+          user_id: string
+        }
+        Insert: {
+          banner_id: string
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          seen_count?: number
+          user_id: string
+        }
+        Update: {
+          banner_id?: string
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          seen_count?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "banner_impressions_banner_id_fkey"
+            columns: ["banner_id"]
+            isOneToOne: false
+            referencedRelation: "banners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       banners: {
         Row: {
           background_color: string | null
@@ -1486,9 +1521,13 @@ export type Database = {
           is_premium_only: boolean | null
           link_type: string | null
           link_url: string | null
+          max_impressions_per_user: number | null
           placement: string
           sort_order: number | null
           start_date: string | null
+          target_countries: string[] | null
+          target_languages: string[] | null
+          target_life_stages: string[] | null
           text_color: string | null
           title: string
           title_az: string | null
@@ -1520,9 +1559,13 @@ export type Database = {
           is_premium_only?: boolean | null
           link_type?: string | null
           link_url?: string | null
+          max_impressions_per_user?: number | null
           placement: string
           sort_order?: number | null
           start_date?: string | null
+          target_countries?: string[] | null
+          target_languages?: string[] | null
+          target_life_stages?: string[] | null
           text_color?: string | null
           title: string
           title_az?: string | null
@@ -1554,9 +1597,13 @@ export type Database = {
           is_premium_only?: boolean | null
           link_type?: string | null
           link_url?: string | null
+          max_impressions_per_user?: number | null
           placement?: string
           sort_order?: number | null
           start_date?: string | null
+          target_countries?: string[] | null
+          target_languages?: string[] | null
+          target_life_stages?: string[] | null
           text_color?: string | null
           title?: string
           title_az?: string | null
@@ -3060,6 +3107,8 @@ export type Database = {
           log_date: string
           mood: number | null
           notes: string | null
+          sleep_hours: number | null
+          sleep_quality: number | null
           symptoms: string[] | null
           temperature: number | null
           user_id: string
@@ -3072,6 +3121,8 @@ export type Database = {
           log_date?: string
           mood?: number | null
           notes?: string | null
+          sleep_hours?: number | null
+          sleep_quality?: number | null
           symptoms?: string[] | null
           temperature?: number | null
           user_id: string
@@ -3084,6 +3135,8 @@ export type Database = {
           log_date?: string
           mood?: number | null
           notes?: string | null
+          sleep_hours?: number | null
+          sleep_quality?: number | null
           symptoms?: string[] | null
           temperature?: number | null
           user_id?: string
@@ -3843,6 +3896,36 @@ export type Database = {
           meaning?: string | null
           name?: string
           origin?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fetal_growth_scans: {
+        Row: {
+          baby_label: string
+          created_at: string
+          efw_grams: number
+          id: string
+          notes: string | null
+          scan_date: string
+          user_id: string
+        }
+        Insert: {
+          baby_label?: string
+          created_at?: string
+          efw_grams: number
+          id?: string
+          notes?: string | null
+          scan_date?: string
+          user_id: string
+        }
+        Update: {
+          baby_label?: string
+          created_at?: string
+          efw_grams?: number
+          id?: string
+          notes?: string | null
+          scan_date?: string
           user_id?: string
         }
         Relationships: []
@@ -5029,6 +5112,7 @@ export type Database = {
           duration_seconds: number
           id: string
           kick_count: number
+          position: string | null
           session_date: string
           user_id: string
         }
@@ -5037,6 +5121,7 @@ export type Database = {
           duration_seconds?: number
           id?: string
           kick_count?: number
+          position?: string | null
           session_date?: string
           user_id: string
         }
@@ -5045,6 +5130,7 @@ export type Database = {
           duration_seconds?: number
           id?: string
           kick_count?: number
+          position?: string | null
           session_date?: string
           user_id?: string
         }
@@ -8570,6 +8656,7 @@ export type Database = {
           mother_warnings_kk: string | null
           mother_warnings_ru: string | null
           mother_warnings_tr: string | null
+          multiples_tip_az: string | null
           nutrition_tip: string | null
           nutrition_tip_ar: string | null
           nutrition_tip_de: string | null
@@ -8703,6 +8790,7 @@ export type Database = {
           mother_warnings_kk?: string | null
           mother_warnings_ru?: string | null
           mother_warnings_tr?: string | null
+          multiples_tip_az?: string | null
           nutrition_tip?: string | null
           nutrition_tip_ar?: string | null
           nutrition_tip_de?: string | null
@@ -8836,6 +8924,7 @@ export type Database = {
           mother_warnings_kk?: string | null
           mother_warnings_ru?: string | null
           mother_warnings_tr?: string | null
+          multiples_tip_az?: string | null
           nutrition_tip?: string | null
           nutrition_tip_ar?: string | null
           nutrition_tip_de?: string | null
@@ -9302,6 +9391,7 @@ export type Database = {
           bio: string | null
           birth_height_cm: number | null
           birth_weight_kg: number | null
+          chorionicity: string | null
           country_code: string | null
           created_at: string
           cycle_length: number | null
@@ -9310,6 +9400,7 @@ export type Database = {
           email: string | null
           id: string
           is_premium: boolean | null
+          is_verified: boolean
           last_period_date: string | null
           life_stage: string | null
           linked_partner_id: string | null
@@ -9324,6 +9415,7 @@ export type Database = {
           start_weight: number | null
           updated_at: string
           user_id: string
+          verified_until: string | null
         }
         Insert: {
           apple_email_enabled?: boolean | null
@@ -9337,6 +9429,7 @@ export type Database = {
           bio?: string | null
           birth_height_cm?: number | null
           birth_weight_kg?: number | null
+          chorionicity?: string | null
           country_code?: string | null
           created_at?: string
           cycle_length?: number | null
@@ -9345,6 +9438,7 @@ export type Database = {
           email?: string | null
           id?: string
           is_premium?: boolean | null
+          is_verified?: boolean
           last_period_date?: string | null
           life_stage?: string | null
           linked_partner_id?: string | null
@@ -9359,6 +9453,7 @@ export type Database = {
           start_weight?: number | null
           updated_at?: string
           user_id: string
+          verified_until?: string | null
         }
         Update: {
           apple_email_enabled?: boolean | null
@@ -9372,6 +9467,7 @@ export type Database = {
           bio?: string | null
           birth_height_cm?: number | null
           birth_weight_kg?: number | null
+          chorionicity?: string | null
           country_code?: string | null
           created_at?: string
           cycle_length?: number | null
@@ -9380,6 +9476,7 @@ export type Database = {
           email?: string | null
           id?: string
           is_premium?: boolean | null
+          is_verified?: boolean
           last_period_date?: string | null
           life_stage?: string | null
           linked_partner_id?: string | null
@@ -9394,6 +9491,7 @@ export type Database = {
           start_weight?: number | null
           updated_at?: string
           user_id?: string
+          verified_until?: string | null
         }
         Relationships: [
           {
@@ -9456,30 +9554,36 @@ export type Database = {
           badge_type: string | null
           created_at: string
           is_premium: boolean
+          is_verified: boolean
           life_stage: string | null
           name: string | null
           updated_at: string
           user_id: string
+          verified_until: string | null
         }
         Insert: {
           avatar_url?: string | null
           badge_type?: string | null
           created_at?: string
           is_premium?: boolean
+          is_verified?: boolean
           life_stage?: string | null
           name?: string | null
           updated_at?: string
           user_id: string
+          verified_until?: string | null
         }
         Update: {
           avatar_url?: string | null
           badge_type?: string | null
           created_at?: string
           is_premium?: boolean
+          is_verified?: boolean
           life_stage?: string | null
           name?: string | null
           updated_at?: string
           user_id?: string
+          verified_until?: string | null
         }
         Relationships: []
       }
@@ -12655,6 +12759,10 @@ export type Database = {
         Args: { _user_id: string; _venue_id: string }
         Returns: Json
       }
+      confirm_referral_conversion: {
+        Args: { p_referred_user_id: string }
+        Returns: Json
+      }
       find_partner_by_code: {
         Args: { p_partner_code: string }
         Returns: {
@@ -12753,6 +12861,14 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_banner_click: {
+        Args: { p_banner_id: string }
+        Returns: undefined
+      }
+      increment_banner_impression: {
+        Args: { p_banner_id: string }
+        Returns: undefined
       }
       increment_blog_view_count: {
         Args: { post_id: string }
