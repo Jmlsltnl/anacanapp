@@ -8601,5 +8601,9 @@
   "partnerv2_her_korpe_texminen": "Jedes Baby ist etwa",
   "aichat_welcome_bump_3_multiple": "Sie sind aktuell in der {0}. Schwangerschaftswoche; Ihre Babys sind etwa so groß wie {1}. ",
   "dashboard_ekiz_hameleliyiniz_ucun": "Für Ihre Zwillingsschwangerschaft",
-  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Tipp für Zwillings-/Mehrlingsschwangerschaft (nur AZ — wird nur Mehrlings-Nutzerinnen angezeigt)"
+  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Tipp für Zwillings-/Mehrlingsschwangerschaft (AZ — andere Sprachen werden über das Tool „Inhaltsübersetzung (KI)“ übersetzt, wird nur Mehrlings-Nutzerinnen angezeigt)",
+  "notfound_oops_page_not_found": "Hoppla! Seite nicht gefunden",
+  "notfound_return_to_home": "Zurück zur Startseite",
+  "userbadge_tesdiqlenmis_hesab": "Verifiziertes Konto",
+  "mentalhealthtracker_30_bal_suffix": "/ 30 Punkte"
 }

@@ -69,9 +69,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(false);
   const [isPro, setIsPro] = useState(false);
-  const syncWithDatabaseRef = useRef<
-    ((isPro: boolean, productId?: string, expiresAtOverride?: string | null, willRenew?: boolean) => Promise<void>) | null>(
-    null);
+  const syncWithDatabaseRef = useRef<(() => Promise<void>) | null>(null);
 
 
   // Initialize RevenueCat
@@ -95,21 +93,18 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
 
         setIsSupported(true);
 
-        // Check entitlements
+        // Check entitlements (yalnız ANİ UI göstəricisi üçün — DB yazısı YOX,
+        // bax syncWithDatabase: real yazı yalnız server-side edge function
+        // vasitəsilə, RevenueCat-ın öz REST API-sindən müstəqil təsdiqlə olur).
         const ent = await checkEntitlement();
         setIsPro(ent.isPro);
 
-        // Self-heal: if store says Pro but DB/profile is out of sync, re-sync now.
-        // willRenew ötürülür → store-dan ləğv (auto-renew off) hər açılışda tutulur.
-        if (ent.isPro && user?.id) {
-          syncWithDatabaseRef.current?.(true, ent.productId || undefined, ent.expiresAt || null, ent.willRenew);
-        }
-
-        // Referral: trial→premium konversiyasını aşkarla (dəvət edənə +7 gün)
+        // Hər açılışda / login-də DB-ni RC-nin HƏQİQİ vəziyyəti ilə sinxronla —
+        // istifadəçi heç bir paywall ekranı açmasa belə (məs. auto-renew olub,
+        // ya ləğv edilib) DB köhnəlmiş qalmasın (əvvəllər YALNIZ ent.isPro=true
+        // olanda sync olunurdu — indi hər iki istiqamətdə, hər açılışda).
         if (user?.id) {
-          import('@/lib/referralSync').then((m) =>
-          m.syncReferralStatusFromEntitlement(ent.periodType, ent.isPro)
-          ).catch(() => {});
+          syncWithDatabaseRef.current?.();
         }
 
         // Load offerings — YENİ build versiyalı offering-i üstün tutur
@@ -167,52 +162,21 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     init();
   }, [user?.id]);
 
-  const syncWithDatabase = useCallback(async (isPro: boolean, productId?: string, expiresAtOverride?: string | null, willRenew?: boolean) => {
+  // Server-side sinxron — TƏK etibarlı yazı yolu (bax sync-revenuecat-entitlement
+  // edge function). Artıq heç bir parametr qəbul etmir: edge function
+  // RevenueCat-ın öz REST API-sindən (məxfi açarla, yalnız serverdə) real
+  // entitlement vəziyyətini müstəqil çəkir — klientin sözünə etibar ETMİR.
+  // subscriptions cədvəli artıq client-tərəfi yazıla bilmir (Duzelis33.sql).
+  const syncWithDatabase = useCallback(async () => {
     if (!user) return;
     try {
-      const planType = productId?.includes('yearly') || productId?.includes('lifetime') ?
-      'premium_plus' : 'premium';
-
-      // Store-dan ləğv edilmiş amma hələ aktiv abunə: RC willRenew=false →
-      // DB status 'cancelled' (win-back axını bunu görür). willRenew yenidən
-      // açılıbsa 'active'-ə sağalır. Əvvəllər store-side ləğvlər DB-yə düşmürdü.
-      const status = !isPro ? 'expired' : willRenew === false ? 'cancelled' : 'active';
-
-      const expiresAt = expiresAtOverride ?
-      new Date(expiresAtOverride) :
-      (() => {
-        const fallback = new Date();
-        if (productId?.includes('lifetime')) {
-          fallback.setFullYear(fallback.getFullYear() + 100);
-        } else if (productId?.includes('yearly')) {
-          fallback.setFullYear(fallback.getFullYear() + 1);
-        } else {
-          fallback.setMonth(fallback.getMonth() + 1);
-        }
-        return fallback;
-      })();
-
-      const { error: subError } = await supabase.
-      from('subscriptions').
-      upsert({
-        user_id: user.id,
-        plan_type: isPro ? planType : 'free',
-        status,
-        started_at: new Date().toISOString(),
-        expires_at: expiresAt.toISOString()
-      }, { onConflict: 'user_id' });
-      if (subError) console.error('Subscription sync error:', subError);
-
-      const { error: profileError } = await supabase.
-      from('profiles').
-      update({
-        is_premium: isPro,
-        premium_until: isPro ? expiresAt.toISOString() : null
-      }).
-      eq('user_id', user.id);
-      if (profileError) console.error('Profile sync error:', profileError);
-
-      // Refresh in-memory profile so the UI unlocks premium immediately
+      const { data, error } = await supabase.functions.invoke('sync-revenuecat-entitlement');
+      if (error) {
+        console.error('sync-revenuecat-entitlement error:', error);
+        return;
+      }
+      if (typeof data?.isPro === 'boolean') setIsPro(data.isPro);
+      // Refresh in-memory profile so the UI unlocks/locks premium immediately
       await refreshProfile();
     } catch (err) {
       console.error('DB sync error:', err);
@@ -238,7 +202,10 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
       if (result.success) {
         setIsPro(true);
         const entitlement = result.customerInfo?.entitlements?.active?.[REVENUECAT_CONFIG.ENTITLEMENT_ID];
-        await syncWithDatabase(true, pkg.product.identifier, entitlement?.expirationDate || null, (entitlement as any)?.willRenew ?? true);
+        // DB yazısı + referral konversiya təsdiqi indi TAMAMİLƏ server-side
+        // (sync-revenuecat-entitlement edge function RC-nin öz REST API-sini
+        // çağırıb müstəqil təsdiqləyir — klient artıq bunu tətikləmir).
+        await syncWithDatabase();
 
         // Analytics: real qiymət/valyuta ilə (FB value-optimization + GA4 purchase).
         // Trial başlanğıcı ayrıca konversiyadır (Meta StartTrial / GA4).
@@ -250,11 +217,6 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
             m.analytics.logPremiumSubscribed(pkg.identifier, pkg.product.price, pkg.product.currencyCode);
           }
         }).catch(() => {});
-
-        // Referral: alış anında statusu sinxronla (TRIAL → 'trial', NORMAL → 'converted')
-        import('@/lib/referralSync').then((m) =>
-        m.syncReferralStatusFromEntitlement((entitlement as any)?.periodType || 'NORMAL', true)
-        ).catch(() => {});
         return true;
       }
 
@@ -297,7 +259,11 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
       const result = await rcRestore();
       if (result.success) {
         setIsPro(true);
-        await syncWithDatabase(true);
+        // Məhsul ID/tarixi ötürməyə ehtiyac yoxdur — edge function RC-dən
+        // real, düzgün (illik/lifetime daxil) məlumatı özü çəkir (əvvəllər
+        // bura parametr ötürülmürdü deyə həmişə "+1 ay" fallback-a düşürdü,
+        // illik/lifetime abunəçiləri səhvən 1 ay sonra "bitmiş" göstərirdi).
+        await syncWithDatabase();
         return true;
       }
       return false;
@@ -318,7 +284,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     if (!result.available) return false;
     if (result.didPurchase) {
       setIsPro(true);
-      await syncWithDatabase(true);
+      await syncWithDatabase();
       return true;
     }
     return false;
@@ -329,7 +295,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     const result = await presentPaywall();
     if (result.available && result.didPurchase) {
       setIsPro(true);
-      await syncWithDatabase(true);
+      await syncWithDatabase();
     }
     return result;
   }, [syncWithDatabase]);
@@ -343,14 +309,10 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   const refreshEntitlements = useCallback(async () => {
     const ent = await checkEntitlement();
     setIsPro(ent.isPro);
-    if (!ent.isPro && isPro) {
-      // User lost entitlement, sync DB
-      await syncWithDatabase(false);
-    } else if (ent.isPro) {
-      // Customer Center-də ləğv / bərpa oluna bilər → willRenew statusunu dərhal əks etdir
-      await syncWithDatabase(true, ent.productId || undefined, ent.expiresAt || null, ent.willRenew);
-    }
-  }, [isPro, syncWithDatabase]);
+    // Customer Center-də istənilən dəyişiklik (ləğv/bərpa/itki) — hər iki
+    // istiqamətdə server-side sinxronlanır (edge function RC-dən real vəziyyəti çəkir).
+    await syncWithDatabase();
+  }, [syncWithDatabase]);
 
   return {
     packages,

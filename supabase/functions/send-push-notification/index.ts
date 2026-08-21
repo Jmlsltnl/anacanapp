@@ -7,11 +7,72 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// ── IDOR düzəlişi (audit tapıntısı) ──────────────────────────────────────
+// Əvvəllər `userId` klientdən gəldiyi kimi HEÇ BİR sahiblik yoxlaması olmadan
+// istifadə olunurdu — istənilən (hətta pulsuz) hesab istənilən başqa
+// istifadəçiyə ixtiyari başlıq/mətnlə push göndərə bilirdi (fişinq riski).
+// İndi çağıran `context` göndərməlidir və server DB-də HƏQİQƏTƏN mövcud
+// münasibəti müstəqil yoxlayır — `userId` təkcə "iddia", sübut deyil.
+// Tanınmayan/göndərilməyən context → default-deny (yalnız özünə göndərə bilər).
+type PushContext = 'self' | 'partner' | 'direct_message' | 'community_post';
+
 interface PushPayload {
   userId: string;
   title: string;
   body: string;
-  data?: Record<string, unknown>;
+  data?: Record<string, unknown> & { context?: PushContext; postId?: string };
+}
+
+async function verifyOwnership(
+  supabase: ReturnType<typeof createClient>,
+  callerId: string,
+  targetUserId: string,
+  data: PushPayload['data']
+): Promise<boolean> {
+  const context = data?.context;
+
+  if (context === 'self' || !context) {
+    return callerId === targetUserId;
+  }
+
+  if (context === 'partner') {
+    // DİQQƏT: profiles.linked_partner_id partnyorun profiles.id-sini saxlayır,
+    // user_id-sini YOX (bax usePartnerData.ts/useSOSAlert.ts eyni 2-addımlı
+    // axtarış nümunəsi) — birbaşa müqayisə HƏMİŞƏ yalan olardı.
+    const { data: callerProfile } = await supabase
+      .from('profiles').select('linked_partner_id').eq('user_id', callerId).maybeSingle();
+    const linkedPartnerId = (callerProfile as any)?.linked_partner_id;
+    if (!linkedPartnerId) return false;
+    const { data: partnerProfile } = await supabase
+      .from('profiles').select('user_id').eq('id', linkedPartnerId).maybeSingle();
+    return !!partnerProfile && (partnerProfile as any).user_id === targetUserId;
+  }
+
+  if (context === 'direct_message') {
+    // Bu tam olaraq çağırandan gələn, HƏQİQƏTƏN mövcud bir mesaj olmalıdır
+    // (son 2 dəqiqədə — "indi göndərilən mesajın bildirişi" ssenarisi).
+    const twoMinAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+    const { data: msg } = await supabase
+      .from('direct_messages')
+      .select('id')
+      .eq('sender_id', callerId)
+      .eq('receiver_id', targetUserId)
+      .gte('created_at', twoMinAgo)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    return !!msg;
+  }
+
+  if (context === 'community_post') {
+    const postId = data?.postId;
+    if (!postId) return false;
+    const { data: post } = await supabase
+      .from('community_posts').select('user_id').eq('id', postId).maybeSingle();
+    return !!post && (post as any).user_id === targetUserId;
+  }
+
+  return false;
 }
 
 Deno.serve(async (req) => {
@@ -35,6 +96,15 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Missing required fields: userId, title, body' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const allowed = await verifyOwnership(supabase, auth.user.id, userId, data);
+    if (!allowed) {
+      console.warn(`[send-push-notification] blocked: caller=${auth.user.id} tried to target=${userId} context=${data?.context || 'none'}`);
+      return new Response(
+        JSON.stringify({ error: 'Forbidden: no verified relationship with target user' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 

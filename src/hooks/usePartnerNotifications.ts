@@ -104,7 +104,7 @@ export const usePartnerNotifications = () => {
             userId: partnerUserId,
             title: notification.title,
             body: notification.getBody(data),
-            data: { type }
+            data: { type, context: 'partner' }
           });
         } catch (pushErr) {
           console.warn('511 push failed:', pushErr);

@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { callVertex, isVertexConfigured } from "../_shared/vertex-ai.ts";
+import { checkBabyPhotoshootLimit, limitExceededResponse } from "../_shared/usage-limit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -333,6 +334,11 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Server-side ömürlük say limiti (bahalı şəkil-generasiya modeli —
+    // əvvəllər YALNIZ klient-tərəfi yoxlanılırdı).
+    const usage = await checkBabyPhotoshootLimit(user.id);
+    if (!usage.allowed) return limitExceededResponse(corsHeaders, usage.limit);
 
     // Parse request
     const { backgroundTheme, sourceImageBase64, customization }: RequestBody = await req.json();

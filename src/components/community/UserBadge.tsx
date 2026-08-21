@@ -1,4 +1,5 @@
 import { Shield, Sparkles, BadgeCheck } from 'lucide-react';
+import { tr } from '@/lib/tr';
 
 /**
  * Paylaşılan community "author badge" komponentləri — əvvəllər PostCard.tsx
@@ -40,7 +41,7 @@ export const VerifiedTick = ({ size = 14, className = '' }: { size?: number; cla
     fill="#0095F6"
     color="#ffffff"
     className={`a-verified-tick ${className}`}
-    aria-label="Təsdiqlənmiş hesab"
+    aria-label={tr("userbadge_tesdiqlenmis_hesab", "Təsdiqlənmiş hesab")}
   />
 );
 

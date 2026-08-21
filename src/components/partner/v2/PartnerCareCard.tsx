@@ -78,7 +78,7 @@ const PartnerCareCard = ({ lifeStage, onOpenSharing }: Props) => {
           userId: partnerProfile.user_id,
           title: payload.title,
           body: payload.body,
-          data: { type: 'thank_you' }
+          data: { type: 'thank_you', context: 'partner' }
         });
       } catch {/* push optional */}
       toast({ title: tr('partnerv2_thank_sent', 'Təşəkkür göndərildi! 💙') });

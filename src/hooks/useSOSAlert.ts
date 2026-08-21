@@ -175,7 +175,7 @@ export const useSOSAlert = () => {
           userId: partnerUserId,
           title: pushTitle,
           body: pushBody,
-          data: { type: isBirth ? 'birth_alert' : 'sos_alert', alertId: data.id }
+          data: { type: isBirth ? 'birth_alert' : 'sos_alert', alertId: data.id, context: 'partner' }
         });
       } catch (pushErr) {
         console.warn('SOS push failed:', pushErr);

@@ -8589,5 +8589,9 @@
   "partnerv2_hefte_korpeleriniz": "week — your babies",
   "partnerv2_her_korpe_texminen": "Each baby is about",
   "dashboard_ekiz_hameleliyiniz_ucun": "For Your Twin Pregnancy",
-  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Twin/multiple pregnancy tip (AZ only — shown only to multiples users)"
+  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Twin/multiple pregnancy tip (AZ — other languages are translated via the 'Content Translation (AI)' tool, shown only to multiples users)",
+  "notfound_oops_page_not_found": "Oops! Page not found",
+  "notfound_return_to_home": "Return to Home",
+  "userbadge_tesdiqlenmis_hesab": "Verified account",
+  "mentalhealthtracker_30_bal_suffix": "/ 30 points"
 }

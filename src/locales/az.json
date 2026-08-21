@@ -7098,5 +7098,9 @@
   "partnerv2_her_korpe_texminen": "Hər körpə təxminən",
   "aichat_welcome_bump_3_multiple": "Hazırda hamiləliyin {0}-ci həftəsindəsiniz; körpələriniz təxminən {1} böyüklüyündədir. ",
   "dashboard_ekiz_hameleliyiniz_ucun": "Əkiz Hamiləliyiniz üçün",
-  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Əkiz/çoxdöllü hamiləlik üçün məsləhət (yalnız AZ — YALNIZ isMultiple istifadəçilərə göstərilir)"
+  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Əkiz/çoxdöllü hamiləlik üçün məsləhət (AZ — digər dillər 'Kontent Tərcüməsi (AI)' alətindən tərcümə olunur, YALNIZ isMultiple istifadəçilərə göstərilir)",
+  "notfound_oops_page_not_found": "Səhifə tapılmadı",
+  "notfound_return_to_home": "Ana səhifəyə qayıt",
+  "userbadge_tesdiqlenmis_hesab": "Təsdiqlənmiş hesab",
+  "mentalhealthtracker_30_bal_suffix": "/ 30 bal"
 }

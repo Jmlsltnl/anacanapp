@@ -1,6 +1,20 @@
 import { supabase } from '@/integrations/supabase/client';
 
 /**
+ * !!! DEPRECATED / ARTIQ ÇAĞIRILMIR (Duzelis33 təhlükəsizlik düzəlişi) !!!
+ *
+ * Əvvəllər bu funksiya klientin öz RevenueCat SDK nəticəsinə əsasən
+ * 'converted' statusunu birbaşa bildirirdi — istənilən istifadəçi bunu əl ilə
+ * çağırıb, real ödəniş olmadan dostuna +7 gün premium "hədiyyə" edə bilərdi
+ * (referral fraud). İndi 'converted' keçidi YALNIZ server-side
+ * sync-revenuecat-entitlement edge function tərəfindən, RevenueCat-ın öz
+ * REST API-sindən müstəqil təsdiqləndikdən sonra baş verir (bax
+ * useInAppPurchase.ts syncWithDatabase() + supabase/functions/
+ * sync-revenuecat-entitlement/index.ts). update_my_referral_status RPC-si
+ * artıq 'converted' qəbul etmir (bax Duzelis33.sql) — bu funksiya heç yerdən
+ * çağırılmır, saxlanılıb ki, tarixçə/kontekst itməsin.
+ *
+ * ---- Köhnə sənədləşmə (arxiv) ----
  * Referral status sinxronu — dəvət OLUNAN istifadəçinin klientindən.
  *
  * RevenueCat entitlement periodType:

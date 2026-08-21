@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { usePartnerNotifications } from './usePartnerNotifications';
+import { is511Rule } from '@/lib/laborUtils';
 
 export interface Contraction {
   id: string;
@@ -88,7 +89,8 @@ export const useContractions = () => {
       : 0;
 
     // 5-1-1 Rule: contractions 5 min apart, 1 min duration, for 1 hour
-    const is511 = avgInterval > 0 && avgInterval <= 300 && avgDuration >= 60 && recent.length >= 3;
+    // (saf məntiq src/lib/laborUtils.ts-də — unit-test edilə bilsin deyə çıxarılıb)
+    const is511 = is511Rule(avgInterval, avgDuration, recent.length);
 
     // Notify partner if 5-1-1 rule triggered and not already notified
     if (is511 && !has511Notified.current) {

@@ -8601,5 +8601,9 @@
   "partnerv2_her_korpe_texminen": "Каждый малыш примерно",
   "aichat_welcome_bump_3_multiple": "Сейчас у вас {0}-я неделя беременности; ваши малыши сейчас примерно размером с {1}. ",
   "dashboard_ekiz_hameleliyiniz_ucun": "Для вашей двойни",
-  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Совет для многоплодной беременности (только AZ — показывается только пользователям с многоплодной беременностью)"
+  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Совет для многоплодной беременности (AZ — остальные языки переводятся через инструмент «Перевод контента (ИИ)», показывается только пользователям с многоплодной беременностью)",
+  "notfound_oops_page_not_found": "Упс! Страница не найдена",
+  "notfound_return_to_home": "Вернуться на главную",
+  "userbadge_tesdiqlenmis_hesab": "Подтверждённый аккаунт",
+  "mentalhealthtracker_30_bal_suffix": "/ 30 баллов"
 }

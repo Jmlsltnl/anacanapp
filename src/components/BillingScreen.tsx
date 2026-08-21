@@ -38,11 +38,11 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   useScrollToTop();
 
   const { profile } = useAuth();
-  const { isPremium, subscription, isCancelled, cancelledButActive, cancelSubscription, restoreSubscription, loading: isLoading } = useSubscription();
+  const { isPremium, subscription, isCancelled, cancelledButActive, loading: isLoading } = useSubscription();
   const { toast } = useToast();
   const config = useBillingConfig();
   const { features: dbFeatures } = usePremiumConfig();
-  const { showCustomerCenter, isSupported: isIAPSupported } = useInAppPurchase();
+  const { showCustomerCenter, isSupported: isIAPSupported, restorePurchases } = useInAppPurchase();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
@@ -53,6 +53,9 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   // (aşağı, planPrice-da) yalnız bu hələ yüklənməyibsə/native olmayan platformada
   // fallback kimi qalır.
   const [realPriceString, setRealPriceString] = useState<string | null>(null);
+  // Aktiv məhsulun RC identifikatoru — Android-də Play Store-un abunəlik
+  // idarəetmə səhifəsinə düzgün SKU ilə yönləndirmək üçün (bax handleCancelSubscription).
+  const [activeProductId, setActiveProductId] = useState<string | null>(null);
   const isAndroidNative = isNativePlatform() && getPlatform() === 'android';
 
   const fetchPaymentHistory = async () => {
@@ -70,6 +73,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
       // real ödədiyi valyuta/məbləğ — country/promo-ya görə fərqli ola bilər).
       const proEntitlement = activeEntitlements[REVENUECAT_CONFIG.ENTITLEMENT_ID];
       if (proEntitlement?.productIdentifier) {
+        setActiveProductId(proEntitlement.productIdentifier);
         try {
           const { products } = await Purchases.getProducts({
             productIdentifiers: [proEntitlement.productIdentifier]
@@ -130,19 +134,30 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
       setIsCanceling(false);
       return;
     }
-    if (!confirm(tr("billingscreen_cancel_confirm", "Are you sure you want to cancel your subscription? You will continue to have Premium access until the end of the current period."))) return;
-    setIsCanceling(true);
-    const success = await cancelSubscription();
-    toast(success ?
-      { title: tr("billingscreen_cancel_success", "Subscription Cancelled"), description: tr("billingscreen_cancel_success_desc", "You can use Premium until the end of the current period.") } :
-      { title: tr("billingscreen_error", "Error"), description: tr("billingscreen_cancel_error", "Failed to cancel subscription."), variant: 'destructive' }
-    );
-    setIsCanceling(false);
+    // Android: TƏTBİQ ÖZÜ abunəliyi ləğv edə bilməz (yalnız Google Play).
+    // Əvvəllər bura sadəcə DB sətrini "cancelled" edirdi — Play Store-da real
+    // abunəlik davam edir, istifadəçi ödənişi almağa davam edirdi, tətbiq isə
+    // "ləğv edilib" göstərirdi. İndi birbaşa Play Store-un öz abunəlik idarəetmə
+    // səhifəsinə yönləndirir (Google-ın da tələb etdiyi düzgün üsul).
+    if (isAndroidNative) {
+      if (!confirm(tr("billingscreen_cancel_appstore", "You will be redirected to the App Store / Google Play subscription management page to cancel your subscription."))) return;
+      const pkg = 'com.atlasoon.anacan';
+      const url = activeProductId ?
+      `https://play.google.com/store/account/subscriptions?sku=${encodeURIComponent(activeProductId)}&package=${pkg}` :
+      `https://play.google.com/store/account/subscriptions?package=${pkg}`;
+      window.open(url, '_system');
+      return;
+    }
+    // Native olmayan (web) — real store yoxdur, sadəcə dəstək ünvanına yönləndir.
+    toast({ title: tr("billingscreen_error", "Error"), description: tr("billingscreen_cancel_error", "Failed to cancel subscription."), variant: 'destructive' });
   };
 
   const handleRestoreSubscription = async () => {
     setIsRestoring(true);
-    const success = await restoreSubscription();
+    // Real RevenueCat restore (Store-dan) + server-side sync-revenuecat-entitlement
+    // (əvvəllər useSubscription().restoreSubscription() heç bir yoxlama olmadan
+    // sadəcə DB status-unu "active" edirdi — real yoxlama YOX idi).
+    const success = await restorePurchases();
     toast(success ?
       { title: tr("billingscreen_restore_success", "Subscription Restored"), description: tr("billingscreen_restore_success_desc", "Your Premium subscription is active again.") } :
       { title: tr("billingscreen_error", "Error"), description: tr("billingscreen_restore_error", "Failed to restore subscription."), variant: 'destructive' }

@@ -152,7 +152,7 @@ export const useDirectMessages = (otherUserId?: string) => {
             type === 'video' ? tr("usedirectmessages_video_gonderdi_41246c", "\uD83C\uDFA5 Video g\xF6nd\u0259rdi") :
             type === 'audio' ? tr("usedirectmessages_ses_mesaji_gonderdi_5b803e", "\uD83C\uDFA4 S\u0259s mesaj\u0131 g\xF6nd\u0259rdi") :
             tr("directmessages_yeni_mesaj", 'Yeni mesaj'),
-            data: { type: 'direct_message', sender_id: user.id }
+            data: { type: 'direct_message', sender_id: user.id, context: 'direct_message' }
           }
         });
       } catch (pushErr) {

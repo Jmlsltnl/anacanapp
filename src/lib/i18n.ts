@@ -1,22 +1,29 @@
 import { supabase } from '@/integrations/supabase/client';
-import enStatic from '@/locales/en.json';
 import azStatic from '@/locales/az.json';
 
 // In-memory translation cache: { [lang]: { [key]: value } }
 const translationCache: Record<string, Record<string, string>> = {};
 
-// Synchronously seed the EN and AZ cache from the bundled JSON so tr() returns expected language
-// on the very first render after a reload — no waiting on the network.
-translationCache['en'] = { ...(enStatic as Record<string, string>) };
+// Synchronously seed ONLY the AZ cache from the bundled JSON so tr() returns
+// expected language on the very first render after a reload — no waiting on
+// the network. AZ is the universal default/fallback (localStorage.getItem
+// ('language') || 'az' pattern used app-wide), so it alone must stay a
+// STATIC import (eager, ~461KB in the main chunk).
+//
+// QEYD (bundle ölçüsü audit tapıntısı): əvvəllər EN də (~525KB) burada
+// statik import edilirdi — 2 dil JSON-u BİRLİKDƏ əsas JS chunk-ın ~37%-ni
+// təşkil edirdi, dilindən asılı olmayaraq HƏR istifadəçi bunu yükləyirdi.
+// EN artıq aşağıdakı ru/tr/kk/de/ar ilə EYNİ "lazy seed" modelinə keçirilib
+// (bax SEED_LANGS + loadLocalSeed) — yalnız EN seçən istifadəçilər yükləyir.
 translationCache['az'] = { ...(azStatic as Record<string, string>) };
 
 // ── Zero-flash dil yüklənməsi ──
 // Problem: ru/tr/kk əvvəllər YALNIZ DB-dən (şəbəkə) gəlirdi → ilk render AZ görünürdü,
 // sonra seçilmiş dilə "sıçrayırdı" (zəif internetdə saniyələrlə). Həll — 3 qat:
 //   1) localStorage keşi: son uğurlu dəst sinxron hidratasiya olunur (aşağıda, modul yüklənən an)
-//   2) Lokal seed chunk-ları: ru/tr/kk seed-ləri bundle-ın hissəsidir (dynamic import, şəbəkəsiz)
+//   2) Lokal seed chunk-ları: en/ru/tr/kk/de/ar seed-ləri bundle-ın hissəsidir (dynamic import, şəbəkəsiz)
 //   3) DB overlay: admin düzəlişləri arxa planda gəlir və keşə yazılır
-const SEED_LANGS = new Set(['ru', 'tr', 'kk', 'de', 'ar']);
+const SEED_LANGS = new Set(['en', 'ru', 'tr', 'kk', 'de', 'ar']);
 const LS_CACHE_PREFIX = 'anacan_i18n_cache:';
 
 function hydrateFromLocalStorage(lang: string): boolean {
@@ -52,15 +59,17 @@ try {
 async function loadLocalSeed(lang: string): Promise<void> {
   if (!SEED_LANGS.has(lang)) return;
   try {
-    const seedModule = lang === 'ru'
-      ? await import('../../scripts/i18n/ru.seed.json')
-      : lang === 'kk'
-        ? await import('../../scripts/i18n/kk.seed.json')
-        : lang === 'de'
-          ? await import('../../scripts/i18n/de.seed.json')
-          : lang === 'ar'
-            ? await import('../../scripts/i18n/ar.seed.json')
-            : await import('../../scripts/i18n/tr.seed.json');
+    const seedModule = lang === 'en'
+      ? await import('@/locales/en.json')
+      : lang === 'ru'
+        ? await import('../../scripts/i18n/ru.seed.json')
+        : lang === 'kk'
+          ? await import('../../scripts/i18n/kk.seed.json')
+          : lang === 'de'
+            ? await import('../../scripts/i18n/de.seed.json')
+            : lang === 'ar'
+              ? await import('../../scripts/i18n/ar.seed.json')
+              : await import('../../scripts/i18n/tr.seed.json');
     const seed = (seedModule.default ?? seedModule) as Record<string, string>;
     // seed ALTDA — localStorage keşi / DB overlay dəyərləri üstün qalsın
     translationCache[lang] = { ...seed, ...(translationCache[lang] || {}) };
@@ -204,8 +213,11 @@ export function getLocaleTag(): string {
 
 export function clearTranslationCache(): void {
   Object.keys(translationCache).forEach(k => delete translationCache[k]);
-  // Re-seed bundles
-  translationCache['en'] = { ...(enStatic as Record<string, string>) };
+  // Re-seed bundle (AZ yeganə statik idxaldır — bax yuxarı şərh). EN artıq
+  // ru/tr/kk/de/ar kimi lazy seed-dir — çağıran kod (LanguageSelector.tsx/
+  // InitialLanguageScreen.tsx) clearTranslationCache()-dən dərhal sonra
+  // `code !== 'az'` olduqda `await ensureLanguageReady(code)` çağırır, bu da
+  // EN daxil bütün lazy dilləri render-dən ƏVVƏL yenidən yükləyir.
   translationCache['az'] = { ...(azStatic as Record<string, string>) };
   dbLoadedFor = null;
   dbPromise = null;

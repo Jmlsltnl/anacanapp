@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { callGeminiSmart } from "../_shared/vertex-ai.ts";
+import { checkAndConsumeServerSide, limitExceededResponse } from "../_shared/usage-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -392,6 +393,9 @@ serve(async (req) => {
   try {
     const auth = await requireUser(req);
     if (auth.error) return auth.error;
+
+    const usage = await checkAndConsumeServerSide(auth.user.id, 'fairy_tale');
+    if (!usage.allowed) return limitExceededResponse(corsHeaders, usage.limit);
 
     const { childName, theme, hero, moralLesson, language = 'az', ageRange, storyStyle, customPrompt } = await req.json();
 

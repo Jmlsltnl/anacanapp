@@ -14,34 +14,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { formatDateAz, formatTimeAz } from '@/lib/date-utils';
 import { tr, getPersistedLanguage } from "@/lib/tr";
 import { ToolPage, ToolHeader } from './anacan/ToolKit';
+// IOM (Institute of Medicine, 2009) hamiləlik çəki artımı ankerləri + xətti
+// interpolyasiya — src/lib/pregnancyWeightGain.ts-ə çıxarılıb ki, React-dan
+// asılı olmadan unit-test edilə bilsin (bax pregnancyWeightGain.test.ts).
+// Tək hamiləlikdə mövcud DB/hardcode dəyərlərlə (13/26/40-cı həftə) UYĞUNDUR.
+// Əkiz/çoxdöllü hamiləlikdə İOM-un ayrıca, DAHA YÜKSƏK məcmu tövsiyəsi var
+// (normal BMI üçün ~16.8-24.5 kq) VƏ "tam vaxtında" 40 yox, ~37-ci həftədir
+// (bax Duzelis29.sql-in "Həftə 36" qeydi — eyni mənbə, ACOG/İOM).
+import { SINGLE_GAIN_ANCHORS, MULTIPLE_GAIN_ANCHORS, interpolateGain } from '@/lib/pregnancyWeightGain';
 
 interface WeightTrackerProps {
   onBack: () => void;
-}
-
-// IOM (Institute of Medicine, 2009) hamiləlik çəki artımı tövsiyələri, normal BMI
-// üçün — [həftə, min kq, max kq] "anker" nöqtələri, aralarında xətti interpolyasiya.
-// Tək hamiləlikdə mövcud DB/hardcode dəyərlərlə (13/26/40-cı həftə) UYĞUNDUR —
-// dəyişməyib. Əkiz/çoxdöllü hamiləlikdə İOM-un ayrıca, DAHA YÜKSƏK məcmu tövsiyəsi
-// var (normal BMI üçün ~16.8-24.5 kq) VƏ "tam vaxtında" 40 yox, ~37-ci həftədir
-// (bax Duzelis29.sql-in "Həftə 36" qeydi — eyni mənbə, ACOG/İOM).
-const SINGLE_GAIN_ANCHORS: [number, number, number][] = [[0, 0, 0], [13, 0.5, 2], [26, 4, 8], [40, 8, 14]];
-const MULTIPLE_GAIN_ANCHORS: [number, number, number][] = [[0, 0, 0], [13, 0.5, 2], [26, 6, 10], [37, 16.8, 24.5]];
-
-function interpolateGain(week: number, anchors: [number, number, number][]): [number, number] {
-  const lastWeek = anchors[anchors.length - 1][0];
-  const last = anchors[anchors.length - 1];
-  if (week <= 0) return [0, 0];
-  if (week >= lastWeek) return [last[1], last[2]];
-  for (let i = 1; i < anchors.length; i++) {
-    if (week <= anchors[i][0]) {
-      const [w0, min0, max0] = anchors[i - 1];
-      const [w1, min1, max1] = anchors[i];
-      const t = (week - w0) / (w1 - w0);
-      return [min0 + t * (min1 - min0), max0 + t * (max1 - max0)];
-    }
-  }
-  return [last[1], last[2]];
 }
 
 const WeightTracker = forwardRef<HTMLDivElement, WeightTrackerProps>(({ onBack }, ref) => {

@@ -798,7 +798,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                 
                 <div>
                   <p className="a-heading" style={{ margin: 0, fontSize: 52, color: 'var(--a-ink)' }}>{showResult.total_score}</p>
-                  <p style={{ margin: 0, color: 'var(--a-ink-soft)' }}>/ 30 bal</p>
+                  <p style={{ margin: 0, color: 'var(--a-ink-soft)' }}>{tr("mentalhealthtracker_30_bal_suffix", "/ 30 bal")}</p>
                 </div>
 
                 <p className="text-sm p-4 rounded-2xl" style={{ margin: 0, background: 'var(--a-surface-soft)', color: 'var(--a-body-text)' }}>{showResult.recommendation}</p>

@@ -2,6 +2,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { callGeminiSmart } from "../_shared/vertex-ai.ts";
+import { checkAndConsumeServerSide, limitExceededResponse } from "../_shared/usage-limit.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -359,6 +360,9 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    const usage = await checkAndConsumeServerSide(user.id, 'poop_scanner');
+    if (!usage.allowed) return limitExceededResponse(corsHeaders, usage.limit);
 
     const { imageBase64, userContext, language = 'az' } = await req.json() as PoopAnalysisRequest;
 

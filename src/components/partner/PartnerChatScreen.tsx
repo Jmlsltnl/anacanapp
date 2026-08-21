@@ -138,7 +138,7 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
           userId: partnerProfile.user_id,
           title: `${profile?.name || tr("common_partnyor", 'Partnyor')} 💌`,
           body: content.slice(0, 80),
-          data: { type: 'partner_message' }
+          data: { type: 'partner_message', context: 'partner' }
         }
       }).catch((e) => console.warn('Push invoke failed:', e));
     } catch (error) {

@@ -444,7 +444,7 @@ export const useToggleLike = () => {
                 userId: post.user_id,
                 title: tr("usecommunity_yeni_beyenme_3fd88a", "Yeni bəyənmə ❤️"),
                 body: `${likerName} ${tr("usecommunity_paylasiminizi_beyendi", "paylaşımınızı bəyəndi")}`,
-                data: { type: 'community_like', postId, groupId }
+                data: { type: 'community_like', postId, groupId, context: 'community_post' }
               }
             });
           }
@@ -621,7 +621,7 @@ export const useCreateComment = () => {
               userId: postAuthorId,
               title: parentCommentId ? tr("usecommunity_yeni_cavab_3b1b2c", "Yeni cavab 💬") : tr("usecommunity_yeni_serh_25bb56", "Yeni \u015F\u0259rh \uD83D\uDCAC"),
               body: `${senderName}: ${preview}`,
-              data: { type: parentCommentId ? 'community_reply' : 'community_comment', postId }
+              data: { type: parentCommentId ? 'community_reply' : 'community_comment', postId, context: 'community_post' }
             }
           });
         } catch (e) {console.error('Comment notification error:', e);}

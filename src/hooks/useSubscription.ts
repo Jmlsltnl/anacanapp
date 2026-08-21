@@ -86,21 +86,14 @@ export function useSubscription() {
       if (subData) {
         setSubscription(subData as Subscription);
         writeCache(SUBSCRIPTION_CACHE, user.id, subData);
-      } else {
-        const { data: newSub } = await supabase
-          .from('subscriptions')
-          .insert({
-            user_id: user.id,
-            plan_type: 'free',
-            status: 'active',
-          })
-          .select()
-          .single();
-        
-        if (newSub) {
-          setSubscription(newSub as Subscription);
-        }
       }
+      // QEYD: əvvəllər burada sətir yoxdursa klient özü INSERT edirdi.
+      // subscriptions cədvəli artıq yalnız admin/service-role tərəfindən
+      // yazıla bilir (Duzelis33.sql — özünə sonsuz Premium yazma bug-ı
+      // düzəldilib) — default 'free' sətri artıq profil yaranan kimi
+      // avtomatik trigger ilə yaranır (ensure_default_subscription). Sətir
+      // hələ də tapılmasa (məs. miqrasiya işlədilməyibsə), subscription
+      // null qalır — ownPremium hesablaması bunu təhlükəsiz "free" sayır.
 
       const today = new Date().toISOString().split('T')[0];
       const { data: usageData } = await supabase
@@ -307,37 +300,27 @@ export function useSubscription() {
     fetchSubscription();
   }, [fetchSubscription, getUsageForFeature, isPremium, user]);
 
+  // !!! DEPRECATED (Duzelis33 təhlükəsizlik düzəlişi) !!!
+  // Əvvəllər bu 2 funksiya subscriptions.status-u BİRBAŞA DB-də dəyişirdi —
+  // real Store/RevenueCat vəziyyətinə heç toxunmadan. Nəticədə:
+  //  - "Cancel" — Google Play/App Store-da abunəlik REAL olaraq davam edir,
+  //    istifadəçi ödənişi almağa davam edir, amma tətbiq "ləğv edilib" göstərir.
+  //  - "Restore" — heç bir yoxlama olmadan statusu "active"-ə qaytarırdı.
+  // subscriptions cədvəli artıq client-tərəfi yazıla bilmir (RLS, Duzelis33).
+  // Doğru axın: BillingScreen.tsx Android-də Play Store-un abunəlik idarəetmə
+  // səhifəsinə yönləndirir (real ləğv), iOS-da RC Customer Center (artıq belə
+  // idi), "Restore" isə useInAppPurchase().restorePurchases()-i çağırır (real
+  // RC restore + server-side sync-revenuecat-entitlement). Bu 2 funksiya heç
+  // yerdən çağırılmır, saxlanılıb ki tarixçə/kontekst itməsin.
   const cancelSubscription = useCallback(async (): Promise<boolean> => {
-    if (!user || !subscription) return false;
-    try {
-      const { error } = await supabase
-        .from('subscriptions')
-        .update({ status: 'cancelled' })
-        .eq('id', subscription.id);
-      if (error) throw error;
-      await fetchSubscription();
-      return true;
-    } catch (err) {
-      console.error('Error cancelling subscription:', err);
-      return false;
-    }
-  }, [user, subscription, fetchSubscription]);
+    console.warn('cancelSubscription() deprecated — see BillingScreen.tsx Play Store deep-link / RC Customer Center');
+    return false;
+  }, []);
 
   const restoreSubscription = useCallback(async (): Promise<boolean> => {
-    if (!user || !subscription) return false;
-    try {
-      const { error } = await supabase
-        .from('subscriptions')
-        .update({ status: 'active' })
-        .eq('id', subscription.id);
-      if (error) throw error;
-      await fetchSubscription();
-      return true;
-    } catch (err) {
-      console.error('Error restoring subscription:', err);
-      return false;
-    }
-  }, [user, subscription, fetchSubscription]);
+    console.warn('restoreSubscription() deprecated — use useInAppPurchase().restorePurchases() instead');
+    return false;
+  }, []);
 
   const upgradeToPremium = () => {
     return {

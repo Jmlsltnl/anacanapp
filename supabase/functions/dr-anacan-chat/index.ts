@@ -38,6 +38,7 @@ interface ChatRequest {
 import { getSystemPrompt } from "./prompts.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { callVertex, isVertexConfigured } from "../_shared/vertex-ai.ts";
+import { checkAndConsumeServerSide, limitExceededResponse } from "../_shared/usage-limit.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -49,6 +50,11 @@ Deno.serve(async (req) => {
     // Require authenticated caller — prevents abuse of quota.
     const auth = await requireUser(req);
     if (auth.error) return auth.error;
+
+    // Server-side gündəlik limit (əvvəllər YALNIZ klient-tərəfi idi — istənilən
+    // istifadəçi JWT-si ilə birbaşa çağırıb limitsiz Gemini sorğusu göndərə bilərdi).
+    const usage = await checkAndConsumeServerSide(auth.user.id, 'ai_chat');
+    if (!usage.allowed) return limitExceededResponse(corsHeaders, usage.limit);
 
     const useVertex = isVertexConfigured();
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");

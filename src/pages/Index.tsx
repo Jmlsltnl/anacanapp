@@ -2,6 +2,7 @@ import { useState, useEffect, useLayoutEffect, useRef, useCallback, lazy, Suspen
 import { motion, AnimatePresence } from 'framer-motion';
 import { saveScroll, restoreScroll } from '@/lib/scrollMemory';
 import SplashScreen from '@/components/SplashScreen';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import logoImage from '@/assets/logo.png';
 import AppIntroduction from '@/components/AppIntroduction';
 import InitialLanguageScreen from '@/components/InitialLanguageScreen';
@@ -522,14 +523,14 @@ const Index = () => {
   if (!forceUpdateLoading && forceUpdate?.enabled) {
     const ForceUpdateScreen = lazy(() => import('@/components/ForceUpdateScreen'));
     return (
-      <Suspense fallback={suspenseFallback}>
+      <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}>
         <ForceUpdateScreen
           title={forceUpdate.title}
           message={forceUpdate.message}
           androidUrl={forceUpdate.android_url}
           iosUrl={forceUpdate.ios_url}
         />
-      </Suspense>
+      </ErrorBoundary></Suspense>
     );
   }
 
@@ -551,7 +552,7 @@ const Index = () => {
       return suspenseFallback;
     }
     return premiumOnboardingEnabled ?
-    <Suspense fallback={suspenseFallback}><PremiumOnboarding /></Suspense> :
+    <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PremiumOnboarding /></ErrorBoundary></Suspense> :
     <OnboardingScreen />;
   }
 
@@ -563,13 +564,13 @@ const Index = () => {
     })();
     if (premiumOnboardingEnabled && !isPartnerUser && pendingFunnel) {
       return (
-        <Suspense fallback={suspenseFallback}>
+        <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}>
           <ReverseTrialFunnel
             onComplete={() => {
               try {localStorage.removeItem(PENDING_FUNNEL_KEY);} catch {/* boş */}
               setFunnelCompleted(true);
             }} />
-        </Suspense>);
+        </ErrorBoundary></Suspense>);
     }
     setFunnelCompleted(true);
   }
@@ -578,59 +579,59 @@ const Index = () => {
 
   // Admin Panel
   if (showAdmin && isAdmin) {
-    return <Suspense fallback={suspenseFallback}><AdminPanel onExit={() => setShowAdmin(false)} /></Suspense>;
+    return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><AdminPanel onExit={() => setShowAdmin(false)} /></ErrorBoundary></Suspense>;
   }
 
   // User Profile View (Community)
   if (viewingUserId) {
-    return <Suspense fallback={suspenseFallback}><UserProfileScreen userId={viewingUserId} onBack={() => setViewingUserId(null)} /></Suspense>;
+    return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><UserProfileScreen userId={viewingUserId} onBack={() => setViewingUserId(null)} /></ErrorBoundary></Suspense>;
   }
 
   // Sub-screens
-  if (activeScreen === 'notifications') return <Suspense fallback={suspenseFallback}><NotificationsScreen onBack={() => setActiveScreen(null)} onNavigateToCommunity={() => { setActiveScreen(null); setActiveTab('community'); }} /></Suspense>;
-  if (activeScreen === 'settings') return <Suspense fallback={suspenseFallback}><SettingsScreen onBack={() => setActiveScreen(null)} onNavigate={setActiveScreen} /></Suspense>;
-  if (activeScreen === 'health-sync') return <Suspense fallback={suspenseFallback}><HealthSyncScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'referral') return <Suspense fallback={suspenseFallback}><ReferralScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'doctor-report') return <Suspense fallback={suspenseFallback}><DoctorReportScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'calendar') return <Suspense fallback={suspenseFallback}><CalendarScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'edit-profile') return <Suspense fallback={suspenseFallback}><ProfileEditScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'help') return <Suspense fallback={suspenseFallback}><HelpScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'privacy') return <Suspense fallback={suspenseFallback}><PrivacyScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'partner-privacy') return <Suspense fallback={suspenseFallback}><PartnerPrivacyScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'appearance') return <Suspense fallback={suspenseFallback}><AppearanceScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'billing') return <Suspense fallback={suspenseFallback}><BillingScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'notifications') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><NotificationsScreen onBack={() => setActiveScreen(null)} onNavigateToCommunity={() => { setActiveScreen(null); setActiveTab('community'); }} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'settings') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><SettingsScreen onBack={() => setActiveScreen(null)} onNavigate={setActiveScreen} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'health-sync') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><HealthSyncScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'referral') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><ReferralScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'doctor-report') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><DoctorReportScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'calendar') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><CalendarScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'edit-profile') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><ProfileEditScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'help') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><HelpScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'privacy') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PrivacyScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'partner-privacy') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PartnerPrivacyScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'appearance') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><AppearanceScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'billing') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><BillingScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
   if (activeScreen === 'legal' || activeScreen?.startsWith('legal/')) {
     const initialDocType = activeScreen?.startsWith('legal/') ? activeScreen.replace('legal/', '') : undefined;
-    return <Suspense fallback={suspenseFallback}><LegalScreen onBack={() => setActiveScreen(null)} initialDocument={initialDocType} /></Suspense>;
+    return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><LegalScreen onBack={() => setActiveScreen(null)} initialDocument={initialDocType} /></ErrorBoundary></Suspense>;
   }
   if (activeScreen === 'blog' || activeScreen?.startsWith('blog/')) {
     const initialSlug = activeScreen?.startsWith('blog/') ? activeScreen.replace('blog/', '') : undefined;
-    return <Suspense fallback={suspenseFallback}><BlogScreen onBack={() => setActiveScreen(null)} initialSlug={initialSlug} lifeStage={lifeStage} /></Suspense>;
+    return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><BlogScreen onBack={() => setActiveScreen(null)} initialSlug={initialSlug} lifeStage={lifeStage} /></ErrorBoundary></Suspense>;
   }
-  if (activeScreen === 'shop' && isAdmin) return <Suspense fallback={suspenseFallback}><ShopScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'name-voting' && role === 'partner') return <Suspense fallback={suspenseFallback}><NameVotingScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'partner-hospital-bag' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerHospitalBagScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'daily-summary' && role === 'partner') return <Suspense fallback={suspenseFallback}><DailySummaryScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'shop' && isAdmin) return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><ShopScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'name-voting' && role === 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><NameVotingScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'partner-hospital-bag' && role === 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PartnerHospitalBagScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'daily-summary' && role === 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><DailySummaryScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
   {/* ── Partner Module 2.0 sub-screens ── */}
-  if (activeScreen === 'partner-shopping' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerShoppingScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'partner-appointments' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerAppointmentsScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'partner-baby-day' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerBabyDayScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'partner-weekly-stats' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerWeeklyStatsScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'partner-surprises' && role === 'partner') return <Suspense fallback={suspenseFallback}><PartnerSurprisesScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'hospital-run' && role === 'partner') return <Suspense fallback={suspenseFallback}><HospitalRunScreen onBack={() => setActiveScreen(null)} onNavigate={setActiveScreen} onOpenContractions={() => setActiveScreen('live-contractions')} /></Suspense>;
-  if (activeScreen === 'live-contractions' && role === 'partner') return <Suspense fallback={suspenseFallback}><LiveContractionsScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'partner-sharing' && role !== 'partner') return <Suspense fallback={suspenseFallback}><PartnerSharingScreen onBack={() => setActiveScreen(null)} /></Suspense>;
-  if (activeScreen === 'partners') return <Suspense fallback={suspenseFallback}><PartnersScreen onBack={() => setActiveScreen(null)} /></Suspense>;
+  if (activeScreen === 'partner-shopping' && role === 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PartnerShoppingScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'partner-appointments' && role === 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PartnerAppointmentsScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'partner-baby-day' && role === 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PartnerBabyDayScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'partner-weekly-stats' && role === 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PartnerWeeklyStatsScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'partner-surprises' && role === 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PartnerSurprisesScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'hospital-run' && role === 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><HospitalRunScreen onBack={() => setActiveScreen(null)} onNavigate={setActiveScreen} onOpenContractions={() => setActiveScreen('live-contractions')} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'live-contractions' && role === 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><LiveContractionsScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'partner-sharing' && role !== 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PartnerSharingScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'partners') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PartnersScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
 
   // Messages screen (unified: partner + community DMs)
   if (showMotherChat) {
     return (
-      <Suspense fallback={suspenseFallback}>
+      <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}>
         <MessagesScreen 
           onBack={() => setShowMotherChat(false)} 
           partnerId={profile?.linked_partner_id}
         />
-      </Suspense>
+      </ErrorBoundary></Suspense>
     );
   }
 
@@ -676,7 +677,9 @@ const Index = () => {
           </div>
         }>
           <AnimatePresence mode="wait">
-            {renderContent()}
+            <ErrorBoundary key={activeTab}>
+              {renderContent()}
+            </ErrorBoundary>
           </AnimatePresence>
         </Suspense>
       </div>

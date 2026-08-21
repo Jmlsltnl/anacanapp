@@ -8601,5 +8601,9 @@
   "partnerv2_her_korpe_texminen": "Әр сәби шамамен",
   "aichat_welcome_bump_3_multiple": "Қазір сіз жүктіліктің {0}-аптасындасыз; сәбилеріңіз шамамен {1} мөлшерінде. ",
   "dashboard_ekiz_hameleliyiniz_ucun": "Егіз жүктілігіңіз үшін",
-  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Егіз/көп жүктілік үшін кеңес (тек AZ — тек көп жүктілік пайдаланушыларына көрсетіледі)"
+  "adminpregnancycontent_ekiz_coxdollu_tovsiye": "Егіз/көп жүктілік үшін кеңес (AZ — басқа тілдер «Мазмұнды аудару (AI)» құралы арқылы аударылады, тек көп жүктілік пайдаланушыларына көрсетіледі)",
+  "notfound_oops_page_not_found": "Ой! Бет табылмады",
+  "notfound_return_to_home": "Басты бетке оралу",
+  "userbadge_tesdiqlenmis_hesab": "Расталған аккаунт",
+  "mentalhealthtracker_30_bal_suffix": "/ 30 балл"
 }

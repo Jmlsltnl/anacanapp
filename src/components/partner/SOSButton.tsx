@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { tr } from '@/lib/tr';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -25,6 +25,13 @@ const SOSButton: React.FC<SOSButtonProps> = ({ variant = 'full' }) => {
   const [isHolding, setIsHolding] = useState(false);
   const [holdProgress, setHoldProgress] = useState(0);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  // one-shot qoruma (bax MotherSOSSheet.tsx eyni nümunə) — setHoldProgress-in
+  // state-updater-i içindən handleSOS() çağırılırdı, guard olmadan: newProgress
+  // 100-ə çatandan sonra HƏR 50ms tick-də təkrar >=100 şərti doğru qalır və
+  // React setIsHolding(false)-u commit edənə qədər (yavaş cihazda bir neçə
+  // tick) handleSOS TƏKRAR-TƏKRAR çağırıla bilər — real SOS 2-ci dəfə
+  // partnyora göndərilə bilər (təkrar DB sətri + təkrar push).
+  const firedRef = useRef(false);
 
   const HOLD_DURATION = 2000; // 2 seconds to activate
 
@@ -32,10 +39,12 @@ const SOSButton: React.FC<SOSButtonProps> = ({ variant = 'full' }) => {
     let interval: NodeJS.Timeout;
 
     if (isHolding) {
+      firedRef.current = false;
       interval = setInterval(() => {
         setHoldProgress((prev) => {
           const newProgress = prev + 100 / (HOLD_DURATION / 50);
-          if (newProgress >= 100) {
+          if (newProgress >= 100 && !firedRef.current) {
+            firedRef.current = true;
             handleSOS();
             return 100;
           }
