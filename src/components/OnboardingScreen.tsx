@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles, Users, Droplets } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, Calendar, Baby, Heart, Sparkles, Users, Droplets, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DateField } from '@/components/ui/date-field';
@@ -25,7 +25,17 @@ const iconMap: Record<string, React.ComponentType<any>> = {
 };
 
 const OnboardingScreen = () => {
-  const [step, setStep] = useState(0);
+  const { updateProfile, profile } = useAuth();
+
+  // Apple/Google ilə qeydiyyatda ad heç vaxt soruşulmurdu → profil hələ də
+  // defolt 'İstifadəçi' placeholder-ini daşıyırsa, bu axının İLK addımı
+  // MƏCBURİ ad sorğusudur (step -1). Əgər istifadəçinin artıq life_stage-i
+  // varsa (mərhələni əvvəllər seçmiş mövcud hesab, sadəcə adı çatışmır),
+  // ad təsdiqləndikdən sonra mərhələ/məlumat addımlarına KEÇMİRİK — valideyn
+  // (Index.tsx) profil yeniləndiyi kimi bu komponenti avtomatik bağlayır.
+  const needsNameStep = !profile?.name || profile.name.trim() === '' || profile.name === 'İstifadəçi';
+  const [step, setStep] = useState(needsNameStep ? -1 : 0);
+  const [nameInput, setNameInput] = useState('');
   const [selectedStage, setSelectedStage] = useState<LifeStage | null>(null);
   const [dateInput, setDateInput] = useState('');
   const [babyName, setBabyName] = useState('');
@@ -49,7 +59,6 @@ const OnboardingScreen = () => {
       setFunnelCompleted: s.setFunnelCompleted,
     }))
   );
-  const { updateProfile } = useAuth();
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();
   const { language } = useLanguage();
@@ -149,6 +158,31 @@ const OnboardingScreen = () => {
   const handleMultiplesSelect = (type: 'single' | 'twins' | 'triplets' | 'quadruplets', count: number) => {
     setMultiplesType(type);
     setBabyCount(count);
+  };
+
+  const handleNameContinue = async () => {
+    const trimmed = nameInput.trim();
+    if (!trimmed || isSaving) return;
+    setIsSaving(true);
+    try {
+      const { error } = await updateProfile({ name: trimmed });
+      if (error) {
+        toast({
+          title: tr("onboardingscreen_xeta_bas_verdi_f22fba", 'Xəta baş verdi'),
+          description: tr("onboardingscreen_melumatlar_saxlanila_bilmedi_a65916", 'Məlumatlar saxlanıla bilmədi'),
+          variant: 'destructive'
+        });
+        return;
+      }
+      // Artıq life_stage-i olan mövcud istifadəçi üçün bu tək lazım olan
+      // addım idi — valideyn (Index.tsx) profil yeniləndikdən sonra bu
+      // komponenti avtomatik bağlayacaq. Yeni istifadəçi mərhələ seçiminə keçir.
+      if (!profile?.life_stage) {
+        setStep(0);
+      }
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleNext = async () => {
@@ -355,9 +389,9 @@ const OnboardingScreen = () => {
         <div className="w-11" />
         }
 
-        {/* Progress indicators */}
+        {/* Progress indicators — ad addımında (step -1) gizlədilir, ayrıca "xoş gəldiniz" ekranıdır */}
         <div className="flex gap-2">
-          {[0, 1].map((i) =>
+          {step >= 0 && [0, 1].map((i) =>
           <motion.div
             key={i}
             className="h-2 rounded-full transition-all duration-500"
@@ -376,6 +410,51 @@ const OnboardingScreen = () => {
       {/* Content */}
       <div className="flex-1 px-5 py-4 relative overflow-y-auto z-10">
         <AnimatePresence mode="wait">
+          {step === -1 &&
+          <motion.div
+            key="step-name"
+            variants={pageVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="h-full flex flex-col max-w-md mx-auto w-full">
+
+              <motion.div
+              className="text-center mb-8"
+              variants={staggerChildren}
+              initial="initial"
+              animate="animate">
+
+                <motion.div variants={childVariants} className="flex justify-center mb-4">
+                  <div className="w-16 h-16 flex items-center justify-center"
+                style={{ borderRadius: 20, background: 'var(--a-grad-peach)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.5)' }}>
+                    <User size={30} style={{ color: 'var(--a-accent-ink)' }} />
+                  </div>
+                </motion.div>
+                <motion.h1 variants={childVariants} style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--a-ink)' }}>
+                  {tr("onboardingscreen_adinizi_deyin_baslik", "Necə çağıraq sizi?")}
+                </motion.h1>
+                <motion.p variants={childVariants} style={{ fontSize: 16, color: 'var(--a-on-bg-soft)', marginTop: 6 }}>
+                  {tr("onboardingscreen_adinizi_deyin_alt", "Tətbiqi tam sizə uyğunlaşdıraq")}
+                </motion.p>
+              </motion.div>
+
+              <motion.div variants={staggerChildren} initial="initial" animate="animate" className="flex-1">
+                <motion.div variants={childVariants}>
+                  <Input
+                  type="text"
+                  autoFocus
+                  placeholder={tr("authscreen_adiniz_b3e84a", "Adınız")}
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleNameContinue(); }}
+                  className="h-14 rounded-2xl border-2 border-transparent text-lg px-5 bg-[var(--a-surface)] text-[var(--a-ink)] focus:border-[var(--a-peach-2)] focus-visible:ring-0"
+                  style={{ boxShadow: 'var(--a-card-shadow)' }} />
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          }
+
           {step === 0 &&
           <motion.div
             key="step-0"
@@ -690,9 +769,10 @@ const OnboardingScreen = () => {
       {/* Footer */}
       <div className="px-5 pb-8 pt-4 relative z-10 max-w-md mx-auto w-full">
         <Button
-          onClick={handleNext}
+          onClick={step === -1 ? handleNameContinue : handleNext}
           disabled={
           isSaving ||
+          step === -1 && !nameInput.trim() ||
           step === 0 && !selectedStage ||
           step === 1 && !dateInput ||
           step === 1 && selectedStage === 'mommy' && (!babyName || !babyGender)

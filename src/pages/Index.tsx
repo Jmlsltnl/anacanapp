@@ -542,12 +542,20 @@ const Index = () => {
   // Partners NEVER see standard onboarding or the funnel — detect via either role or life_stage
   const isPartnerUser = role === 'partner' || lifeStage === 'partner';
 
-  // Onboarding - Partners skip onboarding entirely
+  // Apple/Google ilə qeydiyyatda ad soruşulmurdu (native-auth.ts ID token-dən
+  // kənar məlumat göndərmirdi) → handle_new_user() trigger-i defolt olaraq
+  // 'İstifadəçi' yazır. Bunu YALNIZ bir dəfə, məcburi şəkildə düzəltmək üçün
+  // adı hələ də bu placeholder/boş olan İSTƏNİLƏN istifadəçi (yeni OAuth VƏ
+  // ya köhnədən belə qalmış mövcud hesab) növbəti giriş zamanı onboarding-in
+  // ad addımına yönləndirilir — partner istisnasından da asılı olmayaraq.
+  const needsName = !!profile && (!profile.name || profile.name.trim() === '' || profile.name === 'İstifadəçi');
+
+  // Onboarding - Partners skip onboarding entirely (ad addımı istisnadır)
   // KRİTİK: login-dən sonra profil hələ yüklənməyibsə (hydration davam edir)
   // onboarding GÖSTƏRMƏ — köhnə istifadəçi hər login-də modul seçiminə atılırdı.
   // Onboarding yalnız profil yüklənəndən SONRA hələ də isOnboarded=false qalıbsa
-  // (həqiqətən yeni istifadəçi) açılır.
-  if (!isOnboarded && !isPartnerUser) {
+  // (həqiqətən yeni istifadəçi) və ya ad hələ soruşulmayıbsa açılır.
+  if ((!isOnboarded && !isPartnerUser) || needsName) {
     if (!profileLoaded) {
       return suspenseFallback;
     }

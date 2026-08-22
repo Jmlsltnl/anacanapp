@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Baby, Bell, BellOff, Calendar, Check, Droplets, Heart, Loader2, Minus, Plus, Sparkles } from 'lucide-react';
+import { ArrowLeft, Baby, Bell, BellOff, Calendar, Check, Droplets, Heart, Loader2, Minus, Plus, Sparkles, User as UserIcon } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { useUserStore } from '@/store/userStore';
 import { useShallow } from 'zustand/react/shallow';
@@ -92,6 +92,7 @@ const requestPushPermission = async (): Promise<boolean> => {
 // ── Tip və sual tərifləri ──────────────────────────────────────
 
 type StepId =
+  'name' |
   'stage' |
   'bumpDate' | 'multiples' | 'firstPregnancy' | 'bumpSymptoms' | 'bumpInterests' |
   'babyName' | 'babyGender' | 'babyBirth' | 'feeding' | 'nightWakes' | 'mommyInterests' |
@@ -224,9 +225,22 @@ const PremiumOnboarding = () => {
   const isNative = Capacitor.isNativePlatform();
   const isRtl = useIsRtl();
 
+  const { updateProfile, profile } = useAuth();
+
+  // Apple/Google ilə qeydiyyatda ad heç vaxt soruşulmurdu (native-auth.ts ID
+  // token-dən kənar məlumat göndərmirdi) → profil hələ də defolt 'İstifadəçi'
+  // placeholder-ini daşıyırsa, axının İLK addımı MƏCBURİ ad sorğusudur.
+  // Artıq life_stage-i olan (mövcud, sadəcə adı çatışmayan) hesablar üçün
+  // ad təsdiqləndikdən sonra HEÇ bir başqa addım göstərilmir — valideyn
+  // (Index.tsx) profil yeniləndiyi kimi bu komponenti avtomatik bağlayır.
+  const alreadyHasLifeStage = !!profile?.life_stage;
+  const needsNameStep = !profile?.name || profile.name.trim() === '' || profile.name === 'İstifadəçi';
+
   const [stage, setStage] = useState<LifeStage | null>(null);
   const [stepIdx, setStepIdx] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [nameInput, setNameInput] = useState('');
+  const [nameDone, setNameDone] = useState(!needsNameStep);
 
   // Cavablar
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
@@ -259,13 +273,19 @@ const PremiumOnboarding = () => {
       setMultiplesData: s.setMultiplesData,
     }))
   );
-  const { updateProfile } = useAuth();
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();
 
   // Mərhələyə görə addım ardıcıllığı
   const steps: StepId[] = useMemo(() => {
-    const base: StepId[] = ['stage'];
+    const base: StepId[] = [];
+    if (!nameDone) base.push('name');
+    if (alreadyHasLifeStage) {
+      // Mövcud istifadəçi (life_stage artıq var) — yalnız ad çatışmırdı,
+      // ad təsdiqləndikdən sonra başqa addıma ehtiyac yoxdur.
+      return base;
+    }
+    base.push('stage');
     if (!stage) return base;
     let branch: StepId[] = [];
     if (stage === 'bump') branch = ['bumpDate', 'multiples', 'firstPregnancy', 'bumpSymptoms', 'bumpInterests'];
@@ -273,7 +293,7 @@ const PremiumOnboarding = () => {
     if (stage === 'flow') branch = ['flowGoal', 'lmpDate', 'cycleLens', 'regularity', 'flowSymptoms'];
     // Bildiriş icazəsi yalnız native-də ayrıca ekran kimi
     return isNative ? [...base, ...branch, 'notifications'] : [...base, ...branch];
-  }, [stage, isNative]);
+  }, [stage, isNative, nameDone, alreadyHasLifeStage]);
 
   const current = steps[stepIdx];
   const isLast = stepIdx === steps.length - 1;
@@ -313,6 +333,7 @@ const PremiumOnboarding = () => {
   // Addımın "Davam et" üçün hazır olub-olmaması
   const canContinue = (): boolean => {
     switch (current) {
+      case 'name': return !!nameInput.trim();
       case 'bumpDate': return !!bumpDate;
       case 'babyName': return !!babyName.trim();
       case 'babyBirth': return !!babyBirthDate;
@@ -321,6 +342,34 @@ const PremiumOnboarding = () => {
       case 'bumpSymptoms': case 'bumpInterests': case 'mommyInterests': case 'flowSymptoms':
         return Array.isArray(answers[current]) && (answers[current] as string[]).length > 0;
       default: return true;
+    }
+  };
+
+  // Ad addımı — DİGƏR addımlardan fərqli olaraq dərhal (axının sonunu
+  // gözləmədən) yazılır, çünki mövcud istifadəçi üçün bu, TƏK addım ola
+  // bilər (stage heç vaxt seçilmir, ona görə goNextOrFinish/handleSave-in
+  // "if (!stage) return" qorunması onu heç saxlamazdı).
+  const handleNameContinue = async () => {
+    const trimmed = nameInput.trim();
+    if (!trimmed || saving) return;
+    setSaving(true);
+    try {
+      const { error } = await updateProfile({ name: trimmed } as any);
+      if (error) throw error;
+      // Yeni istifadəçi üçün: 'name' steps-dən çıxacaq, 'stage' addımına
+      // keçiləcək. Mövcud (life_stage-i olan) istifadəçi üçün: steps boş
+      // qalacaq — valideyn (Index.tsx) profil yeniləndiyi kimi bu
+      // komponenti avtomatik bağlayacaq.
+      setNameDone(true);
+    } catch (err) {
+      console.error('Name step save error:', err);
+      toast({
+        title: tr('ponb_error', 'Xəta baş verdi'),
+        description: tr('ponb_error_desc', 'Məlumatlar saxlanıla bilmədi — yenidən cəhd edin'),
+        variant: 'destructive'
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -601,6 +650,28 @@ const PremiumOnboarding = () => {
               exit={{ opacity: 0, x: rtlX(-60, isRtl) }}
               transition={{ duration: 0.25 }}>
 
+              {/* ── Ad (Apple/Google-la qeydiyyatda ad soruşulmadığı üçün məcburi) ── */}
+              {current === 'name' &&
+              <>
+                  <Head emoji="👋" title={tr('ponb_name_title', 'Necə çağıraq sizi?')} subtitle={tr('ponb_name_sub', 'Tətbiqi tam sizə uyğunlaşdıraq')} />
+                  <div className="a-card" style={{ padding: 16 }}>
+                    <label className="a-today-info-eyebrow flex items-center gap-1.5" style={{ marginBottom: 8 }}>
+                      <UserIcon size={12} /> {tr('ponb_name_label', 'Adınız')}
+                    </label>
+                    <input
+                    type="text"
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && nameInput.trim()) handleNameContinue(); }}
+                    placeholder={tr('ponb_name_ph', 'məs. Aylin')}
+                    autoFocus
+                    className="a-input w-full"
+                    style={{ height: 52, fontSize: 16 }} />
+                  </div>
+                  <ContinueBtn onClick={handleNameContinue} />
+                </>
+              }
+
               {/* ── Mərhələ seçimi ── */}
               {current === 'stage' &&
               <>
@@ -872,8 +943,16 @@ const PremiumOnboarding = () => {
                 </>
               }
 
+              {/* Steps boşdur — mövcud istifadəçi ad təsdiqlədi, valideyn (Index.tsx)
+                  bu komponenti dərhal bağlayacaq; bu, keçici anlıq görünüşdür. */}
+              {!current &&
+              <div className="flex items-center justify-center py-20">
+                  <Loader2 size={28} className="animate-spin" style={{ color: 'var(--a-peach-2)' }} />
+                </div>
+              }
+
               {/* Alt qeyd */}
-              {current !== 'stage' && current !== 'notifications' &&
+              {current && current !== 'stage' && current !== 'notifications' && current !== 'name' &&
               <p className="a-teaser text-center" style={{ marginTop: 12 }}>
                   {tr('ponb_change_later', 'Bütün məlumatları sonra parametrlərdən dəyişə bilərsiniz')}
                 </p>

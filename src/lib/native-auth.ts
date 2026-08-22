@@ -9,6 +9,33 @@ export const isNative = (): boolean => {
   return typeof cap?.isNativePlatform === "function" && cap.isNativePlatform();
 };
 
+// handle_new_user() DB trigger-inin ad tapmadıqda yazdığı defolt dəyər
+// (supabase/son/Son8.sql). signInWithIdToken() ID token-dən kənar heç bir
+// profil məlumatı qəbul etmir — trigger bunu HƏMİŞƏ bu placeholder ilə
+// yaradır, əgər raw_user_meta_data.name yoxdursa (Apple-da həmişə belədir).
+const DEFAULT_PLACEHOLDER_NAME = "İstifadəçi";
+
+/**
+ * Provayderdən (Apple/Google) real ad gəlibsə, dərhal profilə yazır —
+ * YALNIZ hazırkı ad hələ də defolt placeholder-dirsə (istifadəçi özü ad
+ * dəyişdiribsə üzərinə yazılmır). Bu, məcburi "Adınızı deyin" ekranının
+ * çoxu istifadəçi üçün ümumiyyətlə görünməməsini təmin edir. Uğursuz olsa
+ * belə kritik deyil — onboarding-dəki məcburi ad addımı son fallback-dır.
+ */
+async function applyProviderNameIfDefault(userId: string | undefined, providerName: string | undefined | null) {
+  const name = providerName?.trim();
+  if (!name || !userId) return;
+  try {
+    await supabase
+      .from("profiles")
+      .update({ name })
+      .eq("user_id", userId)
+      .eq("name", DEFAULT_PLACEHOLDER_NAME);
+  } catch {
+    // kritik deyil
+  }
+}
+
 /**
  * Native Google Sign-In using @capacitor-firebase/authentication.
  * Works on both iOS and Android — Firebase handles the platform bits.
@@ -34,6 +61,11 @@ export async function signInWithGoogleNative() {
     token: idToken,
   });
   if (error) throw error;
+
+  // Google Firebase user obyekti displayName-i həmişə verir (Apple-dan fərqli
+  // olaraq bir dəfəlik deyil) — placeholder ad hələ dəyişdirilməyibsə tətbiq et.
+  await applyProviderNameIfDefault(data?.user?.id, result?.user?.displayName);
+
   return data;
 }
 
@@ -74,6 +106,16 @@ export async function signInWithAppleNative() {
     nonce: rawNonce,
   });
   if (error) throw error;
+
+  // Apple givenName/familyName-i YALNIZ ilk icazədə göndərir (məxfilik
+  // siyasəti) — sonrakı girişlərdə null olur. Apple-ın JWT-si heç vaxt ad
+  // claim-i daşımır, ona görə bu, ADın tutulduğu YEGANƏ məqamdır.
+  const fullName = [res?.response?.givenName, res?.response?.familyName]
+    .filter((p): p is string => !!p && p.trim().length > 0)
+    .join(" ")
+    .trim();
+  await applyProviderNameIfDefault(data?.user?.id, fullName || null);
+
   return data;
 }
 
