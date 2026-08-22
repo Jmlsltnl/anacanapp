@@ -49,20 +49,30 @@ interface RCSubscriberResponse {
   };
 }
 
-async function fetchRevenueCatSubscriber(appUserId: string): Promise<RCSubscriberResponse | null> {
+interface RCFetchResult {
+  data: RCSubscriberResponse | null;
+  // Diaqnostika üçün — DİQQƏT: heç vaxt açarın özünü daşımır, yalnız
+  // "niyə uğursuz oldu" məlumatını. Müvəqqəti debug sonra silinəcək.
+  debugReason?: 'no_secret_key' | 'rc_api_error';
+  debugStatus?: number;
+  debugDetail?: string;
+}
+
+async function fetchRevenueCatSubscriber(appUserId: string): Promise<RCFetchResult> {
   const secretKey = Deno.env.get('REVENUECAT_SECRET_API_KEY');
   if (!secretKey) {
     console.error('[sync-revenuecat-entitlement] REVENUECAT_SECRET_API_KEY not configured');
-    return null;
+    return { data: null, debugReason: 'no_secret_key' };
   }
   const resp = await fetch(`https://api.revenuecat.com/v1/subscribers/${encodeURIComponent(appUserId)}`, {
     headers: { Authorization: `Bearer ${secretKey}` },
   });
   if (!resp.ok) {
-    console.error('[sync-revenuecat-entitlement] RC API error:', resp.status, await resp.text());
-    return null;
+    const bodyText = await resp.text();
+    console.error('[sync-revenuecat-entitlement] RC API error:', resp.status, bodyText);
+    return { data: null, debugReason: 'rc_api_error', debugStatus: resp.status, debugDetail: bodyText.slice(0, 300) };
   }
-  return await resp.json();
+  return { data: await resp.json() };
 }
 
 Deno.serve(async (req) => {
@@ -81,12 +91,18 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    const rc = await fetchRevenueCatSubscriber(userId);
-    if (!rc) {
+    const rcResult = await fetchRevenueCatSubscriber(userId);
+    if (!rcResult.data) {
       // RC əlçatan deyil (açar yoxdur / şəbəkə xətası) — mövcud DB vəziyyətinə
       // toxunmuruq (yanlış "expired" yazmaqdansa heç nə etməmək daha təhlükəsizdir).
-      return json({ error: 'revenuecat_unavailable' }, 503);
+      return json({
+        error: 'revenuecat_unavailable',
+        reason: rcResult.debugReason,
+        rcStatus: rcResult.debugStatus,
+        rcDetail: rcResult.debugDetail,
+      }, 503);
     }
+    const rc = rcResult.data;
 
     const entitlement = rc.subscriber?.entitlements?.[ENTITLEMENT_ID];
     const now = Date.now();
