@@ -51,8 +51,11 @@ interface RCSubscriberResponse {
 
 interface RCFetchResult {
   data: RCSubscriberResponse | null;
-  // Diaqnostika üçün — DİQQƏT: heç vaxt açarın özünü daşımır, yalnız
-  // "niyə uğursuz oldu" məlumatını. Müvəqqəti debug sonra silinəcək.
+  // Diaqnostika üçün (503 cavabına əlavə olunur) — DİQQƏT: heç vaxt açarın
+  // özünü daşımır, yalnız "niyə uğursuz oldu" kateqoriyasını + RC-nin öz
+  // (generic) status/mətnini. Yalnız ÇAĞIRAN İSTİFADƏÇİNİN öz sorğusuna
+  // aiddir (başqa istifadəçi/global məlumat sızmır) — server konfiqurasiya
+  // problemlərini (məs. secret V1/V2 uyğunsuzluğu) tez aşkarlamaq üçün saxlanılır.
   debugReason?: 'no_secret_key' | 'rc_api_error';
   debugStatus?: number;
   debugDetail?: string;
