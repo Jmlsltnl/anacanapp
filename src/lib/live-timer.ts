@@ -3,6 +3,8 @@
 // Android: Foreground Service xronometr bildirişi
 // Native mövcud deyilsə (web / köhnə iOS / widget target quraşdırılmayıb) →
 // köhnə davamlı lokal bildirişə fallback.
+import { Capacitor } from '@capacitor/core';
+import { toast } from 'sonner';
 import { tr } from '@/lib/tr';
 import { isNative } from '@/lib/native';
 import LiveActivity, { type PendingTimerStop } from '@/plugins/LiveActivityPlugin';
@@ -45,6 +47,14 @@ export async function startNativeTimer(timer: ActiveTimer): Promise<void> {
   } catch (e) {
     // Live Activity mümkün deyil → köhnə davamlı bildiriş
     console.warn('LiveActivity start fallback:', e);
+    // MÜVƏQQƏTİ DİAQNOSTİKA (iOS widget "düşmür" problemi araşdırılır) — native
+    // tərəfin dəqiq rədd səbəbini (məs. "Live Activities disabled by user")
+    // Xcode konsoluna ehtiyac olmadan birbaşa ekranda göstərir. Problem
+    // tapılandan sonra bu toast silinəcək.
+    if (Capacitor.getPlatform() === 'ios') {
+      const reason = (e as any)?.message || (e as any)?.errorMessage || String(e);
+      toast.error(`LiveActivity başlamadı: ${reason}`, { duration: 8000 });
+    }
     showTimerNotification(timer.id, timer.type, `${childPrefix}${base}`, timer.feedType);
   }
 }
