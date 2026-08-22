@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		181238B0303A1C1900F002BC /* LiveActivityPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181238AF303A1C1800F002BC /* LiveActivityPlugin.swift */; };
 		184C247330123BAC00B3D8FD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 184C247230123BAC00B3D8FD /* GoogleService-Info.plist */; };
 		18A584573037390900A66DF5 /* HealthCyclePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A584553037390900A66DF5 /* HealthCyclePlugin.swift */; };
 		18A584583037390900A66DF5 /* HealthVitalsPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A584563037390900A66DF5 /* HealthVitalsPlugin.swift */; };
@@ -50,6 +51,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		181238AF303A1C1800F002BC /* LiveActivityPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityPlugin.swift; sourceTree = "<group>"; };
 		184C247230123BAC00B3D8FD /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		18A584553037390900A66DF5 /* HealthCyclePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCyclePlugin.swift; sourceTree = "<group>"; };
 		18A584563037390900A66DF5 /* HealthVitalsPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthVitalsPlugin.swift; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 		504EC3061FED79650016851F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				181238AF303A1C1800F002BC /* LiveActivityPlugin.swift */,
 				18A584593037391100A66DF5 /* PrivacyInfo.xcprivacy */,
 				18A584553037390900A66DF5 /* HealthCyclePlugin.swift */,
 				18A584563037390900A66DF5 /* HealthVitalsPlugin.swift */,
@@ -292,6 +295,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				18A584573037390900A66DF5 /* HealthCyclePlugin.swift in Sources */,
+				181238B0303A1C1900F002BC /* LiveActivityPlugin.swift in Sources */,
 				18A584583037390900A66DF5 /* HealthVitalsPlugin.swift in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 			);
