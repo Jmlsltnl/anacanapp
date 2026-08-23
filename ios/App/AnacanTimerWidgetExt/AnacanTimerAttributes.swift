@@ -1,8 +1,8 @@
 import ActivityKit
 import Foundation
 
-/// Live Activity atributları — HƏM əsas app target-ə, HƏM DƏ widget extension
-/// target-ə üzv edilməlidir (Xcode: Target Membership → App + AnacanTimerWidget).
+/// Live Activity atributları — HƏM əsas "App" target-ə, HƏM DƏ widget
+/// extension target-ə ("AnacanTimerWidgetExt") üzv edilməlidir.
 struct AnacanTimerAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
         var elapsedSeconds: Int
@@ -14,6 +14,7 @@ struct AnacanTimerAttributes: ActivityAttributes {
     var label: String        // lokallaşdırılmış başlıq (JS-dən gəlir)
     var feedType: String?    // "left" | "right"
     var startTime: Date
+    var subLabel: String?    // lokallaşdırılmış alt-mətn (JS-dən gəlir, məs. "Davam edir...")
 
     var timerEmoji: String {
         switch timerType {
