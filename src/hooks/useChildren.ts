@@ -79,9 +79,18 @@ export const useChildren = () => {
 
           const avatarEmoji = normalizedGender === 'girl' ? '👧' : '👦';
 
+          // DÜZƏLİŞ: əvvəllər .upsert(..., {onConflict:'user_id,name,birth_date'})
+          // idi — user_children-in YEGANƏ unikal indeksi QİSMƏN-dir
+          // (WHERE is_active = true, bax Duzelis-dən əvvəlki
+          // 20260813150027_user_children_unique_guard.sql). Supabase-js-in
+          // .upsert() metodu ON CONFLICT-ə WHERE predikatı əlavə edə bilmir,
+          // buna görə Postgres bu qismən indeksi arbiter kimi tanıya bilmir
+          // və HƏR sətir 42P10 xətası ilə rədd olunurdu (səssizcə, heç yerdə
+          // göstərilmədən) — bu sətrin özü elə YALNIZ mövcud sətir sayı 0
+          // olanda işə düşür, ona görə sadə INSERT tam təhlükəsizdir.
           const { error: insertError } = await supabase
             .from('user_children')
-            .upsert({
+            .insert({
               user_id: user.id,
               name: profileRow.baby_name,
               birth_date: profileRow.baby_birth_date,
@@ -89,7 +98,7 @@ export const useChildren = () => {
               avatar_emoji: avatarEmoji,
               is_active: true,
               sort_order: 0,
-            }, { onConflict: 'user_id,name,birth_date', ignoreDuplicates: true });
+            });
 
           if (insertError) {
             console.error('Error seeding first child from profile:', insertError);

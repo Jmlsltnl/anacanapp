@@ -9,10 +9,10 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useAutoJoinGroups } from '@/hooks/useCommunity';
+import { useChildren } from '@/hooks/useChildren';
 import { useOnboardingStages, useMultiplesOptions, getFallbackStages, getFallbackMultiples } from '@/hooks/useDynamicOnboarding';
 import { useAppSettings } from '@/hooks/useAppSettings';
 import { useLanguage } from '@/hooks/useLanguage';
-import { supabase } from '@/integrations/supabase/client';
 import type { LifeStage } from '@/types/anacan';
 import { tr } from "@/lib/tr";
 import { isRtlLang, rtlX } from '@/lib/rtl';
@@ -61,6 +61,7 @@ const OnboardingScreen = () => {
   );
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();
+  const { addChild, children: existingChildren } = useChildren();
   const { language } = useLanguage();
   const isRtl = isRtlLang(language);
 
@@ -214,17 +215,23 @@ const OnboardingScreen = () => {
               return;
             }
 
-            // Also add child to user_children table (idempotent — retry dublikat yaratmır)
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-              await supabase.from('user_children').upsert({
-                user_id: user.id,
+            // user_children-ə əlavə et — DÜZƏLİŞ: əvvəllər burada birbaşa
+            // .upsert({...}, {onConflict:'user_id,name,birth_date'}) çağırılırdı.
+            // user_children-in unikal indeksi QİSMƏNDİR (WHERE is_active=true),
+            // Supabase-js isə ON CONFLICT-ə WHERE əlavə edə bilmir → Postgres
+            // bu indeksi arbiter kimi tanıya bilmirdi və HƏR sətir 42P10
+            // xətası ilə səssizcə rədd olunurdu (heç yerdə göstərilmədən) —
+            // nəticədə Dashboard/böyümə/diş çıxarma/peyvənd və s. HƏMİŞƏ boş
+            // qalırdı, təkcə Profil Redaktəsi (useChildren().addChild — sadə
+            // INSERT, ON CONFLICT-siz) düzəldə bilirdi. İndi eyni işlək
+            // yoldan (addChild) istifadə olunur.
+            if (existingChildren.length === 0) {
+              await addChild({
                 name: babyName,
                 birth_date: dateInput,
                 gender: babyGender,
-                avatar_emoji: babyGender === 'boy' ? '👦' : '👧',
-                sort_order: 0
-              }, { onConflict: 'user_id,name,birth_date', ignoreDuplicates: true });
+                avatar_emoji: babyGender === 'boy' ? '👦' : '👧'
+              });
             }
 
             // Update local store
@@ -234,13 +241,14 @@ const OnboardingScreen = () => {
             setFunnelCompleted(false);
             setOnboarded(true);
 
-            // Auto-join relevant community groups
+            // Auto-join relevant community groups — .catch: profil artıq
+            // saxlanılıb, kosmetik icma-qoşulma xətası əsas nəticəni pozmasın
             await autoJoin({
               life_stage: selectedStage,
               baby_birth_date: dateInput,
               baby_gender: babyGender,
               multiples_type: multiplesType
-            });
+            }).catch((e) => console.warn('autoJoin (mommy) failed:', e));
           }
         } else if (selectedStage === 'bump') {
           if (dateInput) {
@@ -275,12 +283,13 @@ const OnboardingScreen = () => {
             setFunnelCompleted(false);
             setOnboarded(true);
 
-            // Auto-join relevant community groups
+            // Auto-join relevant community groups — .catch: profil artıq
+            // saxlanılıb, kosmetik icma-qoşulma xətası əsas nəticəni pozmasın
             await autoJoin({
               life_stage: selectedStage,
               due_date: dueDate.toISOString().split('T')[0],
               multiples_type: multiplesType
-            });
+            }).catch((e) => console.warn('autoJoin (bump) failed:', e));
           }
         } else {
           // Flow stage
@@ -311,8 +320,8 @@ const OnboardingScreen = () => {
             setFunnelCompleted(false);
             setOnboarded(true);
 
-            // Auto-join general groups
-            await autoJoin({ life_stage: selectedStage });
+            // Auto-join general groups — .catch: profil artıq saxlanılıb
+            await autoJoin({ life_stage: selectedStage }).catch((e) => console.warn('autoJoin (flow) failed:', e));
           }
         }
 

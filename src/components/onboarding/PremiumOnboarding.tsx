@@ -7,6 +7,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useAutoJoinGroups } from '@/hooks/useCommunity';
+import { useChildren } from '@/hooks/useChildren';
 import { supabase } from '@/integrations/supabase/client';
 import type { LifeStage } from '@/types/anacan';
 import { useIsRtl, rtlX } from '@/lib/rtl';
@@ -275,6 +276,7 @@ const PremiumOnboarding = () => {
   );
   const { toast } = useToast();
   const { autoJoin } = useAutoJoinGroups();
+  const { addChild, children: existingChildren } = useChildren();
 
   // Mərhələyə görə addım ardıcıllığı
   const steps: StepId[] = useMemo(() => {
@@ -399,7 +401,10 @@ const PremiumOnboarding = () => {
         setLastPeriodDate(lmp);
         setDueDate(due);
         setMultiplesData(babyCount, multiplesId as any);
-        await autoJoin({ life_stage: stage, due_date: due.toISOString().split('T')[0], multiples_type: multiplesId });
+        // .catch: profil artıq uğurla yadda saxlanıb — icma qrupuna avtomatik
+        // qoşulma (kosmetik funksiya) şəbəkə problemi ilə uğursuz olsa belə,
+        // bu, əsas saxlama nəticəsini "Xəta baş verdi"yə çevirməməlidir.
+        await autoJoin({ life_stage: stage, due_date: due.toISOString().split('T')[0], multiples_type: multiplesId }).catch((e) => console.warn('autoJoin (bump) failed:', e));
       } else if (stage === 'mommy') {
         const { error } = await updateProfile({
           life_stage: stage,
@@ -412,21 +417,26 @@ const PremiumOnboarding = () => {
         } as any);
         if (error) throw error;
 
-        // user_children siyahısına da əlavə et (idempotent — retry dublikat yaratmır)
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          await supabase.from('user_children').upsert({
-            user_id: user.id,
+        // user_children-ə əlavə et — DÜZƏLİŞ: əvvəllər burada birbaşa
+        // .upsert({...}, {onConflict:'user_id,name,birth_date'}) çağırılırdı.
+        // user_children-in unikal indeksi QİSMƏNDİR (WHERE is_active=true),
+        // Supabase-js isə ON CONFLICT-ə WHERE əlavə edə bilmir → Postgres bu
+        // indeksi arbiter kimi tanıya bilmirdi və HƏR sətir 42P10 xətası ilə
+        // səssizcə rədd olunurdu — nəticədə Dashboard/böyümə/diş çıxarma/
+        // peyvənd HƏMİŞƏ boş qalırdı, təkcə Profil Redaktəsi (useChildren().
+        // addChild — sadə INSERT, ON CONFLICT-siz) düzəldə bilirdi. İndi eyni
+        // işlək yoldan istifadə olunur.
+        if (existingChildren.length === 0) {
+          await addChild({
             name: babyName.trim(),
             birth_date: babyBirthDate,
             gender: babyGender!,
-            avatar_emoji: babyGender === 'boy' ? '👦' : '👧',
-            sort_order: 0
-          }, { onConflict: 'user_id,name,birth_date', ignoreDuplicates: true });
+            avatar_emoji: babyGender === 'boy' ? '👦' : '👧'
+          });
         }
 
         setBabyData(new Date(babyBirthDate), babyName.trim(), babyGender!, babyCount, multiplesId as any);
-        await autoJoin({ life_stage: stage, baby_birth_date: babyBirthDate, baby_gender: babyGender!, multiples_type: multiplesId });
+        await autoJoin({ life_stage: stage, baby_birth_date: babyBirthDate, baby_gender: babyGender!, multiples_type: multiplesId }).catch((e) => console.warn('autoJoin (mommy) failed:', e));
       } else {
         const { error } = await updateProfile({
           life_stage: stage,
@@ -440,7 +450,7 @@ const PremiumOnboarding = () => {
         setLastPeriodDate(new Date(lmpDate));
         setStoreCycleLength(cycleLen);
         setStorePeriodLength(periodLen);
-        await autoJoin({ life_stage: stage });
+        await autoJoin({ life_stage: stage }).catch((e) => console.warn('autoJoin (flow) failed:', e));
       }
 
       // Bildiriş icazəsi verilibsə → user_preferences yenilə
