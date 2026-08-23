@@ -43,6 +43,15 @@ export interface RCPackage {
   _raw: any; // full package object for purchasePackage
 }
 
+interface SyncOptions {
+  /** Satın alma/bərpa dərhal sonra çağırılır: RC-nin öz REST API-sinin təzə
+   * alışı "görməsi" bir neçə saniyə gecikə bilər (eventual consistency) —
+   * bu halda tək cəhd kifayət etməyə bilər. true olanda, cavab isPro:false
+   * gəlsə belə bir neçə dəfə (artan gecikmə ilə) təkrar sınanılır ki, real
+   * ödəniş RC-nin özündə "görünənə qədər" səhvən "pulsuz" kimi yazılmasın. */
+  expectPro?: boolean;
+}
+
 interface UseInAppPurchaseReturn {
   packages: RCPackage[];
   isLoading: boolean;
@@ -69,7 +78,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(false);
   const [isPro, setIsPro] = useState(false);
-  const syncWithDatabaseRef = useRef<(() => Promise<void>) | null>(null);
+  const syncWithDatabaseRef = useRef<((opts?: SyncOptions) => Promise<boolean>) | null>(null);
 
 
   // Initialize RevenueCat
@@ -163,24 +172,43 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   }, [user?.id]);
 
   // Server-side sinxron — TƏK etibarlı yazı yolu (bax sync-revenuecat-entitlement
-  // edge function). Artıq heç bir parametr qəbul etmir: edge function
-  // RevenueCat-ın öz REST API-sindən (məxfi açarla, yalnız serverdə) real
-  // entitlement vəziyyətini müstəqil çəkir — klientin sözünə etibar ETMİR.
-  // subscriptions cədvəli artıq client-tərəfi yazıla bilmir (Duzelis33.sql).
-  const syncWithDatabase = useCallback(async () => {
-    if (!user) return;
-    try {
-      const { data, error } = await supabase.functions.invoke('sync-revenuecat-entitlement');
-      if (error) {
-        console.error('sync-revenuecat-entitlement error:', error);
-        return;
+  // edge function). Edge function RevenueCat-ın öz REST API-sindən (məxfi
+  // açarla, yalnız serverdə) real entitlement vəziyyətini müstəqil çəkir —
+  // klientin sözünə etibar ETMİR. subscriptions cədvəli artıq client-tərəfi
+  // yazıla bilmir (Duzelis33.sql).
+  //
+  // DÜZƏLİŞ (təkrar-cəhd əlavəsi): əvvəllər BİR dəfə cəhd olunurdu — uğursuz
+  // olsa (edge function cold-start, alışdan dərhal sonrakı qısa şəbəkə
+  // kəsilməsi, RC-nin öz serverinin təzə alışı hələ "görməməsi" kimi adi
+  // eventual-consistency gecikməsi) HEÇ bir təkrar cəhd yox idi — istifadəçi
+  // ödəyib "Premium aktivləşdi! 🎉" görürdü, DB isə səssizcə köhnə qalırdı.
+  // Bir müştəri məhz bu səbəbdən Premium ala bilməyib şikayət etdi.
+  const syncWithDatabase = useCallback(async (opts?: SyncOptions): Promise<boolean> => {
+    if (!user) return false;
+    const maxAttempts = opts?.expectPro ? 4 : 1;
+    const delaysMs = [0, 1500, 3000, 6000];
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      if (delaysMs[attempt]) await new Promise((resolve) => setTimeout(resolve, delaysMs[attempt]));
+      try {
+        const { data, error } = await supabase.functions.invoke('sync-revenuecat-entitlement');
+        if (error) {
+          console.error(`sync-revenuecat-entitlement error (cəhd ${attempt + 1}/${maxAttempts}):`, error);
+          continue;
+        }
+        if (typeof data?.isPro === 'boolean') setIsPro(data.isPro);
+        // Refresh in-memory profile so the UI unlocks/locks premium immediately
+        await refreshProfile();
+        if (!opts?.expectPro || data?.isPro === true) {
+          return !!data?.isPro;
+        }
+        // expectPro=true amma isPro=false gəldi → RC serverinin gecikməsi ola
+        // bilər, növbəti (daha uzun gözləmə ilə) cəhdə keç.
+      } catch (err) {
+        console.error(`DB sync error (cəhd ${attempt + 1}/${maxAttempts}):`, err);
       }
-      if (typeof data?.isPro === 'boolean') setIsPro(data.isPro);
-      // Refresh in-memory profile so the UI unlocks/locks premium immediately
-      await refreshProfile();
-    } catch (err) {
-      console.error('DB sync error:', err);
     }
+    return false;
   }, [user, refreshProfile]);
 
   useEffect(() => {
@@ -205,7 +233,9 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         // DB yazısı + referral konversiya təsdiqi indi TAMAMİLƏ server-side
         // (sync-revenuecat-entitlement edge function RC-nin öz REST API-sini
         // çağırıb müstəqil təsdiqləyir — klient artıq bunu tətikləmir).
-        await syncWithDatabase();
+        // expectPro:true — RC serveri bu təzə alışı hələ "görməyə" bilər,
+        // isPro:false gəlsə bir neçə dəfə təkrar sınanılsın.
+        await syncWithDatabase({ expectPro: true });
 
         // Analytics: real qiymət/valyuta ilə (FB value-optimization + GA4 purchase).
         // Trial başlanğıcı ayrıca konversiyadır (Meta StartTrial / GA4).
@@ -263,7 +293,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         // real, düzgün (illik/lifetime daxil) məlumatı özü çəkir (əvvəllər
         // bura parametr ötürülmürdü deyə həmişə "+1 ay" fallback-a düşürdü,
         // illik/lifetime abunəçiləri səhvən 1 ay sonra "bitmiş" göstərirdi).
-        await syncWithDatabase();
+        await syncWithDatabase({ expectPro: true });
         return true;
       }
       return false;
@@ -284,7 +314,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     if (!result.available) return false;
     if (result.didPurchase) {
       setIsPro(true);
-      await syncWithDatabase();
+      await syncWithDatabase({ expectPro: true });
       return true;
     }
     return false;
@@ -295,7 +325,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     const result = await presentPaywall();
     if (result.available && result.didPurchase) {
       setIsPro(true);
-      await syncWithDatabase();
+      await syncWithDatabase({ expectPro: true });
     }
     return result;
   }, [syncWithDatabase]);
