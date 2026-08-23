@@ -52,6 +52,7 @@ export interface PostComment {
   user_id: string;
   parent_comment_id: string | null;
   content: string;
+  image_url?: string | null;
   likes_count: number;
   created_at: string;
   is_anonymous?: boolean;
@@ -633,7 +634,6 @@ export const usePostComments = (postId: string, enabled: boolean = true) => {
     }
   });
 };
-
 export const useCreateComment = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -642,6 +642,7 @@ export const useCreateComment = () => {
     mutationFn: async ({
       postId,
       content,
+      imageUrl,
       parentCommentId,
       postAuthorId,
       commenterName,
@@ -650,10 +651,11 @@ export const useCreateComment = () => {
 
 
 
+ 
 
 
 
-    }: {postId: string;content: string;parentCommentId?: string | null;postAuthorId?: string;commenterName?: string;isAnonymous?: boolean;}) => {
+    }: {postId: string;content: string;imageUrl?: string | null;parentCommentId?: string | null;postAuthorId?: string;commenterName?: string;isAnonymous?: boolean;}) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
@@ -664,6 +666,7 @@ export const useCreateComment = () => {
         user_id: user.id,
         parent_comment_id: parentCommentId ?? null,
         content,
+        image_url: imageUrl || null,
         is_anonymous: isAnonymous || false
       });
 
@@ -700,6 +703,7 @@ export const useCreateComment = () => {
         user_id: 'optimistic',
         parent_comment_id: vars.parentCommentId ?? null,
         content: vars.content,
+        image_url: vars.imageUrl || null,
         likes_count: 0,
         created_at: new Date().toISOString(),
         is_anonymous: vars.isAnonymous || false,
@@ -723,6 +727,83 @@ export const useCreateComment = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['post-comments', variables.postId] });
       queryClient.invalidateQueries({ queryKey: ['group-posts'] });
+    }
+  });
+};
+
+/**
+ * Şərh/cavab redaktəsi — useEditPost ilə EYNİ nəzarət nümunəsi
+ * (.eq('user_id', user.id) — yalnız öz şərhini dəyişə bilər, RLS bunu
+ * artıq icazə verir, bax Duzelis41.sql). Mətn və/və ya şəkil dəyişə bilər;
+ * imageUrl===null göndərilsə mövcud şəkil silinir (composer-də "x" düyməsi).
+ */
+export const useEditComment = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ commentId, content, imageUrl }: {commentId: string;content: string;postId: string;imageUrl?: string | null;}) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const updates: Record<string, any> = { content };
+      if (imageUrl !== undefined) updates.image_url = imageUrl;
+
+      const { error } = await supabase.
+      from('post_comments').
+      update(updates).
+      eq('id', commentId).
+      eq('user_id', user.id);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['post-comments', variables.postId] });
+      toast({ title: tr("usecommunity_serh_redakte_edildi", "Şərh redaktə edildi ✏️") });
+    },
+    onError: () => {
+      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    }
+  });
+};
+
+/**
+ * Şərh/cavab silinməsi — DÜZƏLİŞ: əvvəllər CommentReply.tsx bunu xam
+ * supabase çağırışı ilə edirdi və UI-da yalnız admin düyməsi göstərilirdi —
+ * adi istifadəçi öz şərhini silə bilmirdi (RLS artıq icazə verirdi, sadəcə
+ * kod yox idi).
+ *
+ * DİQQƏT: sahiblik yoxlaması BURADA (.eq('user_id', user.id)) YOX, RLS-də
+ * edilir — çünki post_comments-də İKİ ayrı DELETE siyasəti var: "Users can
+ * delete own comments" (auth.uid()=user_id) VƏ "Admins can manage all
+ * comments" (FOR ALL). Əgər client sorğusuna .eq('user_id', user.id) əlavə
+ * etsəydik, bu, admin başqasının şərhini silməyə çalışanda sətri (user_id
+ * uyğun gəlmədiyi üçün) səssizcə TAPMAZDI — admin-in silmə hüququnu
+ * (RLS icazə versə belə) qıraraq. RLS hər iki halı düzgün idarə edir.
+ */
+export const useDeleteComment = () => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ commentId }: {commentId: string;postId: string;}) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase.
+      from('post_comments').
+      delete().
+      eq('id', commentId);
+
+      if (error) throw error;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['post-comments', variables.postId] });
+      queryClient.invalidateQueries({ queryKey: ['group-posts'] });
+      toast({ title: tr("commentreply_serh_silindi_59cfe5", "Şərh silindi") + ' 🗑️' });
+    },
+    onError: () => {
+      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   });
 };

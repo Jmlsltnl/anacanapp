@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Flag, Pencil, EyeOff, Languages, Pin, PinOff } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Flag, Pencil, EyeOff, Languages, Pin, PinOff, ImagePlus, X, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { CommunityPost, useToggleLike, usePostComments, useCreateComment, useEditPost, useDeletePost, useTogglePinPost } from '@/hooks/useCommunity';
@@ -56,6 +56,12 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [commentAnonymous, setCommentAnonymous] = useState(false);
+  // Şərhə şəkil əlavə etmə — post composer-indəki uploadMedia (CreatePostScreen.tsx)
+  // ilə eyni bucket/pattern (community-media, ${user.id}/... yolu).
+  const [commentImageFile, setCommentImageFile] = useState<File | null>(null);
+  const [commentImagePreview, setCommentImagePreview] = useState<string | null>(null);
+  const [uploadingCommentImage, setUploadingCommentImage] = useState(false);
+  const commentFileInputRef = useRef<HTMLInputElement>(null);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -100,17 +106,55 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
     lastTapRef.current = now;
   }, [post.is_liked, handleLike]);
 
-  const handleComment = () => {
+  const handleCommentImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (e.target) e.target.value = '';
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: tr("createpostscreen_fayl_cox_boyukdur_f5cf61", 'Fayl çox böyükdür'), description: 'Max 10MB', variant: 'destructive' });
+      return;
+    }
+    setCommentImageFile(file);
+    setCommentImagePreview(URL.createObjectURL(file));
+  };
+
+  const uploadCommentImage = async (file: File): Promise<string> => {
+    if (!user) throw new Error('Not authenticated');
+    const fileExt = file.name.split('.').pop() || 'jpg';
+    const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const { error } = await supabase.storage.from('community-media').upload(fileName, file, { cacheControl: '3600', upsert: false });
+    if (error) throw new Error(`${tr("community_file_upload_failed", "Fayl yüklənə bilmədi:")} ${error.message}`);
+    const { data: { publicUrl } } = supabase.storage.from('community-media').getPublicUrl(fileName);
+    return publicUrl;
+  };
+
+  const handleComment = async () => {
     const content = commentText.trim();
-    if (!content) return;
+    if (!content && !commentImageFile) return;
     hapticFeedback.light();
+
+    let imageUrl: string | null = null;
+    if (commentImageFile) {
+      setUploadingCommentImage(true);
+      try {
+        imageUrl = await uploadCommentImage(commentImageFile);
+      } catch (e: any) {
+        setUploadingCommentImage(false);
+        toast({ title: tr("postcard_xeta_3cdbb6", 'Xəta'), description: e?.message, variant: 'destructive' });
+        return;
+      }
+      setUploadingCommentImage(false);
+    }
+
     // Dərhal təmizlə (optimistic UX) — createComment artıq özü optimistic
     // əlavə edir və uğursuz olarsa geri qaytarır + toast göstərir
     // (əvvəllər burada heç bir xəta idarəetməsi yox idi, uğursuz olsa belə
     // input sükutla təmizlənirdi, şərh isə görünmürdü).
     setCommentText('');
+    setCommentImageFile(null);
+    setCommentImagePreview(null);
     createComment.mutate({
-      postId: post.id, content, postAuthorId: post.user_id,
+      postId: post.id, content, imageUrl, postAuthorId: post.user_id,
       commenterName: profile?.name || user?.user_metadata?.name || tr("postcard_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
       isAnonymous: commentAnonymous
     });
@@ -376,7 +420,27 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
             style={{ borderTop: '1px solid var(--a-line)', marginTop: 12 }}>
             
               <div className="space-y-3" style={{ paddingTop: 12 }}>
+                {commentImagePreview &&
+              <div style={{ position: 'relative', width: 64, height: 64 }}>
+                    <img src={commentImagePreview} alt="" style={{ width: 64, height: 64, borderRadius: 12, objectFit: 'cover' }} />
+                    <button
+                  type="button"
+                  onClick={() => { setCommentImageFile(null); setCommentImagePreview(null); }}
+                  style={{ position: 'absolute', top: -6, insetInlineEnd: -6, width: 20, height: 20, borderRadius: 999, background: 'var(--a-ink)', color: 'var(--a-bg)', display: 'grid', placeItems: 'center', border: 'none', cursor: 'pointer' }}>
+                      <X size={11} />
+                    </button>
+                  </div>
+              }
                 <div className="flex gap-2.5">
+                  <input type="file" accept="image/*" ref={commentFileInputRef} onChange={handleCommentImageSelect} style={{ display: 'none' }} />
+                  <button
+                  type="button"
+                  onClick={() => commentFileInputRef.current?.click()}
+                  disabled={uploadingCommentImage}
+                  style={{ width: 36, height: 36, borderRadius: 999, flexShrink: 0, background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)', display: 'grid', placeItems: 'center', border: 'none', cursor: 'pointer' }}
+                  aria-label={tr("postcard_sekil_elave_et", "Şəkil əlavə et")}>
+                    <ImagePlus size={16} />
+                  </button>
                   <input
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
@@ -387,9 +451,9 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
                 
                   <button
                   onClick={handleComment}
-                  disabled={!commentText.trim() || createComment.isPending}
-                  style={{ width: 36, height: 36, borderRadius: 999, flexShrink: 0, background: 'var(--a-ink)', color: 'var(--a-bg)', display: 'grid', placeItems: 'center', border: 'none', cursor: 'pointer', opacity: !commentText.trim() ? 0.4 : 1 }}>
-                    <Send size={14} />
+                  disabled={(!commentText.trim() && !commentImageFile) || createComment.isPending || uploadingCommentImage}
+                  style={{ width: 36, height: 36, borderRadius: 999, flexShrink: 0, background: 'var(--a-ink)', color: 'var(--a-bg)', display: 'grid', placeItems: 'center', border: 'none', cursor: 'pointer', opacity: !commentText.trim() && !commentImageFile ? 0.4 : 1 }}>
+                    {uploadingCommentImage ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                   </button>
                 </div>
                 <button
