@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { usePrivacyPreferences } from './usePrivacyPreferences';
 import { Geolocation } from '@capacitor/geolocation';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
@@ -21,6 +22,11 @@ export interface SOSAlert {
 
 export const useSOSAlert = () => {
   const { user, profile } = useAuth();
+  // DÜZƏLİŞ: "Məkan paylaşımı" gizlilik keçidi (PartnerPrivacyScreen.tsx)
+  // istifadəçiyə nəzarət hissi verirdi, amma əvvəllər burada HEÇ YOXLANILMIRDI
+  // — keçid söndürülsə belə SOS zamanı dəqiq GPS məkanı hər halda tutulub
+  // partnyora göndərilirdi. İndi bu preference REAL şəkildə tətbiq olunur.
+  const { prefs: privacyPrefs } = usePrivacyPreferences();
   const [alerts, setAlerts] = useState<SOSAlert[]>([]);
   const [loading, setLoading] = useState(false);
   const [pendingAlert, setPendingAlert] = useState<SOSAlert | null>(null);
@@ -115,8 +121,11 @@ export const useSOSAlert = () => {
         return { error: 'No partner linked' };
       }
 
+      // Çağıran includeLocation=true göndərsə belə, istifadəçinin özü
+      // "Məkan paylaşımı"nı söndürübsə (privacy_location_sharing=false),
+      // GPS heç tutulmur — siqnal/mesaj yenə göndərilir, sadəcə koordinatsız.
       let location = null;
-      if (includeLocation) {
+      if (includeLocation && privacyPrefs.privacy_location_sharing) {
         location = await getCurrentLocation();
       }
 

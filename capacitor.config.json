@@ -26,7 +26,7 @@
       "permissionText": "Tətbiq nəcis skaneri və şəkil yükləmək üçün kameraya ehtiyac duyur"
     },
     "Geolocation": {
-      "permissionText": "Tətbiq hava vəziyyəti və geyim tövsiyələri üçün məkanınıza ehtiyac duyur"
+      "permissionText": "Hava vəziyyətinə uyğun geyim tövsiyələri vermək və təcili vəziyyətdə (SOS) məkanınızı partnyorunuzla paylaşmaq üçün istifadə olunur"
     },
     "FirebaseAuthentication": {
       "skipNativeAuth": false,

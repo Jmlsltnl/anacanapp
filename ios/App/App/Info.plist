@@ -96,10 +96,10 @@
 	<string>Körpə ağlama analizi və səs qeydləri üçün mikrofon istifadə olunur.</string>
 
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Hava vəziyyətinə uyğun geyim tövsiyələri və yaxınlıqdakı ana-dostu məkanları göstərmək üçün məkanınız lazımdır.</string>
+	<string>Hava vəziyyətinə uyğun geyim tövsiyələri vermək və təcili vəziyyətdə (SOS) məkanınızı partnyorunuzla paylaşmaq üçün istifadə olunur.</string>
 
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Hava vəziyyətinə uyğun geyim tövsiyələri və yaxınlıqdakı ana-dostu məkanları göstərmək üçün məkanınız lazımdır.</string>
+	<string>Hava vəziyyətinə uyğun geyim tövsiyələri vermək və təcili vəziyyətdə (SOS) məkanınızı partnyorunuzla paylaşmaq üçün istifadə olunur.</string>
 
 	<key>NSFaceIDUsageDescription</key>
 	<string>Tətbiqə təhlükəsiz daxil olmaq üçün Face ID istifadə olunur.</string>
