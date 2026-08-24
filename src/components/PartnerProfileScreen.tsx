@@ -38,6 +38,8 @@ const ACHIEVEMENT_NAME_TR: Record<string, [string, string]> = {
   caring: ["usepartnerconfig_qaygikes_c791ee", "Qayğıkeş"],
   super_partner: ["partnerprofilescreen_super_partner", "Super Partner"],
   family_hero: ["usepartnerconfig_aile_qehremani_62b00e", "Ailə Qəhrəmanı"],
+  messenger: ["usepartnerconfig_sevgi_elcisi", "Sevgi Elçisi"],
+  weekly_hero: ["usepartnerconfig_heftelik_qehreman", "Həftəlik Qəhrəman"],
 };
 const MENU_LABEL_TR: Record<string, [string, string]> = {
   notifications: ["usepartnerconfig_bildirisler_54eb88", "Bildirişlər"],
@@ -78,6 +80,12 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
   const { data: dbSurpriseCategories = [] } = useSurpriseCategories();
 
   // Build achievements from DB or fallback
+  // NOT: əvvəllər yalnız Sürprizlər aktivliyi (completed_surprises/
+  // surprise_points) nailiyyət aça bilirdi - gündəlik missiya tamamlamaq
+  // və ya sevgi/mətn mesajı göndərmək heç bir nailiyyətə təsir etmirdi,
+  // halbuki bunlar da real partnyor aktivliyidir. `messages_sent` və
+  // `missions_completed` şərtləri indi `usePartnerStats()`-dən gələn
+  // stats-a görə yoxlanılır (bax useEffect üstündəki `stats`).
   const achievements = useMemo(() => {
     const source = dbAchievements.length > 0 ? dbAchievements : FALLBACK_ACHIEVEMENTS;
     return source.map((a) => ({
@@ -88,9 +96,11 @@ const PartnerProfileScreen = ({ onNavigate }: PartnerProfileScreenProps) => {
       emoji: a.emoji,
       unlocked: a.unlock_condition === 'always_unlocked' ||
       a.unlock_condition === 'completed_surprises' && completedSurprises.length >= a.unlock_threshold ||
-      a.unlock_condition === 'surprise_points' && surprisePoints >= a.unlock_threshold
+      a.unlock_condition === 'surprise_points' && surprisePoints >= a.unlock_threshold ||
+      a.unlock_condition === 'messages_sent' && (stats.lovesSent + stats.messagesSent) >= a.unlock_threshold ||
+      a.unlock_condition === 'missions_completed' && stats.completedMissions >= a.unlock_threshold
     }));
-  }, [dbAchievements, completedSurprises, surprisePoints]);
+  }, [dbAchievements, completedSurprises, surprisePoints, stats.lovesSent, stats.messagesSent, stats.completedMissions]);
 
   // Build menu items from DB or fallback
   const menuItems = useMemo(() => {

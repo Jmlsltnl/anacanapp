@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { tr } from '@/lib/tr';
 
 /**
- * Sinxron alÄ±ÅŸveriÅŸ siyahÄ±sÄ± â€” tam ekran (kÃ¶hnÉ™ dashboard tabÄ±ndan Ã§Ä±xarÄ±lÄ±b).
+ * Sinxron alışveriş siyahısı — tam ekran (köhnə dashboard tabından çıxarılıb).
  */
 
 interface Props {
@@ -48,7 +48,7 @@ const PartnerShoppingScreen = ({ onBack }: Props) => {
     if (newItem.trim()) {
       await addItem({ name: newItem, quantity: 1, priority: 'medium' });
       setNewItem('');
-      toast({ title: tr('partnerdashboard_mehsul_elave_edildi_4c8d9f', 'MÉ™hsul É™lavÉ™ edildi! ðŸ›’') });
+      toast({ title: tr('partnerdashboard_mehsul_elave_edildi_4c8d9f', 'Məhsul əlavə edildi! 🛒') });
     }
   };
 
@@ -61,8 +61,8 @@ const PartnerShoppingScreen = ({ onBack }: Props) => {
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
-              <p className="a-eyebrow">{tr('partnerdashboard_sinxronlasdirilmis_siyahi_08835b', 'SinxronlaÅŸdÄ±rÄ±lmÄ±ÅŸ siyahÄ±')}</p>
-              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('partnerdashboard_alis_veris_siyahisi_a2d4a8', 'AlÄ±ÅŸ-veriÅŸ SiyahÄ±sÄ±')}</p>
+              <p className="a-eyebrow">{tr('partnerdashboard_sinxronlasdirilmis_siyahi_08835b', 'Sinxronlaşdırılmış siyahı')}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('partnerdashboard_alis_veris_siyahisi_a2d4a8', 'Alış-veriş Siyahısı')}</p>
             </div>
           </div>
         </header>
@@ -74,7 +74,7 @@ const PartnerShoppingScreen = ({ onBack }: Props) => {
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addShoppingItem()}
-            placeholder={tr('partnerdashboard_yeni_mehsul_elave_et_3d6c73', 'Yeni mÉ™hsul É™lavÉ™ et...')}
+            placeholder={tr('partnerdashboard_yeni_mehsul_elave_et_3d6c73', 'Yeni məhsul əlavə et...')}
             className="flex-1 h-12 px-4 outline-none min-w-0"
             style={{ borderRadius: 999, background: 'var(--a-surface)', fontSize: 13, color: 'var(--a-ink)', boxShadow: 'var(--a-card-shadow)' }} />
 
@@ -84,7 +84,7 @@ const PartnerShoppingScreen = ({ onBack }: Props) => {
             className="w-12 h-12 rounded-full text-white flex items-center justify-center disabled:opacity-50 shrink-0"
             style={{ background: 'var(--a-green-2)' }}
             whileTap={{ scale: 0.95 }}
-            aria-label={tr('partnerdashboard_yeni_mehsul_elave_et_3d6c73', 'Yeni mÉ™hsul É™lavÉ™ et...')}>
+            aria-label={tr('partnerdashboard_yeni_mehsul_elave_et_3d6c73', 'Yeni məhsul əlavə et...')}>
             <Plus size={20} />
           </motion.button>
         </div>
@@ -114,7 +114,7 @@ const PartnerShoppingScreen = ({ onBack }: Props) => {
                 color: '#ffffff'
               }}
               whileTap={{ scale: 0.9 }}>
-                {item.isChecked && <span className="text-sm">âœ“</span>}
+                {item.isChecked && <span className="text-sm">✓</span>}
               </motion.button>
 
               <div className="flex-1 min-w-0">
@@ -125,7 +125,7 @@ const PartnerShoppingScreen = ({ onBack }: Props) => {
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="w-2 h-2 rounded-full" style={{ background: getPriorityColor(item.priority) }} />
                   <span style={{ fontSize: 10, color: 'var(--a-ink-soft)' }}>
-                    {item.addedBy === 'partner' ? tr('partnerdashboard_sen_elave_etdin_0008cb', 'SÉ™n É™lavÉ™ etdin') : tr('partnerdashboard_o_elave_etdi_9aa051', 'O É™lavÉ™ etdi')}
+                    {item.addedBy === 'partner' ? tr('partnerdashboard_sen_elave_etdin_0008cb', 'Sən əlavə etdin') : tr('partnerdashboard_o_elave_etdi_9aa051', 'O əlavə etdi')}
                   </span>
                 </div>
               </div>
@@ -141,8 +141,8 @@ const PartnerShoppingScreen = ({ onBack }: Props) => {
           {shoppingList.length === 0 &&
           <div className="a-card text-center" style={{ padding: '34px 18px' }}>
               <ShoppingCart size={40} className="mx-auto mb-3" style={{ color: 'var(--a-ink-faint)' }} />
-              <p style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr('partnerdashboard_siyahi_bosdur_c420ab', 'SiyahÄ± boÅŸdur')}</p>
-              <p style={{ fontSize: 12, color: 'var(--a-ink-faint)', marginTop: 2 }}>{tr('partnerdashboard_yuxaridaki_formadan_mehsul_elave_edin_32989e', 'YuxarÄ±dakÄ± formadan mÉ™hsul É™lavÉ™ edin')}</p>
+              <p style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr('partnerdashboard_siyahi_bosdur_c420ab', 'Siyahı boşdur')}</p>
+              <p style={{ fontSize: 12, color: 'var(--a-ink-faint)', marginTop: 2 }}>{tr('partnerdashboard_yuxaridaki_formadan_mehsul_elave_edin_32989e', 'Yuxarıdakı formadan məhsul əlavə edin')}</p>
             </div>
           }
         </div>

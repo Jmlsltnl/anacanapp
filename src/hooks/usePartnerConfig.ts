@@ -89,12 +89,19 @@ export const useSurpriseCategories = () => {
 };
 
 // Fallbacks
+// NOT: `messages_sent`/`missions_completed` unlock_condition dəyərləri
+// gamifikasiyanın iki ayrı sistemini (Sürprizlər -> Nailiyyətlər,
+// Missiyalar/Mesajlar -> heç nə) birləşdirmək üçün əlavə olundu - əvvəllər
+// yalnız Sürpriz aktivliyi nailiyyət aça bilirdi, gündəlik missiya
+// tamamlamaq və ya sevgi/mesaj göndərmək HEÇ BİR nailiyyətə təsir etmirdi.
 export const FALLBACK_ACHIEVEMENTS = [
 { achievement_key: 'first_love', name_az: tr("usepartnerconfig_ilk_sevgi", "İlk Sevgi"), emoji: '💕', unlock_condition: 'always_unlocked', unlock_threshold: 0 },
 { achievement_key: 'supporter', name_az: tr("usepartnerconfig_destekci_829677", "D\u0259st\u0259k\xE7i"), emoji: '🤝', unlock_condition: 'always_unlocked', unlock_threshold: 0 },
 { achievement_key: 'caring', name_az: tr("usepartnerconfig_qaygikes_c791ee", "Qay\u011F\u0131ke\u015F"), emoji: '🌟', unlock_condition: 'completed_surprises', unlock_threshold: 3 },
 { achievement_key: 'super_partner', name_az: tr("partnerprofilescreen_super_partner", "Super Partnyor"), emoji: '🏆', unlock_condition: 'completed_surprises', unlock_threshold: 10 },
-{ achievement_key: 'family_hero', name_az: tr("usepartnerconfig_aile_qehremani_62b00e", "Ail\u0259 Q\u0259hr\u0259man\u0131"), emoji: '👑', unlock_condition: 'surprise_points', unlock_threshold: 500 }];
+{ achievement_key: 'family_hero', name_az: tr("usepartnerconfig_aile_qehremani_62b00e", "Ail\u0259 Q\u0259hr\u0259man\u0131"), emoji: '👑', unlock_condition: 'surprise_points', unlock_threshold: 500 },
+{ achievement_key: 'messenger', name_az: tr("usepartnerconfig_sevgi_elcisi", "Sevgi Elçisi"), emoji: '💌', unlock_condition: 'messages_sent', unlock_threshold: 10 },
+{ achievement_key: 'weekly_hero', name_az: tr("usepartnerconfig_heftelik_qehreman", "Həftəlik Qəhrəman"), emoji: '📅', unlock_condition: 'missions_completed', unlock_threshold: 7 }];
 
 
 export const FALLBACK_MENU_ITEMS = [

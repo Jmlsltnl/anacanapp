@@ -8,8 +8,8 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { tr } from '@/lib/tr';
 
 /**
- * "XÉ™stÉ™xana rejimi" â€” doÄŸuÅŸ siqnalÄ±ndan sonra partnyorun yol xÉ™ritÉ™si:
- * addÄ±m-addÄ±m checklist + Ã§anta vÉ™ziyyÉ™ti + lokasiya.
+ * "Xəstəxana rejimi" — doğuş siqnalından sonra partnyorun yol xəritəsi:
+ * addım-addım checklist + çanta vəziyyəti + lokasiya.
  */
 
 interface Props {
@@ -25,16 +25,16 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
   const { alerts } = useSOSAlert();
   const [doneSteps, setDoneSteps] = useState<Set<number>>(new Set());
 
-  // Æn son doÄŸuÅŸ siqnalÄ± (lokasiya Ã¼Ã§Ã¼n)
+  // Ən son doğuş siqnalı (lokasiya üçün)
   const birthAlert = alerts.find((a) => a.alert_type === 'birth' && a.receiver_id === user?.id);
   const hasLocation = birthAlert?.latitude != null && birthAlert?.longitude != null;
 
   const steps = [
-  { icon: HeartPulse, text: tr('partnerv2_hr_step_sakit', 'Sakit ol â€” dÉ™rin nÉ™fÉ™s al. SÉ™n hazÄ±rsan!') },
-  { icon: Package, text: tr('partnerv2_hr_step_canta', 'XÉ™stÉ™xana Ã§antasÄ±nÄ± gÃ¶tÃ¼r') },
-  { icon: FileText, text: tr('partnerv2_hr_step_senedler', 'SÉ™nÉ™dlÉ™ri yoxla (vÉ™siqÉ™, analizlÉ™r, kart)') },
-  { icon: Car, text: tr('partnerv2_hr_step_masin', 'MaÅŸÄ±nÄ± hazÄ±rla / taksi Ã§aÄŸÄ±r') },
-  { icon: Phone, text: tr('partnerv2_hr_step_hekim', 'HÉ™kimÉ™ / xÉ™stÉ™xanaya zÉ™ng et') }];
+  { icon: HeartPulse, text: tr('partnerv2_hr_step_sakit', 'Sakit ol — dərin nəfəs al. Sən hazırsan!') },
+  { icon: Package, text: tr('partnerv2_hr_step_canta', 'Xəstəxana çantasını götür') },
+  { icon: FileText, text: tr('partnerv2_hr_step_senedler', 'Sənədləri yoxla (vəsiqə, analizlər, kart)') },
+  { icon: Car, text: tr('partnerv2_hr_step_masin', 'Maşını hazırla / taksi çağır') },
+  { icon: Phone, text: tr('partnerv2_hr_step_hekim', 'Həkimə / xəstəxanaya zəng et') }];
 
 
   const toggleStep = (i: number) => {
@@ -54,8 +54,8 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
-              <p className="a-eyebrow">{tr('partnerv2_dogus_vaxti', 'DoÄŸuÅŸ vaxtÄ±')}</p>
-              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('partnerv2_xestexana_rejimi', 'XÉ™stÉ™xana Rejimi')} ðŸ¥</p>
+              <p className="a-eyebrow">{tr('partnerv2_dogus_vaxti', 'Doğuş vaxtı')}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('partnerv2_xestexana_rejimi', 'Xəstəxana Rejimi')} 🏥</p>
             </div>
           </div>
         </header>
@@ -74,13 +74,13 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
               </div>
               <div className="flex-1">
                 <p className="text-white" style={{ fontSize: 14.5, fontWeight: 800 }}>{tr('partnerv2_onun_yeri', 'Onun yeri')}</p>
-                <p className="text-white/85" style={{ fontSize: 11.5 }}>{tr('partnerv2_xeritede_ac', 'XÉ™ritÉ™dÉ™ aÃ§ vÉ™ yola dÃ¼ÅŸ')}</p>
+                <p className="text-white/85" style={{ fontSize: 11.5 }}>{tr('partnerv2_xeritede_ac', 'Xəritədə aç və yola düş')}</p>
               </div>
               <Car size={20} className="text-white shrink-0" />
             </motion.button>
           }
 
-          {/* Ã‡anta vÉ™ziyyÉ™ti */}
+          {/* Çanta vəziyyəti */}
           <motion.button
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
             onClick={() => onNavigate('partner-hospital-bag')}
@@ -91,8 +91,8 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
                 <Package size={19} style={{ color: 'var(--a-accent-ink)' }} />
               </div>
               <div className="flex-1">
-                <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--a-ink)' }}>{tr('syncedfeaturesgrid_xestexana_cantasi_045078', 'XÉ™stÉ™xana Ã‡antasÄ±')}</p>
-                <p style={{ fontSize: 11.5, color: 'var(--a-ink-soft)' }}>{checkedCount}/{totalCount} {tr('partner_ready', 'hazÄ±r')}</p>
+                <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--a-ink)' }}>{tr('syncedfeaturesgrid_xestexana_cantasi_045078', 'Xəstəxana Çantası')}</p>
+                <p style={{ fontSize: 11.5, color: 'var(--a-ink-soft)' }}>{checkedCount}/{totalCount} {tr('partner_ready', 'hazır')}</p>
               </div>
               <span style={{ fontSize: 16, fontWeight: 900, color: 'var(--a-accent-ink)' }}>{getProgress().toFixed(0)}%</span>
             </div>
@@ -102,7 +102,7 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
             </div>
           </motion.button>
 
-          {/* CanlÄ± sancÄ±lar */}
+          {/* Canlı sancılar */}
           {onOpenContractions &&
           <motion.button
             initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
@@ -114,15 +114,15 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
                 <HeartPulse size={19} style={{ color: 'var(--a-pink-ink)' }} />
               </div>
               <div className="flex-1">
-                <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--a-alert-ink)' }}>{tr('partnerv2_canli_sancilar', 'CanlÄ± sancÄ±lar')}</p>
-                <p style={{ fontSize: 11.5, color: 'var(--a-berry-ink)' }}>{tr('partnerv2_interval_ve_muddet', 'Ä°nterval vÉ™ mÃ¼ddÉ™ti izlÉ™')}</p>
+                <p style={{ fontSize: 14, fontWeight: 800, color: 'var(--a-alert-ink)' }}>{tr('partnerv2_canli_sancilar', 'Canlı sancılar')}</p>
+                <p style={{ fontSize: 11.5, color: 'var(--a-berry-ink)' }}>{tr('partnerv2_interval_ve_muddet', 'İnterval və müddəti izlə')}</p>
               </div>
             </motion.button>
           }
 
-          {/* AddÄ±mlar */}
+          {/* Addımlar */}
           <motion.div className="a-card" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <h3 className="a-card-title" style={{ marginBottom: 12 }}>{tr('partnerv2_addim_addim', 'AddÄ±m-addÄ±m')}</h3>
+            <h3 className="a-card-title" style={{ marginBottom: 12 }}>{tr('partnerv2_addim_addim', 'Addım-addım')}</h3>
             <div className="space-y-2">
               {steps.map((s, i) => {
                 const Icon = s.icon;
@@ -151,10 +151,10 @@ const HospitalRunScreen = ({ onBack, onNavigate, onOpenContractions }: Props) =>
             </div>
           </motion.div>
 
-          {/* SakitlÉ™ÅŸdirici qeyd */}
+          {/* Sakitləşdirici qeyd */}
           <div style={{ background: 'var(--a-disclaimer-bg)', border: '1px solid var(--a-disclaimer-border)', borderRadius: 16, padding: 14 }}>
             <p className="text-center" style={{ fontSize: 12, color: 'var(--a-disclaimer-ink)', lineHeight: 1.5 }}>
-              {tr('partnerv2_hr_sakit_qeyd', 'Ä°lk doÄŸuÅŸlar adÉ™tÉ™n saatlarla Ã§É™kir â€” tÉ™lÉ™sik amma tÉ™mkinli ol. SÉ™n onun É™n bÃ¶yÃ¼k dayaÄŸÄ±san. ðŸ’ª')}
+              {tr('partnerv2_hr_sakit_qeyd', 'İlk doğuşlar adətən saatlarla çəkir — tələsik amma təmkinli ol. Sən onun ən böyük dayağısan. 💪')}
             </p>
           </div>
         </div>

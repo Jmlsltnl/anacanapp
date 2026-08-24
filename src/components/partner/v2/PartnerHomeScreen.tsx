@@ -24,6 +24,7 @@ import NextAppointmentCard from './NextAppointmentCard';
 import PartnerWeekInfoCard from './PartnerWeekInfoCard';
 import PartnerBabyCrisisCard from './PartnerBabyCrisisCard';
 import PartnerBabyTodayCard from './PartnerBabyTodayCard';
+import PartnerFlowStatusCard from '@/components/flow/PartnerFlowStatusCard';
 
 /**
  * Partnyor "Bu gün" — v2 ana ekran.
@@ -322,6 +323,16 @@ const PartnerHomeScreen = ({ onNavigate, onOpenChat }: Props) => {
             dayContent={dayContent}
             language={language}
             isMultiple={!!partnerProfile?.multiples_type && partnerProfile.multiples_type !== 'single'} />
+          }
+
+          {/* ── Tsikl statusu (flow) ── */}
+          {/* NOT: bu kart əvvəllər FlowDashboard.tsx-də (qadının öz ekranında)
+          səhvən mount olunmuşdu və heç vaxt görünmürdü - düzgün yeri
+          budur (partnyorun öz ekranı, burada usePartnerData() qadının
+          profilini qaytarır, komponentin öz life_stage yoxlaması düzgün
+          işləyir). */}
+          {lifeStage === 'flow' && sharing.share_cycle &&
+          <PartnerFlowStatusCard />
           }
 
           {/* ── Körpə bu gün + Kriz dövrü (mommy) ── */}

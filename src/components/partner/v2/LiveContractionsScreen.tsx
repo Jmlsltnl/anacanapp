@@ -8,9 +8,9 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { tr } from '@/lib/tr';
 
 /**
- * CanlÄ± sancÄ± gÃ¶rÃ¼nÃ¼ÅŸÃ¼ â€” partnyor ananÄ±n sancÄ± taymerini realtime izlÉ™yir.
+ * Canlı sancı görünüşü — partnyor ananın sancı taymerini realtime izləyir.
  * RLS: partnyor daily_logs kimi contractions-a da baxa bilir.
- * 5-1-1 qaydasÄ±: interval â‰¤5 dÉ™q, mÃ¼ddÉ™t â‰¥1 dÉ™q, â‰¥1 saat davam.
+ * 5-1-1 qaydası: interval ≤5 dəq, müddət ≥1 dəq, ≥1 saat davam.
  */
 
 interface ContractionRow {
@@ -49,7 +49,7 @@ const LiveContractionsScreen = ({ onBack }: Props) => {
         limit(30);
 
         if (!cancelled && !error) setContractions((data || []) as ContractionRow[]);
-      } catch {/* boÅŸ */} finally {
+      } catch {/* boş */} finally {
         if (!cancelled) setLoading(false);
       }
     };
@@ -69,7 +69,7 @@ const LiveContractionsScreen = ({ onBack }: Props) => {
     };
   }, [partnerProfile?.user_id, sharing.share_contractions]);
 
-  // Son 1 saatÄ±n statistikasÄ±
+  // Son 1 saatın statistikası
   const stats = useMemo(() => {
     const hourAgo = Date.now() - 3600000;
     const recent = contractions.filter((c) => new Date(c.start_time).getTime() >= hourAgo);
@@ -101,7 +101,7 @@ const LiveContractionsScreen = ({ onBack }: Props) => {
             </motion.button>
             <div>
               <p className="a-eyebrow">{tr('partnerv2_realtime', 'Realtime')}</p>
-              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('partnerv2_canli_sancilar', 'CanlÄ± sancÄ±lar')}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('partnerv2_canli_sancilar', 'Canlı sancılar')}</p>
             </div>
           </div>
         </header>
@@ -112,9 +112,9 @@ const LiveContractionsScreen = ({ onBack }: Props) => {
           style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--a-surface-soft)' }}>
               <HeartPulse size={26} style={{ color: 'var(--a-ink-faint)' }} />
             </div>
-            <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr('partnerv2_paylasim_bagli', 'PaylaÅŸÄ±m baÄŸlÄ±dÄ±r')}</h3>
+            <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr('partnerv2_paylasim_bagli', 'Paylaşım bağlıdır')}</h3>
             <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>
-              {tr('partnerv2_sanci_paylasimi_bagli_izah', 'HÉ™yat yoldaÅŸÄ±nÄ±z sancÄ± paylaÅŸÄ±mÄ±nÄ± hazÄ±rda baÄŸlayÄ±b.')}
+              {tr('partnerv2_sanci_paylasimi_bagli_izah', 'Həyat yoldaşınız sancı paylaşımını hazırda bağlayıb.')}
             </p>
           </div> :
         loading ?
@@ -134,9 +134,9 @@ const LiveContractionsScreen = ({ onBack }: Props) => {
                   <AlertTriangle size={20} className="text-white" />
                 </motion.div>
                 <div>
-                  <p style={{ fontSize: 14.5, fontWeight: 800, color: 'var(--a-alert-ink)' }}>{tr('usepartnernotifications_5_1_1_qaydasi_976061', 'âš ï¸ 5-1-1 QaydasÄ±!')}</p>
+                  <p style={{ fontSize: 14.5, fontWeight: 800, color: 'var(--a-alert-ink)' }}>{tr('usepartnernotifications_5_1_1_qaydasi_976061', '⚠️ 5-1-1 Qaydası!')}</p>
                   <p style={{ fontSize: 11.5, color: 'var(--a-alert-soft)' }}>
-                    {tr('partnerv2_511_izah', 'SancÄ±lar sÄ±xlaÅŸÄ±b â€” xÉ™stÉ™xanaya hazÄ±rlaÅŸ!')}
+                    {tr('partnerv2_511_izah', 'Sancılar sıxlaşıb — xəstəxanaya hazırlaş!')}
                   </p>
                 </div>
               </motion.div>
@@ -149,30 +149,30 @@ const LiveContractionsScreen = ({ onBack }: Props) => {
                 <p style={{ fontSize: 9.5, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr('partnerv2_son_1_saat', 'son 1 saat')}</p>
               </div>
               <div className="text-center a-card" style={{ padding: '14px 8px' }}>
-                <p style={{ fontSize: 20, fontWeight: 900, color: 'var(--a-ink)' }}>{stats ? fmtDur(stats.avgDuration) : 'â€”'}</p>
-                <p style={{ fontSize: 9.5, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr('partnerv2_orta_muddet', 'orta mÃ¼ddÉ™t')}</p>
+                <p style={{ fontSize: 20, fontWeight: 900, color: 'var(--a-ink)' }}>{stats ? fmtDur(stats.avgDuration) : '—'}</p>
+                <p style={{ fontSize: 9.5, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr('partnerv2_orta_muddet', 'orta müddət')}</p>
               </div>
               <div className="text-center a-card" style={{ padding: '14px 8px' }}>
-                <p style={{ fontSize: 20, fontWeight: 900, color: 'var(--a-ink)' }}>{stats && stats.avgInterval > 0 ? `${Math.round(stats.avgInterval / 60)}d` : 'â€”'}</p>
+                <p style={{ fontSize: 20, fontWeight: 900, color: 'var(--a-ink)' }}>{stats && stats.avgInterval > 0 ? `${Math.round(stats.avgInterval / 60)}d` : '—'}</p>
                 <p style={{ fontSize: 9.5, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{tr('partnerv2_orta_interval', 'orta interval')}</p>
               </div>
             </div>
 
-            {/* Son sancÄ± */}
+            {/* Son sancı */}
             {minutesSinceLast !== null &&
           <div className="text-center" style={{ background: 'var(--a-pink-1)', borderRadius: 16, padding: '10px 14px' }}>
                 <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--a-alert-ink)' }}>
-                  {tr('partnerv2_son_sanci', 'Son sancÄ±')}: {minutesSinceLast < 1 ? tr('partnerv2_indice', 'Ä°ndicÉ™') : `${minutesSinceLast} ${tr('partnerv2_deq_evvel', 'dÉ™q É™vvÉ™l')}`}
+                  {tr('partnerv2_son_sanci', 'Son sancı')}: {minutesSinceLast < 1 ? tr('partnerv2_indice', 'İndicə') : `${minutesSinceLast} ${tr('partnerv2_deq_evvel', 'dəq əvvəl')}`}
                 </p>
               </div>
           }
 
-            {/* SiyahÄ± */}
+            {/* Siyahı */}
             <div className="a-card">
               <h3 className="a-card-title" style={{ marginBottom: 12 }}>{tr('partnerv2_son_24_saat', 'Son 24 saat')}</h3>
               {contractions.length === 0 ?
             <p className="text-center py-6" style={{ fontSize: 12.5, color: 'var(--a-ink-soft)' }}>
-                  {tr('partnerv2_sanci_yoxdur', 'SancÄ± qeyd olunmayÄ±b â€” hÉ™r ÅŸey sakitdir ðŸ’š')}
+                  {tr('partnerv2_sanci_yoxdur', 'Sancı qeyd olunmayıb — hər şey sakitdir 💚')}
                 </p> :
 
             <div className="space-y-1.5">
@@ -192,7 +192,7 @@ const LiveContractionsScreen = ({ onBack }: Props) => {
                 <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--a-ink-soft)' }}>{fmtDur(c.duration_seconds)}</span>
                 }
                       {c.interval_seconds != null && c.interval_seconds > 0 &&
-                <span style={{ fontSize: 10.5, color: 'var(--a-ink-faint)' }}>Â· {Math.round(c.interval_seconds / 60)}{tr('partnerv2_d_short', 'd')} {tr('partnerv2_interval_short', 'interval')}</span>
+                <span style={{ fontSize: 10.5, color: 'var(--a-ink-faint)' }}>· {Math.round(c.interval_seconds / 60)}{tr('partnerv2_d_short', 'd')} {tr('partnerv2_interval_short', 'interval')}</span>
                 }
                     </motion.div>
               )}

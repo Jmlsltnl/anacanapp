@@ -4,7 +4,7 @@ import SurpriseTab from '@/components/partner/SurpriseTab';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { tr } from '@/lib/tr';
 
-/** SÃ¼rpriz planlayÄ±cÄ± â€” tam ekran sarÄŸÄ±. */
+/** Sürpriz planlayıcı — tam ekran sarğı. */
 const PartnerSurprisesScreen = ({ onBack }: {onBack: () => void;}) => {
   useScrollToTop();
   return (
@@ -17,7 +17,7 @@ const PartnerSurprisesScreen = ({ onBack }: {onBack: () => void;}) => {
             </motion.button>
             <div>
               <p className="a-eyebrow">{tr('partnerv2_onu_sevindir', 'Onu sevindir')}</p>
-              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('syncedfeaturesgrid_surpriz_planla_d495ce', 'SÃ¼rpriz Planla')}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('syncedfeaturesgrid_surpriz_planla_d495ce', 'Sürpriz Planla')}</p>
             </div>
           </div>
         </header>

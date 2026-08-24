@@ -82,10 +82,15 @@ const PartnerTogetherScreen = ({ onNavigate }: Props) => {
     id: 'daily-summary',
     screen: 'daily-summary',
     title: tr('syncedfeaturesgrid_gundelik_xulase_3d07a5', 'Gündəlik Xülasə'),
-    subtitle: todaySummary ? tr('syncedfeaturesgrid_bugun_gonderildi_1fb520', 'Bugün göndərildi') : tr('syncedfeaturesgrid_gozleyir_7c7f65', 'Gözləyir...'),
+    // NOT: əvvəllər `todaySummary` (səssiz auto-sync tərəfindən HƏMİŞƏ doldurulur)
+    // sadəcə mövcudluğuna görə "Bugün göndərildi" göstərirdi - real
+    // `is_sent` sahəsi heç yoxlanmırdı, çünki göndərmə funksiyası (bax
+    // PartnerCareCard.tsx-dəki yeni düymə) heç vaxt çağırılmırdı. Nəticədə
+    // partnyor "göndərildi" görürdü, halbuki heç bir bildiriş göndərilməmişdi.
+    subtitle: todaySummary?.is_sent ? tr('syncedfeaturesgrid_bugun_gonderildi_1fb520', 'Bugün göndərildi') : tr('syncedfeaturesgrid_gozleyir_7c7f65', 'Gözləyir...'),
     icon: FileText,
     bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)',
-    badge: todaySummary ? MOOD_EMOJIS[(todaySummary.mood || 3) - 1] : null,
+    badge: todaySummary?.is_sent ? MOOD_EMOJIS[(todaySummary.mood || 3) - 1] : null,
     visible: true
   },
   {

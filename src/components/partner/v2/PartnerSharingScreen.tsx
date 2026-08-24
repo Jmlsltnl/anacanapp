@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { tr } from '@/lib/tr';
 
 /**
- * Ana tÉ™rÉ™fi â€” "Partnyor nÉ™lÉ™ri gÃ¶rÃ¼r?" paylaÅŸÄ±m ayarlarÄ± + baÄŸlantÄ±nÄ± kÉ™smÉ™k.
+ * Ana tərəfi — "Partnyor nələri görür?" paylaşım ayarları + bağlantını kəsmək.
  */
 
 interface Props {
@@ -37,21 +37,21 @@ const PartnerSharingScreen = ({ onBack }: Props) => {
   const [unlinking, setUnlinking] = useState(false);
 
   const rows: ToggleRow[] = [
-  { key: 'share_mood', icon: Smile, bg: 'var(--a-yellow-1)', ink: 'var(--a-yellow-ink)', title: tr('partnerv2_sh_ehval', 'Æhval'), sub: tr('partnerv2_sh_ehval_sub', 'GÃ¼ndÉ™lik É™hval-ruhiyyÉ™niz') },
+  { key: 'share_mood', icon: Smile, bg: 'var(--a-yellow-1)', ink: 'var(--a-yellow-ink)', title: tr('partnerv2_sh_ehval', 'Əhval'), sub: tr('partnerv2_sh_ehval_sub', 'Gündəlik əhval-ruhiyyəniz') },
   { key: 'share_symptoms', icon: Thermometer, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)', title: tr('partnerv2_sh_simptomlar', 'Simptomlar'), sub: tr('partnerv2_sh_simptomlar_sub', 'Qeyd etdiyiniz simptomlar') },
-  { key: 'share_water', icon: Droplets, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)', title: tr('partnerv2_sh_su', 'Su qÉ™bulu'), sub: tr('partnerv2_sh_su_sub', 'GÃ¼nlÃ¼k su miqdarÄ± vÉ™ hÉ™dÉ™f') },
-  { key: 'share_kicks', icon: Baby, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)', title: tr('partnerv2_sh_tepikler', 'TÉ™piklÉ™r'), sub: tr('partnerv2_sh_tepikler_sub', 'TÉ™pik sayÄŸacÄ± bildiriÅŸlÉ™ri') },
-  { key: 'share_contractions', icon: Timer, bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)', title: tr('partnerv2_sh_sancilar', 'SancÄ±lar'), sub: tr('partnerv2_sh_sancilar_sub', 'SancÄ± taymeri vÉ™ 5-1-1 xÉ™bÉ™rdarlÄ±ÄŸÄ±') },
-  { key: 'share_weight', icon: Scale, bg: 'var(--a-surface-soft)', ink: 'var(--a-ink-soft)', title: tr('partnerv2_sh_ceki', 'Ã‡É™ki'), sub: tr('partnerv2_sh_ceki_sub', 'Ã‡É™ki qeydlÉ™riniz (standart: baÄŸlÄ±)') },
-  { key: 'share_appointments', icon: CalendarHeart, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)', title: tr('partnerv2_sh_randevular', 'Randevular'), sub: tr('partnerv2_sh_randevular_sub', 'HÉ™kim vizitlÉ™ri vÉ™ xatÄ±rlatmalar') },
-  { key: 'share_baby_logs', icon: Milk, bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)', title: tr('partnerv2_sh_korpe', 'KÃ¶rpÉ™ qeydlÉ™ri'), sub: tr('partnerv2_sh_korpe_sub', 'YemÉ™, yuxu vÉ™ bez qeydlÉ™ri') },
-  { key: 'share_cycle', icon: Flower2, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)', title: tr('partnerv2_sh_tsikl', 'Tsikl fazasÄ±'), sub: tr('partnerv2_sh_tsikl_sub', 'Faza vÉ™ nÃ¶vbÉ™ti period mÉ™lumatÄ±') }];
+  { key: 'share_water', icon: Droplets, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)', title: tr('partnerv2_sh_su', 'Su qəbulu'), sub: tr('partnerv2_sh_su_sub', 'Günlük su miqdarı və hədəf') },
+  { key: 'share_kicks', icon: Baby, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)', title: tr('partnerv2_sh_tepikler', 'Təpiklər'), sub: tr('partnerv2_sh_tepikler_sub', 'Təpik sayğacı bildirişləri') },
+  { key: 'share_contractions', icon: Timer, bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)', title: tr('partnerv2_sh_sancilar', 'Sancılar'), sub: tr('partnerv2_sh_sancilar_sub', 'Sancı taymeri və 5-1-1 xəbərdarlığı') },
+  { key: 'share_weight', icon: Scale, bg: 'var(--a-surface-soft)', ink: 'var(--a-ink-soft)', title: tr('partnerv2_sh_ceki', 'Çəki'), sub: tr('partnerv2_sh_ceki_sub', 'Çəki qeydləriniz (standart: bağlı)') },
+  { key: 'share_appointments', icon: CalendarHeart, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)', title: tr('partnerv2_sh_randevular', 'Randevular'), sub: tr('partnerv2_sh_randevular_sub', 'Həkim vizitləri və xatırlatmalar') },
+  { key: 'share_baby_logs', icon: Milk, bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)', title: tr('partnerv2_sh_korpe', 'Körpə qeydləri'), sub: tr('partnerv2_sh_korpe_sub', 'Yemə, yuxu və bez qeydləri') },
+  { key: 'share_cycle', icon: Flower2, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)', title: tr('partnerv2_sh_tsikl', 'Tsikl fazası'), sub: tr('partnerv2_sh_tsikl_sub', 'Faza və növbəti period məlumatı') }];
 
 
   const handleToggle = async (key: SharingKey, value: boolean) => {
     const ok = await updateSetting(key, value);
     if (!ok) {
-      toast({ title: tr('partnerv2_sh_xeta', 'Yadda saxlanÄ±lmadÄ±'), description: tr('partnerv2_sh_xeta_sub', 'YenidÉ™n cÉ™hd edin.'), variant: 'destructive' });
+      toast({ title: tr('partnerv2_sh_xeta', 'Yadda saxlanılmadı'), description: tr('partnerv2_sh_xeta_sub', 'Yenidən cəhd edin.'), variant: 'destructive' });
     }
   };
 
@@ -60,11 +60,11 @@ const PartnerSharingScreen = ({ onBack }: Props) => {
     try {
       const { error } = await (supabase.rpc as any)('unlink_partners');
       if (error) throw error;
-      toast({ title: tr('partnerv2_baglanti_kesildi', 'BaÄŸlantÄ± kÉ™sildi'), description: tr('partnerv2_baglanti_kesildi_sub', 'Partnyor artÄ±q mÉ™lumatlarÄ±nÄ±zÄ± gÃ¶rmÃ¼r.') });
+      toast({ title: tr('partnerv2_baglanti_kesildi', 'Bağlantı kəsildi'), description: tr('partnerv2_baglanti_kesildi_sub', 'Partnyor artıq məlumatlarınızı görmür.') });
       setTimeout(() => window.location.reload(), 800);
     } catch (e) {
       console.error(e);
-      toast({ title: tr('partnerv2_sh_xeta', 'Yadda saxlanÄ±lmadÄ±'), variant: 'destructive' });
+      toast({ title: tr('partnerv2_sh_xeta', 'Yadda saxlanılmadı'), variant: 'destructive' });
       setUnlinking(false);
       setShowUnlink(false);
     }
@@ -79,25 +79,25 @@ const PartnerSharingScreen = ({ onBack }: Props) => {
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
-              <p className="a-eyebrow">{tr('partnerv2_siz_idare_edirsiniz', 'Siz idarÉ™ edirsiniz')}</p>
-              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('partnerv2_partnyor_nleri_gorur', 'Partnyor nÉ™lÉ™ri gÃ¶rÃ¼r?')}</p>
+              <p className="a-eyebrow">{tr('partnerv2_siz_idare_edirsiniz', 'Siz idarə edirsiniz')}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('partnerv2_partnyor_nleri_gorur', 'Partnyor nələri görür?')}</p>
             </div>
           </div>
         </header>
 
         <div className="space-y-3.5">
-          {/* Ä°zah */}
+          {/* İzah */}
           <div className="flex items-start gap-2.5" style={{ background: 'var(--a-disclaimer-bg)', border: '1px solid var(--a-disclaimer-border)', borderRadius: 16, padding: 13 }}>
             <ShieldCheck size={15} className="mt-0.5 shrink-0" style={{ color: 'var(--a-disclaimer-strong)' }} />
             <p style={{ fontSize: 11.5, color: 'var(--a-disclaimer-ink)', lineHeight: 1.5 }}>
-              {tr('partnerv2_sh_izah', 'ÅžÉ™xsi qeydlÉ™riniz, gÃ¼ndÉ™liyiniz vÉ™ AI sÃ¶hbÉ™tlÉ™riniz heÃ§ vaxt paylaÅŸÄ±lmÄ±r. AÅŸaÄŸÄ±dakÄ± kateqoriyalarÄ± istÉ™nilÉ™n vaxt aÃ§a/baÄŸlaya bilÉ™rsiniz â€” dÉ™rhal qÃ¼vvÉ™yÉ™ minir.')}
+              {tr('partnerv2_sh_izah', 'Şəxsi qeydləriniz, gündəliyiniz və AI söhbətləriniz heç vaxt paylaşılmır. Aşağıdakı kateqoriyaları istənilən vaxt aça/bağlaya bilərsiniz — dərhal qüvvəyə minir.')}
             </p>
           </div>
 
           {!available &&
           <div style={{ background: 'var(--a-yellow-1)', borderRadius: 14, padding: '10px 13px' }}>
               <p style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--a-warn-ink)' }}>
-                {tr('partnerv2_sh_migration_yox', 'Ayarlar bazasÄ± hazÄ±r deyil â€” hazÄ±rda standart paylaÅŸÄ±m aktivdir.')}
+                {tr('partnerv2_sh_migration_yox', 'Ayarlar bazası hazır deyil — hazırda standart paylaşım aktivdir.')}
               </p>
             </div>
           }
@@ -124,7 +124,7 @@ const PartnerSharingScreen = ({ onBack }: Props) => {
             })}
           </div>
 
-          {/* BaÄŸlantÄ±nÄ± kÉ™s */}
+          {/* Bağlantını kəs */}
           <motion.button
             onClick={() => setShowUnlink(true)}
             className="w-full flex items-center gap-4 text-start"
@@ -134,28 +134,28 @@ const PartnerSharingScreen = ({ onBack }: Props) => {
               <Unlink size={17} style={{ color: 'var(--a-alert-ink)' }} />
             </div>
             <div className="flex-1">
-              <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-alert-ink)' }}>{tr('partnerv2_baglantini_kes', 'BaÄŸlantÄ±nÄ± kÉ™s')}</p>
-              <p style={{ fontSize: 11, color: 'var(--a-alert-soft)' }}>{tr('partnerv2_baglantini_kes_sub', 'Partnyor bÃ¼tÃ¼n giriÅŸini itirÉ™cÉ™k')}</p>
+              <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-alert-ink)' }}>{tr('partnerv2_baglantini_kes', 'Bağlantını kəs')}</p>
+              <p style={{ fontSize: 11, color: 'var(--a-alert-soft)' }}>{tr('partnerv2_baglantini_kes_sub', 'Partnyor bütün girişini itirəcək')}</p>
             </div>
           </motion.button>
         </div>
       </div>
 
-      {/* Unlink tÉ™sdiqi */}
+      {/* Unlink təsdiqi */}
       <Dialog open={showUnlink} onOpenChange={setShowUnlink}>
         <DialogContent className="a-scope rounded-[22px]">
           <DialogHeader>
-            <DialogTitle style={{ color: 'var(--a-alert-ink)' }}>{tr('partnerv2_baglantini_kes', 'BaÄŸlantÄ±nÄ± kÉ™s')}?</DialogTitle>
+            <DialogTitle style={{ color: 'var(--a-alert-ink)' }}>{tr('partnerv2_baglantini_kes', 'Bağlantını kəs')}?</DialogTitle>
             <DialogDescription>
-              {tr('partnerv2_unlink_tesdiq_izah', 'Partnyorunuz artÄ±q heÃ§ bir mÉ™lumatÄ±nÄ±zÄ± gÃ¶rmÉ™yÉ™cÉ™k vÉ™ partnyor paneli baÄŸlanacaq. YenidÉ™n baÄŸlanmaq Ã¼Ã§Ã¼n kodu tÉ™krar paylaÅŸmalÄ±sÄ±nÄ±z.')}
+              {tr('partnerv2_unlink_tesdiq_izah', 'Partnyorunuz artıq heç bir məlumatınızı görməyəcək və partnyor paneli bağlanacaq. Yenidən bağlanmaq üçün kodu təkrar paylaşmalısınız.')}
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-3 mt-4">
             <Button variant="outline" onClick={() => setShowUnlink(false)} className="flex-1 rounded-full">
-              {tr('common_legv_et', 'LÉ™ÄŸv et')}
+              {tr('common_legv_et', 'Ləğv et')}
             </Button>
             <Button variant="destructive" onClick={handleUnlink} disabled={unlinking} className="flex-1 rounded-full">
-              {unlinking ? <Loader2 className="w-4 h-4 animate-spin" /> : tr('partnerv2_beli_kes', 'BÉ™li, kÉ™s')}
+              {unlinking ? <Loader2 className="w-4 h-4 animate-spin" /> : tr('partnerv2_beli_kes', 'Bəli, kəs')}
             </Button>
           </div>
         </DialogContent>

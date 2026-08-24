@@ -8,9 +8,9 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { tr } from '@/lib/tr';
 
 /**
- * AnanÄ±n randevularÄ± â€” partnyor gÃ¶rÃ¼nÃ¼ÅŸÃ¼ (read-only).
+ * Ananın randevuları — partnyor görünüşü (read-only).
  * RLS: "Partners can view linked appointments".
- * share_appointments baÄŸlÄ±dÄ±rsa hÃ¶rmÉ™tli boÅŸ vÉ™ziyyÉ™t gÃ¶stÉ™rilir.
+ * share_appointments bağlıdırsa hörmətli boş vəziyyət göstərilir.
  */
 
 interface AppointmentRow {
@@ -56,7 +56,7 @@ const PartnerAppointmentsScreen = ({ onBack }: Props) => {
         order('event_time', { ascending: true, nullsFirst: false });
 
         if (!cancelled && !error) setAppointments((data || []) as AppointmentRow[]);
-      } catch {/* boÅŸ qalÄ±r */} finally {
+      } catch {/* boş qalır */} finally {
         if (!cancelled) setLoading(false);
       }
     })();
@@ -98,12 +98,12 @@ const PartnerAppointmentsScreen = ({ onBack }: Props) => {
             <p className="truncate" style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>{apt.title}</p>
             {isToday &&
             <span className="shrink-0" style={{ background: 'var(--a-blue-2)', color: '#fff', borderRadius: 999, padding: '2px 8px', fontSize: 9.5, fontWeight: 800 }}>
-                {tr('partnerv2_bu_gun', 'Bu gÃ¼n')}
+                {tr('partnerv2_bu_gun', 'Bu gün')}
               </span>
             }
           </div>
           <p style={{ fontSize: 11.5, color: 'var(--a-ink-soft)', marginTop: 1 }}>
-            {formatDate(apt.event_date)}{apt.event_time ? ` Â· ${apt.event_time.slice(0, 5)}` : ''}
+            {formatDate(apt.event_date)}{apt.event_time ? ` · ${apt.event_time.slice(0, 5)}` : ''}
           </p>
           {apt.description && <p className="truncate" style={{ fontSize: 11, color: 'var(--a-ink-faint)', marginTop: 1 }}>{apt.description}</p>}
         </div>
@@ -119,7 +119,7 @@ const PartnerAppointmentsScreen = ({ onBack }: Props) => {
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
-              <p className="a-eyebrow">{tr('partnerv2_onun_vizitleri', 'Onun vizitlÉ™ri')}</p>
+              <p className="a-eyebrow">{tr('partnerv2_onun_vizitleri', 'Onun vizitləri')}</p>
               <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('partnerv2_randevular', 'Randevular')}</p>
             </div>
           </div>
@@ -131,9 +131,9 @@ const PartnerAppointmentsScreen = ({ onBack }: Props) => {
           style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--a-surface-soft)' }}>
               <CalendarHeart size={26} style={{ color: 'var(--a-ink-faint)' }} />
             </div>
-            <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr('partnerv2_paylasim_bagli', 'PaylaÅŸÄ±m baÄŸlÄ±dÄ±r')}</h3>
+            <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr('partnerv2_paylasim_bagli', 'Paylaşım bağlıdır')}</h3>
             <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>
-              {tr('partnerv2_randevu_paylasimi_bagli_izah', 'HÉ™yat yoldaÅŸÄ±nÄ±z randevu paylaÅŸÄ±mÄ±nÄ± hazÄ±rda baÄŸlayÄ±b.')}
+              {tr('partnerv2_randevu_paylasimi_bagli_izah', 'Həyat yoldaşınız randevu paylaşımını hazırda bağlayıb.')}
             </p>
           </div> :
         loading ?
@@ -148,20 +148,20 @@ const PartnerAppointmentsScreen = ({ onBack }: Props) => {
             </div>
             <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr('partnerv2_randevu_yoxdur', 'Randevu yoxdur')}</h3>
             <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>
-              {tr('partnerv2_randevu_yoxdur_izah', 'HÉ™yat yoldaÅŸÄ±nÄ±z randevu É™lavÉ™ etdikdÉ™ burada gÃ¶rÃ¼nÉ™cÉ™k.')}
+              {tr('partnerv2_randevu_yoxdur_izah', 'Həyat yoldaşınız randevu əlavə etdikdə burada görünəcək.')}
             </p>
           </div> :
 
         <div className="space-y-4">
             {upcoming.length > 0 &&
           <div>
-                <h3 className="a-section-title" style={{ marginBottom: 10 }}>{tr('partnerv2_qarsidan_gelen', 'QarÅŸÄ±dan gÉ™lÉ™n')}</h3>
+                <h3 className="a-section-title" style={{ marginBottom: 10 }}>{tr('partnerv2_qarsidan_gelen', 'Qarşıdan gələn')}</h3>
                 <div className="space-y-2">{upcoming.map((a, i) => renderRow(a, true, i))}</div>
               </div>
           }
             {past.length > 0 &&
           <div>
-                <h3 className="a-section-title" style={{ marginBottom: 10 }}>{tr('partnerv2_kecmis', 'KeÃ§miÅŸ')}</h3>
+                <h3 className="a-section-title" style={{ marginBottom: 10 }}>{tr('partnerv2_kecmis', 'Keçmiş')}</h3>
                 <div className="space-y-2">{past.slice(0, 5).map((a, i) => renderRow(a, false, i))}</div>
               </div>
           }

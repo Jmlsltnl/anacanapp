@@ -35,7 +35,7 @@ import PeriodDelayBanner from './PeriodDelayBanner';
 import PillReminderCard from './PillReminderCard';
 import SymptomPatternReport from './SymptomPatternReport';
 import DailyStoryCards from './DailyStoryCards';
-import PartnerFlowStatusCard from './PartnerFlowStatusCard';
+
 import WaterWidget from '@/components/dashboard/WaterWidget';
 import { getPhaseInfoForDate, getNextPeriodDate, getFertileWindow } from '@/lib/cycle-utils';
 import { useCycleHistory } from '@/hooks/useCycleHistory';
@@ -290,8 +290,14 @@ const FlowDashboard = () => {
 
   return (
     <div>
-      {/* Partner's flow status (only renders if user is partner viewing flow woman) */}
-      <PartnerFlowStatusCard />
+      {/* NOT: <PartnerFlowStatusCard /> əvvəllər səhvən BURADA (qadının öz
+      Flow Dashboard-ında) mount olunmuşdu - amma bu komponent
+      usePartnerData()-nı çağıranda (yəni QADIN özü) linked_partner-i
+      (ƏRİNİN profilini) qaytarır, onun life_stage-i HƏMİŞƏ 'partner'-dir,
+      heç vaxt 'flow' olmur - komponentin öz keçidi (life_stage !== 'flow'
+      = null qaytar) buna görə HEÇ VAXT keçilmirdi. Düzgün yeri partnyorun
+      öz PartnerHomeScreen-idir (bax ora) - orada usePartnerData() əksinə,
+      QADIN profilini qaytarır. */}
 
       {/* Period delay banner (auto-shows if late) */}
       <PeriodDelayBanner />

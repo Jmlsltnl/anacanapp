@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { HandHeart, Siren, Settings2 } from 'lucide-react';
+import { HandHeart, Siren, Settings2, Send, Check } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePartnerData } from '@/hooks/usePartnerData';
 import { usePartnerMessages } from '@/hooks/usePartnerMessages';
+import { useDailySummary } from '@/hooks/useDailySummary';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
@@ -28,6 +29,31 @@ const PartnerCareCard = ({ lifeStage, onOpenSharing }: Props) => {
   const { toast } = useToast();
   const [sosOpen, setSosOpen] = useState(false);
   const [thanking, setThanking] = useState(false);
+
+  // NOT: `generateAndSendSummary()` (bax useDailySummary.ts) tam yazılıb və
+  // işləkdir, amma HEÇ BİR ekrandan çağırıla bilmirdi - "Gündəlik Xülasə"
+  // ekranı (DailySummaryScreen) yalnız `role === 'partner'` olanda
+  // açılırdı (bax Index.tsx), halbuki bu funksiya YALNIZ ana (qadın)
+  // tərəfindən çağırıla bilər ("Only woman can send summary"). Yəni bunu
+  // göndərə bilən YEGANƏ rol, bunu göndərəcək ekrana ÇATA BİLMİRDİ. Bu
+  // düymə real, çatılabilən bir yol yaradır.
+  const { todaySummary, generateAndSendSummary } = useDailySummary();
+  const [sendingSummary, setSendingSummary] = useState(false);
+  const isBump = lifeStage === 'bump';
+  const summaryAlreadySent = !!todaySummary?.is_sent;
+
+  const sendSummary = async () => {
+    if (!user || sendingSummary || summaryAlreadySent) return;
+    setSendingSummary(true);
+    await hapticFeedback.light();
+    const result = await generateAndSendSummary();
+    setSendingSummary(false);
+    if (result.error) {
+      toast({ title: tr('partnerv2_xulase_xetasi', 'Xülasə göndərilə bilmədi'), variant: 'destructive' });
+    } else {
+      toast({ title: tr('partnerv2_xulase_gonderildi', 'Bugünkü xülasə göndərildi! 📊') });
+    }
+  };
 
   const todayStats = useMemo(() => {
     const startOfDay = new Date();
@@ -135,6 +161,31 @@ const PartnerCareCard = ({ lifeStage, onOpenSharing }: Props) => {
             SOS
           </motion.button>
         </div>
+
+        {isBump &&
+        <motion.button
+          onClick={sendSummary}
+          disabled={sendingSummary || summaryAlreadySent}
+          className="w-full flex items-center justify-center gap-1.5 disabled:opacity-70"
+          style={{
+            height: 40,
+            marginTop: 8,
+            borderRadius: 999,
+            background: summaryAlreadySent ? 'var(--a-green-1)' : 'var(--a-lav-1)',
+            color: summaryAlreadySent ? 'var(--a-green-ink)' : 'var(--a-lav-ink)',
+            fontSize: 12,
+            fontWeight: 700
+          }}
+          whileTap={{ scale: summaryAlreadySent ? 1 : 0.97 }}>
+          
+            {summaryAlreadySent ? <Check size={14} /> : <Send size={14} />}
+            {summaryAlreadySent ?
+          tr('partnerv2_xulase_gonderildi_badge', 'Bugünkü xülasə göndərildi') :
+          sendingSummary ?
+          tr('partnerv2_gonderilir', 'Göndərilir...') :
+          tr('partnerv2_xulaseni_gonder', 'Bugünkü xülasəni partnyoruma göndər')}
+          </motion.button>
+        }
       </motion.div>
 
       <MotherSOSSheet open={sosOpen} onClose={() => setSosOpen(false)} lifeStage={lifeStage} />

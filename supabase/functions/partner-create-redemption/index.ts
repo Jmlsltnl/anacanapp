@@ -42,13 +42,53 @@ Deno.serve(async (req) => {
     const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // Premium check
+    // NOT: əvvəllər BURADA yalnız `profiles.is_premium` yoxlanılırdı, halbuki
+    // klient tərəfi (useSubscription.ts -> isPremium = ownPremium ||
+    // householdPremium) HƏM `subscriptions` cədvəlini, HƏM DƏ bağlı
+    // partnyorun premium-unu (get_linked_partner_premium) hesaba qatır. Bu
+    // uyğunsuzluq real bir 403-ə səbəb olurdu: yalnız subscriptions
+    // cədvəlindən və ya partnyorunun premium-undan asılı olan istifadəçi
+    // "Endirimi al" düyməsini aktiv görürdü, amma server bunu rədd edirdi.
+    // İndi eyni məntiq server tərəfində tam təkrarlanır.
+    const isPremiumFor = async (uid: string): Promise<boolean> => {
+      const [{ data: profileRow }, { data: subRow }] = await Promise.all([
+        admin.from('profiles').select('is_premium, premium_until').eq('user_id', uid).maybeSingle(),
+        admin
+          .from('subscriptions')
+          .select('plan_type, status, expires_at')
+          .eq('user_id', uid)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+
+      const ownProfilePremium =
+        !!profileRow?.is_premium && (!profileRow?.premium_until || new Date(profileRow.premium_until) > new Date());
+
+      const ownSubPremium =
+        !!subRow &&
+        (subRow.plan_type === 'premium' || subRow.plan_type === 'premium_plus') &&
+        (subRow.status === 'active' || subRow.status === 'cancelled') &&
+        (!subRow.expires_at || new Date(subRow.expires_at) > new Date());
+
+      return ownProfilePremium || ownSubPremium;
+    };
+
     const { data: profile } = await admin
       .from('profiles')
-      .select('is_premium, premium_until, name')
+      .select('name, linked_partner_id')
       .eq('user_id', userId)
       .maybeSingle();
 
-    const isPremium = !!profile?.is_premium && (!profile?.premium_until || new Date(profile.premium_until) > new Date());
+    let isPremium = await isPremiumFor(userId);
+
+    if (!isPremium && profile?.linked_partner_id) {
+      const { data: partnerUserId } = await admin.rpc('get_linked_partner_user_id', { _user_id: userId });
+      if (partnerUserId) {
+        isPremium = await isPremiumFor(partnerUserId as string);
+      }
+    }
+
     if (!isPremium) {
       return new Response(JSON.stringify({ error: 'premium_required' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }

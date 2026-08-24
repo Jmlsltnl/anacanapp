@@ -4,7 +4,7 @@ import WeeklyStatsTab from '@/components/partner/WeeklyStatsTab';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { tr } from '@/lib/tr';
 
-/** HÉ™ftÉ™lik statistika â€” tam ekran sarÄŸÄ±. */
+/** Həftəlik statistika — tam ekran sarğı. */
 const PartnerWeeklyStatsScreen = ({ onBack }: {onBack: () => void;}) => {
   useScrollToTop();
   return (
@@ -16,8 +16,8 @@ const PartnerWeeklyStatsScreen = ({ onBack }: {onBack: () => void;}) => {
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
-              <p className="a-eyebrow">{tr('partnerv2_son_7_gun', 'Son 7 gÃ¼n')}</p>
-              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('syncedfeaturesgrid_heftelik_statistika_292953', 'HÉ™ftÉ™lik Statistika')}</p>
+              <p className="a-eyebrow">{tr('partnerv2_son_7_gun', 'Son 7 gün')}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('syncedfeaturesgrid_heftelik_statistika_292953', 'Həftəlik Statistika')}</p>
             </div>
           </div>
         </header>

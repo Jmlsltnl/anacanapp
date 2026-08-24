@@ -22,9 +22,9 @@ const DailySummaryScreen: React.FC<DailySummaryScreenProps> = ({ onBack }) => {
   const { summaries, loading } = useDailySummary();
 
   const getMoodEmoji = (mood: number | null) => {
-    if (!mood) return 'â“';
-    const emojis = ['ðŸ˜¢', 'ðŸ˜”', 'ðŸ˜', 'ðŸ™‚', 'ðŸ˜Š'];
-    return emojis[mood - 1] || 'â“';
+    if (!mood) return '❓';
+    const emojis = ['😢', '😔', '😐', '🙂', '😊'];
+    return emojis[mood - 1] || '❓';
   };
 
   const getMoodLabel = (mood: number | null) => {
@@ -62,7 +62,7 @@ const DailySummaryScreen: React.FC<DailySummaryScreenProps> = ({ onBack }) => {
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
-            <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("dailysummaryscreen_gundelik_xulase_3d07a5", "GÃ¼ndÉ™lik XÃ¼lasÉ™")}</p>
+            <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("dailysummaryscreen_gundelik_xulase_3d07a5", "Gündəlik Xülasə")}</p>
           </div>
         </header>
 
@@ -159,7 +159,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
             {getMoodEmoji(summary.mood)}
           </div>
           <div>
-            <div style={{ fontSize: 12, color: 'var(--a-ink-soft)' }}>{tr("dailysummaryscreen_ehval_0457f9", "Æhval")}</div>
+            <div style={{ fontSize: 12, color: 'var(--a-ink-soft)' }}>{tr("dailysummaryscreen_ehval_0457f9", "Əhval")}</div>
             <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--a-ink)' }}>{getMoodLabel(summary.mood)}</div>
           </div>
         </div>
@@ -179,7 +179,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
             <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--a-alert-ink)' }}>
               {summary.kick_count}
             </div>
-            <div style={{ fontSize: 10.5, color: 'var(--a-pink-ink)' }}>{tr("dailysummaryscreen_tepik_9a873a", "TÉ™pik")}</div>
+            <div style={{ fontSize: 10.5, color: 'var(--a-pink-ink)' }}>{tr("dailysummaryscreen_tepik_9a873a", "Təpik")}</div>
           </div>
 
           <div className="text-center" style={{ background: 'var(--a-lav-1)', borderRadius: 14, padding: 12 }}>
@@ -187,7 +187,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
             <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--a-lav-ink)' }}>
               {summary.contraction_count}
             </div>
-            <div style={{ fontSize: 10.5, color: 'var(--a-lav-ink)' }}>{tr("dailysummaryscreen_sanci_350c2d", "SancÄ±")}</div>
+            <div style={{ fontSize: 10.5, color: 'var(--a-lav-ink)' }}>{tr("dailysummaryscreen_sanci_350c2d", "Sancı")}</div>
           </div>
         </div>
 
@@ -208,7 +208,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({
         {/* Notes */}
         {summary.notes &&
         <div>
-            <div style={{ fontSize: 12, color: 'var(--a-ink-soft)', marginBottom: 4 }}>{tr("dailysummaryscreen_qeydler_a7a98b", "QeydlÉ™r")}</div>
+            <div style={{ fontSize: 12, color: 'var(--a-ink-soft)', marginBottom: 4 }}>{tr("dailysummaryscreen_qeydler_a7a98b", "Qeydlər")}</div>
             <p style={{ fontSize: 13, color: 'var(--a-body-text)' }}>{summary.notes}</p>
           </div>
         }

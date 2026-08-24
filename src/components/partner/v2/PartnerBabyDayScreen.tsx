@@ -8,8 +8,8 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { tr } from '@/lib/tr';
 
 /**
- * "KÃ¶rpÉ™ GÃ¼nÃ¼" â€” mommy mÉ™rhÉ™lÉ™sindÉ™ partnyor kÃ¶rpÉ™nin bugÃ¼nkÃ¼ ritmini gÃ¶rÃ¼r.
- * RLS: "Partners can view linked baby logs" (mÃ¶vcuddur).
+ * "Körpə Günü" — mommy mərhələsində partnyor körpənin bugünkü ritmini görür.
+ * RLS: "Partners can view linked baby logs" (mövcuddur).
  */
 
 interface BabyLogRow {
@@ -51,14 +51,14 @@ const PartnerBabyDayScreen = ({ onBack }: Props) => {
         order('start_time', { ascending: false });
 
         if (!cancelled && !error) setLogs((data || []) as BabyLogRow[]);
-      } catch {/* boÅŸ */} finally {
+      } catch {/* boş */} finally {
         if (!cancelled) setLoading(false);
       }
     };
 
     fetchLogs();
 
-    // Realtime: ana qeyd etdikcÉ™ yenilÉ™nsin (server-side filtrlÉ™nir)
+    // Realtime: ana qeyd etdikcə yenilənsin (server-side filtrlənir)
     const channel = supabase.
     channel(`partner-baby-day-${partnerProfile.user_id}`).
     on('postgres_changes', { event: '*', schema: 'public', table: 'baby_logs', filter: `user_id=eq.${partnerProfile.user_id}` }, () => {
@@ -72,7 +72,7 @@ const PartnerBabyDayScreen = ({ onBack }: Props) => {
     };
   }, [partnerProfile?.user_id, sharing.share_baby_logs]);
 
-  // â”€â”€ Aqreqatlar â”€â”€
+  // ── Aqreqatlar ──
   const feedings = logs.filter((l) => l.log_type === 'feeding');
   const sleeps = logs.filter((l) => l.log_type === 'sleep');
   const diapers = logs.filter((l) => l.log_type === 'diaper');
@@ -85,7 +85,7 @@ const PartnerBabyDayScreen = ({ onBack }: Props) => {
   const sleepH = Math.floor(totalSleepMin / 60);
   const sleepM = Math.round(totalSleepMin % 60);
 
-  const babyName = partnerProfile?.baby_name || tr('partnerv2_korpe', 'KÃ¶rpÉ™');
+  const babyName = partnerProfile?.baby_name || tr('partnerv2_korpe', 'Körpə');
 
   const formatTime = (d: string) =>
   new Date(d).toLocaleTimeString(getLocaleTag(), { hour: '2-digit', minute: '2-digit' });
@@ -93,26 +93,26 @@ const PartnerBabyDayScreen = ({ onBack }: Props) => {
   const logMeta = (l: BabyLogRow): {icon: any;bg: string;ink: string;label: string;} => {
     if (l.log_type === 'feeding') return {
       icon: Milk, bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)',
-      label: `${tr('partnerv2_qidalanma', 'Qidalanma')}${l.amount_ml ? ` Â· ${l.amount_ml} ml` : ''}`
+      label: `${tr('partnerv2_qidalanma', 'Qidalanma')}${l.amount_ml ? ` · ${l.amount_ml} ml` : ''}`
     };
     if (l.log_type === 'sleep') return {
       icon: Moon, bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)',
       label: l.end_time ?
-      `${tr('partnerv2_yuxu', 'Yuxu')} Â· ${formatTime(l.start_time)}â€“${formatTime(l.end_time)}` :
-      `${tr('partnerv2_yuxu', 'Yuxu')} Â· ${tr('partnerv2_davam_edir', 'davam edir')} ðŸ˜´`
+      `${tr('partnerv2_yuxu', 'Yuxu')} · ${formatTime(l.start_time)}–${formatTime(l.end_time)}` :
+      `${tr('partnerv2_yuxu', 'Yuxu')} · ${tr('partnerv2_davam_edir', 'davam edir')} 😴`
     };
     return {
       icon: Baby, bg: 'var(--a-yellow-1)', ink: 'var(--a-yellow-ink)',
-      label: `${tr('partnerv2_bez_deyisme', 'Bez dÉ™yiÅŸmÉ™')}${l.diaper_type ? ` Â· ${l.diaper_type}` : ''}`
+      label: `${tr('partnerv2_bez_deyisme', 'Bez dəyişmə')}${l.diaper_type ? ` · ${l.diaper_type}` : ''}`
     };
   };
 
   // Dark mode düzəlişi: 3 hardcoded hex dark modda uyğun --a-*-1 tünd
   // tint-lərinə qarşı demək olar oxunmurdu — CSS dəyişənlərinə keçirilib.
   const stats = [
-  { emoji: 'ðŸ¼', value: String(feedings.length), sub: totalMl > 0 ? `${totalMl} ml` : tr('partnerv2_qidalanma', 'Qidalanma'), bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' },
-  { emoji: 'ðŸ˜´', value: totalSleepMin > 0 ? `${sleepH}s ${sleepM}d` : String(sleeps.length), sub: tr('partnerv2_yuxu', 'Yuxu'), bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' },
-  { emoji: 'ðŸ§·', value: String(diapers.length), sub: tr('partnerv2_bez', 'Bez'), bg: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)' }];
+  { emoji: '🍼', value: String(feedings.length), sub: totalMl > 0 ? `${totalMl} ml` : tr('partnerv2_qidalanma', 'Qidalanma'), bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' },
+  { emoji: '😴', value: totalSleepMin > 0 ? `${sleepH}s ${sleepM}d` : String(sleeps.length), sub: tr('partnerv2_yuxu', 'Yuxu'), bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' },
+  { emoji: '🧷', value: String(diapers.length), sub: tr('partnerv2_bez', 'Bez'), bg: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)' }];
 
 
   return (
@@ -125,7 +125,7 @@ const PartnerBabyDayScreen = ({ onBack }: Props) => {
             </motion.button>
             <div>
               <p className="a-eyebrow">{babyName}</p>
-              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('partnerv2_korpe_gunu', 'KÃ¶rpÉ™ GÃ¼nÃ¼')}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr('partnerv2_korpe_gunu', 'Körpə Günü')}</p>
             </div>
           </div>
         </header>
@@ -136,9 +136,9 @@ const PartnerBabyDayScreen = ({ onBack }: Props) => {
           style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--a-surface-soft)' }}>
               <Baby size={26} style={{ color: 'var(--a-ink-faint)' }} />
             </div>
-            <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr('partnerv2_paylasim_bagli', 'PaylaÅŸÄ±m baÄŸlÄ±dÄ±r')}</h3>
+            <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr('partnerv2_paylasim_bagli', 'Paylaşım bağlıdır')}</h3>
             <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>
-              {tr('partnerv2_korpe_paylasimi_bagli_izah', 'HÉ™yat yoldaÅŸÄ±nÄ±z kÃ¶rpÉ™ qeydlÉ™rinin paylaÅŸÄ±mÄ±nÄ± hazÄ±rda baÄŸlayÄ±b.')}
+              {tr('partnerv2_korpe_paylasimi_bagli_izah', 'Həyat yoldaşınız körpə qeydlərinin paylaşımını hazırda bağlayıb.')}
             </p>
           </div> :
         loading ?
@@ -147,7 +147,7 @@ const PartnerBabyDayScreen = ({ onBack }: Props) => {
           </div> :
 
         <div className="space-y-4">
-            {/* GÃ¼nÃ¼n xÃ¼lasÉ™si */}
+            {/* Günün xülasəsi */}
             <div className="grid grid-cols-3 gap-2.5">
               {stats.map((s) =>
             <motion.div
@@ -163,20 +163,20 @@ const PartnerBabyDayScreen = ({ onBack }: Props) => {
             )}
             </div>
 
-            {/* Ä°pucu */}
+            {/* İpucu */}
             <div className="flex items-start gap-2.5" style={{ background: 'var(--a-disclaimer-bg)', border: '1px solid var(--a-disclaimer-border)', borderRadius: 16, padding: 13 }}>
               <Sparkles size={15} className="mt-0.5 shrink-0" style={{ color: 'var(--a-disclaimer-strong)' }} />
               <p style={{ fontSize: 11.5, color: 'var(--a-disclaimer-ink)', lineHeight: 1.5 }}>
-                {tr('partnerv2_korpe_gunu_ipucu', 'GecÉ™ nÃ¶vbÉ™sini Ã¶z Ã¼zÉ™rinÉ™ gÃ¶tÃ¼r â€” ananÄ±n 4 saatlÄ±q fasilÉ™siz yuxusu qÄ±zÄ±l dÉ™yÉ™rindÉ™dir. ðŸ’›')}
+                {tr('partnerv2_korpe_gunu_ipucu', 'Gecə növbəsini öz üzərinə götür — ananın 4 saatlıq fasiləsiz yuxusu qızıl dəyərindədir. 💛')}
               </p>
             </div>
 
-            {/* BugÃ¼nkÃ¼ qeydlÉ™r */}
+            {/* Bugünkü qeydlər */}
             <div className="a-card">
-              <h3 className="a-card-title" style={{ marginBottom: 12 }}>{tr('partnerv2_bugunku_qeydler', 'BugÃ¼nkÃ¼ qeydlÉ™r')}</h3>
+              <h3 className="a-card-title" style={{ marginBottom: 12 }}>{tr('partnerv2_bugunku_qeydler', 'Bugünkü qeydlər')}</h3>
               {logs.length === 0 ?
             <p className="text-center py-6" style={{ fontSize: 12.5, color: 'var(--a-ink-soft)' }}>
-                  {tr('partnerv2_bugun_qeyd_yoxdur', 'Bu gÃ¼n hÉ™lÉ™ qeyd yoxdur')}
+                  {tr('partnerv2_bugun_qeyd_yoxdur', 'Bu gün hələ qeyd yoxdur')}
                 </p> :
 
             <div className="space-y-1.5">

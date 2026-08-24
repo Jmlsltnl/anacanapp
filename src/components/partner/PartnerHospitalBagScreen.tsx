@@ -93,7 +93,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
               <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
                 <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
               </motion.button>
-              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("partnerhospitalbagscreen_xestexana_cantasi_045078", "XÉ™stÉ™xana Ã‡antasÄ±")}</p>
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("partnerhospitalbagscreen_xestexana_cantasi_045078", "Xəstəxana Çantası")}</p>
             </div>
           </header>
 
@@ -123,24 +123,24 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
             <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_geri", "Geri")}>
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
-            <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("partnerhospitalbagscreen_xestexana_cantasi_045078", "XÉ™stÉ™xana Ã‡antasÄ±")}</p>
+            <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("partnerhospitalbagscreen_xestexana_cantasi_045078", "Xəstəxana Çantası")}</p>
           </div>
           <div className="a-topbar-actions">
             <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
               <DialogTrigger asChild>
-                <motion.button className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("partnerhospitalbagscreen_esya_elave_et_79e28e", "ÆÅŸya É™lavÉ™ et")}>
+                <motion.button className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("partnerhospitalbagscreen_esya_elave_et_79e28e", "Əşya əlavə et")}>
                   <Plus size={16} strokeWidth={2} />
                 </motion.button>
               </DialogTrigger>
               <DialogContent className="a-scope rounded-[22px]">
                 <DialogHeader>
-                  <DialogTitle style={{ color: 'var(--a-ink)' }}>{tr("partnerhospitalbagscreen_esya_elave_et_79e28e", "ÆÅŸya É™lavÉ™ et")}</DialogTitle>
+                  <DialogTitle style={{ color: 'var(--a-ink)' }}>{tr("partnerhospitalbagscreen_esya_elave_et_79e28e", "Əşya əlavə et")}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 pt-4">
                   <Input
                     className="h-11 rounded-xl"
                     style={{ background: 'var(--a-surface)', borderColor: 'var(--a-line-strong)', color: 'var(--a-ink)' }}
-                    placeholder={tr("partnerhospitalbagscreen_esya_adi_176586", "ÆÅŸya adÄ±")}
+                    placeholder={tr("partnerhospitalbagscreen_esya_adi_176586", "Əşya adı")}
                     value={newItemName}
                     onChange={(e) => setNewItemName(e.target.value)} />
 
@@ -152,9 +152,9 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="a-scope">
-                      <SelectItem value="mom">{tr("partnerhospitalbagscreen_ana_ucun_8f885e", "Ana Ã¼Ã§Ã¼n")}</SelectItem>
-                      <SelectItem value="baby">{tr("partnerhospitalbagscreen_korpe_ucun_27c058", "KÃ¶rpÉ™ Ã¼Ã§Ã¼n")}</SelectItem>
-                      <SelectItem value="documents">{tr("partnerhospitalbagscreen_senedler_d60b5e", "SÉ™nÉ™dlÉ™r")}</SelectItem>
+                      <SelectItem value="mom">{tr("partnerhospitalbagscreen_ana_ucun_8f885e", "Ana üçün")}</SelectItem>
+                      <SelectItem value="baby">{tr("partnerhospitalbagscreen_korpe_ucun_27c058", "Körpə üçün")}</SelectItem>
+                      <SelectItem value="documents">{tr("partnerhospitalbagscreen_senedler_d60b5e", "Sənədlər")}</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button
@@ -175,7 +175,7 @@ const PartnerHospitalBagScreen: React.FC<PartnerHospitalBagScreenProps> = ({ onB
         {/* Progress */}
         <div className="a-card" style={{ marginBottom: 14 }}>
           <div className="flex items-center justify-between mb-3">
-            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--a-ink)' }}>{tr("partnerhospitalbagscreen_hazirliq_23905c", "HazÄ±rlÄ±q")}</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--a-ink)' }}>{tr("partnerhospitalbagscreen_hazirliq_23905c", "Hazırlıq")}</span>
             <span style={{ fontSize: 12.5, color: 'var(--a-ink-soft)' }}>
               {checkedCount} / {totalCount}
             </span>
