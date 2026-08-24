@@ -26,6 +26,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
   const [activeTab, setActiveTab] = useState<'log' | 'history' | 'insights'>('log');
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [selectedBleeding, setSelectedBleeding] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
 
   const { logs, todayLog, loading: logsLoading, addLog } = useDailyLogs();
@@ -76,9 +77,20 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
     if (todayLog) {
       setSelectedMood(todayLog.mood || null);
       setSelectedSymptoms(todayLog.symptoms || []);
+      setSelectedBleeding(todayLog.bleeding || null);
       setNotes(todayLog.notes || '');
     }
   });
+
+  // Qanaxma yalnız bump (hamiləlikdə ləkələnmə) və mommy (doğuşdan sonra lokia izləmə) üçün
+  // mənalıdır — flow-da artıq ayrıca period-axını (flow_daily_logs.flow_intensity) var
+  const showBleedingTracker = lifeStage === 'bump' || lifeStage === 'mommy';
+  const BLEEDING_OPTIONS = [
+  { id: 'none', label: tr('mooddiary_bleeding_none', 'Yoxdur'), emoji: '⚪' },
+  { id: 'spotting', label: tr('mooddiary_bleeding_spotting', 'Ləkələnmə'), emoji: '🩸' },
+  { id: 'light', label: tr('mooddiary_bleeding_light', 'Az'), emoji: '🩸' },
+  { id: 'medium', label: tr('mooddiary_bleeding_medium', 'Orta'), emoji: '🩸' },
+  { id: 'heavy', label: tr('mooddiary_bleeding_heavy', 'Çox'), emoji: '🩸' }];
 
   const toggleSymptom = async (symptomId: string) => {
     await hapticFeedback.light();
@@ -100,7 +112,7 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
       notes: notes || null,
       water_intake: todayLog?.water_intake || null,
       temperature: todayLog?.temperature || null,
-      bleeding: todayLog?.bleeding || null
+      bleeding: showBleedingTracker ? selectedBleeding : todayLog?.bleeding || null
     });
 
     setActiveTab('history');
@@ -235,6 +247,41 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
                 </div>
               </div>
 
+              {/* Bleeding — yalnız bump/mommy */}
+              {showBleedingTracker &&
+              <div className="a-card">
+                  <h2 className="a-card-title a-heading" style={{ marginBottom: 10 }}>{tr('mooddiary_bleeding_title', 'Qanaxma')}</h2>
+                  <div className="a-tag-row" style={{ marginBottom: 0 }}>
+                    {BLEEDING_OPTIONS.map((opt) => {
+                    const isSelected = opt.id === 'none' ? selectedBleeding === null : selectedBleeding === opt.id;
+                    return (
+                      <motion.button
+                        key={opt.id}
+                        onClick={() => setSelectedBleeding(opt.id === 'none' ? null : opt.id)}
+                        className={`a-tag${isSelected ? ' on' : ''}`}
+                        whileTap={{ scale: 0.95 }}>
+                        
+                          <span className="text-xs">{opt.emoji}</span>
+                          {opt.label}
+                        </motion.button>);
+
+                  })}
+                  </div>
+                  {selectedBleeding === 'heavy' &&
+                <motion.p
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xs"
+                  style={{ margin: '10px 0 0', padding: '10px 12px', borderRadius: 12, background: 'var(--a-alert-bg)', color: 'var(--a-alert-ink)', fontWeight: 600 }}>
+                  
+                      🆘 {lifeStage === 'mommy' ?
+                  tr('mooddiary_bleeding_heavy_warning_mommy', 'Ağır qanaxma (1 saatda bir bezi doldurur və ya iri laxtalar) təhlükəli ola bilər — dərhal həkiminizlə əlaqə saxlayın.') :
+                  tr('mooddiary_bleeding_heavy_warning_bump', 'Hamiləlikdə ağır qanaxma təcili tibbi vəziyyət ola bilər — dərhal həkiminizlə və ya təcili yardımla əlaqə saxlayın.')}
+                    </motion.p>
+                }
+                </div>
+              }
+
               {/* Notes */}
               <div className="a-card">
                 <h2 className="a-card-title a-heading" style={{ marginBottom: 10 }}>{tr("mooddiary_qeydler_a7a98b", "Qeydlər")}</h2>
@@ -311,6 +358,11 @@ const MoodDiary = forwardRef<HTMLDivElement, MoodDiaryProps>(({ onBack }, ref) =
                             </span> :
                     null;
                   })}
+                        {entry.bleeding &&
+                  <span className="a-tag" style={{ cursor: 'default', padding: '4px 9px', fontSize: 10, background: 'var(--a-alert-bg)', color: 'var(--a-alert-ink)' }}>
+                            🩸 {BLEEDING_OPTIONS.find((opt) => opt.id === entry.bleeding)?.label || entry.bleeding}
+                          </span>
+                  }
                       </div>
                     </div>
                   </motion.div>

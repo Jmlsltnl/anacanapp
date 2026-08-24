@@ -33,6 +33,7 @@ import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { analytics } from '@/lib/analytics';
 import { isHealthConnected } from '@/lib/health';
 import { useHealthDaily } from '@/hooks/useHealthData';
+import { useDailyLogs } from '@/hooks/useDailyLogs';
 
 interface MentalHealthTrackerProps {
   onBack: () => void;
@@ -141,10 +142,13 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
   const { data: todayCheckin } = useTodayMoodCheckin();
   const { data: epdsAssessments = [] } = useEPDSAssessments();
   const { data: resources = [] } = useMentalHealthResources();
+  // Dashboard-dakı Əhval vərəqəsi ilə eyni "daily_logs" mənbəyi — EPDS təklifi hər iki
+  // qeyd yerini nəzərə alsın, əhval qeydi isə hər iki yerdə sinxron görünsün deyə
+  const { logs: dailyLogs, updateMood: mirrorMoodToDailyLog } = useDailyLogs();
 
   const addMoodCheckin = useAddMoodCheckin();
   const submitEPDS = useSubmitEPDS();
-  const shouldShowEPDSPrompt = useShouldShowEPDSPrompt();
+  const shouldShowEPDSPrompt = useShouldShowEPDSPrompt(dailyLogs);
 
   // Health-dən mindfulness dəqiqələri — nəfəs məşqi ilə eyni mövzu, "körpü" kimi göstərilir
   const healthConnected = isHealthConnected();
@@ -153,6 +157,9 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
 
   const handleMoodSelect = async (level: number) => {
     await addMoodCheckin.mutateAsync({ mood_level: level, notes: notes || undefined });
+    // Dashboard-dakı Əhval vərəqəsi/həftəlik xülasələr eyni qalsın deyə daily_logs-a da güzgülənir
+    // (uğursuz olsa belə əsas qeyd artıq saxlanılıb, buna görə nəticəsi gözlənilmir)
+    void mirrorMoodToDailyLog(level);
     setNotes('');
     toast.success(tr("mentalhealthtracker_ehvaliniz_qeyd_edildi_dd9071", "\u018Fhval\u0131n\u0131z qeyd edildi \u2728"));
   };

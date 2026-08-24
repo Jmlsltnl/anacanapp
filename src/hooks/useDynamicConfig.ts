@@ -18,6 +18,11 @@ export interface Exercise {
   steps: string[];
   is_active: boolean;
   sort_order: number;
+  /** Doğuşdan Sonra Sağalma bölməsində (mommy) göstərilsin? — supabase/duzelis/Duzelis46.sql */
+  is_postpartum?: boolean;
+  postpartum_week_start?: number | null;
+  postpartum_week_end?: number | null;
+  postpartum_delivery_types?: string[] | null;
 }
 
 export const useExercises = () => {

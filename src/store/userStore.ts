@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { LifeStage, UserRole, DailyLog, CycleData, PregnancyData, BabyData } from '@/types/anacan';
+import type { LifeStage, UserRole, DailyLog, CycleData, PregnancyData, BabyData, DeliveryType, PostpartumData } from '@/types/anacan';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { getPregnancyWeek, getDayInWeek, getTrimester, calculateDueDate, getRealCalendarAge } from '@/lib/pregnancy-utils';
 import { Preferences } from '@capacitor/preferences';
@@ -32,6 +32,8 @@ interface UserState {
   babyGender: 'boy' | 'girl' | null;
   babyCount: number;
   multiplesType: 'single' | 'twins' | 'triplets' | 'quadruplets' | null;
+  /** Doğuş növü (profiles.delivery_type ilə sinxron) — Doğuşdan Sonra Sağalma məzmununu filtrləmək üçün */
+  deliveryType: DeliveryType | null;
   language: string;
   countryCode: string | null;
   
@@ -56,6 +58,7 @@ interface UserState {
   setPeriodLength: (length: number) => void;
   setDueDate: (date: Date) => void;
   setBabyData: (birthDate: Date, name: string, gender: 'boy' | 'girl', babyCount?: number, multiplesType?: 'single' | 'twins' | 'triplets' | 'quadruplets') => void;
+  setDeliveryType: (type: DeliveryType | null) => void;
   setPartnerCode: (code: string) => void;
   setLinkedPartnerId: (id: string | null) => void;
   setPartnerWomanData: (data: UserState['partnerWomanData']) => void;
@@ -68,6 +71,7 @@ interface UserState {
   getCycleData: () => CycleData | null;
   getPregnancyData: () => PregnancyData | null;
   getBabyData: () => BabyData | null;
+  getPostpartumWeek: () => PostpartumData | null;
 }
 
 const generatePartnerCode = (): string => {
@@ -103,6 +107,7 @@ export const useUserStore = create<UserState>()(
       babyGender: null,
       babyCount: 1,
       multiplesType: null,
+      deliveryType: null,
       language: 'az',
       countryCode: null,
       partnerWomanData: null,
@@ -157,6 +162,8 @@ export const useUserStore = create<UserState>()(
 
       setMultiplesData: (babyCount, multiplesType) => set({ babyCount, multiplesType }),
 
+      setDeliveryType: (deliveryType) => set({ deliveryType }),
+
   setLanguage: (lang) => {
     set({ language: lang });
     // KRİTİK: getLocaleTag() bunu oxuyur — tarix/ay/həftə adlarının
@@ -193,6 +200,7 @@ export const useUserStore = create<UserState>()(
         babyGender: null,
         babyCount: 1,
         multiplesType: null,
+        deliveryType: null,
         partnerWomanData: null,
       }),
 
@@ -287,6 +295,21 @@ export const useUserStore = create<UserState>()(
           ageRemainingDays: age.days,
         };
       },
+
+      /** Doğuşdan Sonra Sağalma məzmununu (məşqlər, bərpa cədvəli, 40 gün checklist) həftəyə görə filtrləmək üçün */
+      getPostpartumWeek: () => {
+        const { babyBirthDate, deliveryType } = get();
+        if (!babyBirthDate) return null;
+
+        const age = getRealCalendarAge(babyBirthDate);
+
+        return {
+          birthDate: new Date(babyBirthDate),
+          daysSinceBirth: age.totalDays,
+          week: Math.floor(age.totalDays / 7),
+          deliveryType,
+        };
+      },
     }),
     {
       name: 'anacan-user-store',
@@ -311,6 +334,7 @@ export const useUserStore = create<UserState>()(
         babyGender: state.babyGender,
         babyCount: state.babyCount,
         multiplesType: state.multiplesType,
+        deliveryType: state.deliveryType,
         language: state.language,
         hasSelectedLanguage: state.hasSelectedLanguage,
       }),

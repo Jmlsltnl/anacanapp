@@ -31,6 +31,8 @@ export interface Profile {
   baby_gender: 'boy' | 'girl' | null;
   baby_count: number | null;
   multiples_type: 'single' | 'twins' | 'triplets' | 'quadruplets' | null;
+  /** Doğuş növü — BirthOnboardingModal.tsx ilə yazılır, Doğuşdan Sonra Sağalma məzmunu üçün oxunur */
+  delivery_type: 'natural' | 'cesarean' | 'assisted' | null;
   start_weight: number | null;
   is_premium: boolean | null;
   premium_until: string | null;
@@ -95,6 +97,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
     setPeriodLength,
     setDueDate,
     setBabyData,
+    setDeliveryType,
     setPartnerCode,
     setLinkedPartnerId,
     logout: storeLogout
@@ -109,6 +112,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       setPeriodLength: s.setPeriodLength,
       setDueDate: s.setDueDate,
       setBabyData: s.setBabyData,
+      setDeliveryType: s.setDeliveryType,
       setPartnerCode: s.setPartnerCode,
       setLinkedPartnerId: s.setLinkedPartnerId,
       logout: s.logout
@@ -188,6 +192,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
         setBabyData(new Date(profileData.baby_birth_date), profileData.baby_name, profileData.baby_gender);
       }
 
+      // Doğuş növü — Doğuşdan Sonra Sağalma məzmununu (məşqlər, bərpa cədvəli) filtrləmək üçün
+      setDeliveryType(profileData.delivery_type ?? null);
+
       if (profileData.life_stage === 'partner') {
         setRole('partner');
       } else {
@@ -232,7 +239,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
         }).catch(() => {});
       }
     },
-    [setOnboarded, setPartnerCode, setLastPeriodDate, setCycleLength, setPeriodLength, setDueDate, setBabyData, setRole, setLifeStage, setLinkedPartnerId]
+    [setOnboarded, setPartnerCode, setLastPeriodDate, setCycleLength, setPeriodLength, setDueDate, setBabyData, setDeliveryType, setRole, setLifeStage, setLinkedPartnerId]
   );
 
   // ─────────────────────────────────────────

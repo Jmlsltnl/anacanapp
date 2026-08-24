@@ -10,7 +10,7 @@ import {
   Utensils, Activity, ArrowLeft, Camera, Lock, ShoppingCart, LucideIcon, Wrench, BookOpen, ChefHat,
   Stethoscope, Droplet, ImagePlus, Package, Mic, Scan, CloudSun, Gauge, Store,
   MapPin, Gamepad2, ShieldAlert, BookHeart, Stars, Crown, Ruler, Sparkles, TrendingUp, Zap,
-  Pill, Cake, Syringe } from
+  Pill, Cake, Syringe, Dumbbell, Brain } from
 'lucide-react';
 import BlogScreen from '@/components/BlogScreen';
 import { useUserStore } from '@/store/userStore';
@@ -112,7 +112,9 @@ const iconMap: Record<string, LucideIcon> = {
   'Calculator': Calculator,
   'Pill': Pill,
   'Syringe': Syringe,
-  'TrendingUp': TrendingUp
+  'TrendingUp': TrendingUp,
+  'Dumbbell': Dumbbell,
+  'Brain': Brain
 };
 
 // Import Calculator icon

@@ -309,19 +309,51 @@ export const useMentalHealthResources = () => {
   });
 };
 
+interface MoodSignal {
+  checked_at: string;
+  mood_level: number;
+}
+
+/**
+ * mood_checkins (bu alətin öz qeydləri) ilə daily_logs.mood (Dashboard-dakı Əhval
+ * vərəqəsi/MoodDiary) eyni 1-5 miqyasını (1=pis, 5=əla) paylaşır — istifadəçi hansı
+ * ekrandan qeyd etsə də, EPDS təklifi hər iki mənbəni nəzərə alsın deyə birləşdirilir.
+ * Eyni gün üçün hər iki mənbə varsa, mood_checkins üstünlük təşkil edir (daha spesifik alət).
+ */
+function mergeMoodSignals(
+checkins: MoodCheckin[] = [],
+dailyLogs: {log_date: string;mood: number | null;}[] = [])
+: MoodSignal[] {
+  const byDate = new Map<string, number>();
+  const cutoff = format(subDays(new Date(), 14), 'yyyy-MM-dd');
+
+  for (const log of dailyLogs) {
+    if (log.mood != null && log.log_date >= cutoff) {
+      byDate.set(log.log_date, log.mood);
+    }
+  }
+
+  for (const c of checkins) {
+    byDate.set(c.checked_at, c.mood_level);
+  }
+
+  return Array.from(byDate.entries()).map(([checked_at, mood_level]) => ({ checked_at, mood_level }));
+}
+
 // Check if user should be prompted for EPDS
-export const useShouldShowEPDSPrompt = () => {
+export const useShouldShowEPDSPrompt = (dailyLogs?: {log_date: string;mood: number | null;}[]) => {
   const { data: checkins } = useMoodCheckins(14);
 
-  if (!checkins?.length) return false;
+  const merged = mergeMoodSignals(checkins, dailyLogs);
+  if (!merged.length) return false;
 
-  const lowMoodCount = checkins.filter((c) => c.mood_level <= 2).length;
-  const consecutiveLowDays = getConsecutiveLowMoodDays(checkins);
+  const lowMoodCount = merged.filter((c) => c.mood_level <= 2).length;
+  const consecutiveLowDays = getConsecutiveLowMoodDays(merged);
 
   return lowMoodCount >= 7 || consecutiveLowDays >= 5;
 };
 
-function getConsecutiveLowMoodDays(checkins: MoodCheckin[]): number {
+function getConsecutiveLowMoodDays(checkins: MoodSignal[]): number {
   let maxConsecutive = 0;
   let current = 0;
 

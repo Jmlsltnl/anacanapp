@@ -109,7 +109,7 @@ const AdminDynamicContent = () => {
   const getDefaultFormData = () => {
     switch (activeTab) {
       case 'exercises':
-        return { name: '', name_az: '', duration_minutes: 10, calories: 50, level: 'easy', trimester: [1, 2, 3], icon: '🧘', description: '', steps: [], is_active: true, sort_order: 0 };
+        return { name: '', name_az: '', duration_minutes: 10, calories: 50, level: 'easy', trimester: [1, 2, 3], icon: '🧘', description: '', steps: [], is_active: true, sort_order: 0, is_postpartum: false, postpartum_week_start: 0, postpartum_week_end: null, postpartum_delivery_types: [] };
       case 'sounds':
         return { name: '', name_az: '', emoji: '🎵', color_gradient: 'from-blue-400 to-cyan-500', audio_url: '', noise_type: 'white', description: '', description_az: '', is_active: true, sort_order: 0 };
       case 'surprises':
@@ -190,6 +190,56 @@ const AdminDynamicContent = () => {
             <div className="flex items-center gap-2">
               <Switch checked={formData.is_active} onCheckedChange={(v) => setFormData({ ...formData, is_active: v })} />
               <span className="text-sm">Aktiv</span>
+            </div>
+            <div className="border-t pt-3 mt-1 space-y-3">
+              <div className="flex items-center gap-2">
+                <Switch checked={!!formData.is_postpartum} onCheckedChange={(v) => setFormData({ ...formData, is_postpartum: v })} />
+                <span className="text-sm font-medium">{tr('admindynamiccontent_postpartum_toggle', 'Doğuşdan Sonra Sağalma bölməsində göstər (mommy)')}</span>
+              </div>
+              {formData.is_postpartum &&
+              <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-muted-foreground">{tr('admindynamiccontent_postpartum_week_start', 'Neçənci həftədən (boş = 0)')}</label>
+                      <Input type="number" min={0} value={formData.postpartum_week_start ?? 0} onChange={(e) => setFormData({ ...formData, postpartum_week_start: e.target.value === '' ? null : parseInt(e.target.value) })} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">{tr('admindynamiccontent_postpartum_week_end', 'Neçənci həftəyə qədər (boş = davamlı)')}</label>
+                      <Input type="number" min={0} value={formData.postpartum_week_end ?? ''} onChange={(e) => setFormData({ ...formData, postpartum_week_end: e.target.value === '' ? null : parseInt(e.target.value) })} />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-muted-foreground">{tr('admindynamiccontent_postpartum_delivery_types', 'Doğuş növü (heç biri seçilməsə hamısına uyğundur)')}</label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                    { id: 'natural', label: tr('admindynamiccontent_delivery_natural', 'Təbii') },
+                    { id: 'cesarean', label: tr('admindynamiccontent_delivery_cesarean', 'Qeysəriyyə') },
+                    { id: 'assisted', label: tr('admindynamiccontent_delivery_assisted', 'Köməkli') }].
+                    map((dt) => {
+                        const selected = (formData.postpartum_delivery_types || []).includes(dt.id);
+                        return (
+                          <button
+                          key={dt.id}
+                          type="button"
+                          onClick={() => {
+                            const current: string[] = formData.postpartum_delivery_types || [];
+                            const updated = selected ? current.filter((t: string) => t !== dt.id) : [...current, dt.id];
+                            setFormData({ ...formData, postpartum_delivery_types: updated });
+                          }}
+                          className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${
+                          selected ?
+                          'bg-primary text-primary-foreground border-primary' :
+                          'bg-muted/50 text-muted-foreground border-border hover:bg-muted'}`
+                          }>
+                          
+                            {dt.label}
+                          </button>);
+
+                      })}
+                    </div>
+                  </div>
+                </>
+              }
             </div>
           </>);
 

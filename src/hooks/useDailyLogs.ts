@@ -137,6 +137,21 @@ export const useDailyLogs = () => {
     });
   };
 
+  /** Qanaxma/ləkələnmə qeydi (bump: hamiləlik dövründə ləkələnmə, mommy: doğuşdan sonra lokia izləmə) */
+  const updateBleeding = async (bleeding: 'light' | 'medium' | 'heavy' | 'spotting' | null) => {
+    const today = new Date().toISOString().split('T')[0];
+
+    return addLog({
+      log_date: today,
+      bleeding,
+      mood: todayLog?.mood || null,
+      water_intake: todayLog?.water_intake || 0,
+      symptoms: todayLog?.symptoms || null,
+      temperature: todayLog?.temperature || null,
+      notes: todayLog?.notes || null
+    });
+  };
+
   /** Ananın öz yuxusunu qeyd et (Mommy/Bump — Flow-da bunun ekvivalenti flow_daily_logs-dadır) */
   const updateSleep = async (sleepHours: number, sleepQuality: number | null) => {
     const today = new Date().toISOString().split('T')[0];
@@ -167,6 +182,7 @@ export const useDailyLogs = () => {
     updateMood,
     updateSymptoms,
     updateSleep,
+    updateBleeding,
     refetch: fetchLogs
   };
 };

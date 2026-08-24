@@ -13,6 +13,9 @@
  *  - Alətlər: shop (ikinci əl), cakes, tövsiyə məhsullar, blog
  *  - first-aid free saxlanılıb (təcili tibbi məlumat — etik + App Store review).
  *    danger-signs istifadəçi qərarı ilə premium edildi.
+ *  - mental-health (EPDS/əhval) free saxlanılıb — postpartum depressiya riski
+ *    skrininqi first-aid ilə eyni etik prinsiplə pullu divarın arxasında qala bilməz
+ *    (istifadəçi qərarı, Doğuşdan Sonra Sağalma planı).
  */
 
 const FREE_TOOL_IDS = new Set<string>([
@@ -24,7 +27,8 @@ const FREE_TOOL_IDS = new Set<string>([
 // Mini oyunlar — pulsuz (istifadəçi qərarı)
 'mini-games',
 // Təhlükəsizlik istisnası
-'first-aid']
+'first-aid',
+'mental-health']
 );
 
 /** Alət free siyahısındadır? */

@@ -35,10 +35,20 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
   const [currentStep, setCurrentStep] = useState(0);
   const { loading: logsLoading, addLog, isCompletedToday, getTodayStats, getStreak } = useExerciseLogs();
   const getPregnancyData = useUserStore((s) => s.getPregnancyData);
+  const lifeStage = useUserStore((s) => s.lifeStage);
+  const getPostpartumWeek = useUserStore((s) => s.getPostpartumWeek);
   const { data: dbExercises, isLoading: exercisesLoading } = useExercises();
 
   const pregnancyData = getPregnancyData();
   const currentTrimester = pregnancyData?.trimester || 2;
+
+  // "mommy" mərhələsində trimester deyil, doğuşdan neçənci həftə keçdiyi əsas götürülür —
+  // əvvəllər bu ekran postpartum istifadəçilərinə də sabit "trimester" başlığı göstərirdi
+  // və heç bir doğuşdan-sonra məşqi görünmürdü (bütün məzmun trimester-only filtrlənirdi).
+  const isMommy = lifeStage === 'mommy';
+  const postpartumData = isMommy ? getPostpartumWeek() : null;
+  const currentPostpartumWeek = postpartumData?.week ?? 0;
+  const deliveryType = postpartumData?.deliveryType ?? null;
 
   const exercises = useMemo(() => {
     if (!dbExercises) return [];
@@ -51,11 +61,23 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
       trimester: Array.isArray(e.trimester) ? e.trimester : [1, 2, 3],
       icon: e.icon || '🏃',
       description: e.description || '',
-      steps: Array.isArray(e.steps) ? e.steps : []
+      steps: Array.isArray(e.steps) ? e.steps : [],
+      isPostpartum: !!e.is_postpartum,
+      postpartumWeekStart: e.postpartum_week_start ?? null,
+      postpartumWeekEnd: e.postpartum_week_end ?? null,
+      postpartumDeliveryTypes: Array.isArray(e.postpartum_delivery_types) ? e.postpartum_delivery_types : null
     }));
   }, [dbExercises]);
 
-  const filteredExercises = exercises.filter((e) => e.trimester.includes(currentTrimester));
+  const filteredExercises = isMommy ?
+  exercises.filter((e) => {
+    if (!e.isPostpartum) return false;
+    const afterStart = e.postpartumWeekStart == null || currentPostpartumWeek >= e.postpartumWeekStart;
+    const beforeEnd = e.postpartumWeekEnd == null || currentPostpartumWeek <= e.postpartumWeekEnd;
+    const deliveryOk = !e.postpartumDeliveryTypes?.length || !deliveryType || e.postpartumDeliveryTypes.includes(deliveryType);
+    return afterStart && beforeEnd && deliveryOk;
+  }) :
+  exercises.filter((e) => e.trimester.includes(currentTrimester));
   const selectedExercise = exercises.find((e) => e.id === selectedExerciseId) || null;
   const todayStats = getTodayStats();
   const streak = getStreak();
@@ -94,8 +116,10 @@ const Exercises = forwardRef<HTMLDivElement, ExercisesProps>(({ onBack }, ref) =
       <ToolPage>
         <ToolHeader
           onBack={selectedExercise ? () => {setSelectedExerciseId(null);setCurrentStep(0);} : onBack}
-          eyebrow={`${currentTrimester}${tr("exercises_trimester_ucun_a94dca", ". trimester \xFC\xE7\xFCn")}`}
-          title={selectedExercise ? selectedExercise.name : tr("exercises_hamile_mesqleri_139b99", "Hamil\u0259 M\u0259\u015Fql\u0259ri")} />
+          eyebrow={isMommy ?
+          `${tr('exercises_postpartum_week_prefix', 'Doğuşdan')} ${currentPostpartumWeek}. ${tr('exercises_postpartum_week_suffix', 'həftə')}` :
+          `${currentTrimester}${tr("exercises_trimester_ucun_a94dca", ". trimester \xFC\xE7\xFCn")}`}
+          title={selectedExercise ? selectedExercise.name : isMommy ? tr('exercises_postpartum_title', 'Doğuşdan Sonra Məşqlər') : tr("exercises_hamile_mesqleri_139b99", "Hamil\u0259 M\u0259\u015Fql\u0259ri")} />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-3 gap-3 mb-4">

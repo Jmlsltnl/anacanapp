@@ -50,6 +50,15 @@ export interface BabyData {
   avatarUrl?: string;
 }
 
+export type DeliveryType = 'natural' | 'cesarean' | 'assisted';
+
+export interface PostpartumData {
+  birthDate: Date;
+  daysSinceBirth: number;
+  week: number;
+  deliveryType: DeliveryType | null;
+}
+
 export interface DailyLog {
   id: string;
   userId: string;
