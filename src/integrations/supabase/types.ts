@@ -8404,6 +8404,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          image_url: string | null
           is_active: boolean | null
           is_anonymous: boolean
           likes_count: number | null
@@ -8416,6 +8417,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           is_anonymous?: boolean
           likes_count?: number | null
@@ -8428,6 +8430,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          image_url?: string | null
           is_active?: boolean | null
           is_anonymous?: boolean
           likes_count?: number | null
