@@ -57,6 +57,9 @@ export const useAdminOnboardingStages = () => {
       queryClient.invalidateQueries({ queryKey: ['onboarding-stages'] });
       toast({ title: tr("useadminonboarding_merhele_elave_edildi_5bc49c", "Mərhələ əlavə edildi") });
     },
+    onError: () => {
+      toast({ title: tr("useadminonboarding_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    },
   });
 
   const update = useMutation({
@@ -69,6 +72,9 @@ export const useAdminOnboardingStages = () => {
       queryClient.invalidateQueries({ queryKey: ['onboarding-stages'] });
       toast({ title: tr("useadminonboarding_merhele_yenilendi_18f4f3", "Mərhələ yeniləndi") });
     },
+    onError: () => {
+      toast({ title: tr("useadminonboarding_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    },
   });
 
   const remove = useMutation({
@@ -80,6 +86,9 @@ export const useAdminOnboardingStages = () => {
       queryClient.invalidateQueries({ queryKey: ['onboarding-stages-admin'] });
       queryClient.invalidateQueries({ queryKey: ['onboarding-stages'] });
       toast({ title: tr("useadminonboarding_merhele_silindi_fb7d94", "Mərhələ silindi") });
+    },
+    onError: () => {
+      toast({ title: tr("useadminonboarding_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     },
   });
 
@@ -113,6 +122,9 @@ export const useAdminMultiplesOptions = () => {
       queryClient.invalidateQueries({ queryKey: ['multiples-options'] });
       toast({ title: tr("useadminonboarding_secim_elave_edildi_c68c1c", "Seçim əlavə edildi") });
     },
+    onError: () => {
+      toast({ title: tr("useadminonboarding_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    },
   });
 
   const update = useMutation({
@@ -125,6 +137,9 @@ export const useAdminMultiplesOptions = () => {
       queryClient.invalidateQueries({ queryKey: ['multiples-options'] });
       toast({ title: tr("useadminonboarding_secim_yenilendi_9d5d1b", "Seçim yeniləndi") });
     },
+    onError: () => {
+      toast({ title: tr("useadminonboarding_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    },
   });
 
   const remove = useMutation({
@@ -136,6 +151,9 @@ export const useAdminMultiplesOptions = () => {
       queryClient.invalidateQueries({ queryKey: ['multiples-options-admin'] });
       queryClient.invalidateQueries({ queryKey: ['multiples-options'] });
       toast({ title: tr("useadminonboarding_secim_silindi_78ce04", "Seçim silindi") });
+    },
+    onError: () => {
+      toast({ title: tr("useadminonboarding_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     },
   });
 

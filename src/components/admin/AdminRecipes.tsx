@@ -112,17 +112,27 @@ const AdminRecipes = () => {
   };
 
   const handleSave = async () => {
-    if (editingItem) {
-      await update.mutateAsync({ id: editingItem.id, ...formData });
-    } else {
-      await create.mutateAsync(formData);
+    try {
+      if (editingItem) {
+        await update.mutateAsync({ id: editingItem.id, ...formData });
+      } else {
+        await create.mutateAsync(formData);
+      }
+      setShowModal(false);
+    } catch {
+      // Xəta artıq useAdminRecipes.ts-in onError-u vasitəsilə toast kimi
+      // göstərilib - modal qəsdən açıq qalır ki, admin məlumatı itirmədən
+      // yenidən cəhd edə bilsin.
     }
-    setShowModal(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm(tr("adminrecipes_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
-    await remove.mutateAsync(id);
+    try {
+      await remove.mutateAsync(id);
+    } catch {
+      // Xəta artıq onError vasitəsilə göstərilib.
+    }
   };
 
   // Image upload handler
@@ -346,11 +356,12 @@ const AdminRecipes = () => {
   const saveCat = async () => {
     try {
       if (editingCat) {
-        const { error } = await supabase.from('recipe_categories').update({
-          name: catForm.name, name_az: catForm.name_az, emoji: catForm.emoji,
-          sort_order: catForm.sort_order, is_active: catForm.is_active,
-          category_id: catForm.category_id
-        }).eq('id', editingCat.id);
+        // NOT: əvvəllər sabit sahə siyahısı göndərilirdi - LocalizedInput
+        // admin dili ru/tr/kk/de/ar olanda name_ru/name_kk və s. catForm-a
+        // yazırdı, amma bunlar heç vaxt göndərilmirdi (CREATE budağı isə
+        // bütün catForm-u spread etdiyi üçün təsirlənmirdi - asimmetrik bug).
+        const { id: _catId, ...catUpdates } = catForm as any;
+        const { error } = await supabase.from('recipe_categories').update(catUpdates).eq('id', editingCat.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('recipe_categories').insert([catForm]);
@@ -382,7 +393,9 @@ const AdminRecipes = () => {
 
   const openCatEdit = (cat: any) => {
     setEditingCat(cat);
-    setCatForm({ category_id: cat.category_id, name: cat.name, name_az: cat.name_az || '', emoji: cat.emoji || '', sort_order: cat.sort_order || 0, is_active: cat.is_active !== false });
+    // NOT: `...cat` spread olunur ki, mövcud name_en/ru/tr/kk/de/ar
+    // dəyərləri admin dili dəyişdirildikdə boş görünməsin.
+    setCatForm({ ...cat, category_id: cat.category_id, name: cat.name, name_az: cat.name_az || '', emoji: cat.emoji || '', sort_order: cat.sort_order || 0, is_active: cat.is_active !== false });
     setShowCatModal(true);
   };
 

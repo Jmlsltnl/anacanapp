@@ -239,6 +239,7 @@ const AdminCommunity = () => {
       fetchGroups();
     } catch (error) {
       console.error('Error toggling active:', error);
+      toast({ title: tr("admincommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   };
 

@@ -102,11 +102,18 @@ const AdminFirstAid = () => {
         eq('id', scenario.id);
         if (error) throw error;
       } else {
+        // NOT: <LocalizedInput field="title"> admin dili 'az' olanda (defolt)
+        // HƏMİŞƏ `title_az`-a yazır, heç vaxt bare `title`-a yox (bax
+        // LocalizedInput.tsx-in `isAzProp` məntiqi). Bu yoxlama əvvəllər
+        // yalnız `title`-ı yoxlayırdı - `title` heç vaxt doldurulmadığı üçün
+        // YENİ ssenari yaratmaq HƏR DƏFƏ, nə yazılırsa yazılsın, bloklanırdı
+        // (eyni kök səbəb AdminBlog.tsx-də tapılan bug ilə).
         const { title, title_az, ...rest } = scenario;
-        if (!title || !title_az) throw new Error('Title required');
+        const effectiveTitle = (title || title_az || '').trim();
+        if (!effectiveTitle) throw new Error('Title required');
         const { error } = await supabase.
         from('first_aid_scenarios').
-        insert({ title, title_az, ...rest });
+        insert({ title: effectiveTitle, title_az: title_az || effectiveTitle, ...rest });
         if (error) throw error;
       }
     },
@@ -133,6 +140,9 @@ const AdminFirstAid = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-first-aid-scenarios'] });
       toast({ title: 'Ssenari silindi' });
+    },
+    onError: () => {
+      toast({ title: tr("adminfirstaid_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   });
 

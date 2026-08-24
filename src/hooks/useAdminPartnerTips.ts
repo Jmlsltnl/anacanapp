@@ -41,6 +41,9 @@ export const useAdminPartnerTips = () => {
       queryClient.invalidateQueries({ queryKey: ['partner-daily-tips'] });
       toast({ title: tr("useadminpartnertips_meslehet_elave_edildi_4a4cbc", "Məsləhət əlavə edildi") });
     },
+    onError: () => {
+      toast({ title: tr("useadminpartnertips_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    },
   });
 
   const update = useMutation({
@@ -53,6 +56,9 @@ export const useAdminPartnerTips = () => {
       queryClient.invalidateQueries({ queryKey: ['partner-daily-tips'] });
       toast({ title: tr("useadminpartnertips_meslehet_yenilendi_289f83", "Məsləhət yeniləndi") });
     },
+    onError: () => {
+      toast({ title: tr("useadminpartnertips_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    },
   });
 
   const remove = useMutation({
@@ -64,6 +70,9 @@ export const useAdminPartnerTips = () => {
       queryClient.invalidateQueries({ queryKey: ['partner-daily-tips-admin'] });
       queryClient.invalidateQueries({ queryKey: ['partner-daily-tips'] });
       toast({ title: tr("useadminpartnertips_meslehet_silindi_0a5099", "Məsləhət silindi") });
+    },
+    onError: () => {
+      toast({ title: tr("useadminpartnertips_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     },
   });
 

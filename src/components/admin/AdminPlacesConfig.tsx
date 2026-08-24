@@ -65,6 +65,9 @@ const AdminPlacesConfig = () => {
       setEditingCategory(null);
       setNewCategory(false);
       toast.success(tr("adminplacesconfig_kateqoriya_yadda_saxlanildi_0346be", "Kateqoriya yadda saxlan\u0131ld\u0131"));
+    },
+    onError: () => {
+      toast.error(tr("adminplacesconfig_xeta_bas_verdi_f22fba", "Xəta baş verdi"));
     }
   });
 
@@ -76,6 +79,9 @@ const AdminPlacesConfig = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-place-categories'] });
       toast.success('Kateqoriya silindi');
+    },
+    onError: () => {
+      toast.error(tr("adminplacesconfig_xeta_bas_verdi_f22fba", "Xəta baş verdi"));
     }
   });
 
@@ -97,6 +103,9 @@ const AdminPlacesConfig = () => {
       setEditingAmenity(null);
       setNewAmenity(false);
       toast.success(tr("adminplacesconfig_i_mkan_yadda_saxlanildi_368411", "\u0130mkan yadda saxlan\u0131ld\u0131"));
+    },
+    onError: () => {
+      toast.error(tr("adminplacesconfig_xeta_bas_verdi_f22fba", "Xəta baş verdi"));
     }
   });
 
@@ -108,6 +117,9 @@ const AdminPlacesConfig = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-place-amenities'] });
       toast.success('İmkan silindi');
+    },
+    onError: () => {
+      toast.error(tr("adminplacesconfig_xeta_bas_verdi_f22fba", "Xəta baş verdi"));
     }
   });
 

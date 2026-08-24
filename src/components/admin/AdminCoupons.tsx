@@ -99,7 +99,8 @@ const AdminCoupons = () => {
     onSuccess: () => {
       toast({ title: 'Silindi' });
       queryClient.invalidateQueries({ queryKey: ['admin-coupons'] });
-    }
+    },
+    onError: (err: any) => toast({ title: tr("admincoupons_xeta_3cdbb6", "Xəta"), description: err.message, variant: 'destructive' })
   });
 
   const handleEdit = (coupon: any) => {

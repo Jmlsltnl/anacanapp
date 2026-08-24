@@ -60,17 +60,25 @@ const AdminOnboarding = () => {
   };
 
   const handleSaveStage = async () => {
-    if (editingStage) {
-      await stages.update.mutateAsync({ id: editingStage.id, ...stageFormData });
-    } else {
-      await stages.create.mutateAsync(stageFormData);
+    try {
+      if (editingStage) {
+        await stages.update.mutateAsync({ id: editingStage.id, ...stageFormData });
+      } else {
+        await stages.create.mutateAsync(stageFormData);
+      }
+      setShowStageModal(false);
+    } catch {
+      // Xəta artıq useAdminOnboarding.ts-in onError-u ilə göstərilib.
     }
-    setShowStageModal(false);
   };
 
   const handleDeleteStage = async (id: string) => {
     if (!confirm(tr("adminonboarding_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
-    await stages.remove.mutateAsync(id);
+    try {
+      await stages.remove.mutateAsync(id);
+    } catch {
+      // Xəta artıq onError ilə göstərilib.
+    }
   };
 
   // Multiple handlers
@@ -95,17 +103,25 @@ const AdminOnboarding = () => {
   };
 
   const handleSaveMultiple = async () => {
-    if (editingMultiple) {
-      await multiples.update.mutateAsync({ id: editingMultiple.id, ...multipleFormData });
-    } else {
-      await multiples.create.mutateAsync(multipleFormData);
+    try {
+      if (editingMultiple) {
+        await multiples.update.mutateAsync({ id: editingMultiple.id, ...multipleFormData });
+      } else {
+        await multiples.create.mutateAsync(multipleFormData);
+      }
+      setShowMultipleModal(false);
+    } catch {
+      // Xəta artıq onError ilə göstərilib.
     }
-    setShowMultipleModal(false);
   };
 
   const handleDeleteMultiple = async (id: string) => {
     if (!confirm(tr("adminonboarding_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
-    await multiples.remove.mutateAsync(id);
+    try {
+      await multiples.remove.mutateAsync(id);
+    } catch {
+      // Xəta artıq onError ilə göstərilib.
+    }
   };
 
   return (

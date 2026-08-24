@@ -50,6 +50,9 @@ const AdminAlbumOrders = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-album-orders'] });
       toast({ title: tr("adminalbumorders_status_yenilendi_890662", "Status yeniləndi") });
+    },
+    onError: () => {
+      toast({ title: tr("adminalbumorders_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   });
 

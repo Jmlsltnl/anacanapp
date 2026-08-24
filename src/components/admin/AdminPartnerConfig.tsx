@@ -72,6 +72,9 @@ const AdminPartnerConfig = () => {
       setEditingId(null);
       setIsAdding(false);
       toast.success(tr("adminpartnerconfig_yadda_saxlanildi_cf4f4a", "Yadda saxlan\u0131ld\u0131"));
+    },
+    onError: () => {
+      toast.error(tr("adminpartnerconfig_xeta_bas_verdi_f22fba", "Xəta baş verdi"));
     }
   });
 
@@ -85,6 +88,9 @@ const AdminPartnerConfig = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-partner-menu-items'] });
       queryClient.invalidateQueries({ queryKey: ['admin-surprise-categories'] });
       toast.success('Silindi');
+    },
+    onError: () => {
+      toast.error(tr("adminpartnerconfig_xeta_bas_verdi_f22fba", "Xəta baş verdi"));
     }
   });
 
@@ -287,7 +293,11 @@ const AdminPartnerConfig = () => {
 
 // Form Components
 const AchievementForm = ({ item, onSave, onCancel, isLoading }: any) => {
+  // NOT: `...item` spread olunur ki, mövcud name_en/ru/tr/kk/de/ar dəyərləri
+  // admin dili dəyişdirildikdə boş görünməsin (Save tərəfi artıq bütün formu
+  // göndərir, yalnız Open (bərpa) tərəfi əskik idi).
   const [form, setForm] = useState({
+    ...item,
     achievement_key: item?.achievement_key || '',
     name: item?.name || '',
     name_az: item?.name_az || '',
@@ -317,7 +327,10 @@ const AchievementForm = ({ item, onSave, onCancel, isLoading }: any) => {
 };
 
 const MenuItemForm = ({ item, onSave, onCancel, isLoading }: any) => {
+  // NOT: `...item` spread olunur ki, mövcud label_en/ru/tr/kk/de/ar
+  // dəyərləri gizli qalmasın.
   const [form, setForm] = useState({
+    ...item,
     menu_key: item?.menu_key || '',
     label: item?.label || '',
     label_az: item?.label_az || '',
@@ -346,7 +359,10 @@ const MenuItemForm = ({ item, onSave, onCancel, isLoading }: any) => {
 };
 
 const SurpriseCategoryForm = ({ item, onSave, onCancel, isLoading }: any) => {
+  // NOT: `...item` spread olunur ki, mövcud label_en/ru/tr/kk/de/ar
+  // dəyərləri gizli qalmasın.
   const [form, setForm] = useState({
+    ...item,
     category_key: item?.category_key || '',
     label: item?.label || '',
     label_az: item?.label_az || '',

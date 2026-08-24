@@ -131,14 +131,22 @@ const AdminSupport = () => {
 
   const handleCloseTicket = async () => {
     if (!selectedTicket) return;
-    await updateStatus(selectedTicket.id, 'closed');
+    const result = await updateStatus(selectedTicket.id, 'closed');
+    if (result.error) {
+      toast({ title: tr("adminsupport_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+      return;
+    }
     setSelectedTicket({ ...selectedTicket, status: 'closed' });
     toast({ title: tr("adminsupport_muraciet_baglandi_878702", "Müraciət bağlandı") });
   };
 
   const handleResolveTicket = async () => {
     if (!selectedTicket) return;
-    await updateStatus(selectedTicket.id, 'resolved');
+    const result = await updateStatus(selectedTicket.id, 'resolved');
+    if (result.error) {
+      toast({ title: tr("adminsupport_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+      return;
+    }
     setSelectedTicket({ ...selectedTicket, status: 'resolved' });
     toast({ title: tr("adminsupport_muraciet_hell_edildi_367c6a", "Müraciət həll edildi") });
   };
@@ -191,8 +199,16 @@ const AdminSupport = () => {
           <div className="flex gap-2 mt-3">
             <Select
               value={selectedTicket.status}
-              onValueChange={(value) => {
-                updateStatus(selectedTicket.id, value as AdminSupportTicket['status']);
+              onValueChange={async (value) => {
+                // NOT: əvvəllər await/`{error}` yoxlanmadan yerli state
+                // qeydsiz-şərtsiz yenilənirdi - status admin ekranında
+                // dəyişmiş kimi görünə bilərdi, real DB yazısı uğursuz
+                // olsa belə.
+                const result = await updateStatus(selectedTicket.id, value as AdminSupportTicket['status']);
+                if (result.error) {
+                  toast({ title: tr("adminsupport_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+                  return;
+                }
                 setSelectedTicket({ ...selectedTicket, status: value as AdminSupportTicket['status'] });
               }}>
               
@@ -208,8 +224,12 @@ const AdminSupport = () => {
             </Select>
             <Select
               value={selectedTicket.priority}
-              onValueChange={(value) => {
-                updatePriority(selectedTicket.id, value as AdminSupportTicket['priority']);
+              onValueChange={async (value) => {
+                const result = await updatePriority(selectedTicket.id, value as AdminSupportTicket['priority']);
+                if (result.error) {
+                  toast({ title: tr("adminsupport_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+                  return;
+                }
                 setSelectedTicket({ ...selectedTicket, priority: value as AdminSupportTicket['priority'] });
               }}>
               

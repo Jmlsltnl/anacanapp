@@ -3,6 +3,14 @@ import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+// NOT: bütün bu fayldakı 15 mutasiyanın (5 resurs növü x create/update/
+// remove) heç birində onError yox idi - bir Supabase xətası tamamilə
+// sessiz udulurdu (uğur toast-u da göstərilmirdi, sadəcə heç nə baş
+// vermirdi). Paylaşılan bir xəta callback-i əlavə olunur.
+const showGenericError = (toast: ReturnType<typeof useToast>['toast']) => () => {
+  toast({ title: tr("useadminmentalhealth_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+};
+
 export interface EPDSQuestion {
   id: string;
   question_number: number;
@@ -89,6 +97,7 @@ export const useAdminEPDSQuestions = () => {
       queryClient.invalidateQueries({ queryKey: ['epds-questions'] });
       toast({ title: tr("useadminmentalhealth_sual_elave_edildi_2d000b", "Sual əlavə edildi") });
     },
+    onError: showGenericError(toast),
   });
 
   const update = useMutation({
@@ -101,6 +110,7 @@ export const useAdminEPDSQuestions = () => {
       queryClient.invalidateQueries({ queryKey: ['epds-questions'] });
       toast({ title: tr("useadminmentalhealth_sual_yenilendi_786899", "Sual yeniləndi") });
     },
+    onError: showGenericError(toast),
   });
 
   const remove = useMutation({
@@ -113,6 +123,7 @@ export const useAdminEPDSQuestions = () => {
       queryClient.invalidateQueries({ queryKey: ['epds-questions'] });
       toast({ title: tr("hooks_adminfaq_sual_silindi", "Sual silindi") });
     },
+    onError: showGenericError(toast),
   });
 
   return { ...query, create, update, remove };
@@ -145,6 +156,7 @@ export const useAdminMoodLevels = () => {
       queryClient.invalidateQueries({ queryKey: ['mood-levels'] });
       toast({ title: tr("useadminmentalhealth_ehval_seviyyesi_elave_edildi_b321b6", "Əhval səviyyəsi əlavə edildi") });
     },
+    onError: showGenericError(toast),
   });
 
   const update = useMutation({
@@ -157,6 +169,7 @@ export const useAdminMoodLevels = () => {
       queryClient.invalidateQueries({ queryKey: ['mood-levels'] });
       toast({ title: tr("useadminmentalhealth_ehval_seviyyesi_yenilendi_26939a", "Əhval səviyyəsi yeniləndi") });
     },
+    onError: showGenericError(toast),
   });
 
   const remove = useMutation({
@@ -169,6 +182,7 @@ export const useAdminMoodLevels = () => {
       queryClient.invalidateQueries({ queryKey: ['mood-levels'] });
       toast({ title: tr("useadminmentalhealth_ehval_seviyyesi_silindi_802b1e", "Əhval səviyyəsi silindi") });
     },
+    onError: showGenericError(toast),
   });
 
   return { ...query, create, update, remove };
@@ -201,6 +215,7 @@ export const useAdminBreathingExercises = () => {
       queryClient.invalidateQueries({ queryKey: ['breathing-exercises'] });
       toast({ title: tr("useadminmentalhealth_nefes_mesqi_elave_edildi_0f4266", "Nəfəs məşqi əlavə edildi") });
     },
+    onError: showGenericError(toast),
   });
 
   const update = useMutation({
@@ -213,6 +228,7 @@ export const useAdminBreathingExercises = () => {
       queryClient.invalidateQueries({ queryKey: ['breathing-exercises'] });
       toast({ title: tr("useadminmentalhealth_nefes_mesqi_yenilendi_61bfcc", "Nəfəs məşqi yeniləndi") });
     },
+    onError: showGenericError(toast),
   });
 
   const remove = useMutation({
@@ -225,6 +241,7 @@ export const useAdminBreathingExercises = () => {
       queryClient.invalidateQueries({ queryKey: ['breathing-exercises'] });
       toast({ title: tr("useadminmentalhealth_nefes_mesqi_silindi_4bf0db", "Nəfəs məşqi silindi") });
     },
+    onError: showGenericError(toast),
   });
 
   return { ...query, create, update, remove };
@@ -257,6 +274,7 @@ export const useAdminNoiseThresholds = () => {
       queryClient.invalidateQueries({ queryKey: ['noise-thresholds'] });
       toast({ title: tr("useadminmentalhealth_ses_hedd_elave_edildi_b3723a", "Səs hədd əlavə edildi") });
     },
+    onError: showGenericError(toast),
   });
 
   const update = useMutation({
@@ -269,6 +287,7 @@ export const useAdminNoiseThresholds = () => {
       queryClient.invalidateQueries({ queryKey: ['noise-thresholds'] });
       toast({ title: tr("useadminmentalhealth_ses_hedd_yenilendi_66ecc6", "Səs hədd yeniləndi") });
     },
+    onError: showGenericError(toast),
   });
 
   const remove = useMutation({
@@ -281,6 +300,7 @@ export const useAdminNoiseThresholds = () => {
       queryClient.invalidateQueries({ queryKey: ['noise-thresholds'] });
       toast({ title: tr("useadminmentalhealth_ses_hedd_silindi_041844", "Səs hədd silindi") });
     },
+    onError: showGenericError(toast),
   });
 
   return { ...query, create, update, remove };
@@ -329,6 +349,7 @@ export const useAdminMentalHealthResources = () => {
       queryClient.invalidateQueries({ queryKey: ['mental-health-resources'] });
       toast({ title: tr("useadminmentalhealth_resurs_elave_edildi_5dd590", "Resurs əlavə edildi") });
     },
+    onError: showGenericError(toast),
   });
 
   const update = useMutation({
@@ -341,6 +362,7 @@ export const useAdminMentalHealthResources = () => {
       queryClient.invalidateQueries({ queryKey: ['mental-health-resources'] });
       toast({ title: tr("useadminmentalhealth_resurs_yenilendi_710694", "Resurs yeniləndi") });
     },
+    onError: showGenericError(toast),
   });
 
   const remove = useMutation({
@@ -353,6 +375,7 @@ export const useAdminMentalHealthResources = () => {
       queryClient.invalidateQueries({ queryKey: ['mental-health-resources'] });
       toast({ title: tr("hooks_adminmh_resurs_silindi", "Resurs silindi") });
     },
+    onError: showGenericError(toast),
   });
 
   return { ...query, create, update, remove };

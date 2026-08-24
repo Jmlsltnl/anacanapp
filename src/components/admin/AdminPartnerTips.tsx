@@ -73,17 +73,25 @@ const AdminPartnerTips = () => {
   };
 
   const handleSave = async () => {
-    if (editingItem) {
-      await update.mutateAsync({ id: editingItem.id, ...formData });
-    } else {
-      await create.mutateAsync(formData);
+    try {
+      if (editingItem) {
+        await update.mutateAsync({ id: editingItem.id, ...formData });
+      } else {
+        await create.mutateAsync(formData);
+      }
+      setShowModal(false);
+    } catch {
+      // Xəta artıq useAdminPartnerTips.ts-in onError-u ilə göstərilib.
     }
-    setShowModal(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm(tr("adminpartnertips_silmek_istediyinize_eminsiniz_09658f", "Silm\u0259k ist\u0259diyiniz\u0259 \u0259minsiniz?"))) return;
-    await remove.mutateAsync(id);
+    try {
+      await remove.mutateAsync(id);
+    } catch {
+      // Xəta artıq onError ilə göstərilib.
+    }
   };
 
   const filteredTips = tips.filter((t) =>

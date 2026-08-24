@@ -45,6 +45,10 @@ export const useAdminRecipesAdmin = () => {
 
   const query = useAdminRecipesQuery();
 
+  // NOT: bu 3 mutasiyanın heç birində onError yox idi, VƏ çağıran
+  // komponent (AdminRecipes.tsx) `mutateAsync`-ı try/catch olmadan
+  // çağırırdı - bu, əsas Resept Yarat/Yenilə/Sil axınında (ikinci dərəcəli
+  // deyil) tam sessiz uğursuzluğa səbəb olurdu.
   const create = useMutation({
     mutationFn: async (item: Partial<AdminRecipe>) => {
       const { error } = await supabase.from('admin_recipes').insert([item as any]);
@@ -54,6 +58,9 @@ export const useAdminRecipesAdmin = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-recipes'] });
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
       toast({ title: tr("useadminrecipes_resept_elave_edildi_fe3c1a", "Resept əlavə edildi") });
+    },
+    onError: (error: any) => {
+      toast({ title: tr("useadminrecipes_xeta_bas_verdi_f22fba", "Xəta baş verdi"), description: error?.message, variant: 'destructive' });
     },
   });
 
@@ -67,6 +74,9 @@ export const useAdminRecipesAdmin = () => {
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
       toast({ title: tr("useadminrecipes_resept_yenilendi_dd7821", "Resept yeniləndi") });
     },
+    onError: (error: any) => {
+      toast({ title: tr("useadminrecipes_xeta_bas_verdi_f22fba", "Xəta baş verdi"), description: error?.message, variant: 'destructive' });
+    },
   });
 
   const remove = useMutation({
@@ -78,6 +88,9 @@ export const useAdminRecipesAdmin = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-recipes'] });
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
       toast({ title: tr("hooks_adminrecipes_resept_silindi", "Resept silindi") });
+    },
+    onError: (error: any) => {
+      toast({ title: tr("useadminrecipes_xeta_bas_verdi_f22fba", "Xəta baş verdi"), description: error?.message, variant: 'destructive' });
     },
   });
 
