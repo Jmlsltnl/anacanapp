@@ -23,6 +23,28 @@ interface AppSetting {
   description: string | null;
 }
 
+// NOT: `handleSave` əvvəllər `localSettings`-dəki HƏR açarı (yəni
+// `app_settings` cədvəlində mövcud olan HƏR sətri, bu ekranın heç bir
+// UI elementi olmasa belə) geri yazırdı — nəticədə: (1) başqa admin
+// ekranlarının (AdminForceUpdate, AdminCommunity, AdminEpoint,
+// AdminFlowContent və s.) bu komponent yükləndikdən SONRA etdiyi
+// dəyişikliklər, bu ekranda əlaqəsiz bir "Yadda saxla" kliki ilə köhnə
+// keşlənmiş dəyərə sıfırlanırdı; (2) `force_update` (JSONB obyekt) hər
+// dəfə ikiqat JSON-encode olunaraq korlanırdı (`AdminForceUpdate.tsx`
+// onu sadə string kimi geri oxuyurdu). İndi YALNIZ bu ekranın özünün
+// idarə etdiyi açarlar yazılır.
+const MANAGED_SETTING_KEYS = [
+  'flow_mode_enabled',
+  'bump_mode_enabled',
+  'mommy_mode_enabled',
+  'mommy_hero_variant',
+  'dark_mode_enabled',
+  'ai_model',
+  'app_version',
+  'maintenance_mode',
+  'max_daily_logs',
+] as const;
+
 const aiModels = [
 { id: 'google/gemini-2.5-flash', name: tr("adminsettings_gemini_2_5_flash_tovsiyye_olunan_be1e47", "Gemini 2.5 Flash (Tövsiyyə olunan)") },
 { id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
@@ -81,7 +103,9 @@ const AdminSettings = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      for (const [key, value] of Object.entries(localSettings)) {
+      for (const key of MANAGED_SETTING_KEYS) {
+        if (!(key in localSettings)) continue;
+        const value = localSettings[key];
         const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
 
         // Check if setting exists

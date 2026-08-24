@@ -274,10 +274,37 @@ const AdminTools = () => {
     setEditingTool(null);
   };
 
+  // Fields this screen's bulk save is actually allowed to touch.
+  const SAVED_FIELDS = [
+    'flow_order', 'bump_order', 'mommy_order',
+    'is_active', 'flow_active', 'bump_active', 'mommy_active',
+    'flow_locked', 'bump_locked', 'mommy_locked',
+    'is_premium', 'premium_type', 'premium_limit',
+    'display_name_az', 'description_az',
+    'is_hero', 'hero_order', 'is_quick_access', 'quick_access_order',
+    'quick_access_gradient', 'hero_gradient', 'hero_subtitle', 'hero_badge'
+  ] as const;
+
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: async () => {
-      for (const tool of localTools) {
+      // NOT: əvvəllər HƏR sətir (localTools-dakı bütün ~sıra) qeydsiz-şərtsiz
+      // yenidən yazılırdı - hətta admin sadəcə BİR alətin sırasını dəyişəndə
+      // belə. Bu, `AdminMarketplace.tsx`-in `tool_configs.is_active`
+      // (second-hand-market üçün) hədəflənmiş, tək-sütunlu update-i ilə
+      // yarışa girirdi: marketplace admin-i bazarı aç/bağla edəndən sonra,
+      // bu ekranda əlaqəsiz bir dəyişiklik saxlananda, köhnə keşlənmiş
+      // `localTools` dəyəri həmin marketplace dəyişikliyini SƏSSİZCƏ geri
+      // qaytarırdı. İndi yalnız HƏQİQƏTƏN dəyişmiş sətirlər üçün UPDATE
+      // göndərilir - dəyişməyən sətirlərə toxunulmur.
+      const originalById = new Map(tools.map((t) => [t.id, t]));
+      const changedTools = localTools.filter((tool) => {
+        const original = originalById.get(tool.id);
+        if (!original) return false;
+        return SAVED_FIELDS.some((field) => tool[field as keyof ToolConfig] !== original[field as keyof ToolConfig]);
+      });
+
+      for (const tool of changedTools) {
         const { error } = await supabase.
         from('tool_configs').
         update({
