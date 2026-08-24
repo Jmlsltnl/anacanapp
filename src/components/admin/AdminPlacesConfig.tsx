@@ -257,7 +257,11 @@ const AdminPlacesConfig = () => {
 
 // Category Form Component
 const CategoryForm = ({ category, onSave, onCancel, isLoading }: any) => {
+  // NOT: `...category` spread olunur ki, mövcud label_en/ru/tr/kk/de/ar
+  // dəyərləri admin dili dəyişdirildikdə boş görünməsin (Save tərəfi artıq
+  // bütün formu göndərir, yalnız Open (bərpa) tərəfi əskik idi).
   const [form, setForm] = useState({
+    ...category,
     category_key: category?.category_key || '',
     label: category?.label || '',
     label_az: category?.label_az || '',
@@ -291,7 +295,10 @@ const CategoryForm = ({ category, onSave, onCancel, isLoading }: any) => {
 
 // Amenity Form Component
 const AmenityForm = ({ amenity, onSave, onCancel, isLoading }: any) => {
+  // NOT: `...amenity` spread olunur ki, mövcud label_en/ru/tr/kk/de/ar
+  // dəyərləri admin dili dəyişdirildikdə boş görünməsin.
   const [form, setForm] = useState({
+    ...amenity,
     amenity_key: amenity?.amenity_key || '',
     label: amenity?.label || '',
     label_az: amenity?.label_az || '',

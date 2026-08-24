@@ -101,6 +101,9 @@ const AdminFairyTales = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-fairy-tale-themes'] });
       toast({ title: 'Tema silindi' });
+    },
+    onError: () => {
+      toast({ title: tr("adminfairytales_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   });
 
@@ -241,7 +244,12 @@ interface ThemeFormProps {
 }
 
 const ThemeForm = ({ theme, onSave, onCancel, isLoading }: ThemeFormProps) => {
-  const [form, setForm] = useState({
+  // NOT: `...theme` spread olunur ki, mövcud name_en/ru/tr/kk/de/ar və
+  // description_en/ru/tr/kk/de/ar dəyərləri admin dili dəyişdirildikdə boş
+  // görünməsin (Save tərəfi artıq bütün formu göndərir, yalnız Open (bərpa)
+  // tərəfi əskik idi).
+  const [form, setForm] = useState<Record<string, any>>({
+    ...theme,
     name: theme?.name || '',
     name_az: theme?.name_az || '',
     description: theme?.description || '',

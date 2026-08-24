@@ -72,7 +72,13 @@ const AdminMaternityBenefits = () => {
   };
 
   const openGuideModal = (guide?: MaternityGuideline) => {
+    // NOT: bütün sətir (...guide) spread olunur ki, mövcud title_en/ru/tr və
+    // content_en/ru/tr dəyərləri admin dili dəyişdirildikdə boş görünməsin -
+    // əvvəllər yalnız title_az/content_az bərpa olunurdu, real tərcümələr
+    // gizli qalırdı və admin "boş" görünən sahəyə yazanda əslində mövcud
+    // tərcümənin üzərinə yazılırdı.
     const data = guide ? {
+      ...guide,
       title: guide.title,
       title_az: guide.title_az || '',
       content: guide.content,

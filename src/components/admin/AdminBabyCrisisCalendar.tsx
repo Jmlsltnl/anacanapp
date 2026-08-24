@@ -109,6 +109,10 @@ const AdminBabyCrisisCalendar = () => {
   const handleEdit = (period: BabyCrisisPeriod) => {
     setEditingId(period.id);
     setFormData({
+      // NOT: bütün sətir (...period) spread olunur ki, mövcud title_en/ru/tr,
+      // description_en/ru/tr, symptoms_en/ru/tr, tips_en/ru/tr dəyərləri
+      // admin dili dəyişdirildikdə boş görünməsin.
+      ...period,
       week_start: period.week_start,
       week_end: period.week_end,
       leap_number: period.leap_number || 0,
@@ -130,24 +134,33 @@ const AdminBabyCrisisCalendar = () => {
   };
 
   const handleSave = async () => {
+    // NOT: əvvəllər yalnız title/title_az/description/description_az/
+    // symptoms(_az)/tips(_az) göndərilirdi - LocalizedInput/Textarea admin
+    // dili en/ru/tr olanda title_en/description_ru/symptoms_tr/tips_ru və s.
+    // formData-ya yazırdı, amma bunlar heç vaxt göndərilmirdi (sessiz itki,
+    // 3 dil üçün). `..._en/_ru/_tr` sütunları TEXT tipindədir (massiv deyil)
+    // və oxuma tərəfi (`mapRowTranslation`) sətri "\n" ilə bölə bildiyi üçün
+    // eyni sətir-formatını göndərmək kifayətdir (bax src/lib/tr.ts).
+    const { week_start, week_end, leap_number, title, title_az, description, description_az, symptoms, symptoms_az, tips, tips_az, duration_days, severity, emoji, color, is_active, ...rest } = formData;
     const payload = {
-      week_start: formData.week_start,
-      week_end: formData.week_end,
-      leap_number: formData.leap_number || null,
-      title: formData.title,
-      title_az: formData.title_az || null,
-      description: formData.description || null,
-      description_az: formData.description_az || null,
-      symptoms: formData.symptoms.split('\n').filter(Boolean),
-      symptoms_az: formData.symptoms_az.split('\n').filter(Boolean),
-      tips: formData.tips.split('\n').filter(Boolean),
-      tips_az: formData.tips_az.split('\n').filter(Boolean),
-      duration_days: formData.duration_days,
-      severity: formData.severity,
-      emoji: formData.emoji,
-      color: formData.color,
-      is_active: formData.is_active,
-      sort_order: formData.week_start
+      ...rest,
+      week_start,
+      week_end,
+      leap_number: leap_number || null,
+      title,
+      title_az: title_az || null,
+      description: description || null,
+      description_az: description_az || null,
+      symptoms: symptoms.split('\n').filter(Boolean),
+      symptoms_az: symptoms_az.split('\n').filter(Boolean),
+      tips: tips.split('\n').filter(Boolean),
+      tips_az: tips_az.split('\n').filter(Boolean),
+      duration_days,
+      severity,
+      emoji,
+      color,
+      is_active,
+      sort_order: week_start
     };
 
     try {

@@ -122,7 +122,21 @@ const AdminAffiliateProducts = () => {
         }
       }
 
+      // NOT: əvvəllər sabit sahə siyahısı göndərilirdi (yalnız _az) -
+      // LocalizedInput/Textarea admin dili ru/tr olanda name_ru/
+      // description_tr/review_summary_ru və s. yazırdı, amma bunlar heç vaxt
+      // göndərilmirdi (sessiz itki). `affiliate_products`-da YALNIZ
+      // _az/_en/_ru/_tr sütunları mövcuddur (kk/de/ar sütunları yoxdur) -
+      // ona görə həmin sahələr açıq şəkildə çıxarılır ki, admin təsadüfən
+      // kk/de/ar rejiminə keçəndə mövcud olmayan sütuna yazma xətası
+      // baş verməsin.
+      const { id: _ignoredId, images: _i, pros: _p, cons: _c, tags: _t, specifications: _s, ...localizedFields } = data;
+      const filteredLocalizedFields = Object.fromEntries(
+        Object.entries(localizedFields).filter(([k]) => !k.endsWith('_kk') && !k.endsWith('_de') && !k.endsWith('_ar'))
+      );
+
       const payload = {
+        ...filteredLocalizedFields,
         name: data.name,
         name_az: data.name_az || null,
         description: data.description || null,
@@ -178,6 +192,9 @@ const AdminAffiliateProducts = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-affiliate-products'] });
       toast({ title: 'Silindi' });
+    },
+    onError: (err) => {
+      toast({ title: tr("adminaffiliateproducts_xeta_3cdbb6", "Xəta"), description: String(err), variant: 'destructive' });
     }
   });
 

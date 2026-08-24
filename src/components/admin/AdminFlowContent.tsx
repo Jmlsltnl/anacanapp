@@ -113,10 +113,11 @@ const AdminFlowContent = () => {
     setLabelsLoading(true);
     try {
       for (const [key, value] of Object.entries(flowLabels)) {
-        await supabase.
+        const { error } = await supabase.
         from('app_settings').
         update({ value: JSON.stringify(value) }).
         eq('key', key);
+        if (error) throw error;
       }
       queryClient.invalidateQueries({ queryKey: ['flow-upcoming-labels'] });
       toast({ title: tr("adminflowcontent_basliqlar_saxlanildi_a9004c", "Başlıqlar saxlanıldı ✅") });
@@ -173,9 +174,25 @@ const AdminFlowContent = () => {
     }
   };
 
+  // NOT: formData sahələri (title/label, title_en/label_en) başlanğıcda
+  // literal boş sətir ('') olaraq set olunur. `mapRowTranslation` (`??`
+  // istifadə edir, boş sətri "yoxdur" saymır) buna görə admin YALNIZ
+  // title_az doldurub yadda saxlayanda, EN/RU/TR/... oxucular üçün
+  // `title_en ?? title ?? title_az` zənciri `'' ?? '' ?? 'Azərbaycan mətni'`
+  // olur - `''` NULL olmadığı üçün nəticə BOŞ SƏTIR olur, əsl Azərbaycan
+  // mətninə heç vaxt çatmır. Göndərmədən əvvəl boş sətirləri null-a çeviririk
+  // ki, `??` zənciri düzgün fallback edə bilsin.
+  const normalizeEmptyStrings = (item: Record<string, any>) => {
+    const result: Record<string, any> = {};
+    for (const [key, value] of Object.entries(item)) {
+      result[key] = value === '' ? null : value;
+    }
+    return result;
+  };
+
   const createMutation = useMutation({
     mutationFn: async (item: any) => {
-      const { error } = await supabase.from(getTableName() as any).insert([item]);
+      const { error } = await supabase.from(getTableName() as any).insert([normalizeEmptyStrings(item)]);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -185,12 +202,15 @@ const AdminFlowContent = () => {
       queryClient.invalidateQueries({ queryKey: ['flow-insights'] });
       toast({ title: tr("adminflowcontent_elave_edildi_b7d7e4", "Əlavə edildi") });
       setShowModal(false);
+    },
+    onError: () => {
+      toast({ title: tr("adminflowcontent_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, ...item }: any) => {
-      const { error } = await supabase.from(getTableName() as any).update(item).eq('id', id);
+      const { error } = await supabase.from(getTableName() as any).update(normalizeEmptyStrings(item)).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -200,6 +220,9 @@ const AdminFlowContent = () => {
       queryClient.invalidateQueries({ queryKey: ['flow-insights'] });
       toast({ title: tr("adminflowcontent_yenilendi_d10a01", "Yeniləndi") });
       setShowModal(false);
+    },
+    onError: () => {
+      toast({ title: tr("adminflowcontent_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   });
 
@@ -214,6 +237,9 @@ const AdminFlowContent = () => {
       queryClient.invalidateQueries({ queryKey: ['flow-phase-tips'] });
       queryClient.invalidateQueries({ queryKey: ['flow-insights'] });
       toast({ title: 'Silindi' });
+    },
+    onError: () => {
+      toast({ title: tr("adminflowcontent_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   });
 

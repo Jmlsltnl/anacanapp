@@ -103,7 +103,13 @@ const AdminDefaultShoppingItems = () => {
   };
 
   const openEditModal = (item: DefaultShoppingItem) => {
-    const data = {
+    // NOT: `...item` spread olunur ki, mövcud name_en/ru/tr/kk/de/ar
+    // dəyərləri admin dili dəyişdirildikdə boş görünməsin (DefaultShoppingItem
+    // tipi bu sahələri elan etmir, amma sətirdə həqiqətən mövcuddurlar -
+    // spread onları runtime-da düzgün daşıyır). Save tərəfi artıq bütün
+    // formu göndərir, yalnız Open (bərpa) tərəfi əskik idi.
+    const data: typeof formData = {
+      ...(item as any),
       name: item.name,
       name_az: item.name_az || '',
       category: item.category,

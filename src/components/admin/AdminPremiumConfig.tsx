@@ -432,7 +432,14 @@ const AdminPremiumConfig = () => {
   };
 
   const openFeatureModal = (feature?: PremiumFeature) => {
+    // NOT: mövcud feature `...feature` ilə spread olunur ki, title_en/ru/tr/
+    // kk/de/ar və description_en/ru/tr/kk/de/ar dəyərləri admin dili
+    // dəyişdirildikdə boş görünməsin (Duzelis40.sql-in özü bu sütunları
+    // real məzmunla doldurduğunu təsdiqləyir - bax "Anacan AI"/"Böyümə
+    // İzləmə" düzəlişi). Bu boşluq həmin düzəlişin niyə admin UI əvəzinə
+    // birbaşa SQL ilə edildiyinin əsas səbəbi idi.
     const data = feature ? {
+      ...feature,
       title: feature.title, title_az: feature.title_az || '', description: feature.description || '', description_az: feature.description_az || '', icon: feature.icon, is_included_free: feature.is_included_free, is_included_premium: feature.is_included_premium, is_included_premium_plus: feature.is_included_premium_plus, sort_order: feature.sort_order, is_active: feature.is_active
     } : { title: '', title_az: '', description: '', description_az: '', icon: '✨', is_included_free: false, is_included_premium: true, is_included_premium_plus: true, sort_order: features.length, is_active: true };
     setFeatureForm(data);
@@ -459,7 +466,9 @@ const AdminPremiumConfig = () => {
   const closePlanModal = () => {setShowPlanModal(false);setEditingPlan(null);};
 
   const openPlanModal = (plan: PremiumPlan) => {
-    const data = { name: plan.name, name_az: plan.name_az || '', description: plan.description || '', description_az: plan.description_az || '', price_monthly: plan.price_monthly, price_yearly: plan.price_yearly, currency: plan.currency, badge_text: plan.badge_text || '', badge_text_az: plan.badge_text_az || '', is_popular: plan.is_popular, is_active: plan.is_active };
+    // NOT: bax openFeatureModal-dakı eyni qeyd - `...plan` spread olunur ki,
+    // name_en/ru/tr/kk/de/ar dəyərləri gizli qalmasın.
+    const data = { ...plan, name: plan.name, name_az: plan.name_az || '', description: plan.description || '', description_az: plan.description_az || '', price_monthly: plan.price_monthly, price_yearly: plan.price_yearly, currency: plan.currency, badge_text: plan.badge_text || '', badge_text_az: plan.badge_text_az || '', is_popular: plan.is_popular, is_active: plan.is_active };
     setPlanForm(data);
     initialPlanFormRef.current = JSON.stringify(data);
     setEditingPlan(plan);

@@ -66,6 +66,11 @@ const AdminVitamins = () => {
   const openEditModal = (vitamin: Vitamin) => {
     setEditingVitamin(vitamin);
     setFormData({
+      // NOT: bütün sətir spread olunur ki, mövcud name_ru/tr/kk/de/ar və
+      // description_ru/tr/kk/de/ar dəyərləri admin dili dəyişdirildikdə boş
+      // görünməsin (əvvəllər yalnız name_az/description_az bərpa olunurdu -
+      // real tərcümələr gizli qalır, üstünə yazma riski var idi).
+      ...vitamin,
       name: vitamin.name,
       name_az: vitamin.name_az || '',
       description_az: vitamin.description_az || '',
@@ -86,22 +91,35 @@ const AdminVitamins = () => {
 
   const handleSave = async () => {
     try {
+      // NOT: əvvəllər sabit sahə siyahısı göndərilirdi (yalnız name/name_az/
+      // description_az) - LocalizedInput/Textarea admin dili ru/tr/kk/de/ar
+      // olanda name_ru/description_kk və s. formData-ya yazırdı, amma bunlar
+      // heç vaxt bura göndərilmirdi (sessiz itki). Həm də bare `description`
+      // sütunu HƏMİŞƏ Azərbaycan mətni ilə üzərinə yazılırdı (description_az
+      // dəyəri description-a da kopyalanırdı) - indi `...formData` spread
+      // olunur ki, bütün dil sahələri qorunsun və description toxunulmadan
+      // qalsın (yalnız description_az idarə olunur).
+      const {
+        name, name_az, description_az, benefits, food_sources, dosage,
+        week_start, week_end, trimesters, life_stage, importance,
+        icon_emoji, is_active, sort_order, ...rest
+      } = formData;
       const vitaminData: Record<string, any> = {
-        name: formData.name,
-        name_az: formData.name_az || null,
-        description: formData.description_az || null,
-        description_az: formData.description_az || null,
-        benefits: formData.benefits ? formData.benefits.split('\n').filter((b) => b.trim()) : null,
-        food_sources: formData.food_sources ? formData.food_sources.split('\n').filter((f) => f.trim()) : null,
-        dosage: formData.dosage || null,
-        week_start: formData.week_start ? parseInt(formData.week_start) : null,
-        week_end: formData.week_end ? parseInt(formData.week_end) : null,
-        trimester: formData.trimesters.length > 0 ? formData.trimesters : null,
-        life_stage: formData.life_stage,
-        importance: formData.importance,
-        icon_emoji: formData.icon_emoji,
-        is_active: formData.is_active,
-        sort_order: formData.sort_order
+        ...rest,
+        name,
+        name_az: name_az || null,
+        description_az: description_az || null,
+        benefits: benefits ? benefits.split('\n').filter((b) => b.trim()) : null,
+        food_sources: food_sources ? food_sources.split('\n').filter((f) => f.trim()) : null,
+        dosage: dosage || null,
+        week_start: week_start ? parseInt(week_start) : null,
+        week_end: week_end ? parseInt(week_end) : null,
+        trimester: trimesters.length > 0 ? trimesters : null,
+        life_stage,
+        importance,
+        icon_emoji,
+        is_active,
+        sort_order
       };
 
       if (editingVitamin) {

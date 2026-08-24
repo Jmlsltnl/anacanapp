@@ -84,6 +84,9 @@ const AdminPlayActivities = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-play-activities'] });
       toast({ title: 'Aktivlik silindi' });
+    },
+    onError: () => {
+      toast({ title: tr("adminplayactivities_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   });
 
@@ -246,7 +249,11 @@ interface ActivityFormProps {
 }
 
 const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormProps) => {
-  const [form, setForm] = useState({
+  // NOT: `...activity` spread olunur ki, mövcud title_ru/tr/kk/de/ar və
+  // description_ru/tr/kk/de/ar dəyərləri admin dili dəyişdirildikdə boş
+  // görünməsin (bax handleSave-dəki eyni qeyd).
+  const [form, setForm] = useState<Record<string, any>>({
+    ...activity,
     title: activity?.title || '',
     title_az: activity?.title_az || '',
     description: activity?.description || '',
@@ -261,7 +268,13 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
   });
 
   const handleSave = () => {
+    // NOT: əvvəllər sabit sahə siyahısı göndərilirdi - LocalizedInput/
+    // Textarea admin dili ru/tr/kk/de/ar olanda title_ru/description_kk və
+    // s. yazırdı, amma bunlar heç vaxt göndərilmirdi (sessiz itki, ən aydın
+    // nümunə). İndi bütün form spread olunur, yalnız xüsusi emal tələb edən
+    // sahələr (massivlər) üstünə yazılır.
     onSave({
+      ...form,
       title: form.title,
       title_az: form.title_az || undefined,
       description: form.description || undefined,
@@ -269,8 +282,8 @@ const ActivityForm = ({ activity, onSave, onCancel, isLoading }: ActivityFormPro
       min_age_days: form.min_age_days,
       max_age_days: form.max_age_days,
       duration_minutes: form.duration_minutes,
-      skill_tags: form.skill_tags.split(',').map((s) => s.trim()).filter(Boolean),
-      required_items: form.required_items.split('\n').filter((i) => i.trim()),
+      skill_tags: form.skill_tags.split(',').map((s: string) => s.trim()).filter(Boolean),
+      required_items: form.required_items.split('\n').filter((i: string) => i.trim()),
       difficulty_level: form.difficulty_level,
       is_active: form.is_active
     });

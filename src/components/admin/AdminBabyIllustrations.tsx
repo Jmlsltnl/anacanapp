@@ -33,7 +33,7 @@ const AdminBabyIllustrations = () => {
   const deleteMutation = useDeleteBabyMonthIllustration();
 
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Record<string, any>>({
     title_az: '',
     description_az: '',
     image_url: ''
@@ -86,7 +86,13 @@ const AdminBabyIllustrations = () => {
     }
 
     try {
+      // NOT: əvvəllər yalnız title_az/description_az göndərilirdi (bu
+      // ekranda EN sahəsi heç olmayıb) - LocalizedInput/Textarea admin dili
+      // en/ru/tr olanda title_en/description_ru və s. formData-ya yazırdı,
+      // amma bunlar heç vaxt göndərilmirdi (sessiz itki). İndi bütün
+      // formData spread olunur ki, bütün dil sahələri qorunsun.
       await upsertMutation.mutateAsync({
+        ...formData,
         month_number: selectedMonth,
         image_url: formData.image_url,
         title_az: formData.title_az || null,
@@ -115,7 +121,11 @@ const AdminBabyIllustrations = () => {
   const openEditDialog = (month: number) => {
     const existing = getIllustrationForMonth(month);
     setSelectedMonth(month);
+    // NOT: `...existing` spread olunur ki, mövcud title_en/ru/tr və
+    // description_en/ru/tr dəyərləri admin dili dəyişdirildikdə boş
+    // görünməsin.
     setFormData({
+      ...existing,
       title_az: existing?.title_az || '',
       description_az: existing?.description_az || '',
       image_url: existing?.image_url || ''
