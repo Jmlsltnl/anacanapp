@@ -102,7 +102,8 @@ const AdminHealthcareReviews = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-healthcare-reviews'] });
       toast.success(tr("adminhealthcarereviews_rey_tesdiqlendi_7080f5", "R\u0259y t\u0259sdiql\u0259ndi"));
-    }
+    },
+    onError: () => toast.error(tr("adminhealthcarereviews_xeta_bas_verdi_f22fba", "Xəta baş verdi"))
   });
 
   // Reject/Hide review
@@ -117,7 +118,8 @@ const AdminHealthcareReviews = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-healthcare-reviews'] });
       toast.success(tr("adminhealthcarereviews_rey_gizledildi_1b68f6", "R\u0259y gizl\u0259dildi"));
-    }
+    },
+    onError: () => toast.error(tr("adminhealthcarereviews_xeta_bas_verdi_f22fba", "Xəta baş verdi"))
   });
 
   // Delete review
@@ -132,7 +134,8 @@ const AdminHealthcareReviews = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-healthcare-reviews'] });
       toast.success(tr("adminhealthcarereviews_rey_silindi_833505", "R\u0259y silindi"));
-    }
+    },
+    onError: () => toast.error(tr("adminhealthcarereviews_xeta_bas_verdi_f22fba", "Xəta baş verdi"))
   });
 
   // Update review
@@ -152,7 +155,8 @@ const AdminHealthcareReviews = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-healthcare-reviews'] });
       setEditingReview(null);
       toast.success(tr("adminhealthcarereviews_rey_yenilendi_f1e45d", "R\u0259y yenil\u0259ndi"));
-    }
+    },
+    onError: () => toast.error(tr("adminhealthcarereviews_xeta_bas_verdi_f22fba", "Xəta baş verdi"))
   });
 
   // Filter reviews

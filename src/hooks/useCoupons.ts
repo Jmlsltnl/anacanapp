@@ -124,11 +124,14 @@ export const useCouponValidator = (orderType: string = 'shop') => {
         order_id: orderId || null,
         discount_amount: appliedCoupon.discountAmount,
       });
-      // Increment used_count
-      await supabase
-        .from('coupons' as any)
-        .update({ used_count: (appliedCoupon.coupon.used_count || 0) + 1 })
-        .eq('id', appliedCoupon.coupon.id);
+      // used_count artırılması admin-only RLS-ə görə birbaşa `.update()` ilə
+      // mümkün deyil (adi istifadəçi sıfır sətir dəyişdirirdi, max_uses limiti
+      // heç vaxt tətbiq olunmurdu — bax Duzelis42.sql). Server-side atomic
+      // RPC (row lock + limit yoxlaması daxil) istifadə olunur.
+      const { error: rpcError } = await supabase.rpc('increment_coupon_usage' as any, {
+        p_coupon_id: appliedCoupon.coupon.id,
+      });
+      if (rpcError) console.error('Error incrementing coupon usage:', rpcError);
     } catch (err) {
       console.error('Error recording coupon usage:', err);
     }

@@ -127,8 +127,10 @@ export const useCakeOrders = () => {
 
       if (error) throw error;
       await fetchOrders();
+      return true;
     } catch (error) {
       console.error('Error updating order status:', error);
+      return false;
     }
   };
 

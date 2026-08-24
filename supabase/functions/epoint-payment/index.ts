@@ -84,6 +84,15 @@ Deno.serve(async (req) => {
 
     const publicKey = settings['epoint_public_key'];
     const privateKey = settings['epoint_private_key'];
+    // "Rejim" (Live/Test) admin panelindən (AdminEpoint.tsx) seçilir və
+    // burada YALNIZ oxunur — əvvəllər bu dəyər heç yerdə oxunmurdu, "Test"
+    // seçsə belə HƏMİŞƏ production Epoint endpoint-inə real sorğu gedirdi.
+    // Epoint.az-ın ayrıca sandbox mühiti yoxdur (yalnız test tacir açarları
+    // verir), ona görə "test" rejimi Epoint-ə HEÇ BİR şəbəkə sorğusu
+    // göndərmədən nəticəni yerli olaraq simulyasiya edir — real pul hərəkəti
+    // sıfır, amma tranzaksiya axını (DB yazıları, callback-ə bənzər status)
+    // tam yoxlana bilər.
+    const isTestMode = settings['epoint_mode'] === 'test';
 
     if (!publicKey || !privateKey) {
       return new Response(JSON.stringify({ error: 'Epoint açarları konfiqurasiya olunmayıb' }), {
@@ -132,6 +141,31 @@ Deno.serve(async (req) => {
         console.error('Transaction create error:', txnError);
         return new Response(JSON.stringify({ error: 'Əməliyyat yaradıla bilmədi' }), {
           status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // ===== TEST MODE: Epoint-ə heç bir sorğu getmir, nəticə simulyasiya olunur =====
+      if (isTestMode) {
+        await supabase
+          .from('payment_transactions')
+          .update({
+            status: 'success',
+            epoint_transaction: `TEST-${orderId}`,
+            card_mask: '**** **** **** TEST',
+            card_name: 'TEST MODE',
+            bank_response: JSON.stringify({ simulated: true, note: 'epoint_mode=test — real gateway heç çağrılmadı' }),
+            callback_received_at: new Date().toISOString(),
+          })
+          .eq('id', txn.id);
+
+        return new Response(JSON.stringify({
+          success: true,
+          testMode: true,
+          redirectUrl: successUrl || `${new URL(req.url).origin}/payment/success`,
+          transactionId: txn.id,
+          orderId,
+        }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
@@ -296,6 +330,15 @@ Deno.serve(async (req) => {
         }
       }
 
+      // Simulyasiya olunmuş (TEST-...) tranzaksiyalar real Epoint-də mövcud
+      // deyil — status sorğusunu real gateway-ə göndərmək əvəzinə yerli
+      // simulyasiya nəticəsini qaytarırıq.
+      if (transaction.startsWith('TEST-')) {
+        return new Response(JSON.stringify({ status: 'success', simulated: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       const jsonString = JSON.stringify({ public_key: publicKey, transaction });
       const data = base64Encode(jsonString);
       const signature = await createSignature(privateKey, data);
@@ -331,6 +374,18 @@ Deno.serve(async (req) => {
       if (!transaction || typeof transaction !== 'string') {
         return new Response(JSON.stringify({ error: 'Əməliyyat ID tələb olunur' }), {
           status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Simulyasiya olunmuş tranzaksiya — real gateway-ə refund sorğusu
+      // göndərmək mənasızdır, yerli olaraq "returned" işarələyirik.
+      if (transaction.startsWith('TEST-')) {
+        await supabase
+          .from('payment_transactions')
+          .update({ status: 'returned' })
+          .eq('epoint_transaction', transaction);
+        return new Response(JSON.stringify({ status: 'success', simulated: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }

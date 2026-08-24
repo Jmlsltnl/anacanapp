@@ -52,16 +52,21 @@ const AdminPlaces = () => {
 
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
+      // `is_active` real görünürlük qapısıdır (canlı sorğu yalnız bunu
+      // yoxlayır) — əvvəllər yalnız `is_verified` yazılırdı ki, heç bir
+      // real sorğu tərəfindən oxunmurdu, "Təsdiqlə" düyməsi kosmetik idi.
       const { error } = await supabase.
       from('mom_friendly_places').
-      update({ is_verified: true }).
+      update({ is_verified: true, is_active: true }).
       eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-places'] });
+      queryClient.invalidateQueries({ queryKey: ['mom-friendly-places'] });
       toast.success(tr("adminplaces_mekan_tesdiqlendi_aedeb2", "M\u0259kan t\u0259sdiql\u0259ndi"));
-    }
+    },
+    onError: () => toast.error(tr("adminplaces_xeta_bas_verdi_f22fba", "Xəta baş verdi"))
   });
 
   const deleteMutation = useMutation({
@@ -79,7 +84,8 @@ const AdminPlaces = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-places'] });
       toast.success(tr("adminplaces_mekan_silindi_9b1c9c", "M\u0259kan silindi"));
-    }
+    },
+    onError: () => toast.error(tr("adminplaces_xeta_bas_verdi_f22fba", "Xəta baş verdi"))
   });
 
   const approveReviewMutation = useMutation({
@@ -94,7 +100,8 @@ const AdminPlaces = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-place-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['mom-friendly-places'] });
       toast.success(tr("adminplaces_rey_tesdiqlendi_7080f5", "R\u0259y t\u0259sdiql\u0259ndi"));
-    }
+    },
+    onError: () => toast.error(tr("adminplaces_xeta_bas_verdi_f22fba", "Xəta baş verdi"))
   });
 
   const deleteReviewMutation = useMutation({
@@ -108,7 +115,8 @@ const AdminPlaces = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-place-reviews'] });
       toast.success(tr("adminplaces_rey_silindi_833505", "R\u0259y silindi"));
-    }
+    },
+    onError: () => toast.error(tr("adminplaces_xeta_bas_verdi_f22fba", "Xəta baş verdi"))
   });
 
   const pendingPlaces = places.filter((p) => !p.is_verified).length;

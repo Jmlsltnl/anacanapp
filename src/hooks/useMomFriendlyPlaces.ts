@@ -123,6 +123,12 @@ export const useAddPlace = () => {
         longitude: place.longitude || 0,
         category: place.category || 'cafe',
         ...place,
+        // Təsdiqlənənə qədər gizli qalsın — əvvəllər `is_active` default
+        // dəyəri (true) ilə yaradılırdı və dərhal HAMIYA görünürdü, "Admin
+        // təsdiqindən sonra görünəcək" mesajı yalan idi (bax AdminPlaces.tsx
+        // "Təsdiqlə" düyməsi is_active=true edəndə real görünür olur).
+        is_active: false,
+        is_verified: false,
         created_by: user.id
       }).
       select().

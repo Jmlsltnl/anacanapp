@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminCakes, type Cake } from '@/hooks/useCakes';
 import { useCakeOrders } from '@/hooks/useCakes';
-import { usePaymentMethods } from '@/hooks/usePaymentMethods';
+import { useAdminPaymentMethods } from '@/hooks/usePaymentMethods';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { LocalizedInput } from "./ui/LocalizedInput";
@@ -48,7 +48,7 @@ const AdminCakes = () => {
   const { toast } = useToast();
   const { cakes, loading, addCake, updateCake, deleteCake } = useAdminCakes();
   const { orders, updateOrderStatus } = useCakeOrders();
-  const { methods: paymentMethods, loading: pmLoading, updateMethod } = usePaymentMethods();
+  const { methods: paymentMethods, loading: pmLoading, updateMethod } = useAdminPaymentMethods();
   const [activeTab, setActiveTab] = useState<'cakes' | 'orders' | 'payments'>('cakes');
   const [showForm, setShowForm] = useState(false);
   const [editingCake, setEditingCake] = useState<Cake | null>(null);
@@ -187,8 +187,12 @@ const AdminCakes = () => {
   };
 
   const handleStatusChange = async (orderId: string, status: string) => {
-    await updateOrderStatus(orderId, status);
-    toast({ title: tr("admincakes_status_yenilendi_890662", "Status yeniləndi") });
+    const success = await updateOrderStatus(orderId, status);
+    if (success) {
+      toast({ title: tr("admincakes_status_yenilendi_890662", "Status yeniləndi") });
+    } else {
+      toast({ title: tr("admincakes_xeta_3cdbb6", "Xəta"), description: tr("admincakes_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    }
   };
 
   const handlePaymentStatusChange = async (orderId: string, paymentStatus: string) => {
@@ -218,6 +222,8 @@ const AdminCakes = () => {
     if (success) {
       toast({ title: tr("admincakes_konfiqurasiya_yadda_saxlanildi_919f9e", "Konfiqurasiya yadda saxlanıldı") });
       setEditingConfig(null);
+    } else {
+      toast({ title: tr("admincakes_xeta_3cdbb6", "Xəta"), variant: 'destructive' });
     }
   };
 

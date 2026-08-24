@@ -63,3 +63,55 @@ export const usePaymentMethods = () => {
 
   return { methods, loading, getActiveMethods, updateMethod, refetch: fetchMethods };
 };
+
+// Admin-only variant: reads the FULL row (including the sensitive `config`
+// JSONB — card number/holder/bank name for c2c_transfer) directly from the
+// table instead of the public `get_active_payment_methods()` RPC, which
+// deliberately strips `config` for every caller. `payment_methods` RLS
+// grants admins full-row access ("Admins can manage payment methods" FOR
+// ALL), so this is safe — a non-admin calling this will just get 0 rows.
+// Previously AdminCakes.tsx reused the public hook, so its "Kartdan Karta"
+// config editor always opened blank and could blindly overwrite real
+// customer-facing bank-transfer details without ever showing the current
+// values.
+export const useAdminPaymentMethods = () => {
+  const [methods, setMethods] = useState<PaymentMethod[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchMethods = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('payment_methods')
+        .select('*')
+        .order('sort_order', { ascending: true });
+      if (error) throw error;
+      setMethods((data || []) as unknown as PaymentMethod[]);
+    } catch (error) {
+      console.error('Error fetching payment methods (admin):', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMethods();
+  }, []);
+
+  const updateMethod = async (id: string, updates: Partial<PaymentMethod>) => {
+    try {
+      const { error } = await supabase
+        .from('payment_methods')
+        .update(updates as any)
+        .eq('id', id);
+      if (error) throw error;
+      await fetchMethods();
+      return true;
+    } catch (error) {
+      console.error('Error updating payment method:', error);
+      return false;
+    }
+  };
+
+  return { methods, loading, updateMethod, refetch: fetchMethods };
+};

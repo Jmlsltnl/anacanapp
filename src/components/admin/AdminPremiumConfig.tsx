@@ -196,43 +196,36 @@ const UserSubscriptionsTab = () => {
     setShowEditModal(true);
   };
 
+  // NOT: Bu ekran birbaşa `subscriptions` cədvəlinə yazmır — Duzelis33.sql
+  // həmin cədvəldən INSERT/UPDATE-i `authenticated` roluna görə TAMAMILƏ
+  // REVOKE edib (fraud-qorunma), admin daxil olmaqla. Real dəyişiklik yalnız
+  // `admin-set-subscription` edge function (service-role, admin-only) ilə
+  // aparılır — bax orada tam izahat.
+  const [savingUser, setSavingUser] = useState(false);
+
+  const applySubscriptionChange = async (targetUserId: string, planType: string, status: string) => {
+    const { data, error } = await supabase.functions.invoke('admin-set-subscription', {
+      body: { targetUserId, planType, status }
+    });
+    if (error || (data as any)?.error) {
+      throw new Error((data as any)?.error || error?.message || 'Naməlum xəta');
+    }
+    return data;
+  };
+
   const handleSaveUser = async () => {
     if (!editingUser) return;
-
+    setSavingUser(true);
     try {
-      // Update subscription
-      if (editingUser.id) {
-        await supabase.
-        from('subscriptions').
-        update({
-          plan_type: editForm.plan_type,
-          status: editForm.status,
-          updated_at: new Date().toISOString()
-        }).
-        eq('id', editingUser.id);
-      } else {
-        await supabase.
-        from('subscriptions').
-        insert({
-          user_id: editingUser.user_id,
-          plan_type: editForm.plan_type,
-          status: editForm.status
-        });
-      }
-
-      // Update profile is_premium flag
-      const isPrem = editForm.plan_type === 'premium' || editForm.plan_type === 'premium_plus';
-      await supabase.
-      from('profiles').
-      update({ is_premium: isPrem || editForm.is_premium }).
-      eq('user_id', editingUser.user_id);
-
+      await applySubscriptionChange(editingUser.user_id, editForm.plan_type, editForm.status);
       toast({ title: tr("adminpremiumconfig_istifadeci_yenilendi_3ecf1e", "İstifadəçi yeniləndi ✓") });
       setShowEditModal(false);
       searchUsers(); // Refresh
     } catch (error) {
       console.error('Save error:', error);
-      toast({ title: tr("adminpremiumconfig_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+      toast({ title: tr("adminpremiumconfig_xeta_bas_verdi_f22fba", "Xəta baş verdi"), description: (error as Error).message, variant: 'destructive' });
+    } finally {
+      setSavingUser(false);
     }
   };
 
@@ -241,17 +234,11 @@ const UserSubscriptionsTab = () => {
     const newPlan = newPremium ? 'premium' : 'free';
 
     try {
-      if (user.id) {
-        await supabase.from('subscriptions').update({ plan_type: newPlan, updated_at: new Date().toISOString() }).eq('id', user.id);
-      } else {
-        await supabase.from('subscriptions').insert({ user_id: user.user_id, plan_type: newPlan, status: 'active' });
-      }
-      await supabase.from('profiles').update({ is_premium: newPremium }).eq('user_id', user.user_id);
-
+      await applySubscriptionChange(user.user_id, newPlan, 'active');
       toast({ title: newPremium ? 'Premium verildi ✓' : tr("adminpremiumconfig_premium_legv_edildi_2448a5", "Premium l\u0259\u011Fv edildi") });
       searchUsers();
-    } catch {
-      toast({ title: tr("adminpremiumconfig_xeta_3cdbb6", "Xəta"), variant: 'destructive' });
+    } catch (error) {
+      toast({ title: tr("adminpremiumconfig_xeta_3cdbb6", "Xəta"), description: (error as Error).message, variant: 'destructive' });
     }
   };
 
@@ -367,11 +354,11 @@ const UserSubscriptionsTab = () => {
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={() => setShowEditModal(false)}>
+                <Button variant="outline" className="flex-1" onClick={() => setShowEditModal(false)} disabled={savingUser}>
                   {tr("adminpremiumconfig_legv_et_b5e49c", "L\u0259\u011Fv et")}
                 </Button>
-                <Button className="flex-1" onClick={handleSaveUser}>
-                  <Save className="w-4 h-4 me-2" />
+                <Button className="flex-1" onClick={handleSaveUser} disabled={savingUser}>
+                  {savingUser ? <Loader2 className="w-4 h-4 me-2 animate-spin" /> : <Save className="w-4 h-4 me-2" />}
                   Saxla
                 </Button>
               </div>
