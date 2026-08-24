@@ -512,7 +512,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                     <p className="a-list-title">
                       {format(new Date(assessment.completed_at), 'd MMMM yyyy', { locale: getCurrentDateLocale() })}
                     </p>
-                    <p className="a-list-sub">Bal: {assessment.total_score}/30</p>
+                    <p className="a-list-sub">{tr('mentalhealthtracker_bal_label', 'Bal:')} {assessment.total_score}/30</p>
                   </div>
                   <span className="a-rank-tag" style={{ margin: 0, background: getRiskStyle(assessment.risk_level).bg, color: getRiskStyle(assessment.risk_level).ink }}>
                     {getRiskLabel(assessment.risk_level)}
@@ -642,7 +642,7 @@ const MentalHealthTracker = ({ onBack }: MentalHealthTrackerProps) => {
                         <p className="a-list-title" style={{ margin: 0 }}>{ex.name}</p>
                         <p className="a-list-sub" style={{ margin: 0, whiteSpace: 'normal' }}>{ex.description}</p>
                         <p className="text-xs mt-1 font-semibold" style={{ margin: '4px 0 0', color: 'var(--a-green-ink)' }}>
-                          {tr("mentalhealthtracker_nefes_al_56f3c5", "Nəfəs al:")} {ex.inhale}s • Saxla: {ex.hold}s • Burax: {ex.exhale}s
+                          {tr("mentalhealthtracker_nefes_al_56f3c5", "Nəfəs al:")} {ex.inhale}s • {tr('mentalhealthtracker_saxla_colon', 'Saxla:')} {ex.hold}s • {tr('mentalhealthtracker_burax_colon', 'Burax:')} {ex.exhale}s
                         </p>
                       </div>
                     </motion.button>
