@@ -109,19 +109,33 @@ const AdminAnalytics = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [premiumPlans, setPremiumPlans] = useState<any[]>([]);
+  // NOT: DAU/MAU/Stickiness/ARPU/LTV bu SABIT 30-günlük pəncərədən
+  // hesablanır - `events` (yuxarıdakı ümumi tarix filtri seçiminə görə
+  // dəyişən) İSTİFADƏ OLUNMUR. Əvvəllər `mauEvents` birbaşa `events`-dən
+  // filtrlənirdi - admin yuxarıdakı filtri "Bu gün" (1) və ya "Son 7 gün"
+  // (7) seçəndə, `events`-in özü artıq həmin qısa pəncərəyə kəsilmiş
+  // olduğu üçün MAU heç vaxt 30 günlük real qiyməti görə bilmirdi (DAU-ya
+  // yaxınlaşaraq Stickiness-i süni şəkildə şişirdirdi, ARPU/LTV-ni də
+  // eyni səbəbdən təhrif edirdi) - admin bunun səbəbini heç vaxt bilə
+  // bilməzdi, çünki bu, yuxarıdakı filtrlə heç bir vizual əlaqəsi
+  // olmayan aşağı bölmədə baş verirdi.
+  const [last30DaysEvents, setLast30DaysEvents] = useState<any[]>([]);
 
   const fetchEvents = async () => {
     setLoading(true);
     try {
       const sinceDate = subDays(new Date(), parseInt(dateRange)).toISOString();
-      
+      const thirtyDaysAgoDate = subDays(new Date(), 30).toISOString();
+
       // Fetch startup data concurrently
-      const [subsRes, plansRes] = await Promise.all([
+      const [subsRes, plansRes, thirtyDayRes] = await Promise.all([
         supabase.from('subscriptions').select('*'),
-        supabase.from('premium_plans').select('*')
+        supabase.from('premium_plans').select('*'),
+        supabase.from('analytics_events').select('user_id, created_at').gte('created_at', thirtyDaysAgoDate).limit(20000)
       ]);
       setSubscriptions(subsRes.data || []);
       setPremiumPlans(plansRes.data || []);
+      setLast30DaysEvents(thirtyDayRes.data || []);
 
       const { data, error } = await supabase.
       from('analytics_events').
@@ -152,16 +166,18 @@ const AdminAnalytics = () => {
   // Startup / SaaS Metrics
   const startupStats = useMemo(() => {
     // DAU / MAU Stickiness
-    // We estimate DAU from events in the last 24h, and MAU from events in the last 30d (assuming dateRange >= 30, otherwise we use what we have)
+    // NOT: `last30DaysEvents` yuxarıdakı tarix filtrindən (dateRange) TAM
+    // MÜSTƏQİL, sabit 30-günlük bir sorğudan gəlir - əvvəllər bu hesab
+    // birbaşa `events`-dən (yuxarıdakı filtrə görə dəyişən) filtrlənirdi,
+    // yəni admin "Bu gün"/"Son 7 gün" seçəndə MAU həmişə DAU-ya yaxın
+    // görünürdü (Stickiness süni şəkildə şişirdilirdi).
     const now = new Date();
     const oneDayAgo = subDays(now, 1).toISOString();
-    const thirtyDaysAgo = subDays(now, 30).toISOString();
     
-    const dauEvents = events.filter(e => e.created_at >= oneDayAgo);
-    const mauEvents = events.filter(e => e.created_at >= thirtyDaysAgo);
+    const dauEvents = last30DaysEvents.filter(e => e.created_at >= oneDayAgo);
     
     const dau = new Set(dauEvents.map(e => e.user_id)).size;
-    const mau = new Set(mauEvents.map(e => e.user_id)).size || 1; // avoid div by 0
+    const mau = new Set(last30DaysEvents.map(e => e.user_id)).size || 1; // avoid div by 0
     const stickiness = ((dau / mau) * 100).toFixed(1);
 
     // MRR (Monthly Recurring Revenue) & ARR
@@ -179,8 +195,11 @@ const AdminAnalytics = () => {
       mrr += plan ? (plan.price_monthly || 3.99) : 3.99; 
     });
 
-    // ARPU (Average Revenue Per User)
-    const activeUsers = new Set(events.map(e => e.user_id)).size || 1;
+    // ARPU (Average Revenue Per User) - eyni səbəbdən 30-günlük sabit
+    // pəncərədən hesablanır (aylıq gəlirin aylıq aktiv istifadəçiyə
+    // bölünməsi mənalıdır, yuxarıdakı filtrə görə dəyişən bir pəncərəyə
+    // yox).
+    const activeUsers = new Set(last30DaysEvents.map(e => e.user_id)).size || 1;
     const arpu = (mrr / activeUsers).toFixed(2);
     
     // LTV (Life Time Value) = ARPU / Churn Rate (decimal)
@@ -198,7 +217,7 @@ const AdminAnalytics = () => {
       arpu,
       ltv
     };
-  }, [events, subscriptions, premiumPlans]);
+  }, [last30DaysEvents, subscriptions, premiumPlans]);
 
   // Computed stats
   const filteredEvents = useMemo(() => {

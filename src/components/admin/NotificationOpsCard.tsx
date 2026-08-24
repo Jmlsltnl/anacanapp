@@ -62,9 +62,17 @@ function cronUtcHoursToBaku(schedule: string): {utc: string;baku: string;allHour
   };
 }
 
+// NOT: bu açarlar əvvəllər "-secure" şəkilçisiz idi (send-daily-
+// notifications-slots / send-flow-reminders-every-hour). CRON_SECRET
+// insidenti zamanı (Duzelis33/Duzelis39) real cron işləri "-secure"
+// şəkilçili adlara YENİDƏN adlandırıldı - bu lookup HEÇ VAXT uyğunlaşa
+// bilmirdi, `validateSchedule()` həmişə "tələb tanımlanmayıb" (sükutən
+// yaşıl ✓) qaytarırdı. Yəni bu kartın YEGANƏ avtomatik yoxlaması, elə
+// onu izləməli olduğu təhlükəsizlik düzəlişinin özü tərəfindən sessizcə
+// sıradan çıxarılmışdı.
 const EXPECTED_BAKU_HOURS: Record<string, number[]> = {
-  'send-daily-notifications-slots': [9, 10, 12, 14, 15, 19],
-  'send-flow-reminders-every-hour': [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+  'send-daily-notifications-slots-secure': [9, 10, 12, 14, 15, 19],
+  'send-flow-reminders-every-hour-secure': [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
 };
 
 function validateSchedule(job: CronJob): {ok: boolean;message: string;} {
@@ -154,6 +162,17 @@ const NotificationOpsCard = () => {
         </div>
       </div>
 
+      {/* NOT: bu test düymələri admin-in öz JWT-si ilə (requireAdmin
+      fallback-ı vasitəsilə) autentifikasiya olunur - real pg_cron
+      çağırışlarının istifadə etdiyi x-cron-secret yolu ilə EYNİ DEYİL.
+      Bu düymələrin "uğurlu" olması CRON_SECRET-in düzgün konfiqurasiya
+      olunduğunu SÜBUT ETMİR - yalnız yuxarıdakı "Command" sütunu və
+      "Son icra" sətri real cron-tetiklənməli icraları göstərir. */}
+      <p className="text-[11px] text-muted-foreground mb-3 flex items-start gap-1.5">
+        <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+        {tr("notificationopscard_test_xeberdarligi", "Bu \"Test\" düymələri admin sessiyanızla işləyir, real cron sorğularının istifadə etdiyi gizli açar yolu ilə DEYİL. Uğurlu test CRON_SECRET-in düzgün olduğunu sübut etmir - yalnız yuxarıdakı \"Command\" sütununu və \"Son icra\" tarixini yoxlayın.")}
+      </p>
+
       {data &&
       <div className="space-y-4">
           <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
@@ -174,6 +193,7 @@ const NotificationOpsCard = () => {
                     <th className="text-start p-2">{tr("notificationopscard_baku_saatlari_de5041", "Baku saatları")}</th>
                     <th className="text-start p-2">Validation</th>
                     <th className="text-start p-2">Son icra</th>
+                    <th className="text-start p-2">Command</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -214,11 +234,19 @@ const NotificationOpsCard = () => {
                         <span className="text-muted-foreground">{tr("notificationopscard_hec_vaxt_1c2a46", "heç vaxt")}</span>
                         }
                         </td>
+                        {/* NOT: xam cron `command` mətni burada göstərilir ki, gələcəkdə
+                        CRON_SECRET-in yenidən yerinə qoyulmamış "__PLACEHOLDER__" kimi
+                        literal qalması admin panelə baxaraq GÖZLƏ görünsün - əvvəllər bu
+                        sütun heç yerdə göstərilmirdi, məhz bu cür insidentin ən birbaşa
+                        əlaməti idi. */}
+                        <td className="p-2 font-mono text-[10px] max-w-xs truncate" title={j.command}>
+                          {j.command}
+                        </td>
                       </tr>);
 
                 })}
                   {data.cron_jobs.length === 0 &&
-                <tr><td colSpan={5} className="p-3 text-center text-muted-foreground">{tr("notificationopscard_cron_isi_tapilmadi_7af00b", "Cron işi tapılmadı")}</td></tr>
+                <tr><td colSpan={6} className="p-3 text-center text-muted-foreground">{tr("notificationopscard_cron_isi_tapilmadi_7af00b", "Cron işi tapılmadı")}</td></tr>
                 }
                 </tbody>
               </table>
