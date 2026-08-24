@@ -77,7 +77,8 @@ const AdminBlog = () => {
   const [newTag, setNewTag] = useState('');
 
   const generateAIContent = async () => {
-    if (!formData.title.trim()) {
+    const effectiveTitle = (formData.title || formData.title_az || '').trim();
+    if (!effectiveTitle) {
       toast({
         title: tr("adminblog_basliq_teleb_olunur_097c6f", "Başlıq tələb olunur"),
         description: tr("adminblog_mezmun_yaratmaq_ucun_evvelce_basliq_daxi_74a245", "Məzmun yaratmaq üçün əvvəlcə başlıq daxil edin"),
@@ -90,7 +91,7 @@ const AdminBlog = () => {
     try {
       const { data, error } = await supabase.functions.invoke('generate-blog-content', {
         body: {
-          title: formData.title,
+          title: effectiveTitle,
           category: formData.category
         }
       });
@@ -259,7 +260,16 @@ const AdminBlog = () => {
   };
 
   const handleSave = async () => {
-    if (!formData.title.trim() || !formData.content.trim()) {
+    // NOT: Redaktordakı yeganə Başlıq sahəsi <LocalizedInput field="title">
+    // komponentidir — `title_az` açarı formData-da mövcud olduğu üçün (admin
+    // dili 'az' olanda, defolt) o HƏMİŞƏ `title_az`-a yazır, heç vaxt bare
+    // `title`-a yox (bax LocalizedInput.tsx-in `isAzProp` məntiqi — bu,
+    // kodbazadakı bütün digər tərcümə edilə bilən ekranlarla eyni, qəsdən
+    // seçilmiş davranışdır). Nəticədə `formData.title` yeni yazı üçün HƏMİŞƏ
+    // boş qalırdı və bu yoxlama HƏR DƏFƏ, nə yazılırsa yazılsın, yaradılmanı
+    // bloklayırdı. `title_az`-a da baxaraq düzəldilir.
+    const effectiveTitle = (formData.title || formData.title_az || '').trim();
+    if (!effectiveTitle || !formData.content.trim()) {
       toast({
         title: tr("adminblog_xeta_3cdbb6", "Xəta"),
         description: tr("adminblog_basliq_ve_mezmun_teleb_olunur_02f6f5", "Başlıq və məzmun tələb olunur"),
@@ -270,7 +280,8 @@ const AdminBlog = () => {
 
     const postData = {
       ...formData,
-      slug: formData.slug || generateSlug(formData.title)
+      title: effectiveTitle,
+      slug: formData.slug || generateSlug(effectiveTitle)
     };
 
     let result;
@@ -837,7 +848,7 @@ const AdminBlog = () => {
                     variant="outline"
                     size="sm"
                     onClick={generateAIContent}
-                    disabled={generatingContent || !formData.title.trim()}
+                    disabled={generatingContent || !(formData.title || formData.title_az).trim()}
                     className="gap-2">
                     
                       {generatingContent ?

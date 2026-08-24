@@ -49,6 +49,32 @@ const AdminPhotoshoot = () => {
   const [newItem, setNewItem] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
 
+  // NOT: Əvvəllər bu 6 bölmənin heç birində Redaktə (Edit) düyməsi yox idi —
+  // `editingItem` state-i mövcud idi və `handleSaveX(item, false)` (update)
+  // budaqları tam yazılmışdı, amma HEÇ VAXT çağırıla bilmirdi (dead code).
+  // Bir dublikat/typo düzəltmək üçün admin-in yeganə yolu silib yenidən
+  // yaratmaq idi (id-ni və istinadları itirərək). `formItem`/`updateFormItem`
+  // "Yeni əlavə et" (newItem) və "Redaktə et" (editingItem.data) rejimlərini
+  // eyni forma JSX-i ilə paylaşmağa imkan verir.
+  const formItem: Record<string, any> = editingItem ? editingItem.data : newItem;
+  const updateFormItem = (data: Record<string, any>) => {
+    if (editingItem) {
+      setEditingItem({ ...editingItem, data });
+    } else {
+      setNewItem(data);
+    }
+  };
+  const closeForm = () => {
+    setIsAdding(false);
+    setNewItem({});
+    setEditingItem(null);
+  };
+  const startEdit = (type: EditingItem['type'], item: Record<string, any>) => {
+    setIsAdding(false);
+    setNewItem({});
+    setEditingItem({ id: item.id, type, data: { ...item } });
+  };
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -73,43 +99,35 @@ const AdminPhotoshoot = () => {
   const handleSaveBackground = async (item: Record<string, any>, isNew: boolean) => {
     setSaving(true);
     try {
+      // NOT: əvvəllər sabit sahə siyahısı göndərilirdi (yalnız _az/bare) —
+      // LocalizedInput admin dili ru/tr/kk/de/ar olanda theme_name_ru və s.
+      // yazırdı, amma bunlar heç vaxt DB-yə çatmırdı (sessiz itki). İndi
+      // bütün item (bütün dil sahələri daxil) spread olunur.
+      const { type, id, ...rest } = item;
       if (isNew) {
         const { error } = await supabase.
         from('photoshoot_backgrounds').
         insert({
-          theme_id: item.theme_id,
-          theme_name: item.theme_name,
-          theme_name_az: item.theme_name_az,
-          theme_emoji: item.theme_emoji || '🎨',
-          category_id: item.category_id || 'custom',
-          category_name: item.category_name || 'Custom',
-          category_name_az: item.category_name_az || tr("adminphotoshoot_xususi_1055b8", "X\xFCsusi"),
-          prompt_template: item.prompt_template,
-          gender: item.gender || 'unisex',
+          category_id: 'custom',
+          category_name: 'Custom',
+          category_name_az: tr("adminphotoshoot_xususi_1055b8", "X\xFCsusi"),
+          theme_emoji: '🎨',
+          gender: 'unisex',
+          ...rest,
           is_active: true,
           sort_order: backgrounds.length
-        });
+        } as any);
         if (error) throw error;
       } else {
         const { error } = await supabase.
         from('photoshoot_backgrounds').
-        update({
-          theme_name: item.theme_name,
-          theme_name_az: item.theme_name_az,
-          theme_emoji: item.theme_emoji,
-          category_name: item.category_name,
-          category_name_az: item.category_name_az,
-          prompt_template: item.prompt_template,
-          gender: item.gender
-        }).
-        eq('id', item.id);
+        update(rest).
+        eq('id', id);
         if (error) throw error;
       }
 
       refreshData();
-      setEditingItem(null);
-      setIsAdding(false);
-      setNewItem({});
+      closeForm();
       toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
       toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
@@ -121,36 +139,28 @@ const AdminPhotoshoot = () => {
   const handleSaveOutfit = async (item: Record<string, any>, isNew: boolean) => {
     setSaving(true);
     try {
+      const { type, id, ...rest } = item;
       if (isNew) {
         const { error } = await supabase.
         from('photoshoot_outfits').
         insert({
-          outfit_id: item.outfit_id,
-          outfit_name: item.outfit_name,
-          outfit_name_az: item.outfit_name_az,
-          emoji: item.emoji || '👕',
-          gender: item.gender || 'all',
+          emoji: '👕',
+          gender: 'all',
+          ...rest,
           is_active: true,
           sort_order: outfits.length
-        });
+        } as any);
         if (error) throw error;
       } else {
         const { error } = await supabase.
         from('photoshoot_outfits').
-        update({
-          outfit_name: item.outfit_name,
-          outfit_name_az: item.outfit_name_az,
-          emoji: item.emoji,
-          gender: item.gender
-        }).
-        eq('id', item.id);
+        update(rest).
+        eq('id', id);
         if (error) throw error;
       }
 
       refreshData();
-      setEditingItem(null);
-      setIsAdding(false);
-      setNewItem({});
+      closeForm();
       toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
       toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
@@ -162,34 +172,27 @@ const AdminPhotoshoot = () => {
   const handleSaveEyeColor = async (item: Record<string, any>, isNew: boolean) => {
     setSaving(true);
     try {
+      const { type, id, ...rest } = item;
       if (isNew) {
         const { error } = await supabase.
         from('photoshoot_eye_colors').
         insert({
-          color_id: item.color_id,
-          color_name: item.color_name,
-          color_name_az: item.color_name_az,
-          hex_value: item.hex_value || 'from-gray-400 to-gray-500',
+          hex_value: 'from-gray-400 to-gray-500',
+          ...rest,
           is_active: true,
           sort_order: eyeColors.length
-        });
+        } as any);
         if (error) throw error;
       } else {
         const { error } = await supabase.
         from('photoshoot_eye_colors').
-        update({
-          color_name: item.color_name,
-          color_name_az: item.color_name_az,
-          hex_value: item.hex_value
-        }).
-        eq('id', item.id);
+        update(rest).
+        eq('id', id);
         if (error) throw error;
       }
 
       refreshData();
-      setEditingItem(null);
-      setIsAdding(false);
-      setNewItem({});
+      closeForm();
       toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
       toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
@@ -201,34 +204,27 @@ const AdminPhotoshoot = () => {
   const handleSaveHairColor = async (item: Record<string, any>, isNew: boolean) => {
     setSaving(true);
     try {
+      const { type, id, ...rest } = item;
       if (isNew) {
         const { error } = await supabase.
         from('photoshoot_hair_colors').
         insert({
-          color_id: item.color_id,
-          color_name: item.color_name,
-          color_name_az: item.color_name_az,
-          hex_value: item.hex_value || 'from-gray-400 to-gray-500',
+          hex_value: 'from-gray-400 to-gray-500',
+          ...rest,
           is_active: true,
           sort_order: hairColors.length
-        });
+        } as any);
         if (error) throw error;
       } else {
         const { error } = await supabase.
         from('photoshoot_hair_colors').
-        update({
-          color_name: item.color_name,
-          color_name_az: item.color_name_az,
-          hex_value: item.hex_value
-        }).
-        eq('id', item.id);
+        update(rest).
+        eq('id', id);
         if (error) throw error;
       }
 
       refreshData();
-      setEditingItem(null);
-      setIsAdding(false);
-      setNewItem({});
+      closeForm();
       toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
       toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
@@ -240,34 +236,27 @@ const AdminPhotoshoot = () => {
   const handleSaveHairStyle = async (item: Record<string, any>, isNew: boolean) => {
     setSaving(true);
     try {
+      const { type, id, ...rest } = item;
       if (isNew) {
         const { error } = await supabase.
         from('photoshoot_hair_styles').
         insert({
-          style_id: item.style_id,
-          style_name: item.style_name,
-          style_name_az: item.style_name_az,
-          emoji: item.emoji || '✨',
+          emoji: '✨',
+          ...rest,
           is_active: true,
           sort_order: hairStyles.length
-        });
+        } as any);
         if (error) throw error;
       } else {
         const { error } = await supabase.
         from('photoshoot_hair_styles').
-        update({
-          style_name: item.style_name,
-          style_name_az: item.style_name_az,
-          emoji: item.emoji
-        }).
-        eq('id', item.id);
+        update(rest).
+        eq('id', id);
         if (error) throw error;
       }
 
       refreshData();
-      setEditingItem(null);
-      setIsAdding(false);
-      setNewItem({});
+      closeForm();
       toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
       toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
@@ -279,36 +268,27 @@ const AdminPhotoshoot = () => {
   const handleSaveImageStyle = async (item: Record<string, any>, isNew: boolean) => {
     setSaving(true);
     try {
+      const { type, id, ...rest } = item;
       if (isNew) {
         const { error } = await supabase.
         from('photoshoot_image_styles').
         insert({
-          style_id: item.style_id,
-          style_name: item.style_name,
-          style_name_az: item.style_name_az,
-          emoji: item.emoji || '🎨',
-          prompt_modifier: item.prompt_modifier,
+          emoji: '🎨',
+          ...rest,
           is_active: true,
           sort_order: imageStyles.length
-        });
+        } as any);
         if (error) throw error;
       } else {
         const { error } = await supabase.
         from('photoshoot_image_styles').
-        update({
-          style_name: item.style_name,
-          style_name_az: item.style_name_az,
-          emoji: item.emoji,
-          prompt_modifier: item.prompt_modifier
-        }).
-        eq('id', item.id);
+        update(rest).
+        eq('id', id);
         if (error) throw error;
       }
 
       refreshData();
-      setEditingItem(null);
-      setIsAdding(false);
-      setNewItem({});
+      closeForm();
       toast({ title: tr("adminphotoshoot_ugurla_yadda_saxlanildi_4a21f2", "Uğurla yadda saxlanıldı!") });
     } catch (error: any) {
       toast({ title: tr("adminphotoshoot_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
@@ -440,45 +420,46 @@ const AdminPhotoshoot = () => {
         <TabsContent value="image-styles" className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_sekil_novleri_1d0187", "\u015E\u0259kil N\xF6vl\u0259ri (")}{imageStyles.length})</h3>
-            <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'image_style' });}}>
+            <Button onClick={() => {setEditingItem(null);setIsAdding(true);setNewItem({ type: 'image_style' });}}>
               <Plus className="w-4 h-4 me-2" /> Yeni Stil
             </Button>
           </div>
 
-          {isAdding && newItem.type === 'image_style' &&
+          {((isAdding && newItem.type === 'image_style') || editingItem?.type === 'image_style') &&
           <Card className="border-primary">
               <CardContent className="p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                   placeholder="Stil ID (meselen: 3d_disney)"
-                  value={newItem.style_id || ''}
-                  onChange={(e) => setNewItem({ ...newItem, style_id: e.target.value })} />
+                  value={formItem.style_id || ''}
+                  disabled={!!editingItem}
+                  onChange={(e) => updateFormItem({ ...formItem, style_id: e.target.value })} />
                 
                   <Input
                   placeholder="Emoji"
-                  value={newItem.emoji || ''}
-                  onChange={(e) => setNewItem({ ...newItem, emoji: e.target.value })} />
+                  value={formItem.emoji || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, emoji: e.target.value })} />
                 
                   <Input
                   placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
-                  value={newItem.style_name || ''}
-                  onChange={(e) => setNewItem({ ...newItem, style_name: e.target.value })} />
+                  value={formItem.style_name || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, style_name: e.target.value })} />
                 
-                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="style_name" label="Azərbaycan adı" />
+                  <LocalizedInput formData={formItem} setFormData={updateFormItem} field="style_name" label="Azərbaycan adı" />
                 
                 </div>
                 <Textarea
                 placeholder={tr("adminphotoshoot_prompt_modifier_ai_stil_ucun_d0558d", "Prompt Modifier (AI stil üçün)")}
-                value={newItem.prompt_modifier || ''}
-                onChange={(e) => setNewItem({ ...newItem, prompt_modifier: e.target.value })}
+                value={formItem.prompt_modifier || ''}
+                onChange={(e) => updateFormItem({ ...formItem, prompt_modifier: e.target.value })}
                 rows={3} />
               
                 <div className="flex gap-2">
-                  <Button onClick={() => handleSaveImageStyle(newItem, true)} disabled={saving}>
+                  <Button onClick={() => handleSaveImageStyle(formItem, !editingItem)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ms-2">Yadda saxla</span>
+                    <span className="ms-2">{editingItem ? tr("adminphotoshoot_yenile_570ce2", "Yenilə") : 'Yadda saxla'}</span>
                   </Button>
-                  <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
+                  <Button variant="outline" onClick={closeForm}>
                     <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
@@ -504,6 +485,13 @@ const AdminPhotoshoot = () => {
                         </div>
                       </div>
                       <div className="flex gap-2">
+                        <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => startEdit('image_style', style)}>
+                      
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
                         <Button
                       variant="outline"
                       size="sm"
@@ -536,49 +524,50 @@ const AdminPhotoshoot = () => {
         <TabsContent value="backgrounds" className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_butun_fonlar_19b064", "B\xFCt\xFCn Fonlar (")}{backgrounds.length})</h3>
-            <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'background' });}}>
+            <Button onClick={() => {setEditingItem(null);setIsAdding(true);setNewItem({ type: 'background' });}}>
               <Plus className="w-4 h-4 me-2" /> Yeni Fon
             </Button>
           </div>
 
-          {isAdding && newItem.type === 'background' &&
+          {((isAdding && newItem.type === 'background') || editingItem?.type === 'background') &&
           <Card className="border-primary">
               <CardContent className="p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                   placeholder="Theme ID (meselen: garden_party)"
-                  value={newItem.theme_id || ''}
-                  onChange={(e) => setNewItem({ ...newItem, theme_id: e.target.value })} />
+                  value={formItem.theme_id || ''}
+                  disabled={!!editingItem}
+                  onChange={(e) => updateFormItem({ ...formItem, theme_id: e.target.value })} />
                 
                   <Input
                   placeholder="Emoji"
-                  value={newItem.theme_emoji || ''}
-                  onChange={(e) => setNewItem({ ...newItem, theme_emoji: e.target.value })} />
+                  value={formItem.theme_emoji || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, theme_emoji: e.target.value })} />
                 
                   <Input
                   placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
-                  value={newItem.theme_name || ''}
-                  onChange={(e) => setNewItem({ ...newItem, theme_name: e.target.value })} />
+                  value={formItem.theme_name || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, theme_name: e.target.value })} />
                 
-                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="theme_name" label="Azərbaycan adı" />
+                  <LocalizedInput formData={formItem} setFormData={updateFormItem} field="theme_name" label="Azərbaycan adı" />
                 
                   <Input
                   placeholder={tr("adminphotoshoot_kateqoriya_ingilis_a39e44", "Kateqoriya (İngilis)")}
-                  value={newItem.category_name || ''}
-                  onChange={(e) => setNewItem({ ...newItem, category_name: e.target.value })} />
+                  value={formItem.category_name || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, category_name: e.target.value })} />
                 
-                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="category_name" label="Kateqoriya" />
+                  <LocalizedInput formData={formItem} setFormData={updateFormItem} field="category_name" label="Kateqoriya" />
                 
                 </div>
                 <Textarea
                 placeholder={tr("adminphotoshoot_prompt_template_ai_ucun_39b0ad", "Prompt Template (AI üçün)")}
-                value={newItem.prompt_template || ''}
-                onChange={(e) => setNewItem({ ...newItem, prompt_template: e.target.value })}
+                value={formItem.prompt_template || ''}
+                onChange={(e) => updateFormItem({ ...formItem, prompt_template: e.target.value })}
                 rows={3} />
               
                 <Select
-                value={newItem.gender || 'unisex'}
-                onValueChange={(v) => setNewItem({ ...newItem, gender: v })}>
+                value={formItem.gender || 'unisex'}
+                onValueChange={(v) => updateFormItem({ ...formItem, gender: v })}>
                 
                   <SelectTrigger>
                     <SelectValue placeholder={tr("adminphotoshoot_cinsiyyet_1526fb", "Cinsiyyət")} />
@@ -590,11 +579,11 @@ const AdminPhotoshoot = () => {
                   </SelectContent>
                 </Select>
                 <div className="flex gap-2">
-                  <Button onClick={() => handleSaveBackground(newItem, true)} disabled={saving}>
+                  <Button onClick={() => handleSaveBackground(formItem, !editingItem)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ms-2">Yadda saxla</span>
+                    <span className="ms-2">{editingItem ? tr("adminphotoshoot_yenile_570ce2", "Yenilə") : 'Yadda saxla'}</span>
                   </Button>
-                  <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
+                  <Button variant="outline" onClick={closeForm}>
                     <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
@@ -623,6 +612,13 @@ const AdminPhotoshoot = () => {
                     <div className="flex gap-2">
                       <Button
                     variant="outline"
+                    size="icon"
+                    onClick={() => startEdit('background', bg)}>
+                    
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => handleToggleActive('photoshoot_backgrounds', bg.id, bg.is_active)}>
                     
@@ -647,36 +643,37 @@ const AdminPhotoshoot = () => {
         <TabsContent value="outfits" className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_butun_geyimler_45a2c6", "B\xFCt\xFCn Geyiml\u0259r (")}{outfits.length})</h3>
-            <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'outfit' });}}>
+            <Button onClick={() => {setEditingItem(null);setIsAdding(true);setNewItem({ type: 'outfit' });}}>
               <Plus className="w-4 h-4 me-2" /> Yeni Geyim
             </Button>
           </div>
 
-          {isAdding && newItem.type === 'outfit' &&
+          {((isAdding && newItem.type === 'outfit') || editingItem?.type === 'outfit') &&
           <Card className="border-primary">
               <CardContent className="p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                   placeholder="Outfit ID (meselen: princess_dress)"
-                  value={newItem.outfit_id || ''}
-                  onChange={(e) => setNewItem({ ...newItem, outfit_id: e.target.value })} />
+                  value={formItem.outfit_id || ''}
+                  disabled={!!editingItem}
+                  onChange={(e) => updateFormItem({ ...formItem, outfit_id: e.target.value })} />
                 
                   <Input
                   placeholder="Emoji"
-                  value={newItem.emoji || ''}
-                  onChange={(e) => setNewItem({ ...newItem, emoji: e.target.value })} />
+                  value={formItem.emoji || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, emoji: e.target.value })} />
                 
                   <Input
                   placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
-                  value={newItem.outfit_name || ''}
-                  onChange={(e) => setNewItem({ ...newItem, outfit_name: e.target.value })} />
+                  value={formItem.outfit_name || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, outfit_name: e.target.value })} />
                 
-                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="outfit_name" label="Azərbaycan adı" />
+                  <LocalizedInput formData={formItem} setFormData={updateFormItem} field="outfit_name" label="Azərbaycan adı" />
                 
                 </div>
                 <Select
-                value={newItem.gender || 'all'}
-                onValueChange={(v) => setNewItem({ ...newItem, gender: v })}>
+                value={formItem.gender || 'all'}
+                onValueChange={(v) => updateFormItem({ ...formItem, gender: v })}>
                 
                   <SelectTrigger>
                     <SelectValue placeholder={tr("adminphotoshoot_cinsiyyet_1526fb", "Cinsiyyət")} />
@@ -688,11 +685,11 @@ const AdminPhotoshoot = () => {
                   </SelectContent>
                 </Select>
                 <div className="flex gap-2">
-                  <Button onClick={() => handleSaveOutfit(newItem, true)} disabled={saving}>
+                  <Button onClick={() => handleSaveOutfit(formItem, !editingItem)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ms-2">Yadda saxla</span>
+                    <span className="ms-2">{editingItem ? tr("adminphotoshoot_yenile_570ce2", "Yenilə") : 'Yadda saxla'}</span>
                   </Button>
-                  <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
+                  <Button variant="outline" onClick={closeForm}>
                     <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
@@ -721,6 +718,13 @@ const AdminPhotoshoot = () => {
                     <div className="flex gap-2">
                       <Button
                     variant="outline"
+                    size="icon"
+                    onClick={() => startEdit('outfit', outfit)}>
+                    
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => handleToggleActive('photoshoot_outfits', outfit.id, outfit.is_active)}>
                     
@@ -745,39 +749,40 @@ const AdminPhotoshoot = () => {
         <TabsContent value="eye-colors" className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_butun_goz_rengleri_f4f265", "B\xFCt\xFCn G\xF6z R\u0259ngl\u0259ri (")}{eyeColors.length})</h3>
-            <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'eye_color' });}}>
+            <Button onClick={() => {setEditingItem(null);setIsAdding(true);setNewItem({ type: 'eye_color' });}}>
               <Plus className="w-4 h-4 me-2" /> {tr("adminphotoshoot_yeni_goz_rengi_b3befd", "Yeni G\xF6z R\u0259ngi")}
             </Button>
           </div>
 
-          {isAdding && newItem.type === 'eye_color' &&
+          {((isAdding && newItem.type === 'eye_color') || editingItem?.type === 'eye_color') &&
           <Card className="border-primary">
               <CardContent className="p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                   placeholder="Color ID (meselen: hazel)"
-                  value={newItem.color_id || ''}
-                  onChange={(e) => setNewItem({ ...newItem, color_id: e.target.value })} />
+                  value={formItem.color_id || ''}
+                  disabled={!!editingItem}
+                  onChange={(e) => updateFormItem({ ...formItem, color_id: e.target.value })} />
                 
                   <Input
                   placeholder="Gradient (from-blue-400 to-blue-600)"
-                  value={newItem.hex_value || ''}
-                  onChange={(e) => setNewItem({ ...newItem, hex_value: e.target.value })} />
+                  value={formItem.hex_value || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, hex_value: e.target.value })} />
                 
                   <Input
                   placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
-                  value={newItem.color_name || ''}
-                  onChange={(e) => setNewItem({ ...newItem, color_name: e.target.value })} />
+                  value={formItem.color_name || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, color_name: e.target.value })} />
                 
-                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="color_name" label="Azərbaycan adı" />
+                  <LocalizedInput formData={formItem} setFormData={updateFormItem} field="color_name" label="Azərbaycan adı" />
                 
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={() => handleSaveEyeColor(newItem, true)} disabled={saving}>
+                  <Button onClick={() => handleSaveEyeColor(formItem, !editingItem)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ms-2">Yadda saxla</span>
+                    <span className="ms-2">{editingItem ? tr("adminphotoshoot_yenile_570ce2", "Yenilə") : 'Yadda saxla'}</span>
                   </Button>
-                  <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
+                  <Button variant="outline" onClick={closeForm}>
                     <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
@@ -804,6 +809,13 @@ const AdminPhotoshoot = () => {
                     <div className="flex gap-2">
                       <Button
                     variant="outline"
+                    size="icon"
+                    onClick={() => startEdit('eye_color', color)}>
+                    
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => handleToggleActive('photoshoot_eye_colors', color.id, color.is_active)}>
                     
@@ -828,39 +840,40 @@ const AdminPhotoshoot = () => {
         <TabsContent value="hair-colors" className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_butun_sac_rengleri_7ef7b8", "B\xFCt\xFCn Sa\xE7 R\u0259ngl\u0259ri (")}{hairColors.length})</h3>
-            <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'hair_color' });}}>
+            <Button onClick={() => {setEditingItem(null);setIsAdding(true);setNewItem({ type: 'hair_color' });}}>
               <Plus className="w-4 h-4 me-2" /> {tr("adminphotoshoot_yeni_sac_rengi_961241", "Yeni Sa\xE7 R\u0259ngi")}
             </Button>
           </div>
 
-          {isAdding && newItem.type === 'hair_color' &&
+          {((isAdding && newItem.type === 'hair_color') || editingItem?.type === 'hair_color') &&
           <Card className="border-primary">
               <CardContent className="p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                   placeholder="Color ID (meselen: auburn)"
-                  value={newItem.color_id || ''}
-                  onChange={(e) => setNewItem({ ...newItem, color_id: e.target.value })} />
+                  value={formItem.color_id || ''}
+                  disabled={!!editingItem}
+                  onChange={(e) => updateFormItem({ ...formItem, color_id: e.target.value })} />
                 
                   <Input
                   placeholder="Gradient (from-amber-600 to-amber-800)"
-                  value={newItem.hex_value || ''}
-                  onChange={(e) => setNewItem({ ...newItem, hex_value: e.target.value })} />
+                  value={formItem.hex_value || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, hex_value: e.target.value })} />
                 
                   <Input
                   placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
-                  value={newItem.color_name || ''}
-                  onChange={(e) => setNewItem({ ...newItem, color_name: e.target.value })} />
+                  value={formItem.color_name || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, color_name: e.target.value })} />
                 
-                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="color_name" label="Azərbaycan adı" />
+                  <LocalizedInput formData={formItem} setFormData={updateFormItem} field="color_name" label="Azərbaycan adı" />
                 
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={() => handleSaveHairColor(newItem, true)} disabled={saving}>
+                  <Button onClick={() => handleSaveHairColor(formItem, !editingItem)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ms-2">Yadda saxla</span>
+                    <span className="ms-2">{editingItem ? tr("adminphotoshoot_yenile_570ce2", "Yenilə") : 'Yadda saxla'}</span>
                   </Button>
-                  <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
+                  <Button variant="outline" onClick={closeForm}>
                     <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
@@ -887,6 +900,13 @@ const AdminPhotoshoot = () => {
                     <div className="flex gap-2">
                       <Button
                     variant="outline"
+                    size="icon"
+                    onClick={() => startEdit('hair_color', color)}>
+                    
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => handleToggleActive('photoshoot_hair_colors', color.id, color.is_active)}>
                     
@@ -911,39 +931,40 @@ const AdminPhotoshoot = () => {
         <TabsContent value="hair-styles" className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">{tr("adminphotoshoot_butun_sac_formalari_e89a19", "B\xFCt\xFCn Sa\xE7 Formalar\u0131 (")}{hairStyles.length})</h3>
-            <Button onClick={() => {setIsAdding(true);setNewItem({ type: 'hair_style' });}}>
+            <Button onClick={() => {setEditingItem(null);setIsAdding(true);setNewItem({ type: 'hair_style' });}}>
               <Plus className="w-4 h-4 me-2" /> {tr("adminphotoshoot_yeni_sac_formasi_3063a3", "Yeni Sa\xE7 Formas\u0131")}
             </Button>
           </div>
 
-          {isAdding && newItem.type === 'hair_style' &&
+          {((isAdding && newItem.type === 'hair_style') || editingItem?.type === 'hair_style') &&
           <Card className="border-primary">
               <CardContent className="p-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <Input
                   placeholder="Style ID (meselen: ponytail)"
-                  value={newItem.style_id || ''}
-                  onChange={(e) => setNewItem({ ...newItem, style_id: e.target.value })} />
+                  value={formItem.style_id || ''}
+                  disabled={!!editingItem}
+                  onChange={(e) => updateFormItem({ ...formItem, style_id: e.target.value })} />
                 
                   <Input
                   placeholder="Emoji"
-                  value={newItem.emoji || ''}
-                  onChange={(e) => setNewItem({ ...newItem, emoji: e.target.value })} />
+                  value={formItem.emoji || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, emoji: e.target.value })} />
                 
                   <Input
                   placeholder={tr("adminphotoshoot_ingilis_adi_0325b8", "İngilis adı")}
-                  value={newItem.style_name || ''}
-                  onChange={(e) => setNewItem({ ...newItem, style_name: e.target.value })} />
+                  value={formItem.style_name || ''}
+                  onChange={(e) => updateFormItem({ ...formItem, style_name: e.target.value })} />
                 
-                  <LocalizedInput formData={newItem} setFormData={setNewItem} field="style_name" label="Azərbaycan adı" />
+                  <LocalizedInput formData={formItem} setFormData={updateFormItem} field="style_name" label="Azərbaycan adı" />
                 
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={() => handleSaveHairStyle(newItem, true)} disabled={saving}>
+                  <Button onClick={() => handleSaveHairStyle(formItem, !editingItem)} disabled={saving}>
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    <span className="ms-2">Yadda saxla</span>
+                    <span className="ms-2">{editingItem ? tr("adminphotoshoot_yenile_570ce2", "Yenilə") : 'Yadda saxla'}</span>
                   </Button>
-                  <Button variant="outline" onClick={() => {setIsAdding(false);setNewItem({});}}>
+                  <Button variant="outline" onClick={closeForm}>
                     <X className="w-4 h-4 me-2" /> {tr("adminphotoshoot_legv_et_b5e49c", "L\u0259\u011Fv et")}
                   </Button>
                 </div>
@@ -968,6 +989,13 @@ const AdminPhotoshoot = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
+                      <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => startEdit('hair_style', style)}>
+                    
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
                       <Button
                     variant="outline"
                     size="sm"
