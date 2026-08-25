@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { tr } from '@/lib/tr';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { X, Pause, Play, Trash2, Eye, Users, ChevronUp } from 'lucide-react';
+import { X, Pause, Play, Trash2, Eye, Users, ChevronUp, Heart } from 'lucide-react';
 import { Story, UserStoryGroup } from '@/hooks/useStories';
 import { useStoryViewers } from '@/hooks/useStoryViewers';
 import { useAuth } from '@/hooks/useAuth';
@@ -25,6 +26,7 @@ interface StoryViewerProps {
   onClose: () => void;
   onViewed: (storyId: string) => void;
   onDelete?: (storyId: string) => void;
+  onToggleLike?: (storyId: string, isLiked: boolean) => void;
 }
 
 const StoryViewer = ({
@@ -32,7 +34,8 @@ const StoryViewer = ({
   initialGroupIndex,
   onClose,
   onViewed,
-  onDelete
+  onDelete,
+  onToggleLike
 }: StoryViewerProps) => {
   const { user } = useAuth();
   const isRtl = useIsRtl();
@@ -154,15 +157,26 @@ const StoryViewer = ({
     }
   };
 
-  if (!currentGroup || !currentStory) return null;
+  const handleToggleLike = () => {
+    if (currentStory && onToggleLike) {
+      onToggleLike(currentStory.id, !!currentStory.is_liked);
+    }
+  };
 
-  return (
+  if (!currentGroup || !currentStory) return null;
+  // Community tab-ın .a-shell (z-index: 1, öz stacking context-i) və səhifə-keçid
+  // motion.div-inin (transform → fixed üçün containing block yaradır) içərisindən
+  // adi "fixed inset-0" alt naviqasiyanın (BottomNav, z-40) ARXASINDA qalırdı —
+  // DailyStoryCards.tsx-dəki eyni problemin həllini təkrarlayaraq body-ə portallanır.
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black">
+        className="fixed inset-0 z-[9999] bg-black">
         
         {/* Full screen story container */}
         <motion.div
@@ -295,16 +309,16 @@ const StoryViewer = ({
             </div>
           }
 
-          {/* Bottom: View count for own stories (swipe up to see viewers) */}
+          {/* Bottom: View count (+ bəyənmə sayı) sahiblər üçün — sürüşdürərək baxanları görmək olar */}
           {isOwnStory &&
-          <div className="absolute bottom-0 start-0 end-0 z-20 pb-[calc(env(safe-area-inset-bottom,16px)+16px)]">
+          <div className="absolute bottom-0 start-0 end-0 z-20 pb-[calc(env(safe-area-inset-bottom,16px)+16px)] flex items-center justify-center gap-2">
               <motion.button
               onClick={(e) => {
                 e.stopPropagation();
                 setShowViewers(true);
                 setIsPaused(true);
               }}
-              className="mx-auto flex flex-col items-center gap-1"
+              className="flex flex-col items-center gap-1"
               whileTap={{ scale: 0.95 }}>
               
                 <ChevronUp className="w-5 h-5 text-white/70" />
@@ -312,6 +326,38 @@ const StoryViewer = ({
                   <Eye className="w-4 h-4 text-white" />
                   <span className="text-white text-sm font-medium">{currentStory.view_count} {tr("storyviewer_baxis_d4da3e", "bax\u0131\u015F")}</span>
                 </div>
+              </motion.button>
+              {currentStory.likes_count > 0 &&
+            <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-3.5 py-2">
+                  <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" />
+                  <span className="text-white text-sm font-medium">{currentStory.likes_count}</span>
+                </div>
+            }
+            </div>
+          }
+
+          {/* Bottom: Like button — başqasının story-sinə baxarkən */}
+          {!isOwnStory && onToggleLike &&
+          <div className="absolute bottom-0 start-0 end-0 z-20 pb-[calc(env(safe-area-inset-bottom,16px)+16px)] px-4 flex items-center justify-end">
+              <motion.button
+              onClick={(e) => {e.stopPropagation();handleToggleLike();}}
+              whileTap={{ scale: 1.25 }}
+              className="flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-full px-4 py-2.5">
+              
+                <motion.span
+                key={currentStory.is_liked ? 'liked' : 'unliked'}
+                initial={{ scale: 0.6 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 15 }}>
+                
+                  <Heart
+                  className="w-5 h-5"
+                  style={currentStory.is_liked ? { fill: '#ef4444', color: '#ef4444' } : { color: '#fff' }} />
+                
+                </motion.span>
+                {currentStory.likes_count > 0 &&
+              <span className="text-white text-sm font-medium">{currentStory.likes_count}</span>
+              }
               </motion.button>
             </div>
           }
@@ -344,7 +390,7 @@ const StoryViewer = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] bg-black/50"
+          className="fixed inset-0 z-[10000] bg-black/50"
           onClick={() => {setShowViewers(false);setIsPaused(false);}}>
           
             <motion.div
@@ -430,7 +476,9 @@ const StoryViewer = ({
           </motion.div>
         }
       </AnimatePresence>
-    </>);
+    </>,
+    document.body
+  );
 
 };
 

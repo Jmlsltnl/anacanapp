@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Camera, Image as ImageIcon, X } from 'lucide-react';
-import { UserStoryGroup, useStories } from '@/hooks/useStories';
+import { UserStoryGroup, useStories, useToggleStoryLike } from '@/hooks/useStories';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import StoryViewer from './StoryViewer';
@@ -17,6 +17,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const { storyGroups, isLoading, createStory, isCreating, markAsViewed, deleteStory } = useStories(groupId);
+  const toggleStoryLike = useToggleStoryLike();
   const [viewerOpen, setViewerOpen] = useState(false);
   const [initialGroupIndex, setInitialGroupIndex] = useState(0);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -152,7 +153,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
       </div>
 
       <AnimatePresence>
-        {viewerOpen && <StoryViewer storyGroups={storyGroups} initialGroupIndex={initialGroupIndex} onClose={() => setViewerOpen(false)} onViewed={markAsViewed} onDelete={deleteStory} />}
+        {viewerOpen && <StoryViewer storyGroups={storyGroups} initialGroupIndex={initialGroupIndex} onClose={() => setViewerOpen(false)} onViewed={markAsViewed} onDelete={deleteStory} onToggleLike={(storyId, isLiked) => toggleStoryLike.mutate({ storyId, isLiked })} />}
       </AnimatePresence>
       <AnimatePresence>
         {cropImageUrl && <StoryCropEditor imageUrl={cropImageUrl} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />}

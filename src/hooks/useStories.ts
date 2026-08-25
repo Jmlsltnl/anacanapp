@@ -17,6 +17,8 @@ export interface Story {
   created_at: string;
   expires_at: string;
   view_count: number;
+  likes_count: number;
+  is_liked?: boolean;
   author?: {
     name: string;
     avatar_url: string | null;
@@ -55,6 +57,17 @@ export const useStories = (groupId?: string | null) => {
 
       const authorMap = await getPublicProfileCards((data || []).map((s: any) => s.user_id));
 
+      // Ä°stifadÉ™Ã§inin bÉ™yÉ™ndiklÉ™ri â€” TÆK batch sorÄŸu (post_likes-dÉ™ki enrichPosts nÃ¼munÉ™si ilÉ™ eyni, N+1 yox)
+      const likedSet = new Set<string>();
+      if (user && data && data.length > 0) {
+        const { data: likeRows } = await supabase.
+        from('story_likes' as any).
+        select('story_id').
+        eq('user_id', user.id).
+        in('story_id', data.map((s: any) => s.id));
+        (likeRows || []).forEach((r: any) => likedSet.add(r.story_id));
+      }
+
       // Fetch author details and view status
       const storiesWithDetails = await Promise.all(
         (data || []).map(async (story: any) => {
@@ -73,9 +86,11 @@ export const useStories = (groupId?: string | null) => {
 
           return {
             ...story,
+            likes_count: story.likes_count || 0,
+            is_liked: likedSet.has(story.id),
             author: authorData ?
             { name: authorData.name || tr("usestories_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null } :
-            { name: tr("usestories_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null },
+            { name: tr("usestories_istifadeci_b6bdd6", "Ä°stifadÉ™Ã§i"), avatar_url: null },
             is_viewed: isViewed
           };
         })
@@ -146,10 +161,10 @@ export const useStories = (groupId?: string | null) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stories'] });
-      toast({ title: tr("usestories_story_paylasildi_e1288f", "Story paylaşıldı! 📸") });
+      toast({ title: tr("usestories_story_paylasildi_e1288f", "Story paylaÅŸÄ±ldÄ±! ðŸ“¸") });
     },
     onError: () => {
-      toast({ title: tr("usestories_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+      toast({ title: tr("usestories_xeta_bas_verdi_f22fba", "XÉ™ta baÅŸ verdi"), variant: 'destructive' });
     }
   });
 
@@ -199,4 +214,83 @@ export const useStories = (groupId?: string | null) => {
     markAsViewed,
     deleteStory: deleteStory.mutate
   };
+};
+
+/**
+ * Story like toggle â€” optimistic (useCommunity.ts-dÉ™ki useToggleLike ilÉ™ eyni prinsip).
+ *  - ÃœrÉ™k DÆRHAL dolur/boÅŸalÄ±r (server cavabÄ± gÃ¶zlÉ™nilmir)
+ *  - Push bildiriÅŸi arxa planda gÃ¶ndÉ™rilir (Ã¶z story-nÉ™ like YOX)
+ *  - Duplicate insert (sÃ¼rÉ™tli double-tap, 23505) uÄŸur sayÄ±lÄ±r
+ *  - XÉ™tada cache geri qaytarÄ±lÄ±r (rollback)
+ */
+export const useToggleStoryLike = () => {
+  const queryClient = useQueryClient();
+
+  // ['stories', groupId] aÃ§arÄ±nÄ±n bÃ¼tÃ¼n variantlarÄ±nÄ± (É™sas lenta + hÉ™r qrup) yenilÉ™
+  const patchStoryInCaches = (storyId: string, patch: (s: Story) => Story) => {
+    queryClient.setQueriesData({ queryKey: ['stories'] }, (old: any) =>
+    Array.isArray(old) ? old.map((s: Story) => s.id === storyId ? patch(s) : s) : old
+    );
+  };
+
+  return useMutation({
+    mutationFn: async ({ storyId, isLiked }: {storyId: string;isLiked: boolean;}) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      if (isLiked) {
+        const { error } = await supabase.
+        from('story_likes' as any).
+        delete().
+        eq('story_id', storyId).
+        eq('user_id', user.id);
+        if (error) throw error;
+        return;
+      }
+
+      const { error } = await supabase.
+      from('story_likes' as any).
+      insert({ story_id: storyId, user_id: user.id });
+
+      if (error) {
+        // 23505 = unikal aÃ§ar (artÄ±q bÉ™yÉ™nilib) â€” double-tap yarÄ±ÅŸÄ±, uÄŸur say
+        if ((error as any).code === '23505') return;
+        throw error;
+      }
+
+      // Push bildiriÅŸi ARXA PLANDA â€” story sahibinÉ™ (Ã¶zÃ¼nÉ™ deyilsÉ™)
+      void (async () => {
+        try {
+          const { data: story } = await supabase.from('community_stories').select('user_id').eq('id', storyId).maybeSingle();
+          if (story && story.user_id !== user.id) {
+            const { data: profile } = await supabase.from('public_profile_cards').select('name').eq('user_id', user.id).maybeSingle();
+            const likerName = profile?.name || tr("usestories_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i");
+            await supabase.functions.invoke('send-push-notification', {
+              body: {
+                userId: story.user_id,
+                title: tr('usestories_yeni_beyenme_3fd88a', 'Yeni bÉ™yÉ™nmÉ™ â¤ï¸'),
+                body: `${likerName} ${tr('usestories_story_nizi_beyendi', "story-nizi bÉ™yÉ™ndi")}`,
+                data: { type: 'story_like', storyId, context: 'community_story' }
+              }
+            });
+          }
+        } catch (e) {console.error('Story like notification error:', e);}
+      })();
+    },
+    onMutate: async ({ storyId, isLiked }) => {
+      await queryClient.cancelQueries({ queryKey: ['stories'] });
+      const prev = queryClient.getQueriesData({ queryKey: ['stories'] });
+
+      patchStoryInCaches(storyId, (s) => ({
+        ...s,
+        is_liked: !isLiked,
+        likes_count: Math.max(0, (s.likes_count || 0) + (isLiked ? -1 : 1))
+      }));
+
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      ctx?.prev?.forEach(([key, data]) => queryClient.setQueryData(key, data as any));
+    }
+  });
 };
