@@ -19,6 +19,7 @@ export interface Story {
   view_count: number;
   likes_count: number;
   is_liked?: boolean;
+  replies_count: number;
   author?: {
     name: string;
     avatar_url: string | null;
@@ -57,7 +58,7 @@ export const useStories = (groupId?: string | null) => {
 
       const authorMap = await getPublicProfileCards((data || []).map((s: any) => s.user_id));
 
-      // Ä°stifadÉ™Ã§inin bÉ™yÉ™ndiklÉ™ri â€” TÆK batch sorÄŸu (post_likes-dÉ™ki enrichPosts nÃ¼munÉ™si ilÉ™ eyni, N+1 yox)
+      // İstifadəçinin bəyəndikləri — TƏK batch sorğu (post_likes-dəki enrichPosts nümunəsi ilə eyni, N+1 yox)
       const likedSet = new Set<string>();
       if (user && data && data.length > 0) {
         const { data: likeRows } = await supabase.
@@ -88,9 +89,10 @@ export const useStories = (groupId?: string | null) => {
             ...story,
             likes_count: story.likes_count || 0,
             is_liked: likedSet.has(story.id),
+            replies_count: story.replies_count || 0,
             author: authorData ?
             { name: authorData.name || tr("usestories_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null } :
-            { name: tr("usestories_istifadeci_b6bdd6", "Ä°stifadÉ™Ã§i"), avatar_url: null },
+            { name: tr("usestories_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null },
             is_viewed: isViewed
           };
         })
@@ -161,10 +163,10 @@ export const useStories = (groupId?: string | null) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stories'] });
-      toast({ title: tr("usestories_story_paylasildi_e1288f", "Story paylaÅŸÄ±ldÄ±! ðŸ“¸") });
+      toast({ title: tr("usestories_story_paylasildi_e1288f", "Story paylaşıldı! 📸") });
     },
     onError: () => {
-      toast({ title: tr("usestories_xeta_bas_verdi_f22fba", "XÉ™ta baÅŸ verdi"), variant: 'destructive' });
+      toast({ title: tr("usestories_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   });
 
@@ -217,16 +219,16 @@ export const useStories = (groupId?: string | null) => {
 };
 
 /**
- * Story like toggle â€” optimistic (useCommunity.ts-dÉ™ki useToggleLike ilÉ™ eyni prinsip).
- *  - ÃœrÉ™k DÆRHAL dolur/boÅŸalÄ±r (server cavabÄ± gÃ¶zlÉ™nilmir)
- *  - Push bildiriÅŸi arxa planda gÃ¶ndÉ™rilir (Ã¶z story-nÉ™ like YOX)
- *  - Duplicate insert (sÃ¼rÉ™tli double-tap, 23505) uÄŸur sayÄ±lÄ±r
- *  - XÉ™tada cache geri qaytarÄ±lÄ±r (rollback)
+ * Story like toggle — optimistic (useCommunity.ts-dəki useToggleLike ilə eyni prinsip).
+ *  - Ürək DƏRHAL dolur/boşalır (server cavabı gözlənilmir)
+ *  - Push bildirişi arxa planda göndərilir (öz story-nə like YOX)
+ *  - Duplicate insert (sürətli double-tap, 23505) uğur sayılır
+ *  - Xətada cache geri qaytarılır (rollback)
  */
 export const useToggleStoryLike = () => {
   const queryClient = useQueryClient();
 
-  // ['stories', groupId] aÃ§arÄ±nÄ±n bÃ¼tÃ¼n variantlarÄ±nÄ± (É™sas lenta + hÉ™r qrup) yenilÉ™
+  // ['stories', groupId] açarının bütün variantlarını (əsas lenta + hər qrup) yenilə
   const patchStoryInCaches = (storyId: string, patch: (s: Story) => Story) => {
     queryClient.setQueriesData({ queryKey: ['stories'] }, (old: any) =>
     Array.isArray(old) ? old.map((s: Story) => s.id === storyId ? patch(s) : s) : old
@@ -253,12 +255,12 @@ export const useToggleStoryLike = () => {
       insert({ story_id: storyId, user_id: user.id });
 
       if (error) {
-        // 23505 = unikal aÃ§ar (artÄ±q bÉ™yÉ™nilib) â€” double-tap yarÄ±ÅŸÄ±, uÄŸur say
+        // 23505 = unikal açar (artıq bəyənilib) — double-tap yarışı, uğur say
         if ((error as any).code === '23505') return;
         throw error;
       }
 
-      // Push bildiriÅŸi ARXA PLANDA â€” story sahibinÉ™ (Ã¶zÃ¼nÉ™ deyilsÉ™)
+      // Push bildirişi ARXA PLANDA — story sahibinə (özünə deyilsə)
       void (async () => {
         try {
           const { data: story } = await supabase.from('community_stories').select('user_id').eq('id', storyId).maybeSingle();
@@ -268,8 +270,8 @@ export const useToggleStoryLike = () => {
             await supabase.functions.invoke('send-push-notification', {
               body: {
                 userId: story.user_id,
-                title: tr('usestories_yeni_beyenme_3fd88a', 'Yeni bÉ™yÉ™nmÉ™ â¤ï¸'),
-                body: `${likerName} ${tr('usestories_story_nizi_beyendi', "story-nizi bÉ™yÉ™ndi")}`,
+                title: tr('usestories_yeni_beyenme_3fd88a', 'Yeni bəyənmə ❤️'),
+                body: `${likerName} ${tr('usestories_story_nizi_beyendi', "story-nizi bəyəndi")}`,
                 data: { type: 'story_like', storyId, context: 'community_story' }
               }
             });

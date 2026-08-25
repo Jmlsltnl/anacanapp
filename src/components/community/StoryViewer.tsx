@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { tr } from '@/lib/tr';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { X, Pause, Play, Trash2, Eye, Users, ChevronUp, Heart } from 'lucide-react';
+import { X, Pause, Play, Trash2, Eye, Users, ChevronUp, Heart, MessageCircle, Send } from 'lucide-react';
 import { Story, UserStoryGroup } from '@/hooks/useStories';
 import { useStoryViewers } from '@/hooks/useStoryViewers';
+import { useStoryReplies, useCreateStoryReply, useDeleteStoryReply } from '@/hooks/useStoryReplies';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
@@ -37,7 +38,7 @@ const StoryViewer = ({
   onDelete,
   onToggleLike
 }: StoryViewerProps) => {
-  const { user } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const isRtl = useIsRtl();
   const [currentGroupIndex, setCurrentGroupIndex] = useState(initialGroupIndex);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
@@ -45,6 +46,8 @@ const StoryViewer = ({
   const [progress, setProgress] = useState(0);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showViewers, setShowViewers] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
+  const [replyText, setReplyText] = useState('');
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const isLongPress = useRef(false);
@@ -58,6 +61,14 @@ const StoryViewer = ({
   const { data: viewers = [], isLoading: viewersLoading } = useStoryViewers(
     isOwnStory && showViewers ? currentStory?.id : null
   );
+
+  // Story-yə cavablar — hamı üçün (yalnız sheet açıq olanda yüklənir)
+  const { data: replies = [], isLoading: repliesLoading } = useStoryReplies(
+    showReplies ? currentStory?.id ?? null : null,
+    showReplies
+  );
+  const createStoryReply = useCreateStoryReply();
+  const deleteStoryReply = useDeleteStoryReply();
 
   const goToNextStory = useCallback(() => {
     if (!currentGroup) return;
@@ -94,7 +105,7 @@ const StoryViewer = ({
 
   // Progress timer
   useEffect(() => {
-    if (isPaused || !currentStory || showDeleteConfirm || showViewers) return;
+    if (isPaused || !currentStory || showDeleteConfirm || showViewers || showReplies) return;
 
     progressInterval.current = setInterval(() => {
       setProgress((prev) => {
@@ -109,7 +120,7 @@ const StoryViewer = ({
     return () => {
       if (progressInterval.current) clearInterval(progressInterval.current);
     };
-  }, [isPaused, currentStory, goToNextStory, showDeleteConfirm, showViewers]);
+  }, [isPaused, currentStory, goToNextStory, showDeleteConfirm, showViewers, showReplies]);
 
   // Long press to pause (Instagram-style)
   const handlePointerDown = () => {
@@ -161,6 +172,23 @@ const StoryViewer = ({
     if (currentStory && onToggleLike) {
       onToggleLike(currentStory.id, !!currentStory.is_liked);
     }
+  };
+
+  const handleSendReply = () => {
+    const content = replyText.trim();
+    if (!content || !currentStory) return;
+    createStoryReply.mutate({
+      storyId: currentStory.id,
+      content,
+      storyAuthorId: currentStory.user_id,
+      replierName: profile?.name
+    });
+    setReplyText('');
+  };
+
+  const handleDeleteReply = (replyId: string) => {
+    if (!currentStory) return;
+    deleteStoryReply.mutate({ replyId, storyId: currentStory.id });
   };
 
   if (!currentGroup || !currentStory) return null;
@@ -309,58 +337,99 @@ const StoryViewer = ({
             </div>
           }
 
-          {/* Bottom: View count (+ bəyənmə sayı) sahiblər üçün — sürüşdürərək baxanları görmək olar */}
-          {isOwnStory &&
-          <div className="absolute bottom-0 start-0 end-0 z-20 pb-[calc(env(safe-area-inset-bottom,16px)+16px)] flex items-center justify-center gap-2">
-              <motion.button
+          {/* Bottom cluster: (sahib) baxış+bəyənmə → (hamı) cavab sayı → (hamı) cavab yaz + bəyən.
+              Toxunma/sürüşdürmə naviqasiyasına qarışmasın deyə bütün blok pointer hadisələrini
+              özündə saxlayır (dış konteynerin tap-zone/drag handler-lərinə çatmır). */}
+          <div
+            className="absolute bottom-0 start-0 end-0 z-20 pb-[calc(env(safe-area-inset-bottom,16px)+12px)] px-3 flex flex-col items-center gap-2"
+            onPointerDown={(e) => e.stopPropagation()}
+            onPointerUp={(e) => e.stopPropagation()}>
+            
+            {isOwnStory &&
+            <div className="flex items-center gap-2">
+                <motion.button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowViewers(true);
+                  setIsPaused(true);
+                }}
+                className="flex flex-col items-center gap-1"
+                whileTap={{ scale: 0.95 }}>
+                
+                  <ChevronUp className="w-5 h-5 text-white/70" />
+                  <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-full px-4 py-2">
+                    <Eye className="w-4 h-4 text-white" />
+                    <span className="text-white text-sm font-medium">{currentStory.view_count} {tr("storyviewer_baxis_d4da3e", "bax\u0131\u015F")}</span>
+                  </div>
+                </motion.button>
+                {currentStory.likes_count > 0 &&
+              <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-3.5 py-2">
+                    <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" />
+                    <span className="text-white text-sm font-medium">{currentStory.likes_count}</span>
+                  </div>
+              }
+              </div>
+            }
+
+            {currentStory.replies_count > 0 &&
+            <motion.button
               onClick={(e) => {
                 e.stopPropagation();
-                setShowViewers(true);
+                setShowReplies(true);
                 setIsPaused(true);
               }}
-              className="flex flex-col items-center gap-1"
-              whileTap={{ scale: 0.95 }}>
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-3.5 py-1.5">
               
-                <ChevronUp className="w-5 h-5 text-white/70" />
-                <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-full px-4 py-2">
-                  <Eye className="w-4 h-4 text-white" />
-                  <span className="text-white text-sm font-medium">{currentStory.view_count} {tr("storyviewer_baxis_d4da3e", "bax\u0131\u015F")}</span>
-                </div>
+                <MessageCircle className="w-3.5 h-3.5 text-white" />
+                <span className="text-white text-xs font-medium">
+                  {currentStory.replies_count} {tr('storyviewer_cavab_sayi', 'cavab')}
+                </span>
               </motion.button>
-              {currentStory.likes_count > 0 &&
-            <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-3.5 py-2">
-                  <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" />
-                  <span className="text-white text-sm font-medium">{currentStory.likes_count}</span>
-                </div>
             }
-            </div>
-          }
 
-          {/* Bottom: Like button — başqasının story-sinə baxarkən */}
-          {!isOwnStory && onToggleLike &&
-          <div className="absolute bottom-0 start-0 end-0 z-20 pb-[calc(env(safe-area-inset-bottom,16px)+16px)] px-4 flex items-center justify-end">
-              <motion.button
-              onClick={(e) => {e.stopPropagation();handleToggleLike();}}
-              whileTap={{ scale: 1.25 }}
-              className="flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-full px-4 py-2.5">
+            <div className="w-full flex items-center gap-2">
+              <input
+                type="text"
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                onFocus={() => setIsPaused(true)}
+                onBlur={() => setIsPaused(false)}
+                onKeyPress={(e) => {if (e.key === 'Enter') handleSendReply();}}
+                placeholder={tr('storyviewer_cavab_yaz', 'Cavab yaz...')}
+                className="flex-1 min-w-0 h-11 px-4 rounded-full bg-white/15 backdrop-blur-sm text-white placeholder:text-white/60 text-sm border border-white/20 focus:outline-none focus:border-white/40" />
               
-                <motion.span
-                key={currentStory.is_liked ? 'liked' : 'unliked'}
-                initial={{ scale: 0.6 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 15 }}>
+              {replyText.trim() &&
+              <motion.button
+                onClick={(e) => {e.stopPropagation();handleSendReply();}}
+                disabled={createStoryReply.isPending}
+                whileTap={{ scale: 0.9 }}
+                className="w-11 h-11 flex-shrink-0 rounded-full bg-white flex items-center justify-center disabled:opacity-50">
                 
-                  <Heart
-                  className="w-5 h-5"
-                  style={currentStory.is_liked ? { fill: '#ef4444', color: '#ef4444' } : { color: '#fff' }} />
-                
-                </motion.span>
-                {currentStory.likes_count > 0 &&
-              <span className="text-white text-sm font-medium">{currentStory.likes_count}</span>
+                  <Send className="w-4 h-4 text-black" />
+                </motion.button>
               }
-              </motion.button>
+              {!isOwnStory && onToggleLike &&
+              <motion.button
+                onClick={(e) => {e.stopPropagation();handleToggleLike();}}
+                whileTap={{ scale: 1.25 }}
+                className="w-11 h-11 flex-shrink-0 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center gap-1">
+                
+                  <motion.span
+                  key={currentStory.is_liked ? 'liked' : 'unliked'}
+                  initial={{ scale: 0.6 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}>
+                  
+                    <Heart
+                    className="w-5 h-5"
+                    style={currentStory.is_liked ? { fill: '#ef4444', color: '#ef4444' } : { color: '#fff' }} />
+                  
+                  </motion.span>
+                </motion.button>
+              }
             </div>
-          }
+          </div>
         </motion.div>
       </motion.div>
 
@@ -467,6 +536,111 @@ const StoryViewer = ({
                       })}
                           </p>
                         </div>
+                      </div>
+                )}
+                  </div>
+              }
+              </div>
+            </motion.div>
+          </motion.div>
+        }
+      </AnimatePresence>
+
+      {/* Replies Bottom Sheet */}
+      <AnimatePresence>
+        {showReplies &&
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[10000] bg-black/50"
+          onClick={() => {setShowReplies(false);setIsPaused(false);}}>
+          
+            <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            className="absolute bottom-0 start-0 end-0 max-h-[70vh] bg-card rounded-t-3xl overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}>
+            
+              {/* Handle */}
+              <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
+                <div className="w-10 h-1 bg-muted-foreground/30 rounded-full" />
+              </div>
+
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 pb-4 border-b border-border/50 flex-shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base text-foreground">{tr('storyviewer_cavablar_basliq', 'Cavablar')}</h3>
+                    <p className="text-xs text-muted-foreground">{currentStory.replies_count} {tr("storyviewer_nefer_dbca98", "n\u0259f\u0259r")}</p>
+                  </div>
+                </div>
+                <button
+                onClick={() => {setShowReplies(false);setIsPaused(false);}}
+                className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                
+                  <X className="w-4 h-4 text-muted-foreground" />
+                </button>
+              </div>
+
+              {/* Replies List */}
+              <div className="overflow-y-auto flex-1" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 20px)' }}>
+                {repliesLoading ?
+              <div className="flex items-center justify-center py-12">
+                    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  </div> :
+              replies.length === 0 ?
+              <div className="text-center py-12">
+                    <MessageCircle className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">{tr('storyviewer_hele_cavab_yoxdur', 'Hələ heç kim cavab verməyib')}</p>
+                  </div> :
+
+              <div className="px-5 py-2">
+                    {replies.map((reply) =>
+                <div
+                  key={reply.id}
+                  className="flex items-start gap-3 py-3">
+                  
+                        <div className="w-9 h-9 rounded-full overflow-hidden bg-muted flex-shrink-0">
+                          {reply.author?.avatar_url ?
+                    <img
+                      src={reply.author.avatar_url}
+                      alt={reply.author.name}
+                      className="w-full h-full object-cover" /> :
+
+
+                    <div className="w-full h-full bg-gradient-to-br from-primary/30 to-pink-500/30 flex items-center justify-center">
+                              <span className="text-xs font-bold text-primary">
+                                {(reply.author?.name || '?').charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                    }
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-foreground">
+                            <span className="font-semibold">{reply.author?.name}</span>{' '}
+                            <span className="text-foreground/90">{reply.content}</span>
+                          </p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            {formatDistanceToNow(new Date(reply.created_at), {
+                        addSuffix: true,
+                        locale: getCurrentDateLocale()
+                      })}
+                          </p>
+                        </div>
+                        {(reply.user_id === user?.id || isAdmin) &&
+                  <button
+                    onClick={() => handleDeleteReply(reply.id)}
+                    className="w-7 h-7 flex-shrink-0 rounded-full flex items-center justify-center text-muted-foreground hover:text-destructive">
+                    
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                  }
                       </div>
                 )}
                   </div>
