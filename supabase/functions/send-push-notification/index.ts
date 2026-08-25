@@ -14,13 +14,13 @@ const corsHeaders = {
 // İndi çağıran `context` göndərməlidir və server DB-də HƏQİQƏTƏN mövcud
 // münasibəti müstəqil yoxlayır — `userId` təkcə "iddia", sübut deyil.
 // Tanınmayan/göndərilməyən context → default-deny (yalnız özünə göndərə bilər).
-type PushContext = 'self' | 'partner' | 'direct_message' | 'community_post';
+type PushContext = 'self' | 'partner' | 'direct_message' | 'community_post' | 'community_story';
 
 interface PushPayload {
   userId: string;
   title: string;
   body: string;
-  data?: Record<string, unknown> & { context?: PushContext; postId?: string };
+  data?: Record<string, unknown> & { context?: PushContext; postId?: string; storyId?: string };
 }
 
 async function verifyOwnership(
@@ -70,6 +70,17 @@ async function verifyOwnership(
     const { data: post } = await supabase
       .from('community_posts').select('user_id').eq('id', postId).maybeSingle();
     return !!post && (post as any).user_id === targetUserId;
+  }
+
+  if (context === 'community_story') {
+    // Story like/reply bildirişləri (useStories.ts/useStoryReplies.ts) — əvvəllər bu
+    // case olmadığı üçün HƏR ZAMAN default-deny-ə düşürdü (403), heç bir story
+    // like/reply push bildirişi getmirdi.
+    const storyId = data?.storyId;
+    if (!storyId) return false;
+    const { data: story } = await supabase
+      .from('community_stories').select('user_id').eq('id', storyId).maybeSingle();
+    return !!story && (story as any).user_id === targetUserId;
   }
 
   return false;
