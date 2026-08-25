@@ -204,47 +204,62 @@ const StoryViewer = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9999] bg-black">
+        className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
         
-        {/* Full screen story container */}
-        <motion.div
-          className="w-full h-full relative"
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.15}
-          onDragEnd={handleDrag}
-          onPointerDown={handlePointerDown}
-          onPointerUp={handlePointerUp}>
+        {/* Instagram-tipli standart 9:16 (1080x1920) "story kətanı" — cihazın öz ekran
+            nisbətindən ASILI OLMAYARAQ sabit qalır. Ekran 9:16-dan enlidirsə (planşet və s.)
+            yanlarda, dardırsa (bugünkü çox telefon 9:19-19.5-dir) yuxarı/aşağı qara zolaq
+            (letterbox) əlavə olunur — Instagram/YouTube-un standart üsulu. Əvvəllər tam
+            ekrana (cihazın öz nisbətinə) "object-cover" ilə uzadılırdı, bu da fərqli
+            cihazlarda fərqli hissələrin kəsilməsinə səbəb olurdu.
+            CSS min()-trick: hər iki ölçünü ekrana həm sığdırır, həm nisbəti qoruyur. */}
+        <div
+          className="relative bg-black overflow-hidden"
+          style={{
+            aspectRatio: '9 / 16',
+            width: 'min(100dvw, 100dvh * 9 / 16)',
+            height: 'min(100dvh, 100dvw * 16 / 9)'
+          }}>
           
-          {/* Story media - full screen */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStory.id}
-              initial={{ opacity: 0, scale: 1.02 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.15 }}
-              className="absolute inset-0"
-              style={{ backgroundColor: currentStory.background_color || '#000' }}>
-              
-              {currentStory.media_type === 'video' ?
-              <video
-                src={currentStory.media_url}
-                className="w-full h-full object-cover"
-                autoPlay
-                muted
-                playsInline
-                loop /> :
+          <motion.div
+            className="w-full h-full relative"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={handleDrag}
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}>
+            
+            {/* Story media — tam görünmə təmin edilir (object-contain): heç bir hissəsi kəsilmir,
+                mənbə şəkil/video 9:16-dan fərqlidirsə çərçivə daxilində öz fon rəngi ilə tamamlanır */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStory.id}
+                initial={{ opacity: 0, scale: 1.02 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.15 }}
+                className="absolute inset-0"
+                style={{ backgroundColor: currentStory.background_color || '#000' }}>
+                
+                {currentStory.media_type === 'video' ?
+                <video
+                  src={currentStory.media_url}
+                  className="w-full h-full object-contain"
+                  autoPlay
+                  muted
+                  playsInline
+                  loop /> :
 
 
-              <img
-                src={currentStory.media_url}
-                alt="Story"
-                className="w-full h-full object-cover" />
+                <img
+                  src={currentStory.media_url}
+                  alt="Story"
+                  className="w-full h-full object-contain" />
 
-              }
-            </motion.div>
-          </AnimatePresence>
+                }
+              </motion.div>
+            </AnimatePresence>
 
           {/* Gradient overlays for readability */}
           <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent z-10 pointer-events-none" />
@@ -430,7 +445,8 @@ const StoryViewer = ({
               }
             </div>
           </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </motion.div>
 
       {/* Delete Confirmation */}
