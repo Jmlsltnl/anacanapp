@@ -2772,8 +2772,10 @@ export type Database = {
           expires_at: string
           group_id: string | null
           id: string
+          likes_count: number
           media_type: string
           media_url: string
+          replies_count: number
           text_overlay: string | null
           user_id: string
           view_count: number | null
@@ -2784,8 +2786,10 @@ export type Database = {
           expires_at?: string
           group_id?: string | null
           id?: string
+          likes_count?: number
           media_type?: string
           media_url: string
+          replies_count?: number
           text_overlay?: string | null
           user_id: string
           view_count?: number | null
@@ -2796,8 +2800,10 @@ export type Database = {
           expires_at?: string
           group_id?: string | null
           id?: string
+          likes_count?: number
           media_type?: string
           media_url?: string
+          replies_count?: number
           text_overlay?: string | null
           user_id?: string
           view_count?: number | null
@@ -3612,12 +3618,16 @@ export type Database = {
           icon: string | null
           id: string
           is_active: boolean | null
+          is_postpartum: boolean
           level: string
           name: string
           name_az: string | null
           name_en: string | null
           name_ru: string | null
           name_tr: string | null
+          postpartum_delivery_types: string[] | null
+          postpartum_week_end: number | null
+          postpartum_week_start: number | null
           sort_order: number | null
           steps: Json | null
           trimester: number[] | null
@@ -3637,12 +3647,16 @@ export type Database = {
           icon?: string | null
           id?: string
           is_active?: boolean | null
+          is_postpartum?: boolean
           level?: string
           name: string
           name_az?: string | null
           name_en?: string | null
           name_ru?: string | null
           name_tr?: string | null
+          postpartum_delivery_types?: string[] | null
+          postpartum_week_end?: number | null
+          postpartum_week_start?: number | null
           sort_order?: number | null
           steps?: Json | null
           trimester?: number[] | null
@@ -3662,12 +3676,16 @@ export type Database = {
           icon?: string | null
           id?: string
           is_active?: boolean | null
+          is_postpartum?: boolean
           level?: string
           name?: string
           name_az?: string | null
           name_en?: string | null
           name_ru?: string | null
           name_tr?: string | null
+          postpartum_delivery_types?: string[] | null
+          postpartum_week_end?: number | null
+          postpartum_week_start?: number | null
           sort_order?: number | null
           steps?: Json | null
           trimester?: number[] | null
@@ -10222,6 +10240,70 @@ export type Database = {
         }
         Relationships: []
       }
+      story_likes: {
+        Row: {
+          created_at: string
+          id: string
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_likes_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "community_stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_replies: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_replies_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "community_stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       story_views: {
         Row: {
           id: string
@@ -12854,6 +12936,7 @@ export type Database = {
       }
       get_notification_admin_status: { Args: never; Returns: Json }
       get_or_create_referral_code: { Args: never; Returns: string }
+      get_public_app_setting: { Args: { p_key: string }; Returns: Json }
       get_user_linked_partner_id: {
         Args: { _user_id: string }
         Returns: string
@@ -12875,6 +12958,10 @@ export type Database = {
       }
       increment_blog_view_count: {
         Args: { post_id: string }
+        Returns: undefined
+      }
+      increment_coupon_usage: {
+        Args: { p_coupon_id: string }
         Returns: undefined
       }
       is_group_member: {
