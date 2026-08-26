@@ -90,12 +90,27 @@ Deno.serve(async (req) => {
       resolvedLifeStage = "bump";
     }
 
-    const LANG_NAME: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh", de: "German", ar: "Arabic (Modern Standard, addressing the mother in the FEMININE second person)" };
+    const LANG_NAME: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh (қазақ тілі, Cyrillic script)", de: "German", ar: "Arabic (Modern Standard, addressing the mother in the FEMININE second person)" };
     const replyLangName = LANG_NAME[language];
 
+    // Native-script reminder — appended to the final user turn. The conversation history
+    // (welcome message, earlier answers) is often Azerbaijani, and the model tends to mimic
+    // the history language; a short directive in the TARGET language right before generation
+    // is the most reliable way to force kk/ar/de/… output.
+    const NATIVE_DIRECTIVE: Record<string, string> = {
+      en: "(Answer in English only.)",
+      ru: "(Отвечай только на русском языке.)",
+      tr: "(Yalnızca Türkçe cevap ver.)",
+      kk: "(Тек қазақ тілінде жауап бер.)",
+      de: "(Antworte ausschließlich auf Deutsch.)",
+      ar: "(أجيبي باللغة العربية الفصحى فقط.)",
+    };
+    const nativeDirective = NATIVE_DIRECTIVE[language] ?? "";
+
     const langInstruction = replyLangName
-      ? `\n\nIMPORTANT: Reply ONLY in ${replyLangName}. Keep the same professional tone, no "honey/sweetie" endearments, no markdown decorators, no medical disclaimer headers.`
+      ? `\n\nABSOLUTE LANGUAGE RULE (overrides everything else, including the language of previous messages in this conversation): You MUST write EVERY word of EVERY reply in ${replyLangName}. Never answer in Azerbaijani, English or any other language, even if earlier messages in the conversation history are in another language. Keep the same professional tone, no "honey/sweetie" endearments, no markdown decorators, no medical disclaimer headers.`
       : "";
+
 
     // Localized fallback/error messages shown directly to the user
     const ERR_TEXTS: Record<string, { unavailable: string; noAnswer: string }> = {
