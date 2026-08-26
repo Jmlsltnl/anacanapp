@@ -155,6 +155,20 @@ Deno.serve(async (req) => {
       parts: [{ text: msg.content }],
     }));
 
+    // Reinforce the target language on the final user turn (history is often Azerbaijani)
+    if (nativeDirective) {
+      for (let i = geminiContents.length - 1; i >= 0; i--) {
+        if (geminiContents[i].role === "user") {
+          geminiContents[i] = {
+            role: "user",
+            parts: [{ text: `${geminiContents[i].parts[0].text}\n\n${nativeDirective}` }],
+          };
+          break;
+        }
+      }
+    }
+
+
     const geminiBody = {
       contents: geminiContents,
       systemInstruction: {
