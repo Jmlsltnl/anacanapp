@@ -1149,6 +1149,25 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
       <PrematurityBackfillCard child={selectedChild} onSaved={refetchChildren} />
       }
 
+      {/* Preemie Bələdçisi girişi — yalnız premature körpələrdə (36 aya qədər) */}
+      {!isToolDisabled('preemie-hub') && childAge?.isPremature && babyData.ageInMonths < 36 &&
+      <section className="a-section">
+          <motion.button
+          className="a-card a-fade-in w-full flex items-center gap-3 text-start"
+          style={{ padding: 14 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onNavigateToTool?.('preemie-hub')}>
+
+            <span className="a-rank-avatar" style={{ background: 'var(--a-peach-1)', fontSize: 20 }}>💛</span>
+            <span className="flex-1 min-w-0">
+              <span className="a-rank-title block">{tr('preemie_dash_entry_title', 'Preemie Bələdçisi')}</span>
+              <span className="a-rank-sub block">{tr('preemie_dash_entry_sub', 'NICU, kenquru qayğısı, qidalanma və korreksiya olunmuş yaş')}</span>
+            </span>
+            <ChevronRight size={16} style={{ color: 'var(--a-ink-faint)' }} className="rtl:rotate-180 shrink-0" />
+          </motion.button>
+        </section>
+      }
+
       {/* Bu günün məlumatları — standalone card */}
       {dailyInfo &&
       <section className="a-section">

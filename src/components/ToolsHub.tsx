@@ -34,6 +34,7 @@ const DoctorsHospitals = lazy(() => import('./tools/DoctorsHospitals'));
 const BloodSugarTracker = lazy(() => import('./tools/BloodSugarTracker'));
 const BloodPressureTracker = lazy(() => import('./tools/BloodPressureTracker'));
 const DangerSignsScreen = lazy(() => import('./tools/DangerSignsScreen'));
+const PreemieHubScreen = lazy(() => import('./tools/PreemieHubScreen'));
 const PregnancyAlbum = lazy(() => import('./tools/PregnancyAlbum'));
 const AffiliateProducts = lazy(() => import('./tools/AffiliateProducts'));
 const CryTranslator = lazy(() => import('./tools/CryTranslator'));
@@ -369,6 +370,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       case 'blood-sugar':return <BloodSugarTracker onBack={handleBack} />;
       case 'blood-pressure':return <BloodPressureTracker onBack={handleBack} />;
       case 'danger-signs':return <DangerSignsScreen onBack={handleBack} />;
+      case 'preemie-hub':return <PreemieHubScreen onBack={handleBack} />;
       case 'pregnancy-album':return <PregnancyAlbum onBack={handleBack} />;
       case 'baby-album':return <BabyMonthlyAlbum onBack={handleBack} />;
       case 'cry-translator':return <CryTranslator onBack={handleBack} />;
