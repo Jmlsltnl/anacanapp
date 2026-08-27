@@ -129,6 +129,28 @@ export async function sendFCMv1(
     }
   }
 
+  // DÜZƏLİŞ: iOS tokenləri üçün FCM çox vaxt "INVALID_ARGUMENT" ilə örtülmüş
+  // bir APNs-səviyyəli ApnsError detayı qaytarır: statusCode 410 / reason
+  // "Unregistered" (məs. { message: "APNs device token is disabled." }).
+  // Bu, Apple-ın öz dilində "bu token bir daha işləməyəcək" siqnalıdır —
+  // FCM-in birbaşa UNREGISTERED kodu ilə eyni əhəmiyyətə malikdir. Əvvəllər
+  // yalnız `message.token` fieldViolations yoxlanırdı, bu APNs-spesifik hal
+  // heç vaxt tutulmurdu — nəticədə ölü iOS tokenləri silinmir, hər cron
+  // işində (scheduled/flow_reminder/vitamin_reminder və s.) təkrar-təkrar
+  // uğursuz göndərmə cəhdi kimi qeyd olunurdu.
+  if (!unregistered) {
+    const apnsDetail = errBody?.error?.details?.find((d: any) =>
+      typeof d?.['@type'] === 'string' && d['@type'].includes('ApnsError')
+    );
+    if (
+      apnsDetail &&
+      (apnsDetail.statusCode === 410 ||
+        String(apnsDetail.reason ?? '').toLowerCase() === 'unregistered')
+    ) {
+      unregistered = true;
+    }
+  }
+
   const tokenSuffix = deviceToken.slice(-12);
   console.log(
     `[FCM] send failed http=${res.status} code=${errCode || 'UNKNOWN'} unregistered=${unregistered} token=...${tokenSuffix}`
