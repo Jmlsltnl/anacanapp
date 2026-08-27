@@ -4,9 +4,9 @@ import { Send, X, Heart, Trash2, Pencil, ImagePlus, Loader2 } from 'lucide-react
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { PostComment, useCreateComment, useToggleCommentLike, useEditComment, useDeleteComment } from '@/hooks/useCommunity';
+import { useAutoGrowTextarea } from '@/hooks/useAutoGrowTextarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { hapticFeedback } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
@@ -56,7 +56,7 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [editImageUrl, setEditImageUrl] = useState<string | null | undefined>(comment.image_url);
-  const replyInputRef = useRef<HTMLInputElement>(null);
+  const { ref: replyInputRef } = useAutoGrowTextarea(replyText, 90);
   const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
   const createComment = useCreateComment();
@@ -104,10 +104,12 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   };
 
   const handleOpenReplyInput = () => {
-    if (!showReplyInput && isReply) {
-      const name = comment.author?.name || tr("commentreply_i_stifadeci_b6bdd6", "İstifadəçi");
-      setReplyText(`@${name} `);
-    }
+    // DÜZƏLİŞ: əvvəllər burada "@Ad " mətn kimi input-a əlavə edilirdi, AMMA
+    // render zamanı `repliedToName` artıq eyni adı parent_comment_id-dən
+    // MÜSTƏQİL şəkildə tapıb göstərir (aşağıda) — nəticədə ad İKİ DƏFƏ
+    // görünürdü (bir dəfə etiketli/vurğulanmış, bir dəfə isə content-in
+    // içində sadə mətn kimi). İndi YALNIZ render-side "@Ad" saxlanılır —
+    // input placeholder-i ("{Ad} cavab...") artıq kontekst üçün kifayətdir.
     setShowReplyInput(true);
   };
 
@@ -308,7 +310,7 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
                     </button>
                   </div>
               }
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-end">
                   <input type="file" accept="image/*" ref={replyFileInputRef} onChange={handleReplyImageSelect} style={{ display: 'none' }} />
                   <Button
                   type="button"
@@ -318,8 +320,20 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
                   aria-label={tr("postcard_sekil_elave_et", "Şəkil əlavə et")}>
                     <ImagePlus className="w-3.5 h-3.5" />
                   </Button>
-                  <Input ref={replyInputRef} value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder={tr("commentreply_cavab_yaz_placeholder_123456", "{username} cavab...").replace("{username}", comment.author?.name || tr("commentreply_i_stifadeci_b6bdd6", "İstifadəçi"))}
-                className="flex-1 h-8 text-[11px] rounded-full bg-muted/10 border-border/10 px-3.5" onKeyPress={(e) => e.key === 'Enter' && handleReply()} />
+                  <textarea
+                  ref={replyInputRef}
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  placeholder={tr("commentreply_cavab_yaz_placeholder_123456", "{username} cavab...").replace("{username}", comment.author?.name || tr("commentreply_i_stifadeci_b6bdd6", "İstifadəçi"))}
+                  rows={1}
+                  className="flex-1 text-[11px] rounded-2xl bg-muted/10 border border-border/10 px-3.5 py-1.5 resize-none focus:outline-none"
+                  style={{ lineHeight: 1.4, overflowY: 'hidden' }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleReply();
+                    }
+                  }} />
                   <Button onClick={handleReply} disabled={(!replyText.trim() && !replyImageFile) || uploadingReplyImage} size="sm" className="h-8 w-8 rounded-full gradient-primary p-0 flex-shrink-0">
                     {uploadingReplyImage ? <Loader2 className="w-3 h-3 text-primary-foreground animate-spin" /> : <Send className="w-3 h-3 text-primary-foreground" />}
                   </Button>

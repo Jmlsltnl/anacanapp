@@ -4,6 +4,7 @@ import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Flag, Penci
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { CommunityPost, useToggleLike, usePostComments, useCreateComment, useEditPost, useDeletePost, useTogglePinPost } from '@/hooks/useCommunity';
+import { useAutoGrowTextarea } from '@/hooks/useAutoGrowTextarea';
 import { useUserStore } from '@/store/userStore';
 import { isFeedLang } from '@/lib/langDetect';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -55,6 +56,7 @@ const avatarGradFor = (seed: string) => {
 const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
+  const { ref: commentTextareaRef } = useAutoGrowTextarea(commentText, 110);
   const [commentAnonymous, setCommentAnonymous] = useState(false);
   // Şərhə şəkil əlavə etmə — post composer-indəki uploadMedia (CreatePostScreen.tsx)
   // ilə eyni bucket/pattern (community-media, ${user.id}/... yolu).
@@ -431,7 +433,7 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
                     </button>
                   </div>
               }
-                <div className="flex gap-2.5">
+                <div className="flex gap-2.5 items-end">
                   <input type="file" accept="image/*" ref={commentFileInputRef} onChange={handleCommentImageSelect} style={{ display: 'none' }} />
                   <button
                   type="button"
@@ -441,13 +443,20 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
                   aria-label={tr("postcard_sekil_elave_et", "Şəkil əlavə et")}>
                     <ImagePlus size={16} />
                   </button>
-                  <input
+                  <textarea
+                  ref={commentTextareaRef}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   placeholder={commentAnonymous ? tr("postcard_anonim_serh_yaz_9af1ca", "Anonim \u015F\u0259rh yaz...") : tr("postcard_serh_yaz_54a89a", "Şərh yaz...")}
                   className="a-input"
-                  style={{ borderRadius: 999 }}
-                  onKeyPress={(e) => e.key === 'Enter' && handleComment()} />
+                  rows={1}
+                  style={{ borderRadius: 18, resize: 'none', lineHeight: 1.4, overflowY: 'hidden' }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleComment();
+                    }
+                  }} />
                 
                   <button
                   onClick={handleComment}

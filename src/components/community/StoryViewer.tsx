@@ -6,6 +6,7 @@ import { X, Pause, Play, Trash2, Eye, Users, ChevronUp, Heart, MessageCircle, Se
 import { Story, UserStoryGroup } from '@/hooks/useStories';
 import { useStoryViewers } from '@/hooks/useStoryViewers';
 import { useStoryReplies, useCreateStoryReply, useDeleteStoryReply } from '@/hooks/useStoryReplies';
+import { useAutoGrowTextarea } from '@/hooks/useAutoGrowTextarea';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
@@ -48,6 +49,7 @@ const StoryViewer = ({
   const [showViewers, setShowViewers] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [replyText, setReplyText] = useState('');
+  const { ref: replyTextareaRef } = useAutoGrowTextarea(replyText, 80);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const isLongPress = useRef(false);
@@ -403,16 +405,23 @@ const StoryViewer = ({
               </motion.button>
             }
 
-            <div className="w-full flex items-center gap-2">
-              <input
-                type="text"
+            <div className="w-full flex items-end gap-2">
+              <textarea
+                ref={replyTextareaRef}
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 onFocus={() => setIsPaused(true)}
                 onBlur={() => setIsPaused(false)}
-                onKeyPress={(e) => {if (e.key === 'Enter') handleSendReply();}}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendReply();
+                  }
+                }}
                 placeholder={tr('storyviewer_cavab_yaz', 'Cavab yaz...')}
-                className="flex-1 min-w-0 h-11 px-4 rounded-full bg-white/15 backdrop-blur-sm text-white placeholder:text-white/60 text-sm border border-white/20 focus:outline-none focus:border-white/40" />
+                rows={1}
+                className="flex-1 min-w-0 px-4 py-2.5 rounded-2xl bg-white/15 backdrop-blur-sm text-white placeholder:text-white/60 text-sm border border-white/20 focus:outline-none focus:border-white/40 resize-none"
+                style={{ lineHeight: 1.35, overflowY: 'hidden', maxHeight: 80 }} />
               
               {replyText.trim() &&
               <motion.button
