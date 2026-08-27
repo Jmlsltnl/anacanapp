@@ -46,3 +46,6 @@ project(':revenuecat-purchases-capacitor').projectDir = new File('../node_module
 
 include ':revenuecat-purchases-capacitor-ui'
 project(':revenuecat-purchases-capacitor-ui').projectDir = new File('../node_modules/@revenuecat/purchases-capacitor-ui/android')
+
+include ':capacitor-health'
+project(':capacitor-health').projectDir = new File('../node_modules/capacitor-health/android')

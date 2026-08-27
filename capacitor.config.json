@@ -56,7 +56,8 @@
       "@capacitor/splash-screen",
       "@capacitor/status-bar",
       "@revenuecat/purchases-capacitor",
-      "@revenuecat/purchases-capacitor-ui"
+      "@revenuecat/purchases-capacitor-ui",
+      "capacitor-health"
     ],
     "allowMixedContent": true,
     "captureInput": true,
