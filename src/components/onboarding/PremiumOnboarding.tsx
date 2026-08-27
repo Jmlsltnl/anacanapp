@@ -252,6 +252,9 @@ const PremiumOnboarding = () => {
   const [babyName, setBabyName] = useState('');
   const [babyGender, setBabyGender] = useState<'boy' | 'girl' | null>(null);
   const [babyBirthDate, setBabyBirthDate] = useState('');
+  // Premature dəstəyi: 'term' = vaxtında, 'preterm' = erkən, null = keçilib
+  const [prematureChoice, setPrematureChoice] = useState<'term' | 'preterm' | null>(null);
+  const [gestWeeks, setGestWeeks] = useState(34);
   // flow
   const [lmpDate, setLmpDate] = useState('');
   const [cycleLen, setCycleLen] = useState(28);
@@ -427,11 +430,22 @@ const PremiumOnboarding = () => {
         // addChild — sadə INSERT, ON CONFLICT-siz) düzəldə bilirdi. İndi eyni
         // işlək yoldan istifadə olunur.
         if (existingChildren.length === 0) {
+          // Premature dəstəyi: cavabdan EDD-ni bərpa et (bax OnboardingScreen)
+          let childDueDate: string | null = null;
+          if (prematureChoice === 'preterm') {
+            const d = new Date(babyBirthDate);
+            d.setDate(d.getDate() + (280 - gestWeeks * 7));
+            childDueDate = d.toISOString().split('T')[0];
+          } else if (prematureChoice === 'term') {
+            childDueDate = babyBirthDate;
+          }
+
           await addChild({
             name: babyName.trim(),
             birth_date: babyBirthDate,
             gender: babyGender!,
-            avatar_emoji: babyGender === 'boy' ? '👦' : '👧'
+            avatar_emoji: babyGender === 'boy' ? '👦' : '👧',
+            due_date: childDueDate
           });
         }
 
@@ -838,6 +852,49 @@ const PremiumOnboarding = () => {
                     value={babyBirthDate}
                     max={todayStr()}
                     onChange={setBabyBirthDate} />
+                  </div>
+
+                  {/* Premature sualı — korreksiya olunmuş yaş üçün */}
+                  <div className="a-card" style={{ padding: 16, marginTop: 10 }}>
+                    <label className="a-today-info-eyebrow" style={{ marginBottom: 8, display: 'block' }}>
+                      {tr('ponb_mommy_term_q', 'Körpəniz vaxtında doğulub?')}
+                    </label>
+                    <div className="flex gap-2">
+                      {[
+                    { id: 'term' as const, label: tr('ponb_mommy_term_yes', 'Vaxtında (37+ həftə)') },
+                    { id: 'preterm' as const, label: tr('ponb_mommy_term_no', 'Vaxtından əvvəl') }].
+                    map((opt) =>
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setPrematureChoice(opt.id)}
+                      className="flex-1"
+                      style={{
+                        padding: '11px 8px',
+                        borderRadius: 12,
+                        fontWeight: 700,
+                        fontSize: 12.5,
+                        background: prematureChoice === opt.id ? 'var(--a-peach-1)' : 'var(--a-surface)',
+                        color: prematureChoice === opt.id ? 'var(--a-accent-ink)' : 'var(--a-ink-soft)',
+                        border: prematureChoice === opt.id ? '1.5px solid var(--a-peach-2)' : '1.5px solid transparent'
+                      }}>
+
+                          {opt.label}
+                        </button>
+                    )}
+                    </div>
+                    {prematureChoice === 'preterm' &&
+                  <div className="mt-2 flex items-center gap-2">
+                        <button type="button" onClick={() => setGestWeeks(Math.max(22, gestWeeks - 1))}
+                    style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--a-surface)', fontWeight: 800, border: '1px solid var(--a-peach-2)' }}>-</button>
+                        <div className="flex-1 h-10 flex items-center justify-center" style={{ borderRadius: 12, background: 'var(--a-surface)' }}>
+                          <span style={{ fontSize: 15, fontWeight: 800 }}>{gestWeeks}</span>
+                          <span className="ms-1.5" style={{ fontSize: 11.5, color: 'var(--a-ink-soft)' }}>{tr('ponb_mommy_term_weeks', 'həftəlik doğulub')}</span>
+                        </div>
+                        <button type="button" onClick={() => setGestWeeks(Math.min(36, gestWeeks + 1))}
+                    style={{ width: 40, height: 40, borderRadius: 10, background: 'var(--a-surface)', fontWeight: 800, border: '1px solid var(--a-peach-2)' }}>+</button>
+                      </div>
+                  }
                   </div>
                   <ContinueBtn onClick={() => goNextOrFinish()} />
                 </>

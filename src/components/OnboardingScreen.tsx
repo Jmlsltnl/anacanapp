@@ -39,6 +39,9 @@ const OnboardingScreen = () => {
   const [selectedStage, setSelectedStage] = useState<LifeStage | null>(null);
   const [dateInput, setDateInput] = useState('');
   const [babyName, setBabyName] = useState('');
+  // Premature dəstəyi: 'term' = vaxtında, 'preterm' = vaxtından əvvəl, null = soruşulmayıb/keçilib
+  const [prematureChoice, setPrematureChoice] = useState<'term' | 'preterm' | null>(null);
+  const [gestWeeks, setGestWeeks] = useState(34);
   const [babyGender, setBabyGender] = useState<'boy' | 'girl' | null>(null);
   const [multiplesType, setMultiplesType] = useState<'single' | 'twins' | 'triplets' | 'quadruplets'>('single');
   const [babyCount, setBabyCount] = useState(1);
@@ -226,11 +229,25 @@ const OnboardingScreen = () => {
             // INSERT, ON CONFLICT-siz) düzəldə bilirdi. İndi eyni işlək
             // yoldan (addChild) istifadə olunur.
             if (existingChildren.length === 0) {
+              // Premature dəstəyi: cavabdan EDD-ni bərpa et.
+              //   'preterm' → EDD = doğum + (280 − həftə×7) gün
+              //   'term'    → EDD = doğum tarixi (vaxtında təsdiqi, korreksiya 0)
+              //   null      → məlum deyil (NULL qalır)
+              let childDueDate: string | null = null;
+              if (prematureChoice === 'preterm') {
+                const d = new Date(dateInput);
+                d.setDate(d.getDate() + (280 - gestWeeks * 7));
+                childDueDate = d.toISOString().split('T')[0];
+              } else if (prematureChoice === 'term') {
+                childDueDate = dateInput;
+              }
+
               await addChild({
                 name: babyName,
                 birth_date: dateInput,
                 gender: babyGender,
-                avatar_emoji: babyGender === 'boy' ? '👦' : '👧'
+                avatar_emoji: babyGender === 'boy' ? '👦' : '👧',
+                due_date: childDueDate
               });
             }
 
@@ -683,6 +700,62 @@ const OnboardingScreen = () => {
                           </motion.button>
                     )}
                       </div>
+                    </motion.div>
+
+                    {/* Premature sualı — korreksiya olunmuş yaş üçün EDD-ni bərpa edir */}
+                    <motion.div variants={childVariants}>
+                      <label className="mb-2 block" style={{ fontSize: 12, fontWeight: 700, color: 'var(--a-ink)' }}>
+                        {tr("onboardingscreen_korpeniz_vaxtinda_dogulub", "Körpəniz vaxtında doğulub?")}
+                      </label>
+                      <div className="flex gap-2">
+                        {[
+                    { id: 'term' as const, label: tr("onboardingscreen_vaxtinda_38_helft", "Vaxtında (37+ həftə)") },
+                    { id: 'preterm' as const, label: tr("onboardingscreen_vaxtindan_evvel", "Vaxtından əvvəl") }].
+                    map((opt) =>
+                    <motion.button
+                      key={opt.id}
+                      onClick={() => setPrematureChoice(opt.id)}
+                      className="flex-1 flex items-center justify-center transition-all"
+                      style={{
+                        padding: 12,
+                        borderRadius: 14,
+                        fontWeight: 700,
+                        fontSize: 12.5,
+                        background: prematureChoice === opt.id ? 'var(--a-peach-1)' : 'var(--a-surface)',
+                        color: prematureChoice === opt.id ? 'var(--a-accent-ink)' : 'var(--a-ink-soft)',
+                        border: prematureChoice === opt.id ? '1.5px solid var(--a-peach-2)' : '1.5px solid transparent',
+                        boxShadow: prematureChoice === opt.id ? 'none' : 'var(--a-card-shadow)'
+                      }}
+                      whileTap={{ scale: 0.98 }}>
+
+                            {opt.label}
+                          </motion.button>
+                    )}
+                      </div>
+                      {prematureChoice === 'preterm' &&
+                    <div className="mt-2 flex items-center gap-3">
+                          <motion.button
+                        type="button"
+                        onClick={() => setGestWeeks(Math.max(22, gestWeeks - 1))}
+                        className="w-10 h-10 flex items-center justify-center"
+                        style={{ borderRadius: 12, background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)', fontWeight: 800 }}
+                        whileTap={{ scale: 0.95 }}>
+                            -
+                          </motion.button>
+                          <div className="flex-1 h-11 flex items-center justify-center" style={{ borderRadius: 14, background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)' }}>
+                            <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--a-ink)' }}>{gestWeeks}</span>
+                            <span className="ms-1.5" style={{ fontSize: 12, color: 'var(--a-ink-soft)' }}>{tr("onboardingscreen_heftelik_dogulub", "həftəlik doğulub")}</span>
+                          </div>
+                          <motion.button
+                        type="button"
+                        onClick={() => setGestWeeks(Math.min(36, gestWeeks + 1))}
+                        className="w-10 h-10 flex items-center justify-center"
+                        style={{ borderRadius: 12, background: 'var(--a-surface)', boxShadow: 'var(--a-card-shadow)', fontWeight: 800 }}
+                        whileTap={{ scale: 0.95 }}>
+                            +
+                          </motion.button>
+                        </div>
+                    }
                     </motion.div>
                   </>
               }

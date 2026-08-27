@@ -48,6 +48,7 @@ import QuickStatsWidget from '@/components/mommy/QuickStatsWidget';
 import PremiumBlurGate from '@/components/premium/PremiumBlurGate';
 import GrowthTrackerWidget from '@/components/mommy/GrowthTrackerWidget';
 import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
+import PrematurityBackfillCard from '@/components/mommy/PrematurityBackfillCard';
 import BabyCrisisWidget from '@/components/mommy/BabyCrisisWidget';
 import ChildSelector from '@/components/mommy/ChildSelector';
 import TeethingWidget from '@/components/mommy/TeethingWidget';
@@ -833,7 +834,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
   const { todayLogs, addLog, getTodayStats, refetch } = useBabyLogs();
   const { isToolDisabled } = useDisabledTools();
 
-  const { children, selectedChild, hasChildren, hasMultipleChildren, getChildAge } = useChildren();
+  const { children, selectedChild, hasChildren, hasMultipleChildren, getChildAge, refetch: refetchChildren } = useChildren();
 
   // Derive baby data from selectedChild for multi-child support
   const childAge = selectedChild ? getChildAge(selectedChild) : null;
@@ -847,10 +848,14 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
     ageRemainingDays: childAge.remainingDays
   } : null;
 
-  const babyAgeMonths = childAge?.months || 1;
+  // PREMATURE DƏSTƏYİ: inkişaf məzmunu (illüstrasiya, günlük məlumat, ana
+  // mesajı) korreksiya olunmuş yaşla seçilir — premature deyilsə correctedDays/
+  // correctedMonths xronoloji ilə eynidir, heç nə dəyişmir.
+  const babyAgeMonths = (childAge?.correctionApplied ? childAge.correctedMonths : childAge?.months) || 1;
+  const contentDay = childAge ? (childAge.correctionApplied ? childAge.correctedDays : childAge.days) : 0;
   const { imageUrl: babyIllustration, title: illustrationTitle, description: illustrationDescription } = useBabyIllustrationByMonth(Math.max(1, Math.min(36, babyAgeMonths)));
-  const { data: dailyInfo } = useBabyDailyInfoByDay(babyData?.ageInDays && babyData.ageInDays > 0 ? babyData.ageInDays : null);
-  const { data: mommyMessage } = useMommyDailyMessageByDay(babyData?.ageInDays && babyData.ageInDays > 0 ? babyData.ageInDays : null);
+  const { data: dailyInfo } = useBabyDailyInfoByDay(contentDay > 0 ? contentDay : null);
+  const { data: mommyMessage } = useMommyDailyMessageByDay(contentDay > 0 ? contentDay : null);
 
   // Current time for timer display
   const [, setTick] = useState(0);
@@ -1129,7 +1134,20 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
         <h1 className="a-hero-headline a-heading">
           {heroBefore}<em>{babyData.name}</em>{heroAfter}
         </h1>
+        {childAge?.correctionApplied &&
+        <p className="a-hero-eyebrow" style={{ marginTop: 6, opacity: 0.85 }}>
+            {tr('preemie_corrected_label', 'Korreksiya olunmuş yaş')}: <strong>{childAge.correctedDisplayText}</strong>
+            {childAge.gestationalWeeksAtBirth !== null &&
+          <> · {childAge.gestationalWeeksAtBirth}{childAge.gestationalExtraDays ? `+${childAge.gestationalExtraDays}` : ''} {tr('preemie_weeks_born', 'həftəlik doğulub')}</>
+          }
+          </p>
+        }
       </section>
+
+      {/* Premature backfill — yalnız due_date məlum olmayanda görünür */}
+      {selectedChild &&
+      <PrematurityBackfillCard child={selectedChild} onSaved={refetchChildren} />
+      }
 
       {/* Bu günün məlumatları — standalone card */}
       {dailyInfo &&
@@ -1142,7 +1160,9 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
               <div>
                 <p className="a-today-info-eyebrow">{tr('dashboard_todays_info', 'Bu günün məlumatları')}</p>
                 <p className="a-today-info-meta">
-                  {tr('mommy_hero_day_label', 'Gün')} {babyData.ageInDays} · {exactMonths} {tr('mommy_meta_months', 'ay')}, {remainingDays} {tr('mommy_meta_days', 'gün')}
+                  {tr('mommy_hero_day_label', 'Gün')} {contentDay}
+                  {childAge?.correctionApplied && <> ({tr('preemie_corrected_short', 'korreksiya')})</>}
+                  {' '}· {exactMonths} {tr('mommy_meta_months', 'ay')}, {remainingDays} {tr('mommy_meta_days', 'gün')}
                 </p>
               </div>
               <span className="a-today-info-badge">{tr('dashboard_daily_badge', 'Gündəlik')}</span>

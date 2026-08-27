@@ -133,6 +133,20 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
         (existingChildren || []).map((c) => `${c.name}::${c.birth_date}`)
       );
 
+      // PREMATURE DƏSTƏYİ: bu keçid anında profiles.due_date hələ silinməyib
+      // (onu yalnız ProfileEditScreen-in mommy branch-i null-layır) — orijinal
+      // EDD-ni hər körpəyə köçürürük. Bundan gestasiya yaşı, premature statusu
+      // və korreksiya olunmuş yaş avtomatik hesablanır. EDD yoxdursa, LMP+280
+      // gün istifadə olunur.
+      let originalDueDate: string | null = (profile as any)?.due_date ?? null;
+      if (!originalDueDate && (profile as any)?.last_period_date) {
+        const lmp = new Date((profile as any).last_period_date);
+        if (!Number.isNaN(lmp.getTime())) {
+          lmp.setDate(lmp.getDate() + 280);
+          originalDueDate = format(lmp, 'yyyy-MM-dd');
+        }
+      }
+
       for (let i = 0; i < babies.length; i++) {
         const baby = babies[i];
         const babyName = baby.name.trim();
@@ -144,6 +158,7 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
           user_id: user.id,
           name: babyName,
           birth_date: birthDateStr,
+          due_date: originalDueDate,
           gender: baby.gender,
           avatar_emoji: baby.gender === 'girl' ? '👧' : '👦',
           is_active: true,

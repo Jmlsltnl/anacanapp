@@ -56,6 +56,88 @@ export const getRealCalendarAge = (birthDate: Date | string | null): {
   
   return { months, days, totalDays, years, remainingMonths, displayText };
 };
+
+// ─── Premature (vaxtından əvvəl doğulmuş) körpə dəstəyi ────────────────────
+// WHO tərifi: gestasiya < 37 həftə (259 gün) = premature.
+// Korreksiya olunmuş yaş = due_date-dən bu günə keçən müddət (yəni xronoloji
+// yaş − erkənlik müddəti). Standart praktika: korreksiya YALNIZ premature
+// körpələrə və YALNIZ 24 ay korreksiya yaşına qədər tətbiq olunur; peyvəndlər
+// isə HƏMİŞƏ xronoloji yaşla gedir.
+export const PREMATURE_GESTATION_LIMIT_DAYS = 259; // 37 həftə
+export const CORRECTION_MAX_MONTHS = 24;
+// Ağlabatan gestasiya pəncərəsi: 20–44 həftə. Bundan kənar due_date çox
+// güman ki, səhv daxil edilib — korreksiya tətbiq etmirik.
+const MIN_PLAUSIBLE_GESTATION_DAYS = 140;
+const MAX_PLAUSIBLE_GESTATION_DAYS = 310;
+
+export interface PrematurityInfo {
+  /** due_date mövcuddur və ağlabatandır */
+  isKnown: boolean;
+  isPremature: boolean;
+  gestationalDaysAtBirth: number | null;
+  gestationalWeeksAtBirth: number | null;
+  /** həftədən qalan günlər (məs. "34 həftə + 3 gün") */
+  gestationalExtraDays: number | null;
+  /** due_date − birth_date (gün). Premature deyilsə 0. */
+  correctionDays: number;
+  /** premature + korreksiya yaşı hələ 24 aydan azdır → UI korreksiya göstərməlidir */
+  correctionApplies: boolean;
+  /** Korreksiya olunmuş yaş (due_date-dən hesablanır, 0-a clamp olunur) */
+  corrected: ReturnType<typeof getRealCalendarAge> | null;
+}
+
+export const getPrematurityInfo = (
+  birthDate: Date | string | null,
+  dueDate: Date | string | null | undefined
+): PrematurityInfo => {
+  const none: PrematurityInfo = {
+    isKnown: false, isPremature: false,
+    gestationalDaysAtBirth: null, gestationalWeeksAtBirth: null, gestationalExtraDays: null,
+    correctionDays: 0, correctionApplies: false, corrected: null,
+  };
+  if (!birthDate || !dueDate) return none;
+
+  const birth = startOfDay(new Date(birthDate));
+  const due = startOfDay(new Date(dueDate));
+  if (Number.isNaN(birth.getTime()) || Number.isNaN(due.getTime())) return none;
+
+  const daysBeforeDue = Math.round((due.getTime() - birth.getTime()) / MS_PER_DAY);
+  const gestationalDaysAtBirth = PREGNANCY_DURATION_DAYS - daysBeforeDue;
+  if (
+    gestationalDaysAtBirth < MIN_PLAUSIBLE_GESTATION_DAYS ||
+    gestationalDaysAtBirth > MAX_PLAUSIBLE_GESTATION_DAYS
+  ) return none;
+
+  const isPremature = gestationalDaysAtBirth < PREMATURE_GESTATION_LIMIT_DAYS;
+  const gestationalWeeksAtBirth = Math.floor(gestationalDaysAtBirth / 7);
+  const gestationalExtraDays = gestationalDaysAtBirth % 7;
+
+  if (!isPremature) {
+    return {
+      isKnown: true, isPremature: false,
+      gestationalDaysAtBirth, gestationalWeeksAtBirth, gestationalExtraDays,
+      correctionDays: 0, correctionApplies: false, corrected: null,
+    };
+  }
+
+  // Korreksiya olunmuş yaş = due_date-dən keçən müddət
+  let corrected = getRealCalendarAge(due);
+  if (corrected.totalDays < 0) {
+    // Körpə hələ orijinal termin tarixinə çatmayıb — 0-a clamp
+    corrected = {
+      months: 0, days: 0, totalDays: 0, years: 0, remainingMonths: 0,
+      displayText: `0 ${tr('pregnancy_utils_day', 'gün')}`,
+    };
+  }
+  const correctionApplies = corrected.months < CORRECTION_MAX_MONTHS;
+
+  return {
+    isKnown: true, isPremature: true,
+    gestationalDaysAtBirth, gestationalWeeksAtBirth, gestationalExtraDays,
+    correctionDays: daysBeforeDue, correctionApplies, corrected,
+  };
+};
+
 const PREGNANCY_DURATION_DAYS = 280; // Standard pregnancy duration from LMP
 
 const startOfDay = (date: Date) => {

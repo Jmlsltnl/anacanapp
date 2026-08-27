@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ComposedChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { buildCurveData, percentile, percentileLabel, ageInMonths, type Sex, type Measure } from '@/lib/whoGrowth';
+import { getPrematurityInfo } from '@/lib/pregnancy-utils';
 import {
   ArrowLeft, Scale, Ruler, Plus, TrendingUp, TrendingDown,
   Calendar, ChevronRight, Sparkles, Baby, LineChart, Edit2, Trash2 } from
@@ -28,12 +29,22 @@ interface BabyGrowthTrackerProps {
  * WHO percentil əyriləri (0-24 ay) — çəki və boy.
  * P3/P15/P50/P85/P97 zolaqları + uşağın real ölçüləri.
  */
-const WHOPercentileCard = ({ entries, birthDate, sex }: {
+const WHOPercentileCard = ({ entries, birthDate, sex, dueDate }: {
   entries: {entry_date: string;weight_kg: number | null;height_cm: number | null;}[];
   birthDate: string;
   sex: Sex;
+  /** Orijinal EDD — premature körpələrdə qrafik korreksiya olunmuş yaşla qurulur */
+  dueDate?: string | null;
 }) => {
   const [measure, setMeasure] = useState<Measure>('weight');
+
+  // PREMATURE DƏSTƏYİ: WHO əyriləri termdə doğulmuş körpələr üçündür. Premature
+  // körpənin nöqtələrini XRONOLOJİ yaşla yerləşdirmək onu yalançı "aşağı
+  // percentil"də göstərir. Standart praktika: 24 aya qədər korreksiya olunmuş
+  // yaşla (EDD-dən hesablanan) plot etmək. Korreksiya olunmuş ay =
+  // ageInMonths(dueDate, entry_date).
+  const prematurity = useMemo(() => getPrematurityInfo(birthDate, dueDate ?? null), [birthDate, dueDate]);
+  const ageReferenceDate = prematurity.isPremature && dueDate ? dueDate : birthDate;
 
   const { chartData, latestPercentile } = useMemo(() => {
     const curve = buildCurveData(measure, sex);
@@ -43,7 +54,7 @@ const WHOPercentileCard = ({ entries, birthDate, sex }: {
     for (const e of entries) {
       const val = measure === 'weight' ? e.weight_kg : e.height_cm;
       if (!val) continue;
-      const m = ageInMonths(birthDate, e.entry_date);
+      const m = ageInMonths(ageReferenceDate, e.entry_date);
       if (m >= 0 && m <= 24) childPoints.push({ month: Math.round(m * 10) / 10, value: val });
     }
     childPoints.sort((a, b) => a.month - b.month);
@@ -63,7 +74,7 @@ const WHOPercentileCard = ({ entries, birthDate, sex }: {
     }
 
     return { chartData: merged, latestPercentile: latest };
-  }, [entries, birthDate, sex, measure]);
+  }, [entries, ageReferenceDate, sex, measure]);
 
   const tone = latestPercentile !== null ? percentileLabel(latestPercentile).tone : null;
   const toneStyle = tone === 'ok' ?
@@ -88,6 +99,13 @@ const WHOPercentileCard = ({ entries, birthDate, sex }: {
           </span>
         }
       </div>
+      {prematurity.isPremature &&
+      <p style={{ fontSize: 11, color: 'var(--a-ink-soft)', marginBottom: 8 }}>
+          {tr('who_corrected_note', 'Qrafik korreksiya olunmuş yaşla qurulur (vaxtından əvvəl doğulub')}
+          {prematurity.gestationalWeeksAtBirth !== null && <> — {prematurity.gestationalWeeksAtBirth} {tr('who_corrected_weeks', 'həftəlik')}</>}
+          {')'}
+        </p>
+      }
 
       {/* Ölçü seçimi */}
       <div className="flex gap-2 mb-3">
@@ -431,6 +449,7 @@ const BabyGrowthTracker = ({ onBack }: BabyGrowthTrackerProps) => {
         <WHOPercentileCard
           entries={entries}
           birthDate={selectedChild.birth_date}
+          dueDate={selectedChild.due_date}
           sex={selectedChild.gender === 'boy' ? 'boy' : 'girl'} />
         }
 

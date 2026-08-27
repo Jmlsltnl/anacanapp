@@ -11438,6 +11438,7 @@ export type Database = {
           birth_date: string
           country_code: string
           created_at: string | null
+          due_date: string | null
           gender: string | null
           id: string
           is_active: boolean | null
@@ -11452,6 +11453,7 @@ export type Database = {
           birth_date: string
           country_code?: string
           created_at?: string | null
+          due_date?: string | null
           gender?: string | null
           id?: string
           is_active?: boolean | null
@@ -11466,6 +11468,7 @@ export type Database = {
           birth_date?: string
           country_code?: string
           created_at?: string | null
+          due_date?: string | null
           gender?: string | null
           id?: string
           is_active?: boolean | null

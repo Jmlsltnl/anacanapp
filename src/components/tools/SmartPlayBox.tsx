@@ -3,6 +3,7 @@ import { Play, Check, Clock, Package, Trophy, Baby, ChevronRight, Loader2 } from
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { usePlayActivities, usePlayInventoryItems, useUserPlayInventory, useToggleInventoryItem, useLogPlayActivity, PlayActivity } from '@/hooks/usePlayActivities';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useChildren } from '@/hooks/useChildren';
 import { differenceInDays, differenceInMonths } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
@@ -52,8 +53,35 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
   const [showComplete, setShowComplete] = useState(false);
   const [rating, setRating] = useState(0);
 
+  // PREMATURE DƏSTƏYİ: oyun/inkişaf fəaliyyətləri inkişaf mərhələsinə bağlıdır,
+  // ona görə premature körpələrdə KORREKSİYA OLUNMUŞ yaşla filterlənir.
+  // selectedChild (due_date daşıyır) mövcuddursa ondan, əks halda köhnə yol —
+  // profiles.baby_birth_date-dən istifadə olunur.
+  const { selectedChild, getChildAge } = useChildren();
+
   // Calculate baby age
   const babyInfo = useMemo(() => {
+    if (selectedChild) {
+      const age = getChildAge(selectedChild);
+      const days = age.correctionApplied ? age.correctedDays : age.days;
+      const months = age.correctionApplied ? age.correctedMonths : age.months;
+
+      let label = '';
+      if (months < 1) {
+        label = `${days} ${tr('time_days_old', 'günlük')}`;
+      } else if (months < 12) {
+        label = `${months} ${tr('time_months_old', 'aylıq')}`;
+      } else {
+        const years = Math.floor(months / 12);
+        const remainingMonths = months % 12;
+        label = `${years} ${tr('time_years_old', 'yaş')}${remainingMonths > 0 ? ` ${remainingMonths} ${tr('time_month', 'ay')}` : ''}`;
+      }
+      if (age.correctionApplied) {
+        label += ` (${tr('preemie_corrected_short', 'korreksiya')})`;
+      }
+      return { days, months, label };
+    }
+
     if (!profile?.baby_birth_date) return { days: undefined, months: undefined, label: '' };
     const birthDate = new Date(profile.baby_birth_date);
     const days = differenceInDays(new Date(), birthDate);
@@ -71,7 +99,7 @@ const SmartPlayBox = ({ onBack }: SmartPlayBoxProps) => {
     }
 
     return { days, months, label };
-  }, [profile?.baby_birth_date]);
+  }, [profile?.baby_birth_date, selectedChild, getChildAge]);
 
   const { data: inventoryItems = [] } = usePlayInventoryItems();
   const { data: userInventory = [] } = useUserPlayInventory();

@@ -348,6 +348,15 @@ export default function VaccineCalendar({ onBack }: Props) {
                 transition={{ duration: 0.6 }} />
             </div>
           </div>
+
+          {/* PREMATURE QEYDİ: peyvəndlər korreksiya olunmuş yaşla YOX, real
+              (xronoloji) yaşla vurulur — WHO/AAP standartı. İstifadəçi
+              çaşqınlığının qarşısını almaq üçün premature körpələrdə göstərilir. */}
+          {getChildAge(selectedChild).isPremature &&
+          <p style={{ marginTop: 10, fontSize: 11, color: 'var(--a-ink-soft)', background: 'var(--a-surface-soft)', borderRadius: 10, padding: '8px 10px' }}>
+              ℹ️ {tr('vaccine_preemie_note', 'Vaxtından əvvəl doğulan körpələrdə peyvəndlər korreksiya olunmuş yaşa görə DEYİL, real doğum tarixinə görə vurulur (beynəlxalq standart). Təqvim dəyişməz qalır.')}
+            </p>
+          }
         </div>
 
         {/* Tabs */}

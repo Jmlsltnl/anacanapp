@@ -12,7 +12,9 @@ import { useChildren } from '@/hooks/useChildren';
 const DevelopmentTipsWidget = () => {
   const { selectedChild, getChildAge } = useChildren();
   const childAge = selectedChild ? getChildAge(selectedChild) : null;
-  const ageInMonths = childAge?.months || 0;
+  // PREMATURE DƏSTƏYİ: inkişaf tövsiyələri korreksiya olunmuş yaşla seçilir
+  // (premature deyilsə correctedMonths xronoloji ilə eynidir).
+  const ageInMonths = (childAge?.correctionApplied ? childAge.correctedMonths : childAge?.months) || 0;
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const getAgeGroup = () => {

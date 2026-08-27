@@ -2,13 +2,15 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useChildStore } from '@/store/childStore';
-import { getRealCalendarAge } from '@/lib/pregnancy-utils';
+import { getRealCalendarAge, getPrematurityInfo, type PrematurityInfo } from '@/lib/pregnancy-utils';
 
 export interface Child {
   id: string;
   user_id: string;
   name: string;
   birth_date: string;
+  /** Orijinal gözlənilən doğum tarixi (EDD). NULL = məlum deyil. Premature aşkarlanması + korreksiya yaşı bundan hesablanır. */
+  due_date?: string | null;
   gender: 'boy' | 'girl' | 'unknown';
   avatar_emoji: string;
   is_active: boolean;
@@ -61,7 +63,7 @@ export const useChildren = () => {
       if (rows.length === 0 && !seedAttemptedUsers.has(user.id)) {
         const { data: profileRow, error: profileError } = await supabase
           .from('profiles')
-          .select('baby_name, baby_birth_date, baby_gender')
+          .select('baby_name, baby_birth_date, baby_gender, due_date')
           .eq('user_id', user.id)
           .maybeSingle();
 
@@ -94,6 +96,8 @@ export const useChildren = () => {
               user_id: user.id,
               name: profileRow.baby_name,
               birth_date: profileRow.baby_birth_date,
+              // Premature dəstəyi: profildə EDD hələ silinməyibsə, körpəyə köçür
+              due_date: profileRow.due_date ?? null,
               gender: normalizedGender,
               avatar_emoji: avatarEmoji,
               is_active: true,
@@ -157,6 +161,8 @@ export const useChildren = () => {
     birth_date: string;
     gender?: 'boy' | 'girl' | 'unknown';
     avatar_emoji?: string;
+    /** Orijinal EDD — premature aşkarlanması üçün (opsional) */
+    due_date?: string | null;
   }) => {
     if (!user) return null;
 
@@ -172,6 +178,7 @@ export const useChildren = () => {
           user_id: user.id,
           name: childData.name,
           birth_date: childData.birth_date,
+          due_date: childData.due_date ?? null,
           gender: normalizedGender,
           avatar_emoji: avatarEmoji,
           is_active: true,
@@ -237,6 +244,15 @@ export const useChildren = () => {
     const age = getRealCalendarAge(child.birth_date);
     const weeks = Math.floor(age.totalDays / 7);
 
+    // Premature dəstəyi: due_date varsa korreksiya olunmuş yaş da hesablanır.
+    // corrected* sahələri YALNIZ korreksiya real tətbiq olunanda (premature +
+    // korreksiya yaşı < 24 ay) xronoloji dəyərlərdən fərqlənir — əks halda
+    // eyni dəyərləri daşıyır, ona görə istehlakçılar birbaşa corrected*
+    // istifadə edə bilər.
+    const prematurity: PrematurityInfo = getPrematurityInfo(child.birth_date, child.due_date ?? null);
+    const useCorrected = prematurity.correctionApplies && prematurity.corrected !== null;
+    const corrected = useCorrected ? prematurity.corrected! : age;
+
     return {
       days: age.totalDays,
       weeks,
@@ -245,6 +261,15 @@ export const useChildren = () => {
       remainingMonths: age.remainingMonths,
       remainingDays: age.days,
       displayText: age.displayText,
+      // Korreksiya olunmuş (premature deyilsə xronoloji ilə eynidir):
+      correctedDays: corrected.totalDays,
+      correctedWeeks: Math.floor(corrected.totalDays / 7),
+      correctedMonths: corrected.months,
+      correctedDisplayText: corrected.displayText,
+      correctionApplied: useCorrected,
+      isPremature: prematurity.isPremature,
+      gestationalWeeksAtBirth: prematurity.gestationalWeeksAtBirth,
+      gestationalExtraDays: prematurity.gestationalExtraDays,
     };
   }, []);
 
