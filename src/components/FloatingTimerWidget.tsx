@@ -1,13 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Moon, Baby, Volume2, Square, Clock, X, VolumeX } from 'lucide-react';
-import { App as CapApp } from '@capacitor/app';
 import { useTimerStore, type TimerType } from '@/store/timerStore';
 import { useWhiteNoiseStore } from '@/store/whiteNoiseStore';
 import { useBabyLogs } from '@/hooks/useBabyLogs';
-import { isNative } from '@/lib/native';
-import { processPendingStops, onNativeTimerStopped } from '@/lib/live-timer';
-import type { PendingTimerStop } from '@/plugins/LiveActivityPlugin';
 import { tr } from "@/lib/tr";
 import { useIsRtl, rtlX } from '@/lib/rtl';
 
@@ -41,6 +37,7 @@ const FloatingTimerWidget = () => {
   // Dayandırılan yuxu/əmizdirmə sessiyasını baby_logs-a yaz
   const saveTimerLog = useCallback(async (opts: {
     type: string; feedType?: 'left' | 'right' | null; startTime: number; endTime: number;
+    childId?: string;
   }) => {
     if (opts.type !== 'sleep' && opts.type !== 'feeding') return;
     if (opts.endTime - opts.startTime < 3000) return; // <3s — təsadüfi toxunuş
@@ -51,6 +48,8 @@ const FloatingTimerWidget = () => {
         : undefined,
       start_time: new Date(opts.startTime).toISOString(),
       end_time: new Date(opts.endTime).toISOString(),
+      // Taymer hansı uşaq üçün başladılıbsa, qeyd də ona yazılsın (əkizlər)
+      ...(opts.childId ? { child_id: opts.childId } : {}),
     } as any);
   }, [addLog]);
 
@@ -64,42 +63,15 @@ const FloatingTimerWidget = () => {
         feedType: timer.feedType,
         startTime: Date.now() - result.durationSeconds * 1000,
         endTime: Date.now(),
+        childId: timer.childId,
       });
     }
   }, [activeTimers, stopTimer, saveTimerLog]);
 
-  // Kilid ekranı widget-indən / bildirişdən dayandırılanları emal et
-  const processingRef = useRef(false);
-  const handlePending = useCallback(async () => {
-    if (processingRef.current) return;
-    processingRef.current = true;
-    try {
-      await processPendingStops(async (stop: PendingTimerStop) => {
-        // Store-da hələ aktivdirsə çıxar (bildiriş onsuz da bağlanıb)
-        const { activeTimers: current, stopTimer: stopInStore } = useTimerStore.getState();
-        if (current.some((t) => t.id === stop.id)) stopInStore(stop.id);
-        await saveTimerLog({
-          type: stop.type,
-          feedType: (stop.feedType as 'left' | 'right') || null,
-          startTime: stop.startTime,
-          endTime: stop.stoppedAt,
-        });
-      });
-    } finally {
-      processingRef.current = false;
-    }
-  }, [saveTimerLog]);
-
-  useEffect(() => {
-    if (!isNative) return;
-    handlePending(); // ilk açılışda gözləyənləri yoxla
-    const offEvent = onNativeTimerStopped(handlePending);
-    let appListener: { remove: () => void } | null = null;
-    CapApp.addListener('appStateChange', ({ isActive }) => {
-      if (isActive) handlePending();
-    }).then((h) => { appListener = h; });
-    return () => { offEvent(); appListener?.remove(); };
-  }, [handlePending]);
+  // QEYD: kilid ekranı widget-indən / bildirişdən dayandırılanların emalı
+  // buradan usePendingTimerStops hook-una (Index səviyyəsi, HƏMİŞƏ mounted)
+  // köçürüldü — bu komponent şərti render olunur və ilk render-də uşaq
+  // siyahısı yüklənmədiyi üçün qeydlər child_id=NULL ilə itirdi.
 
   useEffect(() => {
     if (!hasAnything) return;

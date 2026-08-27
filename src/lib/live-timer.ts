@@ -78,21 +78,34 @@ export async function stopNativeTimer(timerId: string): Promise<void> {
 
 /**
  * Widget/bildirişdən dayandırılmış taymerləri emal et:
- * hər biri üçün `save` çağırılır (baby_logs-a yazmaq üçün), sonra siyahı təmizlənir.
- * Həm dərhal (listener), həm resume-da (poll) çağırılmalıdır.
+ * hər biri üçün `save` çağırılır (baby_logs-a yazmaq üçün).
+ *
+ * DÜZƏLİŞ ("widget-dən stop qeyd yaratmır" bug-ı): əvvəllər siyahı save-dən
+ * ƏVVƏL təmizlənirdi və save xətaları udulurdu — soyuq açılışda auth/uşaq
+ * siyahısı hələ hazır olmayanda sessiya birdəfəlik itirdi. İndi `save`
+ * boolean qaytarır (true = yazıldı/qəsdən ötürüldü, false = sonra yenidən
+ * cəhd et) və siyahı YALNIZ hamısı uğurlu olduqda təmizlənir — uğursuz
+ * hallar növbəti çağırışda (resume/mount) yenidən emal olunur.
  */
 export async function processPendingStops(
-  save: (stop: PendingTimerStop) => Promise<void> | void
+  save: (stop: PendingTimerStop) => Promise<boolean> | boolean
 ): Promise<number> {
   if (!isNative) return 0;
   try {
     const { stops } = await LiveActivity.getPendingStops();
     if (!stops?.length) return 0;
-    await LiveActivity.clearPendingStops();
+    let allOk = true;
     for (const s of stops) {
       nativeActive.delete(s.id);
-      try { await save(s); } catch (e) { console.warn('pending stop save error:', e); }
+      try {
+        const ok = await save(s);
+        if (!ok) allOk = false;
+      } catch (e) {
+        console.warn('pending stop save error:', e);
+        allOk = false;
+      }
     }
+    if (allOk) await LiveActivity.clearPendingStops();
     return stops.length;
   } catch {
     return 0;

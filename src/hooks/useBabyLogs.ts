@@ -94,16 +94,22 @@ export const useBabyLogs = () => {
     feed_type?: string | null;
     diaper_type?: string | null;
     notes?: string | null;
+    /** Açıq child_id (widget-dən dayandırma kimi hallarda) — verilməzsə selectedChild işlənir.
+     *  DÜZƏLİŞ: əvvəllər bunu ötürmək mümkün deyildi və təzə mount olunmuş closure-larda
+     *  selectedChild hələ null olduğu üçün qeyd child_id=NULL ilə yazılır, UI-da isə
+     *  child_id filtri onu heç vaxt göstərmirdi ("qeyd yoxa çıxır" bug-ı). */
+    child_id?: string | null;
   }) => {
     if (!user) return { error: 'No user logged in' };
 
     try {
+      const { child_id: explicitChildId, ...rest } = log;
       const { data, error } = await supabase
         .from('baby_logs')
         .insert({
-          ...log,
+          ...rest,
           user_id: user.id,
-          child_id: selectedChild?.id || null,
+          child_id: explicitChildId !== undefined ? explicitChildId : (selectedChild?.id || null),
           start_time: log.start_time || new Date().toISOString()
         })
         .select()

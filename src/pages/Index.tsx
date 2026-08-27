@@ -17,6 +17,7 @@ import { isNative } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
+import { usePendingTimerStops } from '@/hooks/usePendingTimerStops';
 import { useForceUpdate } from '@/hooks/useForceUpdate';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { resetAppScrollPosition } from '@/lib/scroll';
@@ -240,6 +241,11 @@ const Index = () => {
 
   // Initialize push notification token registration for native apps
   useDeviceToken();
+
+  // Kilid ekranı widget-indən (iOS Live Activity / Android bildiriş) dayandırılan
+  // yuxu/əmizdirmə taymerlərini baby_logs-a yaz — HƏMİŞƏ aktiv host (sub-ekranlar
+  // açıq olanda da), auth/uşaq siyahısı hazır olmayana qədər təhlükəsiz gözləyir.
+  usePendingTimerStops();
 
   // ─── Deeplink handler ───
   const handleDeeplink = useCallback((parsed: ParsedDeeplink) => {
