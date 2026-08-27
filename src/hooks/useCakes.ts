@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { mapRowsTranslation, getPersistedLanguage } from '@/lib/tr';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 export interface Cake {
   id: string;
@@ -82,12 +83,11 @@ export const useCakeOrders = () => {
   const fetchOrders = async () => {
     if (!user) return;
     try {
-      const { data, error } = await supabase
-        .from('cake_orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      // DÜZƏLİŞ: limitsiz idi — admin üçün (RLS bütün sifarişləri göstərir)
+      // cake_orders 1000-i keçəndə AdminCakes.tsx yalnız ilk 1000 sifarişi görürdü.
+      const data = await fetchAllRows((from, to) =>
+        supabase.from('cake_orders').select('*').order('created_at', { ascending: false }).range(from, to)
+      );
       setOrders((data || []) as unknown as CakeOrder[]);
     } catch (error) {
       console.error('Error fetching cake orders:', error);

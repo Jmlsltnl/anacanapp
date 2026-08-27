@@ -3,6 +3,7 @@ import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 export interface OrderItem {
   id: string;
@@ -89,12 +90,12 @@ export const useAllOrders = () => {
 
   const fetchAllOrders = async () => {
     try {
-      const { data: ordersData, error: ordersError } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (ordersError) throw ordersError;
+      // DÜZƏLİŞ: limitsiz idi — orders 1000-i keçəndə "Sifarişlər" admin
+      // səhifəsi (stats.total/pending/processing/completed/revenue daxil)
+      // yalnız ilk 1000 sifarişi görürdü.
+      const ordersData = await fetchAllRows((from, to) =>
+        supabase.from('orders').select('*').order('created_at', { ascending: false }).range(from, to)
+      );
 
       // Get order items for each order
       const ordersWithItems = await Promise.all(

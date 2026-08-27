@@ -22,6 +22,7 @@ import {
 '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 interface UserRole {
   id: string;
@@ -49,13 +50,10 @@ const AdminSecurity = () => {
 
   const fetchRoles = async () => {
     try {
-      const { data, error } = await supabase.
-      from('user_roles').
-      select('*').
-      order('role');
-
-      if (error) throw error;
-      setRoles(data || []);
+      const data = await fetchAllRows<UserRole>((from, to) =>
+        supabase.from('user_roles').select('*').order('role').range(from, to)
+      );
+      setRoles(data);
     } catch (error) {
       console.error('Error fetching roles:', error);
     } finally {
@@ -65,12 +63,13 @@ const AdminSecurity = () => {
 
   const fetchProfiles = async () => {
     try {
-      const { data, error } = await supabase.
-      from('profiles').
-      select('user_id, name, email');
-
-      if (error) throw error;
-      setProfiles(data || []);
+      // DÜZƏLİŞ: limitsiz idi — profiles 1000-i keçəndə admin "Admin/Moderator
+      // təyin et" seçicisində YALNIZ ilk 1000 istifadəçini görürdü, bundan
+      // sonrakılara rol vermək MÜMKÜN DEYİLDİ.
+      const data = await fetchAllRows((from, to) =>
+        supabase.from('profiles').select('user_id, name, email').range(from, to)
+      );
+      setProfiles(data);
     } catch (error) {
       console.error('Error fetching profiles:', error);
     }

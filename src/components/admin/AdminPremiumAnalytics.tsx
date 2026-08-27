@@ -15,6 +15,7 @@ import {
   ResponsiveContainer, Legend
 } from 'recharts';
 import countriesData from '../../../countries.json';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 interface Country {
   id: number;
@@ -93,16 +94,28 @@ const AdminPremiumAnalytics = () => {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
+      // DÜZƏLİŞ: bu 3 sorğu əvvəllər `.select('*')` ilə HEÇ BİR limit/range
+      // olmadan çağırılırdı — Supabase/PostgREST-in defolt "db-max-rows"
+      // (1000) həddi SƏSSİZCƏ tətbiq olunurdu, ona görə profiles/subscriptions
+      // 1000-dən çox olanda (bizdə qat-qat çoxdur) YALNIZ ilk 1000 sətir
+      // gəlirdi — bütün KPI/faiz/ölkə hesablamaları səhv idi. İndi
+      // fetchAllRows() ilə .range() loop-u vasitəsilə BÜTÜN sətirlər gətirilir.
       // DİQQƏT: 'subscription_cancellations' hələ generated types.ts-də yoxdur
       // (Duzelis51.sql tətbiq olunana/tiplər yenilənənə qədər) — `as any` ilə keçici həll.
-      const [subsRes, profilesRes, cancelRes] = await Promise.all([
-        supabase.from('subscriptions').select('*'),
-        supabase.from('profiles').select('user_id, name, email, country_code, life_stage'),
-        supabase.from('subscription_cancellations' as any).select('*').order('created_at', { ascending: false }),
+      const [subs, profilesData, cancellationsData] = await Promise.all([
+        fetchAllRows((from, to) =>
+          supabase.from('subscriptions').select('*').range(from, to)
+        ),
+        fetchAllRows<ProfileRow>((from, to) =>
+          supabase.from('profiles').select('user_id, name, email, country_code, life_stage').range(from, to)
+        ),
+        fetchAllRows((from, to) =>
+          supabase.from('subscription_cancellations' as any).select('*').order('created_at', { ascending: false }).range(from, to)
+        ),
       ]);
-      setSubscriptions((subsRes.data as SubscriptionRow[]) || []);
-      setProfiles((profilesRes.data as ProfileRow[]) || []);
-      setCancellations(((cancelRes.data as unknown as CancellationRow[]) || []));
+      setSubscriptions(subs as unknown as SubscriptionRow[]);
+      setProfiles(profilesData);
+      setCancellations(cancellationsData as unknown as CancellationRow[]);
       setLoading(false);
     };
     load();

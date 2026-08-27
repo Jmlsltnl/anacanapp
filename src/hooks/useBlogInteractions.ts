@@ -1,5 +1,6 @@
 import { tr } from "@/lib/tr";import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import { useAuth } from './useAuth';
 
 export interface BlogComment {
@@ -77,22 +78,28 @@ export const useBlogInteractions = (postId?: string) => {
     if (!postId) return;
 
     try {
-      const { data: commentsData, error } = await supabase.
-      from('blog_comments').
-      select('*').
-      eq('post_id', postId).
-      eq('is_active', true).
-      order('created_at', { ascending: true });
-
-      if (error) throw error;
+      const commentsData = await fetchAllRows((from, to) =>
+        supabase.
+        from('blog_comments').
+        select('*').
+        eq('post_id', postId).
+        eq('is_active', true).
+        order('created_at', { ascending: true }).
+        range(from, to)
+      );
 
       // Fetch user profiles for comments
       const userIds = [...new Set((commentsData || []).map((c) => c.user_id))];
 
-      const { data: profiles } = await supabase.
+      const profiles = userIds.length > 0 ?
+      await fetchAllRows((from, to) =>
+      supabase.
       from('public_profile_cards').
       select('user_id, name, avatar_url, badge_type').
-      in('user_id', userIds);
+      in('user_id', userIds).
+      range(from, to)
+      ) :
+      [];
 
       const profileMap = new Map(
         (profiles || []).map((p) => [p.user_id, p])
@@ -100,12 +107,16 @@ export const useBlogInteractions = (postId?: string) => {
 
       // Check which comments user liked
       let likedCommentIds: string[] = [];
-      if (user) {
-        const { data: likes } = await supabase.
+      const commentIds = (commentsData || []).map((c) => c.id);
+      if (user && commentIds.length > 0) {
+        const likes = await fetchAllRows((from, to) =>
+        supabase.
         from('blog_comment_likes').
         select('comment_id').
         eq('user_id', user.id).
-        in('comment_id', (commentsData || []).map((c) => c.id));
+        in('comment_id', commentIds).
+        range(from, to)
+        );
 
         likedCommentIds = (likes || []).map((l) => l.comment_id);
       }
@@ -298,12 +309,13 @@ export const useSavedPosts = () => {
     }
 
     try {
-      const { data, error } = await supabase.
+      const data = await fetchAllRows((from, to) =>
+      supabase.
       from('blog_post_saves').
       select('post_id').
-      eq('user_id', user.id);
-
-      if (error) throw error;
+      eq('user_id', user.id).
+      range(from, to)
+      );
       setSavedPosts((data || []).map((d) => d.post_id));
     } catch (error) {
       console.error('Error fetching saved posts:', error);

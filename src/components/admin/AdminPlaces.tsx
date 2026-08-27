@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import { toast } from 'sonner';
 import AdminUsageStats from './AdminUsageStats';
 import { LocalizedInput } from "./ui/LocalizedInput";
@@ -23,17 +24,19 @@ const AdminPlaces = () => {
   const { data: places = [], isLoading } = useQuery({
     queryKey: ['admin-places', filter],
     queryFn: async () => {
-      let query = supabase.
-      from('mom_friendly_places').
-      select('*').
-      order('created_at', { ascending: false });
+      // DÜZƏLİŞ: limitsiz idi — mom_friendly_places 1000-i keçəndə bu tab
+      // yalnız ilk 1000 məkanı göstərirdi.
+      return await fetchAllRows((from, to) => {
+        let query = supabase.
+        from('mom_friendly_places').
+        select('*').
+        order('created_at', { ascending: false });
 
-      if (filter === 'pending') query = query.eq('is_verified', false);else
-      if (filter === 'approved') query = query.eq('is_verified', true);
+        if (filter === 'pending') query = query.eq('is_verified', false);else
+        if (filter === 'approved') query = query.eq('is_verified', true);
 
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
+        return query.range(from, to);
+      });
     }
   });
 
@@ -41,12 +44,13 @@ const AdminPlaces = () => {
   const { data: reviews = [], isLoading: reviewsLoading } = useQuery({
     queryKey: ['admin-place-reviews'],
     queryFn: async () => {
-      const { data, error } = await supabase.
-      from('place_reviews').
-      select('*, mom_friendly_places(name, name_az)').
-      order('created_at', { ascending: false });
-      if (error) throw error;
-      return data;
+      return await fetchAllRows((from, to) =>
+        supabase.
+        from('place_reviews').
+        select('*, mom_friendly_places(name, name_az)').
+        order('created_at', { ascending: false }).
+        range(from, to)
+      );
     }
   });
 

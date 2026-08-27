@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 const ORDER_STATUSES = [
 { value: 'pending', label: tr("adminalbumorders_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-100 text-yellow-700' },
@@ -30,12 +31,9 @@ const AdminAlbumOrders = () => {
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['admin-album-orders'],
     queryFn: async () => {
-      const { data, error } = await supabase.
-      from('album_orders' as any).
-      select('*').
-      order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
+      return await fetchAllRows((from, to) =>
+        supabase.from('album_orders' as any).select('*').order('created_at', { ascending: false }).range(from, to)
+      );
     }
   });
 

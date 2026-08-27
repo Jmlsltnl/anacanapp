@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 // ==================== AUDIENCE STATS ====================
 export interface AudienceStats {
@@ -18,19 +19,18 @@ export const useAudienceStats = () => {
   return useQuery({
     queryKey: ['audience-stats'],
     queryFn: async (): Promise<AudienceStats> => {
-      // Get all profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, life_stage, role');
-
-      if (profilesError) throw profilesError;
-
-      // Get all device tokens
-      const { data: tokens, error: tokensError } = await supabase
-        .from('device_tokens')
-        .select('user_id');
-
-      if (tokensError) throw tokensError;
+      // DÜZƏLİŞ: hər ikisi limitsiz idi — profiles/device_tokens 1000-i
+      // keçəndə (bizdə qat-qat çoxdur) auditoriya sayları səhv idi, bu isə
+      // Bulk Push-un "Göndər" düyməsinin aktiv olub-olmamasını (tokens===0
+      // yoxlaması) belə səhv təyin edə bilirdi.
+      const [profiles, tokens] = await Promise.all([
+        fetchAllRows<{ user_id: string; life_stage: string | null; role: string | null }>((from, to) =>
+          supabase.from('profiles').select('user_id, life_stage, role').range(from, to)
+        ),
+        fetchAllRows<{ user_id: string }>((from, to) =>
+          supabase.from('device_tokens').select('user_id').range(from, to)
+        ),
+      ]);
 
       const tokenUserIds = new Set(tokens?.map(t => t.user_id) || []);
 
@@ -93,17 +93,12 @@ export const usePregnancyDayNotifications = () => {
   return useQuery({
     queryKey: ['pregnancy-day-notifications'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('pregnancy_day_notifications')
-        .select('*')
-        .order('day_number', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching pregnancy day notifications:', error);
-        throw error;
-      }
-
-      return data as PregnancyDayNotification[];
+      // Cəmi ~294 gün (< 1000) olsa da, sibling hook (useMommyDayNotifications,
+      // 1460 gün) ilə tutarlılıq üçün eyni təhlükəsiz pattern istifadə olunur.
+      const data = await fetchAllRows<PregnancyDayNotification>((from, to) =>
+        supabase.from('pregnancy_day_notifications').select('*').order('day_number', { ascending: true }).range(from, to)
+      );
+      return data;
     },
   });
 };

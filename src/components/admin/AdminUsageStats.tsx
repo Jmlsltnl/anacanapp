@@ -9,6 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { format, subDays } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 interface UsageUser {
   user_id: string;
@@ -44,16 +45,23 @@ const AdminUsageStats = ({ eventNames, title, showUsers = true, showEventData = 
     setLoading(true);
     try {
       const sinceDate = subDays(new Date(), parseInt(dateRange)).toISOString();
-      const { data, error } = await supabase.
-      from('analytics_events').
-      select('*').
-      in('event_name', eventNames).
-      gte('created_at', sinceDate).
-      order('created_at', { ascending: false }).
-      limit(5000);
-
-      if (error) throw error;
-      const evts = data || [];
+      // DÜZƏLİŞ: `.limit(5000)` faktiki HEÇ NƏYƏ TƏSİR ETMİRDİ — Supabase/
+      // PostgREST-in server-tərəfi 1000-sətir həddi client limitindən asılı
+      // deyil. Bu komponent 7 fərqli admin səhifəsində embedded olduğu üçün
+      // (Dashboard, Subscriptions, Community, Places, Photoshoot, FairyTales,
+      // Tools) TƏK bu düzəliş hamısını eyni anda düzəldir.
+      const evts = await fetchAllRows(
+        (from, to) =>
+          supabase
+            .from('analytics_events')
+            .select('*')
+            .in('event_name', eventNames)
+            .gte('created_at', sinceDate)
+            .order('created_at', { ascending: false })
+            .range(from, to),
+        1000,
+        5000
+      );
       setEvents(evts);
 
       // Get unique user IDs and fetch profiles

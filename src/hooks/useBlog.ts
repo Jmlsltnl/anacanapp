@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import { tr, mapRowsTranslation, mapRowTranslation } from '@/lib/tr';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useUserStore } from '@/store/userStore';
@@ -116,13 +117,14 @@ export const useBlog = () => {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from('blog_categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
-
-      if (error) throw error;
+      const data = await fetchAllRows((from, to) =>
+        supabase
+          .from('blog_categories')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true })
+          .range(from, to)
+      );
       let typedCategories = (data || []) as BlogCategory[];
       typedCategories = mapRowsTranslation(typedCategories, language, ['name', 'description']);
       setCategories(typedCategories);
@@ -198,12 +200,15 @@ export const useBlogAdmin = () => {
 
   const fetchAllPosts = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      // DÜZƏLİŞ: limitsiz idi — blog_posts 1000-i keçəndə Admin Blog
+      // panelində ən köhnə yazılar görünmürdü (redaktə/silmək mümkün deyildi).
+      const data = await fetchAllRows((from, to) =>
+        supabase
+          .from('blog_posts')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .range(from, to)
+      );
       let typedPosts = (data || []) as BlogPost[];
       typedPosts = mapRowsTranslation(typedPosts, language, ['title', 'content', 'excerpt']);
       setPosts(typedPosts);
@@ -216,12 +221,13 @@ export const useBlogAdmin = () => {
 
   const fetchAllCategories = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from('blog_categories')
-        .select('*')
-        .order('sort_order', { ascending: true });
-
-      if (error) throw error;
+      const data = await fetchAllRows((from, to) =>
+        supabase
+          .from('blog_categories')
+          .select('*')
+          .order('sort_order', { ascending: true })
+          .range(from, to)
+      );
       let typedCategories = (data || []) as BlogCategory[];
       typedCategories = mapRowsTranslation(typedCategories, language, ['name', 'description']);
       setCategories(typedCategories);
@@ -232,11 +238,14 @@ export const useBlogAdmin = () => {
 
   const fetchPostCategories = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from('blog_post_categories')
-        .select('*');
-
-      if (error) throw error;
+      // DÜZƏLİŞ: limitsiz idi — join cədvəli blog_posts-dan da böyük ola bilər,
+      // 1000-dən sonrakı yazılar kateqoriyasız görünürdü.
+      const data = await fetchAllRows((from, to) =>
+        supabase
+          .from('blog_post_categories')
+          .select('*')
+          .range(from, to)
+      );
       setPostCategories((data || []) as BlogPostCategory[]);
     } catch (error) {
       console.error('Error fetching post categories:', error);

@@ -22,6 +22,7 @@ import {
 '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format, addMonths, addYears } from 'date-fns';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 interface UserProfile {
   id: string;
@@ -47,15 +48,16 @@ const AdminSubscriptions = () => {
 
   const fetchUsers = async () => {
     setLoading(true);
-    const { data, error } = await supabase.
-    from('profiles').
-    select('*').
-    order('created_at', { ascending: false });
-
-    if (error) {
+    try {
+      // DÜZƏLİŞ: əvvəllər `.select('*')` limitsiz idi — profiles cədvəli
+      // 1000-dən çox olanda (bizdə qat-qat çoxdur) YALNIZ ilk 1000 sətir
+      // gəlirdi, "Ümumi"/"Premium"/"Pulsuz" say-ları hamısı səhv idi.
+      const data = await fetchAllRows<UserProfile>((from, to) =>
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }).range(from, to)
+      );
+      setUsers(data);
+    } catch (error: any) {
       toast({ title: tr("adminsubscriptions_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
-    } else {
-      setUsers(data || []);
     }
     setLoading(false);
   };

@@ -3,6 +3,7 @@ import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
 import { Search, MessageSquare, Ban, Trash2, AlertTriangle, Check, Flag, XCircle, CheckCircle, Image, Video } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -82,12 +83,13 @@ const AdminModeration = () => {
 
   const fetchReports = async () => {
     // Use type assertion for new table not yet in generated types
-    const { data, error } = await (supabase as any).
-    from('post_reports').
-    select('*').
-    order('created_at', { ascending: false });
+    // DÜZƏLİŞ: limitsiz idi — post_reports 1000-i keçəndə moderasiya
+    // növbəsi yalnız ilk 1000 şikayəti göstərirdi.
+    const data = await fetchAllRows((from, to) =>
+      (supabase as any).from('post_reports').select('*').order('created_at', { ascending: false }).range(from, to)
+    );
 
-    if (!error && data) {
+    if (data) {
       // Fetch post info including media_urls
       const postIds = [...new Set(data.map((r: any) => r.post_id))];
       const reporterIds = [...new Set(data.map((r: any) => r.reporter_id))];
@@ -154,12 +156,11 @@ const AdminModeration = () => {
   };
 
   const fetchBlocks = async () => {
-    const { data, error } = await supabase.
-    from('user_blocks').
-    select('*').
-    order('created_at', { ascending: false });
+    const data = await fetchAllRows((from, to) =>
+      supabase.from('user_blocks').select('*').order('created_at', { ascending: false }).range(from, to)
+    );
 
-    if (!error && data) {
+    if (data) {
       const userIds = data.map((b) => b.user_id);
       const profileMap = await getPublicProfileCards(userIds);
 

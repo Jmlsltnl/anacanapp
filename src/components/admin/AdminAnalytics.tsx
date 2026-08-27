@@ -16,6 +16,7 @@ import {
 'recharts';
 import { format, subDays, startOfDay, endOfDay } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 interface EventStat {
   event_name: string;
@@ -127,25 +128,39 @@ const AdminAnalytics = () => {
       const sinceDate = subDays(new Date(), parseInt(dateRange)).toISOString();
       const thirtyDaysAgoDate = subDays(new Date(), 30).toISOString();
 
-      // Fetch startup data concurrently
-      const [subsRes, plansRes, thirtyDayRes] = await Promise.all([
-        supabase.from('subscriptions').select('*'),
-        supabase.from('premium_plans').select('*'),
-        supabase.from('analytics_events').select('user_id, created_at').gte('created_at', thirtyDaysAgoDate).limit(20000)
+      // DÜZƏLİŞ: `.limit(20000)`/`.limit(10000)` faktiki olaraq HEÇ BİR TƏSİR
+      // ETMİRDİ — Supabase/PostgREST-in server-tərəfi "db-max-rows" (1000)
+      // həddi client-in istədiyi limit-dən ASILI OLMAYARAQ tətbiq olunur,
+      // ona görə bu iki sorğu da (subscriptions ilə birlikdə) SƏSSİZCƏ 1000
+      // sətirdə kəsilirdi — bütün MRR/ARR/DAU/MAU/Stickiness/Churn/ARPU/LTV
+      // hesablamaları səhv idi. fetchAllRows() ilə .range() loop-u vasitəsilə
+      // DÜZGÜN həcmdə (developer-in orijinal niyyətinə uyğun maxRows həddi
+      // qorunaraq) gətirilir.
+      const [subs, thirtyDayEvents] = await Promise.all([
+        fetchAllRows((from, to) => supabase.from('subscriptions').select('*').range(from, to)),
+        fetchAllRows(
+          (from, to) => supabase.from('analytics_events').select('user_id, created_at').gte('created_at', thirtyDaysAgoDate).range(from, to),
+          1000,
+          20000
+        ),
       ]);
-      setSubscriptions(subsRes.data || []);
-      setPremiumPlans(plansRes.data || []);
-      setLast30DaysEvents(thirtyDayRes.data || []);
+      const { data: plans } = await supabase.from('premium_plans').select('*'); // kiçik konfiqurasiya cədvəli, 1000-i keçməz
+      setSubscriptions(subs);
+      setPremiumPlans(plans || []);
+      setLast30DaysEvents(thirtyDayEvents);
 
-      const { data, error } = await supabase.
-      from('analytics_events').
-      select('*').
-      gte('created_at', sinceDate).
-      order('created_at', { ascending: false }).
-      limit(10000);
-
-      if (error) throw error;
-      setEvents(data || []);
+      const data = await fetchAllRows(
+        (from, to) =>
+          supabase
+            .from('analytics_events')
+            .select('*')
+            .gte('created_at', sinceDate)
+            .order('created_at', { ascending: false })
+            .range(from, to),
+        1000,
+        10000
+      );
+      setEvents(data);
     } catch (err) {
       console.error('Error fetching analytics:', err);
     } finally {

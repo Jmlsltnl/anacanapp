@@ -31,6 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LocalizedInput } from "./ui/LocalizedInput";
 import { LocalizedTextarea } from "./ui/LocalizedTextarea";
 import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 interface UserProfile {
   id: string;
@@ -71,13 +72,13 @@ const AdminUsers = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase.
-      from('profiles').
-      select('*').
-      order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setUsers(data || []);
+      // DÜZƏLİŞ: limitsiz `.select('*')` profiles 1000-i keçəndə (bizdə
+      // qat-qat çoxdur) YALNIZ ilk 1000 istifadəçini gətirirdi — bu, ƏSAS
+      // İstifadəçi İdarəetmə səhifəsi olduğu üçün ən kritik nümunələrdən biri idi.
+      const data = await fetchAllRows<UserProfile>((from, to) =>
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }).range(from, to)
+      );
+      setUsers(data);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
@@ -92,12 +93,10 @@ const AdminUsers = () => {
 
   const fetchUserRoles = async () => {
     try {
-      const { data, error } = await supabase.
-      from('user_roles').
-      select('user_id, role');
-
-      if (error) throw error;
-      setUserRoles(data || []);
+      const data = await fetchAllRows<UserRole>((from, to) =>
+        supabase.from('user_roles').select('user_id, role').range(from, to)
+      );
+      setUserRoles(data);
     } catch (error) {
       console.error('Error fetching roles:', error);
     }

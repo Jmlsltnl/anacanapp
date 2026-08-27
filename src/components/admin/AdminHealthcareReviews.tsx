@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { tr } from '@/lib/tr';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import { motion } from 'framer-motion';
 import {
   Star, Check, X, Trash2, Edit2, Eye, Search,
@@ -57,12 +58,11 @@ const AdminHealthcareReviews = () => {
     queryKey: ['admin-healthcare-reviews'],
     queryFn: async () => {
       // Fetch reviews
-      const { data: reviewsData, error: reviewsError } = await supabase.
-      from('healthcare_provider_reviews').
-      select('*').
-      order('created_at', { ascending: false });
-
-      if (reviewsError) throw reviewsError;
+      // DÜZƏLİŞ: limitsiz idi — healthcare_provider_reviews 1000-i keçəndə
+      // bu səhifə yalnız ilk 1000 rəyi göstərirdi.
+      const reviewsData = await fetchAllRows((from, to) =>
+        supabase.from('healthcare_provider_reviews').select('*').order('created_at', { ascending: false }).range(from, to)
+      );
 
       // Fetch providers
       const providerIds = [...new Set((reviewsData || []).map((r) => r.provider_id))];

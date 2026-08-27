@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import { useSkillCategories, FALLBACK_SKILL_CATEGORIES } from '@/hooks/useSkillCategories';
 import { LocalizedInput } from "./ui/LocalizedInput";
 import { LocalizedTextarea } from "./ui/LocalizedTextarea";
@@ -34,12 +35,9 @@ const AdminPlayActivities = () => {
   const { data: activities = [], isLoading } = useQuery({
     queryKey: ['admin-play-activities'],
     queryFn: async () => {
-      const { data, error } = await supabase.
-      from('play_activities').
-      select('*').
-      order('min_age_days');
-      if (error) throw error;
-      return data;
+      return await fetchAllRows((from, to) =>
+        supabase.from('play_activities').select('*').order('min_age_days').range(from, to)
+      );
     }
   });
 

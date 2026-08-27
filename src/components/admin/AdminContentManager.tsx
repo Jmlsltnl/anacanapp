@@ -5,6 +5,7 @@ import { Plus, Search, Edit, Trash2, ChefHat, Lightbulb, Shield, Baby, Briefcase
 import { exportToCSV } from '@/utils/csvExport';
 import UnsavedChangesDialog from './UnsavedChangesDialog';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -139,15 +140,15 @@ const AdminContentManager = () => {
     setLoading(true);
     const config = contentConfig[activeTab];
 
-    const { data, error } = await supabase.
-    from(config.table as any).
-    select('*').
-    order('created_at', { ascending: false });
-
-    if (error) {
-      toast({ title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
-    } else {
+    try {
+      // DÜZƏLİŞ: limitsiz idi — cədvəl (məs. baby_names_db) 1000-i keçəndə
+      // "Adlar" tab-ı yalnız ilk 1000 sətri göstərir/axtarır/redaktə edirdi.
+      const data = await fetchAllRows((from, to) =>
+        supabase.from(config.table as any).select('*').order('created_at', { ascending: false }).range(from, to)
+      );
       setItems(data as unknown as ContentItem[] || []);
+    } catch (error: any) {
+      toast({ title: tr("admincontentmanager_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     }
     setLoading(false);
   };
@@ -257,12 +258,15 @@ const AdminContentManager = () => {
     setNamesImporting(true);
     try {
       // Fetch existing names to filter duplicates
-      const { data: existingNames } = await supabase.
-      from('baby_names_db').
-      select('name, gender');
+      // DÜZƏLİŞ: limitsiz idi — baby_names_db 1000-i keçəndə (ad bazası
+      // adətən mindən çox olur) dublikat yoxlanışı 1000-dən sonrakı adları
+      // "yox" hesab edib TƏKRAR idxal edə bilirdi.
+      const existingNames = await fetchAllRows<{ name: string; gender: string }>((from, to) =>
+        supabase.from('baby_names_db').select('name, gender').range(from, to)
+      );
 
       const existingSet = new Set(
-        (existingNames || []).map((n: any) => `${n.name.toLowerCase()}|${n.gender}`)
+        (existingNames || []).map((n) => `${n.name.toLowerCase()}|${n.gender}`)
       );
 
       const newNames = namesImportData.filter(

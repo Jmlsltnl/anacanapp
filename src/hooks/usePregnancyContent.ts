@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { tr } from "@/lib/tr";
 import { supabase } from '@/integrations/supabase/client';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import { useUserStore } from '@/store/userStore';
 
 const TRANSLATABLE_FIELDS = [
@@ -141,12 +142,13 @@ export const usePregnancyContentAdmin = () => {
   const fetchAllContent = useQuery({
     queryKey: ['pregnancy_content_admin'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('pregnancy_daily_content')
-        .select('*')
-        .order('week_number', { ascending: true });
-
-      if (error) throw error;
+      const data = await fetchAllRows((from, to) =>
+        (supabase as any)
+          .from('pregnancy_daily_content')
+          .select('*')
+          .order('week_number', { ascending: true })
+          .range(from, to)
+      );
       return (data || []) as PregnancyContent[];
     },
   });

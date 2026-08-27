@@ -34,6 +34,7 @@ import {
 '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
@@ -165,22 +166,25 @@ const AdminMarketplace = () => {
   const loadListings = async () => {
     setIsLoading(true);
     try {
-      let query = supabase.
-      from('marketplace_listings').
-      select('*').
-      order('created_at', { ascending: false });
+      // DÜZƏLİŞ: limitsiz idi — marketplace_listings 1000-i keçəndə
+      // "İkinci Əl Bazarı" admin səhifəsi yalnız ilk 1000 elanı göstərirdi.
+      const data = await fetchAllRows((from, to) => {
+        let query = supabase.
+        from('marketplace_listings').
+        select('*').
+        order('created_at', { ascending: false });
 
-      if (statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
-      }
+        if (statusFilter !== 'all') {
+          query = query.eq('status', statusFilter);
+        }
 
-      if (categoryFilter !== 'all') {
-        query = query.eq('category', categoryFilter);
-      }
+        if (categoryFilter !== 'all') {
+          query = query.eq('category', categoryFilter);
+        }
 
-      const { data, error } = await query;
+        return query.range(from, to);
+      });
 
-      if (error) throw error;
       setListings(data || []);
     } catch (error) {
       toast({

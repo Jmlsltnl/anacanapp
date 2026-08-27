@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 export interface AdminRecipe {
   id: string;
@@ -23,12 +24,9 @@ export const useAdminRecipesQuery = () => {
   return useQuery({
     queryKey: ['admin-recipes'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('admin_recipes')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
+      const data = await fetchAllRows((from, to) =>
+        supabase.from('admin_recipes').select('*').order('created_at', { ascending: false }).range(from, to)
+      );
       return (data || []).map(item => ({
         ...item,
         ingredients: Array.isArray(item.ingredients) ? item.ingredients as string[] : [],

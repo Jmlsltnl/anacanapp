@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { formatDistanceToNow, subDays, format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import AdminUsageStats from './AdminUsageStats';
 
 interface Stats {
@@ -158,9 +159,12 @@ const AdminDashboard = () => {
 
   const fetchLifeStageStats = async () => {
     try {
-      const { data } = await supabase.
-      from('profiles').
-      select('life_stage');
+      // DÜZƏLİŞ: limitsiz `.select('life_stage')` profiles 1000-i keçəndə
+      // (bizdə qat-qat çoxdur) YALNIZ ilk 1000 profili sayırdı — bu qrafik
+      // həmişə səhv (kiçildilmiş) rəqəmlər göstərirdi.
+      const data = await fetchAllRows<{ life_stage: string | null }>((from, to) =>
+        supabase.from('profiles').select('life_stage').range(from, to)
+      );
 
       const stageCounts: {[key: string]: number;} = {
         flow: 0,

@@ -1,5 +1,6 @@
 import { tr } from "@/lib/tr";import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { fetchAllRows } from '@/lib/supabaseFetchAll';
 
 export interface AdminSupportTicket {
   id: string;
@@ -24,20 +25,18 @@ export const useSupportTicketsAdmin = () => {
 
   const fetchTickets = useCallback(async () => {
     try {
-      const { data, error } = await supabase.
-      from('support_tickets').
-      select('*').
-      order('created_at', { ascending: false });
-
-      if (error) throw error;
+      // DÜZƏLİŞ: limitsiz idi — support_tickets 1000-i keçəndə "Dəstək"
+      // admin səhifəsi yalnız ilk 1000 tiketi (və onlara aid stat kartlarını) göstərirdi.
+      const data = await fetchAllRows((from, to) =>
+        supabase.from('support_tickets').select('*').order('created_at', { ascending: false }).range(from, to)
+      );
 
       // Fetch user info
       const userIds = [...new Set((data || []).map((t) => t.user_id))];
 
-      const { data: profiles } = await supabase.
-      from('profiles').
-      select('user_id, name, email').
-      in('user_id', userIds);
+      const profiles = await fetchAllRows((from, to) =>
+        supabase.from('profiles').select('user_id, name, email').in('user_id', userIds).range(from, to)
+      );
 
       const profileMap = new Map(
         (profiles || []).map((p) => [p.user_id, p])
