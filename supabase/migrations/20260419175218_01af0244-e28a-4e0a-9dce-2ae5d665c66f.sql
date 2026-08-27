@@ -108,21 +108,25 @@ USING (
 -- ============================================================
 -- 5. Slow down vitamin reminder cron from 1min to 5min
 -- ============================================================
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'send-vitamin-reminders-every-minute') THEN
-    PERFORM cron.unschedule('send-vitamin-reminders-every-minute');
-  END IF;
-END $$;
-
-SELECT cron.schedule(
-  'send-vitamin-reminders-every-5min',
-  '*/5 * * * *',
-  $$
-  SELECT net.http_post(
-    url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-vitamin-reminders',
-    headers:='{"Content-Type": "application/json", "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRudGJqdWxvamF0bnJxbXlsb3JwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MzYyOTksImV4cCI6MjA4NDQxMjI5OX0.uwaOZsWTw8GBUg6s9GqmbA3EluGf44PmGdUI80RhGNU"}'::jsonb,
-    body:=concat('{"time": "', now(), '"}')::jsonb
-  ) as request_id;
-  $$
-);
+-- AZURE: pg_net/cron.schedule-based HTTP triggering is not available/applicable on
+-- Azure (pg_net not allow-listed; edge function URL below is the old Supabase project).
+-- This scheduling is reimplemented via an Azure Container Apps Job (cron trigger)
+-- calling the Azure-hosted send-vitamin-reminders function directly. See azure-migration/README.md.
+-- DO $$
+-- BEGIN
+--   IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'send-vitamin-reminders-every-minute') THEN
+--     PERFORM cron.unschedule('send-vitamin-reminders-every-minute');
+--   END IF;
+-- END $$;
+--
+-- SELECT cron.schedule(
+--   'send-vitamin-reminders-every-5min',
+--   '*/5 * * * *',
+--   $$
+--   SELECT net.http_post(
+--     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-vitamin-reminders',
+--     headers:='{"Content-Type": "application/json", "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRudGJqdWxvamF0bnJxbXlsb3JwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg4MzYyOTksImV4cCI6MjA4NDQxMjI5OX0.uwaOZsWTw8GBUg6s9GqmbA3EluGf44PmGdUI80RhGNU"}'::jsonb,
+--     body:=concat('{"time": "', now(), '"}')::jsonb
+--   ) as request_id;
+--   $$
+-- );

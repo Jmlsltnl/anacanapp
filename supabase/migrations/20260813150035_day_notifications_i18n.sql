@@ -20,6 +20,17 @@ ALTER TABLE public.mommy_day_notifications
   ADD COLUMN IF NOT EXISTS title_tr TEXT,
   ADD COLUMN IF NOT EXISTS body_tr  TEXT;
 
+-- AZURE: bu sütunları normalda 20260813160000_notifications_i18n_ru_tr.sql əlavə edir,
+-- lakin onun fayl-adı vaxt möhürü (16:00:00) bu fayldan (15:00:35) SONRA olduğu üçün
+-- xronoloji sırayla tətbiq edərkən aşağıdakı UPDATE bu sütunlar hələ mövcud olmadan
+-- işə düşür — ordinal timestamp bug. Idempotent (IF NOT EXISTS) olduğu üçün burada
+-- əvvəlcədən əlavə etmək təhlükəsizdir (20260813160000 sonra yenidən cəhd etsə də NOTICE/skip olar).
+ALTER TABLE public.scheduled_notifications
+  ADD COLUMN IF NOT EXISTS title_ru text,
+  ADD COLUMN IF NOT EXISTS title_tr text,
+  ADD COLUMN IF NOT EXISTS body_ru text,
+  ADD COLUMN IF NOT EXISTS body_tr text;
+
 -- 2) Statik ÅŸablonlar (Fable tÉ™rcÃ¼mÉ™si; en yalnÄ±z boÅŸdursa doldurulur)
 UPDATE public.scheduled_notifications AS n SET
   title_en = COALESCE(NULLIF(n.title_en, ''), v.ten),

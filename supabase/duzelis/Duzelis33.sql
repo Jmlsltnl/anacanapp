@@ -172,52 +172,56 @@ $$;
 -- sətirlərini dinamik tapıb silir — bilmədiyimiz/adı fərqli olan köhnə
 -- cron-lar da təmizlənir, təkrar/münaqişəli çağırış riski qalmır.
 -- ────────────────────────────────────────────────────────────
-DO $$
-DECLARE
-  r RECORD;
-BEGIN
-  FOR r IN
-    SELECT jobid FROM cron.job
-    WHERE command ILIKE '%send-daily-notifications%'
-       OR command ILIKE '%send-flow-reminders%'
-       OR command ILIKE '%send-vitamin-reminders%'
-  LOOP
-    PERFORM cron.unschedule(r.jobid);
-  END LOOP;
-END $$;
-
-SELECT cron.schedule(
-  'send-daily-notifications-slots-secure',
-  '0 5,6,10,11,15 * * *',
-  $$
-  SELECT net.http_post(
-    url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-daily-notifications',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
-    body:=concat('{"time": "', now(), '"}')::jsonb
-  ) as request_id;
-  $$
-);
-
-SELECT cron.schedule(
-  'send-flow-reminders-every-hour-secure',
-  '0 5,6,7,8,9,10,11,12,13,14,15,16,17 * * *',
-  $$
-  SELECT net.http_post(
-    url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-flow-reminders',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
-    body:=concat('{"time": "', now(), '"}')::jsonb
-  ) as request_id;
-  $$
-);
-
-SELECT cron.schedule(
-  'send-vitamin-reminders-every-5min-secure',
-  '*/5 * * * *',
-  $$
-  SELECT net.http_post(
-    url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-vitamin-reminders',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
-    body:=concat('{"time": "', now(), '"}')::jsonb
-  ) as request_id;
-  $$
-);
+-- AZURE: pg_net is not available on Azure Database for PostgreSQL Flexible Server,
+-- so cron.schedule()+net.http_post() cannot run here. This scheduling is reimplemented
+-- via Azure Container Apps Jobs (native cron trigger). See azure-migration/README.md.
+-- (Superseded anyway by Duzelis39/44/50.sql below in the original history.)
+-- DO $$
+-- DECLARE
+--   r RECORD;
+-- BEGIN
+--   FOR r IN
+--     SELECT jobid FROM cron.job
+--     WHERE command ILIKE '%send-daily-notifications%'
+--        OR command ILIKE '%send-flow-reminders%'
+--        OR command ILIKE '%send-vitamin-reminders%'
+--   LOOP
+--     PERFORM cron.unschedule(r.jobid);
+--   END LOOP;
+-- END $$;
+--
+-- SELECT cron.schedule(
+--   'send-daily-notifications-slots-secure',
+--   '0 5,6,10,11,15 * * *',
+--   $$
+--   SELECT net.http_post(
+--     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-daily-notifications',
+--     headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
+--     body:=concat('{"time": "', now(), '"}')::jsonb
+--   ) as request_id;
+--   $$
+-- );
+--
+-- SELECT cron.schedule(
+--   'send-flow-reminders-every-hour-secure',
+--   '0 5,6,7,8,9,10,11,12,13,14,15,16,17 * * *',
+--   $$
+--   SELECT net.http_post(
+--     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-flow-reminders',
+--     headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
+--     body:=concat('{"time": "', now(), '"}')::jsonb
+--   ) as request_id;
+--   $$
+-- );
+--
+-- SELECT cron.schedule(
+--   'send-vitamin-reminders-every-5min-secure',
+--   '*/5 * * * *',
+--   $$
+--   SELECT net.http_post(
+--     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-vitamin-reminders',
+--     headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
+--     body:=concat('{"time": "', now(), '"}')::jsonb
+--   ) as request_id;
+--   $$
+-- );

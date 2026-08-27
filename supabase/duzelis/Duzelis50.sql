@@ -36,58 +36,65 @@
 -- Idempotentdir (təkrar işlətmək təhlükəsizdir — pg_cron eyni ad üzrə mövcud
 -- planı əvəzləyir, yeni/dublikat job yaratmır).
 
+-- AZURE: pg_net is not available on Azure Database for PostgreSQL Flexible Server,
+-- so none of the 4 cron.schedule()+net.http_post() blocks below can run here.
+-- This scheduling (and the CRON_SECRET value documented above, which IS still the
+-- correct/current secret) is reimplemented via Azure Container Apps Jobs (native
+-- cron trigger) reading the same secret from Key Vault (CRON-SECRET) and calling
+-- the Azure-hosted functions directly. See azure-migration/README.md.
+--
 -- 1) send-daily-notifications — gündəlik hamiləlik/mommy məzmunu + admin "Günlük" tabındakı
 --    scheduled_notifications sətirləri (Bakı ~09:00,10:00,14:00,15:00,19:00)
-SELECT cron.schedule(
-  'send-daily-notifications-slots-secure',
-  '0 5,6,10,11,15 * * *',
-  $c$
-  SELECT net.http_post(
-    url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-daily-notifications',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
-    body:=concat('{"time": "', now(), '"}')::jsonb
-  ) as request_id;
-  $c$
-);
-
+-- SELECT cron.schedule(
+--   'send-daily-notifications-slots-secure',
+--   '0 5,6,10,11,15 * * *',
+--   $c$
+--   SELECT net.http_post(
+--     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-daily-notifications',
+--     headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
+--     body:=concat('{"time": "', now(), '"}')::jsonb
+--   ) as request_id;
+--   $c$
+-- );
+--
 -- 2) send-flow-reminders — Flow (dövriyyə) istifadəçilərinin öz qurduğu xatırlatmalar
-SELECT cron.schedule(
-  'send-flow-reminders-every-hour-secure',
-  '0 5,6,7,8,9,10,11,12,13,14,15,16,17 * * *',
-  $c$
-  SELECT net.http_post(
-    url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-flow-reminders',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
-    body:=concat('{"time": "', now(), '"}')::jsonb
-  ) as request_id;
-  $c$
-);
-
+-- SELECT cron.schedule(
+--   'send-flow-reminders-every-hour-secure',
+--   '0 5,6,7,8,9,10,11,12,13,14,15,16,17 * * *',
+--   $c$
+--   SELECT net.http_post(
+--     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-flow-reminders',
+--     headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
+--     body:=concat('{"time": "', now(), '"}')::jsonb
+--   ) as request_id;
+--   $c$
+-- );
+--
 -- 3) send-vitamin-reminders — istifadəçilərin qurduğu vitamin qəbulu xatırlatmaları
-SELECT cron.schedule(
-  'send-vitamin-reminders-every-5min-secure',
-  '*/5 * * * *',
-  $c$
-  SELECT net.http_post(
-    url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-vitamin-reminders',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
-    body:=concat('{"time": "', now(), '"}')::jsonb
-  ) as request_id;
-  $c$
-);
-
+-- SELECT cron.schedule(
+--   'send-vitamin-reminders-every-5min-secure',
+--   '*/5 * * * *',
+--   $c$
+--   SELECT net.http_post(
+--     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-vitamin-reminders',
+--     headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
+--     body:=concat('{"time": "', now(), '"}')::jsonb
+--   ) as request_id;
+--   $c$
+-- );
+--
 -- 4) expire-partner-links — premium bitmiş partnyor bağlantılarının gündəlik təmizlənməsi
-SELECT cron.schedule(
-  'expire-partner-links-daily-secure',
-  '0 5 * * *',
-  $c$
-  SELECT net.http_post(
-    url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/expire-partner-links',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
-    body:=concat('{"time": "', now(), '"}')::jsonb
-  ) as request_id;
-  $c$
-);
+-- SELECT cron.schedule(
+--   'expire-partner-links-daily-secure',
+--   '0 5 * * *',
+--   $c$
+--   SELECT net.http_post(
+--     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/expire-partner-links',
+--     headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
+--     body:=concat('{"time": "', now(), '"}')::jsonb
+--   ) as request_id;
+--   $c$
+-- );
 
 -- ─────────────────────────────────────────────────────────────
 -- YOXLAMA — bu SQL-i AYRICA işlədin (yuxarıdakı bloklardan sonra):
