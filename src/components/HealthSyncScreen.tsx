@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { getLocaleTag } from '@/lib/i18n';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Activity, Flame, Footprints, HeartPulse, Link2, Settings2, Download, Dumbbell, Wind, MapPin } from 'lucide-react';
+import { ArrowLeft, Activity, Footprints, HeartPulse, Link2, Settings2, Download, Dumbbell, Wind } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
@@ -114,7 +114,6 @@ const HealthSyncScreen = ({ onBack }: Props) => {
 
   const todayKey = new Date().toISOString().split('T')[0];
   const todaySteps = daily?.steps.find((s) => s.date === todayKey)?.value ?? 0;
-  const todayCalories = daily?.calories.find((s) => s.date === todayKey)?.value ?? 0;
   const maxSteps = Math.max(1, ...(daily?.steps || []).map((s) => s.value));
   const weekMindfulness = (daily?.mindfulness || []).reduce((sum, s) => sum + s.value, 0);
 
@@ -210,7 +209,7 @@ const HealthSyncScreen = ({ onBack }: Props) => {
                 {`${platformName} ${tr('health_connect_title', 'ilə qoşulun')}`}
               </h2>
               <p className="a-list-sub" style={{ whiteSpace: 'normal', marginBottom: 18 }}>
-                {tr('health_connect_desc', 'Addım sayı, kalori və məşqləriniz avtomatik görünəcək. Məlumatlar cihazınızda qalır.')}
+                {tr('health_connect_desc', 'Addım sayınız və məşqləriniz avtomatik görünəcək. Məlumatlar cihazınızda qalır.')}
               </p>
               <button
             className="a-cta-btn w-full"
@@ -234,10 +233,10 @@ const HealthSyncScreen = ({ onBack }: Props) => {
               </motion.div>
               <motion.div className="a-trio-item" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}>
                 <span className="a-trio-icon" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
-                  <Flame size={17} strokeWidth={2} />
+                  <Wind size={17} strokeWidth={2} />
                 </span>
-                <p className="a-trio-value" style={{ fontSize: 17 }}>{todayCalories.toLocaleString()}</p>
-                <p className="a-trio-label">{tr('health_calories_today', 'Kalori (aktiv)')}</p>
+                <p className="a-trio-value" style={{ fontSize: 17 }}>{weekMindfulness}</p>
+                <p className="a-trio-label">{tr('health_mindfulness_week', 'Rahatlama dəq (7 gün)')}</p>
               </motion.div>
               <motion.div className="a-trio-item" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
                 <span className="a-trio-icon" style={{ background: 'var(--a-grad-lav)', color: 'var(--a-lav-ink)' }}>
@@ -269,25 +268,6 @@ const HealthSyncScreen = ({ onBack }: Props) => {
               </div>
             </motion.div>
 
-            {/* Rahatlama / Mindfulness — Mental Health alətindəki nəfəs məşqləri ilə eyni
-                mövzuya aiddir, buradakı real Health datası oradan körpü kimi göstərilir */}
-            {weekMindfulness > 0 &&
-          <motion.div className="a-card" style={{ marginTop: 12 }} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.13 }}>
-                <div className="flex items-center gap-3">
-                  <span className="a-list-icon shrink-0" style={{ background: 'var(--a-grad-lav)', color: 'var(--a-lav-ink)' }}>
-                    <Wind size={17} strokeWidth={2} />
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="a-list-title" style={{ fontSize: 14 }}>{tr('health_mindfulness_title', 'Rahatlama (bu həftə)')}</p>
-                    <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>
-                      {tr('health_mindfulness_desc', 'Apple Health / Health Connect-dəki mindfulness sessiyalarınız')}
-                    </p>
-                  </div>
-                  <p className="a-list-value" style={{ fontSize: 17, fontWeight: 800 }}>{weekMindfulness} {tr('health_min', 'dəq')}</p>
-                </div>
-              </motion.div>
-          }
-
             {/* Son məşqlər */}
             {workouts.length > 0 &&
           <motion.div className="a-list-card" style={{ marginTop: 12 }} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
@@ -298,18 +278,8 @@ const HealthSyncScreen = ({ onBack }: Props) => {
                     </span>
                     <div>
                       <p className="a-list-title" style={{ fontSize: 14 }}>{workoutLabel(w.workoutType)}</p>
-                      <p className="a-list-sub" style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
-                        <span>{new Date(w.startDate).toLocaleDateString(getLocaleTag(), { day: 'numeric', month: 'short' })} · {Math.round(w.duration / 60)} {tr('health_min', 'dəq')}</span>
-                        {!!w.distanceKm &&
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-                            <MapPin size={10} /> {w.distanceKm} km
-                          </span>
-                  }
-                        {!!w.avgHeartRate &&
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-                            <HeartPulse size={10} /> {w.avgHeartRate} bpm
-                          </span>
-                  }
+                      <p className="a-list-sub">
+                        {new Date(w.startDate).toLocaleDateString(getLocaleTag(), { day: 'numeric', month: 'short' })} · {Math.round(w.duration / 60)} {tr('health_min', 'dəq')}
                       </p>
                     </div>
                     {w.calories > 0 &&

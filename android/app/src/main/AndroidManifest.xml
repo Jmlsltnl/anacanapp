@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
@@ -108,14 +109,25 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <!-- Health Connect (Google Fit alternativi) -->
+    <!-- Health Connect (Google Fit alternativi)
+         GOOGLE PLAY "Minimum Scope" SİYASƏTİ (2026-08-26 rəddi):
+         YALNIZ real, görünən feature-lərin icazələri saxlanılır:
+           READ_STEPS         → Health Sync ekranı: bu günün addımı + 7 günlük qrafik
+           READ_EXERCISE      → Health Sync ekranı: son məşqlər siyahısı
+           WRITE_MENSTRUATION → Flow rejimi: period qeydlərini Health-ə yazma toggle-u
+         Kalori/Məsafə/Nəbz icazələri SİLİNDİ (yalnız dekorativ idi) və
+         capacitor-health plugin-inin öz manifest-inin merge etdiyi artıq
+         icazələr aşağıda tools:node="remove" ilə neytrallaşdırılır. -->
     <queries>
         <package android:name="com.google.android.apps.healthdata" />
     </queries>
     <uses-permission android:name="android.permission.health.READ_STEPS" />
-    <uses-permission android:name="android.permission.health.WRITE_MENSTRUATION" />
-    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" />
-    <uses-permission android:name="android.permission.health.READ_DISTANCE" />
     <uses-permission android:name="android.permission.health.READ_EXERCISE" />
-    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+    <uses-permission android:name="android.permission.health.WRITE_MENSTRUATION" />
+    <!-- capacitor-health plugin manifest-inin əlavə etdiyi, istifadə olunmayan icazələri sil -->
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_DISTANCE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_EXERCISE_ROUTE" tools:node="remove" />
 </manifest>
