@@ -110,23 +110,48 @@ const BirthOnboardingModal = ({ isOpen, onClose, onComplete }: BirthOnboardingMo
       // Hər körpə üçün AYRICA user_children qeydi (idempotent — dublikat yaratmır).
       // Əkiz/üçüzlərdə bu, hər körpənin öz böyümə qrafiki/peyvənd təqvimi/taymeri
       // olmasını təmin edir (əvvəllər vergüllə yazılan tək ad tək sətrə düşürdü).
+      //
+      // DÜZƏLİŞ: əvvəllər burada .upsert({...}, {onConflict:'user_id,name,birth_date'})
+      // çağırılırdı. user_children-in YEGANƏ unikal indeksi QISMƏNDİR
+      // (WHERE is_active = true, bax 20260813150027_user_children_unique_guard.sql).
+      // Supabase-js-in .upsert() metodu ON CONFLICT-ə WHERE predikatı əlavə edə
+      // bilmir, buna görə Postgres bu qismən indeksi arbiter kimi tanıya bilmirdi
+      // və HƏR sətir 42P10 xətası ilə səssizcə rədd olunurdu (xəta mesajında
+      // "duplicate" sözü olmadığı üçün aşağıdakı yoxlama da onu udurdu) — nəticədə
+      // user_children HƏMİŞƏ boş qalırdı və mommy_day push bildirişləri, böyümə
+      // qrafiki, peyvənd təqvimi və s. heç vaxt işə düşmürdü. İndi əvvəlcə mövcud
+      // sətirləri oxuyuruq, sonra YALNIZ olmayanlar üçün sadə INSERT edirik (eyni
+      // işlək yol useChildren.ts/OnboardingScreen.tsx/PremiumOnboarding.tsx-də
+      // artıq istifadə olunur).
+      const { data: existingChildren } = await supabase.
+      from('user_children').
+      select('name, birth_date').
+      eq('user_id', user.id).
+      eq('is_active', true);
+
+      const existingKeys = new Set(
+        (existingChildren || []).map((c) => `${c.name}::${c.birth_date}`)
+      );
+
       for (let i = 0; i < babies.length; i++) {
         const baby = babies[i];
+        const babyName = baby.name.trim();
+        if (existingKeys.has(`${babyName}::${birthDateStr}`)) continue;
+
         const { error: childError } = await supabase.
         from('user_children').
-        upsert({
+        insert({
           user_id: user.id,
-          name: baby.name.trim(),
+          name: babyName,
           birth_date: birthDateStr,
           gender: baby.gender,
           avatar_emoji: baby.gender === 'girl' ? '👧' : '👦',
           is_active: true,
           sort_order: i,
           notes: tr("birthonboardingmodal_notes_template", "Doğum çəkisi: {weight} {weightUnit}, Boy: {height} {heightUnit}, Doğum tipi: {type}").replace("{weight}", baby.weight || '-').replace("{weightUnit}", tr('unit_kg', 'kq')).replace("{height}", baby.height || '-').replace("{heightUnit}", tr('unit_cm', 'sm')).replace("{type}", deliveryLabel)
-        }, { onConflict: 'user_id,name,birth_date', ignoreDuplicates: true });
+        });
 
-        // Ignore if child already exists
-        if (childError && !childError.message.includes('duplicate')) {
+        if (childError) {
           console.error('Child creation error:', childError);
         }
       }

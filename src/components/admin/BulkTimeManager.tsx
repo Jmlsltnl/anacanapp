@@ -18,6 +18,16 @@ const SOURCES: {key: SourceKey;label: string;timeCol: string;labelCol: string;}[
 { key: 'mommy_day_notifications', label: 'Ana (mommy)', timeCol: 'send_time', labelCol: 'title' },
 { key: 'flow_reminders', label: 'Tsikl (flow)', timeCol: 'send_time', labelCol: 'title' }];
 
+// DÜZƏLİŞ: pregnancy_day_notifications/mommy_day_notifications üçün
+// supabase/functions/send-daily-notifications/index.ts (DAILY_RUN_SLOTS) YALNIZ
+// bu 9 dəqiq saatı qəbul edir (tam bərabərlik, tolerans YOXDUR). Əvvəllər bu
+// input sərbəst <Input type="time"/> idi — admin istənilən HH:MM yaza bilirdi
+// (məs. "11:00", "16:00") və həmin sətir cron tərəfindən BİR DƏ HEÇ VAXT
+// görünmürdü (sükutla, xəta vermədən). Bu siyahı DAILY_RUN_SLOTS ilə sinxron
+// saxlanmalıdır — orada dəyişiklik olsa, burada da eyni siyahı yenilənməlidir.
+const VALID_DAY_SLOT_TIMES = [
+'09:00', '10:00', '12:00', '14:00', '14:30', '15:00', '15:30', '19:00', '19:30'];
+
 
 /** Normalize "9:00" / "09:00:00" → "09:00" */
 function normTime(v: string | null | undefined): string {
@@ -167,11 +177,26 @@ const BulkTimeManager = () => {
 
           <div>
             <Label className="text-xs">Yeni saat (HH:MM)</Label>
+            {source === 'flow_reminders' ?
             <Input
               type="time"
               value={newTime}
-              onChange={(e) => setNewTime(e.target.value)} />
-            
+              onChange={(e) => setNewTime(e.target.value)} /> :
+
+            <Select value={newTime} onValueChange={setNewTime}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {VALID_DAY_SLOT_TIMES.map((t) =>
+                <SelectItem key={t} value={t}>{t}</SelectItem>
+                )}
+                </SelectContent>
+              </Select>
+            }
+            {source !== 'flow_reminders' &&
+            <p className="text-[10px] text-muted-foreground mt-1">
+                {tr("bulktimemanager_yalniz_bu_saatlar_cron_terefinden_oxunur", "Yalnız bu saatlar cron tərəfindən oxunur — başqa saat seçilən sətirləri sükutla gizlədər.")}
+              </p>
+            }
           </div>
 
           <div className="flex items-end">
