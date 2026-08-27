@@ -1,4 +1,4 @@
-import { useState, forwardRef, useCallback } from 'react';
+import { useState, forwardRef, useCallback, useEffect } from 'react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Users, Plus, Search, TrendingUp, Compass, Sparkles, X, Pen, MessageCircle } from 'lucide-react';
@@ -14,14 +14,25 @@ import GroupsList from './GroupsList';
 import GroupFeed from './GroupFeed';
 import CreatePostScreen from './CreatePostScreen';
 import StoriesBar from './StoriesBar';
+import SinglePostView from './SinglePostView';
 import UserProfileScreen from './UserProfileScreen';
 import ConversationListScreen from './ConversationListScreen';
 import DirectMessageScreen from './DirectMessageScreen';
 import BannerSlot from '@/components/banners/BannerSlot';
 import { tr } from "@/lib/tr";
 
+export interface CommunityDeepLinkTarget {
+  postId?: string;
+  commentId?: string;
+  storyId?: string;
+}
+
 interface CommunityScreenProps {
   onBack?: () => void;
+  /** Bildiriş/push-tap vasitəsilə: "MƏHZ bu paylaşımı/şərhi aç" — bax Index.tsx */
+  deepLinkTarget?: CommunityDeepLinkTarget | null;
+  /** Deep-link "istehlak" olunduqdan sonra valideyndə təmizləmək üçün (geri qayıdanda təkrar açılmasın) */
+  onDeepLinkConsumed?: () => void;
 }
 
 // Groups temporarily disabled
@@ -29,9 +40,15 @@ const tabs = [
 { id: 'feed', label: tr("communityscreen_umumi_1b5521", 'Ümumi'), icon: TrendingUp }] as
 const;
 
-const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack }, ref) => {
+const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBack, deepLinkTarget, onDeepLinkConsumed }, ref) => {
   const [activeTab, setActiveTab] = useState<'feed' | 'groups' | 'my-groups'>('feed');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  // Bildirişdən gələn "məhz bu postu aç" niyyəti — öz state-inə köçürülür ki,
+  // istifadəçi geri düyməsi ilə bağlayanda (deepLinkTarget prop-u valideyndə
+  // hələ təmizlənməmiş olsa belə) bu ekran YENİDƏN açılmasın.
+  const [openPostId, setOpenPostId] = useState<string | null>(deepLinkTarget?.postId || null);
+  const [openCommentId, setOpenCommentId] = useState<string | null>(deepLinkTarget?.commentId || null);
+  const [openStoryId, setOpenStoryId] = useState<string | null>(deepLinkTarget?.storyId || null);
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -41,6 +58,28 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
 
   useScrollToTop([activeTab, selectedGroupId, selectedUserId]);
   useScreenAnalytics('Community', 'Social');
+
+  // CommunityScreen artıq ekranda olsa belə (istifadəçi Community-də ikən YENİ
+  // bir bildiriş klik edilsə), yeni deep-link niyyətini qəbul et.
+  useEffect(() => {
+    if (deepLinkTarget?.postId) {
+      setOpenPostId(deepLinkTarget.postId);
+      setOpenCommentId(deepLinkTarget.commentId || null);
+    } else if (deepLinkTarget?.storyId) {
+      setOpenStoryId(deepLinkTarget.storyId);
+    }
+  }, [deepLinkTarget]);
+
+  const handleCloseSinglePost = useCallback(() => {
+    setOpenPostId(null);
+    setOpenCommentId(null);
+    onDeepLinkConsumed?.();
+  }, [onDeepLinkConsumed]);
+
+  const handleStoryAutoOpenConsumed = useCallback(() => {
+    setOpenStoryId(null);
+    onDeepLinkConsumed?.();
+  }, [onDeepLinkConsumed]);
 
   // Note: do NOT auto mark-all-seen here. Posts are marked individually as
   // they enter the viewport in GroupFeed via the SeenObserver wrapper.
@@ -86,6 +125,11 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   // Full screen create post
   if (showCreatePost) {
     return <CreatePostScreen onBack={() => setShowCreatePost(false)} groupId={selectedGroupId} groups={myGroups} />;
+  }
+
+  // Bildiriş/deep-link ilə "məhz bu paylaşımı" açma
+  if (openPostId) {
+    return <SinglePostView postId={openPostId} commentId={openCommentId} onBack={handleCloseSinglePost} onUserClick={handleUserClick} />;
   }
 
   if (selectedGroupId && selectedGroup) {
@@ -178,7 +222,7 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
 
         {/* Stories */}
         <div style={{ marginTop: 14 }}>
-          <StoriesBar groupId={null} />
+          <StoriesBar groupId={null} autoOpenStoryId={openStoryId} onAutoOpenConsumed={handleStoryAutoOpenConsumed} />
         </div>
 
         {/* Composer prompt (anacan-demo) */}

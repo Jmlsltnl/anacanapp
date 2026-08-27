@@ -24,6 +24,7 @@ import { initDeeplinkListener, ParsedDeeplink } from '@/lib/deeplink';
 import { pushBackHandler } from '@/lib/backButton';
 import { PUSH_NAV_EVENT, consumePendingPushNav, type PushNavIntent } from '@/lib/pushNav';
 import { isCakesAvailable } from '@/lib/freemium';
+import type { CommunityDeepLinkTarget } from '@/components/community/CommunityScreen';
 
 // PremiumOnboarding.PENDING_FUNNEL_KEY ilə sinxron saxlanmalıdır
 // (lazy chunk-u pozmamaq üçün static import edilmir)
@@ -104,6 +105,10 @@ const Index = () => {
   const [showIntro, setShowIntro] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
   const [activeScreen, _setActiveScreen] = useState<string | null>(null);
+  // Bildiriş/push-tap/deeplink ilə "Community-də MƏHZ bu postu/şərhi/story-ni
+  // aç" niyyəti — CommunityScreen-ə prop kimi ötürülür (bax applyIntent,
+  // handleDeeplink, NotificationsScreen çağırışı aşağıda).
+  const [communityDeepLink, setCommunityDeepLink] = useState<CommunityDeepLinkTarget | null>(null);
 
   // Scroll yaddaşı: alt-ekrana keçəndə cari tabın pozisiyası saxlanır,
   // GERİ qayıdanda (activeScreen → null) bərpa olunur.
@@ -188,7 +193,13 @@ const Index = () => {
         return;
       }
       if (intent.screen) {setActiveScreen(intent.screen);return;}
-      if (intent.tab) {setActiveScreen(null);setActiveTab(intent.tab);}
+      if (intent.tab) {
+        setActiveScreen(null);
+        setActiveTab(intent.tab);
+        if (intent.tab === 'community' && intent.communityTarget) {
+          setCommunityDeepLink(intent.communityTarget);
+        }
+      }
     };
 
     // Soyuq başlanğıc: push app-ı açıbsa intent gözləyir
@@ -255,7 +266,8 @@ const Index = () => {
         break;
       case 'community-post':
         setActiveTab('community');
-        // Community screen will handle post_id via state if needed
+        setActiveScreen(null);
+        setCommunityDeepLink({ postId: parsed.params.post_id });
         break;
     }
   }, []);
@@ -452,7 +464,10 @@ const Index = () => {
       case 'community':
         return (
           <motion.div key="community" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-            <CommunityScreen />
+            <CommunityScreen
+              deepLinkTarget={communityDeepLink}
+              onDeepLinkConsumed={() => setCommunityDeepLink(null)}
+            />
           </motion.div>
         );
       case 'ai':
@@ -596,7 +611,7 @@ const Index = () => {
   }
 
   // Sub-screens
-  if (activeScreen === 'notifications') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><NotificationsScreen onBack={() => setActiveScreen(null)} onNavigateToCommunity={() => { setActiveScreen(null); setActiveTab('community'); }} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'notifications') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><NotificationsScreen onBack={() => setActiveScreen(null)} onNavigateToCommunity={(target) => { setActiveScreen(null); setActiveTab('community'); if (target) setCommunityDeepLink(target); }} /></ErrorBoundary></Suspense>;
   if (activeScreen === 'settings') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><SettingsScreen onBack={() => setActiveScreen(null)} onNavigate={setActiveScreen} /></ErrorBoundary></Suspense>;
   if (activeScreen === 'health-sync') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><HealthSyncScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
   if (activeScreen === 'referral') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><ReferralScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;

@@ -10,6 +10,10 @@ export interface Notification {
   notification_type: string;
   is_read: boolean;
   created_at: string;
+  /** postId/commentId/storyId/context daşıyan strukturlaşdırılmış hədəf — bax
+   *  send-push-notification/index.ts (insert zamanı yazılır) və NotificationsScreen.tsx (klikdə oxunur) */
+  action_data?: any;
+  action_type?: string | null;
 }
 
 export const useNotifications = () => {

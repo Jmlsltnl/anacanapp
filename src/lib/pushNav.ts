@@ -7,6 +7,15 @@
  *
  * Həll: data.type → intent; Index CustomEvent ilə tətbiq edir.
  * Soyuq başlanğıc üçün pending saxlanılır (Index mount olanda istehlak edir).
+ *
+ * DÜZƏLİŞ (Community bildirişləri): əvvəllər `community_reply`/`comment_like`/
+ * `story_like`/`story_reply` bu switch-də HEÇ olmadığı üçün toxunuşları HEÇ
+ * YERƏ aparmırdı (default: null). Digər community tiplər (`community_like`/
+ * `community_comment`) isə YALNIZ ümumi Community tab-ına keçirdi — postId/
+ * commentId/storyId FCM data-sında artıq gəlirdi (bax send-push-notification
+ * edge function-un fcmData tərtibi), sadəcə oxunmurdu. İndi `communityTarget`
+ * sahəsi ilə bu ID-lər Index.tsx-ə qədər aparılır (bax CommunityScreen.tsx-in
+ * `deepLinkTarget` prop-u, SinglePostView.tsx).
  */
 
 export interface PushNavIntent {
@@ -14,6 +23,8 @@ export interface PushNavIntent {
   screen?: string;
   /** Qadın tərəfdə partner söhbəti (MessagesScreen) */
   motherChat?: boolean;
+  /** Community-yə keçəndə MƏHZ hansı post/şərh/story-nin açılacağı (bax CommunityDeepLinkTarget) */
+  communityTarget?: { postId?: string; commentId?: string; storyId?: string };
 }
 
 export const PUSH_NAV_EVENT = 'anacan-push-nav';
@@ -32,6 +43,14 @@ export function intentFromPushData(data: Record<string, any>): PushNavIntent | n
       return { motherChat: true }; // Index rola görə partner chat tab-ına çevirir
     case 'community_like':
     case 'community_comment':
+      return { tab: 'community', communityTarget: { postId: data?.postId } };
+    case 'community_reply':
+      return { tab: 'community', communityTarget: { postId: data?.postId, commentId: data?.commentId } };
+    case 'comment_like':
+      return { tab: 'community', communityTarget: { postId: data?.postId, commentId: data?.commentId } };
+    case 'story_like':
+    case 'story_reply':
+      return { tab: 'community', communityTarget: { storyId: data?.storyId } };
     case 'like':
     case 'comment':
     case 'community':

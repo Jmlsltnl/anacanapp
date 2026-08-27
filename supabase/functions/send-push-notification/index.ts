@@ -133,10 +133,17 @@ Deno.serve(async (req) => {
     }
 
     // Store notification in database
+    // DÜZƏLİŞ: `action_data`/`action_type` sütunları artıq mövcud idi (əvvəlki
+    // bir miqrasiyadan qalıb) amma HEÇ VAXT yazılmırdı — nəticədə bildirişə
+    // klik edəndə hansı post/şərh/story-yə aid olduğunu bilmək mümkün deyildi
+    // (yalnız ümumi Community tab-ına keçirdi). `data` obyekti artıq bura
+    // gəlib çatıb (postId/commentId/storyId/context) — sadəcə saxlanılır.
     try {
       await supabase.from('notifications').insert({
         user_id: userId, title, message: body,
         notification_type: data?.type || 'push', is_read: false,
+        action_type: data?.type || null,
+        action_data: data || null,
       });
     } catch (storeError) {
       console.error('Error storing notification:', storeError);

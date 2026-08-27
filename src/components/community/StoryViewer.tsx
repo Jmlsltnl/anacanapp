@@ -25,6 +25,8 @@ import {
 interface StoryViewerProps {
   storyGroups: UserStoryGroup[];
   initialGroupIndex: number;
+  /** Bildiriş/deep-link ilə: bu qrup daxilində MƏHZ bu ID-li story-dən başla (yoxdursa 0-cı story) */
+  initialStoryId?: string | null;
   onClose: () => void;
   onViewed: (storyId: string) => void;
   onDelete?: (storyId: string) => void;
@@ -34,6 +36,7 @@ interface StoryViewerProps {
 const StoryViewer = ({
   storyGroups,
   initialGroupIndex,
+  initialStoryId,
   onClose,
   onViewed,
   onDelete,
@@ -42,7 +45,13 @@ const StoryViewer = ({
   const { user, profile, isAdmin } = useAuth();
   const isRtl = useIsRtl();
   const [currentGroupIndex, setCurrentGroupIndex] = useState(initialGroupIndex);
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(() => {
+    if (initialStoryId) {
+      const idx = storyGroups[initialGroupIndex]?.stories.findIndex((s) => s.id === initialStoryId);
+      if (idx !== undefined && idx >= 0) return idx;
+    }
+    return 0;
+  });
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);

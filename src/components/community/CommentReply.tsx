@@ -26,6 +26,8 @@ interface CommentReplyProps {
   isReply?: boolean;
   /** cavablar üçün: bu nəslin aid olduğu kök şərhin id-si */
   rootId?: string;
+  /** Bildiriş/deep-link vasitəsilə açılanda: bu ID-li şərhi/cavabı tapıb vurğula + ekrana sürüşdür */
+  highlightCommentId?: string | null;
 }
 
 /**
@@ -42,8 +44,21 @@ interface CommentReplyProps {
  * toxunulmaz qalır — yalnız GÖRÜNÜŞ düzləşdirilir. Kökə deyil, başqa cavaba
  * cavab verilibsə, "@Ad" prefiksi ilə kontekst itirilmir.
  */
-const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, onUserClick, isReply = false, rootId }: CommentReplyProps) => {
+const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, onUserClick, isReply = false, rootId, highlightCommentId }: CommentReplyProps) => {
   const [showReplyInput, setShowReplyInput] = useState(false);
+  const isHighlighted = !!highlightCommentId && comment.id === highlightCommentId;
+  const rowRef = useRef<HTMLDivElement>(null);
+
+  // Bildiriş/deep-link ilə açılan konkret şərhə avtomatik sürüşdür — istifadəçi
+  // uzun bir mövzuda hansı şərhin nəzərdə tutulduğunu axtarmasın.
+  useEffect(() => {
+    if (isHighlighted && rowRef.current) {
+      const t = setTimeout(() => {
+        rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 250);
+      return () => clearTimeout(t);
+    }
+  }, [isHighlighted]);
   const [showReplies, setShowReplies] = useState(true);
   const [replyText, setReplyText] = useState('');
   const [replyAnonymous, setReplyAnonymous] = useState(false);
@@ -191,7 +206,16 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   const avatarSize = isReply ? 'w-7 h-7' : 'w-9 h-9';
 
   return (
-    <div>
+    <div
+      ref={rowRef}
+      style={isHighlighted ? {
+        background: 'var(--a-peach-1)',
+        borderRadius: 14,
+        padding: '8px 8px',
+        margin: '-8px -8px 0',
+        transition: 'background 1.5s ease-out',
+      } : undefined}
+    >
       <div className="flex gap-2.5 items-start">
         {/* Avatar */}
         <motion.button onClick={handleAvatarClick} whileTap={{ scale: 0.94 }} className="flex-shrink-0">
@@ -382,7 +406,7 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
             <div className="ms-[18px] ps-[22px] border-s-2 border-border/20 space-y-4 mt-3">
               {replies.map((reply) =>
-            <CommentReply key={reply.id} comment={reply} postId={postId} postAuthorId={postAuthorId} allComments={allComments} onRefetch={onRefetch} onUserClick={onUserClick} isReply rootId={effectiveRootId} />
+            <CommentReply key={reply.id} comment={reply} postId={postId} postAuthorId={postAuthorId} allComments={allComments} onRefetch={onRefetch} onUserClick={onUserClick} isReply rootId={effectiveRootId} highlightCommentId={highlightCommentId} />
             )}
             </div>
           </motion.div>

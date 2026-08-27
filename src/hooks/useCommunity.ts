@@ -288,6 +288,33 @@ export const useGroupPosts = (groupId: string | null) => {
   });
 };
 
+/**
+ * Bir dənə postu, ID-sinə görə, TƏK başına (üst feed sorğusundan asılı
+ * olmadan) çəkir. Bildiriş klikindən "məhz həmin postu" açmaq üçün lazımdır —
+ * `useGroupPosts` yalnız son 150 (dil/pin sırasına görə) postu gətirir və bu,
+ * daha köhnə/başqa istifadəçinin postunu ehtiva etməyə bilər. RLS
+ * ("Members can view group posts") burada da eyni şəkildə tətbiq olunur —
+ * başqa ölkədən/qrup üzvü olmadığın postu açmaq cəhdi sadəcə boş nəticə verər.
+ */
+export const useSinglePost = (postId: string | null) => {
+  return useQuery({
+    queryKey: ['single-post', postId],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: post, error } = await supabase
+        .from('community_posts')
+        .select('*')
+        .eq('id', postId as string)
+        .maybeSingle();
+      if (error) throw error;
+      if (!post) return null;
+      const [enriched] = await enrichPosts([post], user?.id);
+      return enriched;
+    },
+    enabled: !!postId
+  });
+};
+
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -546,7 +573,7 @@ export const useToggleCommentLike = () => {
       void (async () => {
         try {
           const { data: comment } = await supabase.
-          from('post_comments').select('user_id, content').eq('id', commentId).maybeSingle();
+          from('post_comments').select('user_id, content, post_id').eq('id', commentId).maybeSingle();
           if (comment && (comment as any).user_id !== user.id) {
             const { data: profile } = await supabase.
             from('public_profile_cards').select('name').eq('user_id', user.id).maybeSingle();
@@ -557,7 +584,9 @@ export const useToggleCommentLike = () => {
                 userId: (comment as any).user_id,
                 title: tr("usecommunity_serhiniz_beyenildi", "Şərhiniz bəyənildi ❤️"),
                 body: preview ? `${likerName}: ${preview}` : likerName,
-                data: { type: 'comment_like', commentId, context: 'post_comment' }
+                // postId: bildirişə klik edəndə MƏHZ bu postu (+ şərhi vurğulayaraq)
+                // açmaq üçün lazımdır (bax SinglePostView.tsx, pushNav.ts).
+                data: { type: 'comment_like', commentId, postId: (comment as any).post_id, context: 'post_comment' }
               }
             });
           }

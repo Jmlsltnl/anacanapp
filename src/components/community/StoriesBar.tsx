@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Camera, Image as ImageIcon, X } from 'lucide-react';
 import { UserStoryGroup, useStories, useToggleStoryLike } from '@/hooks/useStories';
@@ -11,15 +11,34 @@ import { tr } from "@/lib/tr";
 
 interface StoriesBarProps {
   groupId?: string | null;
+  /** Bildiriş/deep-link ilə: bu ID-li story-ni tapıb avtomatik aç (bax CommunityScreen.tsx) */
+  autoOpenStoryId?: string | null;
+  /** autoOpenStoryId "istehlak" olunduqdan sonra valideyndə təmizləmək üçün */
+  onAutoOpenConsumed?: () => void;
 }
 
-const StoriesBar = ({ groupId }: StoriesBarProps) => {
+const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBarProps) => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const { storyGroups, isLoading, createStory, isCreating, markAsViewed, deleteStory } = useStories(groupId);
   const toggleStoryLike = useToggleStoryLike();
   const [viewerOpen, setViewerOpen] = useState(false);
   const [initialGroupIndex, setInitialGroupIndex] = useState(0);
+  const [initialStoryId, setInitialStoryId] = useState<string | null>(null);
+
+  // Bildirişdən gələn storyId — story-lər yükləndikdən sonra hansı qrupda
+  // olduğunu tapıb ORAYA açır (StoryViewer öz stack-i daxilində düz story-yə keçir).
+  useEffect(() => {
+    if (!autoOpenStoryId || storyGroups.length === 0) return;
+    const groupIdx = storyGroups.findIndex((g) => g.stories.some((s) => s.id === autoOpenStoryId));
+    if (groupIdx >= 0) {
+      setInitialGroupIndex(groupIdx);
+      setInitialStoryId(autoOpenStoryId);
+      setViewerOpen(true);
+    }
+    onAutoOpenConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoOpenStoryId, storyGroups]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [cropImageUrl, setCropImageUrl] = useState<string | null>(null);
@@ -153,7 +172,7 @@ const StoriesBar = ({ groupId }: StoriesBarProps) => {
       </div>
 
       <AnimatePresence>
-        {viewerOpen && <StoryViewer storyGroups={storyGroups} initialGroupIndex={initialGroupIndex} onClose={() => setViewerOpen(false)} onViewed={markAsViewed} onDelete={deleteStory} onToggleLike={(storyId, isLiked) => toggleStoryLike.mutate({ storyId, isLiked })} />}
+        {viewerOpen && <StoryViewer storyGroups={storyGroups} initialGroupIndex={initialGroupIndex} initialStoryId={initialStoryId} onClose={() => { setViewerOpen(false); setInitialStoryId(null); }} onViewed={markAsViewed} onDelete={deleteStory} onToggleLike={(storyId, isLiked) => toggleStoryLike.mutate({ storyId, isLiked })} />}
       </AnimatePresence>
       <AnimatePresence>
         {cropImageUrl && <StoryCropEditor imageUrl={cropImageUrl} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />}

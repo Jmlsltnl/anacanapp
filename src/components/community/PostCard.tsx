@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, memo } from 'react';
+import { useState, useRef, useCallback, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Flag, Pencil, EyeOff, Languages, Pin, PinOff, ImagePlus, X, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -30,6 +30,10 @@ interface PostCardProps {
   post: CommunityPost;
   groupId: string | null;
   onUserClick?: (userId: string) => void;
+  /** Bildiriş/deep-link vasitəsilə açılanda: şərh panelini əvvəlcədən aç (bax SinglePostView.tsx) */
+  forceShowComments?: boolean;
+  /** Bildiriş/deep-link vasitəsilə açılanda: bu ID-li şərhi/cavabı tapıb vurğula (bax CommentReply.tsx) */
+  highlightCommentId?: string | null;
 }
 
 const getMediaType = (url: string): 'image' | 'video' => {
@@ -53,8 +57,16 @@ const avatarGradFor = (seed: string) => {
 // istənilən re-render-i bütün görünən postları yenidən render edirdi.
 // Effektiv olması üçün onUserClick CommunityScreen-də useCallback ilə sabitlənib,
 // post obyekt referansı isə react-query-nin struktur paylaşımı ilə sabitdir.
-const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
-  const [showComments, setShowComments] = useState(false);
+const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highlightCommentId }: PostCardProps) => {
+  const [showComments, setShowComments] = useState(!!forceShowComments);
+
+  // Bildiriş/deep-link ilə açılan post gec (asinxron) yüklənə bilər — prop
+  // mount-dan SONRA `true` olsa belə (SinglePostView post-u çəkdikdən sonra
+  // render edir), panel yenə açılsın.
+  useEffect(() => {
+    if (forceShowComments) setShowComments(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forceShowComments]);
   const [commentText, setCommentText] = useState('');
   const { ref: commentTextareaRef } = useAutoGrowTextarea(commentText, 110);
   const [commentAnonymous, setCommentAnonymous] = useState(false);
@@ -483,7 +495,7 @@ const PostCard = memo(({ post, groupId, onUserClick }: PostCardProps) => {
 
               <div className="space-y-2">
                     {topLevelComments.map((comment) =>
-                <CommentReply key={comment.id} comment={comment} postId={post.id} postAuthorId={post.user_id} allComments={comments} onRefetch={refetchComments} onUserClick={onUserClick} />
+                <CommentReply key={comment.id} comment={comment} postId={post.id} postAuthorId={post.user_id} allComments={comments} onRefetch={refetchComments} onUserClick={onUserClick} highlightCommentId={highlightCommentId} />
                 )}
                   </div>
               }

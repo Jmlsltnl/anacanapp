@@ -8,12 +8,27 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
 import { useUserStore } from '@/store/userStore';
 
+export interface NotificationCommunityTarget {
+  postId?: string;
+  commentId?: string;
+  storyId?: string;
+}
+
 interface NotificationsScreenProps {
   onBack: () => void;
-  onNavigateToCommunity?: () => void;
+  onNavigateToCommunity?: (target?: NotificationCommunityTarget) => void;
 }
 
 type FilterType = 'all' | 'community' | 'system';
+
+// DÜZƏLİŞ: əvvəllər bu siyahıda `comment_like`/`story_like`/`story_reply`
+// yox idi — useCreateComment/useToggleCommentLike/useStories/useStoryReplies
+// bu tipləri ARTIQ göndərirdi, amma bura klik edəndə heç nə baş vermirdi
+// (nə naviqasiya, nə "Community" filtri, nə "Görmək üçün toxun" işarəsi).
+const communityTypes = [
+  'community_like', 'community_comment', 'community_reply',
+  'comment_like', 'story_like', 'story_reply',
+];
 
 const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScreenProps) => {
   useScrollToTop();
@@ -22,20 +37,22 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
 
   const { notifications, loading, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
 
-  const communityTypes = ['community_like', 'community_comment', 'community_reply'];
-
   const filteredNotifications = notifications.filter((n) => {
     if (filter === 'community') return communityTypes.includes(n.notification_type);
     if (filter === 'system') return !communityTypes.includes(n.notification_type);
     return true;
   });
 
-  // Palitra: tint fon + sabit ink (dizayn sistemi konvensiyasÄ±)
+  // Palitra: tint fon + sabit ink (dizayn sistemi konvensiyası)
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'community_like':return { icon: Heart, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
+      case 'community_like':
+      case 'comment_like':
+        return { icon: Heart, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
       case 'community_comment':return { icon: MessageCircle, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' };
       case 'community_reply':return { icon: Reply, bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
+      case 'story_like':return { icon: Heart, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
+      case 'story_reply':return { icon: Reply, bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
       case 'reminder':return { icon: Bell, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' };
       case 'appointment':return { icon: Calendar, bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
       case 'tip':return { icon: Pill, bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' };
@@ -53,24 +70,36 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
     const diffMins = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (diffMins < 1) return tr("notificationsscreen_i_ndice_3c9745", "\u0130ndic\u0259");
-    if (diffMins < 60) return `${diffMins} ${tr("notificationsscreen_mins", "dÉ™q")}`;
+    if (diffMins < 1) return tr("notificationsscreen_i_ndice_3c9745", "İndicə");
+    if (diffMins < 60) return `${diffMins} ${tr("notificationsscreen_mins", "dəq")}`;
     if (diffHours < 24) return `${diffHours} ${tr("notificationsscreen_hours", "saat")}`;
-    if (diffDays === 1) return tr("notificationsscreen_dunen_52b701", "D\xFCn\u0259n");
+    if (diffDays === 1) return tr("notificationsscreen_dunen_52b701", "Dünən");
     const { language } = useUserStore.getState();
     return date.toLocaleDateString(getLocaleTag(), { day: 'numeric', month: 'short' });
   };
 
+  // DÜZƏLİŞ: əvvəllər YALNIZ notification_type-a baxıb Community tab-ına
+  // (heç bir konkret post/şərh/story olmadan) keçirdi. `action_data` sütunu
+  // (send-push-notification/index.ts artıq bunu yazır) burada oxunub, konkret
+  // hədəf Index.tsx-ə → CommunityScreen-ə → SinglePostView-a qədər aparılır.
   const handleNotificationClick = (notification: any) => {
     if (!notification.is_read) markAsRead(notification.id);
-    if (communityTypes.includes(notification.notification_type) && onNavigateToCommunity) {
-      onNavigateToCommunity();
+    if (!communityTypes.includes(notification.notification_type) || !onNavigateToCommunity) return;
+
+    const actionData = notification.action_data || {};
+    const type = notification.action_type || notification.notification_type;
+
+    if (type === 'story_like' || type === 'story_reply') {
+      onNavigateToCommunity({ storyId: actionData.storyId });
+      return;
     }
+    // community_like / community_comment / community_reply / comment_like — hamısı postId daşıyır
+    onNavigateToCommunity({ postId: actionData.postId, commentId: actionData.commentId });
   };
 
   const filters: {id: FilterType;label: string;}[] = [
-  { id: 'all', label: tr("notificationsscreen_hamisi_c73c4d", 'HamÄ±sÄ±') },
-  { id: 'community', label: tr("notificationsscreen_cemiyyet_2dc44d", 'CÉ™miyyÉ™t') },
+  { id: 'all', label: tr("notificationsscreen_hamisi_c73c4d", 'Hamısı') },
+  { id: 'community', label: tr("notificationsscreen_cemiyyet_2dc44d", 'Cəmiyyət') },
   { id: 'system', label: tr("notificationsscreen_filter_system", "Sistem") }];
 
 
@@ -84,15 +113,15 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div style={{ minWidth: 0 }}>
-              {unreadCount > 0 && <p className="a-eyebrow">{unreadCount} {tr("notificationsscreen_oxunmamis_8bfc41", "oxunmam\u0131\u015F")}</p>}
-              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("notificationsscreen_bildirisler_54eb88", "BildiriÅŸlÉ™r")}</p>
+              {unreadCount > 0 && <p className="a-eyebrow">{unreadCount} {tr("notificationsscreen_oxunmamis_8bfc41", "oxunmamış")}</p>}
+              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("notificationsscreen_bildirisler_54eb88", "Bildirişlər")}</p>
             </div>
           </div>
           {unreadCount > 0 &&
           <div className="a-topbar-actions">
               <motion.button onClick={markAllAsRead} className="a-btn-soft" whileTap={{ scale: 0.95 }}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
-                <Check size={12} strokeWidth={2.5} />{tr("notificationsscreen_hamisini_oxu_29ceea", "Ham\u0131s\u0131n\u0131 oxu")}
+                <Check size={12} strokeWidth={2.5} />{tr("notificationsscreen_hamisini_oxu_29ceea", "Hamısını oxu")}
               </motion.button>
             </div>
           }
@@ -119,8 +148,8 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
           style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--a-surface-soft)' }}>
               <Bell size={26} style={{ color: 'var(--a-ink-faint)' }} />
             </div>
-            <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr("notificationsscreen_bildiris_yoxdur_6ccf4d", "BildiriÅŸ yoxdur")}</h3>
-            <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("notificationsscreen_yeni_bildirisler_burada_gorunecek_a0484a", "Yeni bildiriÅŸlÉ™r burada gÃ¶rÃ¼nÉ™cÉ™k")}</p>
+            <h3 className="a-list-title" style={{ marginBottom: 4 }}>{tr("notificationsscreen_bildiris_yoxdur_6ccf4d", "Bildiriş yoxdur")}</h3>
+            <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("notificationsscreen_yeni_bildirisler_burada_gorunecek_a0484a", "Yeni bildirişlər burada görünəcək")}</p>
           </motion.div> :
 
         <div className="space-y-2.5">
@@ -158,7 +187,7 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
                       </div>
                       <p className="mt-0.5 leading-relaxed line-clamp-2" style={{ fontSize: 11.5, color: 'var(--a-ink-soft)' }}>{notification.message}</p>
                       {isCommunity &&
-                    <p className="mt-1.5" style={{ fontSize: 9.5, fontWeight: 700, color: 'var(--a-accent-ink)' }}>{tr("notificationsscreen_gormek_ucun_toxun_04883f", "GÃ¶rmÉ™k Ã¼Ã§Ã¼n toxun â†’")}</p>
+                    <p className="mt-1.5" style={{ fontSize: 9.5, fontWeight: 700, color: 'var(--a-accent-ink)' }}>{tr("notificationsscreen_gormek_ucun_toxun_04883f", "Görmək üçün toxun →")}</p>
                     }
                     </div>
                   </div>
