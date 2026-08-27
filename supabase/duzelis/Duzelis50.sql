@@ -43,8 +43,16 @@
 -- cron trigger) reading the same secret from Key Vault (CRON-SECRET) and calling
 -- the Azure-hosted functions directly. See azure-migration/README.md.
 --
+-- ⚠️ DÜZƏLİŞ (bax Duzelis55.sql): aşağıdakı "~09:00,10:00,14:00,15:00,19:00" YALNIZ
+-- 5 slotdur — edge function-un öz DAILY_RUN_SLOTS-u isə 9 slot gözləyir (+12:00,
+-- 14:30,15:30,19:30). Bu 5-slotluq cədvəl illərlə pregnancy_day_notifications-un
+-- BÜTÜN sətirlərini (send_time=12:00) və mommy_day_notifications-un 85%-ni
+-- (12:00/14:30/15:30/19:30) sükutla ölü qoyub. Azure Container Apps Jobs (və ya
+-- hər hansı digər əvəzedici planlayıcı) qurularkən BURADAKI deyil, Duzelis55.sql-
+-- dəki TAM 9-slotluq (iki job: tam saat + yarım saat) cədvəli əsas GÖTÜRÜLMƏLİDİR.
+--
 -- 1) send-daily-notifications — gündəlik hamiləlik/mommy məzmunu + admin "Günlük" tabındakı
---    scheduled_notifications sətirləri (Bakı ~09:00,10:00,14:00,15:00,19:00)
+--    scheduled_notifications sətirləri (Bakı ~09:00,10:00,14:00,15:00,19:00 — bax yuxarı qeyd)
 -- SELECT cron.schedule(
 --   'send-daily-notifications-slots-secure',
 --   '0 5,6,10,11,15 * * *',

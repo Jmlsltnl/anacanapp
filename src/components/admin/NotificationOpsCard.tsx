@@ -70,8 +70,15 @@ function cronUtcHoursToBaku(schedule: string): {utc: string;baku: string;allHour
 // yaşıl ✓) qaytarırdı. Yəni bu kartın YEGANƏ avtomatik yoxlaması, elə
 // onu izləməli olduğu təhlükəsizlik düzəlişinin özü tərəfindən sessizcə
 // sıradan çıxarılmışdı.
+// DÜZƏLİŞ (Duzelis55.sql): "send-daily-notifications-slots-secure" tək başına
+// 9 gözlənilən Bakı slotunun 6-sını (tam saatlar) daşıyır — qalan 3 yarım-saat
+// slotu (14:30/15:30/19:30) pg_cron-un "eyni cədvəldə həm :00 həm :30" məhdudiyyəti
+// üzündən AYRI bir job-a ("...-halfhour-secure") köçürülüb. Əvvəllər bu 4-cü/9-cu
+// slotlar (xüsusilə 12:00 — pregnancy_day_notifications-un BÜTÜN sətirlərinin
+// send_time dəyəri) heç bir cron job-a bağlı deyildi və HEÇ VAXT işə düşmürdü.
 const EXPECTED_BAKU_HOURS: Record<string, number[]> = {
   'send-daily-notifications-slots-secure': [9, 10, 12, 14, 15, 19],
+  'send-daily-notifications-halfhour-secure': [14, 15, 19],
   'send-flow-reminders-every-hour-secure': [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
 };
 
