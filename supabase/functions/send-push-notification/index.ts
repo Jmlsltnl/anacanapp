@@ -14,13 +14,13 @@ const corsHeaders = {
 // İndi çağıran `context` göndərməlidir və server DB-də HƏQİQƏTƏN mövcud
 // münasibəti müstəqil yoxlayır — `userId` təkcə "iddia", sübut deyil.
 // Tanınmayan/göndərilməyən context → default-deny (yalnız özünə göndərə bilər).
-type PushContext = 'self' | 'partner' | 'direct_message' | 'community_post' | 'community_story';
+type PushContext = 'self' | 'partner' | 'direct_message' | 'community_post' | 'community_story' | 'post_comment';
 
 interface PushPayload {
   userId: string;
   title: string;
   body: string;
-  data?: Record<string, unknown> & { context?: PushContext; postId?: string; storyId?: string };
+  data?: Record<string, unknown> & { context?: PushContext; postId?: string; storyId?: string; commentId?: string };
 }
 
 async function verifyOwnership(
@@ -81,6 +81,19 @@ async function verifyOwnership(
     const { data: story } = await supabase
       .from('community_stories').select('user_id').eq('id', storyId).maybeSingle();
     return !!story && (story as any).user_id === targetUserId;
+  }
+
+  if (context === 'post_comment') {
+    // Şərhə CAVAB / şərh LIKE bildirişləri (useCommunity.ts: useCreateComment,
+    // useToggleCommentLike) — hədəf burada POST sahibi YOX, KONKRET şərhin
+    // müəllifidir. Əvvəllər bu case olmadığı üçün cavab bildirişləri həmişə
+    // (yanlış olaraq) post sahibinə göndərilirdi — parent şərhin əsl müəllifinə
+    // HEÇ VAXT getmirdi (bax Duzelis-də bu bugu araşdıran commit qeydi).
+    const commentId = data?.commentId;
+    if (!commentId) return false;
+    const { data: comment } = await supabase
+      .from('post_comments').select('user_id').eq('id', commentId).maybeSingle();
+    return !!comment && (comment as any).user_id === targetUserId;
   }
 
   return false;
