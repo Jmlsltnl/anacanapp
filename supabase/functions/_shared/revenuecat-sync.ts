@@ -72,6 +72,7 @@ export interface SyncResult {
   productId?: string | null;
   willRenew?: boolean;
   periodType?: string | null;
+  isTrial?: boolean;
 }
 
 /**
@@ -119,12 +120,37 @@ export async function syncEntitlementForUser(userId: string): Promise<SyncResult
         return d.toISOString();
       })();
 
+  const isTrial = isPro && periodType === 'trial';
+
+  // DÜZƏLİŞ: əvvəllər `started_at` HƏR sinxronizasiyada indiki vaxta
+  // yenilənirdi (halbuki "abunəlik nə vaxt başladı" sabit qalmalıdır) və
+  // `cancelled_at` heç saxlanılmırdı (Admin Premium səhifəsi üçün "kim NƏ
+  // VAXT cancel edib" göstərmək mümkün deyildi). İndi mövcud sətir əvvəlcə
+  // oxunur: `started_at` YALNIZ ilk dəfə yazılır, `cancelled_at` status
+  // 'cancelled'-ə KEÇİDDƏ təyin olunur (yenidən aktivləşəndə təmizlənir).
+  const { data: existingSub } = await admin
+    .from('subscriptions')
+    .select('status, started_at, cancelled_at')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  const nowIso = new Date().toISOString();
+  const startedAt = (existingSub as any)?.started_at || nowIso;
+  const cancelledAt =
+    status === 'cancelled' && (existingSub as any)?.status !== 'cancelled'
+      ? nowIso
+      : status === 'active'
+      ? null
+      : (existingSub as any)?.cancelled_at ?? null;
+
   const { error: subError } = await admin.from('subscriptions').upsert({
     user_id: userId,
     plan_type: isPro ? planType : 'free',
     status,
-    started_at: new Date().toISOString(),
+    started_at: startedAt,
     expires_at: isPro ? expiresAtIso : null,
+    is_trial: isTrial,
+    cancelled_at: cancelledAt,
   }, { onConflict: 'user_id' });
   if (subError) console.error('[revenuecat-sync] subscriptions upsert error:', subError);
 
@@ -152,5 +178,6 @@ export async function syncEntitlementForUser(userId: string): Promise<SyncResult
     productId,
     willRenew,
     periodType,
+    isTrial,
   };
 }

@@ -15,6 +15,8 @@ interface Subscription {
   started_at: string;
   expires_at: string | null;
   updated_at?: string;
+  is_trial?: boolean;
+  cancelled_at?: string | null;
 }
 
 /** Gündəlik say limiti olan feature-lər (usage_tracking.feature_type) */

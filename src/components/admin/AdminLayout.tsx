@@ -111,6 +111,7 @@ const menuGroups: MenuGroup[] = [
   icon: DollarSign,
   items: [
   { id: 'subscriptions', label: tr("adminlayout_abunelikler_467656", "Abunəliklər"), icon: Crown },
+  { id: 'premium-analytics', label: tr("adminlayout_premium_analitika", "Premium Analitika"), icon: BarChart3 },
   { id: 'orders', label: tr("adminlayout_sifarisler_660280", "Sifarişlər"), icon: ShoppingCart },
   { id: 'epoint', label: tr("adminlayout_epoint_odenis_a468aa", "Epoint Ödəniş"), icon: CreditCard },
   { id: 'products', label: tr("adminlayout_mehsullar_24a4ce", "Məhsullar"), icon: Package },

@@ -14,6 +14,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import { PremiumModal } from '@/components/PremiumModal';
+import { CancellationReasonDialog } from '@/components/CancellationReasonDialog';
 import { useBillingConfig } from '@/hooks/usePaywallConfig';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
 import { getPlatform, isNativePlatform, REVENUECAT_CONFIG } from '@/lib/revenuecat';
@@ -44,6 +45,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
   const { features: dbFeatures } = usePremiumConfig();
   const { showCustomerCenter, isSupported: isIAPSupported, restorePurchases } = useInAppPurchase();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showCancelReasonDialog, setShowCancelReasonDialog] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [payments, setPayments] = useState<PaymentEntry[]>([]);
@@ -126,9 +128,19 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
     fetchPaymentHistory();
   }, []);
 
-  const handleCancelSubscription = async () => {
+  // DÜZƏLİŞ: əvvəllər bura düz platform-ləğvinə keçirdi (yalnız bir native
+  // `confirm()` xəbərdarlığı ilə) — istifadəçinin NİYƏ ləğv etdiyi heç vaxt
+  // soruşulmurdu/qeydə alınmırdı. İndi əvvəlcə səliqəli bir "niyə gedirsiniz?"
+  // popup göstərilir (CancellationReasonDialog) — səbəb `subscription_
+  // cancellations`-a yazılır (admin panelində tam görünür), sonra YALNIZ
+  // bundan sonra əsl platform-ləğv axını davam edir. "Keç" seçsə də axın
+  // pozulmur — sadəcə səbəb yazılmır.
+  const handleCancelSubscription = () => {
+    setShowCancelReasonDialog(true);
+  };
+
+  const proceedWithPlatformCancel = async () => {
     if (isIAPSupported && !isAndroidNative) {
-      if (!confirm(tr("billingscreen_cancel_appstore", "You will be redirected to the App Store / Google Play subscription management page to cancel your subscription."))) return;
       setIsCanceling(true);
       await showCustomerCenter();
       setIsCanceling(false);
@@ -140,7 +152,6 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
     // "ləğv edilib" göstərirdi. İndi birbaşa Play Store-un öz abunəlik idarəetmə
     // səhifəsinə yönləndirir (Google-ın da tələb etdiyi düzgün üsul).
     if (isAndroidNative) {
-      if (!confirm(tr("billingscreen_cancel_appstore", "You will be redirected to the App Store / Google Play subscription management page to cancel your subscription."))) return;
       const pkg = 'com.atlasoon.anacan';
       const url = activeProductId ?
       `https://play.google.com/store/account/subscriptions?sku=${encodeURIComponent(activeProductId)}&package=${pkg}` :
@@ -418,6 +429,13 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
       </div>
 
       <PremiumModal isOpen={showPremiumModal} onClose={() => setShowPremiumModal(false)} />
+      <CancellationReasonDialog
+        isOpen={showCancelReasonDialog}
+        onClose={() => setShowCancelReasonDialog(false)}
+        onProceed={proceedWithPlatformCancel}
+        planType={subscription?.plan_type}
+        wasTrial={subscription?.is_trial}
+      />
     </div>
   );
 };

@@ -35,6 +35,7 @@
 // tam uyğun olmalıdır — əks halda kim olursa olsun saxta hadisə göndərib
 // istənilən istifadəçiyə Premium "verə" bilməzdi.
 // ============================================================
+import { createClient } from 'npm:@supabase/supabase-js@2';
 import { syncEntitlementForUser } from '../_shared/revenuecat-sync.ts';
 
 Deno.serve(async (req) => {
@@ -60,6 +61,13 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => null);
     const appUserId: string | undefined = body?.event?.app_user_id;
     const eventType: string | undefined = body?.event?.type;
+    // RC-nin ÖZ mağaza-tərəfi ləğv/bitmə səbəbi (UNSUBSCRIBE, BILLING_ERROR,
+    // CUSTOMER_SUPPORT, PRICE_INCREASE, DEVELOPER_INITIATED, UNKNOWN) —
+    // istifadəçinin tətbiq-daxili popup-da özü yazdığı səbəbdən (bax
+    // useSubscriptionCancellation.ts, cancel_flow='in_app') TAMAMİLƏ AYRI,
+    // tamamlayıcı bir siqnal (cancel_flow='store_reported'). Əvvəllər bu
+    // dəyər HEÇ oxunmurdu, HEÇ saxlanılmırdı.
+    const storeReason: string | undefined = body?.event?.cancel_reason || body?.event?.expiration_reason;
 
     if (!appUserId) {
       console.warn('[revenuecat-webhook] Missing event.app_user_id in payload:', JSON.stringify(body)?.slice(0, 300));
@@ -70,6 +78,22 @@ Deno.serve(async (req) => {
 
     console.log(`[revenuecat-webhook] Event "${eventType}" for app_user_id=${appUserId}`);
     const result = await syncEntitlementForUser(appUserId);
+
+    if ((eventType === 'CANCELLATION' || eventType === 'EXPIRATION') && storeReason) {
+      try {
+        const admin = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
+        await admin.from('subscription_cancellations').insert({
+          user_id: appUserId,
+          reason_code: `store_${storeReason.toLowerCase()}`,
+          reason_text: null,
+          plan_type: result.planType || null,
+          was_trial: result.isTrial || false,
+          cancel_flow: 'store_reported',
+        });
+      } catch (e) {
+        console.error('[revenuecat-webhook] failed to log store-reported cancel reason:', e);
+      }
+    }
 
     if (!result.ok) {
       // RC-nin ÖZ API-si müvəqqəti əlçatan deyilsə (nadir hal — webhook

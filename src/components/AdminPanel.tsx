@@ -12,6 +12,7 @@ import AdminSecurity from './admin/AdminSecurity';
 import AdminCommunity from './admin/AdminCommunity';
 import AdminContentManager from './admin/AdminContentManager';
 import AdminSubscriptions from './admin/AdminSubscriptions';
+import AdminPremiumAnalytics from './admin/AdminPremiumAnalytics';
 import AdminModeration from './admin/AdminModeration';
 import AdminPregnancyContent from './admin/AdminPregnancyContent';
 import AdminFruitImages from './admin/AdminFruitImages';
@@ -117,6 +118,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminPhotoshoot />;
       case 'subscriptions':
         return <AdminSubscriptions />;
+      case 'premium-analytics':
+        return <AdminPremiumAnalytics />;
       case 'moderation':
         return <AdminModeration />;
       case 'data':
