@@ -1,3 +1,8 @@
+-- ⚠️ TƏHLÜKƏSİZLİK (2026-08-28): bu faylda əvvəllər hardcoded CRON_SECRET var idi —
+-- GitGuardian sızıntı aşkarladı, həmin secret LƏĞV EDİLDİ və rotasiya olundu
+-- (bax Duzelis59.sql). Aşağıdakı __CRON_SECRET__ yer-tutucuları köhnə (artıq
+-- etibarsız) dəyəri əvəz edir — bu fayl yalnız tarixi arayışdır.
+--
 -- Duzelis50.sql — Push bildirişləri (database-driven): CRON_SECRET-in QƏTİ düzəlişi
 --
 -- TARİXÇƏ (niyə bu, "3-cü cəhd"dir):
@@ -18,14 +23,14 @@
 --
 -- BU FAYLDA: Duzelis39.sql-in özündə əvvəllər TÖVSİYƏ OLUNMUŞ (amma heç bir
 -- cron job-a köçürülməmiş) dəyər artıq aşağıda BÜTÜN 4 job-a birbaşa
--- yazılıb:  z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c
+-- yazılıb:  __CRON_SECRET__
 --
 -- ⚠️ QALAN YEGANƏ ADDIM (bunu MƏN edə bilmirəm — Supabase Dashboard-a
 -- girişim yoxdur): Supabase Dashboard → Edge Functions → Secrets bölməsinə
 -- gedin və "CRON_SECRET" adlı secret-in dəyərinin DƏQİQ bu olduğunu
 -- təsdiqləyin (və ya bu dəyərlə YARADIN/YENİLƏYİN):
 --
---   z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c
+--   __CRON_SECRET__
 --
 -- Əgər orada ARTIQ FƏRQLİ bir CRON_SECRET dəyəri varsa və onu saxlamaq
 -- istəyirsinizsə, ƏVƏZİNƏ bu faylda AŞAĞIDAKI 4 "x-cron-secret" sətrini
@@ -59,7 +64,7 @@
 --   $c$
 --   SELECT net.http_post(
 --     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-daily-notifications',
---     headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
+--     headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
 --     body:=concat('{"time": "', now(), '"}')::jsonb
 --   ) as request_id;
 --   $c$
@@ -72,7 +77,7 @@
 --   $c$
 --   SELECT net.http_post(
 --     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-flow-reminders',
---     headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
+--     headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
 --     body:=concat('{"time": "', now(), '"}')::jsonb
 --   ) as request_id;
 --   $c$
@@ -85,7 +90,7 @@
 --   $c$
 --   SELECT net.http_post(
 --     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-vitamin-reminders',
---     headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
+--     headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
 --     body:=concat('{"time": "', now(), '"}')::jsonb
 --   ) as request_id;
 --   $c$
@@ -98,7 +103,7 @@
 --   $c$
 --   SELECT net.http_post(
 --     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/expire-partner-links',
---     headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
+--     headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
 --     body:=concat('{"time": "', now(), '"}')::jsonb
 --   ) as request_id;
 --   $c$
@@ -110,7 +115,7 @@
 --   SELECT jobid, jobname, schedule, command FROM cron.job
 --   WHERE jobname LIKE '%-secure' ORDER BY jobname;
 --
--- "command" sütununda "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c" görünməlidir
+-- "command" sütununda "__CRON_SECRET__" görünməlidir
 -- (bu, artıq bu SQL-in özündə yazılıb — dəyişməyə ehtiyac yoxdur). Əsl
 -- yoxlanmalı şey: Supabase Dashboard-dakı CRON_SECRET secret-i DƏQİQ bu
 -- dəyərlə uyğun olmalıdır (yuxarıdakı qeydə bax).

@@ -1,3 +1,9 @@
+-- ⚠️ TƏHLÜKƏSİZLİK (2026-08-28): bu faylda əvvəllər hardcoded CRON_SECRET var idi —
+-- GitGuardian sızıntı aşkarladı, secret LƏĞV EDİLDİ və rotasiya olundu (bax Duzelis59.sql).
+-- __CRON_SECRET__ yer-tutucusu artıq köhnə (etibarsız) dəyəri əvəz edir. Bu faylı
+-- yenidən İŞƏ SALMAYIN — cədvəl dəyişiklikləri artıq tətbiq olunub, cari secret isə
+-- Duzelis59.sql ilə qurulub.
+--
 -- Duzelis55.sql — pregnancy_day/mommy_day pushları demək olar ki, HEÇ KİMƏ getmirdi
 --
 -- KÖK SƏBƏB (canlı data ilə TƏSDİQLƏNİB, kod/data xətası DEYİL — YALNIZ cron cədvəli):
@@ -46,7 +52,7 @@ SELECT cron.schedule(
   $c$
   SELECT net.http_post(
     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-daily-notifications',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
+    headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
     body:=concat('{"time": "', now(), '"}')::jsonb
   ) as request_id;
   $c$
@@ -59,7 +65,7 @@ SELECT cron.schedule(
   $c$
   SELECT net.http_post(
     url:='https://tntbjulojatnrqmylorp.supabase.co/functions/v1/send-daily-notifications',
-    headers:='{"Content-Type": "application/json", "x-cron-secret": "z-bKLs4Vj5-JrH6vHhBkVRlJks46ATkql-6GPCS9M6c"}'::jsonb,
+    headers:='{"Content-Type": "application/json", "x-cron-secret": "__CRON_SECRET__"}'::jsonb,
     body:=concat('{"time": "', now(), '"}')::jsonb
   ) as request_id;
   $c$
