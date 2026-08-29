@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -10333,11 +10333,46 @@ export type Database = {
           },
         ]
       }
+      subscription_cancellations: {
+        Row: {
+          cancel_flow: string
+          created_at: string
+          id: string
+          plan_type: string | null
+          reason_code: string
+          reason_text: string | null
+          user_id: string
+          was_trial: boolean
+        }
+        Insert: {
+          cancel_flow?: string
+          created_at?: string
+          id?: string
+          plan_type?: string | null
+          reason_code: string
+          reason_text?: string | null
+          user_id: string
+          was_trial?: boolean
+        }
+        Update: {
+          cancel_flow?: string
+          created_at?: string
+          id?: string
+          plan_type?: string | null
+          reason_code?: string
+          reason_text?: string | null
+          user_id?: string
+          was_trial?: boolean
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
+          cancelled_at: string | null
           created_at: string
           expires_at: string | null
           id: string
+          is_trial: boolean
           plan_type: string
           started_at: string
           status: string
@@ -10345,9 +10380,11 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cancelled_at?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
+          is_trial?: boolean
           plan_type?: string
           started_at?: string
           status?: string
@@ -10355,9 +10392,11 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cancelled_at?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
+          is_trial?: boolean
           plan_type?: string
           started_at?: string
           status?: string
@@ -12969,6 +13008,10 @@ export type Database = {
       }
       is_group_member: {
         Args: { _group_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_same_country: {
+        Args: { _author_id: string; _viewer_id: string }
         Returns: boolean
       }
       link_partners: {
