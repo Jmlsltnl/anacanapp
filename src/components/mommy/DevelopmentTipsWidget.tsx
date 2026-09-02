@@ -103,7 +103,7 @@ const DevelopmentTipsWidget = () => {
             className="a-icon-btn"
             style={{ width: 30, height: 30 }}
             onClick={handlePrev}
-            aria-label="Previous"
+            aria-label={tr("common_previous", "Əvvəlki")}
           >
             <ChevronLeft className="rtl:rotate-180" size={15} />
           </button>
@@ -113,7 +113,7 @@ const DevelopmentTipsWidget = () => {
                 key={idx}
                 type="button"
                 onClick={() => setCurrentIndex(idx)}
-                aria-label={`Tip ${idx + 1}`}
+                aria-label={tr("devtips_tip_n", "Məsləhət {n}").replace('{n}', String(idx + 1))}
                 style={{
                   width: idx === currentIndex ? 16 : 6,
                   height: 6,
@@ -132,7 +132,7 @@ const DevelopmentTipsWidget = () => {
             className="a-icon-btn"
             style={{ width: 30, height: 30 }}
             onClick={handleNext}
-            aria-label="Next"
+            aria-label={tr("common_next", "Növbəti")}
           >
             <ChevronRight className="rtl:rotate-180" size={15} />
           </button>

@@ -23,6 +23,8 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(FbEventsPlugin.class);
         // Lokal plugin: süd vermə/yuxu taymerləri — kilid ekranı bildirişi (LiveActivity)
         registerPlugin(TimerWidgetPlugin.class);
+        // Lokal plugin: screenshot qadağası (FLAG_SECURE + cəhd aşkarlama)
+        registerPlugin(ScreenshotGuardPlugin.class);
         super.load();
     }
 

@@ -95,10 +95,10 @@ const GroupFeed = forwardRef<HTMLDivElement, GroupFeedProps>(({ group, onBack, o
               <ArrowLeft className="rtl:rotate-180 w-4 h-4 text-foreground" />
             </motion.button>
             <div className="flex-1 min-w-0 flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/8 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/10 to-accent/8 flex items-center justify-center shrink-0">
                 <span className="text-lg">{group?.icon_emoji || '👥'}</span>
               </div>
-              <div>
+              <div className="min-w-0">
                 <h1 className="text-[16px] font-black text-foreground truncate leading-tight">{group?.name ? tr(`group_name_${group.name.replace(/\s+/g, '_').toLowerCase()}`, group.name) : tr("groupfeed_umumi_1b5521", "\xDCmumi")}</h1>
                 <div className="flex items-center gap-1 text-[10px] text-muted-foreground/40 font-medium">
                   <Users className="w-3 h-3" />

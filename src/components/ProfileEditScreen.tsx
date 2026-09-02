@@ -163,19 +163,65 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
     loadBio();
   }, [user]);
 
+  // Avatarı kvadrat şəklə salır (mərkəzdən kəsir) və kiçildir —
+  // uzunsov şəkillər dairəvi avatarda əzilmiş/əyilmiş görünməsin deyə.
+  const squareCropAvatar = (file: File, size = 512): Promise<Blob> =>
+    new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const side = Math.min(img.naturalWidth, img.naturalHeight);
+          const sx = (img.naturalWidth - side) / 2;
+          const sy = (img.naturalHeight - side) / 2;
+          const target = Math.min(size, side);
+          const canvas = document.createElement('canvas');
+          canvas.width = target;
+          canvas.height = target;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) throw new Error('Canvas context unavailable');
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, sx, sy, side, side, 0, 0, target, target);
+          canvas.toBlob(
+            (blob) => blob ? resolve(blob) : reject(new Error('Canvas toBlob failed')),
+            'image/jpeg',
+            0.88
+          );
+        } catch (err) {
+          reject(err);
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Image load failed'));
+      };
+      img.src = url;
+    });
+
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
     setUploading(true);
     try {
-      const fileExt = file.name.split('.').pop();
+      // Kvadrat kəsim mümkün olmasa (məs. dəstəklənməyən format), orijinal faylı yüklə
+      let uploadBody: Blob = file;
+      let fileExt = file.name.split('.').pop() || 'jpg';
+      try {
+        uploadBody = await squareCropAvatar(file);
+        fileExt = 'jpg';
+      } catch {
+        // fallback: orijinal fayl
+      }
+
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
       const { error: uploadError } = await supabase.storage.
       from('community-media').
-      upload(filePath, file);
+      upload(filePath, uploadBody, { contentType: uploadBody === file ? file.type : 'image/jpeg' });
 
       if (uploadError) throw uploadError;
 

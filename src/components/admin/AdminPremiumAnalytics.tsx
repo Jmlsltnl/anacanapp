@@ -58,24 +58,24 @@ interface CancellationRow {
 
 const COLORS = ['#f28155', '#8b5cf6', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#6366f1', '#14b8a6'];
 
-const REASON_LABELS: Record<string, string> = {
-  too_expensive: 'Qiymət baha oldu',
-  not_using_enough: 'Kifayət qədər istifadə etmədi',
-  missing_features: 'İstədiyi funksiya yox idi',
-  technical_issues: 'Texniki problem',
-  found_alternative: 'Alternativ tapdı',
-  temporary_break: 'Müvəqqəti fasilə',
-  other: 'Digər',
-  store_unsubscribe: 'Mağazadan ləğv (özü)',
-  store_billing_error: 'Ödəniş xətası',
-  store_customer_support: 'Dəstək xidməti',
-  store_price_increase: 'Qiymət artımı',
-  store_developer_initiated: 'Tərəfimizdən ləğv',
-  store_unknown: 'Naməlum (mağaza)',
-};
-
+// tr() ilə — admin paneli də tam multilanguage olmalıdır
 function reasonLabel(code: string): string {
-  return REASON_LABELS[code] || code;
+  const labels: Record<string, string> = {
+    too_expensive: tr('adminpremium_reason_too_expensive', 'Qiymət baha oldu'),
+    not_using_enough: tr('adminpremium_reason_not_using_enough', 'Kifayət qədər istifadə etmədi'),
+    missing_features: tr('adminpremium_reason_missing_features', 'İstədiyi funksiya yox idi'),
+    technical_issues: tr('adminpremium_reason_technical_issues', 'Texniki problem'),
+    found_alternative: tr('adminpremium_reason_found_alternative', 'Alternativ tapdı'),
+    temporary_break: tr('adminpremium_reason_temporary_break', 'Müvəqqəti fasilə'),
+    other: tr('adminpremium_reason_other', 'Digər'),
+    store_unsubscribe: tr('adminpremium_reason_store_unsubscribe', 'Mağazadan ləğv (özü)'),
+    store_billing_error: tr('adminpremium_reason_store_billing_error', 'Ödəniş xətası'),
+    store_customer_support: tr('adminpremium_reason_store_customer_support', 'Dəstək xidməti'),
+    store_price_increase: tr('adminpremium_reason_store_price_increase', 'Qiymət artımı'),
+    store_developer_initiated: tr('adminpremium_reason_store_developer_initiated', 'Tərəfimizdən ləğv'),
+    store_unknown: tr('adminpremium_reason_store_unknown', 'Naməlum (mağaza)'),
+  };
+  return labels[code] || code;
 }
 
 type StatusFilter = 'all' | 'premium' | 'trial' | 'cancelled' | 'expired' | 'free';
@@ -350,7 +350,7 @@ const AdminPremiumAnalytics = () => {
         </div>
         {countryBreakdown.length > 8 && (
           <button onClick={() => setShowAllCountries(!showAllCountries)} className="text-xs font-semibold text-primary mt-3 flex items-center gap-1">
-            {showAllCountries ? tr('adminpremium_show_less', 'Az göstər') : tr('adminpremium_show_all', `Hamısını göstər (${countryBreakdown.length})`)}
+            {showAllCountries ? tr('adminpremium_show_less', 'Az göstər') : tr('adminpremium_show_all', 'Hamısını göstər ({n})').replace('{n}', String(countryBreakdown.length))}
             {showAllCountries ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
           </button>
         )}
@@ -368,7 +368,7 @@ const AdminPremiumAnalytics = () => {
                   <span className="font-medium truncate flex-1">{profile?.name || profile?.email || s.user_id.slice(0, 8)}</span>
                   {statusBadge(s)}
                   <span className={`text-xs font-semibold ms-3 shrink-0 ${s.daysLeft <= 3 ? 'text-red-600' : s.daysLeft <= 7 ? 'text-amber-600' : 'text-muted-foreground'}`}>
-                    {s.daysLeft === 0 ? tr('adminpremium_today', 'bu gün') : tr('adminpremium_days_left', `${s.daysLeft} gün qalıb`)}
+                    {s.daysLeft === 0 ? tr('adminpremium_today', 'bu gün') : tr('adminpremium_days_left', '{n} gün qalıb').replace('{n}', String(s.daysLeft))}
                   </span>
                 </div>
               );
@@ -438,7 +438,7 @@ const AdminPremiumAnalytics = () => {
             <p className="text-center text-muted-foreground py-8 text-sm">{tr('adminpremium_no_results', 'Nəticə tapılmadı')}</p>
           )}
           {detailedRows.length > 200 && (
-            <p className="text-center text-muted-foreground py-3 text-xs">{tr('adminpremium_showing_first_200', `İlk 200 nəticə göstərilir (cəmi ${detailedRows.length})`)}</p>
+            <p className="text-center text-muted-foreground py-3 text-xs">{tr('adminpremium_showing_first_200', 'İlk 200 nəticə göstərilir (cəmi {n})').replace('{n}', String(detailedRows.length))}</p>
           )}
         </div>
       </div>

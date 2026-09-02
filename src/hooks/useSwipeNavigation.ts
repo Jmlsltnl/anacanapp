@@ -73,12 +73,20 @@ export const useSwipeNavigation = ({
       const deltaX = Math.abs(x - startX);
       const deltaY = Math.abs(y - startY);
 
+      // Jest istiqaməti yalnız AYDIN üfüqi üstünlükdə qəbul edilir.
+      // Əvvəlki qayda (deltaY > deltaX * 1.2 olduqda ləğv) 45°-lik diaqonal
+      // scroll-u belə "üfüqi swipe" sayırdı — kənara yaxın şaquli scroll
+      // naviqasiyaya çevrilib "scroll işləmir" hissi yaradırdı.
       if (!settled && (deltaX > 10 || deltaY > 10)) {
-        if (deltaY > deltaX * 1.2) {
+        if (deltaY >= deltaX) {
+          // Şaquli üstünlük → bu, scroll-dur; jesti tamamilə burax
           resetGesture();
           return;
         }
-        settled = true;
+        if (deltaX > deltaY * 1.5) {
+          settled = true;
+        }
+        // Aralıq zona (nə aydın üfüqi, nə şaquli) — hələ qərar vermə
       }
 
       if (deltaX > maxDeltaX) {
@@ -104,11 +112,18 @@ export const useSwipeNavigation = ({
           resetGesture();
           return;
         }
-        if (absDeltaY > absDeltaX * 1.2) {
+        if (absDeltaX <= absDeltaY * 1.5) {
           resetGesture();
           return;
         }
         settled = true;
+      }
+
+      // Son yoxlama: jest "settled" olsa belə, yekunda şaquli komponent
+      // üstündürsə bu scroll-dur — naviqasiya etmə.
+      if (absDeltaY > absDeltaX) {
+        resetGesture();
+        return;
       }
 
       if (absDeltaX < threshold && maxDeltaX < threshold) {

@@ -24,7 +24,17 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Analytics + focus + esc + scroll lock
+  // Scroll kilidi AYRICA effektdə və yalnız [isOpen]-dan asılıdır.
+  // Əvvəl onClose/feature ilə birgə idi — valideynlər inline onClose ötürdüyündən
+  // hər render-də effekt sökülüb-qurulur, üst-üstə düşən açılış/bağlanışlarda
+  // body.style.overflow yanlış vəziyyətdə qala bilirdi.
+  useEffect(() => {
+    if (!isOpen) return;
+    document.body.style.overflow = 'hidden';
+    return () => {document.body.style.overflow = '';};
+  }, [isOpen]);
+
+  // Analytics + focus + esc
   useEffect(() => {
     if (!isOpen) return;
     import('@/lib/analytics').then((m) => m.analytics.logPaywallShown(feature || 'general')).catch(() => {});
@@ -40,8 +50,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
       if (!e.shiftKey && document.activeElement === last) {e.preventDefault();first.focus();}
     };
     document.addEventListener('keydown', handleKeyDown);
-    document.body.style.overflow = 'hidden';
-    return () => {document.removeEventListener('keydown', handleKeyDown);document.body.style.overflow = '';};
+    return () => {document.removeEventListener('keydown', handleKeyDown);};
   }, [isOpen, onClose, feature]);
 
   const renderPillIcon = (iconName: string) => {

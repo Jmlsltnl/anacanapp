@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback, lazy, Suspense } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { saveScroll, restoreScroll } from '@/lib/scrollMemory';
 import SplashScreen from '@/components/SplashScreen';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -705,11 +705,15 @@ const Index = () => {
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         }>
-          <AnimatePresence mode="wait">
-            <ErrorBoundary key={activeTab}>
-              {renderContent()}
-            </ErrorBoundary>
-          </AnimatePresence>
+          {/* QEYD: Əvvəllər burada <AnimatePresence mode="wait"> var idi.
+              "wait" rejimində köhnə tab exit animasiyası bitənə qədər DOM-da
+              qalırdı — animasiya yarıda kəsiləndə (ağır render, realtime refetch,
+              açıq Radix menyu/dialoqun scroll kilidi) köhnə ekran + kilid "asılı"
+              qalır və bütün app-da scroll donurdu. Giriş animasiyası (initial→animate)
+              motion.div-lərdə qaldığı üçün vizual keçid yenə də hiss olunur. */}
+          <ErrorBoundary key={activeTab}>
+            {renderContent()}
+          </ErrorBoundary>
         </Suspense>
       </div>
       

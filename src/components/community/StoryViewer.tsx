@@ -302,8 +302,8 @@ const StoryViewer = ({
           {/* Header */}
           <div className="absolute start-0 end-0 z-20 px-4" style={{ top: 'calc(env(safe-area-inset-top, 8px) + 20px)' }}>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full ring-2 ring-white/80 overflow-hidden">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-9 h-9 rounded-full ring-2 ring-white/80 overflow-hidden shrink-0">
                   {currentGroup.user_avatar ?
                   <img
                     src={currentGroup.user_avatar}
@@ -318,8 +318,8 @@ const StoryViewer = ({
                     </div>
                   }
                 </div>
-                <div>
-                  <p className="text-white font-semibold text-[13px] leading-tight">{currentGroup.user_name}</p>
+                <div className="min-w-0">
+                  <p className="text-white font-semibold text-[13px] leading-tight truncate">{currentGroup.user_name}</p>
                   <p className="text-white/50 text-[11px]">
                     {formatDistanceToNow(new Date(currentStory.created_at), {
                       addSuffix: true,
@@ -329,7 +329,7 @@ const StoryViewer = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   onClick={(e) => {e.stopPropagation();setIsPaused(!isPaused);}}
                   className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">

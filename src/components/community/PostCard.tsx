@@ -311,7 +311,11 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
             </div>
             <span className="a-post-time">· {timeAgo}</span>
           </div>
-          <DropdownMenu>
+          {/* modal={false}: hər postda olan bu menyu modal rejimdə bütün sənədə
+              scroll kilidi (react-remove-scroll) qoyur; feed refetch nəticəsində
+              post remount olanda kilid asılı qalıb bütün app-ın scroll-unu dondura
+              bilirdi. Non-modal menyu üçün kilidə ehtiyac yoxdur. */}
+          <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <button
                 style={{ width: 30, height: 30, borderRadius: 999, display: 'grid', placeItems: 'center', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--a-ink-faint)', flexShrink: 0 }}>

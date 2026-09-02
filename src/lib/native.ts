@@ -456,6 +456,28 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
   }
 };
 
+// Screenshot qadağası: cəhd/çəkilmə aşkarlananda lokallaşdırılmış xəbərdarlıq.
+// Android-də FLAG_SECURE onsuz da bloklayır (plugin load()-da tətbiq olunur);
+// iOS-da yalnız fakt-sonrası aşkarlama mümkündür — hər iki halda bu mesaj çıxır.
+const initScreenshotGuard = async () => {
+  try {
+    const { default: ScreenshotGuard } = await import('@/plugins/ScreenshotGuard');
+    const { toast } = await import('sonner');
+    await ScreenshotGuard.addListener('screenshotTaken', () => {
+      toast(tr('screenshot_guard_title', 'Screenshot-a icazə verilmir'), {
+        description: tr(
+          'screenshot_guard_body',
+          'Sensitiv məlumatların yayılmasının qarşısını almaq üçün Anacan-da screenshot-a icazə verilmir. Bütün məlumatlar təhlükəsizdir.'
+        ),
+        duration: 6000,
+      });
+    });
+  } catch (e) {
+    // Köhnə buildlərdə plugin olmaya bilər — kritik deyil
+    console.warn('ScreenshotGuard init failed:', e);
+  }
+};
+
 // Initialize native features
 export const initializeNativeFeatures = async () => {
   if (!isNative) {
@@ -464,6 +486,9 @@ export const initializeNativeFeatures = async () => {
   }
 
   console.log('Initializing native features...');
+
+  // Screenshot qadağası xəbərdarlıq dinləyicisi
+  await initScreenshotGuard();
 
   // Set status bar style
   await statusBar.setDark();

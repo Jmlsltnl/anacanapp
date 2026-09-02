@@ -11,7 +11,6 @@ type UnreadCommunityState = {
   lastSeenAt: string | null;
   seenPostIds: SeenPostMap;
   initializedUserId: string | null;
-  syncing: boolean;
   realtimeReadyForUserId: string | null;
   hydrateForUser: (userId: string) => Promise<void>;
   markPostSeen: (params: { userId: string; postId: string; createdAt: string; postUserId?: string }) => Promise<void>;
@@ -33,13 +32,47 @@ const readSeenPostIds = (userId: string) => {
   }
 };
 
-const writeSeenPostIds = (userId: string, seenPostIds: SeenPostMap) => {
-  if (typeof window === 'undefined') return;
+// PERF: localStorage yazısı debounce olunur — əvvəllər scroll zamanı HƏR
+// işarələnən post üçün bütün massivin JSON.stringify + sinxron setItem-i
+// baş verirdi (main thread-i scroll əsnasında bloklayıb "donma" hissi yaradırdı).
+let pendingWriteTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingWriteUserId: string | null = null;
+let pendingWriteData: SeenPostMap | null = null;
+
+const flushSeenPostIds = () => {
+  if (pendingWriteTimer) {
+    clearTimeout(pendingWriteTimer);
+    pendingWriteTimer = null;
+  }
+  if (!pendingWriteUserId || !pendingWriteData) return;
   try {
-    window.localStorage.setItem(`community_seen_posts:${userId}`, JSON.stringify(Object.keys(seenPostIds)));
+    window.localStorage.setItem(
+      `community_seen_posts:${pendingWriteUserId}`,
+      JSON.stringify(Object.keys(pendingWriteData))
+    );
   } catch {
   }
+  pendingWriteUserId = null;
+  pendingWriteData = null;
 };
+
+const writeSeenPostIds = (userId: string, seenPostIds: SeenPostMap) => {
+  if (typeof window === 'undefined') return;
+  // Fərqli istifadəçiyə keçiddə əvvəlkini dərhal yaz
+  if (pendingWriteUserId && pendingWriteUserId !== userId) flushSeenPostIds();
+  pendingWriteUserId = userId;
+  pendingWriteData = seenPostIds;
+  if (pendingWriteTimer) clearTimeout(pendingWriteTimer);
+  pendingWriteTimer = setTimeout(flushSeenPostIds, 800);
+};
+
+// App arxa plana keçəndə / bağlananda yarımçıq yazı itməsin
+if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', flushSeenPostIds);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushSeenPostIds();
+  });
+}
 
 let activeUnreadChannel: RealtimeChannel | null = null;
 let activeUnreadChannelUserId: string | null = null;
@@ -51,7 +84,6 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
   lastSeenAt: null,
   seenPostIds: {},
   initializedUserId: null,
-  syncing: false,
   realtimeReadyForUserId: null,
 
   hydrateForUser: async (userId: string) => {
@@ -133,11 +165,12 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
     if (state.initializedUserId !== userId) return;
     if (state.seenPostIds[postId]) return;
 
+    // PERF: tək set() çağırışı — əvvəllər 3 ayrı set() (syncing true/false daxil)
+    // hər scroll-da bütün abunəçilərdə 3 render dalğası yaradırdı.
     const nextSeenPostIds = { ...state.seenPostIds, [postId]: true } satisfies SeenPostMap;
     set({
       seenPostIds: nextSeenPostIds,
       unreadCount: Math.max(0, state.unreadCount - 1),
-      syncing: true,
     });
 
     writeSeenPostIds(userId, nextSeenPostIds);
@@ -146,13 +179,10 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
       .from('community_post_reads')
       .upsert({ user_id: userId, post_id: postId, seen_at: new Date().toISOString() } as any, { onConflict: 'user_id,post_id' });
 
-    if (!error) {
-      set({ syncing: false });
-      return;
-    }
-
-    set({ syncing: false });
-    if (error) await get().hydrateForUser(userId);
+    // QEYD: əvvəllər xəta zamanı tam hydrateForUser() işə düşürdü — zəif
+    // şəbəkədə scroll əsnasında sorğu partlayışı yaradırdı. Lokal işarə
+    // onsuz da optimistik saxlanılır; itirilmiş tək read-marker zərərsizdir.
+    if (error) console.warn('markPostSeen upsert failed:', error.message);
   },
 
   markCommunitySeen: async (userId: string) => {
@@ -223,25 +253,24 @@ const useUnreadCommunityStore = create<UnreadCommunityState>((set, get) => ({
     lastSeenAt: null,
     seenPostIds: {},
     initializedUserId: null,
-    syncing: false,
     realtimeReadyForUserId: null,
   }),
 }));
 
 export const useUnreadCommunityPosts = () => {
   const { user } = useAuth();
-  const {
-    unreadCount,
-    lastSeenAt,
-    seenPostIds,
-    initializedUserId,
-    hydrateForUser,
-    markPostSeen: markPostSeenInStore,
-    markCommunitySeen: markCommunitySeenInStore,
-    registerNewPost,
-    isPostUnread,
-    reset,
-  } = useUnreadCommunityStore();
+  // PERF: per-field selektorlar — selektorsuz useStore() HƏR store dəyişikliyində
+  // bütün abunəçiləri (feed-dəki hər PostSeenObserver + BottomNav) re-render edirdi.
+  const unreadCount = useUnreadCommunityStore((s) => s.unreadCount);
+  const lastSeenAt = useUnreadCommunityStore((s) => s.lastSeenAt);
+  const seenPostIds = useUnreadCommunityStore((s) => s.seenPostIds);
+  const initializedUserId = useUnreadCommunityStore((s) => s.initializedUserId);
+  const hydrateForUser = useUnreadCommunityStore((s) => s.hydrateForUser);
+  const markPostSeenInStore = useUnreadCommunityStore((s) => s.markPostSeen);
+  const markCommunitySeenInStore = useUnreadCommunityStore((s) => s.markCommunitySeen);
+  const registerNewPost = useUnreadCommunityStore((s) => s.registerNewPost);
+  const isPostUnread = useUnreadCommunityStore((s) => s.isPostUnread);
+  const reset = useUnreadCommunityStore((s) => s.reset);
 
   useEffect(() => {
     if (!user?.id) {
@@ -302,3 +331,34 @@ export const useUnreadCommunityPosts = () => {
 
   return { unreadCount, markCommunitySeen, markPostSeen, refresh, lastSeenAt, isUnreadPost, seenPostIds };
 };
+
+// ── Feed-dəki hər post üçün YÜNGÜL abunəliklər ──────────────────────────────
+// PostSeenObserver bunlarla yalnız ÖZ postunun statusu dəyişəndə render olunur
+// (boolean selektor). Əvvəl bütün seenPostIds xəritəsinə abunə idi — hər
+// işarələnən post feed-dəki BÜTÜN postları re-render edirdi (scroll donması).
+
+export const usePostSeenFlag = (postId: string) =>
+  useUnreadCommunityStore((s) => !!s.seenPostIds[postId]);
+
+export const usePostUnreadFlag = (
+  userId: string | undefined,
+  postId: string,
+  createdAt: string,
+  postUserId?: string
+) =>
+  useUnreadCommunityStore((s) => {
+    if (!userId) return false;
+    if (postUserId && postUserId === userId) return false;
+    if (s.initializedUserId !== userId) return false;
+    if (s.seenPostIds[postId]) return false;
+    if (!s.lastSeenAt) return true;
+    return new Date(createdAt) > new Date(s.lastSeenAt);
+  });
+
+// Store-a abunə olmadan imperativ işarələmə (stabil referans)
+export const markPostSeenDirect = (
+  userId: string,
+  postId: string,
+  createdAt: string,
+  postUserId?: string
+) => useUnreadCommunityStore.getState().markPostSeen({ userId, postId, createdAt, postUserId });

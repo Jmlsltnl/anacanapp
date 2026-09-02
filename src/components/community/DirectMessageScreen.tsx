@@ -154,8 +154,9 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      {/* Messages — data-scroll-ignore: öz scroll vəziyyətini idarə edir
+          (aşağıda — son mesajda qalmalıdır), qlobal scroll-reset ona toxunmasın */}
+      <div data-scroll-ignore className="flex-1 overflow-y-auto px-4 py-4">
         {loading ?
         <div className="flex items-center justify-center py-12">
             <div className="w-7 h-7 rounded-full animate-spin"

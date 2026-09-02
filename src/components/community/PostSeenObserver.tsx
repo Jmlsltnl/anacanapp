@@ -1,5 +1,5 @@
 import { tr } from "@/lib/tr";import { useEffect, useRef, useState, ReactNode } from 'react';
-import { useUnreadCommunityPosts } from '@/hooks/useUnreadCommunityPosts';
+import { usePostSeenFlag, usePostUnreadFlag, markPostSeenDirect } from '@/hooks/useUnreadCommunityPosts';
 import { useAuth } from '@/hooks/useAuth';
 
 interface PostSeenObserverProps {
@@ -14,27 +14,26 @@ interface PostSeenObserverProps {
  * has been visible in the viewport for ~600ms. Also renders a small red
  * unread-dot in the top-right corner if the post is newer than the user's
  * last-seen timestamp; the dot disappears synchronously when marked seen.
+ *
+ * PERF: yalnız ÖZ postunun seen/unread bayraqlarına abunədir (boolean
+ * selektorlar) — əvvəllər bütün seenPostIds xəritəsinə abunə olduğundan hər
+ * işarələnən post feed-dəki bütün observer-ləri re-render edirdi.
  */
 const PostSeenObserver = ({ postId, createdAt, postUserId, children }: PostSeenObserverProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const { markPostSeen, isUnreadPost, seenPostIds } = useUnreadCommunityPosts();
   const { user } = useAuth();
+  const seenInStore = usePostSeenFlag(postId);
+  const unreadInStore = usePostUnreadFlag(user?.id, postId, createdAt, postUserId);
   const [marked, setMarked] = useState(false);
 
   const isOwnPost = !!postUserId && postUserId === user?.id;
+  const effectivelyMarked = marked || seenInStore;
+  const isUnread = !isOwnPost && !effectivelyMarked && unreadInStore;
+
+  const userId = user?.id;
 
   useEffect(() => {
-    if (seenPostIds[postId]) {
-      setMarked(true);
-      return;
-    }
-    setMarked(false);
-  }, [postId, seenPostIds]);
-
-  const isUnread = !isOwnPost && !marked && isUnreadPost(postId, createdAt, postUserId);
-
-  useEffect(() => {
-    if (!ref.current || marked) return;
+    if (!ref.current || effectivelyMarked || !userId) return;
     let timer: ReturnType<typeof setTimeout> | null = null;
 
     const observer = new IntersectionObserver(
@@ -44,7 +43,7 @@ const PostSeenObserver = ({ postId, createdAt, postUserId, children }: PostSeenO
           if (timer) return;
           timer = setTimeout(() => {
             setMarked(true);
-            markPostSeen(postId, createdAt, postUserId);
+            markPostSeenDirect(userId, postId, createdAt, postUserId);
             observer.disconnect();
           }, 600);
         } else if (timer) {
@@ -60,7 +59,7 @@ const PostSeenObserver = ({ postId, createdAt, postUserId, children }: PostSeenO
       if (timer) clearTimeout(timer);
       observer.disconnect();
     };
-  }, [postId, createdAt, postUserId, markPostSeen, marked]);
+  }, [postId, createdAt, postUserId, userId, effectivelyMarked]);
 
   return (
     <div ref={ref} className="relative">

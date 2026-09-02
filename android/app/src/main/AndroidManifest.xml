@@ -100,6 +100,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- Screenshot cəhdinin aşkarlanması (Android 14+, normal icazə — avtomatik verilir) -->
+    <uses-permission android:name="android.permission.DETECT_SCREEN_CAPTURE" />
 
     <!-- Feature Permissions -->
     <uses-permission android:name="android.permission.CAMERA" />

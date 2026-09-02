@@ -225,6 +225,31 @@ export const useGroupPosts = (groupId: string | null) => {
   // keçəndə görünürdü ("hard refresh olmadan gəlmir" şikayətinin əsas səbəbi).
   useEffect(() => {
     if (groupId === undefined) return;
+
+    // PERF: invalidasiya tənzimlənir (throttle) — əvvəllər HƏR event
+    // (istənilən istifadəçinin like/şərh sayğacı update-i daxil) dərhal tam
+    // refetch + enrich + bütün feed-in re-render-inə səbəb olurdu; aktiv
+    // istifadə zamanı scroll əsnasında "donma" yaradan əsas amillərdən idi.
+    // İlk event dərhal işlənir, ardıcıl partlayışlar 4 saniyəyə birləşdirilir.
+    const MIN_INVALIDATE_INTERVAL = 4000;
+    let lastInvalidatedAt = 0;
+    let pendingTimer: number | null = null;
+
+    const scheduleInvalidate = () => {
+      const now = Date.now();
+      const elapsed = now - lastInvalidatedAt;
+      if (elapsed >= MIN_INVALIDATE_INTERVAL) {
+        lastInvalidatedAt = now;
+        queryClient.invalidateQueries({ queryKey });
+      } else if (pendingTimer === null) {
+        pendingTimer = window.setTimeout(() => {
+          pendingTimer = null;
+          lastInvalidatedAt = Date.now();
+          queryClient.invalidateQueries({ queryKey });
+        }, MIN_INVALIDATE_INTERVAL - elapsed);
+      }
+    };
+
     const channel = supabase
       .channel(`community-posts-${groupId ?? 'global'}`)
       .on(
@@ -242,11 +267,14 @@ export const useGroupPosts = (groupId: string | null) => {
             const row: any = payload.new || payload.old;
             if (row?.group_id) return; // bu qlobal feed — qrup postlarını atla
           }
-          queryClient.invalidateQueries({ queryKey });
+          scheduleInvalidate();
         }
       )
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      if (pendingTimer !== null) window.clearTimeout(pendingTimer);
+      supabase.removeChannel(channel);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupId, queryClient]);
 

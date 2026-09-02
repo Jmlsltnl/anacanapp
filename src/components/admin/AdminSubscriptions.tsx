@@ -97,7 +97,7 @@ const AdminSubscriptions = () => {
     if (error) {
       toast({ title: tr("adminsubscriptions_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: tr("adminsubscriptions_ugurlu_7fe64c", "Uğurlu"), description: `${selectedUser.name} üçün Premium aktivləşdirildi` });
+      toast({ title: tr("adminsubscriptions_ugurlu_7fe64c", "Uğurlu"), description: tr("adminsubscriptions_premium_granted", "{name} üçün Premium aktivləşdirildi").replace('{name}', selectedUser.name || '') });
       setShowModal(false);
       setSelectedUser(null);
       fetchUsers();
@@ -105,7 +105,7 @@ const AdminSubscriptions = () => {
   };
 
   const revokePremium = async (user: UserProfile) => {
-    if (!confirm(`${user.name} üçün Premium-u ləğv etmək istəyirsiniz?`)) return;
+    if (!confirm(tr("adminsubscriptions_revoke_confirm", "{name} üçün Premium-u ləğv etmək istəyirsiniz?").replace('{name}', user.name || ''))) return;
 
     const { error } = await supabase.
     from('profiles').
@@ -119,7 +119,7 @@ const AdminSubscriptions = () => {
     if (error) {
       toast({ title: tr("adminsubscriptions_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: tr("adminsubscriptions_ugurlu_7fe64c", "Uğurlu"), description: `${user.name} üçün Premium ləğv edildi` });
+      toast({ title: tr("adminsubscriptions_ugurlu_7fe64c", "Uğurlu"), description: tr("adminsubscriptions_premium_revoked", "{name} üçün Premium ləğv edildi").replace('{name}', user.name || '') });
       fetchUsers();
     }
   };
@@ -176,7 +176,7 @@ const AdminSubscriptions = () => {
               <User className="w-5 h-5 text-muted-foreground" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Pulsuz</p>
+              <p className="text-sm text-muted-foreground">{tr("adminsubscriptions_pulsuz", "Pulsuz")}</p>
               <p className="text-2xl font-bold">{freeCount}</p>
             </div>
           </div>
@@ -202,7 +202,7 @@ const AdminSubscriptions = () => {
             onClick={() => setFilter(f as any)}
             size="sm">
             
-              {f === 'all' ? tr("adminsubscriptions_hamisi_c73c4d", "Ham\u0131s\u0131") : f === 'premium' ? 'Premium' : 'Pulsuz'}
+              {f === 'all' ? tr("adminsubscriptions_hamisi_c73c4d", "Ham\u0131s\u0131") : f === 'premium' ? 'Premium' : tr("adminsubscriptions_pulsuz", "Pulsuz")}
             </Button>
           )}
         </div>
@@ -260,7 +260,7 @@ const AdminSubscriptions = () => {
 
               <DropdownMenuItem onClick={() => {setSelectedUser(user);setShowModal(true);}}>
                       <Crown className="w-4 h-4 me-2 text-amber-500" />
-                      Premium Ver
+                      {tr("adminsubscriptions_premium_ver", "Premium Ver")}
                     </DropdownMenuItem>
               }
                 </DropdownMenuContent>
@@ -285,8 +285,8 @@ const AdminSubscriptions = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1_month">1 Ay</SelectItem>
-                <SelectItem value="3_months">3 Ay</SelectItem>
+                <SelectItem value="1_month">{tr("adminsubscriptions_1_ay", "1 Ay")}</SelectItem>
+                <SelectItem value="3_months">{tr("adminsubscriptions_3_ay", "3 Ay")}</SelectItem>
                 <SelectItem value="1_year">{tr("adminsubscriptions_1_il_edbac9", "1 İl")}</SelectItem>
                 <SelectItem value="lifetime">{tr("adminsubscriptions_omurluk_988e77", "Ömürlük")}</SelectItem>
               </SelectContent>
@@ -297,7 +297,7 @@ const AdminSubscriptions = () => {
               </Button>
               <Button onClick={grantPremium} className="flex-1 bg-gradient-to-r from-amber-400 to-amber-600">
                 <Crown className="w-4 h-4 me-2" />
-                Premium Ver
+                {tr("adminsubscriptions_premium_ver", "Premium Ver")}
               </Button>
             </div>
           </div>

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		181238B0303A1C1900F002BC /* LiveActivityPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181238AF303A1C1800F002BC /* LiveActivityPlugin.swift */; };
+		181238C1303B2D2A00F002BC /* ScreenshotGuardPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181238C0303B2D2A00F002BC /* ScreenshotGuardPlugin.swift */; };
+		181238C3303B2D3B00F002BC /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181238C2303B2D3B00F002BC /* MainViewController.swift */; };
 		184C247330123BAC00B3D8FD /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 184C247230123BAC00B3D8FD /* GoogleService-Info.plist */; };
 		18A584573037390900A66DF5 /* HealthCyclePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A584553037390900A66DF5 /* HealthCyclePlugin.swift */; };
 		18A584583037390900A66DF5 /* HealthVitalsPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A584563037390900A66DF5 /* HealthVitalsPlugin.swift */; };
@@ -52,6 +54,8 @@
 
 /* Begin PBXFileReference section */
 		181238AF303A1C1800F002BC /* LiveActivityPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityPlugin.swift; sourceTree = "<group>"; };
+		181238C0303B2D2A00F002BC /* ScreenshotGuardPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotGuardPlugin.swift; sourceTree = "<group>"; };
+		181238C2303B2D3B00F002BC /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		184C247230123BAC00B3D8FD /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		18A584553037390900A66DF5 /* HealthCyclePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthCyclePlugin.swift; sourceTree = "<group>"; };
 		18A584563037390900A66DF5 /* HealthVitalsPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthVitalsPlugin.swift; sourceTree = "<group>"; };
@@ -150,6 +154,8 @@
 			isa = PBXGroup;
 			children = (
 				181238AF303A1C1800F002BC /* LiveActivityPlugin.swift */,
+				181238C0303B2D2A00F002BC /* ScreenshotGuardPlugin.swift */,
+				181238C2303B2D3B00F002BC /* MainViewController.swift */,
 				18A584593037391100A66DF5 /* PrivacyInfo.xcprivacy */,
 				18A584553037390900A66DF5 /* HealthCyclePlugin.swift */,
 				18A584563037390900A66DF5 /* HealthVitalsPlugin.swift */,
@@ -297,6 +303,8 @@
 				18A584573037390900A66DF5 /* HealthCyclePlugin.swift in Sources */,
 				181238B0303A1C1900F002BC /* LiveActivityPlugin.swift in Sources */,
 				18A584583037390900A66DF5 /* HealthVitalsPlugin.swift in Sources */,
+				181238C1303B2D2A00F002BC /* ScreenshotGuardPlugin.swift in Sources */,
+				181238C3303B2D3B00F002BC /* MainViewController.swift in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

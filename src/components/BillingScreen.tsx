@@ -366,7 +366,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                 <CreditCard size={15} style={{ color: 'var(--a-accent-ink)' }} />
                 {config.payment_title}
               </h3>
-              <button onClick={fetchPaymentHistory} disabled={loadingPayments} className="p-1.5 rounded-full transition-colors" aria-label={tr("billingscreen_refresh", "YenilÉ™")}>
+              <button onClick={fetchPaymentHistory} disabled={loadingPayments} className="p-1.5 rounded-full transition-colors" aria-label={tr("billingscreen_refresh", "Yenilə")}>
                 <RefreshCw className={`w-3.5 h-3.5 ${loadingPayments ? 'animate-spin' : ''}`} style={{ color: loadingPayments ? 'var(--a-peach-2)' : 'var(--a-ink-soft)' }} />
               </button>
             </div>
@@ -390,7 +390,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
                         <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--a-ink)' }}>
                           {isYearly ? tr("billingscreen_annual_premium", "Annual Premium") : tr("billingscreen_monthly_premium", "Monthly Premium")}
                         </p>
-                        <p style={{ fontSize: 10, color: 'var(--a-ink-soft)' }}>{format(new Date(p.date), 'd MMM yyyy', { locale: getCurrentDateLocale() })} Â· {label}</p>
+                        <p style={{ fontSize: 10, color: 'var(--a-ink-soft)' }}>{format(new Date(p.date), 'd MMM yyyy', { locale: getCurrentDateLocale() })} · {label}</p>
                       </div>
                       <div className="uppercase"
                       style={{

@@ -45,6 +45,22 @@ const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBar
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Yükləmə overlay-i üçün qoruyucu: zəif şəbəkədə mutation asılı qalsa,
+  // tam-ekran overlay bütün app-ı əbədi bloklamasın — 15 saniyədən sonra
+  // "Bağla" düyməsi görünür (yükləmə arxa planda davam edir).
+  const overlayVisible = uploading || isCreating;
+  const [overlayDismissed, setOverlayDismissed] = useState(false);
+  const [overlayEscapable, setOverlayEscapable] = useState(false);
+  useEffect(() => {
+    if (!overlayVisible) {
+      setOverlayDismissed(false);
+      setOverlayEscapable(false);
+      return;
+    }
+    const timer = setTimeout(() => setOverlayEscapable(true), 15000);
+    return () => clearTimeout(timer);
+  }, [overlayVisible]);
+
   const handleStoryClick = (index: number) => {setInitialGroupIndex(index);setViewerOpen(true);};
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -230,11 +246,18 @@ const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBar
         }
       </AnimatePresence>
 
-      {(uploading || isCreating) &&
+      {overlayVisible && !overlayDismissed &&
       <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center">
           <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="bg-card rounded-2xl p-6 flex flex-col items-center gap-3 shadow-xl">
             <div className="w-10 h-10 border-[2.5px] border-primary/25 border-t-primary rounded-full animate-spin" />
             <p className="font-bold text-[12px] text-foreground">{tr("storiesbar_story_yuklenir_a92632", "Story yüklənir...")}</p>
+            {overlayEscapable &&
+            <button
+              onClick={() => setOverlayDismissed(true)}
+              className="mt-1 px-4 py-1.5 rounded-full bg-muted text-[11px] font-bold text-muted-foreground">
+                {tr("common_close", "Bağla")}
+              </button>
+            }
           </motion.div>
         </div>
       }
