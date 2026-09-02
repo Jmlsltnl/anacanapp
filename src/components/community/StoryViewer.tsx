@@ -336,7 +336,7 @@ const StoryViewer = ({
                   
                   {isPaused ? <Play className="w-4 h-4 text-white" /> : <Pause className="w-4 h-4 text-white" />}
                 </button>
-                {isOwnStory && onDelete &&
+                {(isOwnStory || isAdmin) && onDelete &&
                 <button
                   onClick={(e) => {e.stopPropagation();setShowDeleteConfirm(true);setIsPaused(true);}}
                   className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">

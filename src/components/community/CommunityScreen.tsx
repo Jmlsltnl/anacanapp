@@ -8,6 +8,9 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useUserStore } from '@/store/userStore';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
+import { useActiveBlock } from '@/hooks/useUserBlock';
+import { getLocaleTag } from '@/lib/i18n';
+import { Ban } from 'lucide-react';
 
 
 import GroupsList from './GroupsList';
@@ -93,6 +96,9 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
   const { data: groups = [], isLoading: groupsLoading } = useCommunityGroups();
   const { data: memberships = [] } = useUserMemberships();
   const { totalUnread } = useDirectMessages();
+  // Moderasiya bloku: community/full blokda bu ekran bağlanır (server tərəfdə
+  // onsuz da trigger-lər yazmağa imkan vermir — bu, UX qatıdır)
+  const { data: activeBlock } = useActiveBlock();
 
   const memberGroupIds = new Set(memberships.map((m) => m.group_id));
   const myGroups = groups.filter((g) => memberGroupIds.has(g.id));
@@ -107,6 +113,43 @@ const CommunityScreen = forwardRef<HTMLDivElement, CommunityScreenProps>(({ onBa
     setSelectedUserId(null);
     setShowConversations(false);
   }, []);
+
+  // Community bloku: səbəb + bitmə tarixi göstərilir, community tam bağlıdır.
+  // (Tam "full" blok isə Index.tsx-də bütün tətbiqi bağlayır.)
+  if (activeBlock) {
+    const expiryText = activeBlock.expires_at ?
+    new Date(activeBlock.expires_at).toLocaleDateString(getLocaleTag(), {
+      day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    }) : null;
+    return (
+      <div ref={ref} className="a-scope min-h-screen flex flex-col items-center justify-center px-6" style={{ background: 'var(--a-bg)' }}>
+        <div className="w-16 h-16 rounded-3xl bg-red-50 flex items-center justify-center mb-4">
+          <Ban className="w-8 h-8 text-red-500" />
+        </div>
+        <h2 className="text-lg font-black text-foreground text-center mb-2" style={{ color: 'var(--a-ink)' }}>
+          {tr('community_blocked_title', 'Community girişiniz bloklanıb')}
+        </h2>
+        <p className="text-sm text-center mb-4 max-w-sm" style={{ color: 'var(--a-ink-soft)' }}>
+          {tr('community_blocked_subtitle', 'Qaydaların pozulmasına görə community bölməsində paylaşım etmək imkanınız məhdudlaşdırılıb.')}
+        </p>
+        <div className="w-full max-w-sm rounded-2xl p-4 mb-3" style={{ background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
+          <p className="text-[11px] font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--a-warn-ink, #b45309)' }}>
+            {tr('blocked_reason_label', 'Bloklanma səbəbi')}
+          </p>
+          <p className="text-sm" style={{ color: 'var(--a-ink)' }}>
+            {activeBlock.reason || tr('blocked_reason_default', 'Qaydaların pozulması')}
+          </p>
+          <p className="text-xs mt-2" style={{ color: 'var(--a-ink-soft)' }}>
+            {expiryText ?
+            <>{tr('blocked_until', 'Blokun bitmə tarixi:')} {expiryText}</> :
+            tr('blocked_permanent', 'Bu blok daimidir.')}
+          </p>
+        </div>
+        <p className="text-[11px] text-center max-w-xs" style={{ color: 'var(--a-ink-faint)' }}>
+          {tr('blocked_appeal', 'Bunun səhv olduğunu düşünürsünüzsə, support@anacan.az ünvanına yazın.')}
+        </p>
+      </div>);
+  }
 
   // DM Chat screen
   if (dmChat) {

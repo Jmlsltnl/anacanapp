@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Flag, Pencil, EyeOff, Languages, Pin, PinOff, ImagePlus, X, Loader2 } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Flag, Pencil, EyeOff, Languages, Pin, PinOff, ImagePlus, X, Loader2, Ban } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { CommunityPost, useToggleLike, usePostComments, useCreateComment, useEditPost, useDeletePost, useTogglePinPost } from '@/hooks/useCommunity';
@@ -25,6 +25,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from
 '@/components/ui/dialog';
+import BlockUserDialog from '@/components/moderation/BlockUserDialog';
 
 interface PostCardProps {
   post: CommunityPost;
@@ -77,6 +78,7 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
   const [uploadingCommentImage, setUploadingCommentImage] = useState(false);
   const commentFileInputRef = useRef<HTMLInputElement>(null);
   const [showReportDialog, setShowReportDialog] = useState(false);
+  const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
@@ -341,6 +343,11 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
                 }
                 </DropdownMenuItem>
               }
+              {isAdmin && !isOwnPost &&
+              <DropdownMenuItem onClick={() => setShowBlockDialog(true)} className="text-destructive text-[11px] rounded-lg">
+                  <Ban className="w-3 h-3 me-2" /> {tr("postcard_istifadecini_blokla", "İstifadəçini blokla")}
+                </DropdownMenuItem>
+              }
               {(isAdmin || isOwnPost) && <DropdownMenuSeparator className="bg-border/10" />}
               {(isAdmin || isOwnPost) &&
               <DropdownMenuItem onClick={handleDeletePost} className="text-destructive text-[11px] rounded-lg">
@@ -523,6 +530,15 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Admin: istifadəçini blokla (yalnız açılanda mount olunur — feed performansı) */}
+      {showBlockDialog &&
+      <BlockUserDialog
+        open={showBlockDialog}
+        onOpenChange={setShowBlockDialog}
+        userId={post.user_id}
+        userName={post.author?.name || null} />
+      }
     </>);
 
 });

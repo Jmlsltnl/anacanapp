@@ -6,19 +6,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle } from
-'@/components/ui/dialog';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { getPublicProfileCards } from '@/lib/public-profile-cards';
+import BlockUserDialog from '@/components/moderation/BlockUserDialog';
 
 interface Post {
   id: string;
@@ -78,8 +72,6 @@ const AdminModeration = () => {
   const [search, setSearch] = useState('');
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [blockUserId, setBlockUserId] = useState<string>('');
-  const [blockReason, setBlockReason] = useState('');
-  const [blockType, setBlockType] = useState<'community' | 'full'>('community');
 
   const fetchReports = async () => {
     // Use type assertion for new table not yet in generated types
@@ -241,36 +233,6 @@ const AdminModeration = () => {
     } else {
       toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: tr("adminmoderation_serh_silindi_59cfe5", "Şərh silindi") });
       fetchComments();
-    }
-  };
-
-  const blockUser = async () => {
-    if (!blockUserId || !blockReason) {
-      toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: tr("adminmoderation_butun_saheleri_doldurun_3a413d", "Bütün sahələri doldurun"), variant: 'destructive' });
-      return;
-    }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { error } = await supabase.
-    from('user_blocks').
-    insert({
-      user_id: blockUserId,
-      blocked_by: user.id,
-      reason: blockReason,
-      block_type: blockType,
-      is_active: true
-    });
-
-    if (error) {
-      toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: tr("adminmoderation_istifadeci_bloklandi_189b51", "İstifadəçi bloklandı") });
-      setShowBlockModal(false);
-      setBlockUserId('');
-      setBlockReason('');
-      fetchBlocks();
     }
   };
 
@@ -650,6 +612,11 @@ const AdminModeration = () => {
                       </div>
                       <p className="text-xs text-muted-foreground">ID: {block.user_id.substring(0, 8)}...</p>
                       <p className="text-sm text-red-600 mt-1">{tr("adminmoderation_sebeb_e614c3", "S\u0259b\u0259b:")} {block.reason}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {block.expires_at ?
+                    `${tr("adminmoderation_bitme", "Bitmə:")} ${format(new Date(block.expires_at), 'dd.MM.yyyy HH:mm')}` :
+                    tr("adminmoderation_daimi", "Daimi")}
+                      </p>
                     </div>
                     {block.is_active &&
                 <Button
@@ -669,53 +636,12 @@ const AdminModeration = () => {
         }
       </Tabs>
 
-      {/* Block User Modal */}
-      <Dialog open={showBlockModal} onOpenChange={setShowBlockModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{tr("adminmoderation_istifadecini_blokla_160336", "İstifadəçini Blokla")}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 mt-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{tr("adminmoderation_blok_novu_57af90", "Blok Növü")}</label>
-              <div className="flex gap-2">
-                <Button
-                  variant={blockType === 'community' ? 'default' : 'outline'}
-                  onClick={() => setBlockType('community')}
-                  className="flex-1">
-                  {tr("adminmoderation_yalniz_community_50b740", "Yaln\u0131z Community")}
-                
-                </Button>
-                <Button
-                  variant={blockType === 'full' ? 'default' : 'outline'}
-                  onClick={() => setBlockType('full')}
-                  className="flex-1">
-                  
-                  Tam Blok
-                </Button>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{tr("adminmoderation_sebeb_7b51f1", "Səbəb")}</label>
-              <Textarea
-                value={blockReason}
-                onChange={(e) => setBlockReason(e.target.value)}
-                placeholder={tr("adminmoderation_bloklama_sebebini_yazin_994a8a", "Bloklama səbəbini yazın...")}
-                rows={3} />
-              
-            </div>
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setShowBlockModal(false)} className="flex-1">
-                {tr("adminmoderation_legv_et_b5e49c", "L\u0259\u011Fv et")}
-              </Button>
-              <Button onClick={blockUser} variant="destructive" className="flex-1">
-                <Ban className="w-4 h-4 me-2" />
-                Blokla
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Block User Modal — paylaşılan dialog (müddət + səbəb + növ) */}
+      <BlockUserDialog
+        open={showBlockModal}
+        onOpenChange={setShowBlockModal}
+        userId={blockUserId || null}
+        onDone={fetchBlocks} />
     </div>);
 
 };

@@ -424,13 +424,21 @@ export const useDeletePost = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase.
+      // DİQQƏT: sahiblik yoxlaması BURADA (.eq('user_id', ...)) YOX, RLS-də
+      // edilir ("Users can delete own posts" + "Admins can manage all posts").
+      // Əvvəllər .eq('user_id', user.id) var idi — admin başqasının postunu
+      // silməyə çalışanda sorğu 0 sətir tapır, SƏSSİZCƏ heç nə silmirdi
+      // (amma "silindi" toast-u çıxırdı). useDeleteComment-dəki eyni bug-ın
+      // düzəlişi ilə eyni pattern.
+      const { data, error } = await supabase.
       from('community_posts').
       delete().
       eq('id', postId).
-      eq('user_id', user.id);
+      select('id');
 
       if (error) throw error;
+      // RLS icazə verməyibsə 0 sətir silinir — bunu uğur kimi göstərmə
+      if (!data || data.length === 0) throw new Error('Not permitted');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['group-posts'] });

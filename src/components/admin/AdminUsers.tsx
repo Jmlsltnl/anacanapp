@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { tr } from '@/lib/tr';
 import { motion } from 'framer-motion';
-import { Search, Filter, MoreVertical, Shield, User, Trash2, Edit, Crown, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { Search, Filter, MoreVertical, Shield, User, Ban, Edit, Crown, KeyRound, Eye, EyeOff } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,7 @@ import { LocalizedInput } from "./ui/LocalizedInput";
 import { LocalizedTextarea } from "./ui/LocalizedTextarea";
 import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
 import { fetchAllRows } from '@/lib/supabaseFetchAll';
+import BlockUserDialog from '@/components/moderation/BlockUserDialog';
 
 interface UserProfile {
   id: string;
@@ -63,6 +64,7 @@ const AdminUsers = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [blockDialogOpen, setBlockDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -388,9 +390,16 @@ const AdminUsers = () => {
                               {tr("adminusers_sifreni_deyis_a48972", "\u015Eifr\u0259ni d\u0259yi\u015F")}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive">
-                              <Trash2 className="w-4 h-4 me-2" />
-                              Sil
+                            {/* Əvvəllər burada onClick-i OLMAYAN ölü "Sil" düyməsi var idi —
+                                moderasiya üçün işlək "Blokla" ilə əvəzləndi */}
+                            <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setBlockDialogOpen(true);
+                            }}>
+                              <Ban className="w-4 h-4 me-2" />
+                              {tr("adminusers_blokla", "Blokla")}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -583,6 +592,13 @@ const AdminUsers = () => {
           }
         </DialogContent>
       </Dialog>
+
+      {/* İstifadəçini blokla (community/tam, müddət + səbəb) */}
+      <BlockUserDialog
+        open={blockDialogOpen}
+        onOpenChange={setBlockDialogOpen}
+        userId={selectedUser?.user_id || null}
+        userName={selectedUser?.name || null} />
     </div>);
 
 };

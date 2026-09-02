@@ -19,6 +19,8 @@ import { useAppSetting } from '@/hooks/useAppSettings';
 import { useDeviceToken } from '@/hooks/useDeviceToken';
 import { usePendingTimerStops } from '@/hooks/usePendingTimerStops';
 import { useForceUpdate } from '@/hooks/useForceUpdate';
+import { useActiveBlock } from '@/hooks/useUserBlock';
+import BlockedScreen from '@/components/BlockedScreen';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { resetAppScrollPosition } from '@/lib/scroll';
 import { initDeeplinkListener, ParsedDeeplink } from '@/lib/deeplink';
@@ -143,6 +145,8 @@ const Index = () => {
   );
   const { isAdmin, loading, profile, user, profileLoaded } = useAuth();
   const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
+  // Moderasiya: tam blok (block_type='full') → tətbiq əvəzinə blok ekranı
+  const { data: activeBlock } = useActiveBlock();
   // Premium onboarding (funnel ilə) — app_settings ilə idarə olunur; setting yoxdursa AKTİVDİR
   const premiumOnbSetting = useAppSetting('premium_onboarding_enabled');
   const premiumOnboardingEnabled = premiumOnbSetting !== false;
@@ -558,6 +562,13 @@ const Index = () => {
   // Auth screen
   if (!isAuthenticated) {
     return <AuthScreen />;
+  }
+
+  // Tam blok: istifadəçi tətbiqdən tamamilə kənarlaşdırılıb — səbəb + bitmə
+  // tarixi göstərilir (admin moderasiyası, bax user_blocks / Duzelis61).
+  // Community bloku isə yalnız CommunityScreen-i bağlayır (orada idarə olunur).
+  if (activeBlock?.block_type === 'full') {
+    return <BlockedScreen block={activeBlock} />;
   }
 
   // Partners NEVER see standard onboarding or the funnel — detect via either role or life_stage

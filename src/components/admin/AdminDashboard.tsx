@@ -79,8 +79,15 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
+      // "Bu gün aktiv" — analytics_events-dən DISTINCT user sayı (RPC, Duzelis61).
+      // ƏVVƏLKİ BUG: daily_logs sayılırdı, amma daily_logs-da admin SELECT
+      // siyasəti yox idi → RLS sayğacı adminin öz sətirlərinə endirirdi və
+      // UNIQUE(user_id, log_date) səbəbindən nəticə HƏMİŞƏ 0 və ya 1 olurdu.
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
       // Get all counts in parallel
-      const [profilesRes, productsRes, logsRes, premiumRes, weeklyRes, todayLogsRes] = await Promise.all([
+      const [profilesRes, productsRes, logsRes, premiumRes, weeklyRes, activeRes] = await Promise.all([
       supabase.from('profiles').select('id', { count: 'exact', head: true }),
       supabase.from('products').select('id', { count: 'exact', head: true }),
       supabase.from('daily_logs').select('id', { count: 'exact', head: true }),
@@ -88,16 +95,24 @@ const AdminDashboard = () => {
       supabase.from('profiles').
       select('id', { count: 'exact', head: true }).
       gte('created_at', subDays(new Date(), 7).toISOString()),
-      supabase.from('daily_logs').
-      select('user_id', { count: 'exact', head: true }).
-      eq('log_date', new Date().toISOString().split('T')[0])]
+      (supabase as any).rpc('get_active_users_count', { _since: todayStart.toISOString() })]
       );
+
+      // RPC hələ DB-yə tətbiq olunmayıbsa (Duzelis61 işə salınmayıb) köhnə
+      // daily_logs mənbəyinə düş — dashboard sınmasın
+      let activeToday: number = typeof activeRes.data === 'number' ? activeRes.data : 0;
+      if (activeRes.error) {
+        const { count } = await supabase.from('daily_logs').
+        select('user_id', { count: 'exact', head: true }).
+        eq('log_date', new Date().toISOString().split('T')[0]);
+        activeToday = count || 0;
+      }
 
       setStats({
         totalUsers: profilesRes.count || 0,
         totalProducts: productsRes.count || 0,
         totalLogs: logsRes.count || 0,
-        activeToday: todayLogsRes.count || 0,
+        activeToday,
         premiumUsers: premiumRes.count || 0,
         newUsersThisWeek: weeklyRes.count || 0
       });

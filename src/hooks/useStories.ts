@@ -193,13 +193,17 @@ export const useStories = (groupId?: string | null) => {
     mutationFn: async (storyId: string) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase.
+      // Sahiblik yoxlaması RLS-dədir ("Users can delete own stories" +
+      // "Admins can manage all stories" — Duzelis61). Client filtri admin
+      // silməsini səssizcə sındırırdı (bax useDeletePost şərhi).
+      const { data, error } = await supabase.
       from('community_stories').
       delete().
       eq('id', storyId).
-      eq('user_id', user.id);
+      select('id');
 
       if (error) throw error;
+      if (!data || data.length === 0) throw new Error('Not permitted');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stories'] });
