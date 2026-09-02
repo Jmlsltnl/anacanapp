@@ -29,3 +29,10 @@ scripts/content-i18n/.env.azure
 
 # Supabase CLI local cache (created by `supabase functions deploy` etc.)
 supabase/.temp/
+
+# Azure miqrasiya aləti — İÇİNDƏ HARDCODED MIGRATION_SECRET VAR (tam DB dump
+# + istənilən storage faylını yükləmə imkanı verir). GitHub-a DÜŞMƏMƏLİDİR
+# (əvvəlki GitGuardian insidentinin təkrarı olmasın). Miqrasiya bitəndə həm
+# bu alətlər, həm də DB-dəki migration_export_* RPC-ləri silinməlidir.
+azure-migration/
+supabase/functions/migration-download-file/
