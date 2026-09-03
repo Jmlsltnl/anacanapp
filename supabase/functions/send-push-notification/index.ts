@@ -161,8 +161,9 @@ Deno.serve(async (req) => {
     }
 
     if (!tokens?.length) {
+      console.log(`[send-push-notification] no device tokens for user=${userId} type=${data?.type || 'push'}`);
       return new Response(
-        JSON.stringify({ message: 'No device tokens found for user', sent: 0 }),
+        JSON.stringify({ message: 'No device tokens found for user', sent: 0, skipped: 'no_device_tokens' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -188,6 +189,8 @@ Deno.serve(async (req) => {
       Object.entries(data).forEach(([k, v]) => { fcmData[k] = String(v); });
     }
 
+    const notifType = String(data?.type || 'push');
+
     for (const { token } of tokens) {
       const result = await sendFCMv1(accessToken, projectId, token, title, body, fcmData);
 
@@ -204,9 +207,25 @@ Deno.serve(async (req) => {
           await supabase.from('device_tokens').delete().eq('token', token);
         }
       }
+
+      // GÖRÜNÜRLÜK: dinamik (event) pushlar indiyə qədər notification_send_log-a
+      // heç yazılmırdı — yalnız cron pushlar yazılırdı. Ona görə "dinamik pushlar
+      // getmir" şikayətini yoxlamaq mümkün deyildi. İndi hər cəhd loglanır.
+      // QEYD: title/body sütunları NOT NULL-dur — onlarsız insert səssizcə uğursuz olur.
+      const { error: logErr } = await supabase.from('notification_send_log').insert({
+        user_id: userId,
+        title,
+        body,
+        source_type: 'dynamic',
+        notification_type: notifType,
+        status: result.success ? 'sent' : 'failed',
+        reason: result.success ? null : (result.error ?? null),
+        error_code: result.success ? null : (result.errorCode ?? null),
+      });
+      if (logErr) console.log('[send-push-notification] send-log insert failed:', logErr.message);
     }
 
-    console.log(`Push sent: ${successCount} success, ${failureCount} failed`);
+    console.log(`Push sent: ${successCount} success, ${failureCount} failed (type=${notifType})`);
 
     return new Response(
       JSON.stringify({ success: true, sent: successCount, failed: failureCount, results }),

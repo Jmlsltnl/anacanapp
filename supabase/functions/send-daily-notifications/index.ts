@@ -2,6 +2,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
 import { requireCronSecret, requireAdmin } from '../_shared/auth.ts';
 import { startRunLog, finishRunLog, logFailedSend, bumpReason } from '../_shared/notif-logging.ts';
+import { fetchAllPaged } from '../_shared/paginate.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -152,8 +153,14 @@ Deno.serve(async (req) => {
     const currentMinute = bakuNow.getUTCMinutes();
     const currentTimeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
 
-    let body: { manual?: boolean; userId?: string; skipDedup?: boolean; slot?: string } = {};
+    let body: { manual?: boolean; userId?: string; skipDedup?: boolean; slot?: string; offset?: number } = {};
     try { body = await req.json(); } catch { /* No body */ }
+
+    // İstifadəçi sayı artdıqca bir çağırışda hamısını emal etmək worker limitini
+    // aşır (WORKER_RESOURCE_LIMIT). Ona görə hər çağırış yalnız bir parça emal
+    // edir və qalan hissə üçün özünü yenidən çağırır.
+    const CHUNK_SIZE = 900;
+    const chunkOffset = Number(body.offset ?? 0) || 0;
 
     const triggeredBy = body.manual ? (body.userId ? 'admin-test' : 'admin') : 'cron';
 
@@ -278,26 +285,34 @@ Deno.serve(async (req) => {
     });
 
 
-    // Get users — optionally filter by single userId for debugging
-    let profilesQuery = supabase
-      .from('profiles').select('user_id, life_stage, role, due_date, last_period_date');
-    if (body.userId) profilesQuery = profilesQuery.eq('user_id', body.userId);
-    const { data: profiles } = await profilesQuery;
+    // Get users — optionally filter by single userId for debugging.
+    // KRİTİK: bu sorğular səhifələnməlidir, əks halda PostgREST yalnız ilk 1000
+    // sətri qaytarır və istifadəçilərin əksəriyyəti "no_device_token" kimi atlanır.
+    const profiles = await fetchAllPaged<any>(() => {
+      let q = supabase.from('profiles').select('user_id, life_stage, role, due_date, last_period_date').order('user_id');
+      if (body.userId) q = q.eq('user_id', body.userId);
+      return q;
+    });
 
-    let childrenQuery = supabase
-      .from('user_children').select('user_id, birth_date').order('birth_date', { ascending: false });
-    if (body.userId) childrenQuery = childrenQuery.eq('user_id', body.userId);
-    const { data: children } = await childrenQuery;
+    const children = await fetchAllPaged<any>(() => {
+      let q = supabase.from('user_children').select('user_id, birth_date').order('birth_date', { ascending: false });
+      if (body.userId) q = q.eq('user_id', body.userId);
+      return q;
+    });
 
-    let prefsQuery = supabase
-      .from('user_preferences').select('user_id, push_enabled, daily_push_enabled, language');
-    if (body.userId) prefsQuery = prefsQuery.eq('user_id', body.userId);
-    const { data: preferences } = await prefsQuery;
+    const preferences = await fetchAllPaged<any>(() => {
+      let q = supabase.from('user_preferences').select('user_id, push_enabled, daily_push_enabled, language').order('user_id');
+      if (body.userId) q = q.eq('user_id', body.userId);
+      return q;
+    });
 
-    let tokensQuery = supabase
-      .from('device_tokens').select('token, user_id, platform');
-    if (body.userId) tokensQuery = tokensQuery.eq('user_id', body.userId);
-    const { data: tokens } = await tokensQuery;
+    const tokens = await fetchAllPaged<DeviceToken>(() => {
+      let q = supabase.from('device_tokens').select('token, user_id, platform').order('token');
+      if (body.userId) q = q.eq('user_id', body.userId);
+      return q;
+    });
+
+    console.log(`[send-daily-notifications] loaded profiles=${profiles.length} tokens=${tokens.length} prefs=${preferences.length}`);
 
     if (!tokens?.length) {
       await finishRunLog(supabase, runId, { status: 'success', sent_count: 0, skipped_count: 1, reasons: { no_device_token: 1 } });
@@ -314,13 +329,16 @@ Deno.serve(async (req) => {
     // Convert back to real UTC instant by subtracting the +4h shift we added earlier.
     const todayStart = new Date(bakuMidnight.getTime() - bakuOffsetMs);
 
-    let dedupQuery = supabase
-      .from('notification_send_log')
-      .select('user_id, source_type, source_notification_id')
-      .gte('sent_at', todayStart.toISOString())
-      .eq('status', 'sent');
-    if (body.userId) dedupQuery = dedupQuery.eq('user_id', body.userId);
-    const { data: todaySentLogs } = await dedupQuery;
+    const todaySentLogs = await fetchAllPaged<any>(() => {
+      let q = supabase
+        .from('notification_send_log')
+        .select('user_id, source_type, source_notification_id')
+        .gte('sent_at', todayStart.toISOString())
+        .eq('status', 'sent')
+        .order('sent_at');
+      if (body.userId) q = q.eq('user_id', body.userId);
+      return q;
+    });
 
     // Build a set of "userId:sourceType:sourceNotifId" for dedup.
     // skipDedup=true (test mode) → empty set, so resend is allowed.
@@ -363,9 +381,11 @@ Deno.serve(async (req) => {
       return (diffDays >= 1 && diffDays <= 280) ? diffDays : null;
     };
 
-    const eligibleUsers = Array.from(userMap.values()).filter(user => user.daily_push_enabled);
+    const allEligibleUsers = Array.from(userMap.values()).filter(user => user.daily_push_enabled);
+    const eligibleUsers = allEligibleUsers.slice(chunkOffset, chunkOffset + CHUNK_SIZE);
+    const hasMoreUsers = chunkOffset + CHUNK_SIZE < allEligibleUsers.length;
 
-    console.log(`Eligible users: ${eligibleUsers.length}`);
+    console.log(`Eligible users: ${allEligibleUsers.length} | this chunk: ${eligibleUsers.length} (offset ${chunkOffset})`);
 
     let sentCount = 0;
     const results: Array<{ userId: string; success: boolean; type?: string; day?: number; error?: string }> = [];
@@ -520,6 +540,23 @@ Deno.serve(async (req) => {
     }
 
     console.log(`Daily notifications sent: ${sentCount}`);
+
+    // Növbəti parçanı işə sal (fire-and-forget) — bütün istifadəçilər əhatə olunsun.
+    if (hasMoreUsers) {
+      const cronSecret = Deno.env.get('CRON_SECRET') ?? '';
+      const nextBody = { ...body, offset: chunkOffset + CHUNK_SIZE, manual: body.manual ?? false, slot: activeSendTime ?? body.slot };
+      const nextUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-daily-notifications`;
+      console.log(`[send-daily-notifications] scheduling next chunk offset=${nextBody.offset}`);
+      try {
+        fetch(nextUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-cron-secret': cronSecret },
+          body: JSON.stringify(nextBody),
+        }).catch((e) => console.error('[send-daily-notifications] next chunk trigger failed:', e?.message));
+      } catch (e) {
+        console.error('[send-daily-notifications] next chunk error:', e);
+      }
+    }
 
     await finishRunLog(supabase, runId, {
       status: 'success',

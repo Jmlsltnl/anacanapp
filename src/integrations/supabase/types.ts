@@ -12916,6 +12916,7 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_active_users_count: { Args: { _since: string }; Returns: number }
       get_baby_crisis: {
         Args: { baby_age_weeks: number }
         Returns: {
@@ -13012,6 +13013,10 @@ export type Database = {
       }
       is_same_country: {
         Args: { _author_id: string; _viewer_id: string }
+        Returns: boolean
+      }
+      is_user_blocked: {
+        Args: { _scope?: string; _user_id: string }
         Returns: boolean
       }
       link_partners: {

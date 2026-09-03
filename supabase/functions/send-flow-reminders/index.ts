@@ -2,6 +2,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
 import { requireCronSecret, requireAdmin } from '../_shared/auth.ts';
 import { startRunLog, finishRunLog, logFailedSend, bumpReason } from '../_shared/notif-logging.ts';
+import { fetchAllPaged } from '../_shared/paginate.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -206,11 +207,15 @@ Deno.serve(async (req) => {
 
     const { accessToken, projectId } = await getFirebaseAccessToken(saJson);
 
-    let remindersQuery = supabase.from('flow_reminders').select('*').eq('is_enabled', true);
-    if (body.userId) remindersQuery = remindersQuery.eq('user_id', body.userId);
-    const { data: reminders } = await remindersQuery;
+    // Bütün sorğular səhifələnir — PostgREST-in 1000 sətir limiti əks halda
+    // istifadəçilərin çoxunu kənarda qoyurdu.
+    const reminders = await fetchAllPaged<any>(() => {
+      let q = supabase.from('flow_reminders').select('*').eq('is_enabled', true).order('user_id');
+      if (body.userId) q = q.eq('user_id', body.userId);
+      return q;
+    });
 
-    if (!reminders?.length) {
+    if (!reminders.length) {
       await finishRunLog(supabase, runId, { status: 'success', skipped_count: 1, reasons: { no_active_reminders: 1 } });
       return new Response(
         JSON.stringify({ message: 'No active flow reminders', sent: 0 }),
@@ -218,16 +223,21 @@ Deno.serve(async (req) => {
       );
     }
 
-    let profilesQuery = supabase
-      .from('profiles').select('user_id, life_stage, last_period_date, cycle_length, period_length').eq('life_stage', 'flow');
-    if (body.userId) profilesQuery = profilesQuery.eq('user_id', body.userId);
-    const { data: profiles } = await profilesQuery;
+    const profiles = await fetchAllPaged<UserProfile>(() => {
+      let q = supabase
+        .from('profiles').select('user_id, life_stage, last_period_date, cycle_length, period_length')
+        .eq('life_stage', 'flow').order('user_id');
+      if (body.userId) q = q.eq('user_id', body.userId);
+      return q;
+    });
 
-    let tokensQuery = supabase.from('device_tokens').select('token, user_id, platform');
-    if (body.userId) tokensQuery = tokensQuery.eq('user_id', body.userId);
-    const { data: tokens } = await tokensQuery;
+    const tokens = await fetchAllPaged<DeviceToken>(() => {
+      let q = supabase.from('device_tokens').select('token, user_id, platform').order('token');
+      if (body.userId) q = q.eq('user_id', body.userId);
+      return q;
+    });
 
-    if (!tokens?.length) {
+    if (!tokens.length) {
       await finishRunLog(supabase, runId, { status: 'success', skipped_count: 1, reasons: { no_device_tokens: 1 } });
       return new Response(
         JSON.stringify({ message: 'No device tokens', sent: 0 }),
@@ -236,9 +246,12 @@ Deno.serve(async (req) => {
     }
 
     // Fetch user language preferences
-    let prefsQuery = supabase.from('user_preferences').select('user_id, language');
-    if (body.userId) prefsQuery = prefsQuery.eq('user_id', body.userId);
-    const { data: prefs } = await prefsQuery;
+    const prefs = await fetchAllPaged<any>(() => {
+      let q = supabase.from('user_preferences').select('user_id, language').order('user_id');
+      if (body.userId) q = q.eq('user_id', body.userId);
+      return q;
+    });
+    console.log(`[send-flow-reminders] reminders=${reminders.length} profiles=${profiles.length} tokens=${tokens.length}`);
     const langByUser = new Map<string, string>();
     prefs?.forEach((p: any) => { langByUser.set(p.user_id, p.language || 'az'); });
 

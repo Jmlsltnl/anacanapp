@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
 import { requireAdmin } from '../_shared/auth.ts';
+import { fetchAllPaged } from '../_shared/paginate.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -59,18 +60,16 @@ Deno.serve(async (req) => {
 
     await supabase.from('bulk_push_notifications').update({ status: 'sending' }).eq('id', notificationId);
 
-    let profilesQuery = supabase.from('profiles').select('user_id, life_stage, role');
-    if (notification.target_audience !== 'all') {
-      // QEYD (bug düzəlişi): 'partner' profiles.role-da HEÇ VAXT olmur (role yalnız
-      // admin/user/moderator ola bilər — bax profiles CHECK constraint) — 'partner'
-      // əslində life_stage sütununun dəyəridir. Əvvəlki `.eq('role','partner')` HƏMİŞƏ
-      // 0 sətir qaytarırdı, yəni "Hədəf auditoriya: Partnyor" seçimi heç kimə çatmırdı.
-      profilesQuery = profilesQuery.eq('life_stage', notification.target_audience);
-    }
+    const profiles = await fetchAllPaged<any>(() => {
+      let q = supabase.from('profiles').select('user_id, life_stage, role').order('user_id');
+      if (notification.target_audience !== 'all') {
+        // QEYD (bug düzəlişi): 'partner' profiles.role-da HEÇ VAXT olmur — bu, life_stage dəyəridir.
+        q = q.eq('life_stage', notification.target_audience);
+      }
+      return q;
+    });
 
-    const { data: profiles } = await profilesQuery;
-
-    if (!profiles?.length) {
+    if (!profiles.length) {
       await supabase.from('bulk_push_notifications').update({
         status: 'sent', sent_at: new Date().toISOString(), total_sent: 0, total_failed: 0,
       }).eq('id', notificationId);
@@ -80,9 +79,13 @@ Deno.serve(async (req) => {
       );
     }
 
-    const userIds = profiles.map(p => p.user_id);
-    const { data: tokens } = await supabase
-      .from('device_tokens').select('token, user_id, platform').in('user_id', userIds);
+    const userIds = profiles.map((p: any) => p.user_id);
+    // Bütün device_token-lar səhifələnərək yüklənir (1000 limitini keçmək üçün).
+    const userIdSet = new Set<string>(userIds);
+    const allTokens = await fetchAllPaged<DeviceToken>(() =>
+      supabase.from('device_tokens').select('token, user_id, platform').order('token')
+    );
+    const tokens = allTokens.filter((t) => userIdSet.has(t.user_id));
 
     if (!tokens?.length) {
       await supabase.from('bulk_push_notifications').update({
