@@ -337,6 +337,10 @@ export const useUserStore = create<UserState>()(
         deliveryType: state.deliveryType,
         language: state.language,
         hasSelectedLanguage: state.hasSelectedLanguage,
+        // KRİTİK: countryCode persist olunmurdu — InitialLanguageScreen-də seçilən
+        // ölkə qeyri-az dillərdə dərhal gələn window.location.reload() ilə silinir,
+        // qeydiyyata NULL gedirdi ("Naməlum ölkə" statistikasının səbəblərindən biri).
+        countryCode: state.countryCode,
       }),
     }
   )

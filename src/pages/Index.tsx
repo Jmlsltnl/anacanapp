@@ -21,6 +21,7 @@ import { usePendingTimerStops } from '@/hooks/usePendingTimerStops';
 import { useForceUpdate } from '@/hooks/useForceUpdate';
 import { useActiveBlock } from '@/hooks/useUserBlock';
 import BlockedScreen from '@/components/BlockedScreen';
+import CountryGate from '@/components/CountryGate';
 import { useSwipeNavigation } from '@/hooks/useSwipeNavigation';
 import { resetAppScrollPosition } from '@/lib/scroll';
 import { initDeeplinkListener, ParsedDeeplink } from '@/lib/deeplink';
@@ -127,6 +128,9 @@ const Index = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
+  // Ölkə məcburi seçildikdən sonra gate-i dərhal gizlətmək üçün (profil
+  // refresh-i bir anlıq gecikə bilər — ekran yenidən parıldamasın)
+  const [countryJustSet, setCountryJustSet] = useState(false);
   const { isAuthenticated, isOnboarded, role, hasSeenIntro, setHasSeenIntro, hasSelectedLanguage, setHasSelectedLanguage, lifeStage, hasCompletedFunnel, setFunnelCompleted, language, countryCode } = useUserStore(
     useShallow((s) => ({
       isAuthenticated: s.isAuthenticated,
@@ -569,6 +573,15 @@ const Index = () => {
   // Community bloku isə yalnız CommunityScreen-i bağlayır (orada idarə olunur).
   if (activeBlock?.block_type === 'full') {
     return <BlockedScreen block={activeBlock} />;
+  }
+
+  // MƏCBURİ ölkə seçimi: profili olan amma country_code-u boş olan hər kəsə
+  // (Apple/Google qeydiyyatı ölkə soruşmurdu; köhnə hesablarda sütun sonradan
+  // əlavə olunub) bir dəfəlik seçim ekranı. Server tərəfdə IP-dən avtomatik
+  // doldurma da var (Duzelis63) — bu, dəqiq seçim üçün son sığortadır.
+  const needsCountry = profileLoaded && !!profile && !(((profile as any).country_code || '') as string).trim();
+  if (needsCountry && !countryJustSet) {
+    return <CountryGate onDone={() => setCountryJustSet(true)} />;
   }
 
   // Partners NEVER see standard onboarding or the funnel — detect via either role or life_stage

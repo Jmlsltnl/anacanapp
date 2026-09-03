@@ -131,7 +131,20 @@ const AuthScreen = () => {
         return;
       }
 
-      // ── Registration flow: validate partner code ──
+      // ── Registration flow ──
+      // Ölkə MƏCBURİDİR — "Naməlum ölkə" statistika problemi + ölkəyə bağlı
+      // funksiyalar (community sıralama, tortlar, peyvənd təqvimi) üçün
+      if (!countryCode) {
+        toast({
+          title: tr("authscreen_olke_secin_title", 'Ölkə seçin'),
+          description: tr("authscreen_olke_secin_desc", 'Davam etmək üçün yaşadığınız ölkəni seçin.'),
+          variant: 'destructive'
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // ── Validate partner code ──
       const normalizedPartnerCode = partnerCode.trim().toUpperCase();
       if (!normalizedPartnerCode.startsWith('ANACAN-') || normalizedPartnerCode.length < 10) {
         toast({
@@ -317,6 +330,17 @@ const AuthScreen = () => {
           toast({
             title: tr("authscreen_melumat_teleb_olunur_a6d6a7", 'Məlumat tələb olunur'),
             description: tr("authscreen_e_mail_ve_sifre_daxil_edin_07e5e3", 'E-mail və şifrə daxil edin.'),
+            variant: 'destructive'
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        // Ölkə MƏCBURİDİR (bax handlePartnerSubmit-dəki eyni yoxlama)
+        if (!countryCode) {
+          toast({
+            title: tr("authscreen_olke_secin_title", 'Ölkə seçin'),
+            description: tr("authscreen_olke_secin_desc", 'Davam etmək üçün yaşadığınız ölkəni seçin.'),
             variant: 'destructive'
           });
           setIsLoading(false);
