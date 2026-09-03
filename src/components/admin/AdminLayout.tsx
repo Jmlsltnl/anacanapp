@@ -45,6 +45,7 @@ const menuGroups: MenuGroup[] = [
   items: [
   { id: 'dashboard', label: 'Dashboard', icon: Home },
   { id: 'analytics', label: 'Analitika', icon: BarChart3 },
+  { id: 'country-stats', label: tr("adminlayout_olke_statistikasi", "Ölkə Statistikası"), icon: Globe },
   { id: 'quick-actions', label: tr("adminlayout_suretli_kecidler_cee44e", "Sürətli Keçidlər"), icon: Zap }]
 
 },

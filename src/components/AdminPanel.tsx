@@ -61,6 +61,7 @@ import AdminIntroSlides from './admin/AdminIntroSlides';
 import AdminAlbumOrders from './admin/AdminAlbumOrders';
 import AdminCoupons from './admin/AdminCoupons';
 import AdminAnalytics from './admin/AdminAnalytics';
+import AdminCountryStats from './admin/AdminCountryStats';
 import AdminEpoint from './admin/AdminEpoint';
 import AdminForceUpdate from './admin/AdminForceUpdate';
 import AdminLanguages from './admin/AdminLanguages';
@@ -202,6 +203,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminCoupons />;
       case 'analytics':
         return <AdminAnalytics />;
+      case 'country-stats':
+        return <AdminCountryStats />;
       case 'epoint':
         return <AdminEpoint />;
       case 'force-update':

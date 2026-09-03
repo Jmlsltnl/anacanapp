@@ -109,3 +109,27 @@ export function reportComponentCrash(error: Error, componentStack?: string) {
     extra_data: { type: 'react_error_boundary' },
   });
 }
+
+/**
+ * Apple/Google/email giriş xətalarını admin panelinə (Crash Reports) göndərir.
+ * KRİTİK: login xətaları try/catch-lə tutulduğundan qlobal error handler-lərə
+ * heç vaxt çatmır — cihazlarda nə baş verdiyini görmək mümkün olmurdu.
+ * RLS anonim insert-ə icazə verir (user_id NULL) — login uğursuz olanda da işləyir.
+ */
+export function reportAuthError(provider: string, error: unknown) {
+  const err = error as any;
+  const message = err?.message || err?.errorMessage || String(error || 'Unknown auth error');
+  const code = err?.code || err?.error_code || err?.status || null;
+  sendCrashReport({
+    error_message: `[auth:${provider}] ${message}`,
+    error_stack: err?.stack,
+    extra_data: {
+      type: 'auth_error',
+      provider,
+      code,
+      // Supabase AuthError sahələri (varsa)
+      error_name: err?.name || null,
+      error_status: err?.status || null,
+    },
+  });
+}

@@ -295,6 +295,8 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       return { data, error: null };
     } catch (error) {
       console.error('Google sign in error:', error);
+      // Cihazlardakı real xəta admin panelində görünsün (Crash Reports)
+      import('@/lib/crashReporter').then((m) => m.reportAuthError('google', error)).catch(() => {});
       return { data: null, error };
     }
   }, []);
@@ -318,6 +320,8 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       return { data, error: null };
     } catch (error) {
       console.error('Apple sign in error:', error);
+      // Cihazlardakı real xəta admin panelində görünsün (Crash Reports)
+      import('@/lib/crashReporter').then((m) => m.reportAuthError('apple', error)).catch(() => {});
       return { data: null, error };
     }
   }, []);
