@@ -124,21 +124,21 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
 
         // Fix for Nursing (it incorrectly comes as Nursing / Əlavə qida from db in some cases)
         if (m.meal_id === 'nursing') {
-          mealName = language === 'en' ? 'Nursing' : language === 'ru' ? 'Грудное вскармливание' : language === 'tr' ? 'Emzirme' : language === 'kk' ? 'Емізу' : language === 'de' ? 'Stillen' : language === 'ar' ? 'رضاعة' : 'Əmizdirmə';
-          mealTime = language === 'en' ? 'Anytime' : language === 'ru' ? 'В любое время' : language === 'tr' ? 'Her zaman' : language === 'kk' ? 'Кез келген уақытта' : language === 'de' ? 'Jederzeit' : language === 'ar' ? 'في أي وقت' : 'İstənilən vaxt';
+          mealName = language === 'en' ? 'Nursing' : language === 'ru' ? 'Грудное вскармливание' : language === 'tr' ? 'Emzirme' : language === 'kk' ? 'Емізу' : language === 'uz' ? 'Emizish' : language === 'de' ? 'Stillen' : language === 'ar' ? 'رضاعة' : 'Əmizdirmə';
+          mealTime = language === 'en' ? 'Anytime' : language === 'ru' ? 'В любое время' : language === 'tr' ? 'Her zaman' : language === 'kk' ? 'Кез келген уақытта' : language === 'uz' ? 'Istalgan vaqtda' : language === 'de' ? 'Jederzeit' : language === 'ar' ? 'في أي وقت' : 'İstənilən vaxt';
         } else {
           // QEYD: bu düzəliş əvvəllər YALNIZ language==='en' üçün işləyirdi — digər dillərdə
           // (ru/tr/kk/de/ar) DB-dən gələn xam Azərbaycan mətni (məs. "İstənilən vaxt") olduğu
           // kimi göstərilirdi. İndi bütün dillər üçün ümumiləşdirilib.
           const MEAL_NAME_TR: Record<string, Record<string, string>> = {
-            'Əlavə qida': { en: 'Snack', ru: 'Перекус', tr: 'Ara öğün', kk: 'Жеңіл тамақ', de: 'Snack', ar: 'وجبة خفيفة' },
-            'Qəlyanaltı': { en: 'Snack', ru: 'Перекус', tr: 'Ara öğün', kk: 'Жеңіл тамақ', de: 'Snack', ar: 'وجبة خفيفة' },
-            'Səhər yeməyi': { en: 'Breakfast', ru: 'Завтрак', tr: 'Kahvaltı', kk: 'Таңғы ас', de: 'Frühstück', ar: 'الإفطار' },
-            'Nahar': { en: 'Lunch', ru: 'Обед', tr: 'Öğle yemeği', kk: 'Түскі ас', de: 'Mittagessen', ar: 'الغداء' },
-            'Şam yeməyi': { en: 'Dinner', ru: 'Ужин', tr: 'Akşam yemeği', kk: 'Кешкі ас', de: 'Abendessen', ar: 'العشاء' },
+            'Əlavə qida': { en: 'Snack', ru: 'Перекус', tr: 'Ara öğün', kk: 'Жеңіл тамақ', uz: 'Yengil tamaddi', de: 'Snack', ar: 'وجبة خفيفة' },
+            'Qəlyanaltı': { en: 'Snack', ru: 'Перекус', tr: 'Ara öğün', kk: 'Жеңіл тамақ', uz: 'Yengil tamaddi', de: 'Snack', ar: 'وجبة خفيفة' },
+            'Səhər yeməyi': { en: 'Breakfast', ru: 'Завтрак', tr: 'Kahvaltı', kk: 'Таңғы ас', uz: 'Nonushta', de: 'Frühstück', ar: 'الإفطار' },
+            'Nahar': { en: 'Lunch', ru: 'Обед', tr: 'Öğle yemeği', kk: 'Түскі ас', uz: 'Tushlik', de: 'Mittagessen', ar: 'الغداء' },
+            'Şam yeməyi': { en: 'Dinner', ru: 'Ужин', tr: 'Akşam yemeği', kk: 'Кешкі ас', uz: 'Kechki ovqat', de: 'Abendessen', ar: 'العشاء' },
           };
           const MEAL_TIME_TR: Record<string, string> = {
-            en: 'Anytime', ru: 'В любое время', tr: 'Her zaman', kk: 'Кез келген уақытта', de: 'Jederzeit', ar: 'في أي وقت',
+            en: 'Anytime', ru: 'В любое время', tr: 'Her zaman', kk: 'Кез келген уақытта', uz: 'Istalgan vaqtda', de: 'Jederzeit', ar: 'في أي وقت',
           };
           if (MEAL_NAME_TR[mealName]?.[language]) mealName = MEAL_NAME_TR[mealName][language];
           if (mealTime === 'İstənilən vaxt' && MEAL_TIME_TR[language]) mealTime = MEAL_TIME_TR[language];
@@ -250,7 +250,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                   <p className="a-heading" style={{ margin: 0, fontSize: 24 }}>{mealCalories} <span style={{ fontSize: 13, fontWeight: 700 }}>kcal</span></p>
                 </div>
                 <span className="a-tag" style={{ cursor: 'default' }}>
-                  {mealLogs.length} {language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : language === 'kk' ? 'өнім' : language === 'de' ? (mealLogs.length === 1 ? 'Eintrag' : 'Einträge') : language === 'ar' ? 'عنصر' : 'qida'}
+                  {mealLogs.length} {language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : language === 'kk' ? 'өнім' : language === 'uz' ? 'mahsulot' : language === 'de' ? (mealLogs.length === 1 ? 'Eintrag' : 'Einträge') : language === 'ar' ? 'عنصر' : 'qida'}
                 </span>
               </div>
             </div>
@@ -484,7 +484,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
                           <p className="a-list-title">{meal.name}</p>
                           <p className="a-list-sub">
                             {mealLogs.length > 0 ?
-                          `${mealLogs.length} ${language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : language === 'kk' ? 'өнім' : language === 'de' ? (mealLogs.length === 1 ? 'Eintrag' : 'Einträge') : language === 'ar' ? 'عنصر' : 'qida'} • ${mealCalories} kcal` :
+                          `${mealLogs.length} ${language === 'en' ? (mealLogs.length === 1 ? 'item' : 'items') : language === 'ru' ? 'продукт' : language === 'tr' ? 'ürün' : language === 'kk' ? 'өнім' : language === 'uz' ? 'mahsulot' : language === 'de' ? (mealLogs.length === 1 ? 'Eintrag' : 'Einträge') : language === 'ar' ? 'عنصر' : 'qida'} • ${mealCalories} kcal` :
                           meal.time
                           }
                           </p>

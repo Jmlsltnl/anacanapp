@@ -8,13 +8,14 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string; kk: string; de: string; ar: string }> = {
+const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string; kk: string; uz: string; de: string; ar: string }> = {
   '0-2': {
     az: 'Çox sadə cümlələr (3-5 söz). Təkrarlanan ifadələr. Heyvan səsləri. Rənglər və formalar. Nağıl 1-2 dəqiqəlik olsun.',
     en: 'Very simple sentences (3-5 words). Repetitive phrases. Animal sounds. Colors and shapes. Story should be 1-2 minutes.',
     ru: 'Очень простые предложения (3-5 слов). Повторяющиеся фразы. Звуки животных. Цвета и формы. Сказка на 1-2 минуты.',
     tr: 'Çok basit cümleler (3-5 kelime). Tekrarlanan ifadeler. Hayvan sesleri. Renkler ve şekiller. Masal 1-2 dakika olsun.',
     kk: 'Өте қарапайым сөйлемдер (3-5 сөз). Қайталанатын тіркестер. Жануарлардың дыбыстары. Түстер мен пішіндер. Ертегі 1-2 минутқа созылсын.',
+    uz: 'Juda sodda gaplar (3-5 soʻz). Takrorlanuvchi iboralar. Hayvon tovushlari. Ranglar va shakllar. Ertak 1-2 daqiqalik boʻlsin.',
     de: 'Sehr einfache Sätze (3–5 Wörter). Wiederkehrende Formulierungen. Tierlaute. Farben und Formen. Das Märchen sollte 1–2 Minuten lang sein.',
     ar: 'جمل بسيطة جدًا (٣-٥ كلمات). عبارات متكررة. أصوات الحيوانات. الألوان والأشكال. مدة الحكاية من دقيقة إلى دقيقتين.',
   },
@@ -24,6 +25,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     ru: 'Простые, но содержательные предложения. Диалоги. Весёлые события. Ясный воспитательный посыл. Сказка на 3-4 минуты.',
     tr: 'Basit ama anlamlı cümleler. Diyaloglar olsun. Eğlenceli olaylar. Net eğitici mesaj. 3-4 dakikalık masal.',
     kk: 'Қарапайым, бірақ мағыналы сөйлемдер. Диалогтар болсын. Қызықты оқиғалар. Тәрбиелік ойы анық болсын. Ертегі 3-4 минутқа созылсын.',
+    uz: 'Sodda, ammo mazmunli gaplar. Dialoglar boʻlsin. Qiziqarli voqealar. Tarbiyaviy gʻoya aniq boʻlsin. Ertak 3-4 daqiqalik boʻlsin.',
     de: 'Einfache, aber aussagekräftige Sätze. Mit Dialogen. Unterhaltsame Ereignisse. Die pädagogische Botschaft sollte klar sein. Ein 3–4-minütiges Märchen.',
     ar: 'جمل بسيطة وذات معنى. تضمين حوارات وأحداث ممتعة. يجب أن تكون الرسالة التربوية واضحة. مدة الحكاية من ٣ إلى ٤ دقائق.',
   },
@@ -33,6 +35,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     ru: 'Более сложный сюжет. Показать процесс решения проблем. Вопросы для размышления. Сказка на 4-6 минут.',
     tr: 'Daha karmaşık olay örgüsü. Problem çözme süreci gösterilsin. Çocuğun düşünmesine yardımcı sorular. 4-6 dakikalık masal.',
     kk: 'Күрделірек оқиға желісі. Мәселені шешу үдерісі көрсетілсін. Баланың ойлануына көмектесетін сұрақтар. Ертегі 4-6 минутқа созылсын.',
+    uz: 'Murakkabroq syujet chizigʻi. Muammoni hal qilish jarayoni koʻrsatilsin. Bolani oʻylashga undaydigan savollar. Ertak 4-6 daqiqalik boʻlsin.',
     de: 'Eine komplexere Handlung. Zeige den Prozess der Problemlösung. Fragen, die das Kind zum Nachdenken anregen. Ein 4–6-minütiges Märchen.',
     ar: 'حبكة أكثر تعقيدًا. توضيح عملية حل المشكلة. أسئلة تساعد الطفل على التفكير. مدة الحكاية من ٤ إلى ٦ دقائق.',
   },
@@ -42,6 +45,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     ru: 'Богатый сюжет. Моральные дилеммы и выбор. Эмоциональная глубина. Длинные диалоги. Сказка на 5-7 минут.',
     tr: 'Zengin olay örgüsü. Ahlaki ikilemler ve seçimler. Duygusal derinlik. Daha uzun diyaloglar. 5-7 dakikalık masal.',
     kk: 'Мазмұнды оқиға желісі. Моральдық дилеммалар мен таңдау. Эмоциялық тереңдік. Ұзағырақ диалогтар. Ертегі 5-7 минутқа созылсын.',
+    uz: 'Boy syujet. Axloqiy dilemmalar va tanlovlar. Hissiy teranlik. Uzunroq dialoglar. Ertak 5-7 daqiqalik boʻlsin.',
     de: 'Eine vielschichtige Handlung. Moralische Dilemmas und Entscheidungen. Emotionale Tiefe. Längere Dialoge. Ein 5–7-minütiges Märchen.',
     ar: 'حبكة غنية. معضلة أخلاقية وخيارات. عمق عاطفي. حوارات أطول. مدة الحكاية من ٥ إلى ٧ دقائق.',
   },
@@ -258,6 +262,40 @@ Format: In der ersten Zeile steht der Titel, danach folgt der Märchentext. Schr
 
 Пішім: Бірінші жолға тақырыпты, одан кейін ертегі мәтінін жазыңыз. Тізім түрінде емес, абзацтарға бөліп жазыңыз. Ертегі ҚАЗАҚ тілінде болуы керек.`;
 
+    case 'uz':
+      return `Siz mukofotga sazovor boʻlgan bolalar kitobi muallifisiz. Syujeti mantiqiy rivojlanadigan, professional bayon uslubida yozilgan qiziqarli, sifatli bolalar ertagini yozing.
+
+SIFATGA QOʻYILADIGAN MUHIM TALABLAR:
+1. Bolaning ismi — "${childName}". Bosh qahramon sifatida HAR DOIM shu ismdan foydalaning.
+2. Ertakning boshi, oʻrtasi va oxiri aniq BOʻLISHI KERAK. MANTIQIY sabab-oqibat bogʻliqligi boʻlishi lozim.
+3. Har bir voqeaning SABABI boʻlishi kerak — tasodifiy sehrli yechimlar BOʻLMASIN.
+4. Qahramonlarning xarakteri va maqsadlari izchil boʻlishi kerak.
+5. Tarbiyaviy gʻoya voqealardan TABIIY ravishda kelib chiqishi kerak — sunʼiy pand-nasihat BOʻLMASIN.
+6. Jonli, obrazli tildan foydalaning (ranglar, tovushlar, hidlar).
+7. Qahramon xarakterini ochib beradigan mazmunli dialoglar qoʻshing.
+8. Muammo qahramonning OʻZ saʼy-harakati, aql-idroki yoki shaxsiy oʻsishi orqali hal boʻlishi kerak.
+9. "Ular baxtli yashab qolishdi" kabi qoliplashgan iboralar TAQIQLANADI — aniq va qoniqarli yakun yozing.
+10. Boʻrttirilgan, haddan tashqari koʻtarinki tasvirlar TAQIQLANADI. Iliq, ammo samimiy ohangni saqlang.
+
+TAQIQLANADI:
+- Ismi yoʻq "kichkina doʻst", "sehrli mavjudot" kabi iboralar
+- Tasodifiy sehrli yechimlar
+- Vaʼz koʻrinishidagi axloqiy saboqlar
+- Haddan tashqari shirin, sunʼiy til
+- Syujetdagi uzilishlar yoki mantiqsiz ketma-ketlik
+
+Ertakning tuzilishi:
+1. Sarlavha: "${childName} va [nimadir]" koʻrinishida
+2. Voqea joyining tasviri (QAYERDA va QACHON, his-tuygʻularga taʼsir qiluvchi tafsilotlar bilan)
+3. Qahramonlar bilan tanishtirish (xarakter xususiyatlari bilan)
+4. Muammo/sinov (mantiqiy va bolaga tushunarli)
+5. 2-3 urinish/toʻsiq (asta-sekin murakkablashib boradigan)
+6. Kulminatsiya — qahramonning oʻsishi yoki nimanidir oʻrganishi
+7. Voqealardan mantiqiy ravishda kelib chiqadigan yechim
+8. Qoniqarli yakun va tabiiy tarbiyaviy xulosa${ageInstruction}
+
+Format: Birinchi qatorga sarlavhani, keyin ertak matnini yozing. Roʻyxat shaklida emas, xatboshilarga boʻlib yozing. Ertak OʻZBEK tilida (lotin yozuvida) boʻlishi kerak.`;
+
     default: // 'az'
       return `Sən mükafat almış uşaq kitabı müəllifiisən. Məntiqi süjet inkişafı və peşəkar anlatım tərzi ilə uşaqlar üçün maraqlı, keyfiyyətli nağıl yaz.
 
@@ -369,6 +407,19 @@ ${styleText ? `Стиль: ${styleText}` : ''}
 - Жанды сипаттамалар, мағыналы диалогтар және көңілден шығатын аяқталу болсын
 - Тәрбиелік ой жасанды емес, оқиғалардан ТАБИҒИ түрде туындасын
 - Қазақ тілінің грамматикалық нормаларын мұқият сақтаңыз`;
+
+    case 'uz':
+      return `Bolaning ismi: ${childName}${ageText}
+Mavzu: ${theme || 'Oʻrmondagi sarguzasht'}
+Yordamchi qahramon: ${hero || 'Dono oʻrmon hayvoni'}
+Tarbiyaviy gʻoya: ${moralLesson || 'Doʻstlik va mehr-oqibat'}
+${styleText ? `Uslub: ${styleText}` : ''}
+
+MUHIM:
+- "${childName}" haqida PROFESSIONAL, MANTIQIY ertak yozing
+- Jonli tasvirlar, mazmunli dialoglar va qoniqarli yakun boʻlsin
+- Tarbiyaviy gʻoya sunʼiy emas, voqealardan TABIIY ravishda kelib chiqsin
+- Oʻzbek tili (lotin yozuvi) grammatika qoidalariga diqqat bilan rioya qiling`;
 
     default: // 'az'
       return `Uşağın adı: ${childName}${ageText}
@@ -496,6 +547,7 @@ serve(async (req) => {
       ru: `Сказка ${actualChildName}`,
       tr: `${actualChildName}'in Masalı`,
       kk: `${actualChildName} туралы ертегі`,
+      uz: `${actualChildName} haqida ertak`,
       de: `Das Märchen von ${actualChildName}`,
       ar: `حكاية ${actualChildName}`,
     };

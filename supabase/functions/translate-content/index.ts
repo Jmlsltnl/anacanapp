@@ -78,7 +78,7 @@ const REGISTRY: Record<string, TableCfg> = {
   mommy_day_notifications: { text: ['title', 'body'] },
 };
 
-const LANG_NAMES: Record<string, string> = { ru: 'Russian', tr: 'Turkish', en: 'English', kk: 'Kazakh', de: 'German', ar: 'Arabic' };
+const LANG_NAMES: Record<string, string> = { ru: 'Russian', tr: 'Turkish', en: 'English', kk: 'Kazakh', uz: 'Uzbek', de: 'German', ar: 'Arabic' };
 const MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
 
 function buildSystemPrompt(lang: string): string {
@@ -89,11 +89,13 @@ function buildSystemPrompt(lang: string): string {
       ? 'Use the formal "siz" form when addressing the user. Use "regl" for period, "bebek" for baby. Emergency number is 112.'
       : lang === 'kk'
         ? 'Write natural modern Kazakh (Cyrillic script). Use the formal «Сіз» form when addressing the user. Use «етеккір» for period, «бөпе» for baby, «ДДСҰ» for WHO. Emergency number is 103.'
-        : lang === 'de'
-          ? 'Write natural German as used in German parenting apps. Use the informal "du" form when addressing the user (warm, familiar tone). Use "Baby" for baby, "Periode" for period. Emergency number is 112.'
-          : lang === 'ar'
-            ? 'Write Modern Standard Arabic. ALWAYS address the mother in the FEMININE second-person singular (أنتِ). Use «الدورة الشهرية» for period, «طفلكِ»/«رضيعكِ» for baby, «منظمة الصحة العالمية» for WHO. Where the source mentions a specific emergency number (103/112), write «اتصلي بخدمات الطوارئ المحلية» instead.'
-            : 'Use a warm, professional tone.';
+        : lang === 'uz'
+          ? 'Write natural modern Uzbek (LATIN script) as used in Uzbekistan. Use the formal "siz" form when addressing the user. Use "hayz" for period, "chaqaloq" for baby, "JSST" for WHO. Emergency number is 103.'
+          : lang === 'de'
+            ? 'Write natural German as used in German parenting apps. Use the informal "du" form when addressing the user (warm, familiar tone). Use "Baby" for baby, "Periode" for period. Emergency number is 112.'
+            : lang === 'ar'
+              ? 'Write Modern Standard Arabic. ALWAYS address the mother in the FEMININE second-person singular (أنتِ). Use «الدورة الشهرية» for period, «طفلكِ»/«رضيعكِ» for baby, «منظمة الصحة العالمية» for WHO. Where the source mentions a specific emergency number (103/112), write «اتصلي بخدمات الطوارئ المحلية» instead.'
+              : 'Use a warm, professional tone.';
   return [
     `You are a professional medical/parenting content translator for a pregnancy & motherhood app (Anacan).`,
     `Translate the JSON values from Azerbaijani to ${target}.`,
@@ -101,7 +103,7 @@ function buildSystemPrompt(lang: string): string {
     `1) Return ONLY valid JSON with EXACTLY the same keys. No extra keys, no commentary.`,
     `2) String values stay strings; array values stay arrays with the same length and order.`,
     `3) Preserve emojis, line breaks (\\n), HTML/Markdown formatting, numbers, units and placeholders like {x} exactly.`,
-    `4) Keep brand/product names unchanged: Anacan (app name), Premium, Dr.Anacan. EXCEPTION: when "Anacan" is an affectionate address to the mother (baby speaking to mom), translate it: ru «мамочка», tr "anneciğim", kk «анашым», de "Mami", ar «ماما», en "Mommy".`,
+    `4) Keep brand/product names unchanged: Anacan (app name), Premium, Dr.Anacan. EXCEPTION: when "Anacan" is an affectionate address to the mother (baby speaking to mom), translate it: ru «мамочка», tr "anneciğim", kk «анашым», uz "Onajon", de "Mami", ar «ماما», en "Mommy".`,
     `5) Medical accuracy over literal wording; natural, warm tone for mothers. ${style}`,
   ].join('\n');
 }
@@ -224,7 +226,7 @@ Deno.serve(async (req) => {
 
     const cfg = REGISTRY[table];
     if (!cfg) return json({ error: `unknown table '${table}'`, tables: Object.keys(REGISTRY) }, 400);
-    if (!['ru', 'tr', 'en', 'kk', 'de', 'ar'].includes(lang)) return json({ error: "lang must be 'ru' | 'tr' | 'en' | 'kk' | 'de' | 'ar'" }, 400);
+    if (!['ru', 'tr', 'en', 'kk', 'uz', 'de', 'ar'].includes(lang)) return json({ error: "lang must be 'ru' | 'tr' | 'en' | 'kk' | 'uz' | 'de' | 'ar'" }, 400);
 
     const textF = cfg.text ?? [];
     const arrF = cfg.arr ?? [];

@@ -488,6 +488,8 @@ const FlowDashboard = () => {
                     tip.title_tr || getTranslatedTip(tip.title_az || tip.title, language) :
                     language === 'kk' ?
                     (tip as any).title_kk || tip.title_ru || getTranslatedTip(tip.title_az || tip.title, language) :
+                    language === 'uz' ?
+                    (tip as any).title_uz || tip.title_ru || getTranslatedTip(tip.title_az || tip.title, language) :
                     language === 'de' ?
                     (tip as any).title_de || tip.title_en || getTranslatedTip(tip.title_az || tip.title, language) :
                     language === 'ar' ?
@@ -508,6 +510,8 @@ const FlowDashboard = () => {
                 tip.content_tr || getTranslatedTip(tip.content_az || tip.content, language) :
                 language === 'kk' ?
                 (tip as any).content_kk || tip.content_ru || getTranslatedTip(tip.content_az || tip.content, language) :
+                language === 'uz' ?
+                (tip as any).content_uz || tip.content_ru || getTranslatedTip(tip.content_az || tip.content, language) :
                 language === 'de' ?
                 (tip as any).content_de || tip.content_en || getTranslatedTip(tip.content_az || tip.content, language) :
                 language === 'ar' ?

@@ -120,7 +120,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
       // 2. Fallback local dictionary — bütün 7 dil üçün (əvvəllər yalnız en/az var idi,
       // ru/tr/kk/de/ar istifadəçiləri bu fallback-a düşəndə xam Azərbaycan mətni görürdü,
       // məs. "hamısı" filtr çipi — bax Recipes.tsx-də category.id==='all' çağırışı).
-      type LangMap = { az: string; en: string; ru: string; tr: string; kk: string; de: string; ar: string };
+      type LangMap = { az: string; en: string; ru: string; tr: string; kk: string; de: string; ar: string; uz?: string };
       const dictionary: Record<string, LangMap> = {
         'seher_yemeyi': { az: 'Səhər Yeməyi', en: 'Breakfast', ru: 'Завтрак', tr: 'Kahvaltı', kk: 'Таңғы ас', de: 'Frühstück', ar: 'الإفطار' },
         'səhər yeməyi': { az: 'Səhər Yeməyi', en: 'Breakfast', ru: 'Завтрак', tr: 'Kahvaltı', kk: 'Таңғы ас', de: 'Frühstück', ar: 'الإفطار' },
@@ -172,8 +172,9 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
       };
 
       if (dictionary[normalized]) {
-        const langKey = (['az', 'en', 'ru', 'tr', 'kk', 'de', 'ar'] as const).includes(language as any) ? (language as keyof LangMap) : 'az';
-        return dictionary[normalized][langKey];
+        const langKey = (['az', 'en', 'ru', 'tr', 'kk', 'de', 'ar', 'uz'] as const).includes(language as any) ? (language as keyof LangMap) : 'az';
+        // uz lüğətdə yoxdur → ru körpüsü (kk ilə eyni məntiq)
+        return dictionary[normalized][langKey] || dictionary[normalized].ru;
       }
 
       // 3. Fallback to capitalization if nothing matches

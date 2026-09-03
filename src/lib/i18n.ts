@@ -23,7 +23,7 @@ translationCache['az'] = { ...(azStatic as Record<string, string>) };
 //   1) localStorage keşi: son uğurlu dəst sinxron hidratasiya olunur (aşağıda, modul yüklənən an)
 //   2) Lokal seed chunk-ları: en/ru/tr/kk/de/ar seed-ləri bundle-ın hissəsidir (dynamic import, şəbəkəsiz)
 //   3) DB overlay: admin düzəlişləri arxa planda gəlir və keşə yazılır
-const SEED_LANGS = new Set(['en', 'ru', 'tr', 'kk', 'de', 'ar']);
+const SEED_LANGS = new Set(['en', 'ru', 'tr', 'kk', 'de', 'ar', 'uz']);
 const LS_CACHE_PREFIX = 'anacan_i18n_cache:';
 
 function hydrateFromLocalStorage(lang: string): boolean {
@@ -69,7 +69,9 @@ async function loadLocalSeed(lang: string): Promise<void> {
             ? await import('../../scripts/i18n/de.seed.json')
             : lang === 'ar'
               ? await import('../../scripts/i18n/ar.seed.json')
-              : await import('../../scripts/i18n/tr.seed.json');
+              : lang === 'uz'
+                ? await import('../../scripts/i18n/uz.seed.json')
+                : await import('../../scripts/i18n/tr.seed.json');
     const seed = (seedModule.default ?? seedModule) as Record<string, string>;
     // seed ALTDA — localStorage keşi / DB overlay dəyərləri üstün qalsın
     translationCache[lang] = { ...seed, ...(translationCache[lang] || {}) };
@@ -168,6 +170,7 @@ function withDevLanguages(list: AppLanguage[]): AppLanguage[] {
     { code: 'kk', name: 'Kazakh', native_name: 'Қазақша' },
     { code: 'de', name: 'German', native_name: 'Deutsch' },
     { code: 'ar', name: 'Arabic', native_name: 'العربية' },
+    { code: 'uz', name: 'Uzbek', native_name: "O'zbekcha" },
   ];
   return [...list, ...extras.filter((e) => !have.has(e.code))];
 }
@@ -196,6 +199,7 @@ const LOCALE_TAGS: Record<string, string> = {
   de: 'de-DE',
   // QEYD: 'ar-SA' YOX — o, Hicri təqimə keçir; generic 'ar' = Qriqorian + ərəb-hind rəqəmləri (١٢٣)
   ar: 'ar',
+  uz: 'uz-UZ',
 };
 
 /**

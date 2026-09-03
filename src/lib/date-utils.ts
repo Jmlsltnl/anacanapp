@@ -1,5 +1,5 @@
 import { tr } from "@/lib/tr";import { format } from 'date-fns';
-import { az, enUS, ru, tr as trLocale, kk, de, ar } from 'date-fns/locale';
+import { az, enUS, ru, tr as trLocale, kk, de, ar, uz } from 'date-fns/locale';
 import { getPersistedLanguage } from './tr';
 
 export const getCurrentDateLocale = () => {
@@ -10,6 +10,7 @@ export const getCurrentDateLocale = () => {
   if (lang === 'kk') return kk;
   if (lang === 'de') return de;
   if (lang === 'ar') return ar;
+  if (lang === 'uz') return uz;
   return az;
 };
 /**

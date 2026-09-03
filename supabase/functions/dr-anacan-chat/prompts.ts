@@ -30,7 +30,7 @@ export const getSystemPrompt = (
   // en/ru/tr share the English prompt body; `replyRule` + the langInstruction in index.ts
   // enforce the actual response language (reliable for LLMs), so ru/tr users get ru/tr answers.
   const isEn = language !== "az";
-  const REPLY_LANG: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh", de: "German", ar: "Arabic (Modern Standard; address the mother in the FEMININE second person — أنتِ)" };
+  const REPLY_LANG: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh", uz: "Uzbek (Latin script)", de: "German", ar: "Arabic (Modern Standard; address the mother in the FEMININE second person — أنتِ)" };
   const replyRule = language === "az"
     ? "YALNIZ Azərbaycan dilində cavab ver"
     : `Reply ONLY in ${REPLY_LANG[language] ?? "English"}`;
@@ -42,6 +42,7 @@ export const getSystemPrompt = (
     ru: "⚠️ Эта информация носит общий характер. Перед любым лечением или приёмом лекарств обязательно проконсультируйтесь с врачом.",
     tr: "⚠️ Bu bilgiler genel niteliktedir. Herhangi bir tedavi veya ilaç kullanımından önce mutlaka doktora danışın.",
     kk: "⚠️ Бұл ақпарат жалпы сипатта берілген. Кез келген емді бастамас немесе дәрі қабылдамас бұрын міндетті түрде дәрігермен кеңесіңіз.",
+    uz: "⚠️ Bu maʼlumot umumiy xarakterga ega. Har qanday davolanish yoki dori qabul qilishdan oldin albatta shifokor bilan maslahatlashing.",
     de: "⚠️ Diese Informationen sind allgemeiner Natur. Sprich vor jeder Behandlung oder Einnahme von Medikamenten unbedingt mit deinem Arzt oder deiner Ärztin.",
     ar: "⚠️ هذه المعلومات عامة. استشيري الطبيب حتمًا قبل البدء بأي علاج أو تناول أي دواء.",
   };
@@ -62,7 +63,7 @@ export const getSystemPrompt = (
 - Yəni hər cavabda deyil, YALNIZ tibbi/dərman mövsuzunda yazanda göstər.`;
 
   // Add current date dynamically (locale matches the user's language)
-  const dateLocale = language === "ru" ? "ru-RU" : language === "tr" ? "tr-TR" : language === "kk" ? "kk-KZ" : language === "de" ? "de-DE" : language === "ar" ? "ar" : "en-US";
+  const dateLocale = language === "ru" ? "ru-RU" : language === "tr" ? "tr-TR" : language === "kk" ? "kk-KZ" : language === "uz" ? "uz-UZ" : language === "de" ? "de-DE" : language === "ar" ? "ar" : "en-US";
   const currentDateEn = new Date().toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
   const currentDateAz = new Date().toLocaleDateString("az-AZ", { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
   const dateContext = isEn ? `\nToday's Date: ${currentDateEn}\n` : `\nBugünkü tarix: ${currentDateAz}\n`;

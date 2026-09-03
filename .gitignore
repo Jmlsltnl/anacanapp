@@ -36,3 +36,7 @@ supabase/.temp/
 # bu alətlər, həm də DB-dəki migration_export_* RPC-ləri silinməlidir.
 azure-migration/
 supabase/functions/migration-download-file/
+
+# uz seed generasiyasının aralıq faylları (yekun nəticə: scripts/i18n/uz.seed.json)
+scripts/i18n/uz.out/
+scripts/i18n/uz-translate.log

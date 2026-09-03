@@ -8921,5 +8921,6 @@
   "winback_cta": "Rejoin — 3 days free",
   "winback_dismiss": "Dismiss",
   "winback_expired_text": "AI guide, reports and all tools are waiting — try again free for 3 days.",
-  "winback_expired_title": "We missed you on Premium 💛"
+  "winback_expired_title": "We missed you on Premium 💛",
+  "admincountry_retry": "Retry"
 }

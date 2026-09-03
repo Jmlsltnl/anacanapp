@@ -92,7 +92,7 @@ const PartnerHomeScreen = ({ onNavigate, onOpenChat }: Props) => {
   const partnerTip: string | null = (() => {
     if (!dayContent) return null;
     const d = dayContent as any;
-    const localized = language !== 'az' ? d[`partner_tip_${language}`] || (language === 'kk' ? d.partner_tip_ru : null) || (language === 'de' || language === 'ar' ? d.partner_tip_en : null) : null;
+    const localized = language !== 'az' ? d[`partner_tip_${language}`] || (language === 'kk' || language === 'uz' ? d.partner_tip_ru : null) || (language === 'de' || language === 'ar' ? d.partner_tip_en : null) : null;
     return localized || d.partner_tip || null;
   })();
 

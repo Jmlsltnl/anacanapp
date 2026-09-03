@@ -34,7 +34,7 @@ const PartnerWeekInfoCard = ({ currentWeek, weekData, dayContent, language, isMu
   const development: string | null = (() => {
     if (!dayContent) return null;
     const d = dayContent as any;
-    const localized = language !== 'az' ? d[`baby_development_${language}`] || (language === 'kk' ? d.baby_development_ru : null) || (language === 'de' || language === 'ar' ? d.baby_development_en : null) : null;
+    const localized = language !== 'az' ? d[`baby_development_${language}`] || (language === 'kk' || language === 'uz' ? d.baby_development_ru : null) || (language === 'de' || language === 'ar' ? d.baby_development_en : null) : null;
     return localized || d.baby_development || null;
   })();
 

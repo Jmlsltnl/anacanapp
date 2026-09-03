@@ -217,11 +217,11 @@ const AdminCountryStats = () => {
         </div>
       }
 
-      {/* RPC hələ tətbiq olunmayıbsa */}
+      {/* RPC hələ tətbiq olunmayıbsa / schema keşi köhnədirsə */}
       {statsQ.isError &&
       <div className="rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/20 p-4 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div>
+          <div className="flex-1">
             <p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">
               {tr('admincountry_rpc_missing', 'Statistika funksiyaları bazada tapılmadı')}
             </p>
@@ -230,6 +230,12 @@ const AdminCountryStats = () => {
             </p>
             <p className="text-[11px] text-amber-600/80 mt-1 font-mono">{(statsQ.error as any)?.message}</p>
           </div>
+          <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {statsQ.refetch();tsQ.refetch();featQ.refetch();platQ.refetch();}}>
+            {tr('admincountry_retry', 'Yenidən yoxla')}
+          </Button>
         </div>
       }
 

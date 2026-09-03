@@ -143,8 +143,8 @@ export default function VaccineCalendar({ onBack }: Props) {
   const qc = useQueryClient();
   const lang = getPersistedLanguage();
 
-  // Uşaq üçün ölkə seçilməyibsə, default tətbiq dilinə görə (tr→TR, ru→RU, kk→KZ, de→DE, ar→SA, əks halda AZ)
-  const langDefaultCountry = lang === 'tr' ? 'TR' : lang === 'ru' ? 'RU' : lang === 'kk' ? 'KZ' : lang === 'de' ? 'DE' : lang === 'ar' ? 'SA' : 'AZ';
+  // Uşaq üçün ölkə seçilməyibsə, default tətbiq dilinə görə (tr→TR, ru→RU, kk→KZ, uz→UZ, de→DE, ar→SA, əks halda AZ)
+  const langDefaultCountry = lang === 'tr' ? 'TR' : lang === 'ru' ? 'RU' : lang === 'kk' ? 'KZ' : lang === 'uz' ? 'UZ' : lang === 'de' ? 'DE' : lang === 'ar' ? 'SA' : 'AZ';
   const childCountry = (selectedChild as any)?.country_code || langDefaultCountry;
   const [countryCode, setCountryCode] = useState<string>(childCountry);
   const effectiveCountry = countryCode || childCountry;

@@ -1,7 +1,8 @@
 // ============================================================
-// langDetect — cəmiyyət postları üçün yüngül dil aşkarlama (az/en/ru/tr/kk/de).
+// langDetect — cəmiyyət postları üçün yüngül dil aşkarlama (az/en/ru/tr/kk/uz/de).
 // Prinsip:
-//   1. Kiril mətnində qazax-spesifik hərflər (ә/ғ/қ/ң/ө/ұ/ү/һ/і) varsa → kk
+//   1. Kiril mətnində özbək-spesifik hərflər (ў/ҳ) varsa → uz;
+//      qazax-spesifik hərflər (ә/ғ/қ/ң/ө/ұ/ү/һ/і) varsa → kk
 //   2. Qalan kiril üstünlüyü → ru
 //   3. "ə" hərfi varsa → az ("ə" az dilinin ən çox işlənən hərfidir; tr/en/ru-da yoxdur)
 //   4. Alman-spesifik: ß varsa → de; ä varsa (ə-siz mətndə) → de
@@ -13,10 +14,10 @@
 // Qeyd: bu YALNIZ ilkin təxmindir — istifadəçi compose-da dil çipi ilə düzəldə bilər.
 // ============================================================
 
-export type FeedLang = 'az' | 'en' | 'ru' | 'tr' | 'kk' | 'de' | 'ar';
+export type FeedLang = 'az' | 'en' | 'ru' | 'tr' | 'kk' | 'uz' | 'de' | 'ar';
 
 /** Feed linzasında göstərilən sıra ilə bütün dəstəklənən dillər */
-export const FEED_LANGS: FeedLang[] = ['az', 'ru', 'tr', 'kk', 'de', 'ar', 'en'];
+export const FEED_LANGS: FeedLang[] = ['az', 'ru', 'tr', 'kk', 'uz', 'de', 'ar', 'en'];
 
 export function isFeedLang(v: unknown): v is FeedLang {
   return typeof v === 'string' && (FEED_LANGS as string[]).includes(v);
@@ -55,7 +56,7 @@ export function detectLang(text: string, fallback: FeedLang = 'az'): FeedLang {
 
   // 0) Ərəb qrafikası — ən etibarlı marker (başqa heç bir dəstəklənən dildə yoxdur)
   const arb = (t.match(/[\u0600-\u06FF\u0750-\u077F]/g) || []).length;
-  const cyr = (t.match(/[А-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІі]/g) || []).length;
+  const cyr = (t.match(/[А-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІіЎўҲҳ]/g) || []).length;
   const lat = (t.match(/[A-Za-zƏəĞğIıİÖöŞşÜüÇç]/g) || []).length;
   const totalLetters = arb + cyr + lat;
 
@@ -64,14 +65,20 @@ export function detectLang(text: string, fallback: FeedLang = 'az'): FeedLang {
 
   if (arb > totalLetters * 0.3) return 'ar';
 
-  // 1) Kiril üstünlüyü → kk (qazax-spesifik hərf varsa) və ya ru
+  // 1) Kiril üstünlüyü → uz (özbək-spesifik hərf varsa), kk (qazax-spesifik hərf varsa) və ya ru
   if (cyr > totalLetters * 0.4) {
+    // ў ҳ — rus/qazax əlifbasında yoxdur, özbək kiril mətninin etibarlı göstəricisidir
+    if (/[ЎўҲҳ]/.test(t)) return 'uz';
     // ә ғ қ ң ө ұ ү һ і — rus əlifbasında yoxdur, qazax mətninin etibarlı göstəricisidir
     return /[ӘәҒғҚқҢңӨөҰұҮүҺһІі]/.test(t) ? 'kk' : 'ru';
   }
 
   // 2) "ə" → az (praktikada hər az cümləsində var: və, mən, gələcək...)
   if (/[Əə]/.test(t)) return 'az';
+
+  // 2a) Özbək latın markeri: oʻ/gʻ digrafları (apostrof variantları ilə) —
+  //     az/tr/en/de-də bu ardıcıllıq işlənmir; yalnız ilkin təxmindir, çiplə düzəldilə bilər
+  if (/[OoGg][ʻʼ'’‘`]/.test(t)) return 'uz';
 
   // 3) Alman-spesifik: ß yalnız almandadır; ä (ə-siz mətndə) az/tr-də yoxdur
   if (/[ßÄä]/.test(t)) return 'de';

@@ -137,7 +137,7 @@ export const useBabyNames = () => {
       // kk→az, de/ar→en körpüsü ilə "yerli olmayan" adlar göstərilirdi).
       // lang sütunu 20260813150020 migrasiyası ilə gəlir; köhnə DB-lərdə (sütun yoxdursa)
       // origin_en markerinə fallback edirik.
-      const targetLang = ['az', 'en', 'ru', 'tr', 'kk', 'de', 'ar'].includes(language) ? language : 'az';
+      const targetLang = ['az', 'en', 'ru', 'tr', 'kk', 'de', 'ar', 'uz'].includes(language) ? language : 'az';
       let { data, error } = await (supabase as any)
         .from('baby_names_db')
         .select('*')

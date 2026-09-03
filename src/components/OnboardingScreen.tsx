@@ -86,9 +86,10 @@ const OnboardingScreen = () => {
   // Use database data or fallback, then filter by enabled settings
   const stages = useMemo(() => {
     const getStageText = (s: any, field: string) => {
-      // İstənilən dil üçün generik: <field>_<lang> → (kk üçün əlavə ru körpüsü) → fallback
+      // İstənilən dil üçün generik: <field>_<lang> → (kk/uz üçün əlavə ru körpüsü) → fallback
       if (language !== 'az' && s[field + '_' + language]) return s[field + '_' + language];
       if (language === 'kk' && s[field + '_ru']) return s[field + '_ru'];
+      if (language === 'uz' && s[field + '_ru']) return s[field + '_ru'];
       if (language !== 'az' && language !== 'ru' && s[field + '_en']) return s[field + '_en'];
 
       const fallback = getFallbackStages().find(fb => fb.stage_id === s.stage_id);
@@ -129,6 +130,7 @@ const OnboardingScreen = () => {
     const getOptionLabel = (m: any) => {
       if (language !== 'az' && m['label_' + language]) return m['label_' + language];
       if (language === 'kk' && m.label_ru) return m.label_ru;
+      if (language === 'uz' && m.label_ru) return m.label_ru;
       if (language !== 'az' && language !== 'ru' && m.label_en) return m.label_en;
 
       const fallback = getFallbackMultiples().find(fb => fb.option_id === m.option_id);

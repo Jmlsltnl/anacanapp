@@ -145,9 +145,9 @@ export const getTranslatedTip = (text: string, lang: string): string => {
   if (!text) return '';
   if (lang === 'az') return text;
   
-  // Try exact match
-  if (TIP_TRANSLATIONS[text] && TIP_TRANSLATIONS[text][lang]) {
-    return TIP_TRANSLATIONS[text][lang];
+  // Try exact match (uz üçün ru körpüsü: uz tərcüməsi yoxdursa rus mətn az-dan faydalıdır)
+  if (TIP_TRANSLATIONS[text] && (TIP_TRANSLATIONS[text][lang] || (lang === 'uz' && TIP_TRANSLATIONS[text]['ru']))) {
+    return TIP_TRANSLATIONS[text][lang] || TIP_TRANSLATIONS[text]['ru'];
   }
   
   // Try case-insensitive and trimmed match
@@ -155,6 +155,7 @@ export const getTranslatedTip = (text: string, lang: string): string => {
   for (const [key, translations] of Object.entries(TIP_TRANSLATIONS)) {
     if (key.trim().toLowerCase() === trimmedText) {
       if (translations[lang]) return translations[lang];
+      if (lang === 'uz' && translations['ru']) return translations['ru'];
     }
   }
   

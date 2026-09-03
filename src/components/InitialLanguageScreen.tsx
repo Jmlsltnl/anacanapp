@@ -9,7 +9,7 @@ import { useState, useMemo, useEffect } from 'react';
 import countriesData from '../../countries.json';
 
 // flagcdn ölkə kodu xəritəsi (dil kodu → bayraq kodu)
-const FLAG_BY_CODE: Record<string, string> = { az: 'az', en: 'gb', ru: 'ru', tr: 'tr', kk: 'kz', de: 'de', ar: 'sa' };
+const FLAG_BY_CODE: Record<string, string> = { az: 'az', en: 'gb', ru: 'ru', tr: 'tr', kk: 'kz', uz: 'uz', de: 'de', ar: 'sa' };
 
 /**
  * Cihazın/brauzerin dil-regionundan ("ar-SA", "ru-RU", "de-DE" və s.) ölkə kodunu
@@ -148,13 +148,13 @@ export default function InitialLanguageScreen() {
   // Bu ekran tərcümə yüklənməzdən ƏVVƏL göstərilir — mətnlər inline saxlanır.
   const L = (m: Record<string, string>) => m[selectedLang] ?? m.az;
   const t = {
-    selectCountry: L({ az: 'Ölkə seçin', en: 'Select Country', ru: 'Выберите страну', tr: 'Ülke seçin', kk: 'Елді таңдаңыз', de: 'Land auswählen', ar: 'اختاري الدولة' }),
+    selectCountry: L({ az: 'Ölkə seçin', en: 'Select Country', ru: 'Выберите страну', tr: 'Ülke seçin', kk: 'Елді таңдаңыз', uz: 'Mamlakatni tanlang', de: 'Land auswählen', ar: 'اختاري الدولة' }),
     selectCountryCap: 'SELECT COUNTRY',
-    searchPlaceholder: L({ az: 'Axtar', en: 'Search', ru: 'Поиск', tr: 'Ara', kk: 'Іздеу', de: 'Suchen', ar: 'بحث' }),
-    noneFound: L({ az: 'Ölkə tapılmadı', en: 'No countries found', ru: 'Страны не найдены', tr: 'Ülke bulunamadı', kk: 'Ел табылмады', de: 'Kein Land gefunden', ar: 'لم يتم العثور على دولة' }),
-    selectLanguage: L({ az: 'Dil seçin', en: 'Select Language', ru: 'Выберите язык', tr: 'Dil seçin', kk: 'Тілді таңдаңыз', de: 'Sprache auswählen', ar: 'اختاري اللغة' }),
+    searchPlaceholder: L({ az: 'Axtar', en: 'Search', ru: 'Поиск', tr: 'Ara', kk: 'Іздеу', uz: 'Qidirish', de: 'Suchen', ar: 'بحث' }),
+    noneFound: L({ az: 'Ölkə tapılmadı', en: 'No countries found', ru: 'Страны не найдены', tr: 'Ülke bulunamadı', kk: 'Ел табылмады', uz: 'Mamlakat topilmadi', de: 'Kein Land gefunden', ar: 'لم يتم العثور على دولة' }),
+    selectLanguage: L({ az: 'Dil seçin', en: 'Select Language', ru: 'Выберите язык', tr: 'Dil seçin', kk: 'Тілді таңдаңыз', uz: 'Tilni tanlang', de: 'Sprache auswählen', ar: 'اختاري اللغة' }),
     selectLanguageCap: 'SELECT LANGUAGE',
-    continue: L({ az: 'Davam et', en: 'Continue', ru: 'Продолжить', tr: 'Devam et', kk: 'Жалғастыру', de: 'Weiter', ar: 'متابعة' }),
+    continue: L({ az: 'Davam et', en: 'Continue', ru: 'Продолжить', tr: 'Devam et', kk: 'Жалғастыру', uz: 'Davom etish', de: 'Weiter', ar: 'متابعة' }),
     continueEn: 'Continue',
   };
 
@@ -274,6 +274,7 @@ export default function InitialLanguageScreen() {
                   ru: 'Язык можно изменить позже в настройках',
                   tr: 'Dili daha sonra ayarlardan değiştirebilirsiniz',
                   kk: 'Тілді кейін баптаулардан өзгерте аласыз',
+                  uz: 'Tilni keyinroq sozlamalardan oʻzgartira olasiz',
                   de: 'Du kannst die Sprache später in den Einstellungen ändern',
                   ar: 'يمكنكِ تغيير اللغة لاحقًا من الإعدادات',
                 })}

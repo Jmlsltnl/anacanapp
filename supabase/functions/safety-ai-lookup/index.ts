@@ -107,7 +107,7 @@ QAYDALAR:
    - medicine: dərmanlar, vitaminlər
    - beauty: kosmetika, gözəllik prosedurları (epilyasiya, manikür, saç boyası və s.)
 
-4. Ad və izahatı 7 dildə ver (eyni məzmun, hər dildə təbii tərcümə). Rus dilində "вы" formasında, türk dilində "siz" formasında, qazax dilində «Сіз» formasında (kiril), alman dilində "du" formasında, ərəb dilində anaya QADIN cinsində müraciətlə (أنتِ) yaz.
+4. Ad və izahatı 8 dildə ver (eyni məzmun, hər dildə təbii tərcümə). Rus dilində "вы" formasında, türk dilində "siz" formasında, qazax dilində «Сіз» formasında (kiril), özbək dilində "siz" formasında (LATIN yazısı), alman dilində "du" formasında, ərəb dilində anaya QADIN cinsində müraciətlə (أنتِ) yaz.
 
 JSON formatı:
 {
@@ -116,6 +116,7 @@ JSON formatı:
   "name_ru": "Название на русском",
   "name_tr": "Türkçe ad",
   "name_kk": "Қазақша атауы",
+  "name_uz": "Oʻzbekcha nomi (lotin)",
   "name_de": "Deutscher Name",
   "name_ar": "الاسم بالعربية",
   "category": "${categoryList}",
@@ -125,6 +126,7 @@ JSON formatı:
   "description_ru": "Краткое описание безопасности при беременности на русском (eyni məzmun)",
   "description_tr": "Hamilelik döneminde güvenlik hakkında kısa Türkçe açıklama (eyni məzmun)",
   "description_kk": "Жүктілік кезіндегі қауіпсіздік туралы қазақша қысқаша сипаттама (eyni məzmun)",
+  "description_uz": "Homiladorlik davridagi xavfsizlik haqida oʻzbekcha qisqa tavsif (eyni məzmun)",
   "description_de": "Kurze deutsche Beschreibung zur Sicherheit in der Schwangerschaft (eyni məzmun)",
   "description_ar": "وصف عربي قصير عن السلامة أثناء الحمل (eyni məzmun)"
 }
@@ -197,7 +199,7 @@ NÜMUNƏLƏR:
     const localizeItem = <T extends Record<string, unknown>>(row: T): T => {
       const pick = (field: string) =>
         (row[`${field}_${language}`] as string | undefined) ||
-        (language === 'kk' ? (row[`${field}_ru`] as string | undefined) : undefined) ||
+        (language === 'kk' || language === 'uz' ? (row[`${field}_ru`] as string | undefined) : undefined) ||
         (language === 'de' || language === 'ar' ? (row[`${field}_en`] as string | undefined) : undefined) ||
         (row[field] as string | undefined) ||
         (row[`${field}_az`] as string | undefined) || '';
@@ -214,6 +216,7 @@ NÜMUNƏLƏR:
         name_ru: safetyData.name_ru || null,
         name_tr: safetyData.name_tr || null,
         name_kk: (safetyData as any).name_kk || null,
+        name_uz: (safetyData as any).name_uz || null,
         name_de: (safetyData as any).name_de || null,
         name_ar: (safetyData as any).name_ar || null,
         category: safetyData.category,
@@ -224,6 +227,7 @@ NÜMUNƏLƏR:
         description_ru: safetyData.description_ru || null,
         description_tr: safetyData.description_tr || null,
         description_kk: (safetyData as any).description_kk || null,
+        description_uz: (safetyData as any).description_uz || null,
         description_de: (safetyData as any).description_de || null,
         description_ar: (safetyData as any).description_ar || null,
         is_active: true,

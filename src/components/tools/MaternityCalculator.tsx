@@ -50,7 +50,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
     const realCountry = (profile as any)?.country_code || storeCountryCode;
     const supported = maternityRules.some((r) => r.code === realCountry);
     if (realCountry && supported) return realCountry;
-    return language === 'tr' ? 'TR' : language === 'ru' || language === 'kk' ? 'RU' : language === 'de' ? 'DE' : language === 'ar' ? 'SA' : 'AZ';
+    return language === 'tr' ? 'TR' : language === 'ru' || language === 'kk' || language === 'uz' ? 'RU' : language === 'de' ? 'DE' : language === 'ar' ? 'SA' : 'AZ';
   });
   const [eddDate, setEddDate] = useState<string>('');
   const [role, setRole] = useState<'mother' | 'father'>('mother');
@@ -219,9 +219,9 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
         icon: g.icon || '⚖️'
       }))
     : (
-      // Dil üzrə seçim: az→az, ru→ru||en, tr→tr||en, kk→ru||en (statik datada kk yoxdur), digər→en
+      // Dil üzrə seçim: az→az, ru→ru||en, tr→tr||en, kk/uz→ru||en (statik datada kk/uz yoxdur), digər→en
       language === 'az' ? selectedRule.guidelines_az :
-      language === 'ru' || language === 'kk' ? (selectedRule.guidelines_ru || selectedRule.guidelines_en) :
+      language === 'ru' || language === 'kk' || language === 'uz' ? (selectedRule.guidelines_ru || selectedRule.guidelines_en) :
       language === 'tr' ? (selectedRule.guidelines_tr || selectedRule.guidelines_en) :
       selectedRule.guidelines_en
       ).map((g, i) => ({
