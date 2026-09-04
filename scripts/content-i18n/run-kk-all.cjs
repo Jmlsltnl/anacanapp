@@ -33,6 +33,9 @@ const ORDER = [
   'legal_documents', 'mom_friendly_places', 'play_activities', 'admin_recipes', 'tool_configs',
   'healthcare_providers', 'vaccine_countries',
   // ── orta ──
+  // scheduled_notifications ƏVVƏL SİYAHIDA YOX İDİ → statik pushlar bütün
+  // dillərdə AZ gedirdi (kk istifadəçi şikayəti). İndi daxildir.
+  'scheduled_notifications',
   'pregnancy_day_notifications', 'safety_items', 'baby_names_db', 'vaccines', 'vaccine_schedules',
   // ── nəhənglər ──
   'blog_posts', 'pregnancy_daily_content', 'mommy_daily_messages', 'baby_daily_info',

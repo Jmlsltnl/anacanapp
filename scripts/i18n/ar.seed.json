@@ -8933,5 +8933,11 @@
   "winback_dismiss": "إغلاق",
   "winback_expired_text": "دليل الذكاء الاصطناعي والتقارير وجميع الأدوات بانتظاركِ — جرّبيها مجددًا مجانًا لمدة ٣ أيام.",
   "winback_expired_title": "اشتقنا إليكِ من دون Premium 💛",
-  "admincountry_retry": "إعادة المحاولة"
+  "admincountry_retry": "إعادة المحاولة",
+  "aichat_attach_image": "إرفاق صورة",
+  "aichat_image_attached": "تم إرفاق الصورة — اكتبي سؤالك وأرسلي",
+  "aichat_image_remove": "إزالة الصورة",
+  "aichat_image_too_big": "الصورة كبيرة جدًا (بحد أقصى 15MB)",
+  "aichat_image_failed": "تعذّرت معالجة الصورة",
+  "aichat_photo_placeholder": "📷 صورة"
 }

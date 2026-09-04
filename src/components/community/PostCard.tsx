@@ -26,6 +26,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from
 '@/components/ui/dialog';
 import BlockUserDialog from '@/components/moderation/BlockUserDialog';
+import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
 
 interface PostCardProps {
   post: CommunityPost;
@@ -79,6 +80,9 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
   const commentFileInputRef = useRef<HTMLInputElement>(null);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
+  // Post şəkillərini app daxilində açan lightbox (brauzerə yönləndirmə YOXDUR)
+  const [imageViewerOpen, setImageViewerOpen] = useState(false);
+  const [imageViewerIndex, setImageViewerIndex] = useState(0);
   const [reportReason, setReportReason] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
@@ -248,6 +252,15 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
 
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: getCurrentDateLocale() });
   const mediaItems = (post.media_urls || []).map((url) => ({ url, type: getMediaType(url) }));
+  // In-app şəkil viewer: media indeksini yalnız-şəkillər siyahısındakı indeksə çevir
+  const imageItems = mediaItems.filter((m) => m.type === 'image');
+  const openImageViewer = (mediaIndex: number) => {
+    const item = mediaItems[mediaIndex];
+    if (!item || item.type !== 'image') return;
+    const imgIdx = imageItems.findIndex((m) => m.url === item.url);
+    setImageViewerIndex(Math.max(0, imgIdx));
+    setImageViewerOpen(true);
+  };
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
   const authorVerified = isVerifiedActive(post.author?.is_verified, post.author?.verified_until);
   const handleAvatarClick = () => {if (post.user_id && onUserClick && (!isAnonymous || isAdmin)) onUserClick(post.user_id);};
@@ -396,7 +409,7 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
           }
             {mediaItems.length > 0 &&
           <div style={{ marginTop: 12, borderRadius: 'var(--a-radius-md)', overflow: 'hidden' }}>
-                <MediaCarousel media={mediaItems} />
+                <MediaCarousel media={mediaItems} onOpenFullscreen={openImageViewer} />
               </div>
           }
             {/* Heart burst animation */}
@@ -538,6 +551,15 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
         onOpenChange={setShowBlockDialog}
         userId={post.user_id}
         userName={post.author?.name || null} />
+      }
+
+      {/* Post şəkilləri — in-app lightbox (yalnız açılanda mount olunur) */}
+      {imageViewerOpen && imageItems.length > 0 &&
+      <PhotoGalleryViewer
+        photos={imageItems.map((m, i) => ({ id: `${post.id}-img-${i}`, url: m.url }))}
+        initialIndex={imageViewerIndex}
+        isOpen={imageViewerOpen}
+        onClose={() => setImageViewerOpen(false)} />
       }
     </>);
 

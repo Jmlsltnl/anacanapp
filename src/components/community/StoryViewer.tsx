@@ -34,7 +34,7 @@ interface StoryViewerProps {
 }
 
 const StoryViewer = ({
-  storyGroups,
+  storyGroups: liveStoryGroups,
   initialGroupIndex,
   initialStoryId,
   onClose,
@@ -44,10 +44,17 @@ const StoryViewer = ({
 }: StoryViewerProps) => {
   const { user, profile, isAdmin } = useAuth();
   const isRtl = useIsRtl();
+
+  // KRİTİK: qruplar AÇILIŞ ANINDA dondurulur. Əvvəllər canlı prop istifadə
+  // olunurdu — hər baxış qeydiyyatı storyGroups-un yenidən sıralanmasına,
+  // indekslərin sürüşməsinə və "2-3 story birdən keçdi" xaosuna səbəb olurdu.
+  // Silinən story-lər üçün canlı siyahıdan yalnız MÖVCUDLUQ yoxlanılır.
+  const [storyGroups] = useState(() => liveStoryGroups);
+
   const [currentGroupIndex, setCurrentGroupIndex] = useState(initialGroupIndex);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(() => {
     if (initialStoryId) {
-      const idx = storyGroups[initialGroupIndex]?.stories.findIndex((s) => s.id === initialStoryId);
+      const idx = liveStoryGroups[initialGroupIndex]?.stories.findIndex((s) => s.id === initialStoryId);
       if (idx !== undefined && idx >= 0) return idx;
     }
     return 0;
@@ -62,11 +69,22 @@ const StoryViewer = ({
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const isLongPress = useRef(false);
-  const storyDuration = 5000;
+  // Şəkil üçün 6s (İnstagram hissi); video üçün real müddət (onLoadedMetadata)
+  const [storyDuration, setStoryDuration] = useState(6000);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  // Baxış qeydiyyatının təkrarını önləyən dəst (obyekt identikliyi dəyişsə belə)
+  const viewedSetRef = useRef<Set<string>>(new Set());
 
   const currentGroup = storyGroups[currentGroupIndex];
   const currentStory = currentGroup?.stories[currentStoryIndex];
   const isOwnStory = currentStory?.user_id === user?.id;
+
+  // Bəyənmə statusu canlı keşdən oxunur (snapshot köhnələ bilər)
+  const liveCurrentStory = liveStoryGroups.
+  find((g) => g.user_id === currentGroup?.user_id)?.stories.
+  find((s) => s.id === currentStory?.id);
+  const currentIsLiked = liveCurrentStory?.is_liked ?? currentStory?.is_liked ?? false;
+  const currentLikesCount = liveCurrentStory?.likes_count ?? currentStory?.likes_count ?? 0;
 
   // Fetch actual viewers for own stories
   const { data: viewers = [], isLoading: viewersLoading } = useStoryViewers(
@@ -104,34 +122,59 @@ const StoryViewer = ({
       const prevGroup = storyGroups[currentGroupIndex - 1];
       setCurrentStoryIndex(prevGroup.stories.length - 1);
       setProgress(0);
+    } else {
+      // İlk qrupun ilk story-si: Instagram davranışı — cari story-ni yenidən başlat
+      setProgress(0);
     }
   }, [currentStoryIndex, currentGroupIndex, storyGroups]);
 
-  // Mark story as viewed
+  // Mark story as viewed — hər story yalnız BİR dəfə (ref-dəst qoruması:
+  // obyekt identikliyi dəyişəndə effektin təkrar işə düşməsi zərərsizləşir)
   useEffect(() => {
-    if (currentStory && !currentStory.is_viewed && !isOwnStory) {
+    if (currentStory && !currentStory.is_viewed && !isOwnStory && !viewedSetRef.current.has(currentStory.id)) {
+      viewedSetRef.current.add(currentStory.id);
       onViewed(currentStory.id);
     }
   }, [currentStory, isOwnStory, onViewed]);
 
-  // Progress timer
+  // Story dəyişəndə: progress sıfırla + media növünə görə müddət
+  useEffect(() => {
+    setProgress(0);
+    if (currentStory?.media_type !== 'video') {
+      setStoryDuration(6000);
+    }
+    // video müddəti onLoadedMetadata-da təyin olunur (aşağıda)
+  }, [currentGroupIndex, currentStoryIndex, currentStory?.media_type]);
+
+  // Progress timer — updater içində YAN TƏSİR YOXDUR (əvvəllər goToNextStory
+  // setProgress içindən çağırılırdı: StrictMode-da ikiqat işləyib story ötürürdü)
   useEffect(() => {
     if (isPaused || !currentStory || showDeleteConfirm || showViewers || showReplies) return;
 
     progressInterval.current = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          goToNextStory();
-          return 0;
-        }
-        return prev + 100 / (storyDuration / 100);
-      });
+      setProgress((prev) => Math.min(prev + 100 / (storyDuration / 100), 100));
     }, 100);
 
     return () => {
       if (progressInterval.current) clearInterval(progressInterval.current);
     };
-  }, [isPaused, currentStory, goToNextStory, showDeleteConfirm, showViewers, showReplies]);
+  }, [isPaused, currentStory, showDeleteConfirm, showViewers, showReplies, storyDuration]);
+
+  // Progress dolanda NÖVBƏTİ story (yan təsir updater-dən kənarda)
+  useEffect(() => {
+    if (progress >= 100) {
+      goToNextStory();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress]);
+
+  // Video: pauza sinxronu — isPaused olanda video da dayansın
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (isPaused || showDeleteConfirm || showViewers || showReplies) v.pause();else
+    v.play().catch(() => {});
+  }, [isPaused, showDeleteConfirm, showViewers, showReplies, currentStoryIndex, currentGroupIndex]);
 
   // Long press to pause (Instagram-style)
   const handlePointerDown = () => {
@@ -181,7 +224,8 @@ const StoryViewer = ({
 
   const handleToggleLike = () => {
     if (currentStory && onToggleLike) {
-      onToggleLike(currentStory.id, !!currentStory.is_liked);
+      // Snapshot köhnələ bilər — bəyənmə statusu canlı keşdən (currentIsLiked)
+      onToggleLike(currentStory.id, currentIsLiked);
     }
   };
 
@@ -216,6 +260,90 @@ const StoryViewer = ({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
+
+        {/* Progress bars + header — EKRANIN yuxarısında (letterbox üstündə).
+            Əvvəllər 9:16 kətanın İÇİNDƏ idi — kətan şaquli mərkəzləndiyi üçün
+            uzun ekranlarda xətt "çox aşağıda" görünürdü. İndi Instagram kimi
+            həmişə ekranın ən yuxarısındadır. */}
+        <div
+          className="absolute start-0 end-0 z-30 pointer-events-none"
+          style={{ top: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}>
+          {/* Progress bars */}
+          <div className="flex gap-[3px] px-3">
+            {currentGroup.stories.map((_, index) =>
+            <div
+              key={index}
+              className="flex-1 h-[3px] bg-white/30 rounded-full overflow-hidden">
+                <div
+                className="h-full bg-white rounded-full"
+                style={{
+                  width:
+                  index < currentStoryIndex ?
+                  '100%' :
+                  index === currentStoryIndex ?
+                  `${progress}%` :
+                  '0%',
+                  transition: index === currentStoryIndex ? 'width 100ms linear' : 'none'
+                }} />
+              </div>
+            )}
+          </div>
+
+          {/* Header */}
+          <div className="px-3 mt-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-9 h-9 rounded-full ring-2 ring-white/80 overflow-hidden shrink-0">
+                  {currentGroup.user_avatar ?
+                  <img
+                    src={currentGroup.user_avatar}
+                    alt={currentGroup.user_name}
+                    className="w-full h-full object-cover" /> :
+
+
+                  <div className="w-full h-full bg-gradient-to-br from-primary to-pink-500 flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">
+                        {currentGroup.user_name.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  }
+                </div>
+                <div className="min-w-0">
+                  <p className="text-white font-semibold text-[13px] leading-tight truncate">{currentGroup.user_name}</p>
+                  <p className="text-white/50 text-[11px]">
+                    {formatDistanceToNow(new Date(currentStory.created_at), {
+                      addSuffix: true,
+                      locale: getCurrentDateLocale()
+                    })}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0 pointer-events-auto">
+                <button
+                  onClick={(e) => {e.stopPropagation();setIsPaused(!isPaused);}}
+                  className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                  
+                  {isPaused ? <Play className="w-4 h-4 text-white" /> : <Pause className="w-4 h-4 text-white" />}
+                </button>
+                {(isOwnStory || isAdmin) && onDelete &&
+                <button
+                  onClick={(e) => {e.stopPropagation();setShowDeleteConfirm(true);setIsPaused(true);}}
+                  className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                  
+                    <Trash2 className="w-4 h-4 text-white" />
+                  </button>
+                }
+                <button
+                  onClick={(e) => {e.stopPropagation();onClose();}}
+                  className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                  
+                  <X className="w-4 h-4 text-white" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
         
         {/* Instagram-tipli standart 9:16 (1080x1920) "story kətanı" — cihazın öz ekran
             nisbətindən ASILI OLMAYARAQ sabit qalır. Ekran 9:16-dan enlidirsə (planşet və s.)
@@ -255,12 +383,18 @@ const StoryViewer = ({
                 
                 {currentStory.media_type === 'video' ?
                 <video
+                  ref={videoRef}
                   src={currentStory.media_url}
                   className="w-full h-full object-contain"
                   autoPlay
                   muted
                   playsInline
-                  loop /> :
+                  onLoadedMetadata={(e) => {
+                    // Video story real müddəti qədər oynayır (max 30s, Instagram kimi)
+                    const d = (e.target as HTMLVideoElement).duration;
+                    if (Number.isFinite(d) && d > 0) setStoryDuration(Math.min(d * 1000, 30000));
+                  }}
+                  onEnded={() => setProgress(100)} /> :
 
 
                 <img
@@ -275,84 +409,6 @@ const StoryViewer = ({
           {/* Gradient overlays for readability */}
           <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent z-10 pointer-events-none" />
           <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent z-10 pointer-events-none" />
-
-          {/* Progress bars */}
-          <div className="absolute top-0 start-0 end-0 flex gap-[3px] z-20 px-2 pt-[calc(env(safe-area-inset-top,8px)+8px)]">
-            {currentGroup.stories.map((_, index) =>
-            <div
-              key={index}
-              className="flex-1 h-[2.5px] bg-white/30 rounded-full overflow-hidden">
-              
-                <div
-                className="h-full bg-white rounded-full transition-all"
-                style={{
-                  width:
-                  index < currentStoryIndex ?
-                  '100%' :
-                  index === currentStoryIndex ?
-                  `${progress}%` :
-                  '0%',
-                  transitionDuration: index === currentStoryIndex ? '100ms' : '0ms'
-                }} />
-              
-              </div>
-            )}
-          </div>
-
-          {/* Header */}
-          <div className="absolute start-0 end-0 z-20 px-4" style={{ top: 'calc(env(safe-area-inset-top, 8px) + 20px)' }}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="w-9 h-9 rounded-full ring-2 ring-white/80 overflow-hidden shrink-0">
-                  {currentGroup.user_avatar ?
-                  <img
-                    src={currentGroup.user_avatar}
-                    alt={currentGroup.user_name}
-                    className="w-full h-full object-cover" /> :
-
-
-                  <div className="w-full h-full bg-gradient-to-br from-primary to-pink-500 flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">
-                        {currentGroup.user_name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  }
-                </div>
-                <div className="min-w-0">
-                  <p className="text-white font-semibold text-[13px] leading-tight truncate">{currentGroup.user_name}</p>
-                  <p className="text-white/50 text-[11px]">
-                    {formatDistanceToNow(new Date(currentStory.created_at), {
-                      addSuffix: true,
-                      locale: getCurrentDateLocale()
-                    })}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-1.5 shrink-0">
-                <button
-                  onClick={(e) => {e.stopPropagation();setIsPaused(!isPaused);}}
-                  className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
-                  
-                  {isPaused ? <Play className="w-4 h-4 text-white" /> : <Pause className="w-4 h-4 text-white" />}
-                </button>
-                {(isOwnStory || isAdmin) && onDelete &&
-                <button
-                  onClick={(e) => {e.stopPropagation();setShowDeleteConfirm(true);setIsPaused(true);}}
-                  className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
-                  
-                    <Trash2 className="w-4 h-4 text-white" />
-                  </button>
-                }
-                <button
-                  onClick={(e) => {e.stopPropagation();onClose();}}
-                  className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
-                  
-                  <X className="w-4 h-4 text-white" />
-                </button>
-              </div>
-            </div>
-          </div>
 
           {/* Text overlay */}
           {currentStory.text_overlay &&
@@ -388,10 +444,10 @@ const StoryViewer = ({
                     <span className="text-white text-sm font-medium">{currentStory.view_count} {tr("storyviewer_baxis_d4da3e", "bax\u0131\u015F")}</span>
                   </div>
                 </motion.button>
-                {currentStory.likes_count > 0 &&
+                {currentLikesCount > 0 &&
               <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-3.5 py-2">
                     <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" />
-                    <span className="text-white text-sm font-medium">{currentStory.likes_count}</span>
+                    <span className="text-white text-sm font-medium">{currentLikesCount}</span>
                   </div>
               }
               </div>
@@ -449,14 +505,14 @@ const StoryViewer = ({
                 className="w-11 h-11 flex-shrink-0 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center gap-1">
                 
                   <motion.span
-                  key={currentStory.is_liked ? 'liked' : 'unliked'}
+                  key={currentIsLiked ? 'liked' : 'unliked'}
                   initial={{ scale: 0.6 }}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 15 }}>
                   
                     <Heart
                     className="w-5 h-5"
-                    style={currentStory.is_liked ? { fill: '#ef4444', color: '#ef4444' } : { color: '#fff' }} />
+                    style={currentIsLiked ? { fill: '#ef4444', color: '#ef4444' } : { color: '#fff' }} />
                   
                   </motion.span>
                 </motion.button>
@@ -517,7 +573,15 @@ const StoryViewer = ({
                   </div>
                   <div>
                     <h3 className="font-bold text-base text-foreground">{tr("storyviewer_baxislar_e938f5", "Baxışlar")}</h3>
-                    <p className="text-xs text-muted-foreground">{currentStory.view_count} {tr("storyviewer_nefer_dbca98", "n\u0259f\u0259r")}</p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-2">
+                      <span>{currentStory.view_count} {tr("storyviewer_nefer_dbca98", "n\u0259f\u0259r")}</span>
+                      {currentLikesCount > 0 &&
+                    <span className="inline-flex items-center gap-0.5">
+                          <Heart className="w-3 h-3 fill-red-500 text-red-500" />
+                          {currentLikesCount}
+                        </span>
+                    }
+                    </p>
                   </div>
                 </div>
                 <button
@@ -562,7 +626,13 @@ const StoryViewer = ({
                     }
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm text-foreground truncate">{viewer.name}</p>
+                          <p className="font-medium text-sm text-foreground truncate flex items-center gap-1.5">
+                            {viewer.name}
+                            {/* Bəyənənlərin adının yanında ürək (Instagram kimi) */}
+                            {viewer.has_liked &&
+                      <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500 shrink-0" />
+                      }
+                          </p>
                           <p className="text-[11px] text-muted-foreground">
                             {formatDistanceToNow(new Date(viewer.viewed_at), {
                         addSuffix: true,

@@ -8933,5 +8933,11 @@
   "winback_dismiss": "Schließen",
   "winback_expired_text": "KI-Begleitung, Berichte und alle Tools warten auf dich — teste sie erneut 3 Tage kostenlos.",
   "winback_expired_title": "Wir vermissen dich ohne Premium 💛",
-  "admincountry_retry": "Erneut prüfen"
+  "admincountry_retry": "Erneut prüfen",
+  "aichat_attach_image": "Bild anhängen",
+  "aichat_image_attached": "Bild angehängt — Frage eingeben und senden",
+  "aichat_image_remove": "Bild entfernen",
+  "aichat_image_too_big": "Bild ist zu groß (max. 15 MB)",
+  "aichat_image_failed": "Bild konnte nicht verarbeitet werden",
+  "aichat_photo_placeholder": "📷 Bild"
 }

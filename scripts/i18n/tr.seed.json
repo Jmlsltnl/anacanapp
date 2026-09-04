@@ -8933,5 +8933,11 @@
   "winback_dismiss": "Kapat",
   "winback_expired_text": "Yapay zekâ rehberi, raporlar ve tüm araçlar sizi bekliyor — 3 gün ücretsiz tekrar deneyin.",
   "winback_expired_title": "Premium'da sizi özledik 💛",
-  "admincountry_retry": "Yeniden dene"
+  "admincountry_retry": "Yeniden dene",
+  "aichat_attach_image": "Görsel ekle",
+  "aichat_image_attached": "Görsel eklendi — sorunuzu yazıp gönderin",
+  "aichat_image_remove": "Görseli kaldır",
+  "aichat_image_too_big": "Görsel çok büyük (maks 15MB)",
+  "aichat_image_failed": "Görsel işlenemedi",
+  "aichat_photo_placeholder": "📷 Görsel"
 }

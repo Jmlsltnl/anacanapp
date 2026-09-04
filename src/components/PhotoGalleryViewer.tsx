@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import {
   X, Download, Share2, Trash2, ChevronLeft, ChevronRight,
@@ -194,13 +195,16 @@ const PhotoGalleryViewer = ({
 
   if (!isOpen || !currentPhoto) return null;
 
-  return (
+  // PORTAL: community (.a-shell) kimi transform/stacking-context yaradan
+  // konteynerlərin içindən açılanda `fixed` overlay pozulur — StoryViewer ilə
+  // eyni həll: birbaşa document.body-yə render + yüksək z-index.
+  return createPortal(
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black z-50 flex flex-col">
+        className="fixed inset-0 bg-black z-[9999] flex flex-col">
         
         {/* Header */}
         <motion.div
@@ -363,7 +367,8 @@ const PhotoGalleryViewer = ({
           </AlertDialogContent>
         </AlertDialog>
       </motion.div>
-    </AnimatePresence>);
+    </AnimatePresence>,
+    document.body);
 
 };
 

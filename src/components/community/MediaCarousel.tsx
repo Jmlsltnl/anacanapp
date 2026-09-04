@@ -81,7 +81,8 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
             <img
               src={currentMedia.url}
               alt=""
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover cursor-pointer"
+              onClick={() => onOpenFullscreen?.(0)}
             />
           )}
         </div>
@@ -128,7 +129,8 @@ const MediaCarousel = ({ media, onOpenFullscreen }: MediaCarouselProps) => {
               <img
                 src={currentMedia.url}
                 alt=""
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover cursor-pointer"
+              onClick={() => onOpenFullscreen?.(currentIndex)}
               />
             )}
           </motion.div>

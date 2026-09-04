@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { hapticFeedback } from '@/lib/native';
 import { useAuth } from '@/hooks/useAuth';
+import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { UserBadge, VerifiedTick, isVerifiedActive } from './UserBadge';
@@ -66,6 +67,8 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   const [replyImageFile, setReplyImageFile] = useState<File | null>(null);
   const [replyImagePreview, setReplyImagePreview] = useState<string | null>(null);
   const [uploadingReplyImage, setUploadingReplyImage] = useState(false);
+  // Şərh şəkli in-app lightbox-da açılır (əvvəl window.open ilə brauzerə çıxırdı)
+  const [imageViewerOpen, setImageViewerOpen] = useState(false);
   const replyFileInputRef = useRef<HTMLInputElement>(null);
   // Öz şərhini redaktə etmə — PostCard.tsx-in post-redaktə pattern-i ilə eyni
   const [isEditing, setIsEditing] = useState(false);
@@ -287,7 +290,7 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
               src={comment.image_url}
               alt=""
               style={{ maxWidth: 160, maxHeight: 160, borderRadius: 12, objectFit: 'cover', marginTop: 6, display: 'block', cursor: 'pointer' }}
-              onClick={() => window.open(comment.image_url!, '_blank')} />
+              onClick={() => setImageViewerOpen(true)} />
             }
             </>
           }
@@ -412,6 +415,15 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
           </motion.div>
         }
       </AnimatePresence>
+
+      {/* Şərh şəkli — in-app lightbox */}
+      {imageViewerOpen && comment.image_url &&
+      <PhotoGalleryViewer
+        photos={[{ id: comment.id, url: comment.image_url }]}
+        initialIndex={0}
+        isOpen={imageViewerOpen}
+        onClose={() => setImageViewerOpen(false)} />
+      }
     </div>
   );
 };

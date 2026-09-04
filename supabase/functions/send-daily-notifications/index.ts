@@ -442,12 +442,20 @@ Deno.serve(async (req) => {
       }
 
       if (notificationsToSend.length === 0 && scheduledNotifications?.length) {
-        const matches = (scheduledNotifications || []).filter((n: ScheduledNotification) => {
+        const rawMatches = (scheduledNotifications || []).filter((n: ScheduledNotification) => {
           if (n.target_audience === 'all') return true;
           if (n.target_audience === user.life_stage) return true;
           if (n.target_audience === 'partner' && user.role === 'partner') return true;
           return false;
         });
+        // MƏRHƏLƏ PRİORİTETİ: istifadəçinin öz mərhələsinə (mommy/bump/flow)
+        // ünvanlanan şablonlar 'all'-dan ƏVVƏL gəlir — əks halda 'all' kimi
+        // yazılmış hamiləlik-məzmunlu statik push Ana modulundakı istifadəçiyə
+        // düşə bilirdi ("Ana modulundayam, hamilə bildirişi gəlir" şikayəti).
+        const matches = [
+          ...rawMatches.filter((n: ScheduledNotification) => n.target_audience === user.life_stage),
+          ...rawMatches.filter((n: ScheduledNotification) => n.target_audience !== user.life_stage),
+        ];
         const slotIndex = activeSendTime ? Math.max(DAILY_RUN_SLOTS.findIndex((slot) => slot.runAt === activeSendTime), 0) : 0;
         const scheduledSourceType = 'scheduled';
         const rotatedMatches = matches.length

@@ -20,6 +20,9 @@ interface ChatRequest {
   isWeightAnalysis?: boolean;
   cyclePhase?: "menstrual" | "follicular" | "ovulation" | "luteal";
   cycleDay?: number;
+  /** SON user mesajına qoşulan şəkil (Gemini vision) — base64, data: prefikssiz */
+  imageBase64?: string;
+  imageMime?: string;
   userProfile?: {
     name?: string;
     dueDate?: string;
@@ -76,6 +79,8 @@ Deno.serve(async (req) => {
       cyclePhase,
       cycleDay,
       language = "az",
+      imageBase64,
+      imageMime,
     } = (await req.json()) as ChatRequest;
 
     if (!messages || !Array.isArray(messages)) {
@@ -155,19 +160,37 @@ Deno.serve(async (req) => {
       : getSystemPrompt(resolvedLifeStage, pregnancyWeek, isPartner, userProfile, cyclePhase, cycleDay, language)) + langInstruction;
 
     // Convert OpenAI-style messages to Gemini format
-    const geminiContents = messages.map((msg: ChatMessage) => ({
+    // parts tipi: text VƏ YA inline_data (şəkil) ola bilər
+    type GeminiPart = { text: string } | { inline_data: { mime_type: string; data: string } };
+    const geminiContents: Array<{ role: string; parts: GeminiPart[] }> = messages.map((msg: ChatMessage) => ({
       role: msg.role === "assistant" ? "model" : "user",
-      parts: [{ text: msg.content }],
+      parts: [{ text: msg.content }] as GeminiPart[],
     }));
+
+    // Şəkil (vision): SON user mesajına inline_data part-ı əlavə olunur.
+    // Ölçü qoruması: client onsuz da sıxır (max 1280px, jpeg) — yenə də 6MB
+    // base64 həddi qoyuruq ki, funksiya yaddaş/limit aşmasın.
+    if (imageBase64 && imageBase64.length < 6_000_000) {
+      for (let i = geminiContents.length - 1; i >= 0; i--) {
+        if (geminiContents[i].role === "user") {
+          geminiContents[i].parts.push({
+            inline_data: {
+              mime_type: imageMime || "image/jpeg",
+              data: imageBase64,
+            },
+          });
+          break;
+        }
+      }
+    }
 
     // Reinforce the target language on the final user turn (history is often Azerbaijani)
     if (nativeDirective) {
       for (let i = geminiContents.length - 1; i >= 0; i--) {
         if (geminiContents[i].role === "user") {
-          geminiContents[i] = {
-            role: "user",
-            parts: [{ text: `${geminiContents[i].parts[0].text}\n\n${nativeDirective}` }],
-          };
+          // İlk part həmişə text-dir (yuxarıdakı map belə qurur) — şəkil part-ına toxunma
+          const firstPart = geminiContents[i].parts[0] as { text: string };
+          firstPart.text = `${firstPart.text}\n\n${nativeDirective}`;
           break;
         }
       }

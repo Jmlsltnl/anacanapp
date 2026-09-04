@@ -8933,5 +8933,11 @@
   "winback_dismiss": "Закрыть",
   "winback_expired_text": "ИИ-гид, отчёты и все инструменты ждут вас — попробуйте снова бесплатно 3 дня.",
   "winback_expired_title": "Мы скучали по вам в Premium 💛",
-  "admincountry_retry": "Проверить снова"
+  "admincountry_retry": "Проверить снова",
+  "aichat_attach_image": "Прикрепить фото",
+  "aichat_image_attached": "Фото прикреплено — напишите вопрос и отправьте",
+  "aichat_image_remove": "Удалить фото",
+  "aichat_image_too_big": "Фото слишком большое (макс. 15МБ)",
+  "aichat_image_failed": "Не удалось обработать фото",
+  "aichat_photo_placeholder": "📷 Фото"
 }

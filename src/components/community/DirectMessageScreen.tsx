@@ -5,6 +5,7 @@ import { ArrowLeft, Send, Image, Mic, Video, X, Square, Loader2, Play, Pause } f
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { useAuth } from '@/hooks/useAuth';
+import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
 import { hapticFeedback } from '@/lib/native';
 import { tr } from "@/lib/tr";
 
@@ -249,6 +250,8 @@ const DirectMessageScreen = ({ userId, userName, userAvatar, onBack }: DirectMes
 const MessageBubble = ({ message, isMe, formatTime }: {message: any;isMe: boolean;formatTime: (d: string) => string;}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  // Şəkil in-app lightbox-da açılır (əvvəl <a target=_blank> brauzerə çıxarırdı)
+  const [imageOpen, setImageOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const toggleAudio = () => {
@@ -266,12 +269,22 @@ const MessageBubble = ({ message, isMe, formatTime }: {message: any;isMe: boolea
   if (message.message_type === 'image' && message.media_url) {
     return (
       <div className="max-w-[72%] overflow-hidden" style={{ borderRadius: 18, borderBottomRightRadius: isMe ? 4 : 18, borderBottomLeftRadius: isMe ? 18 : 4, boxShadow: 'var(--a-card-shadow)' }}>
-        <a href={message.media_url} target="_blank" rel="noopener noreferrer">
-          <img src={message.media_url} alt={tr("directmessagescreen_sekil_43e2e3", "Şəkil")} className="max-w-full max-h-56 object-cover block" loading="lazy" />
-        </a>
+        <img
+          src={message.media_url}
+          alt={tr("directmessagescreen_sekil_43e2e3", "Şəkil")}
+          className="max-w-full max-h-56 object-cover block cursor-pointer"
+          loading="lazy"
+          onClick={() => setImageOpen(true)} />
         <div className="px-3 py-1" style={mediaFooterStyle}>
           <p style={{ fontSize: 10, opacity: 0.7 }}>{formatTime(message.created_at)}</p>
         </div>
+        {imageOpen &&
+        <PhotoGalleryViewer
+          photos={[{ id: message.id, url: message.media_url }]}
+          initialIndex={0}
+          isOpen={imageOpen}
+          onClose={() => setImageOpen(false)} />
+        }
       </div>);
 
   }

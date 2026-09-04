@@ -7430,5 +7430,11 @@
   "winback_dismiss": "Bağla",
   "winback_expired_text": "AI bələdçi, hesabatlar və bütün alətlər sizi gözləyir — 3 gün pulsuz yenidən sınayın.",
   "winback_expired_title": "Premium-suz darıxdıq 💛",
-  "admincountry_retry": "Yenidən yoxla"
+  "admincountry_retry": "Yenidən yoxla",
+  "aichat_attach_image": "Şəkil əlavə et",
+  "aichat_image_attached": "Şəkil qoşuldu — sualınızı yazın və göndərin",
+  "aichat_image_remove": "Şəkli sil",
+  "aichat_image_too_big": "Şəkil çox böyükdür (max 15MB)",
+  "aichat_image_failed": "Şəkil hazırlana bilmədi",
+  "aichat_photo_placeholder": "📷 Şəkil"
 }

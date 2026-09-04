@@ -8933,5 +8933,11 @@
   "winback_dismiss": "Жабу",
   "winback_expired_text": "AI нұсқаушы, есептер және барлық құралдар Сізді күтуде — 3 күн тегін қайта қолданып көріңіз.",
   "winback_expired_title": "Premium-сыз Сізді сағындық 💛",
-  "admincountry_retry": "Қайта тексеру"
+  "admincountry_retry": "Қайта тексеру",
+  "aichat_attach_image": "Сурет тіркеу",
+  "aichat_image_attached": "Сурет тіркелді — сұрағыңызды жазып жіберіңіз",
+  "aichat_image_remove": "Суретті жою",
+  "aichat_image_too_big": "Сурет тым үлкен (макс. 15МБ)",
+  "aichat_image_failed": "Суретті өңдеу мүмкін болмады",
+  "aichat_photo_placeholder": "📷 Сурет"
 }

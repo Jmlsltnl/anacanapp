@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, forwardRef, memo, useCallback } from 'react';
 import { getLocaleTag } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sparkles, User, Bot, Loader2, RefreshCw, X, ChevronDown, ChevronUp, Copy, Check, Square, ArrowDown } from 'lucide-react';
+import { Send, Sparkles, User, Bot, Loader2, RefreshCw, X, ChevronDown, ChevronUp, Copy, Check, Square, ArrowDown, ImagePlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -36,6 +36,47 @@ interface Message {
   content: string;
   timestamp: Date;
   isStreaming?: boolean;
+  /** İstifadəçinin mesaja qoşduğu şəkil (chat-media URL) — Gemini vision */
+  imageUrl?: string | null;
+}
+
+/**
+ * Şəkli AI üçün sıxır: max 1280px tərəf, JPEG 0.85.
+ * Qaytarır: { blob (yükləmə üçün), base64 (Gemini inline_data üçün, prefikssiz) }
+ */
+async function compressImageForAI(file: File): Promise<{ blob: Blob; base64: string }> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error('Image load failed'));
+      i.src = url;
+    });
+    const maxSide = 1280;
+    const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+    const w = Math.round(img.naturalWidth * scale);
+    const h = Math.round(img.naturalHeight * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas unavailable');
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, w, h);
+    const blob = await new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob((b) => b ? resolve(b) : reject(new Error('toBlob failed')), 'image/jpeg', 0.85)
+    );
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result).split(',')[1] || '');
+      r.onerror = () => reject(new Error('read failed'));
+      r.readAsDataURL(blob);
+    });
+    return { blob, base64 };
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 /**
@@ -61,6 +102,13 @@ const ChatMessageRow = memo(({ message, copied, onCopy }: {
     </span>
     <div className="a-chat-bubble-wrap">
       <div className={`a-chat-bubble ${message.role === 'user' ? 'user' : 'ai'}`}>
+        {/* Mesaja qoşulmuş şəkil */}
+        {message.imageUrl &&
+        <img
+          src={message.imageUrl}
+          alt=""
+          style={{ maxWidth: 220, maxHeight: 260, borderRadius: 12, display: 'block', marginBottom: message.content ? 6 : 0, objectFit: 'cover' }} />
+        }
         {/* Typing göstəricisi — ilk token gələnə qədər 3 nöqtə */}
         {message.isStreaming && !message.content ?
         <span className="inline-flex items-center gap-1 py-1" aria-label={tr('aichat_thinking', 'Düşünür...')}>
@@ -113,6 +161,28 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const { checkAndConsume } = useSubscription();
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // Şəkil qoşması (Gemini vision): seçilmiş fayl + önizləmə
+  const [attachedImage, setAttachedImage] = useState<{file: File;preview: string;} | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return;
+    if (file.size > 15 * 1024 * 1024) {
+      toast({ title: tr('aichat_image_too_big', 'Şəkil çox böyükdür (max 15MB)'), variant: 'destructive' });
+      return;
+    }
+    if (attachedImage) URL.revokeObjectURL(attachedImage.preview);
+    setAttachedImage({ file, preview: URL.createObjectURL(file) });
+    if (imageInputRef.current) imageInputRef.current.value = '';
+  };
+
+  const clearAttachedImage = () => {
+    if (attachedImage) URL.revokeObjectURL(attachedImage.preview);
+    setAttachedImage(null);
+  };
 
   // Tibbi xəbərdarlıq banneri: default YIĞILMIŞ, toxununca açılır, X ilə birdəfəlik bağlanır
   const [warnExpanded, setWarnExpanded] = useState(false);
@@ -252,7 +322,8 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           id: m.id,
           role: m.role,
           content: m.content,
-          timestamp: new Date(m.created_at)
+          timestamp: new Date(m.created_at),
+          imageUrl: (m as any).image_url || null
         }));
         setMessages(restoredMessages);
       } else {
@@ -301,8 +372,9 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
 
   const sendMessage = async (rawText: string) => {
-    const text = rawText.trim();
-    if (!text || isLoading) return;
+    const image = attachedImage;
+    const text = rawText.trim() || (image ? tr('aichat_photo_placeholder', '📷 Şəkil') : '');
+    if ((!text && !image) || isLoading) return;
 
     // Pulsuz plan: gündəlik sual limiti (paywall "Limitsiz AI" vədinin real tətbiqi)
     const { allowed, remaining } = await checkAndConsume('ai_chat');
@@ -317,11 +389,37 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       });
     }
 
+    // Şəkil varsa: sıx + yüklə (bubble URL üçün) + base64 (Gemini üçün)
+    let imageBase64: string | null = null;
+    let imageUrl: string | null = null;
+    if (image) {
+      try {
+        const { blob, base64 } = await compressImageForAI(image.file);
+        imageBase64 = base64;
+        if (user) {
+          const path = `${user.id}/ai_${Date.now()}.jpg`;
+          const { error: upErr } = await supabase.storage.
+          from('chat-media').
+          upload(path, blob, { contentType: 'image/jpeg' });
+          if (!upErr) {
+            const { data: urlData } = supabase.storage.from('chat-media').getPublicUrl(path);
+            imageUrl = urlData.publicUrl;
+          }
+        }
+      } catch (e) {
+        console.error('AI image prep failed:', e);
+        toast({ title: tr('aichat_image_failed', 'Şəkil hazırlana bilmədi'), variant: 'destructive' });
+        return;
+      }
+      clearAttachedImage();
+    }
+
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: 'user',
       content: text,
-      timestamp: new Date()
+      timestamp: new Date(),
+      imageUrl: imageUrl || image?.preview || null
     };
 
     const assistantMessageId = `assistant-${Date.now()}`;
@@ -340,7 +438,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
     requestAnimationFrame(() => scrollToBottom(false));
 
     // DB yazısı arxa planda — sorğunu GECİKDİRMİR (əvvəllər await edilirdi)
-    void addMessage('user', text).catch((e) => console.error('addMessage error:', e));
+    void addMessage('user', text, imageUrl).catch((e) => console.error('addMessage error:', e));
 
     setInput('');
     setIsLoading(true);
@@ -382,6 +480,8 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
           isPartner: false,
           stream: true,
           language: useUserStore.getState().language || 'az',
+          // Gemini vision: son user mesajına şəkil qoşulur (bax dr-anacan-chat)
+          ...(imageBase64 ? { imageBase64, imageMime: 'image/jpeg' } : {}),
           ...(lifeStage === 'flow' && lastPeriodDate ? (() => {
             try {
               const info = getPhaseInfoForDate(new Date(), new Date(lastPeriodDate), cycleLength || 28, periodLength || 5);
@@ -743,7 +843,34 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
 
       {/* Input Area (anacan-demo pill) */}
       <div style={{ padding: '8px 16px 10px', flexShrink: 0 }}>
+        {/* Seçilmiş şəkil önizləməsi */}
+        {attachedImage &&
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, padding: '6px 10px', borderRadius: 14, background: 'var(--a-surface)', border: '1px solid var(--a-line)' }}>
+            <img src={attachedImage.preview} alt="" style={{ width: 42, height: 42, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} />
+            <span style={{ flex: 1, fontSize: 11.5, color: 'var(--a-ink-soft)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {tr('aichat_image_attached', 'Şəkil qoşuldu — sualınızı yazın və göndərin')}
+            </span>
+            <button
+            type="button"
+            onClick={clearAttachedImage}
+            aria-label={tr('aichat_image_remove', 'Şəkli sil')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--a-ink-faint)', padding: 4, flexShrink: 0 }}>
+              <X size={15} strokeWidth={2.2} />
+            </button>
+          </div>
+        }
         <div className="a-chat-input">
+          {/* Şəkil qoş (Gemini vision) */}
+          <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImagePick} />
+          <button
+            type="button"
+            onClick={() => imageInputRef.current?.click()}
+            disabled={isLoading}
+            aria-label={tr('aichat_attach_image', 'Şəkil əlavə et')}
+            title={tr('aichat_attach_image', 'Şəkil əlavə et')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px 4px 6px 0', color: attachedImage ? 'var(--a-peach-2)' : 'var(--a-ink-faint)', flexShrink: 0, display: 'inline-flex', alignItems: 'center', opacity: isLoading ? 0.5 : 1 }}>
+            <ImagePlus size={17} strokeWidth={2.1} />
+          </button>
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -770,7 +897,7 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
             type="button"
             className="a-chat-send"
             onClick={handleSend}
-            disabled={!input.trim()}
+            disabled={!input.trim() && !attachedImage}
             aria-label="Send">
               <Send size={15} strokeWidth={2.2} />
             </button>

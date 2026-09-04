@@ -8922,5 +8922,11 @@
   "winback_dismiss": "Dismiss",
   "winback_expired_text": "AI guide, reports and all tools are waiting — try again free for 3 days.",
   "winback_expired_title": "We missed you on Premium 💛",
-  "admincountry_retry": "Retry"
+  "admincountry_retry": "Retry",
+  "aichat_attach_image": "Attach image",
+  "aichat_image_attached": "Image attached — type your question and send",
+  "aichat_image_remove": "Remove image",
+  "aichat_image_too_big": "Image is too large (max 15MB)",
+  "aichat_image_failed": "Could not process the image",
+  "aichat_photo_placeholder": "📷 Photo"
 }

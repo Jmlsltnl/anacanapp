@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Camera, Image as ImageIcon, X } from 'lucide-react';
 import { UserStoryGroup, useStories, useToggleStoryLike } from '@/hooks/useStories';
@@ -20,6 +21,7 @@ interface StoriesBarProps {
 const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBarProps) => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { storyGroups, isLoading, createStory, isCreating, markAsViewed, deleteStory } = useStories(groupId);
   const toggleStoryLike = useToggleStoryLike();
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -188,7 +190,11 @@ const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBar
       </div>
 
       <AnimatePresence>
-        {viewerOpen && <StoryViewer storyGroups={storyGroups} initialGroupIndex={initialGroupIndex} initialStoryId={initialStoryId} onClose={() => { setViewerOpen(false); setInitialStoryId(null); }} onViewed={markAsViewed} onDelete={deleteStory} onToggleLike={(storyId, isLiked) => toggleStoryLike.mutate({ storyId, isLiked })} />}
+        {viewerOpen && <StoryViewer storyGroups={storyGroups} initialGroupIndex={initialGroupIndex} initialStoryId={initialStoryId} onClose={() => {setViewerOpen(false);setInitialStoryId(null);
+          // markAsViewed artıq refetch ETMİR (açıq viewer altında sıra
+          // dəyişməsin deyə) — halqaların "baxılıb" vəziyyəti viewer
+          // bağlananda BİR DƏFƏ yenilənir
+          queryClient.invalidateQueries({ queryKey: ['stories'] });}} onViewed={markAsViewed} onDelete={deleteStory} onToggleLike={(storyId, isLiked) => toggleStoryLike.mutate({ storyId, isLiked })} />}
       </AnimatePresence>
       <AnimatePresence>
         {cropImageUrl && <StoryCropEditor imageUrl={cropImageUrl} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />}

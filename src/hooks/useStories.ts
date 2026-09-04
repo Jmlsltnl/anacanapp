@@ -123,6 +123,13 @@ export const useStories = (groupId?: string | null) => {
     return acc;
   }, []);
 
+  // Instagram davranışı: qrup DAXİLİNDƏ story-lər XRONOLOJİ (köhnə → yeni)
+  // göstərilir. Sorğu DESC gətirir (qrupların sırası "ən son paylaşan öndə"
+  // qalsın deyə) — ona görə hər qrupun daxilini burada çeviririk.
+  storyGroups.forEach((g) => {
+    g.stories.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  });
+
   // Sort so current user is first, then unviewed, then viewed
   storyGroups.sort((a, b) => {
     if (a.user_id === user?.id) return -1;
@@ -183,7 +190,16 @@ export const useStories = (groupId?: string | null) => {
         onConflict: 'story_id,user_id'
       });
 
-      queryClient.invalidateQueries({ queryKey: ['stories'] });
+      // KRİTİK PERF/UX DÜZƏLİŞİ: əvvəllər burada invalidateQueries(['stories'])
+      // çağırılırdı — HƏR baxılan story tam refetch + qrupların YENİDƏN
+      // sıralanmasına səbəb olurdu. Açıq StoryViewer altında qrup indeksləri
+      // sürüşürdü → "daxil olanda 2-3 story birdən keçir" bug-ı. İndi keş
+      // yerində yamaqlanır (refetch YOX, sıra dəyişmir); StoriesBar halqaları
+      // viewer bağlananda bir dəfə yenilənir (bax StoriesBar onClose).
+      queryClient.setQueriesData({ queryKey: ['stories'] }, (old: Story[] | undefined) => {
+        if (!old) return old;
+        return old.map((s) => s.id === storyId ? { ...s, is_viewed: true } : s);
+      });
     } catch (error) {
       console.error('Error marking story as viewed:', error);
     }
