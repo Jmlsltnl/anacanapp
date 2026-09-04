@@ -97,13 +97,13 @@ export const useCreateStoryReply = () => {
         void (async () => {
           try {
             const preview = content.length > 50 ? `${content.slice(0, 50)}...` : content;
-            await supabase.functions.invoke('send-push-notification', {
-              body: {
-                userId: storyAuthorId,
-                title: tr('usestoryreplies_yeni_cavab_923a12', 'Yeni cavab 💬'),
-                body: `${replierName || tr("usestoryreplies_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}: ${preview}`,
-                data: { type: 'story_reply', storyId, context: 'community_story' }
-              }
+            const { invokeSendPush } = await import('@/lib/push');
+            await invokeSendPush({
+              userId: storyAuthorId,
+              title: tr('usestoryreplies_yeni_cavab_923a12', 'Yeni cavab 💬'),
+              body: `${replierName || tr("usestoryreplies_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}: ${preview}`,
+              data: { type: 'story_reply', storyId, context: 'community_story' },
+              kind: 'story_reply'
             });
           } catch (e) {console.error('Story reply notification error:', e);}
         })();

@@ -8939,5 +8939,10 @@
   "aichat_image_remove": "إزالة الصورة",
   "aichat_image_too_big": "الصورة كبيرة جدًا (بحد أقصى 15MB)",
   "aichat_image_failed": "تعذّرت معالجة الصورة",
-  "aichat_photo_placeholder": "📷 صورة"
+  "aichat_photo_placeholder": "📷 صورة",
+  "pushdiag_event_btn": "اختبار إشعار المجتمع",
+  "pushdiag_event_test_title": "اختبار إشعار المجتمع ❤️",
+  "pushdiag_event_test_body": "إذا رأيتِ هذا، فمسار إشعارات الإعجاب/الرد يعمل على جهازك.",
+  "pushdiag_event_sent": "تم إرسال الإشعار — تحققي من هاتفك!",
+  "pushdiag_event_zero": "لم يُرسل:"
 }

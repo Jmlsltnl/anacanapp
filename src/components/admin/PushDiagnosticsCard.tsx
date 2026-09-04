@@ -16,8 +16,47 @@ import { useAuth } from '@/hooks/useAuth';
  */
 const PushDiagnosticsCard = () => {
   const { user } = useAuth();
-  const [loading, setLoading] = useState<null | 'me-daily' | 'me-flow' | 'check-tokens'>(null);
+  const [loading, setLoading] = useState<null | 'me-daily' | 'me-flow' | 'check-tokens' | 'me-event'>(null);
   const [lastResult, setLastResult] = useState<any>(null);
+
+  /**
+   * COMMUNITY (event) push yolunun UCDAN-UCA testi: like/reply/DM push-larının
+   * getdiyi EYNİ funksiya (send-push-notification) öz cihazına çağırılır
+   * (context: 'self'). Telefona bildiriş GƏLİRSƏ → token + FCM + cihaz
+   * göstərimi tam işləyir; deməli real like/reply pushunun getməməsinin səbəbi
+   * QƏBUL EDƏNİN tokeni/icazəsidir (Crash Reports-da [push:...] qeydlərinə bax).
+   */
+  const sendEventPushToMe = async () => {
+    if (!user) {
+      toast.error(tr("pushdiagnosticscard_giris_etmelisiniz_6c2220", "Giri\u015F etm\u0259lisiniz"));
+      return;
+    }
+    setLoading('me-event');
+    setLastResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-push-notification', {
+        body: {
+          userId: user.id,
+          title: tr("pushdiag_event_test_title", "Community push testi ❤️"),
+          body: tr("pushdiag_event_test_body", "Bu bildirişi görürsənsə, like/reply push yolu cihazında tam işləyir."),
+          data: { type: 'diagnostic', context: 'self' }
+        }
+      });
+      if (error) throw error;
+      setLastResult({ kind: 'send-push-notification (event yolu)', payload: data });
+      const sent = data?.sent ?? 0;
+      if (sent > 0) {
+        toast.success(tr("pushdiag_event_sent", "Event push göndərildi — telefona baxın!"));
+      } else {
+        toast.warning(`${tr("pushdiag_event_zero", "Göndərilmədi:")} ${data?.skipped || data?.message || '—'}`);
+      }
+    } catch (err: any) {
+      setLastResult({ kind: 'error', payload: err?.message || String(err) });
+      toast.error(tr("pushdiagnosticscard_xeta_dbbc36", "X\u0259ta: ") + (err?.message || tr("pushdiagnosticscard_namelum_974fd5", "nam\u0259lum")));
+    } finally {
+      setLoading(null);
+    }
+  };
 
   const sendDailyToMe = async () => {
     if (!user) {
@@ -138,6 +177,19 @@ const PushDiagnosticsCard = () => {
             <Send className="h-4 w-4 me-1" />
             }
             {tr("pushdiagnosticscard_mene_dinamik_push_gonder_642e6b", "M\u0259n\u0259 dinamik push g\xF6nd\u0259r")}
+          </Button>
+          <Button
+            size="sm"
+            onClick={sendEventPushToMe}
+            disabled={loading !== null}
+            className="bg-rose-500 hover:bg-rose-600 text-white">
+            
+            {loading === 'me-event' ?
+            <Loader2 className="h-4 w-4 me-1 animate-spin" /> :
+
+            <Send className="h-4 w-4 me-1" />
+            }
+            {tr("pushdiag_event_btn", "Community push testi")}
           </Button>
           <Button
             variant="secondary"

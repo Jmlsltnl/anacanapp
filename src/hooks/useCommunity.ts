@@ -536,13 +536,13 @@ export const useToggleLike = () => {
           if (post && post.user_id !== user.id) {
             const { data: profile } = await supabase.from('public_profile_cards').select('name').eq('user_id', user.id).maybeSingle();
             const likerName = profile?.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i");
-            await supabase.functions.invoke('send-push-notification', {
-              body: {
-                userId: post.user_id,
-                title: tr("usecommunity_yeni_beyenme_3fd88a", "Yeni bəyənmə ❤️"),
-                body: `${likerName} ${tr("usecommunity_paylasiminizi_beyendi", "paylaşımınızı bəyəndi")}`,
-                data: { type: 'community_like', postId, groupId, context: 'community_post' }
-              }
+            const { invokeSendPush } = await import('@/lib/push');
+            await invokeSendPush({
+              userId: post.user_id,
+              title: tr("usecommunity_yeni_beyenme_3fd88a", "Yeni bəyənmə ❤️"),
+              body: `${likerName} ${tr("usecommunity_paylasiminizi_beyendi", "paylaşımınızı bəyəndi")}`,
+              data: { type: 'community_like', postId, groupId, context: 'community_post' },
+              kind: 'community_like'
             });
           }
         } catch (e) {console.error('Like notification error:', e);}
@@ -615,15 +615,15 @@ export const useToggleCommentLike = () => {
             from('public_profile_cards').select('name').eq('user_id', user.id).maybeSingle();
             const likerName = profile?.name || tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi");
             const preview = ((comment as any).content || '').slice(0, 50);
-            await supabase.functions.invoke('send-push-notification', {
-              body: {
-                userId: (comment as any).user_id,
-                title: tr("usecommunity_serhiniz_beyenildi", "Şərhiniz bəyənildi ❤️"),
-                body: preview ? `${likerName}: ${preview}` : likerName,
-                // postId: bildirişə klik edəndə MƏHZ bu postu (+ şərhi vurğulayaraq)
-                // açmaq üçün lazımdır (bax SinglePostView.tsx, pushNav.ts).
-                data: { type: 'comment_like', commentId, postId: (comment as any).post_id, context: 'post_comment' }
-              }
+            const { invokeSendPush } = await import('@/lib/push');
+            await invokeSendPush({
+              userId: (comment as any).user_id,
+              title: tr("usecommunity_serhiniz_beyenildi", "Şərhiniz bəyənildi ❤️"),
+              body: preview ? `${likerName}: ${preview}` : likerName,
+              // postId: bildirişə klik edəndə MƏHZ bu postu (+ şərhi vurğulayaraq)
+              // açmaq üçün lazımdır (bax SinglePostView.tsx, pushNav.ts).
+              data: { type: 'comment_like', commentId, postId: (comment as any).post_id, context: 'post_comment' },
+              kind: 'comment_like'
             });
           }
         } catch (e) {console.error('Comment like notification error:', e);}
@@ -774,23 +774,23 @@ export const useCreateComment = () => {
           from('post_comments').select('user_id').eq('id', parentCommentId).maybeSingle();
           const parentAuthorId = (parentComment as any)?.user_id;
           if (parentAuthorId && parentAuthorId !== user.id) {
-            await supabase.functions.invoke('send-push-notification', {
-              body: {
-                userId: parentAuthorId,
-                title: tr("usecommunity_yeni_cavab_3b1b2c", "Yeni cavab 💬"),
-                body: `${senderName}: ${preview}`,
-                data: { type: 'community_reply', commentId: parentCommentId, postId, context: 'post_comment' }
-              }
+            const { invokeSendPush } = await import('@/lib/push');
+            await invokeSendPush({
+              userId: parentAuthorId,
+              title: tr("usecommunity_yeni_cavab_3b1b2c", "Yeni cavab 💬"),
+              body: `${senderName}: ${preview}`,
+              data: { type: 'community_reply', commentId: parentCommentId, postId, context: 'post_comment' },
+              kind: 'community_reply'
             });
           }
         } else if (postAuthorId && postAuthorId !== user.id) {
-          await supabase.functions.invoke('send-push-notification', {
-            body: {
-              userId: postAuthorId,
-              title: tr("usecommunity_yeni_serh_25bb56", "Yeni \u015F\u0259rh \uD83D\uDCAC"),
-              body: `${senderName}: ${preview}`,
-              data: { type: 'community_comment', postId, context: 'community_post' }
-            }
+          const { invokeSendPush } = await import('@/lib/push');
+          await invokeSendPush({
+            userId: postAuthorId,
+            title: tr("usecommunity_yeni_serh_25bb56", "Yeni \u015F\u0259rh \uD83D\uDCAC"),
+            body: `${senderName}: ${preview}`,
+            data: { type: 'community_comment', postId, context: 'community_post' },
+            kind: 'community_comment'
           });
         }
       } catch (e) {console.error('Comment notification error:', e);}

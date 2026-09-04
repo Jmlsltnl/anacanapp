@@ -116,6 +116,20 @@ export function reportComponentCrash(error: Error, componentStack?: string) {
  * heç vaxt çatmır — cihazlarda nə baş verdiyini görmək mümkün olmurdu.
  * RLS anonim insert-ə icazə verir (user_id NULL) — login uğursuz olanda da işləyir.
  */
+/**
+ * Push çatdırılma problemlərini admin panelinə (Crash Reports) göndərir.
+ * Community like/reply/DM push-ları arxa planda göndərilir və xətaları
+ * yalnız console-a düşürdü — cihazlarda NƏYİN baş verdiyi görünmürdü
+ * ("pushlar getmir" şikayətini araşdırmaq mümkün deyildi).
+ * type filter: [push:community_like] Forbidden... kimi sətirlər.
+ */
+export function reportPushFailure(kind: string, reason: string, extra?: Record<string, unknown>) {
+  sendCrashReport({
+    error_message: `[push:${kind}] ${reason}`.slice(0, 500),
+    extra_data: { type: 'push_delivery', kind, ...extra },
+  });
+}
+
 export function reportAuthError(provider: string, error: unknown) {
   const err = error as any;
   const message = err?.message || err?.errorMessage || String(error || 'Unknown auth error');

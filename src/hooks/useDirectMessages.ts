@@ -143,17 +143,17 @@ export const useDirectMessages = (otherUserId?: string) => {
 
       // Send push notification
       try {
-        await supabase.functions.invoke('send-push-notification', {
-          body: {
-            userId: otherUserId,
-            title: tr("directmessages_yeni_mesaj", 'Yeni mesaj') + ' 💬',
-            body: type === 'text' ? content.length > 60 ? content.slice(0, 60) + '...' : content :
-            type === 'image' ? tr("usedirectmessages_sekil_gonderdi_9e8836", "\uD83D\uDCF7 \u015E\u0259kil g\xF6nd\u0259rdi") :
-            type === 'video' ? tr("usedirectmessages_video_gonderdi_41246c", "\uD83C\uDFA5 Video g\xF6nd\u0259rdi") :
-            type === 'audio' ? tr("usedirectmessages_ses_mesaji_gonderdi_5b803e", "\uD83C\uDFA4 S\u0259s mesaj\u0131 g\xF6nd\u0259rdi") :
-            tr("directmessages_yeni_mesaj", 'Yeni mesaj'),
-            data: { type: 'direct_message', sender_id: user.id, context: 'direct_message' }
-          }
+        const { invokeSendPush } = await import('@/lib/push');
+        await invokeSendPush({
+          userId: otherUserId,
+          title: tr("directmessages_yeni_mesaj", 'Yeni mesaj') + ' 💬',
+          body: type === 'text' ? content.length > 60 ? content.slice(0, 60) + '...' : content :
+          type === 'image' ? tr("usedirectmessages_sekil_gonderdi_9e8836", "\uD83D\uDCF7 \u015E\u0259kil g\xF6nd\u0259rdi") :
+          type === 'video' ? tr("usedirectmessages_video_gonderdi_41246c", "\uD83C\uDFA5 Video g\xF6nd\u0259rdi") :
+          type === 'audio' ? tr("usedirectmessages_ses_mesaji_gonderdi_5b803e", "\uD83C\uDFA4 S\u0259s mesaj\u0131 g\xF6nd\u0259rdi") :
+          tr("directmessages_yeni_mesaj", 'Yeni mesaj'),
+          data: { type: 'direct_message', sender_id: user.id, context: 'direct_message' },
+          kind: 'direct_message'
         });
       } catch (pushErr) {
         console.warn('Push notification failed:', pushErr);

@@ -8939,5 +8939,10 @@
   "aichat_image_remove": "Bild entfernen",
   "aichat_image_too_big": "Bild ist zu groß (max. 15 MB)",
   "aichat_image_failed": "Bild konnte nicht verarbeitet werden",
-  "aichat_photo_placeholder": "📷 Bild"
+  "aichat_photo_placeholder": "📷 Bild",
+  "pushdiag_event_btn": "Community-Push-Test",
+  "pushdiag_event_test_title": "Community-Push-Test ❤️",
+  "pushdiag_event_test_body": "Wenn du das siehst, funktioniert der Like/Reply-Push-Weg auf deinem Gerät.",
+  "pushdiag_event_sent": "Event-Push gesendet — aufs Handy schauen!",
+  "pushdiag_event_zero": "Nicht gesendet:"
 }

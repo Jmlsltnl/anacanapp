@@ -103,13 +103,13 @@ export const useShoppingItems = () => {
 
       const adderName = profile?.name || 'Partnyorun';
 
-      await supabase.functions.invoke('send-push-notification', {
-        body: {
-          userId: partnerUserId,
-          title: tr("useshoppingitems_alisveris_siyahisina_elave_5d9c87", "🛒 Alışveriş siyahısına əlavə"),
-          body: `${adderName} "${itemName}" ${tr("useshoppingitems_elave_etdi_siyahini_yoxla", "əlavə etdi. Siyahını yoxla!")}`,
-          data: { type: 'shopping_list', context: 'partner' }
-        }
+      const { invokeSendPush } = await import('@/lib/push');
+      await invokeSendPush({
+        userId: partnerUserId,
+        title: tr("useshoppingitems_alisveris_siyahisina_elave_5d9c87", "🛒 Alışveriş siyahısına əlavə"),
+        body: `${adderName} "${itemName}" ${tr("useshoppingitems_elave_etdi_siyahini_yoxla", "əlavə etdi. Siyahını yoxla!")}`,
+        data: { type: 'shopping_list', context: 'partner' },
+        kind: 'shopping_list'
       });
 
       localStorage.setItem(storageKey, '1');

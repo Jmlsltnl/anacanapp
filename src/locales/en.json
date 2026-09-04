@@ -8928,5 +8928,10 @@
   "aichat_image_remove": "Remove image",
   "aichat_image_too_big": "Image is too large (max 15MB)",
   "aichat_image_failed": "Could not process the image",
-  "aichat_photo_placeholder": "📷 Photo"
+  "aichat_photo_placeholder": "📷 Photo",
+  "pushdiag_event_btn": "Community push test",
+  "pushdiag_event_test_title": "Community push test ❤️",
+  "pushdiag_event_test_body": "If you can see this, the like/reply push path works on your device.",
+  "pushdiag_event_sent": "Event push sent — check your phone!",
+  "pushdiag_event_zero": "Not sent:"
 }

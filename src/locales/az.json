@@ -7436,5 +7436,10 @@
   "aichat_image_remove": "Şəkli sil",
   "aichat_image_too_big": "Şəkil çox böyükdür (max 15MB)",
   "aichat_image_failed": "Şəkil hazırlana bilmədi",
-  "aichat_photo_placeholder": "📷 Şəkil"
+  "aichat_photo_placeholder": "📷 Şəkil",
+  "pushdiag_event_btn": "Community push testi",
+  "pushdiag_event_test_title": "Community push testi ❤️",
+  "pushdiag_event_test_body": "Bu bildirişi görürsənsə, like/reply push yolu cihazında tam işləyir.",
+  "pushdiag_event_sent": "Event push göndərildi — telefona baxın!",
+  "pushdiag_event_zero": "Göndərilmədi:"
 }

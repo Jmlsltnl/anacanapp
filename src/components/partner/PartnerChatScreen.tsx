@@ -133,14 +133,13 @@ const PartnerChatScreen = ({ onBack }: PartnerChatScreenProps) => {
       setNewMessage('');
 
       // Fire-and-forget FCM push so receiver gets notified even if app is closed
-      supabase.functions.invoke('send-push-notification', {
-        body: {
-          userId: partnerProfile.user_id,
-          title: `${profile?.name || tr("common_partnyor", 'Partnyor')} 💌`,
-          body: content.slice(0, 80),
-          data: { type: 'partner_message', context: 'partner' }
-        }
-      }).catch((e) => console.warn('Push invoke failed:', e));
+      import('@/lib/push').then(({ invokeSendPush }) => invokeSendPush({
+        userId: partnerProfile.user_id,
+        title: `${profile?.name || tr("common_partnyor", 'Partnyor')} 💌`,
+        body: content.slice(0, 80),
+        data: { type: 'partner_message', context: 'partner' },
+        kind: 'partner_message'
+      })).catch((e) => console.warn('Push invoke failed:', e));
     } catch (error) {
       console.error('Error sending message:', error);
       toast({

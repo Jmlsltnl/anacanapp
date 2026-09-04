@@ -8939,5 +8939,10 @@
   "aichat_image_remove": "Görseli kaldır",
   "aichat_image_too_big": "Görsel çok büyük (maks 15MB)",
   "aichat_image_failed": "Görsel işlenemedi",
-  "aichat_photo_placeholder": "📷 Görsel"
+  "aichat_photo_placeholder": "📷 Görsel",
+  "pushdiag_event_btn": "Topluluk push testi",
+  "pushdiag_event_test_title": "Topluluk push testi ❤️",
+  "pushdiag_event_test_body": "Bunu görüyorsanız, beğeni/yanıt push yolu cihazınızda tam çalışıyor.",
+  "pushdiag_event_sent": "Event push gönderildi — telefona bakın!",
+  "pushdiag_event_zero": "Gönderilmedi:"
 }

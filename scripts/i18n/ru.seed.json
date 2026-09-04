@@ -8939,5 +8939,10 @@
   "aichat_image_remove": "Удалить фото",
   "aichat_image_too_big": "Фото слишком большое (макс. 15МБ)",
   "aichat_image_failed": "Не удалось обработать фото",
-  "aichat_photo_placeholder": "📷 Фото"
+  "aichat_photo_placeholder": "📷 Фото",
+  "pushdiag_event_btn": "Тест community-пуша",
+  "pushdiag_event_test_title": "Тест community-пуша ❤️",
+  "pushdiag_event_test_body": "Если вы видите это, путь пушей лайков/ответов на вашем устройстве работает.",
+  "pushdiag_event_sent": "Событийный пуш отправлен — проверьте телефон!",
+  "pushdiag_event_zero": "Не отправлено:"
 }

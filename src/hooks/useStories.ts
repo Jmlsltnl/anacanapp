@@ -287,13 +287,13 @@ export const useToggleStoryLike = () => {
           if (story && story.user_id !== user.id) {
             const { data: profile } = await supabase.from('public_profile_cards').select('name').eq('user_id', user.id).maybeSingle();
             const likerName = profile?.name || tr("usestories_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i");
-            await supabase.functions.invoke('send-push-notification', {
-              body: {
-                userId: story.user_id,
-                title: tr('usestories_yeni_beyenme_3fd88a', 'Yeni bəyənmə ❤️'),
-                body: `${likerName} ${tr('usestories_story_nizi_beyendi', "story-nizi bəyəndi")}`,
-                data: { type: 'story_like', storyId, context: 'community_story' }
-              }
+            const { invokeSendPush } = await import('@/lib/push');
+            await invokeSendPush({
+              userId: story.user_id,
+              title: tr('usestories_yeni_beyenme_3fd88a', 'Yeni bəyənmə ❤️'),
+              body: `${likerName} ${tr('usestories_story_nizi_beyendi', "story-nizi bəyəndi")}`,
+              data: { type: 'story_like', storyId, context: 'community_story' },
+              kind: 'story_like'
             });
           }
         } catch (e) {console.error('Story like notification error:', e);}
