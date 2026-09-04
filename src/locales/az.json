@@ -7441,5 +7441,7 @@
   "pushdiag_event_test_title": "Community push testi ❤️",
   "pushdiag_event_test_body": "Bu bildirişi görürsənsə, like/reply push yolu cihazında tam işləyir.",
   "pushdiag_event_sent": "Event push göndərildi — telefona baxın!",
-  "pushdiag_event_zero": "Göndərilmədi:"
+  "pushdiag_event_zero": "Göndərilmədi:",
+  "games_tier_usta": "Usta",
+  "games_tier_efsane": "Əfsanə"
 }

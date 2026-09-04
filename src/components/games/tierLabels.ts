@@ -9,6 +9,8 @@ const TIER_KEY_MAP: Record<string, string> = {
   'Çətin': 'games_tier_cetin',
   Ekspert: 'games_tier_ekspert',
   Asan: 'games_tier_asan',
+  Usta: 'games_tier_usta',
+  'Əfsanə': 'games_tier_efsane',
 };
 
 export function trTierName(name: string): string {

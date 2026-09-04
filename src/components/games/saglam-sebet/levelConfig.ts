@@ -1,8 +1,8 @@
 // Sağlam Səbət — level & item configuration
-// 40 hand-tuned difficulty levels for the "catch the healthy object" arcade game,
-// grouped into 4 comfortable difficulty tiers with longer, more relaxed sessions.
+// 60 hand-tuned difficulty levels for the "catch the healthy object" arcade game,
+// grouped into 6 difficulty tiers (Rahat→Əfsanə) with longer, more relaxed sessions.
 
-export const TOTAL_LEVELS = 40;
+export const TOTAL_LEVELS = 60;
 
 export interface GameItemDef {
   emoji: string;
@@ -123,6 +123,31 @@ const TIERS: DifficultyTier[] = [
     targetBase: 700,
     targetStep: 26,
     lives: 3,
+  },
+  // ── Yeni tier-lər (41-60): daha sürətli, daha riskli, daha uzun raundlar ──
+  {
+    name: 'Usta',
+    minLevel: 41,
+    maxLevel: 50,
+    fallSpeedRange: [330, 400],
+    spawnIntervalRange: [280, 400],
+    badChanceRange: [0.46, 0.54],
+    durationRange: [66, 84],
+    targetBase: 980,
+    targetStep: 30,
+    lives: 3,
+  },
+  {
+    name: 'Əfsanə',
+    minLevel: 51,
+    maxLevel: 60,
+    fallSpeedRange: [400, 480],
+    spawnIntervalRange: [240, 340],
+    badChanceRange: [0.52, 0.6],
+    durationRange: [72, 90],
+    targetBase: 1300,
+    targetStep: 34,
+    lives: 2,
   },
 ];
 

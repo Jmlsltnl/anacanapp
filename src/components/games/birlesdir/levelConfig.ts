@@ -1,6 +1,6 @@
-// Birləşdir — match-3 level configuration (20 starting levels, 3 comfortable tiers).
+// Birləşdir — match-3 level configuration (40 levels, 5 tiers: Asan→Əfsanə).
 
-export const TOTAL_LEVELS = 20;
+export const TOTAL_LEVELS = 40;
 export const BOARD_ROWS = 8;
 export const BOARD_COLS = 8;
 
@@ -38,6 +38,11 @@ const TIERS: Tier[] = [
   { name: 'Asan', minLevel: 1, maxLevel: 7, movesBase: 24, movesStep: 1, tileTypesCount: 5, scoreMultiplier: 0.47 },
   { name: 'Orta', minLevel: 8, maxLevel: 14, movesBase: 26, movesStep: 1, tileTypesCount: 6, scoreMultiplier: 1.34 },
   { name: 'Çətin', minLevel: 15, maxLevel: 20, movesBase: 28, movesStep: 1, tileTypesCount: 7, scoreMultiplier: 1.94 },
+  // ── Yeni tier-lər (21-40): gedişlər ARTMIR (sabit təzyiq), hədəf qalxmağa
+  //    davam edir; multiplier yüksəkdir ki, bacarıqlı kombolarla çatmaq mümkün
+  //    olsun — amma az gedişlə hər xəta baha başa gəlir.
+  { name: 'Usta', minLevel: 21, maxLevel: 30, movesBase: 27, movesStep: 0, tileTypesCount: 7, scoreMultiplier: 2.25 },
+  { name: 'Əfsanə', minLevel: 31, maxLevel: 40, movesBase: 25, movesStep: 0, tileTypesCount: 7, scoreMultiplier: 2.55 },
 ];
 
 export const TIER_NAMES = TIERS.map((t) => t.name);

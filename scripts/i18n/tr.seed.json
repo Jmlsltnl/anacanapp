@@ -8944,5 +8944,7 @@
   "pushdiag_event_test_title": "Topluluk push testi ❤️",
   "pushdiag_event_test_body": "Bunu görüyorsanız, beğeni/yanıt push yolu cihazınızda tam çalışıyor.",
   "pushdiag_event_sent": "Event push gönderildi — telefona bakın!",
-  "pushdiag_event_zero": "Gönderilmedi:"
+  "pushdiag_event_zero": "Gönderilmedi:",
+  "games_tier_usta": "Usta",
+  "games_tier_efsane": "Efsane"
 }

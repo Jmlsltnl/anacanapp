@@ -8933,5 +8933,7 @@
   "pushdiag_event_test_title": "Community push test ❤️",
   "pushdiag_event_test_body": "If you can see this, the like/reply push path works on your device.",
   "pushdiag_event_sent": "Event push sent — check your phone!",
-  "pushdiag_event_zero": "Not sent:"
+  "pushdiag_event_zero": "Not sent:",
+  "games_tier_usta": "Master",
+  "games_tier_efsane": "Legend"
 }

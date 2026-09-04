@@ -8944,5 +8944,7 @@
   "pushdiag_event_test_title": "Community-Push-Test ❤️",
   "pushdiag_event_test_body": "Wenn du das siehst, funktioniert der Like/Reply-Push-Weg auf deinem Gerät.",
   "pushdiag_event_sent": "Event-Push gesendet — aufs Handy schauen!",
-  "pushdiag_event_zero": "Nicht gesendet:"
+  "pushdiag_event_zero": "Nicht gesendet:",
+  "games_tier_usta": "Meister",
+  "games_tier_efsane": "Legende"
 }
