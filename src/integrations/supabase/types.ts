@@ -3739,6 +3739,7 @@ export type Database = {
           postpartum_week_start: number | null
           sort_order: number | null
           steps: Json | null
+          steps_uz: Json | null
           trimester: number[] | null
           updated_at: string | null
         }
@@ -3769,6 +3770,7 @@ export type Database = {
           postpartum_week_start?: number | null
           sort_order?: number | null
           steps?: Json | null
+          steps_uz?: Json | null
           trimester?: number[] | null
           updated_at?: string | null
         }
@@ -3799,6 +3801,7 @@ export type Database = {
           postpartum_week_start?: number | null
           sort_order?: number | null
           steps?: Json | null
+          steps_uz?: Json | null
           trimester?: number[] | null
           updated_at?: string | null
         }
@@ -5794,6 +5797,7 @@ export type Database = {
           content_en: string | null
           content_ru: string | null
           content_tr: string | null
+          content_uz: string | null
           created_at: string | null
           emoji: string | null
           id: string
@@ -5805,6 +5809,7 @@ export type Database = {
           title_en: string | null
           title_ru: string | null
           title_tr: string | null
+          title_uz: string | null
           updated_at: string | null
         }
         Insert: {
@@ -5814,6 +5819,7 @@ export type Database = {
           content_en?: string | null
           content_ru?: string | null
           content_tr?: string | null
+          content_uz?: string | null
           created_at?: string | null
           emoji?: string | null
           id?: string
@@ -5825,6 +5831,7 @@ export type Database = {
           title_en?: string | null
           title_ru?: string | null
           title_tr?: string | null
+          title_uz?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -5834,6 +5841,7 @@ export type Database = {
           content_en?: string | null
           content_ru?: string | null
           content_tr?: string | null
+          content_uz?: string | null
           created_at?: string | null
           emoji?: string | null
           id?: string
@@ -5845,6 +5853,7 @@ export type Database = {
           title_en?: string | null
           title_ru?: string | null
           title_tr?: string | null
+          title_uz?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -5856,6 +5865,7 @@ export type Database = {
           address_en: string | null
           address_ru: string | null
           address_tr: string | null
+          country_code: string
           description: string | null
           description_ar: string | null
           description_az: string | null
@@ -5888,6 +5898,7 @@ export type Database = {
           address_en?: string | null
           address_ru?: string | null
           address_tr?: string | null
+          country_code?: string
           description?: string | null
           description_ar?: string | null
           description_az?: string | null
@@ -5920,6 +5931,7 @@ export type Database = {
           address_en?: string | null
           address_ru?: string | null
           address_tr?: string | null
+          country_code?: string
           description?: string | null
           description_ar?: string | null
           description_az?: string | null
