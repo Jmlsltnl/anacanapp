@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Baby, Bell, BellOff, Calendar, Check, Droplets, Heart, Loader2, Minus, Plus, Sparkles, User as UserIcon } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
@@ -391,18 +392,28 @@ const PremiumOnboarding = () => {
         const lmp = bumpDateMode === 'lmp' ? new Date(bumpDate) : new Date(new Date(bumpDate).getTime() - 280 * DAY);
         const due = new Date(lmp.getTime() + 280 * DAY);
 
+        // QORUMA ("hamiləlik həftəsi öz-özünə dəyişdi" bug-ı): artıq bump olan
+        // və LMP-si mövcud olan istifadəçi bura YALNIZ ad düzəlişi (needsName)
+        // üçün düşə bilər — belə halda tarixlər ƏZİLMİR, mövcud dəyərlər qalır.
+        const alreadyPregnantWithDates =
+        (profile as any)?.life_stage === 'bump' && !!(profile as any)?.last_period_date;
+
         const { error } = await updateProfile({
           life_stage: stage,
-          last_period_date: lmp.toISOString().split('T')[0],
-          due_date: due.toISOString().split('T')[0],
+          ...(alreadyPregnantWithDates ? {} : {
+            last_period_date: format(lmp, 'yyyy-MM-dd'),
+            due_date: format(due, 'yyyy-MM-dd')
+          }),
           baby_count: babyCount,
           multiples_type: multiplesId,
           onboarding_answers: answersPayload
         } as any);
         if (error) throw error;
 
-        setLastPeriodDate(lmp);
-        setDueDate(due);
+        if (!alreadyPregnantWithDates) {
+          setLastPeriodDate(lmp);
+          setDueDate(due);
+        }
         setMultiplesData(babyCount, multiplesId as any);
         // .catch: profil artıq uğurla yadda saxlanıb — icma qrupuna avtomatik
         // qoşulma (kosmetik funksiya) şəbəkə problemi ilə uğursuz olsa belə,

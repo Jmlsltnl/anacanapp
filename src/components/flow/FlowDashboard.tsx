@@ -72,7 +72,8 @@ const FlowDashboard = () => {
 
       // Sync to database
       if (user?.id) {
-        const dateStr = selectedDay.toISOString().split('T')[0];
+        // TZ DÜZƏLİŞİ: toISOString() UTC+4-də tarixi 1 gün geri sürüşdürürdü
+        const dateStr = format(selectedDay, 'yyyy-MM-dd');
 
         // Update profile
         await supabase.
@@ -80,42 +81,63 @@ const FlowDashboard = () => {
         update({ last_period_date: dateStr }).
         eq('user_id', user.id);
 
-        // Log to cycle_history
+        // Təqvim loqları ilə sinxron qalsın: başlanğıc günü period_day_logs-a
+        // da yazılır (əvvəllər yazılmırdı → təqvimə sonrakı BİR toxunuş LMP-ni
+        // köhnə blokun tarixinə GERİ çəkirdi)
+        await supabase.
+        from('period_day_logs').
+        upsert(
+          { user_id: user.id, log_date: dateStr, flow_intensity: 'medium' },
+          { onConflict: 'user_id,log_date', ignoreDuplicates: true }
+        );
+
+        // Log to cycle_history — single() boş tarixçədə partlayırdı → maybeSingle
         const { data: lastCycle } = await supabase.
         from('cycle_history').
         select('cycle_number, start_date').
         eq('user_id', user.id).
         order('cycle_number', { ascending: false }).
         limit(1).
-        single();
+        maybeSingle();
 
-        const nextCycleNumber = (lastCycle?.cycle_number || 0) + 1;
+        // REDAKTƏ ≠ YENİ TSİKL: yeni tarix son tsiklin ±12 günü daxilindədirsə
+        // istifadəçi CARİ tsiklin başlanğıcını DÜZƏLDİR — əvvəlki tsiklə
+        // toxunulmur, dublikat yaradılmır (bug: "əvvəlki tsiklin tarixi dəyişir")
+        const startDiff = lastCycle?.start_date ?
+        differenceInDays(selectedDay, new Date(lastCycle.start_date)) :
+        null;
 
-        // Close previous cycle if exists
-        if (lastCycle?.start_date) {
-          const prevStart = new Date(lastCycle.start_date);
-          const cycleLengthCalc = differenceInDays(selectedDay, prevStart);
+        if (lastCycle && startDiff !== null && Math.abs(startDiff) <= 12) {
           await supabase.
           from('cycle_history').
-          update({
-            end_date: dateStr,
-            cycle_length: cycleLengthCalc > 0 ? cycleLengthCalc : null
-          }).
+          update({ start_date: dateStr }).
           eq('user_id', user.id).
           eq('cycle_number', lastCycle.cycle_number);
+        } else {
+          // Yeni tsikl: əvvəlkini sanity-qoruma ilə bağla (15-60 gün xarici → null)
+          if (lastCycle?.start_date && startDiff !== null) {
+            await supabase.
+            from('cycle_history').
+            update({
+              end_date: dateStr,
+              cycle_length: startDiff >= 15 && startDiff <= 60 ? startDiff : null
+            }).
+            eq('user_id', user.id).
+            eq('cycle_number', lastCycle.cycle_number);
+          }
+
+          await supabase.
+          from('cycle_history').
+          insert({
+            user_id: user.id,
+            cycle_number: (lastCycle?.cycle_number || 0) + 1,
+            start_date: dateStr,
+            period_length: periodLength
+          });
         }
 
-        // Insert new cycle
-        await supabase.
-        from('cycle_history').
-        insert({
-          user_id: user.id,
-          cycle_number: nextCycleNumber,
-          start_date: dateStr,
-          period_length: periodLength
-        });
-
         queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
+        queryClient.invalidateQueries({ queryKey: ['period-day-logs'] });
       }
 
       toast.success(tr("flowdashboard_period_baslangici_qeyd_edildi_6961a5", "Period ba\u015Flan\u011F\u0131c\u0131 qeyd edildi! \uD83E\uDE78"), {

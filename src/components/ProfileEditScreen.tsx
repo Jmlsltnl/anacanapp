@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { format } from 'date-fns';
 import { getLocaleTag } from '@/lib/i18n';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Camera, Save, User, Calendar, Loader2, CalendarDays, Baby, Sparkles } from 'lucide-react';
@@ -247,15 +248,17 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
       let effectiveLMP: string | null = null;
       let effectiveDueDate: string | null = null;
 
+      // TZ-itkisiz serializasiya: toISOString() lokal→UTC çevirməsi UTC+4-də
+      // hər LMP↔doğuş tarixi çevrilməsində tarixi 1 gün sürüşdürürdü
+      const toLocalDateStr = (d: Date | null) => d ? format(d, 'yyyy-MM-dd') : null;
+
       if (formData.life_stage === 'bump') {
         if (dateInputMode === 'lmp' && formData.last_period_date) {
           effectiveLMP = formData.last_period_date;
-          const calculatedDD = calculateDueDate(new Date(formData.last_period_date));
-          effectiveDueDate = calculatedDD ? calculatedDD.toISOString().split('T')[0] : null;
+          effectiveDueDate = toLocalDateStr(calculateDueDate(new Date(formData.last_period_date)));
         } else if (dateInputMode === 'dueDate' && formData.due_date) {
           effectiveDueDate = formData.due_date;
-          const calculatedLMP = calculateLMPFromDueDate(new Date(formData.due_date));
-          effectiveLMP = calculatedLMP ? calculatedLMP.toISOString().split('T')[0] : null;
+          effectiveLMP = toLocalDateStr(calculateLMPFromDueDate(new Date(formData.due_date)));
         }
       }
 
@@ -270,17 +273,44 @@ const ProfileEditScreen = ({ onBack }: ProfileEditScreenProps) => {
         country_code: formData.country_code || null
       };
 
+      // KRİTİK BUG DÜZƏLİŞİ ("hamiləlik həftəsi öz-özünə dəyişir"):
+      // Əvvəllər HƏR save-də (ad/şəkil dəyişəndə belə) LMP/doğuş tarixi
+      // yenidən hesablanıb yazılırdı — dueDate rejimində LMP = doğuş−280
+      // düsturu istifadəçinin ƏSL daxil etdiyi LMP-ni əzirdi (üstəlik TZ
+      // itkisi ilə hər dövrədə ~1 gün sürüşürdü). İndi tarix sahələri YALNIZ
+      // istifadəçi onları həqiqətən DƏYİŞİBSƏ (və ya mərhələ dəyişibsə)
+      // payload-a daxil edilir.
+      const dbLMP = (profile as any)?.last_period_date || null;
+      const dbDue = (profile as any)?.due_date || null;
+      const stageChanged = (profile as any)?.life_stage !== formData.life_stage;
+
       // Set dates based on life stage
       if (formData.life_stage === 'bump') {
-        updateData.due_date = effectiveDueDate;
-        updateData.last_period_date = effectiveLMP;
+        const datesChanged = effectiveLMP !== dbLMP || effectiveDueDate !== dbDue;
+        if (stageChanged || datesChanged) {
+          // Yalnız aktiv rejimin sahəsi istifadəçi girişidir; digəri hesablanır.
+          // Dəyişiklik yoxdursa DB-dəki dəyərlərə TOXUNULMUR.
+          const userTouchedDates =
+          dateInputMode === 'lmp' ?
+          formData.last_period_date !== (dbLMP || '') :
+          formData.due_date !== (dbDue || '');
+          if (stageChanged || userTouchedDates) {
+            updateData.due_date = effectiveDueDate;
+            updateData.last_period_date = effectiveLMP;
+          }
+        }
         updateData.multiples_type = formData.multiples_type;
         updateData.baby_count = formData.multiples_type === 'twins' ? 2 : formData.multiples_type === 'triplets' ? 3 : formData.multiples_type === 'quadruplets' ? 4 : 1;
         updateData.chorionicity = formData.multiples_type === 'single' ? null : formData.chorionicity || null;
       } else if (formData.life_stage === 'flow') {
-        updateData.last_period_date = formData.last_period_date || null;
-        updateData.due_date = null;
-      } else {
+        const flowLMP = formData.last_period_date || null;
+        if (stageChanged || flowLMP !== dbLMP) {
+          updateData.last_period_date = flowLMP;
+          updateData.due_date = null;
+        }
+      } else if (stageChanged) {
+        // mommy/partner-ə KEÇİD anında tarixlər təmizlənir; sadə profil
+        // redaktəsində (mərhələ dəyişməyibsə) onlara toxunulmur
         updateData.last_period_date = null;
         updateData.due_date = null;
       }

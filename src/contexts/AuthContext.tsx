@@ -180,10 +180,14 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       }
 
       if (profileData.partner_code) setPartnerCode(profileData.partner_code);
-      if (profileData.last_period_date) setLastPeriodDate(new Date(profileData.last_period_date));
+      // LMP/doğuş tarixi HƏMİŞƏ sinxronlaşdırılır (null daxil) — əvvəllər
+      // yalnız truthy dəyər yazılırdı: DB-də təmizlənmiş LMP store-da köhnə
+      // dəyəri saxlayır, ProfileEdit formu ona əsaslanıb köhnə tarixi
+      // YENİDƏN DB-yə yazırdı ("silinmiş LMP öz-özünə qayıdır" bug-ı)
+      setLastPeriodDate(profileData.last_period_date ? new Date(profileData.last_period_date) : null);
+      setDueDate(profileData.due_date ? new Date(profileData.due_date) : null);
       if (profileData.cycle_length) setCycleLength(profileData.cycle_length);
       if (profileData.period_length) setPeriodLength(profileData.period_length);
-      if (profileData.due_date) setDueDate(new Date(profileData.due_date));
 
       // Sync linked partner ID
       setLinkedPartnerId(profileData.linked_partner_id);

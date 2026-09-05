@@ -58,8 +58,14 @@ export const useCycleStats = () => {
   };
 
   if (cycles.length > 0) {
-    const cycleLengths = cycles.filter(c => c.cycle_length).map(c => c.cycle_length!);
-    const periodLengths = cycles.filter(c => c.period_length).map(c => c.period_length!);
+    // Sanity filtri (15-60 gün): köhnə bug-ların yaratdığı 1-2 günlük saxta
+    // tsikllər ortalamanı zəhərləməsin (bax usePeriodDayLogs sync düzəlişi)
+    const cycleLengths = cycles.
+    filter(c => c.cycle_length && c.cycle_length >= 15 && c.cycle_length <= 60).
+    map(c => c.cycle_length!);
+    const periodLengths = cycles.
+    filter(c => c.period_length && c.period_length >= 1 && c.period_length <= 15).
+    map(c => c.period_length!);
 
     if (cycleLengths.length > 0) {
       stats.averageCycleLength = Math.round(cycleLengths.reduce((a, b) => a + b, 0) / cycleLengths.length);

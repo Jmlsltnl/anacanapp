@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserStore } from '@/store/userStore';
-import { differenceInDays } from 'date-fns';
+import { differenceInDays, format } from 'date-fns';
 
 export interface PeriodDayLog {
   id: string;
@@ -52,7 +52,10 @@ export const useTogglePeriodDay = () => {
     mutationFn: async ({ date, flowIntensity = 'medium' }: { date: Date; flowIntensity?: string }) => {
       if (!user?.id) throw new Error('Not authenticated');
 
-      const dateStr = date.toISOString().split('T')[0];
+      // KRİTİK TZ DÜZƏLİŞİ: toISOString() lokal gecəyarısını UTC-yə çevirir —
+      // UTC+4-də seçilən gün BAZADA 1 GÜN ƏVVƏL kimi yazılırdı (toxunulan
+      // nöqtə ilə görünən nöqtə uyğunsuzluğunun kökü). Lokal format istifadə et.
+      const dateStr = format(date, 'yyyy-MM-dd');
 
       // Check if day already logged
       const { data: existing } = await supabase
@@ -91,12 +94,38 @@ export const useTogglePeriodDay = () => {
   });
 };
 
+// Fizioloji ağlabatan tsikl uzunluğu — bundan kənar dəyərlər KEÇMİŞ tsikli
+// korlamaq əvəzinə null yazılır (statistikaya da düşmür)
+const MIN_CYCLE_LEN = 15;
+const MAX_CYCLE_LEN = 60;
+const saneCycleLen = (n: number): number | null =>
+n >= MIN_CYCLE_LEN && n <= MAX_CYCLE_LEN ? n : null;
+
 /**
  * After period days are toggled on calendar, sync the most recent
- * contiguous period block to profile & cycle_history
+ * contiguous period block to profile & cycle_history.
+ *
+ * BUG DÜZƏLİŞLƏRİ:
+ *  1) life_stage='flow' QORUMASI — əvvəllər hamilə (bump) istifadəçi köhnə
+ *     period loglarına toxunanda LMP-si (hamiləlik həftəsi!) səssizcə
+ *     dəyişirdi.
+ *  2) REDAKTƏ ≠ YENİ TSİKL — əvvəllər başlanğıc tarixini düzəltmək "yeni
+ *     tsikl" sayılırdı: əvvəlki tsiklin tarixi/uzunluğu əzilir, 1-2 günlük
+ *     saxta tsikllər + dublikat sətirlər yaranırdı. İndi ±12 gün daxilindəki
+ *     dəyişiklik mövcud tsiklin REDAKTƏSİ sayılır.
+ *  3) Köhnə tarixçə redaktəsi LMP-ni GERİ çəkmir.
  */
 async function syncPeriodLogsToProfile(userId: string, queryClient: any) {
   try {
+    // Profil konteksti: bu sinxronizasiya YALNIZ flow istifadəçiləri üçündür
+    const { data: prof } = await supabase
+      .from('profiles')
+      .select('life_stage, last_period_date')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (!prof || prof.life_stage !== 'flow') return;
+
     // Get all period logs ordered by date desc
     const { data: logs } = await supabase
       .from('period_day_logs')
@@ -133,6 +162,28 @@ async function syncPeriodLogsToProfile(userId: string, queryClient: any) {
     const periodStart = latestBlock[0];
     const periodLength = latestBlock.length;
 
+    // Mövcud son tsikl sətri — redaktə/yeni qərarını LMP yox, BU verir
+    const { data: lastCycle } = await supabase
+      .from('cycle_history')
+      .select('cycle_number, start_date')
+      .eq('user_id', userId)
+      .order('cycle_number', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    // startDiff > 0 → yeni block son tsikldən SONRA; < 0 → ƏVVƏL
+    const startDiff = lastCycle?.start_date ?
+    differenceInDays(new Date(periodStart), new Date(lastCycle.start_date)) :
+    null;
+
+    // KÖHNƏ TARİXÇƏ REDAKTƏSİ: block son tsikldən xeyli (>12 gün) ƏVVƏLdirsə,
+    // istifadəçi keçmiş ayları düzəldir — NƏ LMP-yə, NƏ tsikl sətirlərinə toxun
+    // (əks halda LMP geri çəkilir, cari tsikl "silinmiş" kimi görünürdü).
+    if (startDiff !== null && startDiff < -12) {
+      queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
+      return;
+    }
+
     // Update profile
     await supabase
       .from('profiles')
@@ -144,17 +195,12 @@ async function syncPeriodLogsToProfile(userId: string, queryClient: any) {
 
     // Update local store (batch to avoid multiple re-renders)
     const store = useUserStore.getState();
-    const currentLPD = store.lastPeriodDate ? new Date(store.lastPeriodDate).toISOString().split('T')[0] : null;
+    const currentLPD = store.lastPeriodDate ? format(new Date(store.lastPeriodDate), 'yyyy-MM-dd') : null;
     if (currentLPD !== periodStart || store.periodLength !== periodLength) {
       store.setLastPeriodDate(new Date(periodStart));
       store.setPeriodLength(periodLength);
 
       // Health inteqrasiyası aktivdirsə → Apple Health / Health Connect-ə yaz (arxa planda).
-      // QEYD: FlowDashboard-ın "Periodum başladı" düyməsi bunu artıq çağırır, amma təqvimdə
-      // günə toxunaraq period qeyd etmə yolu (bu funksiya) bunu HEÇ vaxt çağırmırdı — nəticədə
-      // istifadəçi yalnız təqvimdən istifadə edirdisə, "Health-ə yaz" toggle-i aktiv olsa belə
-      // heç nə yazılmırdı. Yalnız period başlanğıcı həqiqətən dəyişəndə (yeni/fərqli gün) yazırıq,
-      // sadəcə uzunluq redaktəsində təkrar yazmırıq.
       if (currentLPD !== periodStart) {
         import('@/lib/healthCycle').then((m) =>
           m.writePeriodToHealth(new Date(periodStart), periodLength || 5)
@@ -162,41 +208,61 @@ async function syncPeriodLogsToProfile(userId: string, queryClient: any) {
       }
     }
 
-    // Update or insert cycle_history for this period
-    const { data: lastCycle } = await supabase
-      .from('cycle_history')
-      .select('cycle_number, start_date')
-      .eq('user_id', userId)
-      .order('cycle_number', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (lastCycle?.start_date === periodStart) {
-      // Update existing cycle's period length
+    // ── cycle_history: REDAKTƏ vs YENİ TSİKL ──
+    if (!lastCycle) {
+      // İlk tsikl
+      await supabase.from('cycle_history').insert({
+        user_id: userId,
+        cycle_number: 1,
+        start_date: periodStart,
+        period_length: periodLength,
+      });
+    } else if (lastCycle.start_date === periodStart) {
+      // Eyni başlanğıc — yalnız uzunluq yenilənir
       await supabase
         .from('cycle_history')
         .update({ period_length: periodLength })
         .eq('user_id', userId)
         .eq('cycle_number', lastCycle.cycle_number);
-    } else if (!lastCycle || lastCycle.start_date !== periodStart) {
-      // Close previous cycle if exists
-      if (lastCycle?.start_date) {
-        const cycleLen = differenceInDays(new Date(periodStart), new Date(lastCycle.start_date));
-        if (cycleLen > 0) {
-          await supabase
-            .from('cycle_history')
-            .update({ end_date: periodStart, cycle_length: cycleLen })
-            .eq('user_id', userId)
-            .eq('cycle_number', lastCycle.cycle_number);
-        }
-      }
+    } else if (startDiff !== null && Math.abs(startDiff) <= 12) {
+      // REDAKTƏ: istifadəçi CARİ tsiklin başlanğıcını düzəldir (±12 gün) —
+      // yeni sətir YARADILMIR, mövcud sətrin start_date-i yenilənir.
+      await supabase
+        .from('cycle_history')
+        .update({ start_date: periodStart, period_length: periodLength })
+        .eq('user_id', userId)
+        .eq('cycle_number', lastCycle.cycle_number);
 
-      // Insert new cycle
+      // Əvvəlki tsiklin end_date/cycle_length-i yeni başlanğıca uyğunlaşdırılır
+      // (sanity xaricindədirsə null — statistika zəhərlənmir)
+      const { data: prevCycle } = await supabase
+        .from('cycle_history')
+        .select('cycle_number, start_date')
+        .eq('user_id', userId)
+        .eq('cycle_number', lastCycle.cycle_number - 1)
+        .maybeSingle();
+      if (prevCycle?.start_date) {
+        const prevLen = differenceInDays(new Date(periodStart), new Date(prevCycle.start_date));
+        await supabase
+          .from('cycle_history')
+          .update({ end_date: periodStart, cycle_length: saneCycleLen(prevLen) })
+          .eq('user_id', userId)
+          .eq('cycle_number', prevCycle.cycle_number);
+      }
+    } else {
+      // YENİ TSİKL (>12 gün sonra): əvvəlkini sanity-qoruma ilə bağla
+      const cycleLen = startDiff as number;
+      await supabase
+        .from('cycle_history')
+        .update({ end_date: periodStart, cycle_length: saneCycleLen(cycleLen) })
+        .eq('user_id', userId)
+        .eq('cycle_number', lastCycle.cycle_number);
+
       await supabase
         .from('cycle_history')
         .insert({
           user_id: userId,
-          cycle_number: (lastCycle?.cycle_number || 0) + 1,
+          cycle_number: lastCycle.cycle_number + 1,
           start_date: periodStart,
           period_length: periodLength,
         });

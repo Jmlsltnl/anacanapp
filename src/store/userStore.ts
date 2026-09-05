@@ -53,10 +53,10 @@ interface UserState {
   setFunnelCompleted: (v: boolean) => void;
   setLifeStage: (stage: LifeStage) => void;
   setRole: (role: UserRole) => void;
-  setLastPeriodDate: (date: Date) => void;
+  setLastPeriodDate: (date: Date | null) => void;
   setCycleLength: (length: number) => void;
   setPeriodLength: (length: number) => void;
-  setDueDate: (date: Date) => void;
+  setDueDate: (date: Date | null) => void;
   setBabyData: (birthDate: Date, name: string, gender: 'boy' | 'girl', babyCount?: number, multiplesType?: 'single' | 'twins' | 'triplets' | 'quadruplets') => void;
   setDeliveryType: (type: DeliveryType | null) => void;
   setPartnerCode: (code: string) => void;
