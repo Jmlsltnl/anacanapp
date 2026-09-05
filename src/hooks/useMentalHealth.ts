@@ -293,8 +293,10 @@ export const useSubmitEPDS = () => {
 
 export const useMentalHealthResources = () => {
   const language = useUserStore((state) => state.language);
+  const storeCountry = useUserStore((state) => state.countryCode);
+  const { user } = useAuthContext();
   return useQuery({
-    queryKey: ['mental-health-resources', language],
+    queryKey: ['mental-health-resources', language, storeCountry, user?.id],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('mental_health_resources').
@@ -303,7 +305,39 @@ export const useMentalHealthResources = () => {
       order('sort_order');
 
       if (error) throw error;
-      return mapRowsTranslation(data, language, ['name', 'description', 'address']) as unknown as MentalHealthResource[];
+
+      // Yardım nömrələri ÖLKƏYƏ görə seçilir (dil yox): AZ nömrələri (103, 860, ASAN...)
+      // yalnız Azərbaycan istifadəçilərinə, UZ nömrələri (103, 112, 1146...) Özbəkistan
+      // istifadəçilərinə göstərilir. Profildəki ölkə yoxdursa dilə görə təxmin edilir.
+      let activeCountry = storeCountry as string | null;
+      if (!activeCountry && user?.id) {
+        const { data: prof } = await supabase.
+        from('profiles').
+        select('country_code').
+        eq('user_id', user.id).
+        maybeSingle();
+        activeCountry = (prof as any)?.country_code || null;
+      }
+      if (!activeCountry) {
+        activeCountry =
+        language === 'uz' ? 'UZ' :
+        language === 'kk' ? 'KZ' :
+        language === 'tr' ? 'TR' :
+        language === 'ru' ? 'RU' :
+        language === 'de' ? 'DE' :
+        language === 'ar' ? 'SA' : 'AZ';
+      }
+
+      const rows = (data || []) as any[];
+      // country_code sütunu köhnə sxemdə olmaya bilər — müdafiəli filtr.
+      // Sütun varsa: yalnız istifadəçinin ölkəsinin nömrələri göstərilir (yanlış ölkənin
+      // təcili nömrələri təhlükəlidir — boş siyahı yanlış nömrədən yaxşıdır).
+      const hasCountryInfo = rows.some((r) => r.country_code);
+      const finalRows = hasCountryInfo ?
+      rows.filter((r) => (r.country_code || 'AZ') === activeCountry) :
+      rows;
+
+      return mapRowsTranslation(finalRows, language, ['name', 'description', 'address']) as unknown as MentalHealthResource[];
     },
     staleTime: 1000 * 60 * 30
   });

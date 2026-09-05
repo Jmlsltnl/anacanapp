@@ -6,15 +6,28 @@ import {
 'lucide-react';
 import { usePartnerWeeklyStats } from '@/hooks/usePartnerWeeklyStats';
 import { useIsRtl, rtlX } from '@/lib/rtl';
+import { useUserStore } from '@/store/userStore';
+
+// Həftə günü qısaltmaları (bazar = index 0) — VitaminTracker ilə eyni sistem
+const getDayLabels = (language: string) => {
+  if (language === 'en') return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  if (language === 'ru') return ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  if (language === 'tr') return ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+  if (language === 'kk') return ['Жс', 'Дс', 'Сс', 'Ср', 'Бс', 'Жм', 'Сб'];
+  if (language === 'uz') return ['Ya', 'Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh'];
+  if (language === 'de') return ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+  if (language === 'ar') return ['أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
+  return ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'];
+};
 
 const WeeklyStatsTab = () => {
   const isRtl = useIsRtl();
   const { stats, loading } = usePartnerWeeklyStats();
+  const language = useUserStore((state) => state.language);
 
   const getDayName = (dateStr: string) => {
     const date = new Date(dateStr);
-    const days = ['B', 'B.e', tr("weeklystatstab_c_a_28099e", "\xC7.a"), tr("weeklystatstab_c_b70344", "\xC7"), 'C.a', 'C', tr("weeklystatstab_s_b97106", "\u015E")];
-    return days[date.getDay()];
+    return getDayLabels(language)[date.getDay()];
   };
 
   const getMoodEmoji = (mood: number | null) => {

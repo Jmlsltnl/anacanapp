@@ -138,7 +138,9 @@ Deno.serve(async (req) => {
     const sleepH = Math.floor(stats.sleepMinutes / 60);
     const sleepM = stats.sleepMinutes % 60;
 
-    const prompt = `Sən Anacan tətbiqinin pediatrik məlumat köməkçisisən (həkim DEYİLSƏN, diaqnoz qoymursan).
+    const prompt = `${langConf.outLang ? `OUTPUT LANGUAGE: ${langConf.outLang}. Every "note" value MUST be written in natural, fluent ${langConf.outLang} — NEVER in Azerbaijani, even though the instructions below are written in Azerbaijani.
+
+` : ''}Sən Anacan tətbiqinin pediatrik məlumat köməkçisisən (həkim DEYİLSƏN, diaqnoz qoymursan).
 Körpənin BUGÜNKÜ qulluq göstəricilərini yaşına uyğun normalarla (ÜST/AAP təlimatları əsasında) müqayisə et.
 
 KÖRPƏ: ${ageDesc}${child.gender ? ` (${child.gender === 'girl' ? 'qız' : 'oğlan'})` : ''}
@@ -165,7 +167,7 @@ QAYDALAR:
 YALNIZ bu JSON formatında cavab ver (başqa heç nə yazma):
 {"sleep":{"status":"normal","note":"..."},"feeding":{"status":"normal","note":"..."},"diaper":{"status":"normal","note":"..."}}${langConf.outLang ? `
 
-IMPORTANT: Write ALL "note" text values in ${langConf.outLang}. Keep JSON keys and status enum values exactly as shown.` : ''}`;
+IMPORTANT: Write ALL "note" text values ONLY in ${langConf.outLang} (correct spelling and grammar — not a transliteration of Azerbaijani). Keep JSON keys and status enum values exactly as shown.` : ''}`;
 
     const models = ['gemini-2.5-flash-lite', 'gemini-2.5-flash'];
     let geminiResponse: Response | null = null;
