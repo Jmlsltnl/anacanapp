@@ -334,7 +334,7 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
               const text = feat
                 ? (bLang === 'az'
                     ? feat.title_az || feat.title
-                    : (feat as any)[`title_${bLang}`] || (bLang === 'kk' || bLang === 'uz' ? (feat as any).title_ru : null) || feat.title_en || feat.title)
+                    : (feat as any)[`title_${bLang}`] || (bLang === 'kk' || bLang === 'uz' || bLang === 'ka' ? (feat as any).title_ru : null) || feat.title_en || feat.title)
                 : (f as any).text;
               return (
                 <div key={i} className="flex items-center gap-3 p-2 rounded-xl transition-colors">

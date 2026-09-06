@@ -321,6 +321,7 @@ export const useMentalHealthResources = () => {
       if (!activeCountry) {
         activeCountry =
         language === 'uz' ? 'UZ' :
+        language === 'ka' ? 'GE' :
         language === 'kk' ? 'KZ' :
         language === 'tr' ? 'TR' :
         language === 'ru' ? 'RU' :

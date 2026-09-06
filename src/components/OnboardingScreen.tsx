@@ -90,6 +90,7 @@ const OnboardingScreen = () => {
       if (language !== 'az' && s[field + '_' + language]) return s[field + '_' + language];
       if (language === 'kk' && s[field + '_ru']) return s[field + '_ru'];
       if (language === 'uz' && s[field + '_ru']) return s[field + '_ru'];
+      if (language === 'ka' && s[field + '_ru']) return s[field + '_ru'];
       if (language !== 'az' && language !== 'ru' && s[field + '_en']) return s[field + '_en'];
 
       const fallback = getFallbackStages().find(fb => fb.stage_id === s.stage_id);
@@ -131,6 +132,7 @@ const OnboardingScreen = () => {
       if (language !== 'az' && m['label_' + language]) return m['label_' + language];
       if (language === 'kk' && m.label_ru) return m.label_ru;
       if (language === 'uz' && m.label_ru) return m.label_ru;
+      if (language === 'ka' && m.label_ru) return m.label_ru;
       if (language !== 'az' && language !== 'ru' && m.label_en) return m.label_en;
 
       const fallback = getFallbackMultiples().find(fb => fb.option_id === m.option_id);

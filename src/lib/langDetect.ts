@@ -1,5 +1,5 @@
 // ============================================================
-// langDetect — cəmiyyət postları üçün yüngül dil aşkarlama (az/en/ru/tr/kk/uz/de).
+// langDetect — cəmiyyət postları üçün yüngül dil aşkarlama (az/en/ru/tr/kk/uz/ka/de).
 // Prinsip:
 //   1. Kiril mətnində özbək-spesifik hərflər (ў/ҳ) varsa → uz;
 //      qazax-spesifik hərflər (ә/ғ/қ/ң/ө/ұ/ү/һ/і) varsa → kk
@@ -14,10 +14,10 @@
 // Qeyd: bu YALNIZ ilkin təxmindir — istifadəçi compose-da dil çipi ilə düzəldə bilər.
 // ============================================================
 
-export type FeedLang = 'az' | 'en' | 'ru' | 'tr' | 'kk' | 'uz' | 'de' | 'ar';
+export type FeedLang = 'az' | 'en' | 'ru' | 'tr' | 'kk' | 'uz' | 'ka' | 'de' | 'ar';
 
 /** Feed linzasında göstərilən sıra ilə bütün dəstəklənən dillər */
-export const FEED_LANGS: FeedLang[] = ['az', 'ru', 'tr', 'kk', 'uz', 'de', 'ar', 'en'];
+export const FEED_LANGS: FeedLang[] = ['az', 'ru', 'tr', 'kk', 'uz', 'ka', 'de', 'ar', 'en'];
 
 export function isFeedLang(v: unknown): v is FeedLang {
   return typeof v === 'string' && (FEED_LANGS as string[]).includes(v);
@@ -56,14 +56,19 @@ export function detectLang(text: string, fallback: FeedLang = 'az'): FeedLang {
 
   // 0) Ərəb qrafikası — ən etibarlı marker (başqa heç bir dəstəklənən dildə yoxdur)
   const arb = (t.match(/[\u0600-\u06FF\u0750-\u077F]/g) || []).length;
+  // Gürcü (Mkhedruli) qrafikası — ərəb kimi unikal markerdir
+  const geo = (t.match(/[\u10D0-\u10FF]/g) || []).length;
   const cyr = (t.match(/[А-Яа-яЁёӘәҒғҚқҢңӨөҰұҮүҺһІіЎўҲҳ]/g) || []).length;
   const lat = (t.match(/[A-Za-zƏəĞğIıİÖöŞşÜüÇç]/g) || []).length;
-  const totalLetters = arb + cyr + lat;
+  const totalLetters = arb + geo + cyr + lat;
 
   // Çox qısa mətn (emoji, "ok" və s.) — təxmin etmə, UI dilini götür
   if (totalLetters < 6) return fallback;
 
   if (arb > totalLetters * 0.3) return 'ar';
+
+  // 0a) Gürcü qrafikası — kiril yoxlamalarından ƏVVƏL (qarışıq ka+ru mətnlərində ka üstün gəlir)
+  if (geo > totalLetters * 0.3) return 'ka';
 
   // 1) Kiril üstünlüyü → uz (özbək-spesifik hərf varsa), kk (qazax-spesifik hərf varsa) və ya ru
   if (cyr > totalLetters * 0.4) {

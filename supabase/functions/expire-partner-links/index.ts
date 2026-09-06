@@ -129,6 +129,11 @@ Deno.serve(async (req) => {
       inApp: 'Premium obunangiz tugadi va hamkor bilan bogʻlanish toʻxtatildi. Qayta faollashtirish uchun Premium muddatini uzaytiring.',
       push: 'Hamkor bilan bogʻlanishingiz toʻxtatildi. Premium muddatini uzaytirib, qayta ulaning.',
     },
+    ka: {
+      title: 'Premium-ის ვადა ამოიწურა',
+      inApp: 'თქვენი Premium გამოწერა დასრულდა და პარტნიორთან კავშირი შეჩერდა. ხელახლა გასააქტიურებლად განაახლეთ Premium.',
+      push: 'პარტნიორთან კავშირი შეჩერდა. განაახლეთ Premium და ხელახლა დაუკავშირდით.',
+    },
     de: {
       title: 'Premium ist abgelaufen',
       inApp: 'Dein Premium-Abo ist abgelaufen und die Verbindung zu deinem Partner wurde getrennt. Verlängere Premium, um sie wieder zu aktivieren.',

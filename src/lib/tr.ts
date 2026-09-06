@@ -53,6 +53,10 @@ export function mapRowTranslation<T extends Record<string, any>>(
       // uz üçün ru körpüsü (kk ilə eyni məntiq): Özbəkistanda rus dili geniş
       // başa düşülür — _uz sütunları dolana qədər ru göstərilir
       val = row[`${field}_uz`] ?? row[`${field}_ru`] ?? row[field] ?? row[`${field}_az`];
+    } else if (language === 'ka') {
+      // ka üçün ru körpüsü: Gürcüstanda böyük nəsil rus dilini yaxşı bilir —
+      // _ka sütunları dolana qədər ru göstərilir
+      val = row[`${field}_ka`] ?? row[`${field}_ru`] ?? row[field] ?? row[`${field}_az`];
     } else if (language === 'de') {
       // de üçün en körpüsü: de hələ tərcümə olunmayıbsa ingilis mətn az-dan daha faydalıdır
       val = row[`${field}_de`] ?? row[`${field}_en`] ?? row[field] ?? row[`${field}_az`];

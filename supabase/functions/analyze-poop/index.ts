@@ -117,6 +117,20 @@ async function validateImage(imageBase64: string, _apiKey?: string, language: st
       'valid': 'Surat yaroqli',
       'failed': 'Suratni tekshirib boʻlmadi. Qayta urinib koʻring.',
     },
+    ka: {
+      'diaper_empty': 'ეს საფენი ცარიელია, განავალი არ ჩანს. გადაუღეთ ფოტო საფენს, რომელშიც განავალია.',
+      'baby_photo': 'ეს ბავშვის ფოტოა. გთხოვთ, გადაუღოთ ფოტო ბავშვის საფენს.',
+      'adult_content': 'ამ სურათზე ბავშვის საფენი არ ჩანს. გთხოვთ, აირჩიოთ სწორი სურათი.',
+      'food': 'ეს საჭმლის ფოტოა. გთხოვთ, გადაუღოთ ფოტო ბავშვის საფენს.',
+      'animal': 'ეს ცხოველის ფოტოა. გთხოვთ, გადაუღოთ ფოტო ბავშვის საფენს.',
+      'screenshot': 'ეს ეკრანის ანაბეჭდია. გთხოვთ, გადაუღოთ ბავშვის საფენის ნამდვილი ფოტო.',
+      'landscape': 'ეს პეიზაჟის ფოტოა. გთხოვთ, გადაუღოთ ფოტო ბავშვის საფენს.',
+      'object': 'ეს ნივთის ფოტოა. გთხოვთ, გადაუღოთ ფოტო ბავშვის საფენს.',
+      'other': 'ეს სურათი ანალიზისთვის გამოუსადეგარია. გადაუღეთ ფოტო საფენში არსებულ განავალს.',
+      'unknown': 'სურათი ვერ ამოიცნო. გთხოვთ, გადაიღოთ უფრო მკაფიო ფოტო.',
+      'valid': 'სურათი ვარგისია',
+      'failed': 'სურათის შემოწმება ვერ მოხერხდა. სცადეთ თავიდან.',
+    },
     de: {
       'diaper_empty': 'Diese Windel ist leer, es ist kein Stuhl zu sehen. Fotografiere bitte eine Windel mit Stuhl.',
       'baby_photo': 'Dies ist ein Foto eines Babys. Fotografiere bitte die Windel deines Babys.',
@@ -242,8 +256,8 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
 // Stage 2: Analyze the poop
 async function analyzePoop(imageBase64: string, _apiKey?: string, userContext?: PoopAnalysisRequest['userContext'], language: string = 'az'): Promise<Response | null> {
   const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
-  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH', uz: 'UZBEK (Latin script)', de: 'GERMAN', ar: 'ARABIC (feminine address to the mother)' };
-  const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish', kk: 'Kazakh', uz: 'Uzbek', de: 'German', ar: 'Arabic' };
+  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH', uz: 'UZBEK (Latin script)', ka: 'GEORGIAN (ქართული, Mkhedruli script)', de: 'GERMAN', ar: 'ARABIC (feminine address to the mother)' };
+  const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish', kk: 'Kazakh', uz: 'Uzbek', ka: 'Georgian', de: 'German', ar: 'Arabic' };
   const outLang = OUT_LANG[language];
   
   // Build age context for prompt
@@ -456,6 +470,11 @@ Deno.serve(async (req) => {
           colorNameAz: 'Nomaʼlum',
           explanation: 'Surat tahlil qilindi. Aniqroq surat olishga harakat qiling.',
           recommendations: ['Chaqaloqning umumiy holatini kuzatib boring', 'Biror tashvishli holat boʻlsa, shifokorga murojaat qiling'],
+        },
+        ka: {
+          colorNameAz: 'უცნობი',
+          explanation: 'სურათი გაანალიზდა. სცადეთ უფრო მკაფიო ფოტოს გადაღება.',
+          recommendations: ['დააკვირდით ბავშვის ზოგად მდგომარეობას', 'ნებისმიერი შეშფოთების შემთხვევაში მიმართეთ ექიმს'],
         },
         de: {
           colorNameAz: 'Unbekannt',

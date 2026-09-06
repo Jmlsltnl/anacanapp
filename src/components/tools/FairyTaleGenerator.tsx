@@ -79,6 +79,7 @@ const LANGUAGES = [
   { code: 'tr', label: tr("fairytalegenerator_turkce_299adc", 'Türkçe'), flag: 'tr' },
   { code: 'kk', label: 'Қазақша', flag: 'kz' },
   { code: 'uz', label: "O'zbekcha", flag: 'uz' },
+  { code: 'ka', label: 'ქართული', flag: 'ge' },
   { code: 'de', label: 'Deutsch', flag: 'de' },
   { code: 'ar', label: 'العربية', flag: 'sa' }];
 

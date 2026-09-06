@@ -15,6 +15,7 @@ const getDayLabels = (language: string) => {
   if (language === 'tr') return ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
   if (language === 'kk') return ['Жс', 'Дс', 'Сс', 'Ср', 'Бс', 'Жм', 'Сб'];
   if (language === 'uz') return ['Ya', 'Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh'];
+  if (language === 'ka') return ['კვ', 'ორ', 'სა', 'ოთ', 'ხუ', 'პა', 'შა'];
   if (language === 'de') return ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
   if (language === 'ar') return ['أحد', 'اثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'];
   return ['B', 'B.e', 'Ç.a', 'Ç', 'C.a', 'C', 'Ş'];

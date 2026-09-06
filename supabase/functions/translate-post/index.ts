@@ -19,7 +19,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const LANGS = ['az', 'en', 'ru', 'tr', 'kk', 'uz', 'de', 'ar'];
+const LANGS = ['az', 'en', 'ru', 'tr', 'kk', 'uz', 'ka', 'de', 'ar'];
 const LANG_NAMES: Record<string, string> = {
   az: 'Azerbaijani',
   en: 'English',
@@ -27,6 +27,7 @@ const LANG_NAMES: Record<string, string> = {
   tr: 'Turkish',
   kk: 'Kazakh',
   uz: 'Uzbek',
+  ka: 'Georgian',
   de: 'German',
   ar: 'Arabic',
 };
@@ -46,7 +47,9 @@ function buildSystemPrompt(targetLang: string, sourceLang: string | null): strin
           ? 'Write natural modern Kazakh (Cyrillic script). Use the formal «Сіз» form. Use «бөпе» for baby, «етеккір» for period.'
           : targetLang === 'uz'
             ? 'Write natural modern Uzbek (LATIN script) as used in Uzbekistan. Use the formal "siz" form. Use "chaqaloq" for baby, "hayz" for period.'
-            : targetLang === 'de'
+            : targetLang === 'ka'
+              ? 'Write natural modern Georgian (Mkhedruli script). Use the formal «თქვენ» form. Use «ბავშვი» for baby, «მენსტრუაცია» for period.'
+              : targetLang === 'de'
               ? 'Write natural German. Use the informal "du" form (warm parenting-community tone). Use "Baby" for baby, "Periode" for period.'
               : targetLang === 'ar'
                 ? 'Write Modern Standard Arabic. Address the mother in the FEMININE second person (أنتِ). Use «الدورة الشهرية» for period, «طفلكِ» for baby.'
@@ -61,7 +64,7 @@ function buildSystemPrompt(targetLang: string, sourceLang: string | null): strin
     `2) Preserve emojis, line breaks, punctuation style and formatting exactly.`,
     `3) Keep #hashtags, @mentions and URLs completely unchanged (do not translate them).`,
     `4) Do not add or omit anything; keep the author's tone (casual, warm, mother-to-mother).`,
-    `5) Medical terms must stay accurate. Keep brand names unchanged: Anacan (app name), Premium, Dr.Anacan. EXCEPTION: "Anacan" as an affectionate address to the mother → ru «мамочка», tr "anneciğim", kk «анашым», uz "Onajon", de "Mami", ar «ماما», en "Mommy".`,
+    `5) Medical terms must stay accurate. Keep brand names unchanged: Anacan (app name), Premium, Dr.Anacan. EXCEPTION: "Anacan" as an affectionate address to the mother → ru «мамочка», tr "anneciğim", kk «анашым», uz "Onajon", ka «დედიკო», de "Mami", ar «ماما», en "Mommy".`,
     `6) ${style}`,
     `7) If the text is already fully in ${target}, return it unchanged.`,
   ].join('\n');

@@ -40,3 +40,5 @@ supabase/functions/migration-download-file/
 # uz seed generasiyasının aralıq faylları (yekun nəticə: scripts/i18n/uz.seed.json)
 scripts/i18n/uz.out/
 scripts/i18n/uz-translate.log
+scripts/i18n/ka.out/
+scripts/i18n/ka-translate.log

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
-type AdminLanguage = 'az' | 'en' | 'ru' | 'tr' | 'kk' | 'de' | 'ar' | 'uz';
+type AdminLanguage = 'az' | 'en' | 'ru' | 'tr' | 'kk' | 'de' | 'ar' | 'uz' | 'ka';
 
 interface AdminLanguageContextType {
   adminLanguage: AdminLanguage;
@@ -14,7 +14,7 @@ export function AdminLanguageProvider({ children }: { children: ReactNode }) {
   const getInitialLanguage = (): AdminLanguage => {
     try {
       const stored = localStorage.getItem('anacan_admin_language');
-      if (stored === 'az' || stored === 'en' || stored === 'ru' || stored === 'tr' || stored === 'kk' || stored === 'de' || stored === 'ar' || stored === 'uz') {
+      if (stored === 'az' || stored === 'en' || stored === 'ru' || stored === 'tr' || stored === 'kk' || stored === 'de' || stored === 'ar' || stored === 'uz' || stored === 'ka') {
         return stored;
       }
     } catch (e) {}

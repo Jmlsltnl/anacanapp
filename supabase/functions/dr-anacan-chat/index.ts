@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
       resolvedLifeStage = "bump";
     }
 
-    const LANG_NAME: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh (қазақ тілі, Cyrillic script)", uz: "Uzbek (oʻzbek tili, Latin script)", de: "German", ar: "Arabic (Modern Standard, addressing the mother in the FEMININE second person)" };
+    const LANG_NAME: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh (қазақ тілі, Cyrillic script)", uz: "Uzbek (oʻzbek tili, Latin script)", ka: "Georgian (ქართული)", de: "German", ar: "Arabic (Modern Standard, addressing the mother in the FEMININE second person)" };
     const replyLangName = LANG_NAME[language];
 
     // Native-script reminder — appended to the final user turn. The conversation history
@@ -108,6 +108,7 @@ Deno.serve(async (req) => {
       tr: "(Yalnızca Türkçe cevap ver.)",
       kk: "(Тек қазақ тілінде жауап бер.)",
       uz: "(Faqat oʻzbek tilida (lotin yozuvida) javob ber.)",
+      ka: "(უპასუხე მხოლოდ ქართულად.)",
       de: "(Antworte ausschließlich auf Deutsch.)",
       ar: "(أجيبي باللغة العربية الفصحى فقط.)",
     };
@@ -143,6 +144,10 @@ Deno.serve(async (req) => {
       uz: {
         unavailable: "Kechirasiz, xizmat vaqtincha mavjud emas. Iltimos, birozdan soʻng qayta urinib koʻring.",
         noAnswer: "Kechirasiz, javob ololmadim. Qayta urinib koʻring.",
+      },
+      ka: {
+        unavailable: "უკაცრავად, სერვისი დროებით მიუწვდომელია. გთხოვთ, სცადოთ ცოტა მოგვიანებით.",
+        noAnswer: "უკაცრავად, პასუხის მიღება ვერ მოხერხდა. სცადეთ თავიდან.",
       },
       de: {
         unavailable: "Entschuldige, der Dienst ist vorübergehend nicht verfügbar. Bitte versuche es später noch einmal.",

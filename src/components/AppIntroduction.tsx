@@ -54,6 +54,7 @@ const AppIntroduction = ({ onComplete }: AppIntroductionProps) => {
       if (language !== 'az' && s[field + '_' + language]) return s[field + '_' + language];
       if (language === 'kk' && s[field + '_ru']) return s[field + '_ru'];
       if (language === 'uz' && s[field + '_ru']) return s[field + '_ru'];
+      if (language === 'ka' && s[field + '_ru']) return s[field + '_ru'];
       if (language !== 'az' && language !== 'ru' && s[field + '_en']) return s[field + '_en'];
 
       const fallback = getFallbackSlides().find(fb => fb.id === s.id);

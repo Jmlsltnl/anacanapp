@@ -36,15 +36,15 @@ export const isToolFree = (toolId: string): boolean => FREE_TOOL_IDS.has(toolId)
 
 /**
  * Tortlar aləti yalnız Azərbaycan bazarı üçündür:
- * dil az/ru/kk/uz VƏ ölkə AZ (ölkə seçilməyibsə köhnə AZ hesabları sayılır → açıq).
- * Qeyd: əsl məhdudiyyət ÖLKƏDİR (çatdırılma AZ-dadır); kk/uz daxil edildi, çünki
- * cakes kontenti kk-ya tərcümə olunub (uz ru körpüsü ilə görür) və AZ-dakı
- * kk/uz-dilli istifadəçi sifariş verə bilər.
+ * dil az/ru/kk/uz/ka VƏ ölkə AZ (ölkə seçilməyibsə köhnə AZ hesabları sayılır → açıq).
+ * Qeyd: əsl məhdudiyyət ÖLKƏDİR (çatdırılma AZ-dadır); kk/uz/ka daxil edildi, çünki
+ * cakes kontenti kk-ya tərcümə olunub (uz/ka ru körpüsü ilə görür) və AZ-dakı
+ * kk/uz/ka-dilli istifadəçi sifariş verə bilər.
  */
 export const isCakesAvailable = (countryCode?: string | null, language?: string | null): boolean => {
   const country = countryCode ?? null;
   const lang = language || 'az';
   const countryOk = country === null || country === 'AZ';
-  const langOk = lang === 'az' || lang === 'ru' || lang === 'kk' || lang === 'uz';
+  const langOk = lang === 'az' || lang === 'ru' || lang === 'kk' || lang === 'uz' || lang === 'ka';
   return countryOk && langOk;
 };

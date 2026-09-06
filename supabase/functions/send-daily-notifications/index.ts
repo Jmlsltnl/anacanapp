@@ -49,12 +49,12 @@ interface DayNotification {
   is_active: boolean;
 }
 
-/** İstifadəçi dilinə uyğun sütunu qaytarır: field_{en|ru|tr|kk|uz|de} → (kk/uz→ru, de→en körpüsü) → base (AZ). */
+/** İstifadəçi dilinə uyğun sütunu qaytarır: field_{en|ru|tr|kk|uz|ka|de} → (kk/uz/ka→ru, de→en körpüsü) → base (AZ). */
 function pickLang(row: Record<string, unknown>, field: string, lang: string): string {
   if (lang && lang !== 'az') {
     const localized = row[`${field}_${lang}`];
     if (typeof localized === 'string' && localized.trim()) return localized;
-    if (lang === 'kk' || lang === 'uz') {
+    if (lang === 'kk' || lang === 'uz' || lang === 'ka') {
       const ru = row[`${field}_ru`];
       if (typeof ru === 'string' && ru.trim()) return ru;
     }

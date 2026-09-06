@@ -32,6 +32,7 @@ const APP_LANGUAGES: {value: string;label: string;}[] = [
 { value: 'tr', label: 'Türkçe' },
 { value: 'kk', label: 'Қазақша' },
 { value: 'uz', label: "O'zbekcha" },
+{ value: 'ka', label: 'ქართული' },
 { value: 'de', label: 'Deutsch' },
 { value: 'ar', label: 'العربية' }];
 

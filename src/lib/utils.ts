@@ -22,6 +22,9 @@ export function getOrdinal(num: number, lang: string): string {
   if (lang === 'uz') {
     return `${num}-chi`;
   }
+  if (lang === 'ka') {
+    return `${num}-ე`;
+  }
   if (lang === 'de') {
     return `${num}.`;
   }

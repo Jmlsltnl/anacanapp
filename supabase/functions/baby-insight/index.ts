@@ -70,6 +70,11 @@ const FALLBACK: Record<string, Insight> = {
     feeding: { status: 'normal', note: 'Ovqatlanish yozuvlari toʻplanmoqda — har bir ovqatlantirishni qayd etishga harakat qiling.' },
     diaper: { status: 'normal', note: 'Taglik yozuvlari toʻplanmoqda — hoʻl tagliklar yetarli ovqatlanishning yaxshi belgisidir.' },
   },
+  ka: {
+    sleep: { status: 'normal', note: 'ძილის ჩანაწერები გროვდება — განაგრძეთ დაკვირვება დღის განმავლობაში.' },
+    feeding: { status: 'normal', note: 'კვების ჩანაწერები გროვდება — შეეცადეთ, ყოველი კვება აღრიცხოთ.' },
+    diaper: { status: 'normal', note: 'საფენების ჩანაწერები გროვდება — სველი საფენები კარგი კვების კარგი მაჩვენებელია.' },
+  },
   de: {
     sleep: { status: 'normal', note: 'Schlafaufzeichnungen werden gesammelt — dokumentiere den Schlaf weiterhin über den Tag hinweg.' },
     feeding: { status: 'normal', note: 'Fütterungsaufzeichnungen werden gesammelt — versuche, jede Mahlzeit zu dokumentieren.' },
@@ -89,6 +94,7 @@ const LANG_CONF: Record<string, { outLang: string }> = {
   tr: { outLang: 'TURKISH' },
   kk: { outLang: 'KAZAKH' },
   uz: { outLang: 'UZBEK (Latin script)' },
+  ka: { outLang: 'GEORGIAN (ქართული, Mkhedruli script)' },
   de: { outLang: 'GERMAN' },
   ar: { outLang: 'ARABIC (feminine address to the mother)' },
 };

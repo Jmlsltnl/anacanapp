@@ -8,7 +8,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string; kk: string; uz: string; de: string; ar: string }> = {
+const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string; kk: string; uz: string; ka: string; de: string; ar: string }> = {
   '0-2': {
     az: 'Çox sadə cümlələr (3-5 söz). Təkrarlanan ifadələr. Heyvan səsləri. Rənglər və formalar. Nağıl 1-2 dəqiqəlik olsun.',
     en: 'Very simple sentences (3-5 words). Repetitive phrases. Animal sounds. Colors and shapes. Story should be 1-2 minutes.',
@@ -16,6 +16,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     tr: 'Çok basit cümleler (3-5 kelime). Tekrarlanan ifadeler. Hayvan sesleri. Renkler ve şekiller. Masal 1-2 dakika olsun.',
     kk: 'Өте қарапайым сөйлемдер (3-5 сөз). Қайталанатын тіркестер. Жануарлардың дыбыстары. Түстер мен пішіндер. Ертегі 1-2 минутқа созылсын.',
     uz: 'Juda sodda gaplar (3-5 soʻz). Takrorlanuvchi iboralar. Hayvon tovushlari. Ranglar va shakllar. Ertak 1-2 daqiqalik boʻlsin.',
+    ka: 'ძალიან მარტივი წინადადებები (3-5 სიტყვა). განმეორებადი ფრაზები. ცხოველების ხმები. ფერები და ფორმები. ზღაპარი 1-2 წუთიანი იყოს.',
     de: 'Sehr einfache Sätze (3–5 Wörter). Wiederkehrende Formulierungen. Tierlaute. Farben und Formen. Das Märchen sollte 1–2 Minuten lang sein.',
     ar: 'جمل بسيطة جدًا (٣-٥ كلمات). عبارات متكررة. أصوات الحيوانات. الألوان والأشكال. مدة الحكاية من دقيقة إلى دقيقتين.',
   },
@@ -26,6 +27,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     tr: 'Basit ama anlamlı cümleler. Diyaloglar olsun. Eğlenceli olaylar. Net eğitici mesaj. 3-4 dakikalık masal.',
     kk: 'Қарапайым, бірақ мағыналы сөйлемдер. Диалогтар болсын. Қызықты оқиғалар. Тәрбиелік ойы анық болсын. Ертегі 3-4 минутқа созылсын.',
     uz: 'Sodda, ammo mazmunli gaplar. Dialoglar boʻlsin. Qiziqarli voqealar. Tarbiyaviy gʻoya aniq boʻlsin. Ertak 3-4 daqiqalik boʻlsin.',
+    ka: 'მარტივი, მაგრამ შინაარსიანი წინადადებები. იყოს დიალოგები. სახალისო მოვლენები. აღმზრდელობითი გზავნილი ნათელი იყოს. 3-4 წუთიანი ზღაპარი.',
     de: 'Einfache, aber aussagekräftige Sätze. Mit Dialogen. Unterhaltsame Ereignisse. Die pädagogische Botschaft sollte klar sein. Ein 3–4-minütiges Märchen.',
     ar: 'جمل بسيطة وذات معنى. تضمين حوارات وأحداث ممتعة. يجب أن تكون الرسالة التربوية واضحة. مدة الحكاية من ٣ إلى ٤ دقائق.',
   },
@@ -36,6 +38,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     tr: 'Daha karmaşık olay örgüsü. Problem çözme süreci gösterilsin. Çocuğun düşünmesine yardımcı sorular. 4-6 dakikalık masal.',
     kk: 'Күрделірек оқиға желісі. Мәселені шешу үдерісі көрсетілсін. Баланың ойлануына көмектесетін сұрақтар. Ертегі 4-6 минутқа созылсын.',
     uz: 'Murakkabroq syujet chizigʻi. Muammoni hal qilish jarayoni koʻrsatilsin. Bolani oʻylashga undaydigan savollar. Ertak 4-6 daqiqalik boʻlsin.',
+    ka: 'უფრო რთული სიუჟეტური ხაზი. ნაჩვენები იყოს პრობლემის გადაჭრის პროცესი. კითხვები, რომლებიც ბავშვს დაფიქრებაში ეხმარება. 4-6 წუთიანი ზღაპარი.',
     de: 'Eine komplexere Handlung. Zeige den Prozess der Problemlösung. Fragen, die das Kind zum Nachdenken anregen. Ein 4–6-minütiges Märchen.',
     ar: 'حبكة أكثر تعقيدًا. توضيح عملية حل المشكلة. أسئلة تساعد الطفل على التفكير. مدة الحكاية من ٤ إلى ٦ دقائق.',
   },
@@ -46,6 +49,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
     tr: 'Zengin olay örgüsü. Ahlaki ikilemler ve seçimler. Duygusal derinlik. Daha uzun diyaloglar. 5-7 dakikalık masal.',
     kk: 'Мазмұнды оқиға желісі. Моральдық дилеммалар мен таңдау. Эмоциялық тереңдік. Ұзағырақ диалогтар. Ертегі 5-7 минутқа созылсын.',
     uz: 'Boy syujet. Axloqiy dilemmalar va tanlovlar. Hissiy teranlik. Uzunroq dialoglar. Ertak 5-7 daqiqalik boʻlsin.',
+    ka: 'მდიდარი სიუჟეტი. მორალური დილემები და არჩევანი. ემოციური სიღრმე. უფრო გრძელი დიალოგები. 5-7 წუთიანი ზღაპარი.',
     de: 'Eine vielschichtige Handlung. Moralische Dilemmas und Entscheidungen. Emotionale Tiefe. Längere Dialoge. Ein 5–7-minütiges Märchen.',
     ar: 'حبكة غنية. معضلة أخلاقية وخيارات. عمق عاطفي. حوارات أطول. مدة الحكاية من ٥ إلى ٧ دقائق.',
   },
@@ -296,6 +300,40 @@ Ertakning tuzilishi:
 
 Format: Birinchi qatorga sarlavhani, keyin ertak matnini yozing. Roʻyxat shaklida emas, xatboshilarga boʻlib yozing. Ertak OʻZBEK tilida (lotin yozuvida) boʻlishi kerak.`;
 
+    case 'ka':
+      return `თქვენ ხართ პრემიებით დაჯილდოებული საბავშვო წიგნების ავტორი. დაწერეთ ბავშვებისთვის საინტერესო, მაღალხარისხიანი ზღაპარი ლოგიკური სიუჟეტური განვითარებითა და პროფესიული თხრობის სტილით.
+
+ხარისხის კრიტიკული წესები:
+1. ბავშვის სახელია «${childName}». მთავარ გმირად ყოველთვის ზუსტად ეს სახელი გამოიყენეთ.
+2. ზღაპარს უნდა ჰქონდეს მკაფიო დასაწყისი, შუა ნაწილი და დასასრული — ლოგიკური მიზეზ-შედეგობრივი კავშირით.
+3. ყველა მოვლენას უნდა ჰქონდეს მიზეზი — შემთხვევითი ჯადოსნური გადაწყვეტები დაუშვებელია.
+4. პერსონაჟებს უნდა ჰქონდეთ თანმიმდევრული ხასიათი და მოტივაცია.
+5. აღმზრდელობითი გზავნილი მოვლენებიდან ბუნებრივად უნდა გამომდინარეობდეს — ხელოვნური დარიგება არ იყოს.
+6. გამოიყენეთ ცოცხალი, ხატოვანი ენა (ფერები, ხმები, სურნელები).
+7. ჩართეთ პერსონაჟის ხასიათის გამომხატველი შინაარსიანი დიალოგები.
+8. პრობლემა გმირის საკუთარი ძალისხმევით, გონიერებით ან პიროვნული ზრდით უნდა გადაიჭრას.
+9. «ისინი ბედნიერად ცხოვრობდნენ» ტიპის კლიშეები აკრძალულია — დაწერეთ კონკრეტული, დამაკმაყოფილებელი დასასრული.
+10. გაზვიადებული, ზედმეტად ამაღლებული აღწერები აკრძალულია. შეინარჩუნეთ თბილი, მაგრამ გულწრფელი ტონი.
+
+აკრძალულია:
+- უსახელო «პატარა მეგობარი», «ჯადოსნური არსება» ტიპის გამოთქმები
+- შემთხვევითი ჯადოსნური გადაწყვეტები
+- ქადაგების სტილის მორალური გაკვეთილები
+- ზედმეტად ტკბილი, ხელოვნური ენა
+- სიუჟეტური ხარვეზები ან ალოგიკური თანმიმდევრობა
+
+ზღაპრის სტრუქტურა:
+1. სათაური: «${childName} და [რაღაც]» ფორმით
+2. მოქმედების ადგილის აღწერა (სად და როდის, ემოციური დეტალებით)
+3. პერსონაჟების გაცნობა (ხასიათის თვისებებით)
+4. პრობლემა/გამოწვევა (ლოგიკური და ბავშვისთვის გასაგები)
+5. 2-3 მცდელობა/დაბრკოლება (თანდათან მზარდი სირთულით)
+6. კულმინაცია — გმირის ზრდა ან რაღაცის სწავლა
+7. მოვლენებიდან ლოგიკურად გამომდინარე გადაწყვეტა
+8. დამაკმაყოფილებელი დასასრული და ბუნებრივი აღმზრდელობითი დასკვნა${ageInstruction}
+
+ფორმატი: პირველ ხაზზე დაწერეთ სათაური, შემდეგ — ზღაპრის ტექსტი. დაწერეთ აბზაცებად, არა სიის სახით. ზღაპარი ქართულ ენაზე (მხედრული დამწერლობით) უნდა იყოს.`;
+
     default: // 'az'
       return `Sən mükafat almış uşaq kitabı müəllifiisən. Məntiqi süjet inkişafı və peşəkar anlatım tərzi ilə uşaqlar üçün maraqlı, keyfiyyətli nağıl yaz.
 
@@ -420,6 +458,19 @@ MUHIM:
 - Jonli tasvirlar, mazmunli dialoglar va qoniqarli yakun boʻlsin
 - Tarbiyaviy gʻoya sunʼiy emas, voqealardan TABIIY ravishda kelib chiqsin
 - Oʻzbek tili (lotin yozuvi) grammatika qoidalariga diqqat bilan rioya qiling`;
+
+    case 'ka':
+      return `ბავშვის სახელი: ${childName}${ageText}
+თემა: ${theme || 'ტყის თავგადასავალი'}
+დამხმარე პერსონაჟი: ${hero || 'ბრძენი ტყის ცხოველი'}
+აღმზრდელობითი გზავნილი: ${moralLesson || 'მეგობრობა და სიკეთე'}
+${styleText ? `სტილი: ${styleText}` : ''}
+
+მნიშვნელოვანია:
+- დაწერეთ პროფესიული, ლოგიკური ზღაპარი «${childName}»-ზე
+- იყოს ცოცხალი აღწერები, შინაარსიანი დიალოგები და დამაკმაყოფილებელი დასასრული
+- აღმზრდელობითი გზავნილი ხელოვნური კი არა, მოვლენებიდან ბუნებრივად გამომდინარეობდეს
+- ზუსტად დაიცავით ქართული ენის გრამატიკის წესები`;
 
     default: // 'az'
       return `Uşağın adı: ${childName}${ageText}
@@ -548,6 +599,7 @@ serve(async (req) => {
       tr: `${actualChildName}'in Masalı`,
       kk: `${actualChildName} туралы ертегі`,
       uz: `${actualChildName} haqida ertak`,
+      ka: `ზღაპარი ${actualChildName}-ზე`,
       de: `Das Märchen von ${actualChildName}`,
       ar: `حكاية ${actualChildName}`,
     };
