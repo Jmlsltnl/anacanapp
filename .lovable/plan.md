@@ -1,63 +1,28 @@
-## Məqsəd
+# Fetus şəkillərini bazadan idarə etmək (tətbiq yeniləmədən)
 
-Flow modulunda aşağıdakı 4 funksiyanı tam işlək hala gətirmək. Əvvəlki iclasda fayllar yaradılsa da, sən "heç nə qurulmayıb" dedin — ona görə hər birini sıfırdan audit edib, görünən/işləyən hala gətirəcəm.
+## Problem
+Hamiləlik (bump) rejimində 9 aylıq fetus şəkilləri hazırda tətbiqin daxilinə yığılmış SVG fayllardır (`src/assets/fetus/month-1.svg` ... `month-9.svg`). Onları dəyişmək üçün mağazaya yeni versiya göndərmək lazımdır. Admin paneldən dəyişilən və bütün cihazlarda avtomatik yenilənən şəkillər bazadan gəlməlidir.
 
----
+## Həll
 
-## 2. Tsikl Uzunluğu Trend Qrafiki + Anomaliya Aşkarlama
+### 1. Yeni cədvəl: `pregnancy_fetus_illustrations`
+- `month_number` (1–9, unikal), `image_url`, `is_active`, `title`/`description` + mövcud dil sütunları (`_en`, `_ru`, `_tr`, `_kk`, `_de`, `_ar`, `_ka`, `_uz` — digər məzmun cədvəlləri ilə eyni sxem)
+- GRANT + RLS: hamıya (anon + authenticated) oxuma açıq, yazma yalnız admin (`has_role`)
+- Mövcud 9 SVG-ni ilkin məlumat kimi storage-a yükləyib cədvələ salmaq (ki, admin heç nə etməsə belə hazırki görünüş qorunsun)
 
-**Fayllar:** `src/components/flow/CycleTrendChart.tsx`, `src/components/flow/CycleAnomalyBanner.tsx`
+### 2. Frontend: dinamik yükləmə
+- `useBabyMonthIllustrations.ts`-ə oxşar yeni hook: `useFetusIllustrationByMonth(month)` — `pregnancy_fetus_illustrations`-dan oxuyur, dil açarı keşə daxildir, 30 dəqiqəlik keş (mövcud nümunə ilə eyni)
+- `Dashboard.tsx`-də hamiləlik hero-sunda statik SVG importu yerinə bu hook istifadə olunur
+- **Fallback:** bazada şəkil yoxdursa və ya yüklənmə xətası olarsa, köhnə daxili SVG göstərilir — yəni offline/köhnə versiyada da heç nə sınmır
 
-- **Trend Chart:** Son 12 tsiklin uzunluğunu Recharts LineChart ilə göstər. ACOG normal diapazon xətləri (21–35 gün), orta uzunluq referans xətti, tooltip.
-- **Anomaliya Banner:** `useCycleStats` əsasında avtomatik yoxla:
-  - `<21 gün` → "Qısa tsikl" xəbərdarlığı (qırmızı)
-  - `>35 gün` → "Uzun tsikl" xəbərdarlığı (narıncı)
-  - `variation >7 gün` → "Nizamsız tsikl" (sarı)
-  - Hər biri üçün AI-yə sual göndər düyməsi (`navigate('/ai-chat?context=cycle_anomaly')`).
-- **Şərtlər:** Ən azı 2 tamamlanmış tsikl olmalıdır (yoxsa render olunmasın).
+### 3. Admin panel: "Fetus şəkilləri" bölməsi
+- Mövcud "Baby ay şəkilləri" (baby_month_illustrations) admin ekranının eyni sxemi ilə: ay seçimi, şəkil yükləmə (storage-a), aktiv/deaktiv, başlıq/təsvir dillərə görə
+- Yükləmə mövcud storage bucket (`assets`-də yeni `fetus-illustrations/` qovluğu) vasitəsilə
 
-## 3. Həb / Kontrasepsiya Xatırlatması
+## Nəticə
+Bundan sonra admin paneldən fetus şəklini dəyişdikdə, artıq quraşdırılmış bütün cihazlarda ən gec ~30 dəqiqəyə (və ya tətbiq yenidən açılanda) yeni şəkil görünür — mağaza yeniləməsi lazım deyil.
 
-**Fayl:** `src/components/flow/PillReminderCard.tsx`
-
-- `flow_reminders` cədvəlində `reminder_type='pill'` qeydi.
-- UI: Switch (aktiv/passiv), başlıq + vaxt redaktəsi, Capacitor `LocalNotifications` ilə hər gün təkrarlanan bildiriş.
-- Yaddaşda saxla → `useSaveFlowReminder` upsert.
-- Native olmayan platformada DB-də saxla, lakin bildiriş planlaşdırma atla.
-
-## 4. Period Gecikməsi Aşkarlama + AI Avtomatik Mesaj
-
-**Fayl:** `src/components/flow/PeriodDelayBanner.tsx`
-
-- Hesablama: `daysSinceLastPeriod > avgCycleLength + 3` → banner görünsün.
-- Banner məzmunu: gecikmə günü, "Hamiləlik testi etməyi düşünün" məsləhəti, "Anacan.AI ilə danış" CTA.
-- Throttle: `user_preferences.last_delay_notification_at` sahəsi ilə 24 saatda bir lokal bildiriş.
-- AI link: `?context=period_delay&days=X` parametrləri ilə.
-
-## 5. Simptom Pattern Analizi (Premium)
-
-**Fayl:** `src/components/flow/SymptomPatternReport.tsx`
-
-- Son 3 tsiklin `flow_daily_logs` qeydlərini analiz et.
-- Hər faza (menstrual/follicular/ovulation/luteal) üzrə top 5 simptomu say.
-- Bar chart və ya heat-map ilə vizuallaşdır.
-- `useSubscription` ilə premium-gating → premium olmayan istifadəçiyə blur + "Premium-a keç" CTA.
-
----
-
-## Yoxlama
-
-- FlowDashboard.tsx-da 4 komponentin doğru sırada göründüyünə əmin ol.
-- Hər birini DB datasız (boş state) və data ilə test et.
-- Bütün UI Azərbaycan dilində, Coral Orange + Warm Beige palitrası ilə.
-- Anacan.AI tonu: medical disclaimer "Anacan.AI" alt-mətnində, "Canım/Əzizim" yoxdur.
-
-## Technical Details
-
-- Recharts artıq quraşdırılıb (CycleTrendChart-da istifadə olunur).
-- `@capacitor/local-notifications` artıq layihədə var.
-- `flow_reminders` cədvəli `reminder_type` TEXT — `'pill'` dəyəri əlavə miqrasiya tələb etmir.
-- `user_preferences.last_delay_notification_at` sütunu artıq miqrasiya ilə əlavə olunub (`20260609094030`).
-- Premium status: `useSubscription().isPremium`.
-
-İclas başlayanda hər faylı yenidən oxuyub itkin/yarıq hissələri tamamlayacam, sonra preview-də vizual yoxlama edəcəm.
+## Texniki detallar
+- Dəyişən fayllar: yeni migration, `src/hooks/useFetusIllustrations.ts` (yeni), `src/components/Dashboard.tsx` (hero görüntü mənbəyi), admin paneldə yeni idarəetmə ekranı + menyu bəndi
+- Migration-da GRANT/RLS qaydaları tam əməl olunur
+- Keş: React Query `staleTime` 30 dəq (istənilən vaxt azaldıla bilər)
