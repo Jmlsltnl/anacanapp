@@ -151,6 +151,7 @@ const menuGroups: MenuGroup[] = [
   { id: 'banners', label: tr("adminlayout_bannerler_efc415", "Bannerlər"), icon: Megaphone },
   { id: 'branding', label: 'Branding', icon: Image },
   { id: 'baby-illustrations', label: tr("adminlayout_korpe_illustrasiyalari_1abfaa", "Körpə İllustrasiyaları"), icon: Baby },
+  { id: 'fetus-illustrations', label: tr("adminlayout_fetus_sekilleri", "Fetus Şəkilləri"), icon: Baby },
   { id: 'fruit-images', label: tr("adminlayout_korpe_olcusu_sekilleri_103ec8", "Körpə Ölçüsü Şəkilləri"), icon: Baby }]
 
 },

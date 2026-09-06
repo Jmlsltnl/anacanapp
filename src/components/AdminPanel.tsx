@@ -50,6 +50,7 @@ import AdminDefaultShoppingItems from './admin/AdminDefaultShoppingItems';
 import AdminPremiumConfig from './admin/AdminPremiumConfig';
 import AdminMaternityBenefits from './admin/AdminMaternityBenefits';
 import AdminBabyIllustrations from './admin/AdminBabyIllustrations';
+import AdminFetusIllustrations from './admin/AdminFetusIllustrations';
 import AdminBabyCrisisCalendar from './admin/AdminBabyCrisisCalendar';
 import AdminPhaseTips from './admin/AdminPhaseTips';
 import AdminTeething from './admin/AdminTeething';
@@ -181,6 +182,8 @@ const AdminPanel = ({ onExit }: AdminPanelProps) => {
         return <AdminMaternityBenefits />;
       case 'baby-illustrations':
         return <AdminBabyIllustrations />;
+      case 'fetus-illustrations':
+        return <AdminFetusIllustrations />;
       case 'crisis-calendar':
         return <AdminBabyCrisisCalendar />;
       case 'phase-tips':
