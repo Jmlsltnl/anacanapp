@@ -75,6 +75,7 @@ import FetusMonth8 from '@/assets/fetus/month-8.svg';
 import FetusMonth9 from '@/assets/fetus/month-9.svg';
 import { tr } from "@/lib/tr";
 import { useDisabledTools } from '@/hooks/useDisabledTools';
+import { useFetusIllustrationByMonth } from '@/hooks/useFetusIllustrations';
 
 const FETUS_IMAGES: {[key: number]: string;} = {
   1: FetusMonth1,
@@ -293,6 +294,12 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
 
   const weekData = getFruitData();
 
+  // Fetus şəkli: bazadan (admin paneldən idarə olunur, tətbiq
+  // yeniləmədən dəyişir). Bazada yoxdursa daxili SVG fallback işləyir.
+  const fetusMonth = Math.min(Math.ceil(selectedWeek / 4.4), 9);
+  const fetusImageFromDb = useFetusIllustrationByMonth(fetusMonth);
+  const fetusImageSrc = fetusImageFromDb || FETUS_IMAGES[fetusMonth] || FETUS_IMAGES[1];
+
   // For progress bar and development milestones, use actual current day
   const daysLeft = daysUntilDueFromSelected;
   const totalDays = 280;
@@ -350,7 +357,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
             <span style={{ fontSize: 13 }}>💗</span>
           </span>
           <motion.img
-            src={FETUS_IMAGES[Math.min(Math.ceil(selectedWeek / 4.4), 9)] || FETUS_IMAGES[1]}
+            src={fetusImageSrc}
             alt={`${selectedWeek} ${tr("dashboard_week_baby", "həftəlik körpə")}`}
             style={{ width: 156, height: 156, objectFit: 'contain', filter: 'drop-shadow(0 18px 22px rgba(217, 108, 74, 0.3))' }}
             initial={{ scale: 0.8, opacity: 0 }}
