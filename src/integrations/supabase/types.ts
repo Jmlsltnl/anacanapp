@@ -9774,6 +9774,93 @@ export type Database = {
         }
         Relationships: []
       }
+      pregnancy_fetus_illustrations: {
+        Row: {
+          created_at: string
+          description: string | null
+          description_ar: string | null
+          description_az: string | null
+          description_de: string | null
+          description_en: string | null
+          description_ka: string | null
+          description_kk: string | null
+          description_ru: string | null
+          description_tr: string | null
+          description_uz: string | null
+          id: string
+          image_url: string
+          is_active: boolean
+          month_number: number
+          title: string | null
+          title_ar: string | null
+          title_az: string | null
+          title_de: string | null
+          title_en: string | null
+          title_ka: string | null
+          title_kk: string | null
+          title_ru: string | null
+          title_tr: string | null
+          title_uz: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          description_ar?: string | null
+          description_az?: string | null
+          description_de?: string | null
+          description_en?: string | null
+          description_ka?: string | null
+          description_kk?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
+          description_uz?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean
+          month_number: number
+          title?: string | null
+          title_ar?: string | null
+          title_az?: string | null
+          title_de?: string | null
+          title_en?: string | null
+          title_ka?: string | null
+          title_kk?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
+          title_uz?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          description_ar?: string | null
+          description_az?: string | null
+          description_de?: string | null
+          description_en?: string | null
+          description_ka?: string | null
+          description_kk?: string | null
+          description_ru?: string | null
+          description_tr?: string | null
+          description_uz?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          month_number?: number
+          title?: string | null
+          title_ar?: string | null
+          title_az?: string | null
+          title_de?: string | null
+          title_en?: string | null
+          title_ka?: string | null
+          title_kk?: string | null
+          title_ru?: string | null
+          title_tr?: string | null
+          title_uz?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       premium_features: {
         Row: {
           created_at: string | null
