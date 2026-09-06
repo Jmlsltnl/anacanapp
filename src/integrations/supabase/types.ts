@@ -21,6 +21,7 @@ export type Database = {
           category_ar: string | null
           category_de: string | null
           category_en: string | null
+          category_ka: string | null
           category_kk: string | null
           category_ru: string | null
           category_tr: string | null
@@ -31,6 +32,7 @@ export type Database = {
           description_ar: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -41,6 +43,7 @@ export type Database = {
           ingredients_ar: Json | null
           ingredients_de: Json | null
           ingredients_en: Json | null
+          ingredients_ka: Json | null
           ingredients_kk: Json | null
           ingredients_ru: Json | null
           ingredients_tr: Json | null
@@ -49,6 +52,7 @@ export type Database = {
           instructions_ar: Json | null
           instructions_de: Json | null
           instructions_en: Json | null
+          instructions_ka: Json | null
           instructions_kk: Json | null
           instructions_ru: Json | null
           instructions_tr: Json | null
@@ -60,6 +64,7 @@ export type Database = {
           tags_ar: string[] | null
           tags_de: string[] | null
           tags_en: string[] | null
+          tags_ka: string[] | null
           tags_kk: string[] | null
           tags_ru: string[] | null
           tags_tr: string[] | null
@@ -68,6 +73,7 @@ export type Database = {
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -80,6 +86,7 @@ export type Database = {
           category_ar?: string | null
           category_de?: string | null
           category_en?: string | null
+          category_ka?: string | null
           category_kk?: string | null
           category_ru?: string | null
           category_tr?: string | null
@@ -90,6 +97,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -100,6 +108,7 @@ export type Database = {
           ingredients_ar?: Json | null
           ingredients_de?: Json | null
           ingredients_en?: Json | null
+          ingredients_ka?: Json | null
           ingredients_kk?: Json | null
           ingredients_ru?: Json | null
           ingredients_tr?: Json | null
@@ -108,6 +117,7 @@ export type Database = {
           instructions_ar?: Json | null
           instructions_de?: Json | null
           instructions_en?: Json | null
+          instructions_ka?: Json | null
           instructions_kk?: Json | null
           instructions_ru?: Json | null
           instructions_tr?: Json | null
@@ -119,6 +129,7 @@ export type Database = {
           tags_ar?: string[] | null
           tags_de?: string[] | null
           tags_en?: string[] | null
+          tags_ka?: string[] | null
           tags_kk?: string[] | null
           tags_ru?: string[] | null
           tags_tr?: string[] | null
@@ -127,6 +138,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -139,6 +151,7 @@ export type Database = {
           category_ar?: string | null
           category_de?: string | null
           category_en?: string | null
+          category_ka?: string | null
           category_kk?: string | null
           category_ru?: string | null
           category_tr?: string | null
@@ -149,6 +162,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -159,6 +173,7 @@ export type Database = {
           ingredients_ar?: Json | null
           ingredients_de?: Json | null
           ingredients_en?: Json | null
+          ingredients_ka?: Json | null
           ingredients_kk?: Json | null
           ingredients_ru?: Json | null
           ingredients_tr?: Json | null
@@ -167,6 +182,7 @@ export type Database = {
           instructions_ar?: Json | null
           instructions_de?: Json | null
           instructions_en?: Json | null
+          instructions_ka?: Json | null
           instructions_kk?: Json | null
           instructions_ru?: Json | null
           instructions_tr?: Json | null
@@ -178,6 +194,7 @@ export type Database = {
           tags_ar?: string[] | null
           tags_de?: string[] | null
           tags_en?: string[] | null
+          tags_ka?: string[] | null
           tags_kk?: string[] | null
           tags_ru?: string[] | null
           tags_tr?: string[] | null
@@ -186,6 +203,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -433,6 +451,7 @@ export type Database = {
           question_az: string | null
           question_de: string | null
           question_en: string | null
+          question_ka: string | null
           question_kk: string | null
           question_ru: string | null
           question_tr: string | null
@@ -453,6 +472,7 @@ export type Database = {
           question_az?: string | null
           question_de?: string | null
           question_en?: string | null
+          question_ka?: string | null
           question_kk?: string | null
           question_ru?: string | null
           question_tr?: string | null
@@ -473,6 +493,7 @@ export type Database = {
           question_az?: string | null
           question_de?: string | null
           question_en?: string | null
+          question_ka?: string | null
           question_kk?: string | null
           question_ru?: string | null
           question_tr?: string | null
@@ -824,6 +845,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -840,6 +862,7 @@ export type Database = {
           symptoms_az: string[] | null
           symptoms_de: string | null
           symptoms_en: string | null
+          symptoms_ka: string | null
           symptoms_kk: string | null
           symptoms_ru: string | null
           symptoms_tr: string | null
@@ -849,6 +872,7 @@ export type Database = {
           tips_az: string[] | null
           tips_de: string | null
           tips_en: string | null
+          tips_ka: string | null
           tips_kk: string | null
           tips_ru: string | null
           tips_tr: string | null
@@ -858,6 +882,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -874,6 +899,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -890,6 +916,7 @@ export type Database = {
           symptoms_az?: string[] | null
           symptoms_de?: string | null
           symptoms_en?: string | null
+          symptoms_ka?: string | null
           symptoms_kk?: string | null
           symptoms_ru?: string | null
           symptoms_tr?: string | null
@@ -899,6 +926,7 @@ export type Database = {
           tips_az?: string[] | null
           tips_de?: string | null
           tips_en?: string | null
+          tips_ka?: string | null
           tips_kk?: string | null
           tips_ru?: string | null
           tips_tr?: string | null
@@ -908,6 +936,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -924,6 +953,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -940,6 +970,7 @@ export type Database = {
           symptoms_az?: string[] | null
           symptoms_de?: string | null
           symptoms_en?: string | null
+          symptoms_ka?: string | null
           symptoms_kk?: string | null
           symptoms_ru?: string | null
           symptoms_tr?: string | null
@@ -949,6 +980,7 @@ export type Database = {
           tips_az?: string[] | null
           tips_de?: string | null
           tips_en?: string | null
+          tips_ka?: string | null
           tips_kk?: string | null
           tips_ru?: string | null
           tips_tr?: string | null
@@ -958,6 +990,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -977,6 +1010,7 @@ export type Database = {
           info_ar: string | null
           info_de: string | null
           info_en: string | null
+          info_ka: string | null
           info_kk: string | null
           info_ru: string | null
           info_tr: string | null
@@ -992,6 +1026,7 @@ export type Database = {
           info_ar?: string | null
           info_de?: string | null
           info_en?: string | null
+          info_ka?: string | null
           info_kk?: string | null
           info_ru?: string | null
           info_tr?: string | null
@@ -1007,6 +1042,7 @@ export type Database = {
           info_ar?: string | null
           info_de?: string | null
           info_en?: string | null
+          info_ka?: string | null
           info_kk?: string | null
           info_ru?: string | null
           info_tr?: string | null
@@ -1156,6 +1192,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -1168,6 +1205,7 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_ka: string | null
           label_kk: string | null
           label_ru: string | null
           label_tr: string | null
@@ -1183,6 +1221,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -1195,6 +1234,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -1210,6 +1250,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -1222,6 +1263,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -1240,6 +1282,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -1254,6 +1297,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -1267,6 +1311,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -1281,6 +1326,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -1294,6 +1340,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -1308,6 +1355,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -1328,6 +1376,7 @@ export type Database = {
           meaning_az: string | null
           meaning_de: string | null
           meaning_en: string | null
+          meaning_ka: string | null
           meaning_kk: string | null
           meaning_ru: string | null
           meaning_tr: string | null
@@ -1337,6 +1386,7 @@ export type Database = {
           origin_ar: string | null
           origin_de: string | null
           origin_en: string | null
+          origin_ka: string | null
           origin_kk: string | null
           origin_ru: string | null
           origin_tr: string | null
@@ -1354,6 +1404,7 @@ export type Database = {
           meaning_az?: string | null
           meaning_de?: string | null
           meaning_en?: string | null
+          meaning_ka?: string | null
           meaning_kk?: string | null
           meaning_ru?: string | null
           meaning_tr?: string | null
@@ -1363,6 +1414,7 @@ export type Database = {
           origin_ar?: string | null
           origin_de?: string | null
           origin_en?: string | null
+          origin_ka?: string | null
           origin_kk?: string | null
           origin_ru?: string | null
           origin_tr?: string | null
@@ -1380,6 +1432,7 @@ export type Database = {
           meaning_az?: string | null
           meaning_de?: string | null
           meaning_en?: string | null
+          meaning_ka?: string | null
           meaning_kk?: string | null
           meaning_ru?: string | null
           meaning_tr?: string | null
@@ -1389,6 +1442,7 @@ export type Database = {
           origin_ar?: string | null
           origin_de?: string | null
           origin_en?: string | null
+          origin_ka?: string | null
           origin_kk?: string | null
           origin_ru?: string | null
           origin_tr?: string | null
@@ -1438,6 +1492,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -1449,6 +1504,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -1469,6 +1525,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -1480,6 +1537,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -1500,6 +1558,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -1511,6 +1570,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -1686,6 +1746,7 @@ export type Database = {
           description_ar: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -1697,6 +1758,7 @@ export type Database = {
           name_ar: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -1711,6 +1773,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -1722,6 +1785,7 @@ export type Database = {
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -1736,6 +1800,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -1747,6 +1812,7 @@ export type Database = {
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -1942,6 +2008,7 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_ka: string | null
           content_kk: string | null
           content_ru: string | null
           content_tr: string | null
@@ -1955,6 +2022,7 @@ export type Database = {
           excerpt_az: string | null
           excerpt_de: string | null
           excerpt_en: string | null
+          excerpt_ka: string | null
           excerpt_kk: string | null
           excerpt_ru: string | null
           excerpt_tr: string | null
@@ -1974,6 +2042,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -1992,6 +2061,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -2005,6 +2075,7 @@ export type Database = {
           excerpt_az?: string | null
           excerpt_de?: string | null
           excerpt_en?: string | null
+          excerpt_ka?: string | null
           excerpt_kk?: string | null
           excerpt_ru?: string | null
           excerpt_tr?: string | null
@@ -2024,6 +2095,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -2042,6 +2114,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -2055,6 +2128,7 @@ export type Database = {
           excerpt_az?: string | null
           excerpt_de?: string | null
           excerpt_en?: string | null
+          excerpt_ka?: string | null
           excerpt_kk?: string | null
           excerpt_ru?: string | null
           excerpt_tr?: string | null
@@ -2074,6 +2148,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -2163,6 +2238,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -2179,6 +2255,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -2199,6 +2276,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -2215,6 +2293,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -2235,6 +2314,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -2251,6 +2331,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -2385,6 +2466,7 @@ export type Database = {
           description_ar: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -2398,6 +2480,7 @@ export type Database = {
           milestone_label_ar: string | null
           milestone_label_de: string | null
           milestone_label_en: string | null
+          milestone_label_ka: string | null
           milestone_label_kk: string | null
           milestone_label_ru: string | null
           milestone_label_tr: string | null
@@ -2408,6 +2491,7 @@ export type Database = {
           name_ar: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -2424,6 +2508,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -2437,6 +2522,7 @@ export type Database = {
           milestone_label_ar?: string | null
           milestone_label_de?: string | null
           milestone_label_en?: string | null
+          milestone_label_ka?: string | null
           milestone_label_kk?: string | null
           milestone_label_ru?: string | null
           milestone_label_tr?: string | null
@@ -2447,6 +2533,7 @@ export type Database = {
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -2463,6 +2550,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -2476,6 +2564,7 @@ export type Database = {
           milestone_label_ar?: string | null
           milestone_label_de?: string | null
           milestone_label_en?: string | null
+          milestone_label_ka?: string | null
           milestone_label_kk?: string | null
           milestone_label_ru?: string | null
           milestone_label_tr?: string | null
@@ -2486,6 +2575,7 @@ export type Database = {
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -2641,6 +2731,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -2660,6 +2751,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -2679,6 +2771,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -3360,6 +3453,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -3379,6 +3473,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -3398,6 +3493,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -3416,6 +3512,7 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_ka: string | null
           content_kk: string | null
           content_ru: string | null
           content_tr: string | null
@@ -3430,6 +3527,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -3442,6 +3540,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -3456,6 +3555,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -3468,6 +3568,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -3482,6 +3583,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -3595,6 +3697,7 @@ export type Database = {
           question_text_az: string | null
           question_text_de: string | null
           question_text_en: string | null
+          question_text_ka: string | null
           question_text_kk: string | null
           question_text_ru: string | null
           question_text_tr: string | null
@@ -3613,6 +3716,7 @@ export type Database = {
           question_text_az?: string | null
           question_text_de?: string | null
           question_text_en?: string | null
+          question_text_ka?: string | null
           question_text_kk?: string | null
           question_text_ru?: string | null
           question_text_tr?: string | null
@@ -3631,6 +3735,7 @@ export type Database = {
           question_text_az?: string | null
           question_text_de?: string | null
           question_text_en?: string | null
+          question_text_ka?: string | null
           question_text_kk?: string | null
           question_text_ru?: string | null
           question_text_tr?: string | null
@@ -3719,6 +3824,7 @@ export type Database = {
           description_ar: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -3739,6 +3845,7 @@ export type Database = {
           postpartum_week_start: number | null
           sort_order: number | null
           steps: Json | null
+          steps_ka: string[] | null
           steps_uz: Json | null
           trimester: number[] | null
           updated_at: string | null
@@ -3750,6 +3857,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -3770,6 +3878,7 @@ export type Database = {
           postpartum_week_start?: number | null
           sort_order?: number | null
           steps?: Json | null
+          steps_ka?: string[] | null
           steps_uz?: Json | null
           trimester?: number[] | null
           updated_at?: string | null
@@ -3781,6 +3890,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -3801,6 +3911,7 @@ export type Database = {
           postpartum_week_start?: number | null
           sort_order?: number | null
           steps?: Json | null
+          steps_ka?: string[] | null
           steps_uz?: Json | null
           trimester?: number[] | null
           updated_at?: string | null
@@ -3815,6 +3926,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -3827,6 +3939,7 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -3840,6 +3953,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -3852,6 +3966,7 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -3865,6 +3980,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -3877,6 +3993,7 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -3943,6 +4060,7 @@ export type Database = {
           answer_az: string | null
           answer_de: string | null
           answer_en: string | null
+          answer_ka: string | null
           answer_kk: string | null
           answer_ru: string | null
           answer_tr: string | null
@@ -3956,6 +4074,7 @@ export type Database = {
           question_az: string | null
           question_de: string | null
           question_en: string | null
+          question_ka: string | null
           question_kk: string | null
           question_ru: string | null
           question_tr: string | null
@@ -3968,6 +4087,7 @@ export type Database = {
           answer_az?: string | null
           answer_de?: string | null
           answer_en?: string | null
+          answer_ka?: string | null
           answer_kk?: string | null
           answer_ru?: string | null
           answer_tr?: string | null
@@ -3981,6 +4101,7 @@ export type Database = {
           question_az?: string | null
           question_de?: string | null
           question_en?: string | null
+          question_ka?: string | null
           question_kk?: string | null
           question_ru?: string | null
           question_tr?: string | null
@@ -3993,6 +4114,7 @@ export type Database = {
           answer_az?: string | null
           answer_de?: string | null
           answer_en?: string | null
+          answer_ka?: string | null
           answer_kk?: string | null
           answer_ru?: string | null
           answer_tr?: string | null
@@ -4006,6 +4128,7 @@ export type Database = {
           question_az?: string | null
           question_de?: string | null
           question_en?: string | null
+          question_ka?: string | null
           question_kk?: string | null
           question_ru?: string | null
           question_tr?: string | null
@@ -4082,6 +4205,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -4096,6 +4220,7 @@ export type Database = {
           title_az: string
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -4108,6 +4233,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -4122,6 +4248,7 @@ export type Database = {
           title_az: string
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -4134,6 +4261,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -4148,6 +4276,7 @@ export type Database = {
           title_az?: string
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -4167,6 +4296,7 @@ export type Database = {
           instruction_az: string
           instruction_de: string | null
           instruction_en: string | null
+          instruction_ka: string | null
           instruction_kk: string | null
           instruction_ru: string | null
           instruction_tr: string | null
@@ -4179,6 +4309,7 @@ export type Database = {
           title_az: string
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -4195,6 +4326,7 @@ export type Database = {
           instruction_az: string
           instruction_de?: string | null
           instruction_en?: string | null
+          instruction_ka?: string | null
           instruction_kk?: string | null
           instruction_ru?: string | null
           instruction_tr?: string | null
@@ -4207,6 +4339,7 @@ export type Database = {
           title_az: string
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -4223,6 +4356,7 @@ export type Database = {
           instruction_az?: string
           instruction_de?: string | null
           instruction_en?: string | null
+          instruction_ka?: string | null
           instruction_kk?: string | null
           instruction_ru?: string | null
           instruction_tr?: string | null
@@ -4235,6 +4369,7 @@ export type Database = {
           title_az?: string
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -4321,6 +4456,7 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_ka: string | null
           content_kk: string | null
           content_ru: string | null
           content_tr: string | null
@@ -4336,6 +4472,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -4348,6 +4485,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -4363,6 +4501,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -4375,6 +4514,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -4390,6 +4530,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -4411,6 +4552,7 @@ export type Database = {
           tip_text_az: string | null
           tip_text_de: string | null
           tip_text_en: string | null
+          tip_text_ka: string | null
           tip_text_kk: string | null
           tip_text_ru: string | null
           tip_text_tr: string | null
@@ -4429,6 +4571,7 @@ export type Database = {
           tip_text_az?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_ka?: string | null
           tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
@@ -4447,6 +4590,7 @@ export type Database = {
           tip_text_az?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_ka?: string | null
           tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
@@ -4556,6 +4700,7 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_ka: string | null
           label_kk: string | null
           label_ru: string | null
           label_tr: string | null
@@ -4574,6 +4719,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -4592,6 +4738,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -4763,6 +4910,7 @@ export type Database = {
           address_az: string | null
           address_de: string | null
           address_en: string | null
+          address_ka: string | null
           address_kk: string | null
           address_ru: string | null
           address_tr: string | null
@@ -4775,6 +4923,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -4791,6 +4940,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -4806,6 +4956,7 @@ export type Database = {
           specialty_az: string | null
           specialty_de: string | null
           specialty_en: string | null
+          specialty_ka: string | null
           specialty_kk: string | null
           specialty_ru: string | null
           specialty_tr: string | null
@@ -4821,6 +4972,7 @@ export type Database = {
           address_az?: string | null
           address_de?: string | null
           address_en?: string | null
+          address_ka?: string | null
           address_kk?: string | null
           address_ru?: string | null
           address_tr?: string | null
@@ -4833,6 +4985,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -4849,6 +5002,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -4864,6 +5018,7 @@ export type Database = {
           specialty_az?: string | null
           specialty_de?: string | null
           specialty_en?: string | null
+          specialty_ka?: string | null
           specialty_kk?: string | null
           specialty_ru?: string | null
           specialty_tr?: string | null
@@ -4879,6 +5034,7 @@ export type Database = {
           address_az?: string | null
           address_de?: string | null
           address_en?: string | null
+          address_ka?: string | null
           address_kk?: string | null
           address_ru?: string | null
           address_tr?: string | null
@@ -4891,6 +5047,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -4907,6 +5064,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -4922,6 +5080,7 @@ export type Database = {
           specialty_az?: string | null
           specialty_de?: string | null
           specialty_en?: string | null
+          specialty_ka?: string | null
           specialty_kk?: string | null
           specialty_ru?: string | null
           specialty_tr?: string | null
@@ -5124,6 +5283,7 @@ export type Database = {
           item_name_az: string | null
           item_name_de: string | null
           item_name_en: string | null
+          item_name_ka: string | null
           item_name_kk: string | null
           item_name_ru: string | null
           item_name_tr: string | null
@@ -5132,6 +5292,7 @@ export type Database = {
           notes_ar: string | null
           notes_de: string | null
           notes_en: string | null
+          notes_ka: string | null
           notes_kk: string | null
           notes_ru: string | null
           notes_tr: string | null
@@ -5151,6 +5312,7 @@ export type Database = {
           item_name_az?: string | null
           item_name_de?: string | null
           item_name_en?: string | null
+          item_name_ka?: string | null
           item_name_kk?: string | null
           item_name_ru?: string | null
           item_name_tr?: string | null
@@ -5159,6 +5321,7 @@ export type Database = {
           notes_ar?: string | null
           notes_de?: string | null
           notes_en?: string | null
+          notes_ka?: string | null
           notes_kk?: string | null
           notes_ru?: string | null
           notes_tr?: string | null
@@ -5178,6 +5341,7 @@ export type Database = {
           item_name_az?: string | null
           item_name_de?: string | null
           item_name_en?: string | null
+          item_name_ka?: string | null
           item_name_kk?: string | null
           item_name_ru?: string | null
           item_name_tr?: string | null
@@ -5186,6 +5350,7 @@ export type Database = {
           notes_ar?: string | null
           notes_de?: string | null
           notes_en?: string | null
+          notes_ka?: string | null
           notes_kk?: string | null
           notes_ru?: string | null
           notes_tr?: string | null
@@ -5204,6 +5369,7 @@ export type Database = {
           description_ar: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -5217,6 +5383,7 @@ export type Database = {
           subtitle_ar: string | null
           subtitle_de: string | null
           subtitle_en: string | null
+          subtitle_ka: string | null
           subtitle_kk: string | null
           subtitle_ru: string | null
           subtitle_tr: string | null
@@ -5225,6 +5392,7 @@ export type Database = {
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -5238,6 +5406,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -5251,6 +5420,7 @@ export type Database = {
           subtitle_ar?: string | null
           subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_ka?: string | null
           subtitle_kk?: string | null
           subtitle_ru?: string | null
           subtitle_tr?: string | null
@@ -5259,6 +5429,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -5272,6 +5443,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -5285,6 +5457,7 @@ export type Database = {
           subtitle_ar?: string | null
           subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_ka?: string | null
           subtitle_kk?: string | null
           subtitle_ru?: string | null
           subtitle_tr?: string | null
@@ -5293,6 +5466,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -5338,6 +5512,7 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_ka: string | null
           content_kk: string | null
           content_ru: string | null
           content_tr: string | null
@@ -5352,6 +5527,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -5365,6 +5541,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -5379,6 +5556,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -5392,6 +5570,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -5406,6 +5585,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -5617,6 +5797,7 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_ka: string | null
           content_kk: string | null
           content_ru: string | null
           content_tr: string | null
@@ -5631,6 +5812,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -5644,6 +5826,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -5658,6 +5841,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -5671,6 +5855,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -5685,6 +5870,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -5742,6 +5928,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -5761,6 +5948,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -5780,6 +5968,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -5795,6 +5984,7 @@ export type Database = {
           content: string
           content_az: string | null
           content_en: string | null
+          content_ka: string | null
           content_ru: string | null
           content_tr: string | null
           content_uz: string | null
@@ -5807,6 +5997,7 @@ export type Database = {
           title: string
           title_az: string | null
           title_en: string | null
+          title_ka: string | null
           title_ru: string | null
           title_tr: string | null
           title_uz: string | null
@@ -5817,6 +6008,7 @@ export type Database = {
           content: string
           content_az?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_ru?: string | null
           content_tr?: string | null
           content_uz?: string | null
@@ -5829,6 +6021,7 @@ export type Database = {
           title: string
           title_az?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_ru?: string | null
           title_tr?: string | null
           title_uz?: string | null
@@ -5839,6 +6032,7 @@ export type Database = {
           content?: string
           content_az?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_ru?: string | null
           content_tr?: string | null
           content_uz?: string | null
@@ -5851,6 +6045,7 @@ export type Database = {
           title?: string
           title_az?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_ru?: string | null
           title_tr?: string | null
           title_uz?: string | null
@@ -5871,6 +6066,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -5883,6 +6079,7 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -5904,6 +6101,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -5916,6 +6114,7 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -5937,6 +6136,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -5949,6 +6149,7 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -5967,6 +6168,7 @@ export type Database = {
           address_az: string | null
           address_de: string | null
           address_en: string | null
+          address_ka: string | null
           address_kk: string | null
           address_ru: string | null
           address_tr: string | null
@@ -5980,6 +6182,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -6004,6 +6207,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -6020,6 +6224,7 @@ export type Database = {
           address_az?: string | null
           address_de?: string | null
           address_en?: string | null
+          address_ka?: string | null
           address_kk?: string | null
           address_ru?: string | null
           address_tr?: string | null
@@ -6033,6 +6238,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -6057,6 +6263,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -6073,6 +6280,7 @@ export type Database = {
           address_az?: string | null
           address_de?: string | null
           address_en?: string | null
+          address_ka?: string | null
           address_kk?: string | null
           address_ru?: string | null
           address_tr?: string | null
@@ -6086,6 +6294,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -6110,6 +6319,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -6132,6 +6342,7 @@ export type Database = {
           message_ar: string | null
           message_de: string | null
           message_en: string | null
+          message_ka: string | null
           message_kk: string | null
           message_ru: string | null
           message_tr: string | null
@@ -6147,6 +6358,7 @@ export type Database = {
           message_ar?: string | null
           message_de?: string | null
           message_en?: string | null
+          message_ka?: string | null
           message_kk?: string | null
           message_ru?: string | null
           message_tr?: string | null
@@ -6162,6 +6374,7 @@ export type Database = {
           message_ar?: string | null
           message_de?: string | null
           message_en?: string | null
+          message_ka?: string | null
           message_kk?: string | null
           message_ru?: string | null
           message_tr?: string | null
@@ -6176,6 +6389,7 @@ export type Database = {
           body_ar: string | null
           body_de: string | null
           body_en: string | null
+          body_ka: string | null
           body_kk: string | null
           body_ru: string | null
           body_tr: string | null
@@ -6190,6 +6404,7 @@ export type Database = {
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -6201,6 +6416,7 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_ka?: string | null
           body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
@@ -6215,6 +6431,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -6226,6 +6443,7 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_ka?: string | null
           body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
@@ -6240,6 +6458,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -6290,6 +6509,7 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_ka: string | null
           label_kk: string | null
           label_ru: string | null
           label_tr: string | null
@@ -6308,6 +6528,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -6326,6 +6547,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -6347,6 +6569,7 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_ka: string | null
           label_kk: string | null
           label_ru: string | null
           label_tr: string | null
@@ -6364,6 +6587,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -6381,6 +6605,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -6401,6 +6626,7 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_ka: string | null
           label_kk: string | null
           label_ru: string | null
           label_tr: string | null
@@ -6419,6 +6645,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -6437,6 +6664,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -6518,6 +6746,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -6530,6 +6759,7 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_ka: string | null
           label_kk: string | null
           label_ru: string | null
           label_tr: string | null
@@ -6547,6 +6777,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -6559,6 +6790,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -6576,6 +6808,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -6588,6 +6821,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -6751,6 +6985,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -6769,6 +7004,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -6787,6 +7023,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -6807,6 +7044,7 @@ export type Database = {
           content_ar: string | null
           content_de: string | null
           content_en: string | null
+          content_ka: string | null
           content_kk: string | null
           content_ru: string | null
           content_tr: string | null
@@ -6819,6 +7057,7 @@ export type Database = {
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -6833,6 +7072,7 @@ export type Database = {
           content_ar?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -6845,6 +7085,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -6859,6 +7100,7 @@ export type Database = {
           content_ar?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -6871,6 +7113,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -6889,6 +7132,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -6904,6 +7148,7 @@ export type Database = {
           subtitle_az: string | null
           subtitle_de: string | null
           subtitle_en: string | null
+          subtitle_ka: string | null
           subtitle_kk: string | null
           subtitle_ru: string | null
           subtitle_tr: string | null
@@ -6913,6 +7158,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -6926,6 +7172,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -6941,6 +7188,7 @@ export type Database = {
           subtitle_az?: string | null
           subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_ka?: string | null
           subtitle_kk?: string | null
           subtitle_ru?: string | null
           subtitle_tr?: string | null
@@ -6950,6 +7198,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -6963,6 +7212,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -6978,6 +7228,7 @@ export type Database = {
           subtitle_az?: string | null
           subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_ka?: string | null
           subtitle_kk?: string | null
           subtitle_ru?: string | null
           subtitle_tr?: string | null
@@ -6987,6 +7238,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -7150,6 +7402,7 @@ export type Database = {
           tip_text_az: string | null
           tip_text_de: string | null
           tip_text_en: string | null
+          tip_text_ka: string | null
           tip_text_kk: string | null
           tip_text_ru: string | null
           tip_text_tr: string | null
@@ -7169,6 +7422,7 @@ export type Database = {
           tip_text_az?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_ka?: string | null
           tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
@@ -7188,6 +7442,7 @@ export type Database = {
           tip_text_az?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_ka?: string | null
           tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
@@ -7463,6 +7718,7 @@ export type Database = {
           label_az: string
           label_de: string | null
           label_en: string | null
+          label_ka: string | null
           label_kk: string | null
           label_ru: string | null
           label_tr: string | null
@@ -7480,6 +7736,7 @@ export type Database = {
           label_az: string
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -7497,6 +7754,7 @@ export type Database = {
           label_az?: string
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -7807,6 +8065,7 @@ export type Database = {
           category_name_az: string | null
           category_name_de: string | null
           category_name_en: string | null
+          category_name_ka: string | null
           category_name_kk: string | null
           category_name_ru: string | null
           category_name_tr: string | null
@@ -7825,6 +8084,7 @@ export type Database = {
           theme_name_az: string | null
           theme_name_de: string | null
           theme_name_en: string | null
+          theme_name_ka: string | null
           theme_name_kk: string | null
           theme_name_ru: string | null
           theme_name_tr: string | null
@@ -7838,6 +8098,7 @@ export type Database = {
           category_name_az?: string | null
           category_name_de?: string | null
           category_name_en?: string | null
+          category_name_ka?: string | null
           category_name_kk?: string | null
           category_name_ru?: string | null
           category_name_tr?: string | null
@@ -7856,6 +8117,7 @@ export type Database = {
           theme_name_az?: string | null
           theme_name_de?: string | null
           theme_name_en?: string | null
+          theme_name_ka?: string | null
           theme_name_kk?: string | null
           theme_name_ru?: string | null
           theme_name_tr?: string | null
@@ -7869,6 +8131,7 @@ export type Database = {
           category_name_az?: string | null
           category_name_de?: string | null
           category_name_en?: string | null
+          category_name_ka?: string | null
           category_name_kk?: string | null
           category_name_ru?: string | null
           category_name_tr?: string | null
@@ -7887,6 +8150,7 @@ export type Database = {
           theme_name_az?: string | null
           theme_name_de?: string | null
           theme_name_en?: string | null
+          theme_name_ka?: string | null
           theme_name_kk?: string | null
           theme_name_ru?: string | null
           theme_name_tr?: string | null
@@ -7903,6 +8167,7 @@ export type Database = {
           color_name_az: string | null
           color_name_de: string | null
           color_name_en: string | null
+          color_name_ka: string | null
           color_name_kk: string | null
           color_name_ru: string | null
           color_name_tr: string | null
@@ -7920,6 +8185,7 @@ export type Database = {
           color_name_az?: string | null
           color_name_de?: string | null
           color_name_en?: string | null
+          color_name_ka?: string | null
           color_name_kk?: string | null
           color_name_ru?: string | null
           color_name_tr?: string | null
@@ -7937,6 +8203,7 @@ export type Database = {
           color_name_az?: string | null
           color_name_de?: string | null
           color_name_en?: string | null
+          color_name_ka?: string | null
           color_name_kk?: string | null
           color_name_ru?: string | null
           color_name_tr?: string | null
@@ -7957,6 +8224,7 @@ export type Database = {
           color_name_az: string | null
           color_name_de: string | null
           color_name_en: string | null
+          color_name_ka: string | null
           color_name_kk: string | null
           color_name_ru: string | null
           color_name_tr: string | null
@@ -7974,6 +8242,7 @@ export type Database = {
           color_name_az?: string | null
           color_name_de?: string | null
           color_name_en?: string | null
+          color_name_ka?: string | null
           color_name_kk?: string | null
           color_name_ru?: string | null
           color_name_tr?: string | null
@@ -7991,6 +8260,7 @@ export type Database = {
           color_name_az?: string | null
           color_name_de?: string | null
           color_name_en?: string | null
+          color_name_ka?: string | null
           color_name_kk?: string | null
           color_name_ru?: string | null
           color_name_tr?: string | null
@@ -8016,6 +8286,7 @@ export type Database = {
           style_name_az: string | null
           style_name_de: string | null
           style_name_en: string | null
+          style_name_ka: string | null
           style_name_kk: string | null
           style_name_ru: string | null
           style_name_tr: string | null
@@ -8033,6 +8304,7 @@ export type Database = {
           style_name_az?: string | null
           style_name_de?: string | null
           style_name_en?: string | null
+          style_name_ka?: string | null
           style_name_kk?: string | null
           style_name_ru?: string | null
           style_name_tr?: string | null
@@ -8050,6 +8322,7 @@ export type Database = {
           style_name_az?: string | null
           style_name_de?: string | null
           style_name_en?: string | null
+          style_name_ka?: string | null
           style_name_kk?: string | null
           style_name_ru?: string | null
           style_name_tr?: string | null
@@ -8071,6 +8344,7 @@ export type Database = {
           style_name_az: string | null
           style_name_de: string | null
           style_name_en: string | null
+          style_name_ka: string | null
           style_name_kk: string | null
           style_name_ru: string | null
           style_name_tr: string | null
@@ -8089,6 +8363,7 @@ export type Database = {
           style_name_az?: string | null
           style_name_de?: string | null
           style_name_en?: string | null
+          style_name_ka?: string | null
           style_name_kk?: string | null
           style_name_ru?: string | null
           style_name_tr?: string | null
@@ -8107,6 +8382,7 @@ export type Database = {
           style_name_az?: string | null
           style_name_de?: string | null
           style_name_en?: string | null
+          style_name_ka?: string | null
           style_name_kk?: string | null
           style_name_ru?: string | null
           style_name_tr?: string | null
@@ -8127,6 +8403,7 @@ export type Database = {
           outfit_name_az: string | null
           outfit_name_de: string | null
           outfit_name_en: string | null
+          outfit_name_ka: string | null
           outfit_name_kk: string | null
           outfit_name_ru: string | null
           outfit_name_tr: string | null
@@ -8145,6 +8422,7 @@ export type Database = {
           outfit_name_az?: string | null
           outfit_name_de?: string | null
           outfit_name_en?: string | null
+          outfit_name_ka?: string | null
           outfit_name_kk?: string | null
           outfit_name_ru?: string | null
           outfit_name_tr?: string | null
@@ -8163,6 +8441,7 @@ export type Database = {
           outfit_name_az?: string | null
           outfit_name_de?: string | null
           outfit_name_en?: string | null
+          outfit_name_ka?: string | null
           outfit_name_kk?: string | null
           outfit_name_ru?: string | null
           outfit_name_tr?: string | null
@@ -8234,6 +8513,7 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_ka: string | null
           label_kk: string | null
           label_ru: string | null
           label_tr: string | null
@@ -8251,6 +8531,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -8268,6 +8549,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -8289,6 +8571,7 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_ka: string | null
           label_kk: string | null
           label_ru: string | null
           label_tr: string | null
@@ -8307,6 +8590,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -8325,6 +8609,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -8423,6 +8708,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -8436,6 +8722,7 @@ export type Database = {
           instructions_az: string | null
           instructions_de: string | null
           instructions_en: string | null
+          instructions_ka: string | null
           instructions_kk: string | null
           instructions_ru: string | null
           instructions_tr: string | null
@@ -8451,6 +8738,7 @@ export type Database = {
           title_az: string
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -8464,6 +8752,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -8477,6 +8766,7 @@ export type Database = {
           instructions_az?: string | null
           instructions_de?: string | null
           instructions_en?: string | null
+          instructions_ka?: string | null
           instructions_kk?: string | null
           instructions_ru?: string | null
           instructions_tr?: string | null
@@ -8492,6 +8782,7 @@ export type Database = {
           title_az: string
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -8505,6 +8796,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -8518,6 +8810,7 @@ export type Database = {
           instructions_az?: string | null
           instructions_de?: string | null
           instructions_en?: string | null
+          instructions_ka?: string | null
           instructions_kk?: string | null
           instructions_ru?: string | null
           instructions_tr?: string | null
@@ -8533,6 +8826,7 @@ export type Database = {
           title_az?: string
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -8587,6 +8881,7 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -8603,6 +8898,7 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -8619,6 +8915,7 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -8892,6 +9189,7 @@ export type Database = {
           baby_development_ar: string | null
           baby_development_de: string | null
           baby_development_en: string | null
+          baby_development_ka: string | null
           baby_development_kk: string | null
           baby_development_ru: string | null
           baby_development_tr: string | null
@@ -8900,6 +9198,7 @@ export type Database = {
           baby_message_ar: string | null
           baby_message_de: string | null
           baby_message_en: string | null
+          baby_message_ka: string | null
           baby_message_kk: string | null
           baby_message_ru: string | null
           baby_message_tr: string | null
@@ -8909,6 +9208,7 @@ export type Database = {
           baby_size_fruit_ar: string | null
           baby_size_fruit_de: string | null
           baby_size_fruit_en: string | null
+          baby_size_fruit_ka: string | null
           baby_size_fruit_kk: string | null
           baby_size_fruit_ru: string | null
           baby_size_fruit_tr: string | null
@@ -8918,6 +9218,7 @@ export type Database = {
           body_changes_ar: string | null
           body_changes_de: string | null
           body_changes_en: string | null
+          body_changes_ka: string | null
           body_changes_kk: string | null
           body_changes_ru: string | null
           body_changes_tr: string | null
@@ -8927,6 +9228,7 @@ export type Database = {
           daily_tip_ar: string | null
           daily_tip_de: string | null
           daily_tip_en: string | null
+          daily_tip_ka: string | null
           daily_tip_kk: string | null
           daily_tip_ru: string | null
           daily_tip_tr: string | null
@@ -8937,6 +9239,7 @@ export type Database = {
           doctor_visit_tip_ar: string | null
           doctor_visit_tip_de: string | null
           doctor_visit_tip_en: string | null
+          doctor_visit_tip_ka: string | null
           doctor_visit_tip_kk: string | null
           doctor_visit_tip_ru: string | null
           doctor_visit_tip_tr: string | null
@@ -8945,6 +9248,7 @@ export type Database = {
           emotional_tip_ar: string | null
           emotional_tip_de: string | null
           emotional_tip_en: string | null
+          emotional_tip_ka: string | null
           emotional_tip_kk: string | null
           emotional_tip_ru: string | null
           emotional_tip_tr: string | null
@@ -8953,6 +9257,7 @@ export type Database = {
           exercise_tip_ar: string | null
           exercise_tip_de: string | null
           exercise_tip_en: string | null
+          exercise_tip_ka: string | null
           exercise_tip_kk: string | null
           exercise_tip_ru: string | null
           exercise_tip_tr: string | null
@@ -8961,6 +9266,7 @@ export type Database = {
           foods_to_avoid_ar: string[] | null
           foods_to_avoid_de: string[] | null
           foods_to_avoid_en: string[] | null
+          foods_to_avoid_ka: string[] | null
           foods_to_avoid_kk: string[] | null
           foods_to_avoid_ru: string[] | null
           foods_to_avoid_tr: string[] | null
@@ -8972,6 +9278,7 @@ export type Database = {
           mother_symptoms_ar: string[] | null
           mother_symptoms_de: string[] | null
           mother_symptoms_en: string[] | null
+          mother_symptoms_ka: string[] | null
           mother_symptoms_kk: string[] | null
           mother_symptoms_ru: string[] | null
           mother_symptoms_tr: string[] | null
@@ -8980,6 +9287,7 @@ export type Database = {
           mother_tips_ar: string | null
           mother_tips_de: string | null
           mother_tips_en: string | null
+          mother_tips_ka: string | null
           mother_tips_kk: string | null
           mother_tips_ru: string | null
           mother_tips_tr: string | null
@@ -8988,6 +9296,7 @@ export type Database = {
           mother_warnings_ar: string | null
           mother_warnings_de: string | null
           mother_warnings_en: string | null
+          mother_warnings_ka: string | null
           mother_warnings_kk: string | null
           mother_warnings_ru: string | null
           mother_warnings_tr: string | null
@@ -8997,6 +9306,7 @@ export type Database = {
           nutrition_tip_ar: string | null
           nutrition_tip_de: string | null
           nutrition_tip_en: string | null
+          nutrition_tip_ka: string | null
           nutrition_tip_kk: string | null
           nutrition_tip_ru: string | null
           nutrition_tip_tr: string | null
@@ -9005,6 +9315,7 @@ export type Database = {
           partner_tip_ar: string | null
           partner_tip_de: string | null
           partner_tip_en: string | null
+          partner_tip_ka: string | null
           partner_tip_kk: string | null
           partner_tip_ru: string | null
           partner_tip_tr: string | null
@@ -9014,6 +9325,7 @@ export type Database = {
           recommended_exercises_ar: string[] | null
           recommended_exercises_de: string[] | null
           recommended_exercises_en: string[] | null
+          recommended_exercises_ka: string[] | null
           recommended_exercises_kk: string[] | null
           recommended_exercises_ru: string[] | null
           recommended_exercises_tr: string[] | null
@@ -9022,6 +9334,7 @@ export type Database = {
           recommended_foods_ar: string[] | null
           recommended_foods_de: string[] | null
           recommended_foods_en: string[] | null
+          recommended_foods_ka: string[] | null
           recommended_foods_kk: string[] | null
           recommended_foods_ru: string[] | null
           recommended_foods_tr: string[] | null
@@ -9030,6 +9343,7 @@ export type Database = {
           tests_to_do_ar: string[] | null
           tests_to_do_de: string[] | null
           tests_to_do_en: string[] | null
+          tests_to_do_ka: string[] | null
           tests_to_do_kk: string[] | null
           tests_to_do_ru: string[] | null
           tests_to_do_tr: string[] | null
@@ -9043,6 +9357,7 @@ export type Database = {
           baby_development_ar?: string | null
           baby_development_de?: string | null
           baby_development_en?: string | null
+          baby_development_ka?: string | null
           baby_development_kk?: string | null
           baby_development_ru?: string | null
           baby_development_tr?: string | null
@@ -9051,6 +9366,7 @@ export type Database = {
           baby_message_ar?: string | null
           baby_message_de?: string | null
           baby_message_en?: string | null
+          baby_message_ka?: string | null
           baby_message_kk?: string | null
           baby_message_ru?: string | null
           baby_message_tr?: string | null
@@ -9060,6 +9376,7 @@ export type Database = {
           baby_size_fruit_ar?: string | null
           baby_size_fruit_de?: string | null
           baby_size_fruit_en?: string | null
+          baby_size_fruit_ka?: string | null
           baby_size_fruit_kk?: string | null
           baby_size_fruit_ru?: string | null
           baby_size_fruit_tr?: string | null
@@ -9069,6 +9386,7 @@ export type Database = {
           body_changes_ar?: string | null
           body_changes_de?: string | null
           body_changes_en?: string | null
+          body_changes_ka?: string | null
           body_changes_kk?: string | null
           body_changes_ru?: string | null
           body_changes_tr?: string | null
@@ -9078,6 +9396,7 @@ export type Database = {
           daily_tip_ar?: string | null
           daily_tip_de?: string | null
           daily_tip_en?: string | null
+          daily_tip_ka?: string | null
           daily_tip_kk?: string | null
           daily_tip_ru?: string | null
           daily_tip_tr?: string | null
@@ -9088,6 +9407,7 @@ export type Database = {
           doctor_visit_tip_ar?: string | null
           doctor_visit_tip_de?: string | null
           doctor_visit_tip_en?: string | null
+          doctor_visit_tip_ka?: string | null
           doctor_visit_tip_kk?: string | null
           doctor_visit_tip_ru?: string | null
           doctor_visit_tip_tr?: string | null
@@ -9096,6 +9416,7 @@ export type Database = {
           emotional_tip_ar?: string | null
           emotional_tip_de?: string | null
           emotional_tip_en?: string | null
+          emotional_tip_ka?: string | null
           emotional_tip_kk?: string | null
           emotional_tip_ru?: string | null
           emotional_tip_tr?: string | null
@@ -9104,6 +9425,7 @@ export type Database = {
           exercise_tip_ar?: string | null
           exercise_tip_de?: string | null
           exercise_tip_en?: string | null
+          exercise_tip_ka?: string | null
           exercise_tip_kk?: string | null
           exercise_tip_ru?: string | null
           exercise_tip_tr?: string | null
@@ -9112,6 +9434,7 @@ export type Database = {
           foods_to_avoid_ar?: string[] | null
           foods_to_avoid_de?: string[] | null
           foods_to_avoid_en?: string[] | null
+          foods_to_avoid_ka?: string[] | null
           foods_to_avoid_kk?: string[] | null
           foods_to_avoid_ru?: string[] | null
           foods_to_avoid_tr?: string[] | null
@@ -9123,6 +9446,7 @@ export type Database = {
           mother_symptoms_ar?: string[] | null
           mother_symptoms_de?: string[] | null
           mother_symptoms_en?: string[] | null
+          mother_symptoms_ka?: string[] | null
           mother_symptoms_kk?: string[] | null
           mother_symptoms_ru?: string[] | null
           mother_symptoms_tr?: string[] | null
@@ -9131,6 +9455,7 @@ export type Database = {
           mother_tips_ar?: string | null
           mother_tips_de?: string | null
           mother_tips_en?: string | null
+          mother_tips_ka?: string | null
           mother_tips_kk?: string | null
           mother_tips_ru?: string | null
           mother_tips_tr?: string | null
@@ -9139,6 +9464,7 @@ export type Database = {
           mother_warnings_ar?: string | null
           mother_warnings_de?: string | null
           mother_warnings_en?: string | null
+          mother_warnings_ka?: string | null
           mother_warnings_kk?: string | null
           mother_warnings_ru?: string | null
           mother_warnings_tr?: string | null
@@ -9148,6 +9474,7 @@ export type Database = {
           nutrition_tip_ar?: string | null
           nutrition_tip_de?: string | null
           nutrition_tip_en?: string | null
+          nutrition_tip_ka?: string | null
           nutrition_tip_kk?: string | null
           nutrition_tip_ru?: string | null
           nutrition_tip_tr?: string | null
@@ -9156,6 +9483,7 @@ export type Database = {
           partner_tip_ar?: string | null
           partner_tip_de?: string | null
           partner_tip_en?: string | null
+          partner_tip_ka?: string | null
           partner_tip_kk?: string | null
           partner_tip_ru?: string | null
           partner_tip_tr?: string | null
@@ -9165,6 +9493,7 @@ export type Database = {
           recommended_exercises_ar?: string[] | null
           recommended_exercises_de?: string[] | null
           recommended_exercises_en?: string[] | null
+          recommended_exercises_ka?: string[] | null
           recommended_exercises_kk?: string[] | null
           recommended_exercises_ru?: string[] | null
           recommended_exercises_tr?: string[] | null
@@ -9173,6 +9502,7 @@ export type Database = {
           recommended_foods_ar?: string[] | null
           recommended_foods_de?: string[] | null
           recommended_foods_en?: string[] | null
+          recommended_foods_ka?: string[] | null
           recommended_foods_kk?: string[] | null
           recommended_foods_ru?: string[] | null
           recommended_foods_tr?: string[] | null
@@ -9181,6 +9511,7 @@ export type Database = {
           tests_to_do_ar?: string[] | null
           tests_to_do_de?: string[] | null
           tests_to_do_en?: string[] | null
+          tests_to_do_ka?: string[] | null
           tests_to_do_kk?: string[] | null
           tests_to_do_ru?: string[] | null
           tests_to_do_tr?: string[] | null
@@ -9194,6 +9525,7 @@ export type Database = {
           baby_development_ar?: string | null
           baby_development_de?: string | null
           baby_development_en?: string | null
+          baby_development_ka?: string | null
           baby_development_kk?: string | null
           baby_development_ru?: string | null
           baby_development_tr?: string | null
@@ -9202,6 +9534,7 @@ export type Database = {
           baby_message_ar?: string | null
           baby_message_de?: string | null
           baby_message_en?: string | null
+          baby_message_ka?: string | null
           baby_message_kk?: string | null
           baby_message_ru?: string | null
           baby_message_tr?: string | null
@@ -9211,6 +9544,7 @@ export type Database = {
           baby_size_fruit_ar?: string | null
           baby_size_fruit_de?: string | null
           baby_size_fruit_en?: string | null
+          baby_size_fruit_ka?: string | null
           baby_size_fruit_kk?: string | null
           baby_size_fruit_ru?: string | null
           baby_size_fruit_tr?: string | null
@@ -9220,6 +9554,7 @@ export type Database = {
           body_changes_ar?: string | null
           body_changes_de?: string | null
           body_changes_en?: string | null
+          body_changes_ka?: string | null
           body_changes_kk?: string | null
           body_changes_ru?: string | null
           body_changes_tr?: string | null
@@ -9229,6 +9564,7 @@ export type Database = {
           daily_tip_ar?: string | null
           daily_tip_de?: string | null
           daily_tip_en?: string | null
+          daily_tip_ka?: string | null
           daily_tip_kk?: string | null
           daily_tip_ru?: string | null
           daily_tip_tr?: string | null
@@ -9239,6 +9575,7 @@ export type Database = {
           doctor_visit_tip_ar?: string | null
           doctor_visit_tip_de?: string | null
           doctor_visit_tip_en?: string | null
+          doctor_visit_tip_ka?: string | null
           doctor_visit_tip_kk?: string | null
           doctor_visit_tip_ru?: string | null
           doctor_visit_tip_tr?: string | null
@@ -9247,6 +9584,7 @@ export type Database = {
           emotional_tip_ar?: string | null
           emotional_tip_de?: string | null
           emotional_tip_en?: string | null
+          emotional_tip_ka?: string | null
           emotional_tip_kk?: string | null
           emotional_tip_ru?: string | null
           emotional_tip_tr?: string | null
@@ -9255,6 +9593,7 @@ export type Database = {
           exercise_tip_ar?: string | null
           exercise_tip_de?: string | null
           exercise_tip_en?: string | null
+          exercise_tip_ka?: string | null
           exercise_tip_kk?: string | null
           exercise_tip_ru?: string | null
           exercise_tip_tr?: string | null
@@ -9263,6 +9602,7 @@ export type Database = {
           foods_to_avoid_ar?: string[] | null
           foods_to_avoid_de?: string[] | null
           foods_to_avoid_en?: string[] | null
+          foods_to_avoid_ka?: string[] | null
           foods_to_avoid_kk?: string[] | null
           foods_to_avoid_ru?: string[] | null
           foods_to_avoid_tr?: string[] | null
@@ -9274,6 +9614,7 @@ export type Database = {
           mother_symptoms_ar?: string[] | null
           mother_symptoms_de?: string[] | null
           mother_symptoms_en?: string[] | null
+          mother_symptoms_ka?: string[] | null
           mother_symptoms_kk?: string[] | null
           mother_symptoms_ru?: string[] | null
           mother_symptoms_tr?: string[] | null
@@ -9282,6 +9623,7 @@ export type Database = {
           mother_tips_ar?: string | null
           mother_tips_de?: string | null
           mother_tips_en?: string | null
+          mother_tips_ka?: string | null
           mother_tips_kk?: string | null
           mother_tips_ru?: string | null
           mother_tips_tr?: string | null
@@ -9290,6 +9632,7 @@ export type Database = {
           mother_warnings_ar?: string | null
           mother_warnings_de?: string | null
           mother_warnings_en?: string | null
+          mother_warnings_ka?: string | null
           mother_warnings_kk?: string | null
           mother_warnings_ru?: string | null
           mother_warnings_tr?: string | null
@@ -9299,6 +9642,7 @@ export type Database = {
           nutrition_tip_ar?: string | null
           nutrition_tip_de?: string | null
           nutrition_tip_en?: string | null
+          nutrition_tip_ka?: string | null
           nutrition_tip_kk?: string | null
           nutrition_tip_ru?: string | null
           nutrition_tip_tr?: string | null
@@ -9307,6 +9651,7 @@ export type Database = {
           partner_tip_ar?: string | null
           partner_tip_de?: string | null
           partner_tip_en?: string | null
+          partner_tip_ka?: string | null
           partner_tip_kk?: string | null
           partner_tip_ru?: string | null
           partner_tip_tr?: string | null
@@ -9316,6 +9661,7 @@ export type Database = {
           recommended_exercises_ar?: string[] | null
           recommended_exercises_de?: string[] | null
           recommended_exercises_en?: string[] | null
+          recommended_exercises_ka?: string[] | null
           recommended_exercises_kk?: string[] | null
           recommended_exercises_ru?: string[] | null
           recommended_exercises_tr?: string[] | null
@@ -9324,6 +9670,7 @@ export type Database = {
           recommended_foods_ar?: string[] | null
           recommended_foods_de?: string[] | null
           recommended_foods_en?: string[] | null
+          recommended_foods_ka?: string[] | null
           recommended_foods_kk?: string[] | null
           recommended_foods_ru?: string[] | null
           recommended_foods_tr?: string[] | null
@@ -9332,6 +9679,7 @@ export type Database = {
           tests_to_do_ar?: string[] | null
           tests_to_do_de?: string[] | null
           tests_to_do_en?: string[] | null
+          tests_to_do_ka?: string[] | null
           tests_to_do_kk?: string[] | null
           tests_to_do_ru?: string[] | null
           tests_to_do_tr?: string[] | null
@@ -9348,6 +9696,7 @@ export type Database = {
           body_ar: string | null
           body_de: string | null
           body_en: string | null
+          body_ka: string | null
           body_kk: string | null
           body_ru: string | null
           body_tr: string | null
@@ -9362,6 +9711,7 @@ export type Database = {
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -9373,6 +9723,7 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_ka?: string | null
           body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
@@ -9387,6 +9738,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -9398,6 +9750,7 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_ka?: string | null
           body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
@@ -9412,6 +9765,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -9428,6 +9782,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -9444,6 +9799,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -9457,6 +9813,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -9473,6 +9830,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -9486,6 +9844,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -9502,6 +9861,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -9517,6 +9877,7 @@ export type Database = {
           badge_text_az: string | null
           badge_text_de: string | null
           badge_text_en: string | null
+          badge_text_ka: string | null
           badge_text_kk: string | null
           badge_text_ru: string | null
           badge_text_tr: string | null
@@ -9528,6 +9889,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -9540,6 +9902,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -9556,6 +9919,7 @@ export type Database = {
           badge_text_az?: string | null
           badge_text_de?: string | null
           badge_text_en?: string | null
+          badge_text_ka?: string | null
           badge_text_kk?: string | null
           badge_text_ru?: string | null
           badge_text_tr?: string | null
@@ -9567,6 +9931,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -9579,6 +9944,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -9595,6 +9961,7 @@ export type Database = {
           badge_text_az?: string | null
           badge_text_de?: string | null
           badge_text_en?: string | null
+          badge_text_ka?: string | null
           badge_text_kk?: string | null
           badge_text_ru?: string | null
           badge_text_tr?: string | null
@@ -9606,6 +9973,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -9618,6 +9986,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -9681,6 +10050,7 @@ export type Database = {
           category_ar: string | null
           category_de: string | null
           category_en: string | null
+          category_ka: string | null
           category_kk: string | null
           category_ru: string | null
           category_tr: string | null
@@ -9690,6 +10060,7 @@ export type Database = {
           description_ar: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -9701,6 +10072,7 @@ export type Database = {
           name_ar: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -9716,6 +10088,7 @@ export type Database = {
           category_ar?: string | null
           category_de?: string | null
           category_en?: string | null
+          category_ka?: string | null
           category_kk?: string | null
           category_ru?: string | null
           category_tr?: string | null
@@ -9725,6 +10098,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -9736,6 +10110,7 @@ export type Database = {
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -9751,6 +10126,7 @@ export type Database = {
           category_ar?: string | null
           category_de?: string | null
           category_en?: string | null
+          category_ka?: string | null
           category_kk?: string | null
           category_ru?: string | null
           category_tr?: string | null
@@ -9760,6 +10136,7 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -9771,6 +10148,7 @@ export type Database = {
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -10059,6 +10437,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -10077,6 +10456,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -10095,6 +10475,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -10214,6 +10595,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -10231,6 +10613,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -10248,6 +10631,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -10265,6 +10649,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -10280,6 +10665,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -10298,6 +10684,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -10313,6 +10700,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -10331,6 +10719,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -10346,6 +10735,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -10393,6 +10783,7 @@ export type Database = {
           body_ar: string | null
           body_de: string | null
           body_en: string | null
+          body_ka: string | null
           body_kk: string | null
           body_ru: string | null
           body_tr: string | null
@@ -10407,6 +10798,7 @@ export type Database = {
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -10418,6 +10810,7 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_ka?: string | null
           body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
@@ -10432,6 +10825,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -10443,6 +10837,7 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_ka?: string | null
           body_kk?: string | null
           body_ru?: string | null
           body_tr?: string | null
@@ -10457,6 +10852,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -10477,6 +10873,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -10494,6 +10891,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -10511,6 +10909,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -10822,6 +11221,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -10839,6 +11239,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -10856,6 +11257,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -10995,6 +11397,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -11013,6 +11416,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -11026,6 +11430,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -11044,6 +11449,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -11057,6 +11463,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -11075,6 +11482,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -11093,6 +11501,7 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_ka: string | null
           label_kk: string | null
           label_ru: string | null
           label_tr: string | null
@@ -11111,6 +11520,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -11129,6 +11539,7 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_ka?: string | null
           label_kk?: string | null
           label_ru?: string | null
           label_tr?: string | null
@@ -11147,6 +11558,7 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_ka: string | null
           content_kk: string | null
           content_ru: string | null
           content_tr: string | null
@@ -11161,6 +11573,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -11174,6 +11587,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -11188,6 +11602,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -11201,6 +11616,7 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -11215,6 +11631,7 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -11231,6 +11648,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -11243,6 +11661,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -11252,6 +11671,7 @@ export type Database = {
           relief_tips_az: string[] | null
           relief_tips_de: string | null
           relief_tips_en: string | null
+          relief_tips_ka: string | null
           relief_tips_kk: string | null
           relief_tips_ru: string | null
           relief_tips_tr: string | null
@@ -11267,6 +11687,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -11279,6 +11700,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -11288,6 +11710,7 @@ export type Database = {
           relief_tips_az?: string[] | null
           relief_tips_de?: string | null
           relief_tips_en?: string | null
+          relief_tips_ka?: string | null
           relief_tips_kk?: string | null
           relief_tips_ru?: string | null
           relief_tips_tr?: string | null
@@ -11303,6 +11726,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -11315,6 +11739,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -11324,6 +11749,7 @@ export type Database = {
           relief_tips_az?: string[] | null
           relief_tips_de?: string | null
           relief_tips_en?: string | null
+          relief_tips_ka?: string | null
           relief_tips_kk?: string | null
           relief_tips_ru?: string | null
           relief_tips_tr?: string | null
@@ -11446,6 +11872,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -11480,6 +11907,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -11489,6 +11917,7 @@ export type Database = {
           partner_description_az: string | null
           partner_description_de: string | null
           partner_description_en: string | null
+          partner_description_ka: string | null
           partner_description_kk: string | null
           partner_description_ru: string | null
           partner_description_tr: string | null
@@ -11498,6 +11927,7 @@ export type Database = {
           partner_name_az: string | null
           partner_name_de: string | null
           partner_name_en: string | null
+          partner_name_ka: string | null
           partner_name_kk: string | null
           partner_name_ru: string | null
           partner_name_tr: string | null
@@ -11523,6 +11953,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -11557,6 +11988,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -11566,6 +11998,7 @@ export type Database = {
           partner_description_az?: string | null
           partner_description_de?: string | null
           partner_description_en?: string | null
+          partner_description_ka?: string | null
           partner_description_kk?: string | null
           partner_description_ru?: string | null
           partner_description_tr?: string | null
@@ -11575,6 +12008,7 @@ export type Database = {
           partner_name_az?: string | null
           partner_name_de?: string | null
           partner_name_en?: string | null
+          partner_name_ka?: string | null
           partner_name_kk?: string | null
           partner_name_ru?: string | null
           partner_name_tr?: string | null
@@ -11600,6 +12034,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -11634,6 +12069,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -11643,6 +12079,7 @@ export type Database = {
           partner_description_az?: string | null
           partner_description_de?: string | null
           partner_description_en?: string | null
+          partner_description_ka?: string | null
           partner_description_kk?: string | null
           partner_description_ru?: string | null
           partner_description_tr?: string | null
@@ -11652,6 +12089,7 @@ export type Database = {
           partner_name_az?: string | null
           partner_name_de?: string | null
           partner_name_en?: string | null
+          partner_name_ka?: string | null
           partner_name_kk?: string | null
           partner_name_ru?: string | null
           partner_name_tr?: string | null
@@ -11758,6 +12196,7 @@ export type Database = {
           tip_text_ar: string | null
           tip_text_de: string | null
           tip_text_en: string | null
+          tip_text_ka: string | null
           tip_text_kk: string | null
           tip_text_ru: string | null
           tip_text_tr: string | null
@@ -11775,6 +12214,7 @@ export type Database = {
           tip_text_ar?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_ka?: string | null
           tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
@@ -11792,6 +12232,7 @@ export type Database = {
           tip_text_ar?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_ka?: string | null
           tip_text_kk?: string | null
           tip_text_ru?: string | null
           tip_text_tr?: string | null
@@ -12230,6 +12671,7 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -12250,6 +12692,7 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en: string
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -12270,6 +12713,7 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -12287,6 +12731,7 @@ export type Database = {
           age_label_az: string
           age_label_de: string | null
           age_label_en: string | null
+          age_label_ka: string | null
           age_label_kk: string | null
           age_label_ru: string | null
           age_label_tr: string | null
@@ -12297,6 +12742,7 @@ export type Database = {
           dose_label_az: string
           dose_label_de: string | null
           dose_label_en: string | null
+          dose_label_ka: string | null
           dose_label_kk: string | null
           dose_label_ru: string | null
           dose_label_tr: string | null
@@ -12309,6 +12755,7 @@ export type Database = {
           notes_az: string | null
           notes_de: string | null
           notes_en: string | null
+          notes_ka: string | null
           notes_kk: string | null
           notes_ru: string | null
           notes_tr: string | null
@@ -12323,6 +12770,7 @@ export type Database = {
           age_label_az: string
           age_label_de?: string | null
           age_label_en?: string | null
+          age_label_ka?: string | null
           age_label_kk?: string | null
           age_label_ru?: string | null
           age_label_tr?: string | null
@@ -12333,6 +12781,7 @@ export type Database = {
           dose_label_az: string
           dose_label_de?: string | null
           dose_label_en?: string | null
+          dose_label_ka?: string | null
           dose_label_kk?: string | null
           dose_label_ru?: string | null
           dose_label_tr?: string | null
@@ -12345,6 +12794,7 @@ export type Database = {
           notes_az?: string | null
           notes_de?: string | null
           notes_en?: string | null
+          notes_ka?: string | null
           notes_kk?: string | null
           notes_ru?: string | null
           notes_tr?: string | null
@@ -12359,6 +12809,7 @@ export type Database = {
           age_label_az?: string
           age_label_de?: string | null
           age_label_en?: string | null
+          age_label_ka?: string | null
           age_label_kk?: string | null
           age_label_ru?: string | null
           age_label_tr?: string | null
@@ -12369,6 +12820,7 @@ export type Database = {
           dose_label_az?: string
           dose_label_de?: string | null
           dose_label_en?: string | null
+          dose_label_ka?: string | null
           dose_label_kk?: string | null
           dose_label_ru?: string | null
           dose_label_tr?: string | null
@@ -12381,6 +12833,7 @@ export type Database = {
           notes_az?: string | null
           notes_de?: string | null
           notes_en?: string | null
+          notes_ka?: string | null
           notes_kk?: string | null
           notes_ru?: string | null
           notes_tr?: string | null
@@ -12408,6 +12861,7 @@ export type Database = {
           contraindications_az: string | null
           contraindications_de: string | null
           contraindications_en: string | null
+          contraindications_ka: string | null
           contraindications_kk: string | null
           contraindications_ru: string | null
           contraindications_tr: string | null
@@ -12418,6 +12872,7 @@ export type Database = {
           disease_az: string | null
           disease_de: string | null
           disease_en: string | null
+          disease_ka: string | null
           disease_kk: string | null
           disease_ru: string | null
           disease_tr: string | null
@@ -12426,6 +12881,7 @@ export type Database = {
           full_description_az: string | null
           full_description_de: string | null
           full_description_en: string | null
+          full_description_ka: string | null
           full_description_kk: string | null
           full_description_ru: string | null
           full_description_tr: string | null
@@ -12437,6 +12893,7 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -12445,6 +12902,7 @@ export type Database = {
           route_az: string | null
           route_de: string | null
           route_en: string | null
+          route_ka: string | null
           route_kk: string | null
           route_ru: string | null
           route_tr: string | null
@@ -12453,6 +12911,7 @@ export type Database = {
           short_description_az: string | null
           short_description_de: string | null
           short_description_en: string | null
+          short_description_ka: string | null
           short_description_kk: string | null
           short_description_ru: string | null
           short_description_tr: string | null
@@ -12461,6 +12920,7 @@ export type Database = {
           side_effects_az: string | null
           side_effects_de: string | null
           side_effects_en: string | null
+          side_effects_ka: string | null
           side_effects_kk: string | null
           side_effects_ru: string | null
           side_effects_tr: string | null
@@ -12476,6 +12936,7 @@ export type Database = {
           contraindications_az?: string | null
           contraindications_de?: string | null
           contraindications_en?: string | null
+          contraindications_ka?: string | null
           contraindications_kk?: string | null
           contraindications_ru?: string | null
           contraindications_tr?: string | null
@@ -12486,6 +12947,7 @@ export type Database = {
           disease_az?: string | null
           disease_de?: string | null
           disease_en?: string | null
+          disease_ka?: string | null
           disease_kk?: string | null
           disease_ru?: string | null
           disease_tr?: string | null
@@ -12494,6 +12956,7 @@ export type Database = {
           full_description_az?: string | null
           full_description_de?: string | null
           full_description_en?: string | null
+          full_description_ka?: string | null
           full_description_kk?: string | null
           full_description_ru?: string | null
           full_description_tr?: string | null
@@ -12505,6 +12968,7 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -12513,6 +12977,7 @@ export type Database = {
           route_az?: string | null
           route_de?: string | null
           route_en?: string | null
+          route_ka?: string | null
           route_kk?: string | null
           route_ru?: string | null
           route_tr?: string | null
@@ -12521,6 +12986,7 @@ export type Database = {
           short_description_az?: string | null
           short_description_de?: string | null
           short_description_en?: string | null
+          short_description_ka?: string | null
           short_description_kk?: string | null
           short_description_ru?: string | null
           short_description_tr?: string | null
@@ -12529,6 +12995,7 @@ export type Database = {
           side_effects_az?: string | null
           side_effects_de?: string | null
           side_effects_en?: string | null
+          side_effects_ka?: string | null
           side_effects_kk?: string | null
           side_effects_ru?: string | null
           side_effects_tr?: string | null
@@ -12544,6 +13011,7 @@ export type Database = {
           contraindications_az?: string | null
           contraindications_de?: string | null
           contraindications_en?: string | null
+          contraindications_ka?: string | null
           contraindications_kk?: string | null
           contraindications_ru?: string | null
           contraindications_tr?: string | null
@@ -12554,6 +13022,7 @@ export type Database = {
           disease_az?: string | null
           disease_de?: string | null
           disease_en?: string | null
+          disease_ka?: string | null
           disease_kk?: string | null
           disease_ru?: string | null
           disease_tr?: string | null
@@ -12562,6 +13031,7 @@ export type Database = {
           full_description_az?: string | null
           full_description_de?: string | null
           full_description_en?: string | null
+          full_description_ka?: string | null
           full_description_kk?: string | null
           full_description_ru?: string | null
           full_description_tr?: string | null
@@ -12573,6 +13043,7 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -12581,6 +13052,7 @@ export type Database = {
           route_az?: string | null
           route_de?: string | null
           route_en?: string | null
+          route_ka?: string | null
           route_kk?: string | null
           route_ru?: string | null
           route_tr?: string | null
@@ -12589,6 +13061,7 @@ export type Database = {
           short_description_az?: string | null
           short_description_de?: string | null
           short_description_en?: string | null
+          short_description_ka?: string | null
           short_description_kk?: string | null
           short_description_ru?: string | null
           short_description_tr?: string | null
@@ -12597,6 +13070,7 @@ export type Database = {
           side_effects_az?: string | null
           side_effects_de?: string | null
           side_effects_en?: string | null
+          side_effects_ka?: string | null
           side_effects_kk?: string | null
           side_effects_ru?: string | null
           side_effects_tr?: string | null
@@ -12659,6 +13133,7 @@ export type Database = {
           benefits_ar: string[] | null
           benefits_de: string[] | null
           benefits_en: string[] | null
+          benefits_ka: string[] | null
           benefits_kk: string[] | null
           benefits_ru: string[] | null
           benefits_tr: string[] | null
@@ -12669,6 +13144,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -12677,6 +13153,7 @@ export type Database = {
           dosage_ar: string | null
           dosage_de: string | null
           dosage_en: string | null
+          dosage_ka: string | null
           dosage_kk: string | null
           dosage_ru: string | null
           dosage_tr: string | null
@@ -12685,6 +13162,7 @@ export type Database = {
           food_sources_ar: string[] | null
           food_sources_de: string[] | null
           food_sources_en: string[] | null
+          food_sources_ka: string[] | null
           food_sources_kk: string[] | null
           food_sources_ru: string[] | null
           food_sources_tr: string[] | null
@@ -12702,6 +13180,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -12717,6 +13196,7 @@ export type Database = {
           benefits_ar?: string[] | null
           benefits_de?: string[] | null
           benefits_en?: string[] | null
+          benefits_ka?: string[] | null
           benefits_kk?: string[] | null
           benefits_ru?: string[] | null
           benefits_tr?: string[] | null
@@ -12727,6 +13207,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -12735,6 +13216,7 @@ export type Database = {
           dosage_ar?: string | null
           dosage_de?: string | null
           dosage_en?: string | null
+          dosage_ka?: string | null
           dosage_kk?: string | null
           dosage_ru?: string | null
           dosage_tr?: string | null
@@ -12743,6 +13225,7 @@ export type Database = {
           food_sources_ar?: string[] | null
           food_sources_de?: string[] | null
           food_sources_en?: string[] | null
+          food_sources_ka?: string[] | null
           food_sources_kk?: string[] | null
           food_sources_ru?: string[] | null
           food_sources_tr?: string[] | null
@@ -12760,6 +13243,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -12775,6 +13259,7 @@ export type Database = {
           benefits_ar?: string[] | null
           benefits_de?: string[] | null
           benefits_en?: string[] | null
+          benefits_ka?: string[] | null
           benefits_kk?: string[] | null
           benefits_ru?: string[] | null
           benefits_tr?: string[] | null
@@ -12785,6 +13270,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -12793,6 +13279,7 @@ export type Database = {
           dosage_ar?: string | null
           dosage_de?: string | null
           dosage_en?: string | null
+          dosage_ka?: string | null
           dosage_kk?: string | null
           dosage_ru?: string | null
           dosage_tr?: string | null
@@ -12801,6 +13288,7 @@ export type Database = {
           food_sources_ar?: string[] | null
           food_sources_de?: string[] | null
           food_sources_en?: string[] | null
+          food_sources_ka?: string[] | null
           food_sources_kk?: string[] | null
           food_sources_ru?: string[] | null
           food_sources_tr?: string[] | null
@@ -12818,6 +13306,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -12872,6 +13361,7 @@ export type Database = {
           content_ar: string | null
           content_de: string | null
           content_en: string | null
+          content_ka: string | null
           content_kk: string | null
           content_ru: string | null
           content_tr: string | null
@@ -12885,6 +13375,7 @@ export type Database = {
           tips_ar: Json | null
           tips_de: Json | null
           tips_en: Json | null
+          tips_ka: Json | null
           tips_kk: Json | null
           tips_ru: Json | null
           tips_tr: Json | null
@@ -12893,6 +13384,7 @@ export type Database = {
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
@@ -12905,6 +13397,7 @@ export type Database = {
           content_ar?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -12918,6 +13411,7 @@ export type Database = {
           tips_ar?: Json | null
           tips_de?: Json | null
           tips_en?: Json | null
+          tips_ka?: Json | null
           tips_kk?: Json | null
           tips_ru?: Json | null
           tips_tr?: Json | null
@@ -12926,6 +13420,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -12938,6 +13433,7 @@ export type Database = {
           content_ar?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_ka?: string | null
           content_kk?: string | null
           content_ru?: string | null
           content_tr?: string | null
@@ -12951,6 +13447,7 @@ export type Database = {
           tips_ar?: Json | null
           tips_de?: Json | null
           tips_en?: Json | null
+          tips_ka?: Json | null
           tips_kk?: Json | null
           tips_ru?: Json | null
           tips_tr?: Json | null
@@ -12959,6 +13456,7 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_ka?: string | null
           title_kk?: string | null
           title_ru?: string | null
           title_tr?: string | null
@@ -13004,6 +13502,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -13023,6 +13522,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -13042,6 +13542,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -13065,6 +13566,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -13077,6 +13579,7 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -13093,6 +13596,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -13105,6 +13609,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -13121,6 +13626,7 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_ka?: string | null
           description_kk?: string | null
           description_ru?: string | null
           description_tr?: string | null
@@ -13133,6 +13639,7 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -13188,6 +13695,7 @@ export type Database = {
           characteristics_az: string[] | null
           characteristics_de: string | null
           characteristics_en: string | null
+          characteristics_ka: string | null
           characteristics_kk: string | null
           characteristics_ru: string | null
           characteristics_tr: string | null
@@ -13201,6 +13709,7 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string | null
+          name_ka: string | null
           name_kk: string | null
           name_ru: string | null
           name_tr: string | null
@@ -13216,6 +13725,7 @@ export type Database = {
           characteristics_az?: string[] | null
           characteristics_de?: string | null
           characteristics_en?: string | null
+          characteristics_ka?: string | null
           characteristics_kk?: string | null
           characteristics_ru?: string | null
           characteristics_tr?: string | null
@@ -13229,6 +13739,7 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -13244,6 +13755,7 @@ export type Database = {
           characteristics_az?: string[] | null
           characteristics_de?: string | null
           characteristics_en?: string | null
+          characteristics_ka?: string | null
           characteristics_kk?: string | null
           characteristics_ru?: string | null
           characteristics_tr?: string | null
@@ -13257,6 +13769,7 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string | null
+          name_ka?: string | null
           name_kk?: string | null
           name_ru?: string | null
           name_tr?: string | null
@@ -13485,6 +13998,7 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_ka: string | null
           description_kk: string | null
           description_ru: string | null
           description_tr: string | null
@@ -13501,6 +14015,7 @@ export type Database = {
           symptoms_az: string[] | null
           symptoms_de: string | null
           symptoms_en: string | null
+          symptoms_ka: string | null
           symptoms_kk: string | null
           symptoms_ru: string | null
           symptoms_tr: string | null
@@ -13510,6 +14025,7 @@ export type Database = {
           tips_az: string[] | null
           tips_de: string | null
           tips_en: string | null
+          tips_ka: string | null
           tips_kk: string | null
           tips_ru: string | null
           tips_tr: string | null
@@ -13519,6 +14035,7 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_ka: string | null
           title_kk: string | null
           title_ru: string | null
           title_tr: string | null
