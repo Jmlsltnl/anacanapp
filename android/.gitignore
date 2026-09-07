@@ -56,6 +56,7 @@ captures/
 # Keystore faylları GİT-ə HEÇ VAXT düşməməlidir
 *.jks
 *.keystore
+anacan-release
 
 # Release imzalama parolları — HEÇ VAXT git-ə düşməməlidir (bax keystore.properties.example)
 keystore.properties
