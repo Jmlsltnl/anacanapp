@@ -24,6 +24,7 @@
 		504EC30D1FED79650016851F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30B1FED79650016851F /* Main.storyboard */; };
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
+		68F3127EBA5AD56899E2DF45 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0E4B02CC57C35751D6A8D759 /* InfoPlist.strings */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		A1B2C3D4E5F60718293A4B5C /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F60718293A4B5B /* FacebookCore */; };
 /* End PBXBuildFile section */
@@ -73,6 +74,15 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+		DFA9857DB6ACC82870032099 /* az */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = az; path = az.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		31429659F1C64F7DD2895087 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		2C46CCF17C6980ABB476F953 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		2F453DBA5467DF56E206BF8D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5D3F69E5559F02659B3D8389 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		EFAA04AE77CE4E2EED1AA600 /* kk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kk; path = kk.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A6CB94097988676E73E2F6DC /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A767237328120DB8E1EA9A8E /* uz */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uz; path = uz.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		2FA6330A8DB46052C655AF36 /* ka */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ka; path = ka.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -166,6 +176,7 @@
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				184C247230123BAC00B3D8FD /* GoogleService-Info.plist */,
 				504EC3131FED79650016851F /* Info.plist */,
+				0E4B02CC57C35751D6A8D759 /* InfoPlist.strings */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
 			);
@@ -245,7 +256,15 @@
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				az,
 				en,
+				tr,
+				ru,
+				de,
+				kk,
+				ar,
+				uz,
+				ka,
 				Base,
 			);
 			mainGroup = 504EC2FB1FED79650016851F;
@@ -283,6 +302,7 @@
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				18A5845A3037391100A66DF5 /* PrivacyInfo.xcprivacy in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
+				68F3127EBA5AD56899E2DF45 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -334,6 +354,22 @@
 				504EC3111FED79650016851F /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		0E4B02CC57C35751D6A8D759 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DFA9857DB6ACC82870032099 /* az */,
+				31429659F1C64F7DD2895087 /* en */,
+				2C46CCF17C6980ABB476F953 /* tr */,
+				2F453DBA5467DF56E206BF8D /* ru */,
+				5D3F69E5559F02659B3D8389 /* de */,
+				EFAA04AE77CE4E2EED1AA600 /* kk */,
+				A6CB94097988676E73E2F6DC /* ar */,
+				A767237328120DB8E1EA9A8E /* uz */,
+				2FA6330A8DB46052C655AF36 /* ka */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
