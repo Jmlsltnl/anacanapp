@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import MediaCarousel from './MediaCarousel';
 import CommentReply from './CommentReply';
 import { UserBadge, VerifiedTick, isVerifiedActive } from './UserBadge';
+import { getLifeStageMeta } from '@/lib/lifeStageLabel';
 import { tr } from "@/lib/tr";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from
@@ -263,6 +264,8 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
   };
   const authorBadge = post.author?.badge_type as 'admin' | 'premium' | 'moderator' | null;
   const authorVerified = isVerifiedActive(post.author?.is_verified, post.author?.verified_until);
+  // Hamilə/Ana/Flow — anonim postlarda göstərilmir (enrichPosts() onsuz da null verir, əlavə qoruma)
+  const authorLifeStage = isAnonymous ? null : getLifeStageMeta(post.author?.life_stage);
   const handleAvatarClick = () => {if (post.user_id && onUserClick && (!isAnonymous || isAdmin)) onUserClick(post.user_id);};
   const topLevelComments = comments.filter((c) => !c.parent_comment_id);
 
@@ -324,7 +327,11 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
               {isAnonymous && isAdmin && <UserBadge type={authorBadge} />}
               {isAnonymous && <span className="a-post-anon">({tr("untranslated_anonim_89j5l6", "Anonim")})</span>}
             </div>
-            <span className="a-post-time">· {timeAgo}</span>
+            <span className="a-post-time">
+              · {authorLifeStage &&
+              <span style={{ color: authorLifeStage.ink, fontWeight: 700 }}>{authorLifeStage.label} · </span>
+              }{timeAgo}
+            </span>
           </div>
           {/* modal={false}: hər postda olan bu menyu modal rejimdə bütün sənədə
               scroll kilidi (react-remove-scroll) qoyur; feed refetch nəticəsində

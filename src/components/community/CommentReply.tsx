@@ -14,6 +14,7 @@ import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { UserBadge, VerifiedTick, isVerifiedActive } from './UserBadge';
+import { getLifeStageMeta } from '@/lib/lifeStageLabel';
 import { tr } from "@/lib/tr";
 
 interface CommentReplyProps {
@@ -206,6 +207,7 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
   const timeAgo = formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: getCurrentDateLocale() });
   const authorBadge = (comment.author?.badge_type as 'admin' | 'premium' | 'moderator' | null) || null;
   const authorVerified = isVerifiedActive(comment.author?.is_verified, comment.author?.verified_until);
+  const authorLifeStage = comment.is_anonymous ? null : getLifeStageMeta(comment.author?.life_stage);
   const avatarSize = isReply ? 'w-7 h-7' : 'w-9 h-9';
 
   return (
@@ -298,6 +300,11 @@ const CommentReply = ({ comment, postId, postAuthorId, allComments, onRefetch, o
           {/* Meta row: time · likes · reply · (own) edit · (admin/own) delete */}
           {!isEditing &&
           <div className="flex items-center gap-3 mt-1">
+              {authorLifeStage &&
+              <span className="text-[10.5px] font-bold shrink-0" style={{ color: authorLifeStage.ink }}>
+                  {authorLifeStage.label}
+                </span>
+              }
               <span className="text-[10.5px] text-muted-foreground/45 font-medium shrink-0">{timeAgo}</span>
               {(comment.likes_count || 0) > 0 &&
             <span className="text-[10.5px] text-muted-foreground/45 font-bold shrink-0">

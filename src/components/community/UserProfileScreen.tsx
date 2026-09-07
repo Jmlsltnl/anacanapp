@@ -10,6 +10,7 @@ import PostCard from './PostCard';
 import { CommunityPost } from '@/hooks/useCommunity';
 import { VerifiedTick, isVerifiedActive } from './UserBadge';
 import { getPublicProfileCard } from '@/lib/public-profile-cards';
+import { getLifeStageMeta } from '@/lib/lifeStageLabel';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
@@ -159,16 +160,6 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
     }
   };
 
-  const getLifeStageLabel = (stage: string | null) => {
-    switch (stage) {
-      case 'flow':return { label: 'Flow', bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
-      case 'bump':return { label: tr("userprofilescreen_hamile_0080af", 'HamilÉ™'), bg: 'var(--a-peach-1)', ink: 'var(--a-accent-ink)' };
-      case 'mommy':return { label: tr("common_ana", 'Ana'), bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
-      case 'partner':return { label: 'Partner', bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' };
-      default:return null;
-    }
-  };
-
   if (loading || postsLoading) {
     return (
       <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
@@ -199,7 +190,7 @@ const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenP
   }
 
   const badge = getBadgeLabel(profile.badge_type);
-  const lifeStage = getLifeStageLabel(profile.life_stage);
+  const lifeStage = getLifeStageMeta(profile.life_stage);
   const verified = isVerifiedActive(profile.is_verified, profile.verified_until);
 
   return (

@@ -185,11 +185,11 @@ export default function InitialLanguageScreen() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: rtlX(-30, isRtl) }}
               transition={{ duration: 0.35 }}
-              className="flex-1 min-h-0 overflow-y-auto flex flex-col justify-start py-4 overscroll-contain"
+              className="flex-1 min-h-0 flex flex-col"
             >
-              {/* Compact brand */}
-              <div className="flex flex-col items-center mb-8">
-                <div className="w-14 h-14 flex items-center justify-center mb-5 overflow-hidden"
+              {/* Compact brand — sabit hissə, heç vaxt scroll olunmur */}
+              <div className="flex flex-col items-center shrink-0 mb-5">
+                <div className="w-14 h-14 flex items-center justify-center mb-4 overflow-hidden"
                 style={{ borderRadius: 18, background: 'var(--a-grad-peach)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.5)' }}>
                   <img src={logoImage} alt="Anacan" className="w-9 h-9 object-contain" />
                 </div>
@@ -201,86 +201,91 @@ export default function InitialLanguageScreen() {
                 </p>
               </div>
 
-              {/* 2-column language grid */}
-              <div className="grid grid-cols-2 gap-3 w-full">
-                {langs.map((lang, idx) => {
-                  const isSelected = selectedLang === lang.code;
-                  return (
-                    <motion.button
-                      key={lang.code}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.15 + idx * 0.06, duration: 0.35 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => handleLangSelect(lang.code)}
-                      disabled={isSwitching}
-                      className="relative flex flex-col items-center transition-all cursor-pointer disabled:cursor-not-allowed"
-                      style={{
-                        padding: 16,
-                        borderRadius: 20,
-                        background: 'var(--a-surface)',
-                        border: isSelected ? '2px solid var(--a-peach-2)' : '2px solid transparent',
-                        boxShadow: 'var(--a-card-shadow)'
-                      }}
-                    >
-                      <div className="mb-2.5 rounded-md overflow-hidden" style={{ border: '1px solid var(--a-line)', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}>
-                        <img
-                          src={`https://flagcdn.com/w40/${lang.flag}.png`}
-                          alt={lang.code}
-                          className="w-9 h-6 object-cover"
-                        />
-                      </div>
-                      <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>
-                        {lang.nativeLabel}
-                      </span>
-                      <span style={{ fontSize: 9.5, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--a-ink-soft)', marginTop: 2 }}>
-                        {lang.subLabel}
-                      </span>
-                      {isSelected && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 18 }}
-                          className="absolute top-2 end-2 w-5 h-5 rounded-full flex items-center justify-center"
-                          style={{ background: 'var(--a-peach-2)' }}
-                        >
-                          <Check className="w-3 h-3 text-white" strokeWidth={3.5} />
-                        </motion.div>
-                      )}
-                    </motion.button>
-                  );
-                })}
+              {/* 2-column language grid — YALNIZ bura scroll olunur (kiçik ekranda 9 dil sığmaya bilər);
+                  başlıq və Davam et düyməsi bundan asılı olmadan HƏMİŞƏ görünür (menyu kimi sabit). */}
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain -mx-1 px-1">
+                <div className="grid grid-cols-2 gap-3 w-full pb-1">
+                  {langs.map((lang, idx) => {
+                    const isSelected = selectedLang === lang.code;
+                    return (
+                      <motion.button
+                        key={lang.code}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: Math.min(0.08 + idx * 0.035, 0.35), duration: 0.3 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => handleLangSelect(lang.code)}
+                        disabled={isSwitching}
+                        className="relative flex flex-col items-center transition-all cursor-pointer disabled:cursor-not-allowed"
+                        style={{
+                          padding: 16,
+                          borderRadius: 20,
+                          background: 'var(--a-surface)',
+                          border: isSelected ? '2px solid var(--a-peach-2)' : '2px solid transparent',
+                          boxShadow: 'var(--a-card-shadow)'
+                        }}
+                      >
+                        <div className="mb-2.5 rounded-md overflow-hidden" style={{ border: '1px solid var(--a-line)', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}>
+                          <img
+                            src={`https://flagcdn.com/w40/${lang.flag}.png`}
+                            alt={lang.code}
+                            className="w-9 h-6 object-cover"
+                          />
+                        </div>
+                        <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--a-ink)' }}>
+                          {lang.nativeLabel}
+                        </span>
+                        <span style={{ fontSize: 9.5, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--a-ink-soft)', marginTop: 2 }}>
+                          {lang.subLabel}
+                        </span>
+                        {isSelected && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+                            className="absolute top-2 end-2 w-5 h-5 rounded-full flex items-center justify-center"
+                            style={{ background: 'var(--a-peach-2)' }}
+                          >
+                            <Check className="w-3 h-3 text-white" strokeWidth={3.5} />
+                          </motion.div>
+                        )}
+                      </motion.button>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* Continue */}
-              <motion.button
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35, duration: 0.35 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleContinue}
-                disabled={isSwitching || !selectedLang}
-                className="w-full mt-8 py-4 rounded-full text-white transition-all disabled:opacity-70"
-                style={{ background: 'var(--a-peach-2)', fontSize: 14, fontWeight: 700, boxShadow: '0 16px 32px -12px rgba(217, 108, 74, 0.6)' }}
-              >
-                {t.continue}
-                <span className="font-normal opacity-70 mx-1.5">·</span>
-                <span className="font-medium opacity-90">{t.continueEn}</span>
-              </motion.button>
+              {/* Continue — sabit alt zolaq (menyu kimi), grid scroll olunsa belə HƏMİŞƏ görünür */}
+              <div className="shrink-0 pt-4">
+                <motion.button
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25, duration: 0.3 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleContinue}
+                  disabled={isSwitching || !selectedLang}
+                  className="w-full py-4 rounded-full text-white transition-all disabled:opacity-70"
+                  style={{ background: 'var(--a-peach-2)', fontSize: 14, fontWeight: 700, boxShadow: '0 16px 32px -12px rgba(217, 108, 74, 0.6)' }}
+                >
+                  {t.continue}
+                  <span className="font-normal opacity-70 mx-1.5">·</span>
+                  <span className="font-medium opacity-90">{t.continueEn}</span>
+                </motion.button>
 
-              <p className="text-center mt-5 leading-relaxed" style={{ fontSize: 11, color: 'var(--a-on-bg-soft)' }}>
-                {L({
-                  az: 'Dili sonradan tənzimləmələrdən dəyişə bilərsiniz',
-                  en: 'You can change the language later in settings',
-                  ru: 'Язык можно изменить позже в настройках',
-                  tr: 'Dili daha sonra ayarlardan değiştirebilirsiniz',
-                  kk: 'Тілді кейін баптаулардан өзгерте аласыз',
-                  uz: 'Tilni keyinroq sozlamalardan oʻzgartira olasiz',
-                  ka: 'ენის შეცვლა მოგვიანებით პარამეტრებში შეგიძლიათ',
-                  de: 'Du kannst die Sprache später in den Einstellungen ändern',
-                  ar: 'يمكنكِ تغيير اللغة لاحقًا من الإعدادات',
-                })}
-              </p>
+                <p className="text-center mt-3 leading-relaxed" style={{ fontSize: 11, color: 'var(--a-on-bg-soft)' }}>
+                  {L({
+                    az: 'Dili sonradan tənzimləmələrdən dəyişə bilərsiniz',
+                    en: 'You can change the language later in settings',
+                    ru: 'Язык можно изменить позже в настройках',
+                    tr: 'Dili daha sonra ayarlardan değiştirebilirsiniz',
+                    kk: 'Тілді кейін баптаулардан өзгерте аласыз',
+                    uz: 'Tilni keyinroq sozlamalardan oʻzgartira olasiz',
+                    ka: 'ენის შეცვლა მოგვიანებით პარამეტრებში შეგიძლიათ',
+                    de: 'Du kannst die Sprache später in den Einstellungen ändern',
+                    ar: 'يمكنكِ تغيير اللغة لاحقًا من الإعدادات',
+                  })}
+                </p>
+              </div>
             </motion.div>
           ) : (
             <motion.div
@@ -289,10 +294,10 @@ export default function InitialLanguageScreen() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: rtlX(-30, isRtl) }}
               transition={{ duration: 0.35 }}
-              className="flex-1 flex flex-col h-full"
+              className="flex-1 min-h-0 flex flex-col h-full"
             >
-              {/* Header */}
-              <div className="flex items-center justify-between mb-5 pt-2">
+              {/* Header — sabit, heç vaxt scroll olunmur (Geri düyməsi həmişə görünür) */}
+              <div className="flex items-center justify-between shrink-0 mb-5 pt-2">
                 <button
                   onClick={() => setStep(1)}
                   className="a-icon-btn"
@@ -311,8 +316,8 @@ export default function InitialLanguageScreen() {
                 <div className="w-10" />
               </div>
 
-              {/* Search */}
-              <div className="relative mb-4">
+              {/* Search — sabit, list-in üstündə həmişə görünür */}
+              <div className="relative shrink-0 mb-4">
                 <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4" strokeWidth={2.5} style={{ color: 'var(--a-ink-faint)' }} />
                 <input
                   type="text"
@@ -324,8 +329,8 @@ export default function InitialLanguageScreen() {
                 />
               </div>
 
-              {/* List card */}
-              <div className="flex-1 overflow-hidden mb-4" style={{ background: 'var(--a-surface)', borderRadius: 20, boxShadow: 'var(--a-card-shadow)' }}>
+              {/* List card — YALNIZ bura scroll olunur; header/search yuxarıda sabit qalır */}
+              <div className="flex-1 min-h-0 overflow-hidden mb-4" style={{ background: 'var(--a-surface)', borderRadius: 20, boxShadow: 'var(--a-card-shadow)' }}>
                 <div className="h-full overflow-y-auto scrollbar-hide">
                   {filteredCountries.length > 0 ? (
                     filteredCountries.map((country, idx) => {

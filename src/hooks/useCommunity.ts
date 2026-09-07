@@ -42,6 +42,8 @@ export interface CommunityPost {
     badge_type?: string;
     is_verified?: boolean | null;
     verified_until?: string | null;
+    /** Hamilə/Ana/Flow — anonim postlarda HƏMİŞƏ null (aşağı enrichPosts()-a bax) */
+    life_stage?: string | null;
   };
   is_liked?: boolean;
 }
@@ -62,6 +64,7 @@ export interface PostComment {
     badge_type?: string;
     is_verified?: boolean | null;
     verified_until?: string | null;
+    life_stage?: string | null;
   };
   is_liked?: boolean;
 }
@@ -182,7 +185,8 @@ const enrichPosts = async (posts: any[], userId?: string | null): Promise<Commun
         avatar_url: authorData.avatar_url || null,
         badge_type: authorData.badge_type || null,
         is_verified: authorData.is_verified || false,
-        verified_until: authorData.verified_until || null
+        verified_until: authorData.verified_until || null,
+        life_stage: authorData.life_stage || null
       } :
       { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null, is_verified: false, verified_until: null },
       is_liked: likedSet.has(post.id)
@@ -716,7 +720,8 @@ export const usePostComments = (postId: string, enabled: boolean = true) => {
             avatar_url: authorData.avatar_url || null,
             badge_type: authorData.badge_type || null,
             is_verified: authorData.is_verified || false,
-            verified_until: authorData.verified_until || null
+            verified_until: authorData.verified_until || null,
+            life_stage: authorData.life_stage || null
           } :
           { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null, is_verified: false, verified_until: null },
           is_liked: likedSet.has(comment.id)
