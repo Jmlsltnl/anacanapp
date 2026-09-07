@@ -75,17 +75,18 @@ export default function InitialLanguageScreen() {
   // Aktiv dillər DB-dən (app_languages.is_active) — ru/tr açılışı app release tələb etmir.
   useEffect(() => {
     fetchActiveLanguages()
-      .then((list) =>
-        setLangs(
-          list.map((l) => ({
+      .then((list) => {
+        const mapped = list.map((l) => ({
             code: l.code,
             label: l.native_name,
             nativeLabel: l.native_name,
             subLabel: l.name,
             flag: FLAG_BY_CODE[l.code] || 'az',
-          }))
-        )
-      )
+        }));
+        // AZ universal fallback-dır; remote siyahı natamam olsa belə itirmə.
+        if (!mapped.some((l) => l.code === 'az')) mapped.unshift(FALLBACK_LANGS[0]);
+        setLangs(mapped);
+      })
       .catch(() => {});
   }, []);
 
@@ -175,7 +176,7 @@ export default function InitialLanguageScreen() {
         <span className="a-cloud c4" />
       </div>
 
-      <div className="flex-1 flex flex-col px-6 py-8 relative z-10 w-full max-w-md mx-auto h-full">
+      <div className="flex-1 min-h-0 flex flex-col px-6 py-8 relative z-10 w-full max-w-md mx-auto h-full">
         <AnimatePresence mode="wait">
           {step === 1 ? (
             <motion.div
@@ -184,7 +185,7 @@ export default function InitialLanguageScreen() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: rtlX(-30, isRtl) }}
               transition={{ duration: 0.35 }}
-              className="flex-1 flex flex-col justify-center"
+              className="flex-1 min-h-0 overflow-y-auto flex flex-col justify-start py-4 overscroll-contain"
             >
               {/* Compact brand */}
               <div className="flex flex-col items-center mb-8">

@@ -53,9 +53,9 @@ captures/
 .idea/navEditor.xml
 
 # Keystore files
-# Uncomment the following lines if you do not want to check your keystore files in.
-#*.jks
-#*.keystore
+# Keystore faylları GİT-ə HEÇ VAXT düşməməlidir
+*.jks
+*.keystore
 
 # Release imzalama parolları — HEÇ VAXT git-ə düşməməlidir (bax keystore.properties.example)
 keystore.properties
