@@ -15,6 +15,9 @@ dist-ssr
 # Local AI credentials (never commit)
 .env.azure
 scripts/content-i18n/.env.azure
+.env.vertex
+scripts/content-i18n/baby-activities/.env.vertex
+scripts/content-i18n/baby-activities/images/
 
 # Editor directories and files
 .vscode/*
