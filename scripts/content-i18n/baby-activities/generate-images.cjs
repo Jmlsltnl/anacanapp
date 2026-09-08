@@ -137,15 +137,32 @@ async function generateOne(prompt) {
   }
 
   const errors = [];
+  const BACKOFFS = [15000, 30000, 60000]; // 429 (kvota) — eyni model üçün artan gözləmə
   for (const model of models) {
-    let r = await callModel({ vertex: useVertex, model, prompt, withImageConfig: true });
-    // Bəzi modellər imageConfig-i tanımır → onsuz bir dəfə təkrar
-    if (r.error && r.status === 400 && /imageConfig|image_config|aspect/i.test(r.error)) {
-      r = await callModel({ vertex: useVertex, model, prompt, withImageConfig: false });
+    let r;
+    let attempt = 0;
+    for (;;) {
+      r = await callModel({ vertex: useVertex, model, prompt, withImageConfig: true });
+      // Bəzi modellər imageConfig-i tanımır → onsuz bir dəfə təkrar
+      if (r.error && r.status === 400 && /imageConfig|image_config|aspect/i.test(r.error)) {
+        r = await callModel({ vertex: useVertex, model, prompt, withImageConfig: false });
+      }
+      if (r.base64) {
+        if (process.env.DEBUG_MODELS) console.log(`\n   ✓ uğurlu model: ${model}`);
+        return { ...r, model };
+      }
+      // 429 = kvota/sürət limiti — model İŞLƏKDİR, sadəcə gözləyib EYNİ modeli təkrar sına
+      if (r.status === 429 && attempt < BACKOFFS.length) {
+        const wait = BACKOFFS[attempt];
+        process.stdout.write(`\n   ⏸ 429 (kvota) — ${model} üçün ${wait / 1000}s gözlənilir (cəhd ${attempt + 1}/${BACKOFFS.length})... `);
+        await new Promise((res) => setTimeout(res, wait));
+        attempt++;
+        continue;
+      }
+      if (process.env.DEBUG_MODELS) console.log(`\n   ✗ ${model}: [${r.status}] ${r.error}`);
+      errors.push(`${model}: [${r.status}] ${r.error}`);
+      break; // 404 (model yoxdur) və ya 429 limiti bitdi → növbəti modelə keç
     }
-    if (r.base64) return { ...r, model };
-    errors.push(`${model}: [${r.status}] ${r.error}`);
-    // 503 (yüklənib) / 404 (model yoxdur) → növbəti modelə keç; digərləri də sınansın deyə davam edirik
   }
   throw new Error('Bütün modellər alınmadı:\n  ' + errors.join('\n  '));
 }
@@ -185,8 +202,8 @@ async function generateOne(prompt) {
       console.log('   ' + String(e.message).split('\n').join('\n   '));
       failed.push(p.id);
     }
-    // Rate limit üçün fasilə
-    await new Promise((r) => setTimeout(r, 2000));
+    // Rate limit üçün fasilə (bu layihənin kvotası azdır — 429-ları azaltmaq üçün)
+    await new Promise((r) => setTimeout(r, 8000));
   }
 
   console.log(`\n═══ Nəticə: ${done} yeni, ${failed.length} xəta ═══`);

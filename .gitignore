@@ -18,6 +18,8 @@ scripts/content-i18n/.env.azure
 .env.vertex
 scripts/content-i18n/baby-activities/.env.vertex
 scripts/content-i18n/baby-activities/images/
+service-account*.json
+**/service-account*.json
 
 # Editor directories and files
 .vscode/*
