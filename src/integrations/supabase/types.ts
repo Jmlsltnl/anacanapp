@@ -14193,6 +14193,34 @@ export type Database = {
         }
         Returns: boolean
       }
+      migration_export_auth_identities: {
+        Args: { p_limit?: number; p_offset?: number; p_secret: string }
+        Returns: Json
+      }
+      migration_export_auth_users: {
+        Args: { p_limit?: number; p_offset?: number; p_secret: string }
+        Returns: Json
+      }
+      migration_export_storage_objects: {
+        Args: { p_limit?: number; p_offset?: number; p_secret: string }
+        Returns: Json
+      }
+      migration_export_table: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+          p_secret: string
+          p_table_name: string
+        }
+        Returns: Json
+      }
+      migration_list_tables: {
+        Args: { p_secret: string }
+        Returns: {
+          approx_row_count: number
+          table_name: string
+        }[]
+      }
       redeem_referral_code: { Args: { p_code: string }; Returns: Json }
       unlink_partners: { Args: never; Returns: undefined }
       update_my_referral_status: { Args: { p_state: string }; Returns: Json }
