@@ -50,7 +50,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
     const realCountry = (profile as any)?.country_code || storeCountryCode;
     const supported = maternityRules.some((r) => r.code === realCountry);
     if (realCountry && supported) return realCountry;
-    return language === 'tr' ? 'TR' : language === 'ru' || language === 'kk' || language === 'uz' || language === 'ka' ? 'RU' : language === 'de' ? 'DE' : language === 'ar' ? 'SA' : 'AZ';
+    return language === 'tr' ? 'TR' : language === 'ru' || language === 'kk' || language === 'uz' ? 'RU' : language === 'ka' ? 'GE' : language === 'de' ? 'DE' : language === 'ar' ? 'SA' : 'AZ';
   });
   const [eddDate, setEddDate] = useState<string>('');
   const [role, setRole] = useState<'mother' | 'father'>('mother');

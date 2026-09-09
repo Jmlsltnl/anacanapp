@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { tr } from '@/lib/tr';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { X, Pause, Play, Trash2, Eye, Users, ChevronUp, Heart, MessageCircle, Send } from 'lucide-react';
+import { X, Pause, Play, Trash2, Eye, Users, ChevronUp, Heart, MessageCircle, Send, Volume2, VolumeX } from 'lucide-react';
 import { Story, UserStoryGroup } from '@/hooks/useStories';
 import { useStoryViewers } from '@/hooks/useStoryViewers';
 import { useStoryReplies, useCreateStoryReply, useDeleteStoryReply } from '@/hooks/useStoryReplies';
@@ -60,6 +60,12 @@ const StoryViewer = ({
     return 0;
   });
   const [isPaused, setIsPaused] = useState(false);
+  // Instagram kimi: video story-lər İLK avtomatik başlayanda səssiz olmalıdır
+  // (brauzer/WebView autoplay siyasəti buna görə tələb edir) — istifadəçi
+  // toxunanda (user-gesture daxilində) səsi aça bilər. Əvvəllər <video muted>
+  // statik idi, açma düyməsi/məntiqi ümumiyyətlə yox idi — səs HEÇ VAXT
+  // işləmirdi. Seçim story-dən story-yə keçəndə DƏYİŞMİR (bir dəfə açsa davam edir).
+  const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showViewers, setShowViewers] = useState(false);
@@ -175,6 +181,15 @@ const StoryViewer = ({
     if (isPaused || showDeleteConfirm || showViewers || showReplies) v.pause();else
     v.play().catch(() => {});
   }, [isPaused, showDeleteConfirm, showViewers, showReplies, currentStoryIndex, currentGroupIndex]);
+
+  // Video: mute sinxronu — JSX `muted` prop-u DOM-da mount-dan sonra bəzi
+  // WebView-larda etibarlı yenilənmir; imperativ təyinat bunu təmin edir.
+  // Story dəyişəndə videoRef YENİ elementə keçir — ona görə currentStoryIndex də dependency-dir.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = isMuted;
+  }, [isMuted, currentStoryIndex, currentGroupIndex]);
 
   // Long press to pause (Instagram-style)
   const handlePointerDown = () => {
@@ -326,6 +341,15 @@ const StoryViewer = ({
                   
                   {isPaused ? <Play className="w-4 h-4 text-white" /> : <Pause className="w-4 h-4 text-white" />}
                 </button>
+                {currentStory.media_type === 'video' &&
+                <button
+                  onClick={(e) => {e.stopPropagation();setIsMuted((m) => !m);}}
+                  aria-label={isMuted ? tr('storyviewer_sesi_ac', 'Səsi aç') : tr('storyviewer_sesi_bagla', 'Səsi bağla')}
+                  className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+                  
+                    {isMuted ? <VolumeX className="w-4 h-4 text-white" /> : <Volume2 className="w-4 h-4 text-white" />}
+                  </button>
+                }
                 {(isOwnStory || isAdmin) && onDelete &&
                 <button
                   onClick={(e) => {e.stopPropagation();setShowDeleteConfirm(true);setIsPaused(true);}}
@@ -387,7 +411,7 @@ const StoryViewer = ({
                   src={currentStory.media_url}
                   className="w-full h-full object-contain"
                   autoPlay
-                  muted
+                  muted={isMuted}
                   playsInline
                   onLoadedMetadata={(e) => {
                     // Video story real müddəti qədər oynayır (max 30s, Instagram kimi)
