@@ -2780,6 +2780,24 @@ export type Database = {
         }
         Relationships: []
       }
+      community_follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+        }
+        Relationships: []
+      }
       community_groups: {
         Row: {
           auto_join_criteria: Json | null
@@ -2833,6 +2851,32 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      community_post_bookmarks: {
+        Row: {
+          created_at: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_post_bookmarks_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       community_post_reads: {
         Row: {
@@ -2958,6 +3002,7 @@ export type Database = {
         Row: {
           background_color: string | null
           created_at: string
+          editor_layout: Json | null
           expires_at: string
           group_id: string | null
           id: string
@@ -2972,6 +3017,7 @@ export type Database = {
         Insert: {
           background_color?: string | null
           created_at?: string
+          editor_layout?: Json | null
           expires_at?: string
           group_id?: string | null
           id?: string
@@ -2986,6 +3032,7 @@ export type Database = {
         Update: {
           background_color?: string | null
           created_at?: string
+          editor_layout?: Json | null
           expires_at?: string
           group_id?: string | null
           id?: string
@@ -4396,6 +4443,7 @@ export type Database = {
           log_date: string
           mood: number | null
           notes: string | null
+          ovulation_test: string | null
           pain_level: number | null
           sexual_activity: string | null
           sleep_hours: number | null
@@ -4416,6 +4464,7 @@ export type Database = {
           log_date?: string
           mood?: number | null
           notes?: string | null
+          ovulation_test?: string | null
           pain_level?: number | null
           sexual_activity?: string | null
           sleep_hours?: number | null
@@ -4436,6 +4485,7 @@ export type Database = {
           log_date?: string
           mood?: number | null
           notes?: string | null
+          ovulation_test?: string | null
           pain_level?: number | null
           sexual_activity?: string | null
           sleep_hours?: number | null
@@ -4793,6 +4843,33 @@ export type Database = {
           updated_at?: string
           week_number?: number
           weight_g?: number | null
+        }
+        Relationships: []
+      }
+      game_score_receipts: {
+        Row: {
+          created_at: string
+          game_id: string
+          level: number
+          score: number
+          submission_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          level: number
+          score: number
+          submission_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          level?: number
+          score?: number
+          submission_id?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -6394,6 +6471,8 @@ export type Database = {
           body_ru: string | null
           body_tr: string | null
           body_uz: string | null
+          calendar_day_offset: number | null
+          calendar_months: number | null
           created_at: string
           day_number: number
           emoji: string | null
@@ -6421,6 +6500,8 @@ export type Database = {
           body_ru?: string | null
           body_tr?: string | null
           body_uz?: string | null
+          calendar_day_offset?: number | null
+          calendar_months?: number | null
           created_at?: string
           day_number: number
           emoji?: string | null
@@ -6448,6 +6529,8 @@ export type Database = {
           body_ru?: string | null
           body_tr?: string | null
           body_uz?: string | null
+          calendar_day_offset?: number | null
+          calendar_months?: number | null
           created_at?: string
           day_number?: number
           emoji?: string | null
@@ -14040,6 +14123,15 @@ export type Database = {
           new_users: number
         }[]
       }
+      anacan_source_stream_v1: {
+        Args: { p_action: string; p_options?: Json }
+        Returns: Json
+      }
+      anacan_source_sync_v1: {
+        Args: { p_action: string; p_options?: Json }
+        Returns: Json
+      }
+      anacan_source_writer_status_v1: { Args: never; Returns: Json }
       can_redeem_partner_venue: {
         Args: { _user_id: string; _venue_id: string }
         Returns: Json
@@ -14075,6 +14167,7 @@ export type Database = {
         }[]
       }
       get_active_users_count: { Args: { _since: string }; Returns: number }
+      get_anacan_runtime_contract_v1: { Args: never; Returns: Json }
       get_baby_crisis: {
         Args: { baby_age_weeks: number }
         Returns: {
@@ -14138,6 +14231,61 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_community_connections: {
+        Args: {
+          p_direction: string
+          p_limit?: number
+          p_offset?: number
+          p_user_id: string
+        }
+        Returns: {
+          avatar_url: string
+          badge_type: string
+          followed_at: string
+          is_following: boolean
+          is_verified: boolean
+          life_stage: string
+          name: string
+          user_id: string
+          verified_until: string
+        }[]
+      }
+      get_community_feed: {
+        Args: {
+          p_author_id?: string
+          p_group_id?: string
+          p_limit?: number
+          p_offset?: number
+          p_priority_languages?: string[]
+          p_search?: string
+          p_view?: string
+        }
+        Returns: {
+          comments_count: number | null
+          content: string
+          created_at: string
+          group_id: string | null
+          id: string
+          is_active: boolean | null
+          is_anonymous: boolean
+          is_pinned: boolean | null
+          language: string | null
+          likes_count: number | null
+          media_urls: string[] | null
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "community_posts"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_community_profile_stats: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       get_linked_partner_premium: { Args: never; Returns: boolean }
       get_linked_partner_user_id: {
         Args: { _user_id: string }
@@ -14193,7 +14341,58 @@ export type Database = {
         }
         Returns: boolean
       }
+      record_period_days: {
+        Args: {
+          p_complete?: boolean
+          p_daily_log?: Json
+          p_dates: string[]
+          p_expected_user_id: string
+          p_flow?: string
+          p_preserve_existing?: boolean
+          p_timezone?: string
+        }
+        Returns: Json
+      }
       redeem_referral_code: { Args: { p_code: string }; Returns: Json }
+      save_story_editor: {
+        Args: {
+          p_background_color?: string
+          p_editor_layout?: Json
+          p_expected_user_id: string
+          p_group_id: string
+          p_media_type: string
+          p_media_url: string
+          p_story_id: string
+          p_text_overlay?: string
+        }
+        Returns: string
+      }
+      set_community_bookmark: {
+        Args: {
+          p_expected_user_id: string
+          p_post_id: string
+          p_saved: boolean
+        }
+        Returns: Json
+      }
+      set_community_follow: {
+        Args: {
+          p_expected_user_id: string
+          p_follow: boolean
+          p_following_id: string
+        }
+        Returns: Json
+      }
+      submit_game_score_v1: {
+        Args: {
+          p_expected_user_id: string
+          p_game_id: string
+          p_level: number
+          p_score: number
+          p_submission_id: string
+        }
+        Returns: Json
+      }
       unlink_partners: { Args: never; Returns: undefined }
       update_my_referral_status: { Args: { p_state: string }; Returns: Json }
     }
