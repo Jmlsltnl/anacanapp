@@ -14167,6 +14167,7 @@ export type Database = {
         }[]
       }
       get_active_users_count: { Args: { _since: string }; Returns: number }
+      get_anacan_notification_contract_v1: { Args: never; Returns: Json }
       get_anacan_runtime_contract_v1: { Args: never; Returns: Json }
       get_baby_crisis: {
         Args: { baby_age_weeks: number }
