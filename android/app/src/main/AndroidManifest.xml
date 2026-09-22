@@ -75,6 +75,8 @@
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Google Mobile Ads: Android 13+ reklam identifikatoru (istifadəçi ayarlarına tabedir) -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
     <!-- Required for Android 13+ (API 33+) to display notifications -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Taymer foreground service (kilid ekranı sayğacı) -->

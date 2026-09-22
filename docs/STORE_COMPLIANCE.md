@@ -28,7 +28,7 @@ Play Console → App content → Data safety → yenilə:
 | Fitness info (Health Connect: steps/calories) | Yes (on-device) | No | App functionality |
 | Name, Email | Yes | No | App functionality, Account management |
 | User IDs | Yes | Yes (Firebase/RevenueCat/Facebook) | Analytics, App functionality |
-| Device IDs (advertising ID — Facebook SDK) | Yes | Yes | Advertising/Marketing, Analytics |
+| Device IDs (advertising ID — AdMob/Google and Facebook SDK) | Yes | Yes | Advertising/Marketing, Analytics |
 | Photos | Yes | No | App functionality |
 | Approx/Precise location | Yes | No | App functionality (hava/xəritə) |
 | Purchase history | Yes | Yes (RevenueCat) | App functionality |
@@ -47,7 +47,7 @@ kateqoriya: **Reproductive health / cycle tracking** seçin.
 `PrivacyInfo.xcprivacy` ilə uyğun olmalıdır:
 - **Health & Fitness** → Collected, Linked to user, App Functionality
 - Contact Info (Name, Email) → Linked, App Functionality
-- Identifiers (User ID / Device ID) → Linked; Device ID → **Used for Tracking = YES** (Facebook SDK)
+- Identifiers (User ID / Device ID) → Linked; Device ID → **Used for Tracking = YES** (AdMob/Google and Facebook SDK)
 - Photos, Location (Precise), Purchase History, Crash & Performance Data → App Functionality/Analytics
 - Tracking sualına: **Yes** (ATT dialoqu mövcuddur — `NSUserTrackingUsageDescription`)
 

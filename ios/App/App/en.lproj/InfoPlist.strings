@@ -10,4 +10,4 @@
 "NSMotionUsageDescription" = "Motion sensor is used to track daily activity and step count.";
 "NSBluetoothAlwaysUsageDescription" = "Anacan may use Bluetooth to connect with smart devices (e.g. baby monitors).";
 "NSLocalNetworkUsageDescription" = "The app requires permission to connect with devices on your local network.";
-"NSUserTrackingUsageDescription" = "Your permission helps us measure the effectiveness of our ads and show you more relevant content. Your personal data is not shared with third parties.";
+"NSUserTrackingUsageDescription" = "Your permission allows AdMob and its advertising partners to use your device identifier to personalize ads and measure their effectiveness.";
