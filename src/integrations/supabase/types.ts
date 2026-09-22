@@ -2613,6 +2613,58 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_message_reactions: {
+        Row: {
+          created_at: string
+          direct_message_id: string | null
+          emoji: string
+          group_message_id: string | null
+          id: string
+          partner_message_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          direct_message_id?: string | null
+          emoji: string
+          group_message_id?: string | null
+          id?: string
+          partner_message_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          direct_message_id?: string | null
+          emoji?: string
+          group_message_id?: string | null
+          id?: string
+          partner_message_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_message_reactions_direct_message_id_fkey"
+            columns: ["direct_message_id"]
+            isOneToOne: false
+            referencedRelation: "direct_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_message_reactions_group_message_id_fkey"
+            columns: ["group_message_id"]
+            isOneToOne: false
+            referencedRelation: "group_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_message_reactions_partner_message_id_fkey"
+            columns: ["partner_message_id"]
+            isOneToOne: false
+            referencedRelation: "partner_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       child_vaccinations: {
         Row: {
           administered_at: string | null
@@ -2780,6 +2832,27 @@ export type Database = {
         }
         Relationships: []
       }
+      communication_push_claims: {
+        Row: {
+          claimed_at: string
+          interaction_id: string
+          kind: string
+          target_user_id: string
+        }
+        Insert: {
+          claimed_at?: string
+          interaction_id: string
+          kind: string
+          target_user_id: string
+        }
+        Update: {
+          claimed_at?: string
+          interaction_id?: string
+          kind?: string
+          target_user_id?: string
+        }
+        Relationships: []
+      }
       community_follows: {
         Row: {
           created_at: string
@@ -2801,6 +2874,8 @@ export type Database = {
       community_groups: {
         Row: {
           auto_join_criteria: Json | null
+          chat_posting_policy: string | null
+          chat_visibility: string | null
           cover_image_url: string | null
           created_at: string
           created_by: string | null
@@ -2818,6 +2893,8 @@ export type Database = {
         }
         Insert: {
           auto_join_criteria?: Json | null
+          chat_posting_policy?: string | null
+          chat_visibility?: string | null
           cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
@@ -2835,6 +2912,8 @@ export type Database = {
         }
         Update: {
           auto_join_criteria?: Json | null
+          chat_posting_policy?: string | null
+          chat_visibility?: string | null
           cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
@@ -2955,6 +3034,7 @@ export type Database = {
           language: string | null
           likes_count: number | null
           media_urls: string[] | null
+          tagged_group_ids: string[] | null
           updated_at: string
           user_id: string
         }
@@ -2970,6 +3050,7 @@ export type Database = {
           language?: string | null
           likes_count?: number | null
           media_urls?: string[] | null
+          tagged_group_ids?: string[] | null
           updated_at?: string
           user_id: string
         }
@@ -2985,6 +3066,7 @@ export type Database = {
           language?: string | null
           likes_count?: number | null
           media_urls?: string[] | null
+          tagged_group_ids?: string[] | null
           updated_at?: string
           user_id?: string
         }
@@ -3672,34 +3754,54 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string
+          duration_ms: number | null
           id: string
           is_read: boolean
+          media_mime: string | null
+          media_path: string | null
           media_url: string | null
           message_type: string
           receiver_id: string
+          reply_to_id: string | null
           sender_id: string
         }
         Insert: {
           content?: string | null
           created_at?: string
+          duration_ms?: number | null
           id?: string
           is_read?: boolean
+          media_mime?: string | null
+          media_path?: string | null
           media_url?: string | null
           message_type?: string
           receiver_id: string
+          reply_to_id?: string | null
           sender_id: string
         }
         Update: {
           content?: string | null
           created_at?: string
+          duration_ms?: number | null
           id?: string
           is_read?: boolean
+          media_mime?: string | null
+          media_path?: string | null
           media_url?: string | null
           message_type?: string
           receiver_id?: string
+          reply_to_id?: string | null
           sender_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "direct_message_reply_v2"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "direct_messages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       epds_assessments: {
         Row: {
@@ -4906,11 +5008,53 @@ export type Database = {
         }
         Relationships: []
       }
+      group_chat_access: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          group_id: string
+          id: string
+          owner_id: string | null
+          state: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          group_id: string
+          id?: string
+          owner_id?: string | null
+          state: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          group_id?: string
+          id?: string
+          owner_id?: string | null
+          state?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_chat_access_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_memberships: {
         Row: {
           group_id: string
           id: string
           joined_at: string
+          last_read_at: string | null
           role: string | null
           user_id: string
         }
@@ -4918,6 +5062,7 @@ export type Database = {
           group_id: string
           id?: string
           joined_at?: string
+          last_read_at?: string | null
           role?: string | null
           user_id: string
         }
@@ -4925,6 +5070,7 @@ export type Database = {
           group_id?: string
           id?: string
           joined_at?: string
+          last_read_at?: string | null
           role?: string | null
           user_id?: string
         }
@@ -4934,6 +5080,60 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_messages: {
+        Row: {
+          content: string | null
+          created_at: string
+          duration_ms: number | null
+          group_id: string
+          id: string
+          media_mime: string | null
+          media_path: string | null
+          message_type: string
+          reply_to_id: string | null
+          sender_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          group_id: string
+          id?: string
+          media_mime?: string | null
+          media_path?: string | null
+          message_type?: string
+          reply_to_id?: string | null
+          sender_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          group_id?: string
+          id?: string
+          media_mime?: string | null
+          media_path?: string | null
+          message_type?: string
+          reply_to_id?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_messages_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "group_messages"
             referencedColumns: ["id"]
           },
         ]
@@ -7584,31 +7784,51 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string
+          duration_ms: number | null
           id: string
           is_read: boolean | null
+          media_mime: string | null
+          media_path: string | null
           message_type: string
           receiver_id: string
+          reply_to_id: string | null
           sender_id: string
         }
         Insert: {
           content?: string | null
           created_at?: string
+          duration_ms?: number | null
           id?: string
           is_read?: boolean | null
+          media_mime?: string | null
+          media_path?: string | null
           message_type: string
           receiver_id: string
+          reply_to_id?: string | null
           sender_id: string
         }
         Update: {
           content?: string | null
           created_at?: string
+          duration_ms?: number | null
           id?: string
           is_read?: boolean | null
+          media_mime?: string | null
+          media_path?: string | null
           message_type?: string
           receiver_id?: string
+          reply_to_id?: string | null
           sender_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "partner_message_reply_v2"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "partner_messages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       partner_missions: {
         Row: {
@@ -14123,6 +14343,10 @@ export type Database = {
           new_users: number
         }[]
       }
+      admin_set_source_admob_emergency_v1: {
+        Args: { p_disabled: boolean }
+        Returns: Json
+      }
       anacan_source_stream_v1: {
         Args: { p_action: string; p_options?: Json }
         Returns: Json
@@ -14135,6 +14359,154 @@ export type Database = {
       can_redeem_partner_venue: {
         Args: { _user_id: string; _venue_id: string }
         Returns: Json
+      }
+      chat_actor_v2: { Args: { p_expected: string }; Returns: string }
+      chat_create_group_v2: {
+        Args: {
+          p_actor: string
+          p_description?: string
+          p_id: string
+          p_members?: string[]
+          p_name: string
+        }
+        Returns: string
+      }
+      chat_create_group_v3: {
+        Args: {
+          p_actor: string
+          p_description?: string
+          p_id: string
+          p_members?: string[]
+          p_name: string
+          p_visibility?: string
+        }
+        Returns: string
+      }
+      chat_delete_group_message_v3: {
+        Args: { p_actor: string; p_group: string; p_message: string }
+        Returns: Json
+      }
+      chat_group_action_v3: {
+        Args: {
+          p_action: string
+          p_actor: string
+          p_group: string
+          p_users?: string[]
+        }
+        Returns: Json
+      }
+      chat_group_admin_v2: { Args: { p_group: string }; Returns: boolean }
+      chat_group_cards_v3: { Args: { p_groups: string[] }; Returns: Json[] }
+      chat_group_member_v2: { Args: { p_group: string }; Returns: boolean }
+      chat_group_members_v2: {
+        Args: { p_group: string }
+        Returns: {
+          avatar_url: string
+          joined_at: string
+          name: string
+          role: string
+          user_id: string
+        }[]
+      }
+      chat_group_notice_v3: {
+        Args: {
+          p_actor: string
+          p_group: string
+          p_kind: string
+          p_target: string
+        }
+        Returns: undefined
+      }
+      chat_group_owner_v3: { Args: { p_group: string }; Returns: boolean }
+      chat_group_people_v3: { Args: { p_group: string }; Returns: Json[] }
+      chat_group_public_v2: { Args: { p_group: string }; Returns: boolean }
+      chat_groups_v2: { Args: never; Returns: Json[] }
+      chat_groups_v3: {
+        Args: { p_group?: string; p_scope?: string; p_search?: string }
+        Returns: Json[]
+      }
+      chat_manage_members_v2: {
+        Args: {
+          p_action: string
+          p_actor: string
+          p_group: string
+          p_users?: string[]
+        }
+        Returns: undefined
+      }
+      chat_mark_read_v2: {
+        Args: {
+          p_actor: string
+          p_ids?: string[]
+          p_kind: string
+          p_target: string
+        }
+        Returns: undefined
+      }
+      chat_media_visible_v2: { Args: { p_path: string }; Returns: boolean }
+      chat_message_visible_v2: {
+        Args: { p_kind: string; p_message: string }
+        Returns: boolean
+      }
+      chat_messages_v2: {
+        Args: {
+          p_before_at?: string
+          p_before_id?: string
+          p_kind: string
+          p_limit?: number
+          p_target: string
+        }
+        Returns: Json[]
+      }
+      chat_send_message_v2: {
+        Args: {
+          p_actor: string
+          p_content?: string
+          p_duration_ms?: number
+          p_id: string
+          p_kind: string
+          p_media_mime?: string
+          p_media_path?: string
+          p_reply_to?: string
+          p_target: string
+          p_type?: string
+        }
+        Returns: Json
+      }
+      chat_set_reaction_v2: {
+        Args: {
+          p_actor: string
+          p_emoji?: string
+          p_kind: string
+          p_message: string
+        }
+        Returns: undefined
+      }
+      chat_update_group_v3: {
+        Args: {
+          p_actor: string
+          p_description: string
+          p_group: string
+          p_name: string
+          p_posting_policy: string
+          p_visibility: string
+        }
+        Returns: undefined
+      }
+      claim_communication_notification_v2: {
+        Args: {
+          p_body: string
+          p_data: Json
+          p_interaction_id: string
+          p_kind: string
+          p_target_user_id: string
+          p_title: string
+        }
+        Returns: boolean
+      }
+      community_premium_active_v2: {
+        Args: { p_user: string }
+        Returns: boolean
       }
       confirm_referral_conversion: {
         Args: { p_referred_user_id: string }
@@ -14167,6 +14539,7 @@ export type Database = {
         }[]
       }
       get_active_users_count: { Args: { _since: string }; Returns: number }
+      get_anacan_account_projection_contract_v1: { Args: never; Returns: Json }
       get_anacan_notification_contract_v1: { Args: never; Returns: Json }
       get_anacan_runtime_contract_v1: { Args: never; Returns: Json }
       get_baby_crisis: {
@@ -14232,6 +14605,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_chat_contract_v2: { Args: never; Returns: Json }
       get_community_connections: {
         Args: {
           p_direction: string
@@ -14273,6 +14647,7 @@ export type Database = {
           language: string | null
           likes_count: number | null
           media_urls: string[] | null
+          tagged_group_ids: string[] | null
           updated_at: string
           user_id: string
         }[]
@@ -14287,6 +14662,7 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
+      get_group_chat_contract_v3: { Args: never; Returns: Json }
       get_linked_partner_premium: { Args: never; Returns: boolean }
       get_linked_partner_user_id: {
         Args: { _user_id: string }
@@ -14295,6 +14671,26 @@ export type Database = {
       get_notification_admin_status: { Args: never; Returns: Json }
       get_or_create_referral_code: { Args: never; Returns: string }
       get_public_app_setting: { Args: { p_key: string }; Returns: Json }
+      get_public_community_profiles_v2: {
+        Args: { p_user_ids: string[] }
+        Returns: {
+          avatar_url: string
+          badge_type: string
+          can_share_links: boolean
+          created_at: string
+          is_premium: boolean
+          is_verified: boolean
+          life_stage: string
+          name: string
+          user_id: string
+          verified_until: string
+        }[]
+      }
+      get_source_admob_configuration_v1: {
+        Args: { p_expected_revision?: number }
+        Returns: Json
+      }
+      get_source_admob_contract_v1: { Args: never; Returns: Json }
       get_user_linked_partner_id: {
         Args: { _user_id: string }
         Returns: string
