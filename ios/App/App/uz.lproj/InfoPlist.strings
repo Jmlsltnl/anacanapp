@@ -10,4 +10,4 @@
 "NSMotionUsageDescription" = "Kunlik faollik va qadamlar sonini kuzatish uchun harakat sensori ishlatiladi.";
 "NSBluetoothAlwaysUsageDescription" = "Anacan aqlli qurilmalar (masalan, chaqaloq monitorlari) bilan bog'lanish uchun Bluetooth-dan foydalanishi mumkin.";
 "NSLocalNetworkUsageDescription" = "Ilova lokal tarmoqdagi qurilmalar bilan bog'lanish uchun ruxsat talab qiladi.";
-"NSUserTrackingUsageDescription" = "Ruxsatingiz reklamalarimiz samaradorligini o'lchashga va sizga mos kontent ko'rsatishga yordam beradi. Shaxsiy ma'lumotlaringiz uchinchi tomonlarga berilmaydi.";
+"NSUserTrackingUsageDescription" = "Ruxsatingiz AdMob va uning reklama hamkorlariga reklamalarni moslashtirish va samaradorligini o‘lchash uchun qurilma identifikatoridan foydalanish imkonini beradi.";

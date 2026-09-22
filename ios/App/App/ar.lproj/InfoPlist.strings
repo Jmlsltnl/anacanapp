@@ -10,4 +10,4 @@
 "NSMotionUsageDescription" = "يُستخدم مستشعر الحركة لتتبع النشاط اليومي وعدد الخطوات.";
 "NSBluetoothAlwaysUsageDescription" = "قد يستخدم Anacan تقنية Bluetooth للاتصال بالأجهزة الذكية (مثل أجهزة مراقبة الطفل).";
 "NSLocalNetworkUsageDescription" = "يتطلب التطبيق إذنًا للاتصال بالأجهزة الموجودة على شبكتك المحلية.";
-"NSUserTrackingUsageDescription" = "يساعدنا إذنك في قياس فعالية إعلاناتنا وعرض محتوى أكثر ملاءمة لكِ. لا تتم مشاركة بياناتك الشخصية مع أطراف ثالثة.";
+"NSUserTrackingUsageDescription" = "يسمح إذنك لخدمة AdMob وشركائها الإعلانيين باستخدام معرّف جهازك لتخصيص الإعلانات وقياس فعاليتها.";

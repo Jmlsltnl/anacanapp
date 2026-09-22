@@ -10,4 +10,4 @@
 "NSMotionUsageDescription" = "Gündəlik aktivlik və addım sayını izləmək üçün hərəkət sensoru istifadə olunur.";
 "NSBluetoothAlwaysUsageDescription" = "Anacan ağıllı cihazlarla (məs. körpə monitoru) əlaqə üçün Bluetooth istifadə edə bilər.";
 "NSLocalNetworkUsageDescription" = "Tətbiq lokal şəbəkədəki cihazlarla əlaqə qurmaq üçün icazə tələb edir.";
-"NSUserTrackingUsageDescription" = "İcazəniz reklamlarımızın effektivliyini ölçməyə və sizə daha uyğun məzmun göstərməyə kömək edir. Şəxsi məlumatlarınız üçüncü tərəflərlə paylaşılmır.";
+"NSUserTrackingUsageDescription" = "İcazəniz AdMob və onun reklam tərəfdaşlarının cihaz identifikatorundan reklamları fərdiləşdirmək və effektivliyini ölçmək üçün istifadə etməsinə imkan verir.";

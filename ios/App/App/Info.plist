@@ -181,7 +181,7 @@
 	<key>FacebookAdvertiserIDCollectionEnabled</key>
 	<true/>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>İcazəniz reklamlarımızın effektivliyini ölçməyə və sizə daha uyğun məzmun göstərməyə kömək edir. Şəxsi məlumatlarınız üçüncü tərəflərlə paylaşılmır.</string>
+	<string>İcazəniz AdMob və onun reklam tərəfdaşlarının cihaz identifikatorundan reklamları fərdiləşdirmək və effektivliyini ölçmək üçün istifadə etməsinə imkan verir.</string>
 
 	<!-- ===== Universal Links üçün açılan tətbiqlər ===== -->
 	<key>LSApplicationQueriesSchemes</key>
