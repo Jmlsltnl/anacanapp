@@ -1,80 +1,343 @@
+// supabase/functions/generate-fairy-tale/index.ts
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { requireUser } from "../_shared/auth.ts";
-import { callGeminiSmart } from "../_shared/vertex-ai.ts";
-import { checkAndConsumeServerSide, limitExceededResponse } from "../_shared/usage-limit.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+// supabase/functions/_shared/auth.ts
+import { createClient } from "npm:@supabase/supabase-js@2";
+async function checkModerationAccess(userId, functionName = "source-authenticated-function") {
+  const sourceRelease = Deno.env.get("SUPABASE_URL") === "https://tntbjulojatnrqmylorp.supabase.co";
+  if (!sourceRelease && Deno.env.get("MODERATOR_ENFORCEMENT_REQUIRED") !== "true") return null;
+  const denied = (unavailable) => new Response(JSON.stringify({ error: unavailable ? "moderation_unavailable" : "account_restricted" }), {
+    status: unavailable ? 503 : 403,
+    headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+  });
+  try {
+    const admin = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
+    const { data, error } = await admin.rpc("moderator_function_access_v1", { p_user: userId, p_function: functionName }).abortSignal(AbortSignal.timeout(5e3));
+    return error ? denied(true) : data === true ? null : denied(false);
+  } catch {
+    return denied(true);
+  }
+}
+async function requireUser(req, restrictedAccessPurpose) {
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return {
+      user: null,
+      error: new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+      })
+    };
+  }
+  const token = authHeader.replace("Bearer ", "");
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL"),
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+  );
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data?.user?.id) {
+    console.log("[auth] getUser failed:", error?.message);
+    return {
+      user: null,
+      error: new Response(JSON.stringify({ error: "Unauthorized", detail: error?.message }), {
+        status: 401,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+      })
+    };
+  }
+  const moderationError = await checkModerationAccess(data.user.id, restrictedAccessPurpose || Deno.env.get("SUPABASE_FUNCTION_SLUG"));
+  if (moderationError) return { user: null, error: moderationError };
+  return { user: { id: data.user.id, email: data.user.email ?? null }, error: null };
+}
+
+// supabase/functions/_shared/vertex-ai.ts
+var cachedToken = null;
+function isVertexConfigured() {
+  return !!(Deno.env.get("GCP_SERVICE_ACCOUNT_JSON") && Deno.env.get("GCP_PROJECT_ID"));
+}
+function getServiceAccount() {
+  const raw = Deno.env.get("GCP_SERVICE_ACCOUNT_JSON");
+  if (!raw) throw new Error("GCP_SERVICE_ACCOUNT_JSON not configured");
+  return JSON.parse(raw);
+}
+function base64UrlEncode(data) {
+  const bytes = typeof data === "string" ? new TextEncoder().encode(data) : data;
+  let str = btoa(String.fromCharCode(...bytes));
+  return str.replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
+}
+function pemToArrayBuffer(pem) {
+  const b64 = pem.replace(/-----BEGIN PRIVATE KEY-----/g, "").replace(/-----END PRIVATE KEY-----/g, "").replace(/\s+/g, "");
+  const binary = atob(b64);
+  const buf = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) buf[i] = binary.charCodeAt(i);
+  return buf.buffer;
+}
+async function getAccessToken() {
+  const now = Math.floor(Date.now() / 1e3);
+  if (cachedToken && cachedToken.exp - 60 > now) return cachedToken.token;
+  const sa = getServiceAccount();
+  const tokenUri = sa.token_uri || "https://oauth2.googleapis.com/token";
+  const header = { alg: "RS256", typ: "JWT" };
+  const claims = {
+    iss: sa.client_email,
+    scope: "https://www.googleapis.com/auth/cloud-platform",
+    aud: tokenUri,
+    exp: now + 3600,
+    iat: now
+  };
+  const unsigned = `${base64UrlEncode(JSON.stringify(header))}.${base64UrlEncode(JSON.stringify(claims))}`;
+  const keyData = pemToArrayBuffer(sa.private_key);
+  const cryptoKey = await crypto.subtle.importKey(
+    "pkcs8",
+    keyData,
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sigBuf = await crypto.subtle.sign(
+    "RSASSA-PKCS1-v1_5",
+    cryptoKey,
+    new TextEncoder().encode(unsigned)
+  );
+  const jwt = `${unsigned}.${base64UrlEncode(new Uint8Array(sigBuf))}`;
+  const res = await fetch(tokenUri, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to get GCP access token: ${res.status} ${text}`);
+  }
+  const data = await res.json();
+  cachedToken = { token: data.access_token, exp: now + (data.expires_in || 3600) };
+  return cachedToken.token;
+}
+async function callVertex(opts) {
+  const projectId = Deno.env.get("GCP_PROJECT_ID");
+  const location = Deno.env.get("GCP_LOCATION") || "us-central1";
+  if (!projectId) throw new Error("GCP_PROJECT_ID not configured");
+  const token = await getAccessToken();
+  const endpoint = opts.stream ? "streamGenerateContent" : "generateContent";
+  const host = location === "global" ? "aiplatform.googleapis.com" : `${location}-aiplatform.googleapis.com`;
+  const url = `https://${host}/v1/projects/${projectId}/locations/${location}/publishers/google/models/${opts.model}:${endpoint}${opts.stream ? "?alt=sse" : ""}`;
+  return await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(opts.body)
+  });
+}
+async function callGeminiSmart(model, body) {
+  const normalized = { ...body };
+  if (Array.isArray(normalized.contents)) {
+    normalized.contents = normalized.contents.map(
+      (c) => c && typeof c === "object" && !c.role ? { role: "user", ...c } : c
+    );
+  }
+  if (isVertexConfigured()) {
+    return await callVertex({ model, body: normalized });
+  }
+  const apiKey = Deno.env.get("GEMINI_API_KEY");
+  if (!apiKey) throw new Error("Neither Vertex AI nor GEMINI_API_KEY is configured");
+  return await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(normalized)
+    }
+  );
+}
+
+// supabase/functions/_shared/languages.ts
+var EXPANDED_LANGUAGE_NAMES = {
+  zh: "Mandarin Chinese (Simplified Chinese characters, zh-CN)",
+  id: "Indonesian (Bahasa Indonesia, id-ID)",
+  fr: "French (fr-FR)",
+  es: "Spanish (es-ES)",
+  pt: "European Portuguese (pt-PT)",
+  vi: "Vietnamese (vi-VN, with complete Vietnamese diacritics)",
+  hi: "Hindi (hi-IN, Devanagari script)",
+  ja: "Japanese (ja-JP, natural Japanese with kanji and kana)",
+  ko: "Korean (ko-KR, Hangul)",
+  pl: "Polish (pl-PL)",
+  nl: "Dutch (Netherlands, nl-NL)",
+  sv: "Swedish (sv-SE)"
 };
-
-const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: string; kk: string; uz: string; ka: string; de: string; ar: string }> = {
-  '0-2': {
-    az: 'Çox sadə cümlələr (3-5 söz). Təkrarlanan ifadələr. Heyvan səsləri. Rənglər və formalar. Nağıl 1-2 dəqiqəlik olsun.',
-    en: 'Very simple sentences (3-5 words). Repetitive phrases. Animal sounds. Colors and shapes. Story should be 1-2 minutes.',
-    ru: 'Очень простые предложения (3-5 слов). Повторяющиеся фразы. Звуки животных. Цвета и формы. Сказка на 1-2 минуты.',
-    tr: 'Çok basit cümleler (3-5 kelime). Tekrarlanan ifadeler. Hayvan sesleri. Renkler ve şekiller. Masal 1-2 dakika olsun.',
-    kk: 'Өте қарапайым сөйлемдер (3-5 сөз). Қайталанатын тіркестер. Жануарлардың дыбыстары. Түстер мен пішіндер. Ертегі 1-2 минутқа созылсын.',
-    uz: 'Juda sodda gaplar (3-5 soʻz). Takrorlanuvchi iboralar. Hayvon tovushlari. Ranglar va shakllar. Ertak 1-2 daqiqalik boʻlsin.',
-    ka: 'ძალიან მარტივი წინადადებები (3-5 სიტყვა). განმეორებადი ფრაზები. ცხოველების ხმები. ფერები და ფორმები. ზღაპარი 1-2 წუთიანი იყოს.',
-    de: 'Sehr einfache Sätze (3–5 Wörter). Wiederkehrende Formulierungen. Tierlaute. Farben und Formen. Das Märchen sollte 1–2 Minuten lang sein.',
-    ar: 'جمل بسيطة جدًا (٣-٥ كلمات). عبارات متكررة. أصوات الحيوانات. الألوان والأشكال. مدة الحكاية من دقيقة إلى دقيقتين.',
-  },
-  '3-5': {
-    az: 'Sadə amma məzmunlu cümlələr. Dialoqlar olsun. Əyləncəli hadisələr. Tərbiyəvi mesaj aydın olsun. 3-4 dəqiqəlik nağıl.',
-    en: 'Simple but meaningful sentences. Include dialogues. Fun events. Clear moral message. 3-4 minute story.',
-    ru: 'Простые, но содержательные предложения. Диалоги. Весёлые события. Ясный воспитательный посыл. Сказка на 3-4 минуты.',
-    tr: 'Basit ama anlamlı cümleler. Diyaloglar olsun. Eğlenceli olaylar. Net eğitici mesaj. 3-4 dakikalık masal.',
-    kk: 'Қарапайым, бірақ мағыналы сөйлемдер. Диалогтар болсын. Қызықты оқиғалар. Тәрбиелік ойы анық болсын. Ертегі 3-4 минутқа созылсын.',
-    uz: 'Sodda, ammo mazmunli gaplar. Dialoglar boʻlsin. Qiziqarli voqealar. Tarbiyaviy gʻoya aniq boʻlsin. Ertak 3-4 daqiqalik boʻlsin.',
-    ka: 'მარტივი, მაგრამ შინაარსიანი წინადადებები. იყოს დიალოგები. სახალისო მოვლენები. აღმზრდელობითი გზავნილი ნათელი იყოს. 3-4 წუთიანი ზღაპარი.',
-    de: 'Einfache, aber aussagekräftige Sätze. Mit Dialogen. Unterhaltsame Ereignisse. Die pädagogische Botschaft sollte klar sein. Ein 3–4-minütiges Märchen.',
-    ar: 'جمل بسيطة وذات معنى. تضمين حوارات وأحداث ممتعة. يجب أن تكون الرسالة التربوية واضحة. مدة الحكاية من ٣ إلى ٤ دقائق.',
-  },
-  '6-9': {
-    az: 'Daha mürəkkəb süjet xətti. Problemin həlli prosesi göstərilsin. Uşağın düşünməsinə kömək edən suallar. 4-6 dəqiqəlik nağıl.',
-    en: 'More complex plot. Show problem-solving process. Questions that help the child think. 4-6 minute story.',
-    ru: 'Более сложный сюжет. Показать процесс решения проблем. Вопросы для размышления. Сказка на 4-6 минут.',
-    tr: 'Daha karmaşık olay örgüsü. Problem çözme süreci gösterilsin. Çocuğun düşünmesine yardımcı sorular. 4-6 dakikalık masal.',
-    kk: 'Күрделірек оқиға желісі. Мәселені шешу үдерісі көрсетілсін. Баланың ойлануына көмектесетін сұрақтар. Ертегі 4-6 минутқа созылсын.',
-    uz: 'Murakkabroq syujet chizigʻi. Muammoni hal qilish jarayoni koʻrsatilsin. Bolani oʻylashga undaydigan savollar. Ertak 4-6 daqiqalik boʻlsin.',
-    ka: 'უფრო რთული სიუჟეტური ხაზი. ნაჩვენები იყოს პრობლემის გადაჭრის პროცესი. კითხვები, რომლებიც ბავშვს დაფიქრებაში ეხმარება. 4-6 წუთიანი ზღაპარი.',
-    de: 'Eine komplexere Handlung. Zeige den Prozess der Problemlösung. Fragen, die das Kind zum Nachdenken anregen. Ein 4–6-minütiges Märchen.',
-    ar: 'حبكة أكثر تعقيدًا. توضيح عملية حل المشكلة. أسئلة تساعد الطفل على التفكير. مدة الحكاية من ٤ إلى ٦ دقائق.',
-  },
-  '10-12': {
-    az: 'Zəngin süjet. Əxlaqi dilemma və seçimlər. Emosional dərinlik. Daha uzun dialoqlar. 5-7 dəqiqəlik nağıl.',
-    en: 'Rich plot. Moral dilemmas and choices. Emotional depth. Longer dialogues. 5-7 minute story.',
-    ru: 'Богатый сюжет. Моральные дилеммы и выбор. Эмоциональная глубина. Длинные диалоги. Сказка на 5-7 минут.',
-    tr: 'Zengin olay örgüsü. Ahlaki ikilemler ve seçimler. Duygusal derinlik. Daha uzun diyaloglar. 5-7 dakikalık masal.',
-    kk: 'Мазмұнды оқиға желісі. Моральдық дилеммалар мен таңдау. Эмоциялық тереңдік. Ұзағырақ диалогтар. Ертегі 5-7 минутқа созылсын.',
-    uz: 'Boy syujet. Axloqiy dilemmalar va tanlovlar. Hissiy teranlik. Uzunroq dialoglar. Ertak 5-7 daqiqalik boʻlsin.',
-    ka: 'მდიდარი სიუჟეტი. მორალური დილემები და არჩევანი. ემოციური სიღრმე. უფრო გრძელი დიალოგები. 5-7 წუთიანი ზღაპარი.',
-    de: 'Eine vielschichtige Handlung. Moralische Dilemmas und Entscheidungen. Emotionale Tiefe. Längere Dialoge. Ein 5–7-minütiges Märchen.',
-    ar: 'حبكة غنية. معضلة أخلاقية وخيارات. عمق عاطفي. حوارات أطول. مدة الحكاية من ٥ إلى ٧ دقائق.',
-  },
+var LANGUAGE_NAMES = {
+  az: "Azerbaijani",
+  en: "English",
+  tr: "Turkish",
+  ru: "Russian",
+  de: "German",
+  ar: "Modern Standard Arabic",
+  ka: "Georgian",
+  kk: "Kazakh",
+  uz: "Uzbek (Latin script)",
+  ...EXPANDED_LANGUAGE_NAMES
 };
+var LANGUAGE_CODES = Object.keys(LANGUAGE_NAMES);
+var isExpandedLanguage = (language) => Object.hasOwn(EXPANDED_LANGUAGE_NAMES, language);
+function outputLanguageRule(language) {
+  if (!isExpandedLanguage(language)) return "";
+  return `Write all user-visible text in ${EXPANDED_LANGUAGE_NAMES[language]}, including titles, labels, descriptions, explanations and recommendations. The language of these instructions does not determine the reply language. Keep JSON keys, enum/status codes, numbers, units, identifiers, names supplied by the user and URLs unchanged. Do not add medical claims or change the meaning.`;
+}
 
-const getSystemPrompt = (language: string, childName: string, ageRange?: string) => {
-  const ageGuide = ageRange && AGE_GUIDELINES[ageRange] 
-    ? AGE_GUIDELINES[ageRange][language as keyof typeof AGE_GUIDELINES['0-2']] || AGE_GUIDELINES[ageRange]['az']
-    : '';
-  const ageInstruction = ageGuide ? `\n\nYAŞ QRUPUNA UYĞUN YAZMA QAYDALARI:\n${ageGuide}` : '';
+// supabase/functions/_shared/usage-limit.ts
+import { createClient as createClient2 } from "npm:@supabase/supabase-js@2";
+var DAILY_LIMIT_KEYS = {
+  ai_chat: "ai_chat_count_per_day",
+  cry_translator: "cry_translator_count_per_day",
+  poop_scanner: "poop_scanner_count_per_day",
+  fairy_tale: "fairy_tale_count_per_day",
+  horoscope: "horoscope_count_per_day",
+  baby_insight: "baby_insight_count_per_day"
+};
+var DEFAULT_LIMITS = {
+  ai_chat: 10,
+  cry_translator: 3,
+  poop_scanner: 3,
+  fairy_tale: 3,
+  horoscope: 2,
+  baby_insight: 2
+};
+function adminClient() {
+  return createClient2(
+    Deno.env.get("SUPABASE_URL"),
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+  );
+}
+async function isPremiumUser(admin, userId) {
+  const access = await admin.rpc("get_premium_access_v1", { p_user_id: userId });
+  if (!access.error && access.data?.protocol === "anacan-premium-access-v1") return access.data.own?.active === true || access.data.household?.active === true;
+  if (access.error?.code !== "PGRST202") return false;
+  const now = /* @__PURE__ */ new Date();
+  const { data: sub } = await admin.from("subscriptions").select("plan_type, status, expires_at").eq("user_id", userId).maybeSingle();
+  const subOk = !!sub && (sub.plan_type === "premium" || sub.plan_type === "premium_plus") && (sub.status === "active" || sub.status === "cancelled") && (!sub.expires_at || new Date(sub.expires_at) > now);
+  if (sub) return subOk;
+  const { data: profile } = await admin.from("profiles").select("is_premium, premium_until").eq("user_id", userId).maybeSingle();
+  return !!profile?.is_premium && (!profile.premium_until || new Date(profile.premium_until) > now);
+}
+async function checkAndConsumeServerSide(userId, feature) {
+  const admin = adminClient();
+  try {
+    if (await isPremiumUser(admin, userId)) {
+      return { allowed: true, remaining: Infinity, limit: Infinity };
+    }
+    let limit = DEFAULT_LIMITS[feature];
+    try {
+      const { data: setting } = await admin.from("app_settings").select("value").eq("key", "free_limits").maybeSingle();
+      const configured = setting?.value?.[DAILY_LIMIT_KEYS[feature]];
+      if (typeof configured === "number" && configured >= 0) limit = configured;
+    } catch {
+    }
+    const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+    const { data: row } = await admin.from("usage_tracking").select("id, usage_count").eq("user_id", userId).eq("feature_type", feature).eq("usage_date", today).maybeSingle();
+    const used = row?.usage_count || 0;
+    if (used >= limit) return { allowed: false, remaining: 0, limit };
+    if (row) {
+      await admin.from("usage_tracking").update({ usage_count: used + 1 }).eq("id", row.id);
+    } else {
+      await admin.from("usage_tracking").upsert({
+        user_id: userId,
+        feature_type: feature,
+        usage_date: today,
+        usage_count: 1
+      }, { onConflict: "user_id,feature_type,usage_date" });
+    }
+    return { allowed: true, remaining: Math.max(0, limit - used - 1), limit };
+  } catch (e) {
+    console.error("[usage-limit] checkAndConsumeServerSide failed (allowing by default):", e);
+    return { allowed: true, remaining: 0, limit: DEFAULT_LIMITS[feature] };
+  }
+}
+function limitExceededResponse(corsHeaders2, limit) {
+  return new Response(
+    JSON.stringify({
+      error: "daily_limit_exceeded",
+      message: `Daily free limit reached (${limit}/day). Upgrade to Premium for unlimited access.`
+    }),
+    { status: 429, headers: { ...corsHeaders2, "Content-Type": "application/json" } }
+  );
+}
 
+// supabase/functions/generate-fairy-tale/index.ts
+var corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version"
+};
+var AGE_GUIDELINES = {
+  "0-2": {
+    az: "\xC7ox sad\u0259 c\xFCml\u0259l\u0259r (3-5 s\xF6z). T\u0259krarlanan ifad\u0259l\u0259r. Heyvan s\u0259sl\u0259ri. R\u0259ngl\u0259r v\u0259 formalar. Na\u011F\u0131l 1-2 d\u0259qiq\u0259lik olsun.",
+    en: "Very simple sentences (3-5 words). Repetitive phrases. Animal sounds. Colors and shapes. Story should be 1-2 minutes.",
+    ru: "\u041E\u0447\u0435\u043D\u044C \u043F\u0440\u043E\u0441\u0442\u044B\u0435 \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u044F (3-5 \u0441\u043B\u043E\u0432). \u041F\u043E\u0432\u0442\u043E\u0440\u044F\u044E\u0449\u0438\u0435\u0441\u044F \u0444\u0440\u0430\u0437\u044B. \u0417\u0432\u0443\u043A\u0438 \u0436\u0438\u0432\u043E\u0442\u043D\u044B\u0445. \u0426\u0432\u0435\u0442\u0430 \u0438 \u0444\u043E\u0440\u043C\u044B. \u0421\u043A\u0430\u0437\u043A\u0430 \u043D\u0430 1-2 \u043C\u0438\u043D\u0443\u0442\u044B.",
+    tr: "\xC7ok basit c\xFCmleler (3-5 kelime). Tekrarlanan ifadeler. Hayvan sesleri. Renkler ve \u015Fekiller. Masal 1-2 dakika olsun.",
+    kk: "\u04E8\u0442\u0435 \u049B\u0430\u0440\u0430\u043F\u0430\u0439\u044B\u043C \u0441\u04E9\u0439\u043B\u0435\u043C\u0434\u0435\u0440 (3-5 \u0441\u04E9\u0437). \u049A\u0430\u0439\u0442\u0430\u043B\u0430\u043D\u0430\u0442\u044B\u043D \u0442\u0456\u0440\u043A\u0435\u0441\u0442\u0435\u0440. \u0416\u0430\u043D\u0443\u0430\u0440\u043B\u0430\u0440\u0434\u044B\u04A3 \u0434\u044B\u0431\u044B\u0441\u0442\u0430\u0440\u044B. \u0422\u04AF\u0441\u0442\u0435\u0440 \u043C\u0435\u043D \u043F\u0456\u0448\u0456\u043D\u0434\u0435\u0440. \u0415\u0440\u0442\u0435\u0433\u0456 1-2 \u043C\u0438\u043D\u0443\u0442\u049B\u0430 \u0441\u043E\u0437\u044B\u043B\u0441\u044B\u043D.",
+    uz: "Juda sodda gaplar (3-5 so\u02BBz). Takrorlanuvchi iboralar. Hayvon tovushlari. Ranglar va shakllar. Ertak 1-2 daqiqalik bo\u02BBlsin.",
+    ka: "\u10EB\u10D0\u10DA\u10D8\u10D0\u10DC \u10DB\u10D0\u10E0\u10E2\u10D8\u10D5\u10D8 \u10EC\u10D8\u10DC\u10D0\u10D3\u10D0\u10D3\u10D4\u10D1\u10D4\u10D1\u10D8 (3-5 \u10E1\u10D8\u10E2\u10E7\u10D5\u10D0). \u10D2\u10D0\u10DC\u10DB\u10D4\u10DD\u10E0\u10D4\u10D1\u10D0\u10D3\u10D8 \u10E4\u10E0\u10D0\u10D6\u10D4\u10D1\u10D8. \u10EA\u10EE\u10DD\u10D5\u10D4\u10DA\u10D4\u10D1\u10D8\u10E1 \u10EE\u10DB\u10D4\u10D1\u10D8. \u10E4\u10D4\u10E0\u10D4\u10D1\u10D8 \u10D3\u10D0 \u10E4\u10DD\u10E0\u10DB\u10D4\u10D1\u10D8. \u10D6\u10E6\u10D0\u10DE\u10D0\u10E0\u10D8 1-2 \u10EC\u10E3\u10D7\u10D8\u10D0\u10DC\u10D8 \u10D8\u10E7\u10DD\u10E1.",
+    de: "Sehr einfache S\xE4tze (3\u20135 W\xF6rter). Wiederkehrende Formulierungen. Tierlaute. Farben und Formen. Das M\xE4rchen sollte 1\u20132 Minuten lang sein.",
+    ar: "\u062C\u0645\u0644 \u0628\u0633\u064A\u0637\u0629 \u062C\u062F\u064B\u0627 (\u0663-\u0665 \u0643\u0644\u0645\u0627\u062A). \u0639\u0628\u0627\u0631\u0627\u062A \u0645\u062A\u0643\u0631\u0631\u0629. \u0623\u0635\u0648\u0627\u062A \u0627\u0644\u062D\u064A\u0648\u0627\u0646\u0627\u062A. \u0627\u0644\u0623\u0644\u0648\u0627\u0646 \u0648\u0627\u0644\u0623\u0634\u0643\u0627\u0644. \u0645\u062F\u0629 \u0627\u0644\u062D\u0643\u0627\u064A\u0629 \u0645\u0646 \u062F\u0642\u064A\u0642\u0629 \u0625\u0644\u0649 \u062F\u0642\u064A\u0642\u062A\u064A\u0646."
+  },
+  "3-5": {
+    az: "Sad\u0259 amma m\u0259zmunlu c\xFCml\u0259l\u0259r. Dialoqlar olsun. \u018Fyl\u0259nc\u0259li hadis\u0259l\u0259r. T\u0259rbiy\u0259vi mesaj ayd\u0131n olsun. 3-4 d\u0259qiq\u0259lik na\u011F\u0131l.",
+    en: "Simple but meaningful sentences. Include dialogues. Fun events. Clear moral message. 3-4 minute story.",
+    ru: "\u041F\u0440\u043E\u0441\u0442\u044B\u0435, \u043D\u043E \u0441\u043E\u0434\u0435\u0440\u0436\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435 \u043F\u0440\u0435\u0434\u043B\u043E\u0436\u0435\u043D\u0438\u044F. \u0414\u0438\u0430\u043B\u043E\u0433\u0438. \u0412\u0435\u0441\u0451\u043B\u044B\u0435 \u0441\u043E\u0431\u044B\u0442\u0438\u044F. \u042F\u0441\u043D\u044B\u0439 \u0432\u043E\u0441\u043F\u0438\u0442\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u043F\u043E\u0441\u044B\u043B. \u0421\u043A\u0430\u0437\u043A\u0430 \u043D\u0430 3-4 \u043C\u0438\u043D\u0443\u0442\u044B.",
+    tr: "Basit ama anlaml\u0131 c\xFCmleler. Diyaloglar olsun. E\u011Flenceli olaylar. Net e\u011Fitici mesaj. 3-4 dakikal\u0131k masal.",
+    kk: "\u049A\u0430\u0440\u0430\u043F\u0430\u0439\u044B\u043C, \u0431\u0456\u0440\u0430\u049B \u043C\u0430\u0493\u044B\u043D\u0430\u043B\u044B \u0441\u04E9\u0439\u043B\u0435\u043C\u0434\u0435\u0440. \u0414\u0438\u0430\u043B\u043E\u0433\u0442\u0430\u0440 \u0431\u043E\u043B\u0441\u044B\u043D. \u049A\u044B\u0437\u044B\u049B\u0442\u044B \u043E\u049B\u0438\u0493\u0430\u043B\u0430\u0440. \u0422\u04D9\u0440\u0431\u0438\u0435\u043B\u0456\u043A \u043E\u0439\u044B \u0430\u043D\u044B\u049B \u0431\u043E\u043B\u0441\u044B\u043D. \u0415\u0440\u0442\u0435\u0433\u0456 3-4 \u043C\u0438\u043D\u0443\u0442\u049B\u0430 \u0441\u043E\u0437\u044B\u043B\u0441\u044B\u043D.",
+    uz: "Sodda, ammo mazmunli gaplar. Dialoglar bo\u02BBlsin. Qiziqarli voqealar. Tarbiyaviy g\u02BBoya aniq bo\u02BBlsin. Ertak 3-4 daqiqalik bo\u02BBlsin.",
+    ka: "\u10DB\u10D0\u10E0\u10E2\u10D8\u10D5\u10D8, \u10DB\u10D0\u10D2\u10E0\u10D0\u10DB \u10E8\u10D8\u10DC\u10D0\u10D0\u10E0\u10E1\u10D8\u10D0\u10DC\u10D8 \u10EC\u10D8\u10DC\u10D0\u10D3\u10D0\u10D3\u10D4\u10D1\u10D4\u10D1\u10D8. \u10D8\u10E7\u10DD\u10E1 \u10D3\u10D8\u10D0\u10DA\u10DD\u10D2\u10D4\u10D1\u10D8. \u10E1\u10D0\u10EE\u10D0\u10DA\u10D8\u10E1\u10DD \u10DB\u10DD\u10D5\u10DA\u10D4\u10DC\u10D4\u10D1\u10D8. \u10D0\u10E6\u10DB\u10D6\u10E0\u10D3\u10D4\u10DA\u10DD\u10D1\u10D8\u10D7\u10D8 \u10D2\u10D6\u10D0\u10D5\u10DC\u10D8\u10DA\u10D8 \u10DC\u10D0\u10D7\u10D4\u10DA\u10D8 \u10D8\u10E7\u10DD\u10E1. 3-4 \u10EC\u10E3\u10D7\u10D8\u10D0\u10DC\u10D8 \u10D6\u10E6\u10D0\u10DE\u10D0\u10E0\u10D8.",
+    de: "Einfache, aber aussagekr\xE4ftige S\xE4tze. Mit Dialogen. Unterhaltsame Ereignisse. Die p\xE4dagogische Botschaft sollte klar sein. Ein 3\u20134-min\xFCtiges M\xE4rchen.",
+    ar: "\u062C\u0645\u0644 \u0628\u0633\u064A\u0637\u0629 \u0648\u0630\u0627\u062A \u0645\u0639\u0646\u0649. \u062A\u0636\u0645\u064A\u0646 \u062D\u0648\u0627\u0631\u0627\u062A \u0648\u0623\u062D\u062F\u0627\u062B \u0645\u0645\u062A\u0639\u0629. \u064A\u062C\u0628 \u0623\u0646 \u062A\u0643\u0648\u0646 \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u062A\u0631\u0628\u0648\u064A\u0629 \u0648\u0627\u0636\u062D\u0629. \u0645\u062F\u0629 \u0627\u0644\u062D\u0643\u0627\u064A\u0629 \u0645\u0646 \u0663 \u0625\u0644\u0649 \u0664 \u062F\u0642\u0627\u0626\u0642."
+  },
+  "6-9": {
+    az: "Daha m\xFCr\u0259kk\u0259b s\xFCjet x\u0259tti. Problemin h\u0259lli prosesi g\xF6st\u0259rilsin. U\u015Fa\u011F\u0131n d\xFC\u015F\xFCnm\u0259sin\u0259 k\xF6m\u0259k ed\u0259n suallar. 4-6 d\u0259qiq\u0259lik na\u011F\u0131l.",
+    en: "More complex plot. Show problem-solving process. Questions that help the child think. 4-6 minute story.",
+    ru: "\u0411\u043E\u043B\u0435\u0435 \u0441\u043B\u043E\u0436\u043D\u044B\u0439 \u0441\u044E\u0436\u0435\u0442. \u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C \u043F\u0440\u043E\u0446\u0435\u0441\u0441 \u0440\u0435\u0448\u0435\u043D\u0438\u044F \u043F\u0440\u043E\u0431\u043B\u0435\u043C. \u0412\u043E\u043F\u0440\u043E\u0441\u044B \u0434\u043B\u044F \u0440\u0430\u0437\u043C\u044B\u0448\u043B\u0435\u043D\u0438\u044F. \u0421\u043A\u0430\u0437\u043A\u0430 \u043D\u0430 4-6 \u043C\u0438\u043D\u0443\u0442.",
+    tr: "Daha karma\u015F\u0131k olay \xF6rg\xFCs\xFC. Problem \xE7\xF6zme s\xFCreci g\xF6sterilsin. \xC7ocu\u011Fun d\xFC\u015F\xFCnmesine yard\u0131mc\u0131 sorular. 4-6 dakikal\u0131k masal.",
+    kk: "\u041A\u04AF\u0440\u0434\u0435\u043B\u0456\u0440\u0435\u043A \u043E\u049B\u0438\u0493\u0430 \u0436\u0435\u043B\u0456\u0441\u0456. \u041C\u04D9\u0441\u0435\u043B\u0435\u043D\u0456 \u0448\u0435\u0448\u0443 \u04AF\u0434\u0435\u0440\u0456\u0441\u0456 \u043A\u04E9\u0440\u0441\u0435\u0442\u0456\u043B\u0441\u0456\u043D. \u0411\u0430\u043B\u0430\u043D\u044B\u04A3 \u043E\u0439\u043B\u0430\u043D\u0443\u044B\u043D\u0430 \u043A\u04E9\u043C\u0435\u043A\u0442\u0435\u0441\u0435\u0442\u0456\u043D \u0441\u04B1\u0440\u0430\u049B\u0442\u0430\u0440. \u0415\u0440\u0442\u0435\u0433\u0456 4-6 \u043C\u0438\u043D\u0443\u0442\u049B\u0430 \u0441\u043E\u0437\u044B\u043B\u0441\u044B\u043D.",
+    uz: "Murakkabroq syujet chizig\u02BBi. Muammoni hal qilish jarayoni ko\u02BBrsatilsin. Bolani o\u02BBylashga undaydigan savollar. Ertak 4-6 daqiqalik bo\u02BBlsin.",
+    ka: "\u10E3\u10E4\u10E0\u10DD \u10E0\u10D7\u10E3\u10DA\u10D8 \u10E1\u10D8\u10E3\u10DF\u10D4\u10E2\u10E3\u10E0\u10D8 \u10EE\u10D0\u10D6\u10D8. \u10DC\u10D0\u10E9\u10D5\u10D4\u10DC\u10D4\u10D1\u10D8 \u10D8\u10E7\u10DD\u10E1 \u10DE\u10E0\u10DD\u10D1\u10DA\u10D4\u10DB\u10D8\u10E1 \u10D2\u10D0\u10D3\u10D0\u10ED\u10E0\u10D8\u10E1 \u10DE\u10E0\u10DD\u10EA\u10D4\u10E1\u10D8. \u10D9\u10D8\u10D7\u10EE\u10D5\u10D4\u10D1\u10D8, \u10E0\u10DD\u10DB\u10DA\u10D4\u10D1\u10D8\u10EA \u10D1\u10D0\u10D5\u10E8\u10D5\u10E1 \u10D3\u10D0\u10E4\u10D8\u10E5\u10E0\u10D4\u10D1\u10D0\u10E8\u10D8 \u10D4\u10EE\u10DB\u10D0\u10E0\u10D4\u10D1\u10D0. 4-6 \u10EC\u10E3\u10D7\u10D8\u10D0\u10DC\u10D8 \u10D6\u10E6\u10D0\u10DE\u10D0\u10E0\u10D8.",
+    de: "Eine komplexere Handlung. Zeige den Prozess der Probleml\xF6sung. Fragen, die das Kind zum Nachdenken anregen. Ein 4\u20136-min\xFCtiges M\xE4rchen.",
+    ar: "\u062D\u0628\u0643\u0629 \u0623\u0643\u062B\u0631 \u062A\u0639\u0642\u064A\u062F\u064B\u0627. \u062A\u0648\u0636\u064A\u062D \u0639\u0645\u0644\u064A\u0629 \u062D\u0644 \u0627\u0644\u0645\u0634\u0643\u0644\u0629. \u0623\u0633\u0626\u0644\u0629 \u062A\u0633\u0627\u0639\u062F \u0627\u0644\u0637\u0641\u0644 \u0639\u0644\u0649 \u0627\u0644\u062A\u0641\u0643\u064A\u0631. \u0645\u062F\u0629 \u0627\u0644\u062D\u0643\u0627\u064A\u0629 \u0645\u0646 \u0664 \u0625\u0644\u0649 \u0666 \u062F\u0642\u0627\u0626\u0642."
+  },
+  "10-12": {
+    az: "Z\u0259ngin s\xFCjet. \u018Fxlaqi dilemma v\u0259 se\xE7iml\u0259r. Emosional d\u0259rinlik. Daha uzun dialoqlar. 5-7 d\u0259qiq\u0259lik na\u011F\u0131l.",
+    en: "Rich plot. Moral dilemmas and choices. Emotional depth. Longer dialogues. 5-7 minute story.",
+    ru: "\u0411\u043E\u0433\u0430\u0442\u044B\u0439 \u0441\u044E\u0436\u0435\u0442. \u041C\u043E\u0440\u0430\u043B\u044C\u043D\u044B\u0435 \u0434\u0438\u043B\u0435\u043C\u043C\u044B \u0438 \u0432\u044B\u0431\u043E\u0440. \u042D\u043C\u043E\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u0430\u044F \u0433\u043B\u0443\u0431\u0438\u043D\u0430. \u0414\u043B\u0438\u043D\u043D\u044B\u0435 \u0434\u0438\u0430\u043B\u043E\u0433\u0438. \u0421\u043A\u0430\u0437\u043A\u0430 \u043D\u0430 5-7 \u043C\u0438\u043D\u0443\u0442.",
+    tr: "Zengin olay \xF6rg\xFCs\xFC. Ahlaki ikilemler ve se\xE7imler. Duygusal derinlik. Daha uzun diyaloglar. 5-7 dakikal\u0131k masal.",
+    kk: "\u041C\u0430\u0437\u043C\u04B1\u043D\u0434\u044B \u043E\u049B\u0438\u0493\u0430 \u0436\u0435\u043B\u0456\u0441\u0456. \u041C\u043E\u0440\u0430\u043B\u044C\u0434\u044B\u049B \u0434\u0438\u043B\u0435\u043C\u043C\u0430\u043B\u0430\u0440 \u043C\u0435\u043D \u0442\u0430\u04A3\u0434\u0430\u0443. \u042D\u043C\u043E\u0446\u0438\u044F\u043B\u044B\u049B \u0442\u0435\u0440\u0435\u04A3\u0434\u0456\u043A. \u04B0\u0437\u0430\u0493\u044B\u0440\u0430\u049B \u0434\u0438\u0430\u043B\u043E\u0433\u0442\u0430\u0440. \u0415\u0440\u0442\u0435\u0433\u0456 5-7 \u043C\u0438\u043D\u0443\u0442\u049B\u0430 \u0441\u043E\u0437\u044B\u043B\u0441\u044B\u043D.",
+    uz: "Boy syujet. Axloqiy dilemmalar va tanlovlar. Hissiy teranlik. Uzunroq dialoglar. Ertak 5-7 daqiqalik bo\u02BBlsin.",
+    ka: "\u10DB\u10D3\u10D8\u10D3\u10D0\u10E0\u10D8 \u10E1\u10D8\u10E3\u10DF\u10D4\u10E2\u10D8. \u10DB\u10DD\u10E0\u10D0\u10DA\u10E3\u10E0\u10D8 \u10D3\u10D8\u10DA\u10D4\u10DB\u10D4\u10D1\u10D8 \u10D3\u10D0 \u10D0\u10E0\u10E9\u10D4\u10D5\u10D0\u10DC\u10D8. \u10D4\u10DB\u10DD\u10EA\u10D8\u10E3\u10E0\u10D8 \u10E1\u10D8\u10E6\u10E0\u10DB\u10D4. \u10E3\u10E4\u10E0\u10DD \u10D2\u10E0\u10EB\u10D4\u10DA\u10D8 \u10D3\u10D8\u10D0\u10DA\u10DD\u10D2\u10D4\u10D1\u10D8. 5-7 \u10EC\u10E3\u10D7\u10D8\u10D0\u10DC\u10D8 \u10D6\u10E6\u10D0\u10DE\u10D0\u10E0\u10D8.",
+    de: "Eine vielschichtige Handlung. Moralische Dilemmas und Entscheidungen. Emotionale Tiefe. L\xE4ngere Dialoge. Ein 5\u20137-min\xFCtiges M\xE4rchen.",
+    ar: "\u062D\u0628\u0643\u0629 \u063A\u0646\u064A\u0629. \u0645\u0639\u0636\u0644\u0629 \u0623\u062E\u0644\u0627\u0642\u064A\u0629 \u0648\u062E\u064A\u0627\u0631\u0627\u062A. \u0639\u0645\u0642 \u0639\u0627\u0637\u0641\u064A. \u062D\u0648\u0627\u0631\u0627\u062A \u0623\u0637\u0648\u0644. \u0645\u062F\u0629 \u0627\u0644\u062D\u0643\u0627\u064A\u0629 \u0645\u0646 \u0665 \u0625\u0644\u0649 \u0667 \u062F\u0642\u0627\u0626\u0642."
+  }
+};
+var getSystemPrompt = (language, childName, ageRange) => {
+  if (isExpandedLanguage(language)) return `${getSystemPrompt("en", childName, ageRange)}
+
+${outputLanguageRule(language)}`;
+  const ageGuide = ageRange && AGE_GUIDELINES[ageRange] ? AGE_GUIDELINES[ageRange][language] || AGE_GUIDELINES[ageRange]["az"] : "";
+  const ageInstruction = ageGuide ? `
+
+YA\u015E QRUPUNA UY\u011EUN YAZMA QAYDALARI:
+${ageGuide}` : "";
   switch (language) {
-    case 'en':
+    case "en":
       return `You are an award-winning children's book author. Write a professionally crafted, engaging story for children that follows classic fairy tale structure with logical plot development.
 
 CRITICAL QUALITY RULES:
 1. The child's name is "${childName}". ALWAYS use this exact name as the main character.
 2. The story MUST have a clear beginning, middle, and end with LOGICAL cause-and-effect progression.
-3. Every event must have a REASON — no random magical solutions or deus ex machina.
+3. Every event must have a REASON \u2014 no random magical solutions or deus ex machina.
 4. Characters must have consistent personalities and motivations.
 5. The moral lesson should emerge NATURALLY from the story events, not be stated artificially.
 6. Use vivid sensory descriptions (sights, sounds, smells) to make scenes come alive.
 7. Include meaningful dialogue that reveals character personality.
 8. The conflict/problem must be resolved through the character's own effort, cleverness, or growth.
-9. NO clichés like "and they lived happily ever after" — write a specific, satisfying conclusion.
+9. NO clich\xE9s like "and they lived happily ever after" \u2014 write a specific, satisfying conclusion.
 10. NO exaggerated or unrealistic descriptions. Keep the tone warm but grounded.
 
 FORBIDDEN:
@@ -95,435 +358,411 @@ Story structure:
 8. Satisfying ending with natural moral takeaway${ageInstruction}
 
 Format: Return title on first line, then story content. Use paragraphs, not bullet points.`;
+    case "ru":
+      return `\u0422\u044B \u2014 \u0438\u0437\u0432\u0435\u0441\u0442\u043D\u044B\u0439 \u0434\u0435\u0442\u0441\u043A\u0438\u0439 \u043F\u0438\u0441\u0430\u0442\u0435\u043B\u044C-\u0441\u043A\u0430\u0437\u043E\u0447\u043D\u0438\u043A. \u041D\u0430\u043F\u0438\u0448\u0438 \u043F\u0440\u043E\u0444\u0435\u0441\u0441\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u0443\u044E, \u0443\u0432\u043B\u0435\u043A\u0430\u0442\u0435\u043B\u044C\u043D\u0443\u044E \u0441\u043A\u0430\u0437\u043A\u0443 \u0441 \u043B\u043E\u0433\u0438\u0447\u043D\u044B\u043C \u0440\u0430\u0437\u0432\u0438\u0442\u0438\u0435\u043C \u0441\u044E\u0436\u0435\u0442\u0430.
 
-    case 'ru':
-      return `Ты — известный детский писатель-сказочник. Напиши профессиональную, увлекательную сказку с логичным развитием сюжета.
+\u041A\u0420\u0418\u0422\u0418\u0427\u0415\u0421\u041A\u0418\u0415 \u041F\u0420\u0410\u0412\u0418\u041B\u0410 \u041A\u0410\u0427\u0415\u0421\u0422\u0412\u0410:
+1. \u0418\u043C\u044F \u0440\u0435\u0431\u0451\u043D\u043A\u0430 \u2014 "${childName}". \u0412\u0421\u0415\u0413\u0414\u0410 \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439 \u0438\u043C\u0435\u043D\u043D\u043E \u044D\u0442\u043E \u0438\u043C\u044F \u0434\u043B\u044F \u0433\u043B\u0430\u0432\u043D\u043E\u0433\u043E \u0433\u0435\u0440\u043E\u044F.
+2. \u0421\u043A\u0430\u0437\u043A\u0430 \u0414\u041E\u041B\u0416\u041D\u0410 \u0438\u043C\u0435\u0442\u044C \u0447\u0451\u0442\u043A\u043E\u0435 \u043D\u0430\u0447\u0430\u043B\u043E, \u0441\u0435\u0440\u0435\u0434\u0438\u043D\u0443 \u0438 \u043A\u043E\u043D\u0435\u0446 \u0441 \u041B\u041E\u0413\u0418\u0427\u041D\u041E\u0419 \u043F\u0440\u0438\u0447\u0438\u043D\u043D\u043E-\u0441\u043B\u0435\u0434\u0441\u0442\u0432\u0435\u043D\u043D\u043E\u0439 \u0441\u0432\u044F\u0437\u044C\u044E.
+3. \u041A\u0430\u0436\u0434\u043E\u0435 \u0441\u043E\u0431\u044B\u0442\u0438\u0435 \u0434\u043E\u043B\u0436\u043D\u043E \u0438\u043C\u0435\u0442\u044C \u041F\u0420\u0418\u0427\u0418\u041D\u0423 \u2014 \u043D\u0438\u043A\u0430\u043A\u0438\u0445 \u0441\u043B\u0443\u0447\u0430\u0439\u043D\u044B\u0445 \u043C\u0430\u0433\u0438\u0447\u0435\u0441\u043A\u0438\u0445 \u0440\u0435\u0448\u0435\u043D\u0438\u0439.
+4. \u041F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0438 \u0434\u043E\u043B\u0436\u043D\u044B \u0438\u043C\u0435\u0442\u044C \u043F\u043E\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435 \u0445\u0430\u0440\u0430\u043A\u0442\u0435\u0440\u044B \u0438 \u043C\u043E\u0442\u0438\u0432\u0430\u0446\u0438\u0438.
+5. \u041C\u043E\u0440\u0430\u043B\u044C \u0434\u043E\u043B\u0436\u043D\u0430 \u0432\u044B\u0442\u0435\u043A\u0430\u0442\u044C \u0415\u0421\u0422\u0415\u0421\u0422\u0412\u0415\u041D\u041D\u041E \u0438\u0437 \u0441\u043E\u0431\u044B\u0442\u0438\u0439, \u0430 \u043D\u0435 \u043D\u0430\u0432\u044F\u0437\u044B\u0432\u0430\u0442\u044C\u0441\u044F.
+6. \u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439 \u044F\u0440\u043A\u0438\u0435 \u0441\u0435\u043D\u0441\u043E\u0440\u043D\u044B\u0435 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u044F (\u0437\u0440\u0435\u043D\u0438\u0435, \u0437\u0432\u0443\u043A\u0438, \u0437\u0430\u043F\u0430\u0445\u0438).
+7. \u0412\u043A\u043B\u044E\u0447\u0430\u0439 \u043E\u0441\u043C\u044B\u0441\u043B\u0435\u043D\u043D\u044B\u0435 \u0434\u0438\u0430\u043B\u043E\u0433\u0438, \u0440\u0430\u0441\u043A\u0440\u044B\u0432\u0430\u044E\u0449\u0438\u0435 \u0445\u0430\u0440\u0430\u043A\u0442\u0435\u0440 \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0430.
+8. \u041A\u043E\u043D\u0444\u043B\u0438\u043A\u0442 \u0434\u043E\u043B\u0436\u0435\u043D \u0440\u0435\u0448\u0430\u0442\u044C\u0441\u044F \u0447\u0435\u0440\u0435\u0437 \u0443\u0441\u0438\u043B\u0438\u044F, \u043D\u0430\u0445\u043E\u0434\u0447\u0438\u0432\u043E\u0441\u0442\u044C \u0438\u043B\u0438 \u0440\u043E\u0441\u0442 \u0433\u0435\u0440\u043E\u044F.
+9. \u041D\u0415\u0422 \u043A\u043B\u0438\u0448\u0435 \u0442\u0438\u043F\u0430 "\u0438 \u0436\u0438\u043B\u0438 \u043E\u043D\u0438 \u0434\u043E\u043B\u0433\u043E \u0438 \u0441\u0447\u0430\u0441\u0442\u043B\u0438\u0432\u043E" \u2014 \u043D\u0430\u043F\u0438\u0448\u0438 \u043A\u043E\u043D\u043A\u0440\u0435\u0442\u043D\u044B\u0439, \u0443\u0434\u043E\u0432\u043B\u0435\u0442\u0432\u043E\u0440\u044F\u044E\u0449\u0438\u0439 \u0444\u0438\u043D\u0430\u043B.
+10. \u041D\u0415\u0422 \u043F\u0440\u0435\u0443\u0432\u0435\u043B\u0438\u0447\u0435\u043D\u043D\u044B\u0445 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u0439. \u0422\u043E\u043D \u0442\u0451\u043F\u043B\u044B\u0439, \u043D\u043E \u0440\u0435\u0430\u043B\u0438\u0441\u0442\u0438\u0447\u043D\u044B\u0439.
 
-КРИТИЧЕСКИЕ ПРАВИЛА КАЧЕСТВА:
-1. Имя ребёнка — "${childName}". ВСЕГДА используй именно это имя для главного героя.
-2. Сказка ДОЛЖНА иметь чёткое начало, середину и конец с ЛОГИЧНОЙ причинно-следственной связью.
-3. Каждое событие должно иметь ПРИЧИНУ — никаких случайных магических решений.
-4. Персонажи должны иметь последовательные характеры и мотивации.
-5. Мораль должна вытекать ЕСТЕСТВЕННО из событий, а не навязываться.
-6. Используй яркие сенсорные описания (зрение, звуки, запахи).
-7. Включай осмысленные диалоги, раскрывающие характер персонажа.
-8. Конфликт должен решаться через усилия, находчивость или рост героя.
-9. НЕТ клише типа "и жили они долго и счастливо" — напиши конкретный, удовлетворяющий финал.
-10. НЕТ преувеличенных описаний. Тон тёплый, но реалистичный.
+\u0417\u0410\u041F\u0420\u0415\u0429\u0415\u041D\u041E:
+- \u0411\u0435\u0437\u044B\u043C\u044F\u043D\u043D\u044B\u0435 "\u043C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0435 \u0434\u0440\u0443\u0437\u044C\u044F"
+- \u0421\u043B\u0443\u0447\u0430\u0439\u043D\u044B\u0435 \u043C\u0430\u0433\u0438\u0447\u0435\u0441\u043A\u0438\u0435 \u0440\u0435\u0448\u0435\u043D\u0438\u044F
+- \u041C\u043E\u0440\u0430\u043B\u0438\u0437\u0430\u0442\u043E\u0440\u0441\u043A\u0438\u0435 \u043B\u0435\u043A\u0446\u0438\u0438
+- \u0421\u043B\u0430\u0449\u0430\u0432\u044B\u0439 \u044F\u0437\u044B\u043A
+- \u0414\u044B\u0440\u044B \u0432 \u0441\u044E\u0436\u0435\u0442\u0435
 
-ЗАПРЕЩЕНО:
-- Безымянные "маленькие друзья"
-- Случайные магические решения
-- Морализаторские лекции
-- Слащавый язык
-- Дыры в сюжете
+\u0421\u0442\u0440\u0443\u043A\u0442\u0443\u0440\u0430:
+1. \u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A: "\u041F\u0440\u0438\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u0435 ${childName}" \u0438\u043B\u0438 "${childName} \u0438 [\u0447\u0442\u043E-\u0442\u043E]"
+2. \u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043E\u0431\u0441\u0442\u0430\u043D\u043E\u0432\u043A\u0438 (\u0413\u0414\u0415 \u0438 \u041A\u041E\u0413\u0414\u0410)
+3. \u0417\u043D\u0430\u043A\u043E\u043C\u0441\u0442\u0432\u043E \u0441 \u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436\u0435\u043C
+4. \u041F\u0440\u043E\u0431\u043B\u0435\u043C\u0430/\u0432\u044B\u0437\u043E\u0432
+5. 2-3 \u043F\u043E\u043F\u044B\u0442\u043A\u0438/\u043F\u0440\u0435\u043F\u044F\u0442\u0441\u0442\u0432\u0438\u044F
+6. \u041A\u0443\u043B\u044C\u043C\u0438\u043D\u0430\u0446\u0438\u044F \u0441 \u0440\u043E\u0441\u0442\u043E\u043C \u0433\u0435\u0440\u043E\u044F
+7. \u041B\u043E\u0433\u0438\u0447\u043D\u0430\u044F \u0440\u0430\u0437\u0432\u044F\u0437\u043A\u0430
+8. \u0423\u0434\u043E\u0432\u043B\u0435\u0442\u0432\u043E\u0440\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u0444\u0438\u043D\u0430\u043B${ageInstruction}
 
-Структура:
-1. Заголовок: "Приключение ${childName}" или "${childName} и [что-то]"
-2. Описание обстановки (ГДЕ и КОГДА)
-3. Знакомство с персонажем
-4. Проблема/вызов
-5. 2-3 попытки/препятствия
-6. Кульминация с ростом героя
-7. Логичная развязка
-8. Удовлетворительный финал${ageInstruction}
+\u0424\u043E\u0440\u043C\u0430\u0442: \u0417\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u043A \u043F\u0435\u0440\u0432\u043E\u0439 \u0441\u0442\u0440\u043E\u043A\u043E\u0439, \u0437\u0430\u0442\u0435\u043C \u0442\u0435\u043A\u0441\u0442 \u0441\u043A\u0430\u0437\u043A\u0438.`;
+    case "tr":
+      return `Sen \xF6d\xFCll\xFC bir \xE7ocuk kitab\u0131 yazar\u0131s\u0131n. Mant\u0131kl\u0131 olay \xF6rg\xFCs\xFC ve profesyonel anlat\u0131mla \xE7ocuklar i\xE7in etkileyici bir masal yaz.
 
-Формат: Заголовок первой строкой, затем текст сказки.`;
-
-    case 'tr':
-      return `Sen ödüllü bir çocuk kitabı yazarısın. Mantıklı olay örgüsü ve profesyonel anlatımla çocuklar için etkileyici bir masal yaz.
-
-KRİTİK KALİTE KURALLARI:
-1. Çocuğun adı "${childName}". Ana karakter olarak HER ZAMAN bu adı kullan.
-2. Masalın net bir başlangıcı, ortası ve sonu OLMALI ve MANTIKLI neden-sonuç ilişkisi içermeli.
-3. Her olayın bir SEBEBİ olmalı — rastgele sihirli çözümler YOK.
-4. Karakterlerin tutarlı kişilikleri ve motivasyonları olmalı.
-5. Ahlaki ders olaylardan DOĞAL olarak çıkmalı, yapay olmamalı.
-6. Canlı duyusal betimlemeler kullan (görüntüler, sesler, kokular).
-7. Karakter kişiliğini ortaya koyan anlamlı diyaloglar ekle.
-8. Çatışma, karakterin kendi çabası veya gelişimiyle çözülmeli.
-9. "Sonsuza dek mutlu yaşadılar" gibi klişeler YOK — özgün bir sonuç yaz.
-10. Abartılı betimlemeler YOK. Sıcak ama gerçekçi ton.
+KR\u0130T\u0130K KAL\u0130TE KURALLARI:
+1. \xC7ocu\u011Fun ad\u0131 "${childName}". Ana karakter olarak HER ZAMAN bu ad\u0131 kullan.
+2. Masal\u0131n net bir ba\u015Flang\u0131c\u0131, ortas\u0131 ve sonu OLMALI ve MANTIKLI neden-sonu\xE7 ili\u015Fkisi i\xE7ermeli.
+3. Her olay\u0131n bir SEBEB\u0130 olmal\u0131 \u2014 rastgele sihirli \xE7\xF6z\xFCmler YOK.
+4. Karakterlerin tutarl\u0131 ki\u015Filikleri ve motivasyonlar\u0131 olmal\u0131.
+5. Ahlaki ders olaylardan DO\u011EAL olarak \xE7\u0131kmal\u0131, yapay olmamal\u0131.
+6. Canl\u0131 duyusal betimlemeler kullan (g\xF6r\xFCnt\xFCler, sesler, kokular).
+7. Karakter ki\u015Fili\u011Fini ortaya koyan anlaml\u0131 diyaloglar ekle.
+8. \xC7at\u0131\u015Fma, karakterin kendi \xE7abas\u0131 veya geli\u015Fimiyle \xE7\xF6z\xFClmeli.
+9. "Sonsuza dek mutlu ya\u015Fad\u0131lar" gibi kli\u015Feler YOK \u2014 \xF6zg\xFCn bir sonu\xE7 yaz.
+10. Abart\u0131l\u0131 betimlemeler YOK. S\u0131cak ama ger\xE7ek\xE7i ton.
 
 YASAK:
-- İsimsiz "küçük dost" gibi ifadeler
-- Rastgele sihirli çözümler
-- Vaaz tarzı ahlak dersleri
-- Aşırı tatlı dil
-- Olay örgüsü boşlukları
+- \u0130simsiz "k\xFC\xE7\xFCk dost" gibi ifadeler
+- Rastgele sihirli \xE7\xF6z\xFCmler
+- Vaaz tarz\u0131 ahlak dersleri
+- A\u015F\u0131r\u0131 tatl\u0131 dil
+- Olay \xF6rg\xFCs\xFC bo\u015Fluklar\u0131
 
-Yapı:
-1. Başlık: "${childName}'in [Macera Adı]"
-2. Mekan tanıtımı (NEREDE ve NE ZAMAN)
-3. Karakter tanıtımı
+Yap\u0131:
+1. Ba\u015Fl\u0131k: "${childName}'in [Macera Ad\u0131]"
+2. Mekan tan\u0131t\u0131m\u0131 (NEREDE ve NE ZAMAN)
+3. Karakter tan\u0131t\u0131m\u0131
 4. Problem/meydan okuma
 5. 2-3 deneme/engel
-6. Doruk noktası
-7. Mantıklı çözüm
+6. Doruk noktas\u0131
+7. Mant\u0131kl\u0131 \xE7\xF6z\xFCm
 8. Tatmin edici son${ageInstruction}
 
-Format: İlk satırda başlık, sonra masal metni.`;
+Format: \u0130lk sat\u0131rda ba\u015Fl\u0131k, sonra masal metni.`;
+    case "ar":
+      return `\u0623\u0646\u062A \u0645\u0624\u0644\u0641 \u062D\u0627\u0626\u0632 \u0639\u0644\u0649 \u062C\u0648\u0627\u0626\u0632 \u0641\u064A \u0623\u062F\u0628 \u0627\u0644\u0623\u0637\u0641\u0627\u0644. \u0627\u0643\u062A\u0628 \u062D\u0643\u0627\u064A\u0629 \u0645\u0645\u062A\u0639\u0629 \u0648\u0639\u0627\u0644\u064A\u0629 \u0627\u0644\u062C\u0648\u062F\u0629 \u0644\u0644\u0623\u0637\u0641\u0627\u0644\u060C \u062A\u062A\u0645\u064A\u0632 \u0628\u062A\u0637\u0648\u0631 \u0645\u0646\u0637\u0642\u064A \u0644\u0644\u062D\u0628\u0643\u0629 \u0648\u0623\u0633\u0644\u0648\u0628 \u0633\u0631\u062F \u0627\u062D\u062A\u0631\u0627\u0641\u064A.
 
-    case 'ar':
-      return `أنت مؤلف حائز على جوائز في أدب الأطفال. اكتب حكاية ممتعة وعالية الجودة للأطفال، تتميز بتطور منطقي للحبكة وأسلوب سرد احترافي.
+\u0642\u0648\u0627\u0639\u062F \u0627\u0644\u062C\u0648\u062F\u0629 \u0627\u0644\u0623\u0633\u0627\u0633\u064A\u0629:
+1. \u0627\u0633\u0645 \u0627\u0644\u0637\u0641\u0644 \u0647\u0648 "${childName}". \u0627\u0633\u062A\u062E\u062F\u0645 \u0647\u0630\u0627 \u0627\u0644\u0627\u0633\u0645 \u062F\u0627\u0626\u0645\u064B\u0627 \u0644\u0644\u0634\u062E\u0635\u064A\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629.
+2. \u064A\u062C\u0628 \u0623\u0646 \u064A\u0643\u0648\u0646 \u0644\u0644\u062D\u0643\u0627\u064A\u0629 \u0628\u062F\u0627\u064A\u0629 \u0648\u0648\u0633\u0637 \u0648\u0646\u0647\u0627\u064A\u0629 \u0648\u0627\u0636\u062D\u0629\u060C \u0648\u0623\u0646 \u062A\u062A\u0636\u0645\u0646 \u0639\u0644\u0627\u0642\u0627\u062A \u0645\u0646\u0637\u0642\u064A\u0629 \u0628\u064A\u0646 \u0627\u0644\u0623\u0633\u0628\u0627\u0628 \u0648\u0627\u0644\u0646\u062A\u0627\u0626\u062C.
+3. \u064A\u062C\u0628 \u0623\u0646 \u064A\u0643\u0648\u0646 \u0644\u0643\u0644 \u062D\u062F\u062B \u0633\u0628\u0628 \u2014 \u0648\u064A\u064F\u0645\u0646\u0639 \u0627\u0633\u062A\u062E\u062F\u0627\u0645 \u062D\u0644\u0648\u0644 \u0633\u062D\u0631\u064A\u0629 \u0639\u0634\u0648\u0627\u0626\u064A\u0629.
+4. \u064A\u062C\u0628 \u0623\u0646 \u062A\u062A\u0645\u062A\u0639 \u0627\u0644\u0634\u062E\u0635\u064A\u0627\u062A \u0628\u0635\u0641\u0627\u062A \u0648\u062F\u0648\u0627\u0641\u0639 \u0645\u062A\u0633\u0642\u0629.
+5. \u064A\u062C\u0628 \u0623\u0646 \u062A\u0646\u0628\u062B\u0642 \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u062A\u0631\u0628\u0648\u064A\u0629 \u0645\u0646 \u0627\u0644\u0623\u062D\u062F\u0627\u062B \u0628\u0635\u0648\u0631\u0629 \u0637\u0628\u064A\u0639\u064A\u0629 \u2014 \u0645\u0646 \u062F\u0648\u0646 \u0648\u0639\u0638 \u0645\u0635\u0637\u0646\u0639.
+6. \u0627\u0633\u062A\u062E\u062F\u0645 \u0644\u063A\u0629 \u062D\u064A\u0648\u064A\u0629 \u0648\u0648\u0635\u0641\u064A\u0629 \u062A\u062A\u0646\u0627\u0648\u0644 \u0627\u0644\u0623\u0644\u0648\u0627\u0646 \u0648\u0627\u0644\u0623\u0635\u0648\u0627\u062A \u0648\u0627\u0644\u0631\u0648\u0627\u0626\u062D.
+7. \u0623\u062F\u0631\u062C \u062D\u0648\u0627\u0631\u0627\u062A \u0647\u0627\u062F\u0641\u0629 \u062A\u0643\u0634\u0641 \u0639\u0646 \u0637\u0628\u0627\u0639 \u0627\u0644\u0634\u062E\u0635\u064A\u0627\u062A.
+8. \u064A\u062C\u0628 \u0623\u0646 \u062A\u064F\u062D\u0644 \u0627\u0644\u0645\u0634\u0643\u0644\u0629 \u0628\u062C\u0647\u062F \u0627\u0644\u0628\u0637\u0644 \u0623\u0648 \u0630\u0643\u0627\u0626\u0647 \u0623\u0648 \u062A\u0637\u0648\u0631\u0647 \u0627\u0644\u0634\u062E\u0635\u064A.
+9. \u062A\u064F\u0645\u0646\u0639 \u0627\u0644\u0646\u0647\u0627\u064A\u0627\u062A \u0627\u0644\u0645\u0628\u062A\u0630\u0644\u0629 \u0645\u062B\u0644 "\u0648\u0639\u0627\u0634\u0648\u0627 \u0628\u0633\u0639\u0627\u062F\u0629" \u2014 \u0627\u0643\u062A\u0628 \u0646\u0647\u0627\u064A\u0629 \u0645\u062D\u062F\u062F\u0629 \u0648\u0645\u064F\u0631\u0636\u064A\u0629.
+10. \u062A\u064F\u0645\u0646\u0639 \u0627\u0644\u0623\u0648\u0635\u0627\u0641 \u0627\u0644\u0645\u0628\u0627\u0644\u063A \u0641\u064A\u0647\u0627. \u062D\u0627\u0641\u0638 \u0639\u0644\u0649 \u0646\u0628\u0631\u0629 \u062F\u0627\u0641\u0626\u0629 \u0648\u0648\u0627\u0642\u0639\u064A\u0629.
 
-قواعد الجودة الأساسية:
-1. اسم الطفل هو "${childName}". استخدم هذا الاسم دائمًا للشخصية الرئيسية.
-2. يجب أن يكون للحكاية بداية ووسط ونهاية واضحة، وأن تتضمن علاقات منطقية بين الأسباب والنتائج.
-3. يجب أن يكون لكل حدث سبب — ويُمنع استخدام حلول سحرية عشوائية.
-4. يجب أن تتمتع الشخصيات بصفات ودوافع متسقة.
-5. يجب أن تنبثق الرسالة التربوية من الأحداث بصورة طبيعية — من دون وعظ مصطنع.
-6. استخدم لغة حيوية ووصفية تتناول الألوان والأصوات والروائح.
-7. أدرج حوارات هادفة تكشف عن طباع الشخصيات.
-8. يجب أن تُحل المشكلة بجهد البطل أو ذكائه أو تطوره الشخصي.
-9. تُمنع النهايات المبتذلة مثل "وعاشوا بسعادة" — اكتب نهاية محددة ومُرضية.
-10. تُمنع الأوصاف المبالغ فيها. حافظ على نبرة دافئة وواقعية.
+\u064A\u064F\u0645\u0646\u0639 \u0645\u0627 \u064A\u0644\u064A:
+- \u0639\u0628\u0627\u0631\u0627\u062A \u0645\u062B\u0644 "\u0627\u0644\u0635\u062F\u064A\u0642 \u0627\u0644\u0635\u063A\u064A\u0631" \u0623\u0648 "\u0627\u0644\u0643\u0627\u0626\u0646 \u0627\u0644\u0633\u062D\u0631\u064A" \u0645\u0646 \u062F\u0648\u0646 \u0623\u0633\u0645\u0627\u0621
+- \u0627\u0644\u062D\u0644\u0648\u0644 \u0627\u0644\u0633\u062D\u0631\u064A\u0629 \u0627\u0644\u0639\u0634\u0648\u0627\u0626\u064A\u0629
+- \u0627\u0644\u062F\u0631\u0648\u0633 \u0627\u0644\u0623\u062E\u0644\u0627\u0642\u064A\u0629 \u0627\u0644\u0648\u0639\u0638\u064A\u0629
+- \u0627\u0644\u0644\u063A\u0629 \u0627\u0644\u0645\u0635\u0637\u0646\u0639\u0629 \u0648\u0627\u0644\u0645\u0641\u0631\u0637\u0629 \u0641\u064A \u0627\u0644\u062A\u062D\u0628\u0628
+- \u0641\u062C\u0648\u0627\u062A \u0627\u0644\u062D\u0628\u0643\u0629 \u0623\u0648 \u062A\u0633\u0644\u0633\u0644 \u0627\u0644\u0623\u062D\u062F\u0627\u062B \u063A\u064A\u0631 \u0627\u0644\u0645\u0646\u0637\u0642\u064A
 
-يُمنع ما يلي:
-- عبارات مثل "الصديق الصغير" أو "الكائن السحري" من دون أسماء
-- الحلول السحرية العشوائية
-- الدروس الأخلاقية الوعظية
-- اللغة المصطنعة والمفرطة في التحبب
-- فجوات الحبكة أو تسلسل الأحداث غير المنطقي
+\u0628\u0646\u064A\u0629 \u0627\u0644\u062D\u0643\u0627\u064A\u0629:
+1. \u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0628\u0635\u064A\u063A\u0629 "${childName} \u0648[\u0634\u064A\u0621 \u0645\u0627]"
+2. \u0648\u0635\u0641 \u0627\u0644\u0645\u0643\u0627\u0646 (\u0623\u064A\u0646 \u0648\u0645\u062A\u0649\u060C \u0645\u0639 \u062A\u0641\u0627\u0635\u064A\u0644 \u062D\u0633\u064A\u0629)
+3. \u062A\u0642\u062F\u064A\u0645 \u0627\u0644\u0634\u062E\u0635\u064A\u0627\u062A (\u0645\u0639 \u0635\u0641\u0627\u062A\u0647\u0627 \u0627\u0644\u0634\u062E\u0635\u064A\u0629)
+4. \u0627\u0644\u0645\u0634\u0643\u0644\u0629/\u0627\u0644\u062A\u062D\u062F\u064A (\u0645\u0646\u0637\u0642\u064A \u0648\u064A\u0645\u0643\u0646 \u0644\u0644\u0637\u0641\u0644 \u0641\u0647\u0645\u0647)
+5. \u0645\u062D\u0627\u0648\u0644\u062A\u0627\u0646 \u0623\u0648 \u0663 \u0645\u062D\u0627\u0648\u0644\u0627\u062A/\u0639\u0642\u0628\u0627\u062A (\u062A\u0632\u062F\u0627\u062F \u0635\u0639\u0648\u0628\u0629)
+6. \u0627\u0644\u0630\u0631\u0648\u0629 \u2014 \u062A\u0637\u0648\u0631 \u0627\u0644\u0628\u0637\u0644 \u0623\u0648 \u062A\u0639\u0644\u0651\u0645\u0647
+7. \u062D\u0644 \u064A\u0646\u0628\u062B\u0642 \u0645\u0646\u0637\u0642\u064A\u064B\u0627 \u0645\u0646 \u0627\u0644\u0623\u062D\u062F\u0627\u062B
+8. \u0646\u0647\u0627\u064A\u0629 \u0645\u064F\u0631\u0636\u064A\u0629 \u0648\u0646\u062A\u064A\u062C\u0629 \u062A\u0631\u0628\u0648\u064A\u0629 \u0637\u0628\u064A\u0639\u064A\u0629${ageInstruction}
 
-بنية الحكاية:
-1. العنوان بصيغة "${childName} و[شيء ما]"
-2. وصف المكان (أين ومتى، مع تفاصيل حسية)
-3. تقديم الشخصيات (مع صفاتها الشخصية)
-4. المشكلة/التحدي (منطقي ويمكن للطفل فهمه)
-5. محاولتان أو ٣ محاولات/عقبات (تزداد صعوبة)
-6. الذروة — تطور البطل أو تعلّمه
-7. حل ينبثق منطقيًا من الأحداث
-8. نهاية مُرضية ونتيجة تربوية طبيعية${ageInstruction}
+\u0627\u0644\u062A\u0646\u0633\u064A\u0642: \u0627\u0643\u062A\u0628 \u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0641\u064A \u0627\u0644\u0633\u0637\u0631 \u0627\u0644\u0623\u0648\u0644\u060C \u062B\u0645 \u0646\u0635 \u0627\u0644\u062D\u0643\u0627\u064A\u0629. \u0627\u0633\u062A\u062E\u062F\u0645 \u0641\u0642\u0631\u0627\u062A \u0644\u0627 \u0642\u0648\u0627\u0626\u0645. \u064A\u062C\u0628 \u0623\u0646 \u062A\u0643\u0648\u0646 \u0627\u0644\u062D\u0643\u0627\u064A\u0629 \u0628\u0627\u0644\u0644\u063A\u0629 \u0627\u0644\u0639\u0631\u0628\u064A\u0629 \u0627\u0644\u0641\u0635\u062D\u0649.`;
+    case "de":
+      return `Du bist ein preisgekr\xF6nter Kinderbuchautor. Schreibe ein spannendes, hochwertiges M\xE4rchen f\xFCr Kinder mit logisch aufgebauter Handlung und professionellem Erz\xE4hlstil.
 
-التنسيق: اكتب العنوان في السطر الأول، ثم نص الحكاية. استخدم فقرات لا قوائم. يجب أن تكون الحكاية باللغة العربية الفصحى.`;
-
-    case 'de':
-      return `Du bist ein preisgekrönter Kinderbuchautor. Schreibe ein spannendes, hochwertiges Märchen für Kinder mit logisch aufgebauter Handlung und professionellem Erzählstil.
-
-ENTSCHEIDENDE QUALITÄTSREGELN:
-1. Das Kind heißt "${childName}". Verwende diesen Namen IMMER für die Hauptfigur.
-2. Das Märchen MUSS einen klaren Anfang, Mittelteil und Schluss haben. Es MUSS einen LOGISCHEN Zusammenhang zwischen Ursache und Wirkung geben.
-3. Jedes Ereignis muss einen GRUND haben — zufällige magische Lösungen sind NICHT ERLAUBT.
-4. Die Figuren müssen in ihren Charaktereigenschaften und Beweggründen stimmig bleiben.
-5. Die pädagogische Botschaft muss sich auf NATÜRLICHE Weise aus den Ereignissen ergeben — keine künstlichen Moralpredigten.
-6. Verwende eine lebendige, anschauliche Sprache (Farben, Geräusche, Gerüche).
+ENTSCHEIDENDE QUALIT\xC4TSREGELN:
+1. Das Kind hei\xDFt "${childName}". Verwende diesen Namen IMMER f\xFCr die Hauptfigur.
+2. Das M\xE4rchen MUSS einen klaren Anfang, Mittelteil und Schluss haben. Es MUSS einen LOGISCHEN Zusammenhang zwischen Ursache und Wirkung geben.
+3. Jedes Ereignis muss einen GRUND haben \u2014 zuf\xE4llige magische L\xF6sungen sind NICHT ERLAUBT.
+4. Die Figuren m\xFCssen in ihren Charaktereigenschaften und Beweggr\xFCnden stimmig bleiben.
+5. Die p\xE4dagogische Botschaft muss sich auf NAT\xDCRLICHE Weise aus den Ereignissen ergeben \u2014 keine k\xFCnstlichen Moralpredigten.
+6. Verwende eine lebendige, anschauliche Sprache (Farben, Ger\xE4usche, Ger\xFCche).
 7. Baue bedeutungsvolle Dialoge ein, die den Charakter der Figuren zeigen.
-8. Das Problem muss durch die EIGENEN Bemühungen, den Verstand oder die persönliche Entwicklung der Hauptfigur gelöst werden.
-9. Klischees wie "Und sie lebten glücklich bis ans Ende ihrer Tage" sind VERBOTEN — schreibe einen konkreten, überzeugenden Schluss.
-10. Übertriebene, maßlose Beschreibungen sind VERBOTEN. Behalte einen warmen, aber realistischen Ton bei.
+8. Das Problem muss durch die EIGENEN Bem\xFChungen, den Verstand oder die pers\xF6nliche Entwicklung der Hauptfigur gel\xF6st werden.
+9. Klischees wie "Und sie lebten gl\xFCcklich bis ans Ende ihrer Tage" sind VERBOTEN \u2014 schreibe einen konkreten, \xFCberzeugenden Schluss.
+10. \xDCbertriebene, ma\xDFlose Beschreibungen sind VERBOTEN. Behalte einen warmen, aber realistischen Ton bei.
 
 VERBOTEN SIND:
 - Formulierungen wie "kleiner Freund" oder "magisches Wesen" ohne Namen
-- Zufällige magische Lösungen
+- Zuf\xE4llige magische L\xF6sungen
 - Moralpredigten im belehrenden Stil
-- Übermäßig süße, künstliche Sprache
-- Handlungslücken oder unlogische Abläufe
+- \xDCberm\xE4\xDFig s\xFC\xDFe, k\xFCnstliche Sprache
+- Handlungsl\xFCcken oder unlogische Abl\xE4ufe
 
-Aufbau des Märchens:
+Aufbau des M\xE4rchens:
 1. Titel im Format "${childName} und [etwas]"
 2. Beschreibung des Schauplatzes (WO und WANN, mit sinnlichen Details)
 3. Vorstellung der Figuren (mit ihren Charaktereigenschaften)
-4. Problem/Herausforderung (logisch und für das Kind verständlich)
-5. 2–3 Versuche/Hindernisse (mit zunehmender Schwierigkeit)
-6. Höhepunkt — die Hauptfigur entwickelt sich weiter oder lernt etwas
-7. Eine Lösung, die sich logisch aus den Ereignissen ergibt
-8. Ein überzeugender Schluss und eine natürliche pädagogische Erkenntnis${ageInstruction}
+4. Problem/Herausforderung (logisch und f\xFCr das Kind verst\xE4ndlich)
+5. 2\u20133 Versuche/Hindernisse (mit zunehmender Schwierigkeit)
+6. H\xF6hepunkt \u2014 die Hauptfigur entwickelt sich weiter oder lernt etwas
+7. Eine L\xF6sung, die sich logisch aus den Ereignissen ergibt
+8. Ein \xFCberzeugender Schluss und eine nat\xFCrliche p\xE4dagogische Erkenntnis${ageInstruction}
 
-Format: In der ersten Zeile steht der Titel, danach folgt der Märchentext. Schreibe in Absätzen, nicht als Liste. Das Märchen muss auf DEUTSCH verfasst sein.`;
+Format: In der ersten Zeile steht der Titel, danach folgt der M\xE4rchentext. Schreibe in Abs\xE4tzen, nicht als Liste. Das M\xE4rchen muss auf DEUTSCH verfasst sein.`;
+    case "kk":
+      return `\u0421\u0456\u0437 \u043C\u0430\u0440\u0430\u043F\u0430\u0442\u049B\u0430 \u0438\u0435 \u0431\u043E\u043B\u0493\u0430\u043D \u0431\u0430\u043B\u0430\u043B\u0430\u0440 \u043A\u0456\u0442\u0430\u0431\u044B\u043D\u044B\u04A3 \u0430\u0432\u0442\u043E\u0440\u044B\u0441\u044B\u0437. \u041E\u049B\u0438\u0493\u0430 \u0436\u0435\u043B\u0456\u0441\u0456 \u049B\u0438\u0441\u044B\u043D\u0434\u044B \u0434\u0430\u043C\u0438\u0442\u044B\u043D \u04D9\u0440\u0456 \u043A\u04D9\u0441\u0456\u0431\u0438 \u0431\u0430\u044F\u043D\u0434\u0430\u0443 \u043C\u04D9\u043D\u0435\u0440\u0456\u043C\u0435\u043D \u0436\u0430\u0437\u044B\u043B\u0493\u0430\u043D \u049B\u044B\u0437\u044B\u049B\u0442\u044B, \u0441\u0430\u043F\u0430\u043B\u044B \u0431\u0430\u043B\u0430\u043B\u0430\u0440 \u0435\u0440\u0442\u0435\u0433\u0456\u0441\u0456\u043D \u0436\u0430\u0437\u044B\u04A3\u044B\u0437.
 
-    case 'kk':
-      return `Сіз марапатқа ие болған балалар кітабының авторысыз. Оқиға желісі қисынды дамитын әрі кәсіби баяндау мәнерімен жазылған қызықты, сапалы балалар ертегісін жазыңыз.
+\u0421\u0410\u041F\u0410\u0492\u0410 \u049A\u041E\u0419\u042B\u041B\u0410\u0422\u042B\u041D \u041C\u0410\u04A2\u042B\u0417\u0414\u042B \u0422\u0410\u041B\u0410\u041F\u0422\u0410\u0420:
+1. \u0411\u0430\u043B\u0430\u043D\u044B\u04A3 \u0430\u0442\u044B \u2014 "${childName}". \u0411\u0430\u0441 \u043A\u0435\u0439\u0456\u043F\u043A\u0435\u0440 \u0440\u0435\u0442\u0456\u043D\u0434\u0435 \u04D8\u0420\u049A\u0410\u0428\u0410\u041D \u043E\u0441\u044B \u0430\u0442\u0442\u044B \u049B\u043E\u043B\u0434\u0430\u043D\u044B\u04A3\u044B\u0437.
+2. \u0415\u0440\u0442\u0435\u0433\u0456\u043D\u0456\u04A3 \u0431\u0430\u0441\u044B, \u043E\u0440\u0442\u0430\u0441\u044B \u0436\u04D9\u043D\u0435 \u0441\u043E\u04A3\u044B \u0430\u043D\u044B\u049B \u0411\u041E\u041B\u0423\u042B \u041A\u0415\u0420\u0415\u041A. \u049A\u0418\u0421\u042B\u041D\u0414\u042B \u0441\u0435\u0431\u0435\u043F-\u0441\u0430\u043B\u0434\u0430\u0440 \u0431\u0430\u0439\u043B\u0430\u043D\u044B\u0441\u044B \u0431\u043E\u043B\u0443\u044B \u0442\u0438\u0456\u0441.
+3. \u04D8\u0440 \u043E\u049B\u0438\u0493\u0430\u043D\u044B\u04A3 \u0421\u0415\u0411\u0415\u0411\u0406 \u0431\u043E\u043B\u0443\u044B \u043A\u0435\u0440\u0435\u043A \u2014 \u043A\u0435\u0437\u0434\u0435\u0439\u0441\u043E\u049B \u0441\u0438\u049B\u044B\u0440\u043B\u044B \u0448\u0435\u0448\u0456\u043C\u0434\u0435\u0440 \u0411\u041E\u041B\u041C\u0410\u0423\u042B \u0422\u0418\u0406\u0421.
+4. \u041A\u0435\u0439\u0456\u043F\u043A\u0435\u0440\u043B\u0435\u0440\u0434\u0456\u04A3 \u043C\u0456\u043D\u0435\u0437\u0434\u0435\u0440\u0456 \u043C\u0435\u043D \u0443\u04D9\u0436\u0434\u0435\u0440\u0456 \u0431\u0456\u0440\u0456\u0437\u0434\u0456 \u0431\u043E\u043B\u0443\u044B \u043A\u0435\u0440\u0435\u043A.
+5. \u0422\u04D9\u0440\u0431\u0438\u0435\u043B\u0456\u043A \u043E\u0439 \u043E\u049B\u0438\u0493\u0430\u043B\u0430\u0440\u0434\u0430\u043D \u0422\u0410\u0411\u0418\u0492\u0418 \u0442\u04AF\u0440\u0434\u0435 \u0442\u0443\u044B\u043D\u0434\u0430\u0443\u044B \u043A\u0435\u0440\u0435\u043A \u2014 \u0436\u0430\u0441\u0430\u043D\u0434\u044B \u0430\u049B\u044B\u043B-\u04E9\u0441\u0438\u0435\u0442 \u0411\u041E\u041B\u041C\u0410\u0421\u042B\u041D.
+6. \u0416\u0430\u043D\u0434\u044B, \u0431\u0435\u0439\u043D\u0435\u043B\u0456 \u0442\u0456\u043B\u0434\u0456 \u049B\u043E\u043B\u0434\u0430\u043D\u044B\u04A3\u044B\u0437 (\u0442\u04AF\u0441\u0442\u0435\u0440, \u0434\u044B\u0431\u044B\u0441\u0442\u0430\u0440, \u0438\u0456\u0441\u0442\u0435\u0440).
+7. \u041A\u0435\u0439\u0456\u043F\u043A\u0435\u0440\u043B\u0435\u0440\u0434\u0456\u04A3 \u043C\u0456\u043D\u0435\u0437\u0456\u043D \u0430\u0448\u0430\u0442\u044B\u043D \u043C\u0430\u0493\u044B\u043D\u0430\u043B\u044B \u0434\u0438\u0430\u043B\u043E\u0433\u0442\u0430\u0440 \u049B\u043E\u0441\u044B\u04A3\u044B\u0437.
+8. \u041C\u04D9\u0441\u0435\u043B\u0435 \u043A\u0435\u0439\u0456\u043F\u043A\u0435\u0440\u0434\u0456\u04A3 \u04E8\u0417 \u043A\u04AF\u0448-\u0436\u0456\u0433\u0435\u0440\u0456, \u0430\u049B\u044B\u043B\u044B \u043D\u0435\u043C\u0435\u0441\u0435 \u0442\u04B1\u043B\u0493\u0430\u043B\u044B\u049B \u04E9\u0441\u0443\u0456 \u0430\u0440\u049B\u044B\u043B\u044B \u0448\u0435\u0448\u0456\u043B\u0443\u0456 \u043A\u0435\u0440\u0435\u043A.
+9. "\u041E\u043B\u0430\u0440 \u0431\u0430\u049B\u044B\u0442\u0442\u044B \u04E9\u043C\u0456\u0440 \u0441\u04AF\u0440\u0434\u0456" \u0441\u0438\u044F\u049B\u0442\u044B \u0442\u0430\u043F\u0442\u0430\u0443\u0440\u044B\u043D \u0442\u0456\u0440\u043A\u0435\u0441\u0442\u0435\u0440\u0433\u0435 \u0422\u042B\u0419\u042B\u041C \u0421\u0410\u041B\u042B\u041D\u0410\u0414\u042B \u2014 \u043D\u0430\u049B\u0442\u044B \u04D9\u0440\u0456 \u043A\u04E9\u04A3\u0456\u043B\u0434\u0435\u043D \u0448\u044B\u0493\u0430\u0442\u044B\u043D \u0430\u044F\u049B\u0442\u0430\u043B\u0443 \u0436\u0430\u0437\u044B\u04A3\u044B\u0437.
+10. \u04D8\u0441\u0456\u0440\u0435\u043B\u0435\u043D\u0433\u0435\u043D, \u0442\u044B\u043C \u043A\u04E9\u0442\u0435\u0440\u0456\u04A3\u043A\u0456 \u0441\u0438\u043F\u0430\u0442\u0442\u0430\u043C\u0430\u043B\u0430\u0440\u0493\u0430 \u0422\u042B\u0419\u042B\u041C \u0421\u0410\u041B\u042B\u041D\u0410\u0414\u042B. \u0416\u044B\u043B\u044B, \u0431\u0456\u0440\u0430\u049B \u0448\u044B\u043D\u0430\u0439\u044B \u0440\u0435\u04A3\u043A\u0442\u0456 \u0441\u0430\u049B\u0442\u0430\u04A3\u044B\u0437.
 
-САПАҒА ҚОЙЫЛАТЫН МАҢЫЗДЫ ТАЛАПТАР:
-1. Баланың аты — "${childName}". Бас кейіпкер ретінде ӘРҚАШАН осы атты қолданыңыз.
-2. Ертегінің басы, ортасы және соңы анық БОЛУЫ КЕРЕК. ҚИСЫНДЫ себеп-салдар байланысы болуы тиіс.
-3. Әр оқиғаның СЕБЕБІ болуы керек — кездейсоқ сиқырлы шешімдер БОЛМАУЫ ТИІС.
-4. Кейіпкерлердің мінездері мен уәждері бірізді болуы керек.
-5. Тәрбиелік ой оқиғалардан ТАБИҒИ түрде туындауы керек — жасанды ақыл-өсиет БОЛМАСЫН.
-6. Жанды, бейнелі тілді қолданыңыз (түстер, дыбыстар, иістер).
-7. Кейіпкерлердің мінезін ашатын мағыналы диалогтар қосыңыз.
-8. Мәселе кейіпкердің ӨЗ күш-жігері, ақылы немесе тұлғалық өсуі арқылы шешілуі керек.
-9. "Олар бақытты өмір сүрді" сияқты таптаурын тіркестерге ТЫЙЫМ САЛЫНАДЫ — нақты әрі көңілден шығатын аяқталу жазыңыз.
-10. Әсіреленген, тым көтеріңкі сипаттамаларға ТЫЙЫМ САЛЫНАДЫ. Жылы, бірақ шынайы реңкті сақтаңыз.
+\u0422\u042B\u0419\u042B\u041C \u0421\u0410\u041B\u042B\u041D\u0410\u0414\u042B:
+- \u0410\u0442\u044B \u0436\u043E\u049B "\u043A\u0456\u0448\u043A\u0435\u043D\u0442\u0430\u0439 \u0434\u043E\u0441", "\u0441\u0438\u049B\u044B\u0440\u043B\u044B \u0442\u0456\u0440\u0448\u0456\u043B\u0456\u043A \u0438\u0435\u0441\u0456" \u0441\u0438\u044F\u049B\u0442\u044B \u0442\u0456\u0440\u043A\u0435\u0441\u0442\u0435\u0440
+- \u041A\u0435\u0437\u0434\u0435\u0439\u0441\u043E\u049B \u0441\u0438\u049B\u044B\u0440\u043B\u044B \u0448\u0435\u0448\u0456\u043C\u0434\u0435\u0440
+- \u0423\u0430\u0493\u044B\u0437 \u0442\u04AF\u0440\u0456\u043D\u0434\u0435\u0433\u0456 \u043C\u043E\u0440\u0430\u043B\u044C\u0434\u044B\u049B \u0441\u0430\u0431\u0430\u049B\u0442\u0430\u0440
+- \u0428\u0435\u043A\u0442\u0435\u043D \u0442\u044B\u0441 \u0442\u04D9\u0442\u0442\u0456, \u0436\u0430\u0441\u0430\u043D\u0434\u044B \u0442\u0456\u043B
+- \u041E\u049B\u0438\u0493\u0430 \u0436\u0435\u043B\u0456\u0441\u0456\u043D\u0434\u0435\u0433\u0456 \u043E\u043B\u049B\u044B\u043B\u044B\u049B\u0442\u0430\u0440 \u043D\u0435\u043C\u0435\u0441\u0435 \u049B\u0438\u0441\u044B\u043D\u0441\u044B\u0437 \u0440\u0435\u0442\u0442\u0456\u043B\u0456\u043A
 
-ТЫЙЫМ САЛЫНАДЫ:
-- Аты жоқ "кішкентай дос", "сиқырлы тіршілік иесі" сияқты тіркестер
-- Кездейсоқ сиқырлы шешімдер
-- Уағыз түріндегі моральдық сабақтар
-- Шектен тыс тәтті, жасанды тіл
-- Оқиға желісіндегі олқылықтар немесе қисынсыз реттілік
+\u0415\u0440\u0442\u0435\u0433\u0456\u043D\u0456\u04A3 \u049B\u04B1\u0440\u044B\u043B\u044B\u043C\u044B:
+1. \u0422\u0430\u049B\u044B\u0440\u044B\u043F: "${childName} \u0436\u04D9\u043D\u0435 [\u0431\u0456\u0440 \u043D\u04D9\u0440\u0441\u0435]" \u0442\u04AF\u0440\u0456\u043D\u0434\u0435
+2. \u041E\u049B\u0438\u0493\u0430 \u043E\u0440\u043D\u044B\u043D\u044B\u04A3 \u0441\u0438\u043F\u0430\u0442\u0442\u0430\u043C\u0430\u0441\u044B (\u049A\u0410\u0419\u0414\u0410 \u0436\u04D9\u043D\u0435 \u049A\u0410\u0428\u0410\u041D, \u0441\u0435\u0437\u0456\u043C\u0433\u0435 \u04D9\u0441\u0435\u0440 \u0435\u0442\u0435\u0442\u0456\u043D \u0435\u0433\u0436\u0435\u0439-\u0442\u0435\u0433\u0436\u0435\u0439\u043B\u0435\u0440\u043C\u0435\u043D)
+3. \u041A\u0435\u0439\u0456\u043F\u043A\u0435\u0440\u043B\u0435\u0440\u0434\u0456 \u0442\u0430\u043D\u044B\u0441\u0442\u044B\u0440\u0443 (\u043C\u0456\u043D\u0435\u0437 \u0435\u0440\u0435\u043A\u0448\u0435\u043B\u0456\u043A\u0442\u0435\u0440\u0456\u043C\u0435\u043D)
+4. \u041C\u04D9\u0441\u0435\u043B\u0435/\u0441\u044B\u043D\u0430\u049B (\u049B\u0438\u0441\u044B\u043D\u0434\u044B \u04D9\u0440\u0456 \u0431\u0430\u043B\u0430\u0493\u0430 \u0442\u04AF\u0441\u0456\u043D\u0456\u043A\u0442\u0456)
+5. 2-3 \u04D9\u0440\u0435\u043A\u0435\u0442/\u043A\u0435\u0434\u0435\u0440\u0433\u0456 (\u0431\u0456\u0440\u0442\u0456\u043D\u0434\u0435\u043F \u043A\u04AF\u0440\u0434\u0435\u043B\u0435\u043D\u0435 \u0442\u04AF\u0441\u0435\u0442\u0456\u043D)
+6. \u0428\u0430\u0440\u044B\u049B\u0442\u0430\u0443 \u0448\u0435\u0433\u0456 \u2014 \u043A\u0435\u0439\u0456\u043F\u043A\u0435\u0440\u0434\u0456\u04A3 \u04E9\u0441\u0443\u0456 \u043D\u0435\u043C\u0435\u0441\u0435 \u0431\u0456\u0440 \u043D\u04D9\u0440\u0441\u0435\u043D\u0456 \u04AF\u0439\u0440\u0435\u043D\u0443\u0456
+7. \u041E\u049B\u0438\u0493\u0430\u043B\u0430\u0440\u0434\u0430\u043D \u049B\u0438\u0441\u044B\u043D\u0434\u044B \u0442\u04AF\u0440\u0434\u0435 \u0442\u0443\u044B\u043D\u0434\u0430\u0439\u0442\u044B\u043D \u0448\u0435\u0448\u0456\u043C
+8. \u041A\u04E9\u04A3\u0456\u043B\u0434\u0435\u043D \u0448\u044B\u0493\u0430\u0442\u044B\u043D \u0430\u044F\u049B\u0442\u0430\u043B\u0443 \u0436\u04D9\u043D\u0435 \u0442\u0430\u0431\u0438\u0493\u0438 \u0442\u04D9\u0440\u0431\u0438\u0435\u043B\u0456\u043A \u049B\u043E\u0440\u044B\u0442\u044B\u043D\u0434\u044B${ageInstruction}
 
-Ертегінің құрылымы:
-1. Тақырып: "${childName} және [бір нәрсе]" түрінде
-2. Оқиға орнының сипаттамасы (ҚАЙДА және ҚАШАН, сезімге әсер ететін егжей-тегжейлермен)
-3. Кейіпкерлерді таныстыру (мінез ерекшеліктерімен)
-4. Мәселе/сынақ (қисынды әрі балаға түсінікті)
-5. 2-3 әрекет/кедергі (біртіндеп күрделене түсетін)
-6. Шарықтау шегі — кейіпкердің өсуі немесе бір нәрсені үйренуі
-7. Оқиғалардан қисынды түрде туындайтын шешім
-8. Көңілден шығатын аяқталу және табиғи тәрбиелік қорытынды${ageInstruction}
+\u041F\u0456\u0448\u0456\u043C: \u0411\u0456\u0440\u0456\u043D\u0448\u0456 \u0436\u043E\u043B\u0493\u0430 \u0442\u0430\u049B\u044B\u0440\u044B\u043F\u0442\u044B, \u043E\u0434\u0430\u043D \u043A\u0435\u0439\u0456\u043D \u0435\u0440\u0442\u0435\u0433\u0456 \u043C\u04D9\u0442\u0456\u043D\u0456\u043D \u0436\u0430\u0437\u044B\u04A3\u044B\u0437. \u0422\u0456\u0437\u0456\u043C \u0442\u04AF\u0440\u0456\u043D\u0434\u0435 \u0435\u043C\u0435\u0441, \u0430\u0431\u0437\u0430\u0446\u0442\u0430\u0440\u0493\u0430 \u0431\u04E9\u043B\u0456\u043F \u0436\u0430\u0437\u044B\u04A3\u044B\u0437. \u0415\u0440\u0442\u0435\u0433\u0456 \u049A\u0410\u0417\u0410\u049A \u0442\u0456\u043B\u0456\u043D\u0434\u0435 \u0431\u043E\u043B\u0443\u044B \u043A\u0435\u0440\u0435\u043A.`;
+    case "uz":
+      return `Siz mukofotga sazovor bo\u02BBlgan bolalar kitobi muallifisiz. Syujeti mantiqiy rivojlanadigan, professional bayon uslubida yozilgan qiziqarli, sifatli bolalar ertagini yozing.
 
-Пішім: Бірінші жолға тақырыпты, одан кейін ертегі мәтінін жазыңыз. Тізім түрінде емес, абзацтарға бөліп жазыңыз. Ертегі ҚАЗАҚ тілінде болуы керек.`;
-
-    case 'uz':
-      return `Siz mukofotga sazovor boʻlgan bolalar kitobi muallifisiz. Syujeti mantiqiy rivojlanadigan, professional bayon uslubida yozilgan qiziqarli, sifatli bolalar ertagini yozing.
-
-SIFATGA QOʻYILADIGAN MUHIM TALABLAR:
-1. Bolaning ismi — "${childName}". Bosh qahramon sifatida HAR DOIM shu ismdan foydalaning.
-2. Ertakning boshi, oʻrtasi va oxiri aniq BOʻLISHI KERAK. MANTIQIY sabab-oqibat bogʻliqligi boʻlishi lozim.
-3. Har bir voqeaning SABABI boʻlishi kerak — tasodifiy sehrli yechimlar BOʻLMASIN.
-4. Qahramonlarning xarakteri va maqsadlari izchil boʻlishi kerak.
-5. Tarbiyaviy gʻoya voqealardan TABIIY ravishda kelib chiqishi kerak — sunʼiy pand-nasihat BOʻLMASIN.
+SIFATGA QO\u02BBYILADIGAN MUHIM TALABLAR:
+1. Bolaning ismi \u2014 "${childName}". Bosh qahramon sifatida HAR DOIM shu ismdan foydalaning.
+2. Ertakning boshi, o\u02BBrtasi va oxiri aniq BO\u02BBLISHI KERAK. MANTIQIY sabab-oqibat bog\u02BBliqligi bo\u02BBlishi lozim.
+3. Har bir voqeaning SABABI bo\u02BBlishi kerak \u2014 tasodifiy sehrli yechimlar BO\u02BBLMASIN.
+4. Qahramonlarning xarakteri va maqsadlari izchil bo\u02BBlishi kerak.
+5. Tarbiyaviy g\u02BBoya voqealardan TABIIY ravishda kelib chiqishi kerak \u2014 sun\u02BCiy pand-nasihat BO\u02BBLMASIN.
 6. Jonli, obrazli tildan foydalaning (ranglar, tovushlar, hidlar).
-7. Qahramon xarakterini ochib beradigan mazmunli dialoglar qoʻshing.
-8. Muammo qahramonning OʻZ saʼy-harakati, aql-idroki yoki shaxsiy oʻsishi orqali hal boʻlishi kerak.
-9. "Ular baxtli yashab qolishdi" kabi qoliplashgan iboralar TAQIQLANADI — aniq va qoniqarli yakun yozing.
-10. Boʻrttirilgan, haddan tashqari koʻtarinki tasvirlar TAQIQLANADI. Iliq, ammo samimiy ohangni saqlang.
+7. Qahramon xarakterini ochib beradigan mazmunli dialoglar qo\u02BBshing.
+8. Muammo qahramonning O\u02BBZ sa\u02BCy-harakati, aql-idroki yoki shaxsiy o\u02BBsishi orqali hal bo\u02BBlishi kerak.
+9. "Ular baxtli yashab qolishdi" kabi qoliplashgan iboralar TAQIQLANADI \u2014 aniq va qoniqarli yakun yozing.
+10. Bo\u02BBrttirilgan, haddan tashqari ko\u02BBtarinki tasvirlar TAQIQLANADI. Iliq, ammo samimiy ohangni saqlang.
 
 TAQIQLANADI:
-- Ismi yoʻq "kichkina doʻst", "sehrli mavjudot" kabi iboralar
+- Ismi yo\u02BBq "kichkina do\u02BBst", "sehrli mavjudot" kabi iboralar
 - Tasodifiy sehrli yechimlar
-- Vaʼz koʻrinishidagi axloqiy saboqlar
-- Haddan tashqari shirin, sunʼiy til
+- Va\u02BCz ko\u02BBrinishidagi axloqiy saboqlar
+- Haddan tashqari shirin, sun\u02BCiy til
 - Syujetdagi uzilishlar yoki mantiqsiz ketma-ketlik
 
 Ertakning tuzilishi:
-1. Sarlavha: "${childName} va [nimadir]" koʻrinishida
-2. Voqea joyining tasviri (QAYERDA va QACHON, his-tuygʻularga taʼsir qiluvchi tafsilotlar bilan)
+1. Sarlavha: "${childName} va [nimadir]" ko\u02BBrinishida
+2. Voqea joyining tasviri (QAYERDA va QACHON, his-tuyg\u02BBularga ta\u02BCsir qiluvchi tafsilotlar bilan)
 3. Qahramonlar bilan tanishtirish (xarakter xususiyatlari bilan)
 4. Muammo/sinov (mantiqiy va bolaga tushunarli)
-5. 2-3 urinish/toʻsiq (asta-sekin murakkablashib boradigan)
-6. Kulminatsiya — qahramonning oʻsishi yoki nimanidir oʻrganishi
+5. 2-3 urinish/to\u02BBsiq (asta-sekin murakkablashib boradigan)
+6. Kulminatsiya \u2014 qahramonning o\u02BBsishi yoki nimanidir o\u02BBrganishi
 7. Voqealardan mantiqiy ravishda kelib chiqadigan yechim
 8. Qoniqarli yakun va tabiiy tarbiyaviy xulosa${ageInstruction}
 
-Format: Birinchi qatorga sarlavhani, keyin ertak matnini yozing. Roʻyxat shaklida emas, xatboshilarga boʻlib yozing. Ertak OʻZBEK tilida (lotin yozuvida) boʻlishi kerak.`;
+Format: Birinchi qatorga sarlavhani, keyin ertak matnini yozing. Ro\u02BByxat shaklida emas, xatboshilarga bo\u02BBlib yozing. Ertak O\u02BBZBEK tilida (lotin yozuvida) bo\u02BBlishi kerak.`;
+    case "ka":
+      return `\u10D7\u10E5\u10D5\u10D4\u10DC \u10EE\u10D0\u10E0\u10D7 \u10DE\u10E0\u10D4\u10DB\u10D8\u10D4\u10D1\u10D8\u10D7 \u10D3\u10D0\u10EF\u10D8\u10DA\u10D3\u10DD\u10D4\u10D1\u10E3\u10DA\u10D8 \u10E1\u10D0\u10D1\u10D0\u10D5\u10E8\u10D5\u10DD \u10EC\u10D8\u10D2\u10DC\u10D4\u10D1\u10D8\u10E1 \u10D0\u10D5\u10E2\u10DD\u10E0\u10D8. \u10D3\u10D0\u10EC\u10D4\u10E0\u10D4\u10D7 \u10D1\u10D0\u10D5\u10E8\u10D5\u10D4\u10D1\u10D8\u10E1\u10D7\u10D5\u10D8\u10E1 \u10E1\u10D0\u10D8\u10DC\u10E2\u10D4\u10E0\u10D4\u10E1\u10DD, \u10DB\u10D0\u10E6\u10D0\u10DA\u10EE\u10D0\u10E0\u10D8\u10E1\u10EE\u10D8\u10D0\u10DC\u10D8 \u10D6\u10E6\u10D0\u10DE\u10D0\u10E0\u10D8 \u10DA\u10DD\u10D2\u10D8\u10D9\u10E3\u10E0\u10D8 \u10E1\u10D8\u10E3\u10DF\u10D4\u10E2\u10E3\u10E0\u10D8 \u10D2\u10D0\u10DC\u10D5\u10D8\u10D7\u10D0\u10E0\u10D4\u10D1\u10D8\u10D7\u10D0 \u10D3\u10D0 \u10DE\u10E0\u10DD\u10E4\u10D4\u10E1\u10D8\u10E3\u10DA\u10D8 \u10D7\u10EE\u10E0\u10DD\u10D1\u10D8\u10E1 \u10E1\u10E2\u10D8\u10DA\u10D8\u10D7.
 
-    case 'ka':
-      return `თქვენ ხართ პრემიებით დაჯილდოებული საბავშვო წიგნების ავტორი. დაწერეთ ბავშვებისთვის საინტერესო, მაღალხარისხიანი ზღაპარი ლოგიკური სიუჟეტური განვითარებითა და პროფესიული თხრობის სტილით.
+\u10EE\u10D0\u10E0\u10D8\u10E1\u10EE\u10D8\u10E1 \u10D9\u10E0\u10D8\u10E2\u10D8\u10D9\u10E3\u10DA\u10D8 \u10EC\u10D4\u10E1\u10D4\u10D1\u10D8:
+1. \u10D1\u10D0\u10D5\u10E8\u10D5\u10D8\u10E1 \u10E1\u10D0\u10EE\u10D4\u10DA\u10D8\u10D0 \xAB${childName}\xBB. \u10DB\u10D7\u10D0\u10D5\u10D0\u10E0 \u10D2\u10DB\u10D8\u10E0\u10D0\u10D3 \u10E7\u10DD\u10D5\u10D4\u10DA\u10D7\u10D5\u10D8\u10E1 \u10D6\u10E3\u10E1\u10E2\u10D0\u10D3 \u10D4\u10E1 \u10E1\u10D0\u10EE\u10D4\u10DA\u10D8 \u10D2\u10D0\u10DB\u10DD\u10D8\u10E7\u10D4\u10DC\u10D4\u10D7.
+2. \u10D6\u10E6\u10D0\u10DE\u10D0\u10E0\u10E1 \u10E3\u10DC\u10D3\u10D0 \u10F0\u10E5\u10DD\u10DC\u10D3\u10D4\u10E1 \u10DB\u10D9\u10D0\u10E4\u10D8\u10DD \u10D3\u10D0\u10E1\u10D0\u10EC\u10E7\u10D8\u10E1\u10D8, \u10E8\u10E3\u10D0 \u10DC\u10D0\u10EC\u10D8\u10DA\u10D8 \u10D3\u10D0 \u10D3\u10D0\u10E1\u10D0\u10E1\u10E0\u10E3\u10DA\u10D8 \u2014 \u10DA\u10DD\u10D2\u10D8\u10D9\u10E3\u10E0\u10D8 \u10DB\u10D8\u10D6\u10D4\u10D6-\u10E8\u10D4\u10D3\u10D4\u10D2\u10DD\u10D1\u10E0\u10D8\u10D5\u10D8 \u10D9\u10D0\u10D5\u10E8\u10D8\u10E0\u10D8\u10D7.
+3. \u10E7\u10D5\u10D4\u10DA\u10D0 \u10DB\u10DD\u10D5\u10DA\u10D4\u10DC\u10D0\u10E1 \u10E3\u10DC\u10D3\u10D0 \u10F0\u10E5\u10DD\u10DC\u10D3\u10D4\u10E1 \u10DB\u10D8\u10D6\u10D4\u10D6\u10D8 \u2014 \u10E8\u10D4\u10DB\u10D7\u10EE\u10D5\u10D4\u10D5\u10D8\u10D7\u10D8 \u10EF\u10D0\u10D3\u10DD\u10E1\u10DC\u10E3\u10E0\u10D8 \u10D2\u10D0\u10D3\u10D0\u10EC\u10E7\u10D5\u10D4\u10E2\u10D4\u10D1\u10D8 \u10D3\u10D0\u10E3\u10E8\u10D5\u10D4\u10D1\u10D4\u10DA\u10D8\u10D0.
+4. \u10DE\u10D4\u10E0\u10E1\u10DD\u10DC\u10D0\u10DF\u10D4\u10D1\u10E1 \u10E3\u10DC\u10D3\u10D0 \u10F0\u10E5\u10DD\u10DC\u10D3\u10D4\u10D7 \u10D7\u10D0\u10DC\u10DB\u10D8\u10DB\u10D3\u10D4\u10D5\u10E0\u10E3\u10DA\u10D8 \u10EE\u10D0\u10E1\u10D8\u10D0\u10D7\u10D8 \u10D3\u10D0 \u10DB\u10DD\u10E2\u10D8\u10D5\u10D0\u10EA\u10D8\u10D0.
+5. \u10D0\u10E6\u10DB\u10D6\u10E0\u10D3\u10D4\u10DA\u10DD\u10D1\u10D8\u10D7\u10D8 \u10D2\u10D6\u10D0\u10D5\u10DC\u10D8\u10DA\u10D8 \u10DB\u10DD\u10D5\u10DA\u10D4\u10DC\u10D4\u10D1\u10D8\u10D3\u10D0\u10DC \u10D1\u10E3\u10DC\u10D4\u10D1\u10E0\u10D8\u10D5\u10D0\u10D3 \u10E3\u10DC\u10D3\u10D0 \u10D2\u10D0\u10DB\u10DD\u10DB\u10D3\u10D8\u10DC\u10D0\u10E0\u10D4\u10DD\u10D1\u10D3\u10D4\u10E1 \u2014 \u10EE\u10D4\u10DA\u10DD\u10D5\u10DC\u10E3\u10E0\u10D8 \u10D3\u10D0\u10E0\u10D8\u10D2\u10D4\u10D1\u10D0 \u10D0\u10E0 \u10D8\u10E7\u10DD\u10E1.
+6. \u10D2\u10D0\u10DB\u10DD\u10D8\u10E7\u10D4\u10DC\u10D4\u10D7 \u10EA\u10DD\u10EA\u10EE\u10D0\u10DA\u10D8, \u10EE\u10D0\u10E2\u10DD\u10D5\u10D0\u10DC\u10D8 \u10D4\u10DC\u10D0 (\u10E4\u10D4\u10E0\u10D4\u10D1\u10D8, \u10EE\u10DB\u10D4\u10D1\u10D8, \u10E1\u10E3\u10E0\u10DC\u10D4\u10DA\u10D4\u10D1\u10D8).
+7. \u10E9\u10D0\u10E0\u10D7\u10D4\u10D7 \u10DE\u10D4\u10E0\u10E1\u10DD\u10DC\u10D0\u10DF\u10D8\u10E1 \u10EE\u10D0\u10E1\u10D8\u10D0\u10D7\u10D8\u10E1 \u10D2\u10D0\u10DB\u10DD\u10DB\u10EE\u10D0\u10E2\u10D5\u10D4\u10DA\u10D8 \u10E8\u10D8\u10DC\u10D0\u10D0\u10E0\u10E1\u10D8\u10D0\u10DC\u10D8 \u10D3\u10D8\u10D0\u10DA\u10DD\u10D2\u10D4\u10D1\u10D8.
+8. \u10DE\u10E0\u10DD\u10D1\u10DA\u10D4\u10DB\u10D0 \u10D2\u10DB\u10D8\u10E0\u10D8\u10E1 \u10E1\u10D0\u10D9\u10E3\u10D7\u10D0\u10E0\u10D8 \u10EB\u10D0\u10DA\u10D8\u10E1\u10EE\u10DB\u10D4\u10D5\u10D8\u10D7, \u10D2\u10DD\u10DC\u10D8\u10D4\u10E0\u10D4\u10D1\u10D8\u10D7 \u10D0\u10DC \u10DE\u10D8\u10E0\u10DD\u10D5\u10DC\u10E3\u10DA\u10D8 \u10D6\u10E0\u10D3\u10D8\u10D7 \u10E3\u10DC\u10D3\u10D0 \u10D2\u10D0\u10D3\u10D0\u10D8\u10ED\u10E0\u10D0\u10E1.
+9. \xAB\u10D8\u10E1\u10D8\u10DC\u10D8 \u10D1\u10D4\u10D3\u10DC\u10D8\u10D4\u10E0\u10D0\u10D3 \u10EA\u10EE\u10DD\u10D5\u10E0\u10DD\u10D1\u10D3\u10DC\u10D4\u10DC\xBB \u10E2\u10D8\u10DE\u10D8\u10E1 \u10D9\u10DA\u10D8\u10E8\u10D4\u10D4\u10D1\u10D8 \u10D0\u10D9\u10E0\u10EB\u10D0\u10DA\u10E3\u10DA\u10D8\u10D0 \u2014 \u10D3\u10D0\u10EC\u10D4\u10E0\u10D4\u10D7 \u10D9\u10DD\u10DC\u10D9\u10E0\u10D4\u10E2\u10E3\u10DA\u10D8, \u10D3\u10D0\u10DB\u10D0\u10D9\u10DB\u10D0\u10E7\u10DD\u10E4\u10D8\u10DA\u10D4\u10D1\u10D4\u10DA\u10D8 \u10D3\u10D0\u10E1\u10D0\u10E1\u10E0\u10E3\u10DA\u10D8.
+10. \u10D2\u10D0\u10D6\u10D5\u10D8\u10D0\u10D3\u10D4\u10D1\u10E3\u10DA\u10D8, \u10D6\u10D4\u10D3\u10DB\u10D4\u10E2\u10D0\u10D3 \u10D0\u10DB\u10D0\u10E6\u10DA\u10D4\u10D1\u10E3\u10DA\u10D8 \u10D0\u10E6\u10EC\u10D4\u10E0\u10D4\u10D1\u10D8 \u10D0\u10D9\u10E0\u10EB\u10D0\u10DA\u10E3\u10DA\u10D8\u10D0. \u10E8\u10D4\u10D8\u10DC\u10D0\u10E0\u10E9\u10E3\u10DC\u10D4\u10D7 \u10D7\u10D1\u10D8\u10DA\u10D8, \u10DB\u10D0\u10D2\u10E0\u10D0\u10DB \u10D2\u10E3\u10DA\u10EC\u10E0\u10E4\u10D4\u10DA\u10D8 \u10E2\u10DD\u10DC\u10D8.
 
-ხარისხის კრიტიკული წესები:
-1. ბავშვის სახელია «${childName}». მთავარ გმირად ყოველთვის ზუსტად ეს სახელი გამოიყენეთ.
-2. ზღაპარს უნდა ჰქონდეს მკაფიო დასაწყისი, შუა ნაწილი და დასასრული — ლოგიკური მიზეზ-შედეგობრივი კავშირით.
-3. ყველა მოვლენას უნდა ჰქონდეს მიზეზი — შემთხვევითი ჯადოსნური გადაწყვეტები დაუშვებელია.
-4. პერსონაჟებს უნდა ჰქონდეთ თანმიმდევრული ხასიათი და მოტივაცია.
-5. აღმზრდელობითი გზავნილი მოვლენებიდან ბუნებრივად უნდა გამომდინარეობდეს — ხელოვნური დარიგება არ იყოს.
-6. გამოიყენეთ ცოცხალი, ხატოვანი ენა (ფერები, ხმები, სურნელები).
-7. ჩართეთ პერსონაჟის ხასიათის გამომხატველი შინაარსიანი დიალოგები.
-8. პრობლემა გმირის საკუთარი ძალისხმევით, გონიერებით ან პიროვნული ზრდით უნდა გადაიჭრას.
-9. «ისინი ბედნიერად ცხოვრობდნენ» ტიპის კლიშეები აკრძალულია — დაწერეთ კონკრეტული, დამაკმაყოფილებელი დასასრული.
-10. გაზვიადებული, ზედმეტად ამაღლებული აღწერები აკრძალულია. შეინარჩუნეთ თბილი, მაგრამ გულწრფელი ტონი.
+\u10D0\u10D9\u10E0\u10EB\u10D0\u10DA\u10E3\u10DA\u10D8\u10D0:
+- \u10E3\u10E1\u10D0\u10EE\u10D4\u10DA\u10DD \xAB\u10DE\u10D0\u10E2\u10D0\u10E0\u10D0 \u10DB\u10D4\u10D2\u10DD\u10D1\u10D0\u10E0\u10D8\xBB, \xAB\u10EF\u10D0\u10D3\u10DD\u10E1\u10DC\u10E3\u10E0\u10D8 \u10D0\u10E0\u10E1\u10D4\u10D1\u10D0\xBB \u10E2\u10D8\u10DE\u10D8\u10E1 \u10D2\u10D0\u10DB\u10DD\u10D7\u10E5\u10DB\u10D4\u10D1\u10D8
+- \u10E8\u10D4\u10DB\u10D7\u10EE\u10D5\u10D4\u10D5\u10D8\u10D7\u10D8 \u10EF\u10D0\u10D3\u10DD\u10E1\u10DC\u10E3\u10E0\u10D8 \u10D2\u10D0\u10D3\u10D0\u10EC\u10E7\u10D5\u10D4\u10E2\u10D4\u10D1\u10D8
+- \u10E5\u10D0\u10D3\u10D0\u10D2\u10D4\u10D1\u10D8\u10E1 \u10E1\u10E2\u10D8\u10DA\u10D8\u10E1 \u10DB\u10DD\u10E0\u10D0\u10DA\u10E3\u10E0\u10D8 \u10D2\u10D0\u10D9\u10D5\u10D4\u10D7\u10D8\u10DA\u10D4\u10D1\u10D8
+- \u10D6\u10D4\u10D3\u10DB\u10D4\u10E2\u10D0\u10D3 \u10E2\u10D9\u10D1\u10D8\u10DA\u10D8, \u10EE\u10D4\u10DA\u10DD\u10D5\u10DC\u10E3\u10E0\u10D8 \u10D4\u10DC\u10D0
+- \u10E1\u10D8\u10E3\u10DF\u10D4\u10E2\u10E3\u10E0\u10D8 \u10EE\u10D0\u10E0\u10D5\u10D4\u10D6\u10D4\u10D1\u10D8 \u10D0\u10DC \u10D0\u10DA\u10DD\u10D2\u10D8\u10D9\u10E3\u10E0\u10D8 \u10D7\u10D0\u10DC\u10DB\u10D8\u10DB\u10D3\u10D4\u10D5\u10E0\u10DD\u10D1\u10D0
 
-აკრძალულია:
-- უსახელო «პატარა მეგობარი», «ჯადოსნური არსება» ტიპის გამოთქმები
-- შემთხვევითი ჯადოსნური გადაწყვეტები
-- ქადაგების სტილის მორალური გაკვეთილები
-- ზედმეტად ტკბილი, ხელოვნური ენა
-- სიუჟეტური ხარვეზები ან ალოგიკური თანმიმდევრობა
+\u10D6\u10E6\u10D0\u10DE\u10E0\u10D8\u10E1 \u10E1\u10E2\u10E0\u10E3\u10E5\u10E2\u10E3\u10E0\u10D0:
+1. \u10E1\u10D0\u10D7\u10D0\u10E3\u10E0\u10D8: \xAB${childName} \u10D3\u10D0 [\u10E0\u10D0\u10E6\u10D0\u10EA]\xBB \u10E4\u10DD\u10E0\u10DB\u10D8\u10D7
+2. \u10DB\u10DD\u10E5\u10DB\u10D4\u10D3\u10D4\u10D1\u10D8\u10E1 \u10D0\u10D3\u10D2\u10D8\u10DA\u10D8\u10E1 \u10D0\u10E6\u10EC\u10D4\u10E0\u10D0 (\u10E1\u10D0\u10D3 \u10D3\u10D0 \u10E0\u10DD\u10D3\u10D8\u10E1, \u10D4\u10DB\u10DD\u10EA\u10D8\u10E3\u10E0\u10D8 \u10D3\u10D4\u10E2\u10D0\u10DA\u10D4\u10D1\u10D8\u10D7)
+3. \u10DE\u10D4\u10E0\u10E1\u10DD\u10DC\u10D0\u10DF\u10D4\u10D1\u10D8\u10E1 \u10D2\u10D0\u10EA\u10DC\u10DD\u10D1\u10D0 (\u10EE\u10D0\u10E1\u10D8\u10D0\u10D7\u10D8\u10E1 \u10D7\u10D5\u10D8\u10E1\u10D4\u10D1\u10D4\u10D1\u10D8\u10D7)
+4. \u10DE\u10E0\u10DD\u10D1\u10DA\u10D4\u10DB\u10D0/\u10D2\u10D0\u10DB\u10DD\u10EC\u10D5\u10D4\u10D5\u10D0 (\u10DA\u10DD\u10D2\u10D8\u10D9\u10E3\u10E0\u10D8 \u10D3\u10D0 \u10D1\u10D0\u10D5\u10E8\u10D5\u10D8\u10E1\u10D7\u10D5\u10D8\u10E1 \u10D2\u10D0\u10E1\u10D0\u10D2\u10D4\u10D1\u10D8)
+5. 2-3 \u10DB\u10EA\u10D3\u10D4\u10DA\u10DD\u10D1\u10D0/\u10D3\u10D0\u10D1\u10E0\u10D9\u10DD\u10DA\u10D4\u10D1\u10D0 (\u10D7\u10D0\u10DC\u10D3\u10D0\u10D7\u10D0\u10DC \u10DB\u10D6\u10D0\u10E0\u10D3\u10D8 \u10E1\u10D8\u10E0\u10D7\u10E3\u10DA\u10D8\u10D7)
+6. \u10D9\u10E3\u10DA\u10DB\u10D8\u10DC\u10D0\u10EA\u10D8\u10D0 \u2014 \u10D2\u10DB\u10D8\u10E0\u10D8\u10E1 \u10D6\u10E0\u10D3\u10D0 \u10D0\u10DC \u10E0\u10D0\u10E6\u10D0\u10EA\u10D8\u10E1 \u10E1\u10EC\u10D0\u10D5\u10DA\u10D0
+7. \u10DB\u10DD\u10D5\u10DA\u10D4\u10DC\u10D4\u10D1\u10D8\u10D3\u10D0\u10DC \u10DA\u10DD\u10D2\u10D8\u10D9\u10E3\u10E0\u10D0\u10D3 \u10D2\u10D0\u10DB\u10DD\u10DB\u10D3\u10D8\u10DC\u10D0\u10E0\u10D4 \u10D2\u10D0\u10D3\u10D0\u10EC\u10E7\u10D5\u10D4\u10E2\u10D0
+8. \u10D3\u10D0\u10DB\u10D0\u10D9\u10DB\u10D0\u10E7\u10DD\u10E4\u10D8\u10DA\u10D4\u10D1\u10D4\u10DA\u10D8 \u10D3\u10D0\u10E1\u10D0\u10E1\u10E0\u10E3\u10DA\u10D8 \u10D3\u10D0 \u10D1\u10E3\u10DC\u10D4\u10D1\u10E0\u10D8\u10D5\u10D8 \u10D0\u10E6\u10DB\u10D6\u10E0\u10D3\u10D4\u10DA\u10DD\u10D1\u10D8\u10D7\u10D8 \u10D3\u10D0\u10E1\u10D9\u10D5\u10DC\u10D0${ageInstruction}
 
-ზღაპრის სტრუქტურა:
-1. სათაური: «${childName} და [რაღაც]» ფორმით
-2. მოქმედების ადგილის აღწერა (სად და როდის, ემოციური დეტალებით)
-3. პერსონაჟების გაცნობა (ხასიათის თვისებებით)
-4. პრობლემა/გამოწვევა (ლოგიკური და ბავშვისთვის გასაგები)
-5. 2-3 მცდელობა/დაბრკოლება (თანდათან მზარდი სირთულით)
-6. კულმინაცია — გმირის ზრდა ან რაღაცის სწავლა
-7. მოვლენებიდან ლოგიკურად გამომდინარე გადაწყვეტა
-8. დამაკმაყოფილებელი დასასრული და ბუნებრივი აღმზრდელობითი დასკვნა${ageInstruction}
+\u10E4\u10DD\u10E0\u10DB\u10D0\u10E2\u10D8: \u10DE\u10D8\u10E0\u10D5\u10D4\u10DA \u10EE\u10D0\u10D6\u10D6\u10D4 \u10D3\u10D0\u10EC\u10D4\u10E0\u10D4\u10D7 \u10E1\u10D0\u10D7\u10D0\u10E3\u10E0\u10D8, \u10E8\u10D4\u10DB\u10D3\u10D4\u10D2 \u2014 \u10D6\u10E6\u10D0\u10DE\u10E0\u10D8\u10E1 \u10E2\u10D4\u10E5\u10E1\u10E2\u10D8. \u10D3\u10D0\u10EC\u10D4\u10E0\u10D4\u10D7 \u10D0\u10D1\u10D6\u10D0\u10EA\u10D4\u10D1\u10D0\u10D3, \u10D0\u10E0\u10D0 \u10E1\u10D8\u10D8\u10E1 \u10E1\u10D0\u10EE\u10D8\u10D7. \u10D6\u10E6\u10D0\u10DE\u10D0\u10E0\u10D8 \u10E5\u10D0\u10E0\u10D7\u10E3\u10DA \u10D4\u10DC\u10D0\u10D6\u10D4 (\u10DB\u10EE\u10D4\u10D3\u10E0\u10E3\u10DA\u10D8 \u10D3\u10D0\u10DB\u10EC\u10D4\u10E0\u10DA\u10DD\u10D1\u10D8\u10D7) \u10E3\u10DC\u10D3\u10D0 \u10D8\u10E7\u10DD\u10E1.`;
+    default:
+      return `S\u0259n m\xFCkafat alm\u0131\u015F u\u015Faq kitab\u0131 m\xFC\u0259llifiis\u0259n. M\u0259ntiqi s\xFCjet inki\u015Faf\u0131 v\u0259 pe\u015F\u0259kar anlat\u0131m t\u0259rzi il\u0259 u\u015Faqlar \xFC\xE7\xFCn maraql\u0131, keyfiyy\u0259tli na\u011F\u0131l yaz.
 
-ფორმატი: პირველ ხაზზე დაწერეთ სათაური, შემდეგ — ზღაპრის ტექსტი. დაწერეთ აბზაცებად, არა სიის სახით. ზღაპარი ქართულ ენაზე (მხედრული დამწერლობით) უნდა იყოს.`;
-
-    default: // 'az'
-      return `Sən mükafat almış uşaq kitabı müəllifiisən. Məntiqi süjet inkişafı və peşəkar anlatım tərzi ilə uşaqlar üçün maraqlı, keyfiyyətli nağıl yaz.
-
-KRİTİK KEYFİYYƏT QAYDALARI:
-1. Uşağın adı "${childName}"-dir. Baş qəhrəman olaraq HƏMİŞƏ bu adı istifadə et.
-2. Nağılın aydın başlanğıcı, ortası və sonu OLMALIDIR. MƏNTİQLİ səbəb-nəticə əlaqəsi olmalıdır.
-3. Hər hadisənin bir SƏBƏBİ olmalıdır — təsadüfi sehrli həllər OLMAMALIDIR.
-4. Personajların ardıcıl xarakterləri və motivasiyaları olmalıdır.
-5. Tərbiyəvi mesaj hadisələrdən TƏBİİ şəkildə çıxmalıdır — süni öyüd-nəsihət OLMASIN.
-6. Canlı, təsvirli dil istifadə et (rənglər, səslər, qoxular).
-7. Personaj xarakterini açan mənalı dialoqlar daxil et.
-8. Problem qəhrəmanın ÖZ səyi, ağlı və ya böyüməsi ilə həll olunmalıdır.
-9. "Onlar xoşbəxt yaşadılar" kimi klişelər YASAQDIR — konkret, qənaətbəxş sonluq yaz.
-10. Şişirdilmiş, mübaliğəli təsvirlər YASAQDIR. İsti amma gerçəkçi ton saxla.
+KR\u0130T\u0130K KEYF\u0130YY\u018FT QAYDALARI:
+1. U\u015Fa\u011F\u0131n ad\u0131 "${childName}"-dir. Ba\u015F q\u0259hr\u0259man olaraq H\u018FM\u0130\u015E\u018F bu ad\u0131 istifad\u0259 et.
+2. Na\u011F\u0131l\u0131n ayd\u0131n ba\u015Flan\u011F\u0131c\u0131, ortas\u0131 v\u0259 sonu OLMALIDIR. M\u018FNT\u0130QL\u0130 s\u0259b\u0259b-n\u0259tic\u0259 \u0259laq\u0259si olmal\u0131d\u0131r.
+3. H\u0259r hadis\u0259nin bir S\u018FB\u018FB\u0130 olmal\u0131d\u0131r \u2014 t\u0259sad\xFCfi sehrli h\u0259ll\u0259r OLMAMALIDIR.
+4. Personajlar\u0131n ard\u0131c\u0131l xarakterl\u0259ri v\u0259 motivasiyalar\u0131 olmal\u0131d\u0131r.
+5. T\u0259rbiy\u0259vi mesaj hadis\u0259l\u0259rd\u0259n T\u018FB\u0130\u0130 \u015F\u0259kild\u0259 \xE7\u0131xmal\u0131d\u0131r \u2014 s\xFCni \xF6y\xFCd-n\u0259sih\u0259t OLMASIN.
+6. Canl\u0131, t\u0259svirli dil istifad\u0259 et (r\u0259ngl\u0259r, s\u0259sl\u0259r, qoxular).
+7. Personaj xarakterini a\xE7an m\u0259nal\u0131 dialoqlar daxil et.
+8. Problem q\u0259hr\u0259man\u0131n \xD6Z s\u0259yi, a\u011Fl\u0131 v\u0259 ya b\xF6y\xFCm\u0259si il\u0259 h\u0259ll olunmal\u0131d\u0131r.
+9. "Onlar xo\u015Fb\u0259xt ya\u015Fad\u0131lar" kimi kli\u015Fel\u0259r YASAQDIR \u2014 konkret, q\u0259na\u0259tb\u0259x\u015F sonluq yaz.
+10. \u015Ei\u015Firdilmi\u015F, m\xFCbali\u011F\u0259li t\u0259svirl\u0259r YASAQDIR. \u0130sti amma ger\xE7\u0259k\xE7i ton saxla.
 
 YASAQDIR:
-- Adsız "kiçik dost", "sehrli varlıq" kimi ifadələr
-- Təsadüfi sehrli həllər
-- Moizə tərzi əxlaq dərsləri
-- Həddən artıq şirin, süni dil
-- Süjet boşluqları və ya məntiqsiz ardıcıllıq
+- Ads\u0131z "ki\xE7ik dost", "sehrli varl\u0131q" kimi ifad\u0259l\u0259r
+- T\u0259sad\xFCfi sehrli h\u0259ll\u0259r
+- Moiz\u0259 t\u0259rzi \u0259xlaq d\u0259rsl\u0259ri
+- H\u0259dd\u0259n art\u0131q \u015Firin, s\xFCni dil
+- S\xFCjet bo\u015Fluqlar\u0131 v\u0259 ya m\u0259ntiqsiz ard\u0131c\u0131ll\u0131q
 
-VACİB QRAMMATIKA QAYDALARI:
-- Düzgün hal şəkilçiləri (yiyəlik, təsirlik, yerlik, çıxışlıq)
-- Düzgün feil zamanları və şəxs sonluqları
-- Azərbaycanca doğma adlar: Zübeydə, Əlibala, Günəş, Lalə, Tülkü baba, Ayı dayı, Ceyran, Bülbül
+VAC\u0130B QRAMMATIKA QAYDALARI:
+- D\xFCzg\xFCn hal \u015F\u0259kil\xE7il\u0259ri (yiy\u0259lik, t\u0259sirlik, yerlik, \xE7\u0131x\u0131\u015Fl\u0131q)
+- D\xFCzg\xFCn feil zamanlar\u0131 v\u0259 \u015F\u0259xs sonluqlar\u0131
+- Az\u0259rbaycanca do\u011Fma adlar: Z\xFCbeyd\u0259, \u018Flibala, G\xFCn\u0259\u015F, Lal\u0259, T\xFClk\xFC baba, Ay\u0131 day\u0131, Ceyran, B\xFClb\xFCl
 
-Nağılın strukturu:
-1. Başlıq: "${childName}ın [Macəra adı]" və ya "${childName} və [nəsə]"
-2. Məkan təsviri (HARADA və NƏ VAXT, duyğusal detallarla)
-3. Personaj tanıtımı (xarakter xüsusiyyətləri ilə)
-4. Problem/çağırış (məntiqi, uşağın anlayacağı)
-5. 2-3 cəhd/maneə (artan çətinlik)
-6. Kulminasiya — qəhrəmanın böyüməsi və ya öyrənməsi
-7. Hadisələrdən məntiqi olaraq irəli gələn həll
-8. Qənaətbəxş sonluq və təbii tərbiyəvi nəticə${ageInstruction}
+Na\u011F\u0131l\u0131n strukturu:
+1. Ba\u015Fl\u0131q: "${childName}\u0131n [Mac\u0259ra ad\u0131]" v\u0259 ya "${childName} v\u0259 [n\u0259s\u0259]"
+2. M\u0259kan t\u0259sviri (HARADA v\u0259 N\u018F VAXT, duy\u011Fusal detallarla)
+3. Personaj tan\u0131t\u0131m\u0131 (xarakter x\xFCsusiyy\u0259tl\u0259ri il\u0259)
+4. Problem/\xE7a\u011F\u0131r\u0131\u015F (m\u0259ntiqi, u\u015Fa\u011F\u0131n anlayaca\u011F\u0131)
+5. 2-3 c\u0259hd/mane\u0259 (artan \xE7\u0259tinlik)
+6. Kulminasiya \u2014 q\u0259hr\u0259man\u0131n b\xF6y\xFCm\u0259si v\u0259 ya \xF6yr\u0259nm\u0259si
+7. Hadis\u0259l\u0259rd\u0259n m\u0259ntiqi olaraq ir\u0259li g\u0259l\u0259n h\u0259ll
+8. Q\u0259na\u0259tb\u0259x\u015F sonluq v\u0259 t\u0259bii t\u0259rbiy\u0259vi n\u0259tic\u0259${ageInstruction}
 
-Format: Birinci sətirdə başlıq, sonra nağıl mətni. Abzaslarla yaz, siyahı formatında yox.`;
+Format: Birinci s\u0259tird\u0259 ba\u015Fl\u0131q, sonra na\u011F\u0131l m\u0259tni. Abzaslarla yaz, siyah\u0131 format\u0131nda yox.`;
   }
 };
+var getUserPrompt = (language, childName, theme, hero, moralLesson, ageRange, storyStyle) => {
+  if (isExpandedLanguage(language)) return `${getUserPrompt("en", childName, theme, hero, moralLesson, ageRange, storyStyle)}
 
-const getUserPrompt = (language: string, childName: string, theme: string, hero: string, moralLesson: string, ageRange?: string, storyStyle?: string) => {
-  const ageText = ageRange ? ` (yaş qrupu: ${ageRange})` : '';
-  const styleText = storyStyle || '';
-
+${outputLanguageRule(language)}`;
+  const ageText = ageRange ? ` (ya\u015F qrupu: ${ageRange})` : "";
+  const styleText = storyStyle || "";
   switch (language) {
-    case 'en':
+    case "en":
       return `Child's name: ${childName}${ageText}
-Theme: ${theme || 'Forest adventure'}
-Supporting character: ${hero || 'A wise forest animal'}
-Moral lesson: ${moralLesson || 'Friendship and kindness'}
-${styleText ? `Story style: ${styleText}` : ''}
+Theme: ${theme || "Forest adventure"}
+Supporting character: ${hero || "A wise forest animal"}
+Moral lesson: ${moralLesson || "Friendship and kindness"}
+${styleText ? `Story style: ${styleText}` : ""}
 
 Write a PROFESSIONAL story about "${childName}" with logical plot, vivid descriptions, and a satisfying ending. The moral must emerge naturally from the story events.`;
+    case "ru":
+      return `\u0418\u043C\u044F \u0440\u0435\u0431\u0451\u043D\u043A\u0430: ${childName}${ageText}
+\u0422\u0435\u043C\u0430: ${theme || "\u041B\u0435\u0441\u043D\u043E\u0435 \u043F\u0440\u0438\u043A\u043B\u044E\u0447\u0435\u043D\u0438\u0435"}
+\u041F\u043E\u043C\u043E\u0449\u043D\u0438\u043A-\u043F\u0435\u0440\u0441\u043E\u043D\u0430\u0436: ${hero || "\u041C\u0443\u0434\u0440\u043E\u0435 \u043B\u0435\u0441\u043D\u043E\u0435 \u0436\u0438\u0432\u043E\u0442\u043D\u043E\u0435"}
+\u0412\u043E\u0441\u043F\u0438\u0442\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u0443\u0440\u043E\u043A: ${moralLesson || "\u0414\u0440\u0443\u0436\u0431\u0430 \u0438 \u0434\u043E\u0431\u0440\u043E\u0442\u0430"}
+${styleText ? `\u0421\u0442\u0438\u043B\u044C: ${styleText}` : ""}
 
-    case 'ru':
-      return `Имя ребёнка: ${childName}${ageText}
-Тема: ${theme || 'Лесное приключение'}
-Помощник-персонаж: ${hero || 'Мудрое лесное животное'}
-Воспитательный урок: ${moralLesson || 'Дружба и доброта'}
-${styleText ? `Стиль: ${styleText}` : ''}
+\u041D\u0430\u043F\u0438\u0448\u0438 \u041F\u0420\u041E\u0424\u0415\u0421\u0421\u0418\u041E\u041D\u0410\u041B\u042C\u041D\u0423\u042E \u0441\u043A\u0430\u0437\u043A\u0443 \u043E "${childName}" \u0441 \u043B\u043E\u0433\u0438\u0447\u043D\u044B\u043C \u0441\u044E\u0436\u0435\u0442\u043E\u043C, \u0436\u0438\u0432\u044B\u043C\u0438 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u044F\u043C\u0438 \u0438 \u0443\u0434\u043E\u0432\u043B\u0435\u0442\u0432\u043E\u0440\u044F\u044E\u0449\u0438\u043C \u0444\u0438\u043D\u0430\u043B\u043E\u043C.`;
+    case "tr":
+      return `\xC7ocu\u011Fun ad\u0131: ${childName}${ageText}
+Tema: ${theme || "Orman maceras\u0131"}
+Yard\u0131mc\u0131 karakter: ${hero || "Bilge bir orman hayvan\u0131"}
+E\u011Fitici mesaj: ${moralLesson || "Dostluk ve iyilik"}
+${styleText ? `Tarz: ${styleText}` : ""}
 
-Напиши ПРОФЕССИОНАЛЬНУЮ сказку о "${childName}" с логичным сюжетом, живыми описаниями и удовлетворяющим финалом.`;
+"${childName}" hakk\u0131nda PROFESYONEL, mant\u0131kl\u0131 bir masal yaz. Canl\u0131 betimlemeler ve tatmin edici bir son olsun.`;
+    case "ar":
+      return `\u0627\u0633\u0645 \u0627\u0644\u0637\u0641\u0644: ${childName}${ageText}
+\u0627\u0644\u0645\u0648\u0636\u0648\u0639/\u0627\u0644\u0641\u0643\u0631\u0629: ${theme || "\u0645\u063A\u0627\u0645\u0631\u0629 \u0641\u064A \u0627\u0644\u063A\u0627\u0628\u0629"}
+\u0627\u0644\u0634\u062E\u0635\u064A\u0629 \u0627\u0644\u0645\u0633\u0627\u0639\u062F\u0629: ${hero || "\u062D\u064A\u0648\u0627\u0646 \u062D\u0643\u064A\u0645 \u0645\u0646 \u062D\u064A\u0648\u0627\u0646\u0627\u062A \u0627\u0644\u063A\u0627\u0628\u0629"}
+\u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u062A\u0631\u0628\u0648\u064A\u0629: ${moralLesson || "\u0627\u0644\u0635\u062F\u0627\u0642\u0629 \u0648\u0641\u0639\u0644 \u0627\u0644\u062E\u064A\u0631"}
+${styleText ? `\u0627\u0644\u0623\u0633\u0644\u0648\u0628: ${styleText}` : ""}
 
-    case 'tr':
-      return `Çocuğun adı: ${childName}${ageText}
-Tema: ${theme || 'Orman macerası'}
-Yardımcı karakter: ${hero || 'Bilge bir orman hayvanı'}
-Eğitici mesaj: ${moralLesson || 'Dostluk ve iyilik'}
-${styleText ? `Tarz: ${styleText}` : ''}
-
-"${childName}" hakkında PROFESYONEL, mantıklı bir masal yaz. Canlı betimlemeler ve tatmin edici bir son olsun.`;
-
-    case 'ar':
-      return `اسم الطفل: ${childName}${ageText}
-الموضوع/الفكرة: ${theme || 'مغامرة في الغابة'}
-الشخصية المساعدة: ${hero || 'حيوان حكيم من حيوانات الغابة'}
-الرسالة التربوية: ${moralLesson || 'الصداقة وفعل الخير'}
-${styleText ? `الأسلوب: ${styleText}` : ''}
-
-مهم:
-- اكتب حكاية احترافية ومنطقية عن "${childName}"
-- استخدم أوصافًا حيوية وحوارات هادفة ونهاية مُرضية
-- اجعل الرسالة التربوية تنبثق من الأحداث بصورة طبيعية لا مصطنعة
-- التزم بدقة بقواعد اللغة العربية الفصحى`;
-
-    case 'de':
+\u0645\u0647\u0645:
+- \u0627\u0643\u062A\u0628 \u062D\u0643\u0627\u064A\u0629 \u0627\u062D\u062A\u0631\u0627\u0641\u064A\u0629 \u0648\u0645\u0646\u0637\u0642\u064A\u0629 \u0639\u0646 "${childName}"
+- \u0627\u0633\u062A\u062E\u062F\u0645 \u0623\u0648\u0635\u0627\u0641\u064B\u0627 \u062D\u064A\u0648\u064A\u0629 \u0648\u062D\u0648\u0627\u0631\u0627\u062A \u0647\u0627\u062F\u0641\u0629 \u0648\u0646\u0647\u0627\u064A\u0629 \u0645\u064F\u0631\u0636\u064A\u0629
+- \u0627\u062C\u0639\u0644 \u0627\u0644\u0631\u0633\u0627\u0644\u0629 \u0627\u0644\u062A\u0631\u0628\u0648\u064A\u0629 \u062A\u0646\u0628\u062B\u0642 \u0645\u0646 \u0627\u0644\u0623\u062D\u062F\u0627\u062B \u0628\u0635\u0648\u0631\u0629 \u0637\u0628\u064A\u0639\u064A\u0629 \u0644\u0627 \u0645\u0635\u0637\u0646\u0639\u0629
+- \u0627\u0644\u062A\u0632\u0645 \u0628\u062F\u0642\u0629 \u0628\u0642\u0648\u0627\u0639\u062F \u0627\u0644\u0644\u063A\u0629 \u0627\u0644\u0639\u0631\u0628\u064A\u0629 \u0627\u0644\u0641\u0635\u062D\u0649`;
+    case "de":
       return `Name des Kindes: ${childName}${ageText}
-Thema: ${theme || 'Abenteuer im Wald'}
-Nebenfigur: ${hero || 'Ein weises Waldtier'}
-Pädagogische Botschaft: ${moralLesson || 'Freundschaft und Güte'}
-${styleText ? `Stil: ${styleText}` : ''}
+Thema: ${theme || "Abenteuer im Wald"}
+Nebenfigur: ${hero || "Ein weises Waldtier"}
+P\xE4dagogische Botschaft: ${moralLesson || "Freundschaft und G\xFCte"}
+${styleText ? `Stil: ${styleText}` : ""}
 
 WICHTIG:
-- Schreibe ein PROFESSIONELLES, LOGISCHES Märchen über "${childName}"
-- Verwende lebendige Beschreibungen und bedeutungsvolle Dialoge und schreibe einen überzeugenden Schluss
-- Die pädagogische Botschaft soll nicht künstlich wirken, sondern sich auf NATÜRLICHE Weise aus den Ereignissen ergeben
-- Halte dich sorgfältig an die deutsche Grammatik`;
+- Schreibe ein PROFESSIONELLES, LOGISCHES M\xE4rchen \xFCber "${childName}"
+- Verwende lebendige Beschreibungen und bedeutungsvolle Dialoge und schreibe einen \xFCberzeugenden Schluss
+- Die p\xE4dagogische Botschaft soll nicht k\xFCnstlich wirken, sondern sich auf NAT\xDCRLICHE Weise aus den Ereignissen ergeben
+- Halte dich sorgf\xE4ltig an die deutsche Grammatik`;
+    case "kk":
+      return `\u0411\u0430\u043B\u0430\u043D\u044B\u04A3 \u0430\u0442\u044B: ${childName}${ageText}
+\u0422\u0430\u049B\u044B\u0440\u044B\u043F: ${theme || "\u041E\u0440\u043C\u0430\u043D\u0434\u0430\u0493\u044B \u0448\u044B\u0442\u044B\u0440\u043C\u0430\u043D \u043E\u049B\u0438\u0493\u0430"}
+\u041A\u04E9\u043C\u0435\u043A\u0448\u0456 \u043A\u0435\u0439\u0456\u043F\u043A\u0435\u0440: ${hero || "\u0414\u0430\u043D\u0430 \u043E\u0440\u043C\u0430\u043D \u0436\u0430\u043D\u0443\u0430\u0440\u044B"}
+\u0422\u04D9\u0440\u0431\u0438\u0435\u043B\u0456\u043A \u043E\u0439: ${moralLesson || "\u0414\u043E\u0441\u0442\u044B\u049B \u043F\u0435\u043D \u0436\u0430\u049B\u0441\u044B\u043B\u044B\u049B"}
+${styleText ? `\u0421\u0442\u0438\u043B\u044C: ${styleText}` : ""}
 
-    case 'kk':
-      return `Баланың аты: ${childName}${ageText}
-Тақырып: ${theme || 'Ормандағы шытырман оқиға'}
-Көмекші кейіпкер: ${hero || 'Дана орман жануары'}
-Тәрбиелік ой: ${moralLesson || 'Достық пен жақсылық'}
-${styleText ? `Стиль: ${styleText}` : ''}
-
-МАҢЫЗДЫ:
-- "${childName}" туралы КӘСІБИ, ҚИСЫНДЫ ертегі жазыңыз
-- Жанды сипаттамалар, мағыналы диалогтар және көңілден шығатын аяқталу болсын
-- Тәрбиелік ой жасанды емес, оқиғалардан ТАБИҒИ түрде туындасын
-- Қазақ тілінің грамматикалық нормаларын мұқият сақтаңыз`;
-
-    case 'uz':
+\u041C\u0410\u04A2\u042B\u0417\u0414\u042B:
+- "${childName}" \u0442\u0443\u0440\u0430\u043B\u044B \u041A\u04D8\u0421\u0406\u0411\u0418, \u049A\u0418\u0421\u042B\u041D\u0414\u042B \u0435\u0440\u0442\u0435\u0433\u0456 \u0436\u0430\u0437\u044B\u04A3\u044B\u0437
+- \u0416\u0430\u043D\u0434\u044B \u0441\u0438\u043F\u0430\u0442\u0442\u0430\u043C\u0430\u043B\u0430\u0440, \u043C\u0430\u0493\u044B\u043D\u0430\u043B\u044B \u0434\u0438\u0430\u043B\u043E\u0433\u0442\u0430\u0440 \u0436\u04D9\u043D\u0435 \u043A\u04E9\u04A3\u0456\u043B\u0434\u0435\u043D \u0448\u044B\u0493\u0430\u0442\u044B\u043D \u0430\u044F\u049B\u0442\u0430\u043B\u0443 \u0431\u043E\u043B\u0441\u044B\u043D
+- \u0422\u04D9\u0440\u0431\u0438\u0435\u043B\u0456\u043A \u043E\u0439 \u0436\u0430\u0441\u0430\u043D\u0434\u044B \u0435\u043C\u0435\u0441, \u043E\u049B\u0438\u0493\u0430\u043B\u0430\u0440\u0434\u0430\u043D \u0422\u0410\u0411\u0418\u0492\u0418 \u0442\u04AF\u0440\u0434\u0435 \u0442\u0443\u044B\u043D\u0434\u0430\u0441\u044B\u043D
+- \u049A\u0430\u0437\u0430\u049B \u0442\u0456\u043B\u0456\u043D\u0456\u04A3 \u0433\u0440\u0430\u043C\u043C\u0430\u0442\u0438\u043A\u0430\u043B\u044B\u049B \u043D\u043E\u0440\u043C\u0430\u043B\u0430\u0440\u044B\u043D \u043C\u04B1\u049B\u0438\u044F\u0442 \u0441\u0430\u049B\u0442\u0430\u04A3\u044B\u0437`;
+    case "uz":
       return `Bolaning ismi: ${childName}${ageText}
-Mavzu: ${theme || 'Oʻrmondagi sarguzasht'}
-Yordamchi qahramon: ${hero || 'Dono oʻrmon hayvoni'}
-Tarbiyaviy gʻoya: ${moralLesson || 'Doʻstlik va mehr-oqibat'}
-${styleText ? `Uslub: ${styleText}` : ''}
+Mavzu: ${theme || "O\u02BBrmondagi sarguzasht"}
+Yordamchi qahramon: ${hero || "Dono o\u02BBrmon hayvoni"}
+Tarbiyaviy g\u02BBoya: ${moralLesson || "Do\u02BBstlik va mehr-oqibat"}
+${styleText ? `Uslub: ${styleText}` : ""}
 
 MUHIM:
 - "${childName}" haqida PROFESSIONAL, MANTIQIY ertak yozing
-- Jonli tasvirlar, mazmunli dialoglar va qoniqarli yakun boʻlsin
-- Tarbiyaviy gʻoya sunʼiy emas, voqealardan TABIIY ravishda kelib chiqsin
-- Oʻzbek tili (lotin yozuvi) grammatika qoidalariga diqqat bilan rioya qiling`;
+- Jonli tasvirlar, mazmunli dialoglar va qoniqarli yakun bo\u02BBlsin
+- Tarbiyaviy g\u02BBoya sun\u02BCiy emas, voqealardan TABIIY ravishda kelib chiqsin
+- O\u02BBzbek tili (lotin yozuvi) grammatika qoidalariga diqqat bilan rioya qiling`;
+    case "ka":
+      return `\u10D1\u10D0\u10D5\u10E8\u10D5\u10D8\u10E1 \u10E1\u10D0\u10EE\u10D4\u10DA\u10D8: ${childName}${ageText}
+\u10D7\u10D4\u10DB\u10D0: ${theme || "\u10E2\u10E7\u10D8\u10E1 \u10D7\u10D0\u10D5\u10D2\u10D0\u10D3\u10D0\u10E1\u10D0\u10D5\u10D0\u10DA\u10D8"}
+\u10D3\u10D0\u10DB\u10EE\u10DB\u10D0\u10E0\u10D4 \u10DE\u10D4\u10E0\u10E1\u10DD\u10DC\u10D0\u10DF\u10D8: ${hero || "\u10D1\u10E0\u10EB\u10D4\u10DC\u10D8 \u10E2\u10E7\u10D8\u10E1 \u10EA\u10EE\u10DD\u10D5\u10D4\u10DA\u10D8"}
+\u10D0\u10E6\u10DB\u10D6\u10E0\u10D3\u10D4\u10DA\u10DD\u10D1\u10D8\u10D7\u10D8 \u10D2\u10D6\u10D0\u10D5\u10DC\u10D8\u10DA\u10D8: ${moralLesson || "\u10DB\u10D4\u10D2\u10DD\u10D1\u10E0\u10DD\u10D1\u10D0 \u10D3\u10D0 \u10E1\u10D8\u10D9\u10D4\u10D7\u10D4"}
+${styleText ? `\u10E1\u10E2\u10D8\u10DA\u10D8: ${styleText}` : ""}
 
-    case 'ka':
-      return `ბავშვის სახელი: ${childName}${ageText}
-თემა: ${theme || 'ტყის თავგადასავალი'}
-დამხმარე პერსონაჟი: ${hero || 'ბრძენი ტყის ცხოველი'}
-აღმზრდელობითი გზავნილი: ${moralLesson || 'მეგობრობა და სიკეთე'}
-${styleText ? `სტილი: ${styleText}` : ''}
+\u10DB\u10DC\u10D8\u10E8\u10D5\u10DC\u10D4\u10DA\u10DD\u10D5\u10D0\u10DC\u10D8\u10D0:
+- \u10D3\u10D0\u10EC\u10D4\u10E0\u10D4\u10D7 \u10DE\u10E0\u10DD\u10E4\u10D4\u10E1\u10D8\u10E3\u10DA\u10D8, \u10DA\u10DD\u10D2\u10D8\u10D9\u10E3\u10E0\u10D8 \u10D6\u10E6\u10D0\u10DE\u10D0\u10E0\u10D8 \xAB${childName}\xBB-\u10D6\u10D4
+- \u10D8\u10E7\u10DD\u10E1 \u10EA\u10DD\u10EA\u10EE\u10D0\u10DA\u10D8 \u10D0\u10E6\u10EC\u10D4\u10E0\u10D4\u10D1\u10D8, \u10E8\u10D8\u10DC\u10D0\u10D0\u10E0\u10E1\u10D8\u10D0\u10DC\u10D8 \u10D3\u10D8\u10D0\u10DA\u10DD\u10D2\u10D4\u10D1\u10D8 \u10D3\u10D0 \u10D3\u10D0\u10DB\u10D0\u10D9\u10DB\u10D0\u10E7\u10DD\u10E4\u10D8\u10DA\u10D4\u10D1\u10D4\u10DA\u10D8 \u10D3\u10D0\u10E1\u10D0\u10E1\u10E0\u10E3\u10DA\u10D8
+- \u10D0\u10E6\u10DB\u10D6\u10E0\u10D3\u10D4\u10DA\u10DD\u10D1\u10D8\u10D7\u10D8 \u10D2\u10D6\u10D0\u10D5\u10DC\u10D8\u10DA\u10D8 \u10EE\u10D4\u10DA\u10DD\u10D5\u10DC\u10E3\u10E0\u10D8 \u10D9\u10D8 \u10D0\u10E0\u10D0, \u10DB\u10DD\u10D5\u10DA\u10D4\u10DC\u10D4\u10D1\u10D8\u10D3\u10D0\u10DC \u10D1\u10E3\u10DC\u10D4\u10D1\u10E0\u10D8\u10D5\u10D0\u10D3 \u10D2\u10D0\u10DB\u10DD\u10DB\u10D3\u10D8\u10DC\u10D0\u10E0\u10D4\u10DD\u10D1\u10D3\u10D4\u10E1
+- \u10D6\u10E3\u10E1\u10E2\u10D0\u10D3 \u10D3\u10D0\u10D8\u10EA\u10D0\u10D5\u10D8\u10D7 \u10E5\u10D0\u10E0\u10D7\u10E3\u10DA\u10D8 \u10D4\u10DC\u10D8\u10E1 \u10D2\u10E0\u10D0\u10DB\u10D0\u10E2\u10D8\u10D9\u10D8\u10E1 \u10EC\u10D4\u10E1\u10D4\u10D1\u10D8`;
+    default:
+      return `U\u015Fa\u011F\u0131n ad\u0131: ${childName}${ageText}
+M\xF6vzu/Tema: ${theme || "Me\u015F\u0259 mac\u0259ras\u0131"}
+K\xF6m\u0259k\xE7i q\u0259hr\u0259man: ${hero || "M\xFCdrik bir me\u015F\u0259 heyvan\u0131"}
+T\u0259rbiy\u0259vi mesaj: ${moralLesson || "Dostluq v\u0259 yax\u015F\u0131l\u0131q"}
+${styleText ? `\xDCslub: ${styleText}` : ""}
 
-მნიშვნელოვანია:
-- დაწერეთ პროფესიული, ლოგიკური ზღაპარი «${childName}»-ზე
-- იყოს ცოცხალი აღწერები, შინაარსიანი დიალოგები და დამაკმაყოფილებელი დასასრული
-- აღმზრდელობითი გზავნილი ხელოვნური კი არა, მოვლენებიდან ბუნებრივად გამომდინარეობდეს
-- ზუსტად დაიცავით ქართული ენის გრამატიკის წესები`;
-
-    default: // 'az'
-      return `Uşağın adı: ${childName}${ageText}
-Mövzu/Tema: ${theme || 'Meşə macərası'}
-Köməkçi qəhrəman: ${hero || 'Müdrik bir meşə heyvanı'}
-Tərbiyəvi mesaj: ${moralLesson || 'Dostluq və yaxşılıq'}
-${styleText ? `Üslub: ${styleText}` : ''}
-
-VACİB:
-- "${childName}" haqqında PEŞƏkar, MƏNTİQLİ nağıl yaz
-- Canlı təsvirlər, mənalı dialoqlar, qənaətbəxş sonluq olsun
-- Tərbiyəvi mesaj süni yox, hadisələrdən TƏBİİ çıxsın
-- Azərbaycan dili qrammatikasına diqqətlə əməl et`;
+VAC\u0130B:
+- "${childName}" haqq\u0131nda PE\u015E\u018Fkar, M\u018FNT\u0130QL\u0130 na\u011F\u0131l yaz
+- Canl\u0131 t\u0259svirl\u0259r, m\u0259nal\u0131 dialoqlar, q\u0259na\u0259tb\u0259x\u015F sonluq olsun
+- T\u0259rbiy\u0259vi mesaj s\xFCni yox, hadis\u0259l\u0259rd\u0259n T\u018FB\u0130\u0130 \xE7\u0131xs\u0131n
+- Az\u0259rbaycan dili qrammatikas\u0131na diqq\u0259tl\u0259 \u0259m\u0259l et`;
   }
 };
-
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
-
   try {
     const auth = await requireUser(req);
     if (auth.error) return auth.error;
-
-    const usage = await checkAndConsumeServerSide(auth.user.id, 'fairy_tale');
+    const usage = await checkAndConsumeServerSide(auth.user.id, "fairy_tale");
     if (!usage.allowed) return limitExceededResponse(corsHeaders, usage.limit);
-
-    const { childName, theme, hero, moralLesson, language = 'az', ageRange, storyStyle, customPrompt } = await req.json();
-
-    // AI handled by callGeminiSmart
-    
-    const actualChildName = childName || 'Əli';
-    
-    let systemPrompt: string;
-    let userPrompt: string;
-
+    const { childName, theme, hero, moralLesson, language = "az", ageRange, storyStyle, customPrompt } = await req.json();
+    const actualChildName = childName || "\u018Fli";
+    let systemPrompt;
+    let userPrompt;
     if (customPrompt) {
-      // Direct prompt mode - user writes their own prompt
       systemPrompt = getSystemPrompt(language, actualChildName, ageRange);
-      userPrompt = `${customPrompt}\n\nVACİB: Nağılın birinci sətri BAŞLIQ olmalıdır. Sonra nağıl mətni gəlsin.`;
+      userPrompt = `${customPrompt}
+
+VAC\u0130B: Na\u011F\u0131l\u0131n birinci s\u0259tri BA\u015ELIQ olmal\u0131d\u0131r. Sonra na\u011F\u0131l m\u0259tni g\u0259lsin.`;
     } else {
       systemPrompt = getSystemPrompt(language, actualChildName, ageRange);
       userPrompt = getUserPrompt(language, actualChildName, theme, hero, moralLesson, ageRange, storyStyle);
     }
-
-    console.log(`Generating fairy tale in language: ${language}, age: ${ageRange || 'not specified'}...`);
-
-    let generatedText = '';
-
-    const callGemini = async (model: string) => {
+    console.log(`Generating fairy tale in language: ${language}, age: ${ageRange || "not specified"}...`);
+    let generatedText = "";
+    const callGemini = async (model) => {
       return await callGeminiSmart(model, {
-        contents: [{ role: 'user', parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
+        contents: [{ role: "user", parts: [{ text: `${systemPrompt}
+
+${userPrompt}` }] }],
         generationConfig: {
           temperature: 0.7,
           topK: 30,
@@ -533,89 +772,76 @@ serve(async (req) => {
           // sərf olunur) — uzun nağıl mətni (xüsusən ərəb kimi fərqli tokenləşməsi olan dillərdə)
           // üçün bu, vizual mətn üçün HEÇ NƏ qalmamasına səbəb ola bilər (boş nəticə bug-u).
           // Thinking-i deaktiv edirik ki, bütün büdcə birbaşa nağıl mətninə getsin.
-          thinkingConfig: { thinkingBudget: 0 },
+          thinkingConfig: { thinkingBudget: 0 }
         },
         safetySettings: [
-          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-        ],
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
+        ]
       });
     };
-
-    // Flash-first for speed; fall back to lite then pro on overload
-    const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-pro'];
-    let response: Response | null = null;
-    
+    const models = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-pro"];
+    let response = null;
     for (const model of models) {
       console.log(`Trying model: ${model}...`);
       response = await callGemini(model);
-      
       if (response.status === 429 || response.status === 503) {
         console.log(`${model} unavailable (${response.status}), trying next...`);
-        await response.text(); // consume body
+        await response.text();
         continue;
       }
       break;
     }
-
     if (!response || !response.ok) {
-      const errorText = response ? await response.text() : 'All models unavailable';
-      console.error('Gemini API error:', response?.status, errorText);
-      throw new Error(`Gemini API error: ${response?.status || 'unavailable'}`);
+      const errorText = response ? await response.text() : "All models unavailable";
+      console.error("Gemini API error:", response?.status, errorText);
+      throw new Error(`Gemini API error: ${response?.status || "unavailable"}`);
     }
-
     const data = await response.json();
-    generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
+    generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
     if (!generatedText) {
-      throw new Error('No content generated');
+      throw new Error("No content generated");
     }
-
-    // Extract title
-    const lines = generatedText.split('\n').filter((line: string) => line.trim());
-    let rawTitle = lines[0]?.replace(/^#+\s*/, '').replace(/\*\*/g, '').trim() || '';
-    
-    rawTitle = rawTitle
-      .replace(/^(əlbəttə|buyurun|budur|bax|mən sizə|конечно|вот|here is|here's|tabii|buyrun|işte|بالتأكيد|إليك|تفضلي|هذه قصة)[,!.،\s]*/i, '')
-      .replace(/^["«"""]?\s*/, '')
-      .replace(/\s*["»"""]?\s*$/, '')
-      .replace(new RegExp(`^.*üçün bir nağıl:\\s*`, 'i'), '')
-      .replace(new RegExp(`^.*üçün nağıl:\\s*`, 'i'), '')
-      .replace(new RegExp(`^.*için bir masal:\\s*`, 'i'), '')
-      .replace(new RegExp(`^.*story for.*:\\s*`, 'i'), '')
-      .replace(new RegExp(`^.*сказка для.*:\\s*`, 'i'), '')
-      .trim();
-    
+    const lines = generatedText.split("\n").filter((line) => line.trim());
+    let rawTitle = lines[0]?.replace(/^#+\s*/, "").replace(/\*\*/g, "").trim() || "";
+    rawTitle = rawTitle.replace(/^(əlbəttə|buyurun|budur|bax|mən sizə|конечно|вот|here is|here's|tabii|buyrun|işte|بالتأكيد|إليك|تفضلي|هذه قصة)[,!.،\s]*/i, "").replace(/^["«"""]?\s*/, "").replace(/\s*["»"""]?\s*$/, "").replace(new RegExp(`^.*\xFC\xE7\xFCn bir na\u011F\u0131l:\\s*`, "i"), "").replace(new RegExp(`^.*\xFC\xE7\xFCn na\u011F\u0131l:\\s*`, "i"), "").replace(new RegExp(`^.*i\xE7in bir masal:\\s*`, "i"), "").replace(new RegExp(`^.*story for.*:\\s*`, "i"), "").replace(new RegExp(`^.*\u0441\u043A\u0430\u0437\u043A\u0430 \u0434\u043B\u044F.*:\\s*`, "i"), "").trim();
     if (rawTitle && !rawTitle.includes(actualChildName)) {
       rawTitle = `${actualChildName} - ${rawTitle}`;
     }
-    
-    const defaultTitles: Record<string, string> = {
-      az: `${actualChildName}ın Nağılı`,
+    const defaultTitles = {
+      az: `${actualChildName}\u0131n Na\u011F\u0131l\u0131`,
       en: `${actualChildName}'s Story`,
-      ru: `Сказка ${actualChildName}`,
-      tr: `${actualChildName}'in Masalı`,
-      kk: `${actualChildName} туралы ертегі`,
+      ru: `\u0421\u043A\u0430\u0437\u043A\u0430 ${actualChildName}`,
+      tr: `${actualChildName}'in Masal\u0131`,
+      kk: `${actualChildName} \u0442\u0443\u0440\u0430\u043B\u044B \u0435\u0440\u0442\u0435\u0433\u0456`,
       uz: `${actualChildName} haqida ertak`,
-      ka: `ზღაპარი ${actualChildName}-ზე`,
-      de: `Das Märchen von ${actualChildName}`,
-      ar: `حكاية ${actualChildName}`,
+      ka: `\u10D6\u10E6\u10D0\u10DE\u10D0\u10E0\u10D8 ${actualChildName}-\u10D6\u10D4`,
+      de: `Das M\xE4rchen von ${actualChildName}`,
+      ar: `\u062D\u0643\u0627\u064A\u0629 ${actualChildName}`,
+      zh: `${actualChildName}\u7684\u6545\u4E8B`,
+      id: `Kisah ${actualChildName}`,
+      fr: `L\u2019histoire de ${actualChildName}`,
+      es: `El cuento de ${actualChildName}`,
+      pt: `A hist\xF3ria de ${actualChildName}`,
+      vi: `C\xE2u chuy\u1EC7n c\u1EE7a ${actualChildName}`,
+      hi: `${actualChildName} \u0915\u0940 \u0915\u0939\u093E\u0928\u0940`,
+      ja: `${actualChildName}\u306E\u304A\u8A71`,
+      ko: `${actualChildName}\uC758 \uC774\uC57C\uAE30`,
+      pl: `Historia: ${actualChildName}`,
+      nl: `Het verhaal van ${actualChildName}`,
+      sv: `${actualChildName} \u2013 en ber\xE4ttelse`
     };
-    
-    const title = rawTitle || defaultTitles[language] || defaultTitles['az'];
-    
-    const contentStartIndex = lines.findIndex((line: string, i: number) => {
+    const title = rawTitle || defaultTitles[language] || defaultTitles["az"];
+    const contentStartIndex = lines.findIndex((line, i) => {
       if (i === 0) return false;
-      const cleaned = line.replace(/^#+\s*/, '').replace(/\*\*/g, '').trim();
+      const cleaned = line.replace(/^#+\s*/, "").replace(/\*\*/g, "").trim();
       return cleaned.length > 0;
     });
-    const content = (contentStartIndex > 0 ? lines.slice(contentStartIndex) : lines.slice(1)).join('\n').trim() || generatedText;
-
-    const wordCount = content.split(/\s+/).length;
+    const content = (contentStartIndex > 0 ? lines.slice(contentStartIndex) : lines.slice(1)).join("\n").trim() || generatedText;
+    const wordCount = ["zh", "ja"].includes(language) ? Array.from(content.replace(/\s/g, "")).length / 2 : content.split(/\s+/).length;
     const durationMinutes = Math.max(2, Math.ceil(wordCount / 100));
-
     return new Response(
       JSON.stringify({
         success: true,
@@ -626,18 +852,18 @@ serve(async (req) => {
         theme,
         hero,
         moralLesson,
-        language,
+        language
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error('Error generating fairy tale:', error);
+    console.error("Error generating fairy tale:", error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: error instanceof Error ? error.message : 'Nağıl yaradılarkən xəta baş verdi',
+        error: error instanceof Error ? error.message : "Na\u011F\u0131l yarad\u0131lark\u0259n x\u0259ta ba\u015F verdi"
       }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

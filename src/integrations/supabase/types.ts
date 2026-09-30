@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notification_deliveries: {
+        Row: {
+          campaign_id: string
+          claim_id: string | null
+          claimed_at: string | null
+          created_at: string
+          error_code: string | null
+          finished_at: string | null
+          id: string
+          platform: string
+          state: string
+          token_hash: string
+          token_id: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          claim_id?: string | null
+          claimed_at?: string | null
+          created_at?: string
+          error_code?: string | null
+          finished_at?: string | null
+          id?: string
+          platform: string
+          state?: string
+          token_hash: string
+          token_id: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          claim_id?: string | null
+          claimed_at?: string | null
+          created_at?: string
+          error_code?: string | null
+          finished_at?: string | null
+          id?: string
+          platform?: string
+          state?: string
+          token_hash?: string
+          token_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_notification_deliveries_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "bulk_push_notifications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_recipes: {
         Row: {
           calories: number | null
@@ -21,42 +74,90 @@ export type Database = {
           category_ar: string | null
           category_de: string | null
           category_en: string | null
+          category_es: string | null
+          category_fr: string | null
+          category_hi: string | null
+          category_id: string | null
+          category_ja: string | null
           category_ka: string | null
           category_kk: string | null
+          category_ko: string | null
+          category_nl: string | null
+          category_pl: string | null
+          category_pt: string | null
           category_ru: string | null
+          category_sv: string | null
           category_tr: string | null
           category_uz: string | null
+          category_vi: string | null
+          category_zh: string | null
           cook_time: number | null
           created_at: string
           description: string | null
           description_ar: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           image_url: string | null
           ingredients: Json
           ingredients_ar: Json | null
           ingredients_de: Json | null
           ingredients_en: Json | null
+          ingredients_es: Json | null
+          ingredients_fr: Json | null
+          ingredients_hi: Json | null
+          ingredients_id: Json | null
+          ingredients_ja: Json | null
           ingredients_ka: Json | null
           ingredients_kk: Json | null
+          ingredients_ko: Json | null
+          ingredients_nl: Json | null
+          ingredients_pl: Json | null
+          ingredients_pt: Json | null
           ingredients_ru: Json | null
+          ingredients_sv: Json | null
           ingredients_tr: Json | null
           ingredients_uz: Json | null
+          ingredients_vi: Json | null
+          ingredients_zh: Json | null
           instructions: Json
           instructions_ar: Json | null
           instructions_de: Json | null
           instructions_en: Json | null
+          instructions_es: Json | null
+          instructions_fr: Json | null
+          instructions_hi: Json | null
+          instructions_id: Json | null
+          instructions_ja: Json | null
           instructions_ka: Json | null
           instructions_kk: Json | null
+          instructions_ko: Json | null
+          instructions_nl: Json | null
+          instructions_pl: Json | null
+          instructions_pt: Json | null
           instructions_ru: Json | null
+          instructions_sv: Json | null
           instructions_tr: Json | null
           instructions_uz: Json | null
+          instructions_vi: Json | null
+          instructions_zh: Json | null
           is_active: boolean | null
           prep_time: number | null
           servings: number | null
@@ -64,20 +165,44 @@ export type Database = {
           tags_ar: string[] | null
           tags_de: string[] | null
           tags_en: string[] | null
+          tags_es: string[] | null
+          tags_fr: string[] | null
+          tags_hi: string[] | null
+          tags_id: string[] | null
+          tags_ja: string[] | null
           tags_ka: string[] | null
           tags_kk: string[] | null
+          tags_ko: string[] | null
+          tags_nl: string[] | null
+          tags_pl: string[] | null
+          tags_pt: string[] | null
           tags_ru: string[] | null
+          tags_sv: string[] | null
           tags_tr: string[] | null
           tags_uz: string[] | null
+          tags_vi: string[] | null
+          tags_zh: string[] | null
           title: string
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string
         }
         Insert: {
@@ -86,42 +211,90 @@ export type Database = {
           category_ar?: string | null
           category_de?: string | null
           category_en?: string | null
+          category_es?: string | null
+          category_fr?: string | null
+          category_hi?: string | null
+          category_id?: string | null
+          category_ja?: string | null
           category_ka?: string | null
           category_kk?: string | null
+          category_ko?: string | null
+          category_nl?: string | null
+          category_pl?: string | null
+          category_pt?: string | null
           category_ru?: string | null
+          category_sv?: string | null
           category_tr?: string | null
           category_uz?: string | null
+          category_vi?: string | null
+          category_zh?: string | null
           cook_time?: number | null
           created_at?: string
           description?: string | null
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url?: string | null
           ingredients?: Json
           ingredients_ar?: Json | null
           ingredients_de?: Json | null
           ingredients_en?: Json | null
+          ingredients_es?: Json | null
+          ingredients_fr?: Json | null
+          ingredients_hi?: Json | null
+          ingredients_id?: Json | null
+          ingredients_ja?: Json | null
           ingredients_ka?: Json | null
           ingredients_kk?: Json | null
+          ingredients_ko?: Json | null
+          ingredients_nl?: Json | null
+          ingredients_pl?: Json | null
+          ingredients_pt?: Json | null
           ingredients_ru?: Json | null
+          ingredients_sv?: Json | null
           ingredients_tr?: Json | null
           ingredients_uz?: Json | null
+          ingredients_vi?: Json | null
+          ingredients_zh?: Json | null
           instructions?: Json
           instructions_ar?: Json | null
           instructions_de?: Json | null
           instructions_en?: Json | null
+          instructions_es?: Json | null
+          instructions_fr?: Json | null
+          instructions_hi?: Json | null
+          instructions_id?: Json | null
+          instructions_ja?: Json | null
           instructions_ka?: Json | null
           instructions_kk?: Json | null
+          instructions_ko?: Json | null
+          instructions_nl?: Json | null
+          instructions_pl?: Json | null
+          instructions_pt?: Json | null
           instructions_ru?: Json | null
+          instructions_sv?: Json | null
           instructions_tr?: Json | null
           instructions_uz?: Json | null
+          instructions_vi?: Json | null
+          instructions_zh?: Json | null
           is_active?: boolean | null
           prep_time?: number | null
           servings?: number | null
@@ -129,20 +302,44 @@ export type Database = {
           tags_ar?: string[] | null
           tags_de?: string[] | null
           tags_en?: string[] | null
+          tags_es?: string[] | null
+          tags_fr?: string[] | null
+          tags_hi?: string[] | null
+          tags_id?: string[] | null
+          tags_ja?: string[] | null
           tags_ka?: string[] | null
           tags_kk?: string[] | null
+          tags_ko?: string[] | null
+          tags_nl?: string[] | null
+          tags_pl?: string[] | null
+          tags_pt?: string[] | null
           tags_ru?: string[] | null
+          tags_sv?: string[] | null
           tags_tr?: string[] | null
           tags_uz?: string[] | null
+          tags_vi?: string[] | null
+          tags_zh?: string[] | null
           title: string
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
         }
         Update: {
@@ -151,42 +348,90 @@ export type Database = {
           category_ar?: string | null
           category_de?: string | null
           category_en?: string | null
+          category_es?: string | null
+          category_fr?: string | null
+          category_hi?: string | null
+          category_id?: string | null
+          category_ja?: string | null
           category_ka?: string | null
           category_kk?: string | null
+          category_ko?: string | null
+          category_nl?: string | null
+          category_pl?: string | null
+          category_pt?: string | null
           category_ru?: string | null
+          category_sv?: string | null
           category_tr?: string | null
           category_uz?: string | null
+          category_vi?: string | null
+          category_zh?: string | null
           cook_time?: number | null
           created_at?: string
           description?: string | null
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url?: string | null
           ingredients?: Json
           ingredients_ar?: Json | null
           ingredients_de?: Json | null
           ingredients_en?: Json | null
+          ingredients_es?: Json | null
+          ingredients_fr?: Json | null
+          ingredients_hi?: Json | null
+          ingredients_id?: Json | null
+          ingredients_ja?: Json | null
           ingredients_ka?: Json | null
           ingredients_kk?: Json | null
+          ingredients_ko?: Json | null
+          ingredients_nl?: Json | null
+          ingredients_pl?: Json | null
+          ingredients_pt?: Json | null
           ingredients_ru?: Json | null
+          ingredients_sv?: Json | null
           ingredients_tr?: Json | null
           ingredients_uz?: Json | null
+          ingredients_vi?: Json | null
+          ingredients_zh?: Json | null
           instructions?: Json
           instructions_ar?: Json | null
           instructions_de?: Json | null
           instructions_en?: Json | null
+          instructions_es?: Json | null
+          instructions_fr?: Json | null
+          instructions_hi?: Json | null
+          instructions_id?: Json | null
+          instructions_ja?: Json | null
           instructions_ka?: Json | null
           instructions_kk?: Json | null
+          instructions_ko?: Json | null
+          instructions_nl?: Json | null
+          instructions_pl?: Json | null
+          instructions_pt?: Json | null
           instructions_ru?: Json | null
+          instructions_sv?: Json | null
           instructions_tr?: Json | null
           instructions_uz?: Json | null
+          instructions_vi?: Json | null
+          instructions_zh?: Json | null
           is_active?: boolean | null
           prep_time?: number | null
           servings?: number | null
@@ -194,20 +439,44 @@ export type Database = {
           tags_ar?: string[] | null
           tags_de?: string[] | null
           tags_en?: string[] | null
+          tags_es?: string[] | null
+          tags_fr?: string[] | null
+          tags_hi?: string[] | null
+          tags_id?: string[] | null
+          tags_ja?: string[] | null
           tags_ka?: string[] | null
           tags_kk?: string[] | null
+          tags_ko?: string[] | null
+          tags_nl?: string[] | null
+          tags_pl?: string[] | null
+          tags_pt?: string[] | null
           tags_ru?: string[] | null
+          tags_sv?: string[] | null
           tags_tr?: string[] | null
           tags_uz?: string[] | null
+          tags_vi?: string[] | null
+          tags_zh?: string[] | null
           title?: string
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -218,17 +487,53 @@ export type Database = {
           category: string | null
           category_az: string | null
           category_en: string | null
+          category_es: string | null
+          category_fr: string | null
+          category_hi: string | null
+          category_id: string | null
+          category_ja: string | null
+          category_ko: string | null
+          category_nl: string | null
+          category_pl: string | null
+          category_pt: string | null
           category_ru: string | null
+          category_sv: string | null
           category_tr: string | null
+          category_vi: string | null
+          category_zh: string | null
           cons: string[] | null
           cons_en: string[] | null
+          cons_es: string[] | null
+          cons_fr: string[] | null
+          cons_hi: string[] | null
+          cons_id: string[] | null
+          cons_ja: string[] | null
+          cons_ko: string[] | null
+          cons_nl: string[] | null
+          cons_pl: string[] | null
+          cons_pt: string[] | null
+          cons_sv: string[] | null
+          cons_vi: string[] | null
+          cons_zh: string[] | null
           created_at: string | null
           currency: string | null
           description: string | null
           description_az: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           image_url: string | null
           images: string[] | null
@@ -238,26 +543,74 @@ export type Database = {
           name: string
           name_az: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
+          name_vi: string | null
+          name_zh: string | null
           original_price: number | null
           platform: string | null
           price: number | null
           price_updated_at: string | null
           pros: string[] | null
           pros_en: string[] | null
+          pros_es: string[] | null
+          pros_fr: string[] | null
+          pros_hi: string[] | null
+          pros_id: string[] | null
+          pros_ja: string[] | null
+          pros_ko: string[] | null
+          pros_nl: string[] | null
+          pros_pl: string[] | null
+          pros_pt: string[] | null
+          pros_sv: string[] | null
+          pros_vi: string[] | null
+          pros_zh: string[] | null
           rating: number | null
           review_count: number | null
           review_summary: string | null
           review_summary_az: string | null
           review_summary_en: string | null
+          review_summary_es: string | null
+          review_summary_fr: string | null
+          review_summary_hi: string | null
+          review_summary_id: string | null
+          review_summary_ja: string | null
+          review_summary_ko: string | null
+          review_summary_nl: string | null
+          review_summary_pl: string | null
+          review_summary_pt: string | null
           review_summary_ru: string | null
+          review_summary_sv: string | null
           review_summary_tr: string | null
+          review_summary_vi: string | null
+          review_summary_zh: string | null
           sort_order: number | null
           specifications: Json | null
           store_logo_url: string | null
           store_name: string | null
           store_name_en: string | null
+          store_name_es: string | null
+          store_name_fr: string | null
+          store_name_hi: string | null
+          store_name_id: string | null
+          store_name_ja: string | null
+          store_name_ko: string | null
+          store_name_nl: string | null
+          store_name_pl: string | null
+          store_name_pt: string | null
+          store_name_sv: string | null
+          store_name_vi: string | null
+          store_name_zh: string | null
           tags: string[] | null
           updated_at: string | null
           video_url: string | null
@@ -267,17 +620,53 @@ export type Database = {
           category?: string | null
           category_az?: string | null
           category_en?: string | null
+          category_es?: string | null
+          category_fr?: string | null
+          category_hi?: string | null
+          category_id?: string | null
+          category_ja?: string | null
+          category_ko?: string | null
+          category_nl?: string | null
+          category_pl?: string | null
+          category_pt?: string | null
           category_ru?: string | null
+          category_sv?: string | null
           category_tr?: string | null
+          category_vi?: string | null
+          category_zh?: string | null
           cons?: string[] | null
           cons_en?: string[] | null
+          cons_es?: string[] | null
+          cons_fr?: string[] | null
+          cons_hi?: string[] | null
+          cons_id?: string[] | null
+          cons_ja?: string[] | null
+          cons_ko?: string[] | null
+          cons_nl?: string[] | null
+          cons_pl?: string[] | null
+          cons_pt?: string[] | null
+          cons_sv?: string[] | null
+          cons_vi?: string[] | null
+          cons_zh?: string[] | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url?: string | null
           images?: string[] | null
@@ -287,26 +676,74 @@ export type Database = {
           name: string
           name_az?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           original_price?: number | null
           platform?: string | null
           price?: number | null
           price_updated_at?: string | null
           pros?: string[] | null
           pros_en?: string[] | null
+          pros_es?: string[] | null
+          pros_fr?: string[] | null
+          pros_hi?: string[] | null
+          pros_id?: string[] | null
+          pros_ja?: string[] | null
+          pros_ko?: string[] | null
+          pros_nl?: string[] | null
+          pros_pl?: string[] | null
+          pros_pt?: string[] | null
+          pros_sv?: string[] | null
+          pros_vi?: string[] | null
+          pros_zh?: string[] | null
           rating?: number | null
           review_count?: number | null
           review_summary?: string | null
           review_summary_az?: string | null
           review_summary_en?: string | null
+          review_summary_es?: string | null
+          review_summary_fr?: string | null
+          review_summary_hi?: string | null
+          review_summary_id?: string | null
+          review_summary_ja?: string | null
+          review_summary_ko?: string | null
+          review_summary_nl?: string | null
+          review_summary_pl?: string | null
+          review_summary_pt?: string | null
           review_summary_ru?: string | null
+          review_summary_sv?: string | null
           review_summary_tr?: string | null
+          review_summary_vi?: string | null
+          review_summary_zh?: string | null
           sort_order?: number | null
           specifications?: Json | null
           store_logo_url?: string | null
           store_name?: string | null
           store_name_en?: string | null
+          store_name_es?: string | null
+          store_name_fr?: string | null
+          store_name_hi?: string | null
+          store_name_id?: string | null
+          store_name_ja?: string | null
+          store_name_ko?: string | null
+          store_name_nl?: string | null
+          store_name_pl?: string | null
+          store_name_pt?: string | null
+          store_name_sv?: string | null
+          store_name_vi?: string | null
+          store_name_zh?: string | null
           tags?: string[] | null
           updated_at?: string | null
           video_url?: string | null
@@ -316,17 +753,53 @@ export type Database = {
           category?: string | null
           category_az?: string | null
           category_en?: string | null
+          category_es?: string | null
+          category_fr?: string | null
+          category_hi?: string | null
+          category_id?: string | null
+          category_ja?: string | null
+          category_ko?: string | null
+          category_nl?: string | null
+          category_pl?: string | null
+          category_pt?: string | null
           category_ru?: string | null
+          category_sv?: string | null
           category_tr?: string | null
+          category_vi?: string | null
+          category_zh?: string | null
           cons?: string[] | null
           cons_en?: string[] | null
+          cons_es?: string[] | null
+          cons_fr?: string[] | null
+          cons_hi?: string[] | null
+          cons_id?: string[] | null
+          cons_ja?: string[] | null
+          cons_ko?: string[] | null
+          cons_nl?: string[] | null
+          cons_pl?: string[] | null
+          cons_pt?: string[] | null
+          cons_sv?: string[] | null
+          cons_vi?: string[] | null
+          cons_zh?: string[] | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url?: string | null
           images?: string[] | null
@@ -336,26 +809,74 @@ export type Database = {
           name?: string
           name_az?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           original_price?: number | null
           platform?: string | null
           price?: number | null
           price_updated_at?: string | null
           pros?: string[] | null
           pros_en?: string[] | null
+          pros_es?: string[] | null
+          pros_fr?: string[] | null
+          pros_hi?: string[] | null
+          pros_id?: string[] | null
+          pros_ja?: string[] | null
+          pros_ko?: string[] | null
+          pros_nl?: string[] | null
+          pros_pl?: string[] | null
+          pros_pt?: string[] | null
+          pros_sv?: string[] | null
+          pros_vi?: string[] | null
+          pros_zh?: string[] | null
           rating?: number | null
           review_count?: number | null
           review_summary?: string | null
           review_summary_az?: string | null
           review_summary_en?: string | null
+          review_summary_es?: string | null
+          review_summary_fr?: string | null
+          review_summary_hi?: string | null
+          review_summary_id?: string | null
+          review_summary_ja?: string | null
+          review_summary_ko?: string | null
+          review_summary_nl?: string | null
+          review_summary_pl?: string | null
+          review_summary_pt?: string | null
           review_summary_ru?: string | null
+          review_summary_sv?: string | null
           review_summary_tr?: string | null
+          review_summary_vi?: string | null
+          review_summary_zh?: string | null
           sort_order?: number | null
           specifications?: Json | null
           store_logo_url?: string | null
           store_name?: string | null
           store_name_en?: string | null
+          store_name_es?: string | null
+          store_name_fr?: string | null
+          store_name_hi?: string | null
+          store_name_id?: string | null
+          store_name_ja?: string | null
+          store_name_ko?: string | null
+          store_name_nl?: string | null
+          store_name_pl?: string | null
+          store_name_pt?: string | null
+          store_name_sv?: string | null
+          store_name_vi?: string | null
+          store_name_zh?: string | null
           tags?: string[] | null
           updated_at?: string | null
           video_url?: string | null
@@ -370,8 +891,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           max_months: number | null
           min_months: number | null
           range_key: string
@@ -384,8 +917,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           max_months?: number | null
           min_months?: number | null
           range_key: string
@@ -398,8 +943,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           max_months?: number | null
           min_months?: number | null
           range_key?: string
@@ -451,11 +1008,23 @@ export type Database = {
           question_az: string | null
           question_de: string | null
           question_en: string | null
+          question_es: string | null
+          question_fr: string | null
+          question_hi: string | null
+          question_id: string | null
+          question_ja: string | null
           question_ka: string | null
           question_kk: string | null
+          question_ko: string | null
+          question_nl: string | null
+          question_pl: string | null
+          question_pt: string | null
           question_ru: string | null
+          question_sv: string | null
           question_tr: string | null
           question_uz: string | null
+          question_vi: string | null
+          question_zh: string | null
           sort_order: number | null
           user_type: string
         }
@@ -472,11 +1041,23 @@ export type Database = {
           question_az?: string | null
           question_de?: string | null
           question_en?: string | null
+          question_es?: string | null
+          question_fr?: string | null
+          question_hi?: string | null
+          question_id?: string | null
+          question_ja?: string | null
           question_ka?: string | null
           question_kk?: string | null
+          question_ko?: string | null
+          question_nl?: string | null
+          question_pl?: string | null
+          question_pt?: string | null
           question_ru?: string | null
+          question_sv?: string | null
           question_tr?: string | null
           question_uz?: string | null
+          question_vi?: string | null
+          question_zh?: string | null
           sort_order?: number | null
           user_type?: string
         }
@@ -493,11 +1074,23 @@ export type Database = {
           question_az?: string | null
           question_de?: string | null
           question_en?: string | null
+          question_es?: string | null
+          question_fr?: string | null
+          question_hi?: string | null
+          question_id?: string | null
+          question_ja?: string | null
           question_ka?: string | null
           question_kk?: string | null
+          question_ko?: string | null
+          question_nl?: string | null
+          question_pl?: string | null
+          question_pt?: string | null
           question_ru?: string | null
+          question_sv?: string | null
           question_tr?: string | null
           question_uz?: string | null
+          question_vi?: string | null
+          question_zh?: string | null
           sort_order?: number | null
           user_type?: string
         }
@@ -634,6 +1227,18 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
+          description_sv: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           image_url: string | null
           key: string
@@ -643,6 +1248,18 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
+          description_sv?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url?: string | null
           key: string
@@ -652,6 +1269,18 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
+          description_sv?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url?: string | null
           key?: string
@@ -845,11 +1474,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           duration_days: number | null
           emoji: string | null
           id: string
@@ -862,31 +1503,67 @@ export type Database = {
           symptoms_az: string[] | null
           symptoms_de: string | null
           symptoms_en: string | null
+          symptoms_es: string | null
+          symptoms_fr: string | null
+          symptoms_hi: string | null
+          symptoms_id: string | null
+          symptoms_ja: string | null
           symptoms_ka: string | null
           symptoms_kk: string | null
+          symptoms_ko: string | null
+          symptoms_nl: string | null
+          symptoms_pl: string | null
+          symptoms_pt: string | null
           symptoms_ru: string | null
+          symptoms_sv: string | null
           symptoms_tr: string | null
           symptoms_uz: string | null
+          symptoms_vi: string | null
+          symptoms_zh: string | null
           tips: string[] | null
           tips_ar: string | null
           tips_az: string[] | null
           tips_de: string | null
           tips_en: string | null
+          tips_es: string | null
+          tips_fr: string | null
+          tips_hi: string | null
+          tips_id: string | null
+          tips_ja: string | null
           tips_ka: string | null
           tips_kk: string | null
+          tips_ko: string | null
+          tips_nl: string | null
+          tips_pl: string | null
+          tips_pt: string | null
           tips_ru: string | null
+          tips_sv: string | null
           tips_tr: string | null
           tips_uz: string | null
+          tips_vi: string | null
+          tips_zh: string | null
           title: string
           title_ar: string | null
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string
           week_end: number
           week_start: number
@@ -899,11 +1576,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           duration_days?: number | null
           emoji?: string | null
           id?: string
@@ -916,31 +1605,67 @@ export type Database = {
           symptoms_az?: string[] | null
           symptoms_de?: string | null
           symptoms_en?: string | null
+          symptoms_es?: string | null
+          symptoms_fr?: string | null
+          symptoms_hi?: string | null
+          symptoms_id?: string | null
+          symptoms_ja?: string | null
           symptoms_ka?: string | null
           symptoms_kk?: string | null
+          symptoms_ko?: string | null
+          symptoms_nl?: string | null
+          symptoms_pl?: string | null
+          symptoms_pt?: string | null
           symptoms_ru?: string | null
+          symptoms_sv?: string | null
           symptoms_tr?: string | null
           symptoms_uz?: string | null
+          symptoms_vi?: string | null
+          symptoms_zh?: string | null
           tips?: string[] | null
           tips_ar?: string | null
           tips_az?: string[] | null
           tips_de?: string | null
           tips_en?: string | null
+          tips_es?: string | null
+          tips_fr?: string | null
+          tips_hi?: string | null
+          tips_id?: string | null
+          tips_ja?: string | null
           tips_ka?: string | null
           tips_kk?: string | null
+          tips_ko?: string | null
+          tips_nl?: string | null
+          tips_pl?: string | null
+          tips_pt?: string | null
           tips_ru?: string | null
+          tips_sv?: string | null
           tips_tr?: string | null
           tips_uz?: string | null
+          tips_vi?: string | null
+          tips_zh?: string | null
           title: string
           title_ar?: string | null
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
           week_end: number
           week_start: number
@@ -953,11 +1678,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           duration_days?: number | null
           emoji?: string | null
           id?: string
@@ -970,31 +1707,67 @@ export type Database = {
           symptoms_az?: string[] | null
           symptoms_de?: string | null
           symptoms_en?: string | null
+          symptoms_es?: string | null
+          symptoms_fr?: string | null
+          symptoms_hi?: string | null
+          symptoms_id?: string | null
+          symptoms_ja?: string | null
           symptoms_ka?: string | null
           symptoms_kk?: string | null
+          symptoms_ko?: string | null
+          symptoms_nl?: string | null
+          symptoms_pl?: string | null
+          symptoms_pt?: string | null
           symptoms_ru?: string | null
+          symptoms_sv?: string | null
           symptoms_tr?: string | null
           symptoms_uz?: string | null
+          symptoms_vi?: string | null
+          symptoms_zh?: string | null
           tips?: string[] | null
           tips_ar?: string | null
           tips_az?: string[] | null
           tips_de?: string | null
           tips_en?: string | null
+          tips_es?: string | null
+          tips_fr?: string | null
+          tips_hi?: string | null
+          tips_id?: string | null
+          tips_ja?: string | null
           tips_ka?: string | null
           tips_kk?: string | null
+          tips_ko?: string | null
+          tips_nl?: string | null
+          tips_pl?: string | null
+          tips_pt?: string | null
           tips_ru?: string | null
+          tips_sv?: string | null
           tips_tr?: string | null
           tips_uz?: string | null
+          tips_vi?: string | null
+          tips_zh?: string | null
           title?: string
           title_ar?: string | null
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
           week_end?: number
           week_start?: number
@@ -1010,11 +1783,23 @@ export type Database = {
           info_ar: string | null
           info_de: string | null
           info_en: string | null
+          info_es: string | null
+          info_fr: string | null
+          info_hi: string | null
+          info_id: string | null
+          info_ja: string | null
           info_ka: string | null
           info_kk: string | null
+          info_ko: string | null
+          info_nl: string | null
+          info_pl: string | null
+          info_pt: string | null
           info_ru: string | null
+          info_sv: string | null
           info_tr: string | null
           info_uz: string | null
+          info_vi: string | null
+          info_zh: string | null
           is_active: boolean
           updated_at: string
         }
@@ -1026,11 +1811,23 @@ export type Database = {
           info_ar?: string | null
           info_de?: string | null
           info_en?: string | null
+          info_es?: string | null
+          info_fr?: string | null
+          info_hi?: string | null
+          info_id?: string | null
+          info_ja?: string | null
           info_ka?: string | null
           info_kk?: string | null
+          info_ko?: string | null
+          info_nl?: string | null
+          info_pl?: string | null
+          info_pt?: string | null
           info_ru?: string | null
+          info_sv?: string | null
           info_tr?: string | null
           info_uz?: string | null
+          info_vi?: string | null
+          info_zh?: string | null
           is_active?: boolean
           updated_at?: string
         }
@@ -1042,11 +1839,23 @@ export type Database = {
           info_ar?: string | null
           info_de?: string | null
           info_en?: string | null
+          info_es?: string | null
+          info_fr?: string | null
+          info_hi?: string | null
+          info_id?: string | null
+          info_ja?: string | null
           info_ka?: string | null
           info_kk?: string | null
+          info_ko?: string | null
+          info_nl?: string | null
+          info_pl?: string | null
+          info_pt?: string | null
           info_ru?: string | null
+          info_sv?: string | null
           info_tr?: string | null
           info_uz?: string | null
+          info_vi?: string | null
+          info_zh?: string | null
           is_active?: boolean
           updated_at?: string
         }
@@ -1192,11 +2001,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           emoji: string | null
           id: string
           is_active: boolean | null
@@ -1205,11 +2026,23 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
           label_ka: string | null
           label_kk: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
           label_uz: string | null
+          label_vi: string | null
+          label_zh: string | null
           milestone_key: string
           sort_order: number | null
           week_number: number
@@ -1221,11 +2054,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
@@ -1234,11 +2079,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           milestone_key: string
           sort_order?: number | null
           week_number: number
@@ -1250,11 +2107,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
@@ -1263,11 +2132,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           milestone_key?: string
           sort_order?: number | null
           week_number?: number
@@ -1282,11 +2163,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           image_url: string
           is_active: boolean
@@ -1297,11 +2190,23 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string
         }
         Insert: {
@@ -1311,11 +2216,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url: string
           is_active?: boolean
@@ -1326,11 +2243,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
         }
         Update: {
@@ -1340,11 +2269,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url?: string
           is_active?: boolean
@@ -1355,11 +2296,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1376,21 +2329,45 @@ export type Database = {
           meaning_az: string | null
           meaning_de: string | null
           meaning_en: string | null
+          meaning_es: string | null
+          meaning_fr: string | null
+          meaning_hi: string | null
+          meaning_id: string | null
+          meaning_ja: string | null
           meaning_ka: string | null
           meaning_kk: string | null
+          meaning_ko: string | null
+          meaning_nl: string | null
+          meaning_pl: string | null
+          meaning_pt: string | null
           meaning_ru: string | null
+          meaning_sv: string | null
           meaning_tr: string | null
           meaning_uz: string | null
+          meaning_vi: string | null
+          meaning_zh: string | null
           name: string
           origin: string | null
           origin_ar: string | null
           origin_de: string | null
           origin_en: string | null
+          origin_es: string | null
+          origin_fr: string | null
+          origin_hi: string | null
+          origin_id: string | null
+          origin_ja: string | null
           origin_ka: string | null
           origin_kk: string | null
+          origin_ko: string | null
+          origin_nl: string | null
+          origin_pl: string | null
+          origin_pt: string | null
           origin_ru: string | null
+          origin_sv: string | null
           origin_tr: string | null
           origin_uz: string | null
+          origin_vi: string | null
+          origin_zh: string | null
           popularity: number | null
         }
         Insert: {
@@ -1404,21 +2381,45 @@ export type Database = {
           meaning_az?: string | null
           meaning_de?: string | null
           meaning_en?: string | null
+          meaning_es?: string | null
+          meaning_fr?: string | null
+          meaning_hi?: string | null
+          meaning_id?: string | null
+          meaning_ja?: string | null
           meaning_ka?: string | null
           meaning_kk?: string | null
+          meaning_ko?: string | null
+          meaning_nl?: string | null
+          meaning_pl?: string | null
+          meaning_pt?: string | null
           meaning_ru?: string | null
+          meaning_sv?: string | null
           meaning_tr?: string | null
           meaning_uz?: string | null
+          meaning_vi?: string | null
+          meaning_zh?: string | null
           name: string
           origin?: string | null
           origin_ar?: string | null
           origin_de?: string | null
           origin_en?: string | null
+          origin_es?: string | null
+          origin_fr?: string | null
+          origin_hi?: string | null
+          origin_id?: string | null
+          origin_ja?: string | null
           origin_ka?: string | null
           origin_kk?: string | null
+          origin_ko?: string | null
+          origin_nl?: string | null
+          origin_pl?: string | null
+          origin_pt?: string | null
           origin_ru?: string | null
+          origin_sv?: string | null
           origin_tr?: string | null
           origin_uz?: string | null
+          origin_vi?: string | null
+          origin_zh?: string | null
           popularity?: number | null
         }
         Update: {
@@ -1432,21 +2433,45 @@ export type Database = {
           meaning_az?: string | null
           meaning_de?: string | null
           meaning_en?: string | null
+          meaning_es?: string | null
+          meaning_fr?: string | null
+          meaning_hi?: string | null
+          meaning_id?: string | null
+          meaning_ja?: string | null
           meaning_ka?: string | null
           meaning_kk?: string | null
+          meaning_ko?: string | null
+          meaning_nl?: string | null
+          meaning_pl?: string | null
+          meaning_pt?: string | null
           meaning_ru?: string | null
+          meaning_sv?: string | null
           meaning_tr?: string | null
           meaning_uz?: string | null
+          meaning_vi?: string | null
+          meaning_zh?: string | null
           name?: string
           origin?: string | null
           origin_ar?: string | null
           origin_de?: string | null
           origin_en?: string | null
+          origin_es?: string | null
+          origin_fr?: string | null
+          origin_hi?: string | null
+          origin_id?: string | null
+          origin_ja?: string | null
           origin_ka?: string | null
           origin_kk?: string | null
+          origin_ko?: string | null
+          origin_nl?: string | null
+          origin_pl?: string | null
+          origin_pt?: string | null
           origin_ru?: string | null
+          origin_sv?: string | null
           origin_tr?: string | null
           origin_uz?: string | null
+          origin_vi?: string | null
+          origin_zh?: string | null
           popularity?: number | null
         }
         Relationships: []
@@ -1492,11 +2517,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           is_active: boolean | null
           name: string
@@ -1504,11 +2541,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           position: string
           side: string
           sort_order: number | null
@@ -1525,11 +2574,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           name: string
@@ -1537,11 +2598,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           position: string
           side: string
           sort_order?: number | null
@@ -1558,11 +2631,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           name?: string
@@ -1570,11 +2655,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           position?: string
           side?: string
           sort_order?: number | null
@@ -1628,15 +2725,39 @@ export type Database = {
           button_text: string | null
           button_text_az: string | null
           button_text_en: string | null
+          button_text_es: string | null
+          button_text_fr: string | null
+          button_text_hi: string | null
+          button_text_id: string | null
+          button_text_ja: string | null
+          button_text_ko: string | null
+          button_text_nl: string | null
+          button_text_pl: string | null
+          button_text_pt: string | null
           button_text_ru: string | null
+          button_text_sv: string | null
           button_text_tr: string | null
+          button_text_vi: string | null
+          button_text_zh: string | null
           click_count: number | null
           created_at: string | null
           description: string | null
           description_az: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
+          description_vi: string | null
+          description_zh: string | null
           end_date: string | null
           id: string
           image_url: string | null
@@ -1655,8 +2776,20 @@ export type Database = {
           title: string
           title_az: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string | null
           view_count: number | null
         }
@@ -1666,15 +2799,39 @@ export type Database = {
           button_text?: string | null
           button_text_az?: string | null
           button_text_en?: string | null
+          button_text_es?: string | null
+          button_text_fr?: string | null
+          button_text_hi?: string | null
+          button_text_id?: string | null
+          button_text_ja?: string | null
+          button_text_ko?: string | null
+          button_text_nl?: string | null
+          button_text_pl?: string | null
+          button_text_pt?: string | null
           button_text_ru?: string | null
+          button_text_sv?: string | null
           button_text_tr?: string | null
+          button_text_vi?: string | null
+          button_text_zh?: string | null
           click_count?: number | null
           created_at?: string | null
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           end_date?: string | null
           id?: string
           image_url?: string | null
@@ -1693,8 +2850,20 @@ export type Database = {
           title: string
           title_az?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
           view_count?: number | null
         }
@@ -1704,15 +2873,39 @@ export type Database = {
           button_text?: string | null
           button_text_az?: string | null
           button_text_en?: string | null
+          button_text_es?: string | null
+          button_text_fr?: string | null
+          button_text_hi?: string | null
+          button_text_id?: string | null
+          button_text_ja?: string | null
+          button_text_ko?: string | null
+          button_text_nl?: string | null
+          button_text_pl?: string | null
+          button_text_pt?: string | null
           button_text_ru?: string | null
+          button_text_sv?: string | null
           button_text_tr?: string | null
+          button_text_vi?: string | null
+          button_text_zh?: string | null
           click_count?: number | null
           created_at?: string | null
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           end_date?: string | null
           id?: string
           image_url?: string | null
@@ -1731,8 +2924,20 @@ export type Database = {
           title?: string
           title_az?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
           view_count?: number | null
         }
@@ -1746,11 +2951,23 @@ export type Database = {
           description_ar: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           icon: string | null
           id: string
           is_active: boolean | null
@@ -1758,11 +2975,23 @@ export type Database = {
           name_ar: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           slug: string
           sort_order: number | null
         }
@@ -1773,11 +3002,23 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean | null
@@ -1785,11 +3026,23 @@ export type Database = {
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           slug: string
           sort_order?: number | null
         }
@@ -1800,11 +3053,23 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean | null
@@ -1812,11 +3077,23 @@ export type Database = {
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           slug?: string
           sort_order?: number | null
         }
@@ -2008,11 +3285,23 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_es: string | null
+          content_fr: string | null
+          content_hi: string | null
+          content_id: string | null
+          content_ja: string | null
           content_ka: string | null
           content_kk: string | null
+          content_ko: string | null
+          content_nl: string | null
+          content_pl: string | null
+          content_pt: string | null
           content_ru: string | null
+          content_sv: string | null
           content_tr: string | null
           content_uz: string | null
+          content_vi: string | null
+          content_zh: string | null
           countries_exclude: string[] | null
           countries_include: string[] | null
           cover_image_url: string | null
@@ -2022,11 +3311,23 @@ export type Database = {
           excerpt_az: string | null
           excerpt_de: string | null
           excerpt_en: string | null
+          excerpt_es: string | null
+          excerpt_fr: string | null
+          excerpt_hi: string | null
+          excerpt_id: string | null
+          excerpt_ja: string | null
           excerpt_ka: string | null
           excerpt_kk: string | null
+          excerpt_ko: string | null
+          excerpt_nl: string | null
+          excerpt_pl: string | null
+          excerpt_pt: string | null
           excerpt_ru: string | null
+          excerpt_sv: string | null
           excerpt_tr: string | null
           excerpt_uz: string | null
+          excerpt_vi: string | null
+          excerpt_zh: string | null
           id: string
           is_featured: boolean | null
           is_published: boolean | null
@@ -2042,11 +3343,23 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string
           view_count: number | null
         }
@@ -2061,11 +3374,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           countries_exclude?: string[] | null
           countries_include?: string[] | null
           cover_image_url?: string | null
@@ -2075,11 +3400,23 @@ export type Database = {
           excerpt_az?: string | null
           excerpt_de?: string | null
           excerpt_en?: string | null
+          excerpt_es?: string | null
+          excerpt_fr?: string | null
+          excerpt_hi?: string | null
+          excerpt_id?: string | null
+          excerpt_ja?: string | null
           excerpt_ka?: string | null
           excerpt_kk?: string | null
+          excerpt_ko?: string | null
+          excerpt_nl?: string | null
+          excerpt_pl?: string | null
+          excerpt_pt?: string | null
           excerpt_ru?: string | null
+          excerpt_sv?: string | null
           excerpt_tr?: string | null
           excerpt_uz?: string | null
+          excerpt_vi?: string | null
+          excerpt_zh?: string | null
           id?: string
           is_featured?: boolean | null
           is_published?: boolean | null
@@ -2095,11 +3432,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
           view_count?: number | null
         }
@@ -2114,11 +3463,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           countries_exclude?: string[] | null
           countries_include?: string[] | null
           cover_image_url?: string | null
@@ -2128,11 +3489,23 @@ export type Database = {
           excerpt_az?: string | null
           excerpt_de?: string | null
           excerpt_en?: string | null
+          excerpt_es?: string | null
+          excerpt_fr?: string | null
+          excerpt_hi?: string | null
+          excerpt_id?: string | null
+          excerpt_ja?: string | null
           excerpt_ka?: string | null
           excerpt_kk?: string | null
+          excerpt_ko?: string | null
+          excerpt_nl?: string | null
+          excerpt_pl?: string | null
+          excerpt_pt?: string | null
           excerpt_ru?: string | null
+          excerpt_sv?: string | null
           excerpt_tr?: string | null
           excerpt_uz?: string | null
+          excerpt_vi?: string | null
+          excerpt_zh?: string | null
           id?: string
           is_featured?: boolean | null
           is_published?: boolean | null
@@ -2148,11 +3521,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
           view_count?: number | null
         }
@@ -2238,11 +3623,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           exhale_seconds: number
           hold_after_exhale_seconds: number | null
           hold_seconds: number | null
@@ -2255,11 +3652,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
           total_cycles: number | null
         }
@@ -2276,11 +3685,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           exhale_seconds?: number
           hold_after_exhale_seconds?: number | null
           hold_seconds?: number | null
@@ -2293,11 +3714,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
           total_cycles?: number | null
         }
@@ -2314,11 +3747,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           exhale_seconds?: number
           hold_after_exhale_seconds?: number | null
           hold_seconds?: number | null
@@ -2331,11 +3776,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
           total_cycles?: number | null
         }
@@ -2343,11 +3800,13 @@ export type Database = {
       }
       bulk_push_notifications: {
         Row: {
+          audience_snapshot: Json | null
           body: string
           created_at: string | null
           created_by: string | null
           id: string
           scheduled_at: string | null
+          segment: Json | null
           sent_at: string | null
           status: string | null
           target_audience: string
@@ -2356,11 +3815,13 @@ export type Database = {
           total_sent: number | null
         }
         Insert: {
+          audience_snapshot?: Json | null
           body: string
           created_at?: string | null
           created_by?: string | null
           id?: string
           scheduled_at?: string | null
+          segment?: Json | null
           sent_at?: string | null
           status?: string | null
           target_audience?: string
@@ -2369,11 +3830,13 @@ export type Database = {
           total_sent?: number | null
         }
         Update: {
+          audience_snapshot?: Json | null
           body?: string
           created_at?: string | null
           created_by?: string | null
           id?: string
           scheduled_at?: string | null
+          segment?: Json | null
           sent_at?: string | null
           status?: string | null
           target_audience?: string
@@ -2466,11 +3929,23 @@ export type Database = {
           description_ar: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           has_custom_fields: boolean | null
           id: string
           image_url: string | null
@@ -2480,22 +3955,46 @@ export type Database = {
           milestone_label_ar: string | null
           milestone_label_de: string | null
           milestone_label_en: string | null
+          milestone_label_es: string | null
+          milestone_label_fr: string | null
+          milestone_label_hi: string | null
+          milestone_label_id: string | null
+          milestone_label_ja: string | null
           milestone_label_ka: string | null
           milestone_label_kk: string | null
+          milestone_label_ko: string | null
+          milestone_label_nl: string | null
+          milestone_label_pl: string | null
+          milestone_label_pt: string | null
           milestone_label_ru: string | null
+          milestone_label_sv: string | null
           milestone_label_tr: string | null
           milestone_label_uz: string | null
+          milestone_label_vi: string | null
+          milestone_label_zh: string | null
           milestone_type: string | null
           month_number: number | null
           name: string
           name_ar: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           price: number
           sort_order: number | null
           updated_at: string
@@ -2508,11 +4007,23 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           has_custom_fields?: boolean | null
           id?: string
           image_url?: string | null
@@ -2522,22 +4033,46 @@ export type Database = {
           milestone_label_ar?: string | null
           milestone_label_de?: string | null
           milestone_label_en?: string | null
+          milestone_label_es?: string | null
+          milestone_label_fr?: string | null
+          milestone_label_hi?: string | null
+          milestone_label_id?: string | null
+          milestone_label_ja?: string | null
           milestone_label_ka?: string | null
           milestone_label_kk?: string | null
+          milestone_label_ko?: string | null
+          milestone_label_nl?: string | null
+          milestone_label_pl?: string | null
+          milestone_label_pt?: string | null
           milestone_label_ru?: string | null
+          milestone_label_sv?: string | null
           milestone_label_tr?: string | null
           milestone_label_uz?: string | null
+          milestone_label_vi?: string | null
+          milestone_label_zh?: string | null
           milestone_type?: string | null
           month_number?: number | null
           name: string
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           price?: number
           sort_order?: number | null
           updated_at?: string
@@ -2550,11 +4085,23 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           has_custom_fields?: boolean | null
           id?: string
           image_url?: string | null
@@ -2564,22 +4111,46 @@ export type Database = {
           milestone_label_ar?: string | null
           milestone_label_de?: string | null
           milestone_label_en?: string | null
+          milestone_label_es?: string | null
+          milestone_label_fr?: string | null
+          milestone_label_hi?: string | null
+          milestone_label_id?: string | null
+          milestone_label_ja?: string | null
           milestone_label_ka?: string | null
           milestone_label_kk?: string | null
+          milestone_label_ko?: string | null
+          milestone_label_nl?: string | null
+          milestone_label_pl?: string | null
+          milestone_label_pt?: string | null
           milestone_label_ru?: string | null
+          milestone_label_sv?: string | null
           milestone_label_tr?: string | null
           milestone_label_uz?: string | null
+          milestone_label_vi?: string | null
+          milestone_label_zh?: string | null
           milestone_type?: string | null
           month_number?: number | null
           name?: string
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           price?: number
           sort_order?: number | null
           updated_at?: string
@@ -2783,11 +4354,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -2803,11 +4386,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -2823,11 +4418,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -2850,6 +4457,213 @@ export type Database = {
           interaction_id?: string
           kind?: string
           target_user_id?: string
+        }
+        Relationships: []
+      }
+      community_ad_deliveries: {
+        Row: {
+          attempts: number
+          channel: string
+          created_at: string
+          error_code: string | null
+          event: string
+          finished_at: string | null
+          id: string
+          lease_id: string | null
+          lease_until: string | null
+          next_attempt_at: string
+          notice_round: number
+          payload: Json
+          review_id: string
+          state: string
+          token_hash: string | null
+          token_id: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          channel: string
+          created_at?: string
+          error_code?: string | null
+          event: string
+          finished_at?: string | null
+          id?: string
+          lease_id?: string | null
+          lease_until?: string | null
+          next_attempt_at?: string
+          notice_round?: number
+          payload: Json
+          review_id: string
+          state?: string
+          token_hash?: string | null
+          token_id?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          channel?: string
+          created_at?: string
+          error_code?: string | null
+          event?: string
+          finished_at?: string | null
+          id?: string
+          lease_id?: string | null
+          lease_until?: string | null
+          next_attempt_at?: string
+          notice_round?: number
+          payload?: Json
+          review_id?: string
+          state?: string
+          token_hash?: string | null
+          token_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_ad_deliveries_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "community_ad_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_ad_review_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          detail: Json
+          event: string
+          id: string
+          request_id: string | null
+          review_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          event: string
+          id?: string
+          request_id?: string | null
+          review_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          event?: string
+          id?: string
+          request_id?: string | null
+          review_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_ad_review_events_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "community_ad_reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_ad_reviews: {
+        Row: {
+          assessment: Json | null
+          attempts: number
+          author_id: string
+          content_hash: string
+          created_at: string
+          decision_reason: string | null
+          id: string
+          language: string | null
+          last_error: string | null
+          lease_id: string | null
+          lease_until: string | null
+          moderator_note: string | null
+          next_attempt_at: string
+          payload: Json
+          post_id: string | null
+          review_round: number
+          reviewed_at: string | null
+          reviewed_by: string | null
+          revision: number
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          assessment?: Json | null
+          attempts?: number
+          author_id: string
+          content_hash: string
+          created_at?: string
+          decision_reason?: string | null
+          id?: string
+          language?: string | null
+          last_error?: string | null
+          lease_id?: string | null
+          lease_until?: string | null
+          moderator_note?: string | null
+          next_attempt_at?: string
+          payload: Json
+          post_id?: string | null
+          review_round?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          revision: number
+          state?: string
+          updated_at?: string
+        }
+        Update: {
+          assessment?: Json | null
+          attempts?: number
+          author_id?: string
+          content_hash?: string
+          created_at?: string
+          decision_reason?: string | null
+          id?: string
+          language?: string | null
+          last_error?: string | null
+          lease_id?: string | null
+          lease_until?: string | null
+          moderator_note?: string | null
+          next_attempt_at?: string
+          payload?: Json
+          post_id?: string | null
+          review_round?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          revision?: number
+          state?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_ad_reviews_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_ad_worker_state: {
+        Row: {
+          last_seen_at: string
+          name: string
+          report: Json
+          run_id: string
+        }
+        Insert: {
+          last_seen_at: string
+          name: string
+          report: Json
+          run_id: string
+        }
+        Update: {
+          last_seen_at?: string
+          name?: string
+          report?: Json
+          run_id?: string
         }
         Relationships: []
       }
@@ -2881,6 +4695,7 @@ export type Database = {
           created_by: string | null
           description: string | null
           description_en: string | null
+          discovery_language: string | null
           group_type: string
           icon_emoji: string | null
           id: string
@@ -2900,6 +4715,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           description_en?: string | null
+          discovery_language?: string | null
           group_type?: string
           icon_emoji?: string | null
           id?: string
@@ -2919,6 +4735,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           description_en?: string | null
+          discovery_language?: string | null
           group_type?: string
           icon_emoji?: string | null
           id?: string
@@ -3023,7 +4840,12 @@ export type Database = {
       }
       community_posts: {
         Row: {
+          ad_moderated_at: string | null
+          ad_moderation_revision: number | null
+          ad_moderation_state: string | null
+          blog_post_id: string | null
           comments_count: number | null
+          comments_locked: boolean | null
           content: string
           created_at: string
           group_id: string | null
@@ -3034,12 +4856,23 @@ export type Database = {
           language: string | null
           likes_count: number | null
           media_urls: string[] | null
+          moderation_action_id: string | null
+          moderation_edited_at: string | null
+          moderation_edited_by: string | null
+          moderation_reason: string | null
+          moderation_removed_at: string | null
+          moderation_version: number | null
           tagged_group_ids: string[] | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          ad_moderated_at?: string | null
+          ad_moderation_revision?: number | null
+          ad_moderation_state?: string | null
+          blog_post_id?: string | null
           comments_count?: number | null
+          comments_locked?: boolean | null
           content: string
           created_at?: string
           group_id?: string | null
@@ -3050,12 +4883,23 @@ export type Database = {
           language?: string | null
           likes_count?: number | null
           media_urls?: string[] | null
+          moderation_action_id?: string | null
+          moderation_edited_at?: string | null
+          moderation_edited_by?: string | null
+          moderation_reason?: string | null
+          moderation_removed_at?: string | null
+          moderation_version?: number | null
           tagged_group_ids?: string[] | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          ad_moderated_at?: string | null
+          ad_moderation_revision?: number | null
+          ad_moderation_state?: string | null
+          blog_post_id?: string | null
           comments_count?: number | null
+          comments_locked?: boolean | null
           content?: string
           created_at?: string
           group_id?: string | null
@@ -3066,6 +4910,12 @@ export type Database = {
           language?: string | null
           likes_count?: number | null
           media_urls?: string[] | null
+          moderation_action_id?: string | null
+          moderation_edited_at?: string | null
+          moderation_edited_by?: string | null
+          moderation_reason?: string | null
+          moderation_removed_at?: string | null
+          moderation_version?: number | null
           tagged_group_ids?: string[] | null
           updated_at?: string
           user_id?: string
@@ -3091,6 +4941,12 @@ export type Database = {
           likes_count: number
           media_type: string
           media_url: string
+          moderation_action_id: string | null
+          moderation_edited_at: string | null
+          moderation_edited_by: string | null
+          moderation_reason: string | null
+          moderation_removed_at: string | null
+          moderation_version: number | null
           replies_count: number
           text_overlay: string | null
           user_id: string
@@ -3106,6 +4962,12 @@ export type Database = {
           likes_count?: number
           media_type?: string
           media_url: string
+          moderation_action_id?: string | null
+          moderation_edited_at?: string | null
+          moderation_edited_by?: string | null
+          moderation_reason?: string | null
+          moderation_removed_at?: string | null
+          moderation_version?: number | null
           replies_count?: number
           text_overlay?: string | null
           user_id: string
@@ -3121,6 +4983,12 @@ export type Database = {
           likes_count?: number
           media_type?: string
           media_url?: string
+          moderation_action_id?: string | null
+          moderation_edited_at?: string | null
+          moderation_edited_by?: string | null
+          moderation_reason?: string | null
+          moderation_removed_at?: string | null
+          moderation_version?: number | null
           replies_count?: number
           text_overlay?: string | null
           user_id?: string
@@ -3208,6 +5076,18 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
+          description_sv: string | null
+          description_vi: string | null
+          description_zh: string | null
           discount_type: string
           discount_value: number
           expires_at: string | null
@@ -3225,6 +5105,18 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
+          description_sv?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           discount_type?: string
           discount_value?: number
           expires_at?: string | null
@@ -3242,6 +5134,18 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
+          description_sv?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           discount_type?: string
           discount_value?: number
           expires_at?: string | null
@@ -3334,16 +5238,40 @@ export type Database = {
           cry_type: string
           description_az: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
+          description_vi: string | null
+          description_zh: string | null
           emoji: string | null
           id: string
           is_active: boolean | null
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -3352,16 +5280,40 @@ export type Database = {
           cry_type: string
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -3370,17 +5322,221 @@ export type Database = {
           cry_type?: string
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
+        }
+        Relationships: []
+      }
+      customerio_audience_facts: {
+        Row: {
+          attempts: number
+          checked_at: string | null
+          claimed_revision: number | null
+          covered_revision: number
+          ever_paid: boolean
+          ever_premium: boolean
+          ever_trial: boolean
+          last_error: string | null
+          lease_id: string | null
+          lease_until: string | null
+          next_check_at: string
+          provider_facts: Json | null
+          revision: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          checked_at?: string | null
+          claimed_revision?: number | null
+          covered_revision?: number
+          ever_paid?: boolean
+          ever_premium?: boolean
+          ever_trial?: boolean
+          last_error?: string | null
+          lease_id?: string | null
+          lease_until?: string | null
+          next_check_at?: string
+          provider_facts?: Json | null
+          revision?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          checked_at?: string | null
+          claimed_revision?: number | null
+          covered_revision?: number
+          ever_paid?: boolean
+          ever_premium?: boolean
+          ever_trial?: boolean
+          last_error?: string | null
+          lease_id?: string | null
+          lease_until?: string | null
+          next_check_at?: string
+          provider_facts?: Json | null
+          revision?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      customerio_sync_control: {
+        Row: {
+          backend: string
+          backfill_seeded_at: string | null
+          backfill_total: number
+          cooldown_until: string | null
+          created_at: string
+          destination_id: string | null
+          enabled: boolean
+          last_error: string | null
+          last_finished_at: string | null
+          last_report: Json
+          last_started_at: string | null
+          last_success_at: string | null
+          lease_until: string | null
+          reconcile_after: string | null
+          reconcile_at: string
+          run_id: string | null
+          singleton: boolean
+          worker_token_hash: string | null
+        }
+        Insert: {
+          backend: string
+          backfill_seeded_at?: string | null
+          backfill_total?: number
+          cooldown_until?: string | null
+          created_at?: string
+          destination_id?: string | null
+          enabled?: boolean
+          last_error?: string | null
+          last_finished_at?: string | null
+          last_report?: Json
+          last_started_at?: string | null
+          last_success_at?: string | null
+          lease_until?: string | null
+          reconcile_after?: string | null
+          reconcile_at?: string
+          run_id?: string | null
+          singleton?: boolean
+          worker_token_hash?: string | null
+        }
+        Update: {
+          backend?: string
+          backfill_seeded_at?: string | null
+          backfill_total?: number
+          cooldown_until?: string | null
+          created_at?: string
+          destination_id?: string | null
+          enabled?: boolean
+          last_error?: string | null
+          last_finished_at?: string | null
+          last_report?: Json
+          last_started_at?: string | null
+          last_success_at?: string | null
+          lease_until?: string | null
+          reconcile_after?: string | null
+          reconcile_at?: string
+          run_id?: string | null
+          singleton?: boolean
+          worker_token_hash?: string | null
+        }
+        Relationships: []
+      }
+      customerio_sync_queue: {
+        Row: {
+          attempts: number
+          claimed_deleted: boolean | null
+          claimed_hash: string | null
+          claimed_revision: number | null
+          initial_backfill: boolean
+          last_error: string | null
+          last_http_status: number | null
+          last_sent_at: string | null
+          lease_id: string | null
+          lease_until: string | null
+          needs_resend: boolean
+          next_attempt_at: string
+          revision: number
+          sent_deleted: boolean
+          sent_hash: string | null
+          sent_revision: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          claimed_deleted?: boolean | null
+          claimed_hash?: string | null
+          claimed_revision?: number | null
+          initial_backfill?: boolean
+          last_error?: string | null
+          last_http_status?: number | null
+          last_sent_at?: string | null
+          lease_id?: string | null
+          lease_until?: string | null
+          needs_resend?: boolean
+          next_attempt_at?: string
+          revision?: number
+          sent_deleted?: boolean
+          sent_hash?: string | null
+          sent_revision?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          claimed_deleted?: boolean | null
+          claimed_hash?: string | null
+          claimed_revision?: number | null
+          initial_backfill?: boolean
+          last_error?: string | null
+          last_http_status?: number | null
+          last_sent_at?: string | null
+          lease_id?: string | null
+          lease_until?: string | null
+          needs_resend?: boolean
+          next_attempt_at?: string
+          revision?: number
+          sent_deleted?: boolean
+          sent_hash?: string | null
+          sent_revision?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -3526,13 +5682,37 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           short_label: string | null
           short_label_az: string | null
           short_label_en: string | null
+          short_label_es: string | null
+          short_label_fr: string | null
+          short_label_hi: string | null
+          short_label_id: string | null
+          short_label_ja: string | null
+          short_label_ko: string | null
+          short_label_nl: string | null
+          short_label_pl: string | null
+          short_label_pt: string | null
           short_label_ru: string | null
+          short_label_sv: string | null
           short_label_tr: string | null
+          short_label_vi: string | null
+          short_label_zh: string | null
         }
         Insert: {
           created_at?: string | null
@@ -3543,13 +5723,37 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           short_label?: string | null
           short_label_az?: string | null
           short_label_en?: string | null
+          short_label_es?: string | null
+          short_label_fr?: string | null
+          short_label_hi?: string | null
+          short_label_id?: string | null
+          short_label_ja?: string | null
+          short_label_ko?: string | null
+          short_label_nl?: string | null
+          short_label_pl?: string | null
+          short_label_pt?: string | null
           short_label_ru?: string | null
+          short_label_sv?: string | null
           short_label_tr?: string | null
+          short_label_vi?: string | null
+          short_label_zh?: string | null
         }
         Update: {
           created_at?: string | null
@@ -3560,13 +5764,37 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           short_label?: string | null
           short_label_az?: string | null
           short_label_en?: string | null
+          short_label_es?: string | null
+          short_label_fr?: string | null
+          short_label_hi?: string | null
+          short_label_id?: string | null
+          short_label_ja?: string | null
+          short_label_ko?: string | null
+          short_label_nl?: string | null
+          short_label_pl?: string | null
+          short_label_pt?: string | null
           short_label_ru?: string | null
+          short_label_sv?: string | null
           short_label_tr?: string | null
+          short_label_vi?: string | null
+          short_label_zh?: string | null
         }
         Relationships: []
       }
@@ -3582,11 +5810,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           priority: string | null
           sort_order: number | null
           updated_at: string | null
@@ -3602,11 +5842,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           priority?: string | null
           sort_order?: number | null
           updated_at?: string | null
@@ -3622,11 +5874,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           priority?: string | null
           sort_order?: number | null
           updated_at?: string | null
@@ -3641,11 +5905,23 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_es: string | null
+          content_fr: string | null
+          content_hi: string | null
+          content_id: string | null
+          content_ja: string | null
           content_ka: string | null
           content_kk: string | null
+          content_ko: string | null
+          content_nl: string | null
+          content_pl: string | null
+          content_pt: string | null
           content_ru: string | null
+          content_sv: string | null
           content_tr: string | null
           content_uz: string | null
+          content_vi: string | null
+          content_zh: string | null
           created_at: string | null
           emoji: string
           id: string
@@ -3656,11 +5932,23 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
         }
         Insert: {
           age_group: string
@@ -3669,11 +5957,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           emoji: string
           id?: string
@@ -3684,11 +5984,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Update: {
           age_group?: string
@@ -3697,11 +6009,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           emoji?: string
           id?: string
@@ -3712,11 +6036,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Relationships: []
       }
@@ -3840,17 +6176,41 @@ export type Database = {
           is_active: boolean | null
           is_reverse_scored: boolean | null
           options: Json
+          options_es: Json | null
+          options_fr: Json | null
+          options_hi: Json | null
+          options_id: Json | null
+          options_ja: Json | null
+          options_ko: Json | null
+          options_nl: Json | null
+          options_pl: Json | null
+          options_pt: Json | null
+          options_sv: Json | null
+          options_vi: Json | null
+          options_zh: Json | null
           question_number: number
           question_text: string
           question_text_ar: string | null
           question_text_az: string | null
           question_text_de: string | null
           question_text_en: string | null
+          question_text_es: string | null
+          question_text_fr: string | null
+          question_text_hi: string | null
+          question_text_id: string | null
+          question_text_ja: string | null
           question_text_ka: string | null
           question_text_kk: string | null
+          question_text_ko: string | null
+          question_text_nl: string | null
+          question_text_pl: string | null
+          question_text_pt: string | null
           question_text_ru: string | null
+          question_text_sv: string | null
           question_text_tr: string | null
           question_text_uz: string | null
+          question_text_vi: string | null
+          question_text_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -3859,17 +6219,41 @@ export type Database = {
           is_active?: boolean | null
           is_reverse_scored?: boolean | null
           options?: Json
+          options_es?: Json | null
+          options_fr?: Json | null
+          options_hi?: Json | null
+          options_id?: Json | null
+          options_ja?: Json | null
+          options_ko?: Json | null
+          options_nl?: Json | null
+          options_pl?: Json | null
+          options_pt?: Json | null
+          options_sv?: Json | null
+          options_vi?: Json | null
+          options_zh?: Json | null
           question_number: number
           question_text: string
           question_text_ar?: string | null
           question_text_az?: string | null
           question_text_de?: string | null
           question_text_en?: string | null
+          question_text_es?: string | null
+          question_text_fr?: string | null
+          question_text_hi?: string | null
+          question_text_id?: string | null
+          question_text_ja?: string | null
           question_text_ka?: string | null
           question_text_kk?: string | null
+          question_text_ko?: string | null
+          question_text_nl?: string | null
+          question_text_pl?: string | null
+          question_text_pt?: string | null
           question_text_ru?: string | null
+          question_text_sv?: string | null
           question_text_tr?: string | null
           question_text_uz?: string | null
+          question_text_vi?: string | null
+          question_text_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -3878,17 +6262,41 @@ export type Database = {
           is_active?: boolean | null
           is_reverse_scored?: boolean | null
           options?: Json
+          options_es?: Json | null
+          options_fr?: Json | null
+          options_hi?: Json | null
+          options_id?: Json | null
+          options_ja?: Json | null
+          options_ko?: Json | null
+          options_nl?: Json | null
+          options_pl?: Json | null
+          options_pt?: Json | null
+          options_sv?: Json | null
+          options_vi?: Json | null
+          options_zh?: Json | null
           question_number?: number
           question_text?: string
           question_text_ar?: string | null
           question_text_az?: string | null
           question_text_de?: string | null
           question_text_en?: string | null
+          question_text_es?: string | null
+          question_text_fr?: string | null
+          question_text_hi?: string | null
+          question_text_id?: string | null
+          question_text_ja?: string | null
           question_text_ka?: string | null
           question_text_kk?: string | null
+          question_text_ko?: string | null
+          question_text_nl?: string | null
+          question_text_pl?: string | null
+          question_text_pt?: string | null
           question_text_ru?: string | null
+          question_text_sv?: string | null
           question_text_tr?: string | null
           question_text_uz?: string | null
+          question_text_vi?: string | null
+          question_text_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -3903,8 +6311,20 @@ export type Database = {
           tip: string
           tip_az: string | null
           tip_en: string | null
+          tip_es: string | null
+          tip_fr: string | null
+          tip_hi: string | null
+          tip_id: string | null
+          tip_ja: string | null
+          tip_ko: string | null
+          tip_nl: string | null
+          tip_pl: string | null
+          tip_pt: string | null
           tip_ru: string | null
+          tip_sv: string | null
           tip_tr: string | null
+          tip_vi: string | null
+          tip_zh: string | null
           trimester: number[] | null
         }
         Insert: {
@@ -3916,8 +6336,20 @@ export type Database = {
           tip: string
           tip_az?: string | null
           tip_en?: string | null
+          tip_es?: string | null
+          tip_fr?: string | null
+          tip_hi?: string | null
+          tip_id?: string | null
+          tip_ja?: string | null
+          tip_ko?: string | null
+          tip_nl?: string | null
+          tip_pl?: string | null
+          tip_pt?: string | null
           tip_ru?: string | null
+          tip_sv?: string | null
           tip_tr?: string | null
+          tip_vi?: string | null
+          tip_zh?: string | null
           trimester?: number[] | null
         }
         Update: {
@@ -3929,8 +6361,20 @@ export type Database = {
           tip?: string
           tip_az?: string | null
           tip_en?: string | null
+          tip_es?: string | null
+          tip_fr?: string | null
+          tip_hi?: string | null
+          tip_id?: string | null
+          tip_ja?: string | null
+          tip_ko?: string | null
+          tip_nl?: string | null
+          tip_pl?: string | null
+          tip_pt?: string | null
           tip_ru?: string | null
+          tip_sv?: string | null
           tip_tr?: string | null
+          tip_vi?: string | null
+          tip_zh?: string | null
           trimester?: number[] | null
         }
         Relationships: []
@@ -3971,13 +6415,26 @@ export type Database = {
           created_at: string | null
           description: string | null
           description_ar: string | null
+          description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           duration_minutes: number
           icon: string | null
           id: string
@@ -3985,17 +6442,53 @@ export type Database = {
           is_postpartum: boolean
           level: string
           name: string
+          name_ar: string | null
           name_az: string | null
+          name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
+          name_ka: string | null
+          name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
+          name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           postpartum_delivery_types: string[] | null
           postpartum_week_end: number | null
           postpartum_week_start: number | null
           sort_order: number | null
           steps: Json | null
+          steps_ar: Json | null
+          steps_az: Json | null
+          steps_de: Json | null
+          steps_en: Json | null
+          steps_es: Json | null
+          steps_fr: Json | null
+          steps_hi: Json | null
+          steps_id: Json | null
+          steps_ja: Json | null
           steps_ka: string[] | null
+          steps_kk: Json | null
+          steps_ko: Json | null
+          steps_nl: Json | null
+          steps_pl: Json | null
+          steps_pt: Json | null
+          steps_ru: Json | null
+          steps_sv: Json | null
+          steps_tr: Json | null
           steps_uz: Json | null
+          steps_vi: Json | null
+          steps_zh: Json | null
           trimester: number[] | null
           updated_at: string | null
         }
@@ -4004,13 +6497,26 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_ar?: string | null
+          description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           duration_minutes?: number
           icon?: string | null
           id?: string
@@ -4018,17 +6524,53 @@ export type Database = {
           is_postpartum?: boolean
           level?: string
           name: string
+          name_ar?: string | null
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ka?: string | null
+          name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           postpartum_delivery_types?: string[] | null
           postpartum_week_end?: number | null
           postpartum_week_start?: number | null
           sort_order?: number | null
           steps?: Json | null
+          steps_ar?: Json | null
+          steps_az?: Json | null
+          steps_de?: Json | null
+          steps_en?: Json | null
+          steps_es?: Json | null
+          steps_fr?: Json | null
+          steps_hi?: Json | null
+          steps_id?: Json | null
+          steps_ja?: Json | null
           steps_ka?: string[] | null
+          steps_kk?: Json | null
+          steps_ko?: Json | null
+          steps_nl?: Json | null
+          steps_pl?: Json | null
+          steps_pt?: Json | null
+          steps_ru?: Json | null
+          steps_sv?: Json | null
+          steps_tr?: Json | null
           steps_uz?: Json | null
+          steps_vi?: Json | null
+          steps_zh?: Json | null
           trimester?: number[] | null
           updated_at?: string | null
         }
@@ -4037,13 +6579,26 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           description_ar?: string | null
+          description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           duration_minutes?: number
           icon?: string | null
           id?: string
@@ -4051,17 +6606,53 @@ export type Database = {
           is_postpartum?: boolean
           level?: string
           name?: string
+          name_ar?: string | null
           name_az?: string | null
+          name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ka?: string | null
+          name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           postpartum_delivery_types?: string[] | null
           postpartum_week_end?: number | null
           postpartum_week_start?: number | null
           sort_order?: number | null
           steps?: Json | null
+          steps_ar?: Json | null
+          steps_az?: Json | null
+          steps_de?: Json | null
+          steps_en?: Json | null
+          steps_es?: Json | null
+          steps_fr?: Json | null
+          steps_hi?: Json | null
+          steps_id?: Json | null
+          steps_ja?: Json | null
           steps_ka?: string[] | null
+          steps_kk?: Json | null
+          steps_ko?: Json | null
+          steps_nl?: Json | null
+          steps_pl?: Json | null
+          steps_pt?: Json | null
+          steps_ru?: Json | null
+          steps_sv?: Json | null
+          steps_tr?: Json | null
           steps_uz?: Json | null
+          steps_vi?: Json | null
+          steps_zh?: Json | null
           trimester?: number[] | null
           updated_at?: string | null
         }
@@ -4075,11 +6666,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           emoji: string | null
           id: string
           is_active: boolean | null
@@ -4088,11 +6691,23 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -4102,11 +6717,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
@@ -4115,11 +6742,23 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -4129,11 +6768,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
@@ -4142,11 +6793,23 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -4209,11 +6872,23 @@ export type Database = {
           answer_az: string | null
           answer_de: string | null
           answer_en: string | null
+          answer_es: string | null
+          answer_fr: string | null
+          answer_hi: string | null
+          answer_id: string | null
+          answer_ja: string | null
           answer_ka: string | null
           answer_kk: string | null
+          answer_ko: string | null
+          answer_nl: string | null
+          answer_pl: string | null
+          answer_pt: string | null
           answer_ru: string | null
+          answer_sv: string | null
           answer_tr: string | null
           answer_uz: string | null
+          answer_vi: string | null
+          answer_zh: string | null
           category: string | null
           created_at: string | null
           id: string
@@ -4223,11 +6898,23 @@ export type Database = {
           question_az: string | null
           question_de: string | null
           question_en: string | null
+          question_es: string | null
+          question_fr: string | null
+          question_hi: string | null
+          question_id: string | null
+          question_ja: string | null
           question_ka: string | null
           question_kk: string | null
+          question_ko: string | null
+          question_nl: string | null
+          question_pl: string | null
+          question_pt: string | null
           question_ru: string | null
+          question_sv: string | null
           question_tr: string | null
           question_uz: string | null
+          question_vi: string | null
+          question_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -4236,11 +6923,23 @@ export type Database = {
           answer_az?: string | null
           answer_de?: string | null
           answer_en?: string | null
+          answer_es?: string | null
+          answer_fr?: string | null
+          answer_hi?: string | null
+          answer_id?: string | null
+          answer_ja?: string | null
           answer_ka?: string | null
           answer_kk?: string | null
+          answer_ko?: string | null
+          answer_nl?: string | null
+          answer_pl?: string | null
+          answer_pt?: string | null
           answer_ru?: string | null
+          answer_sv?: string | null
           answer_tr?: string | null
           answer_uz?: string | null
+          answer_vi?: string | null
+          answer_zh?: string | null
           category?: string | null
           created_at?: string | null
           id?: string
@@ -4250,11 +6949,23 @@ export type Database = {
           question_az?: string | null
           question_de?: string | null
           question_en?: string | null
+          question_es?: string | null
+          question_fr?: string | null
+          question_hi?: string | null
+          question_id?: string | null
+          question_ja?: string | null
           question_ka?: string | null
           question_kk?: string | null
+          question_ko?: string | null
+          question_nl?: string | null
+          question_pl?: string | null
+          question_pt?: string | null
           question_ru?: string | null
+          question_sv?: string | null
           question_tr?: string | null
           question_uz?: string | null
+          question_vi?: string | null
+          question_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -4263,11 +6974,23 @@ export type Database = {
           answer_az?: string | null
           answer_de?: string | null
           answer_en?: string | null
+          answer_es?: string | null
+          answer_fr?: string | null
+          answer_hi?: string | null
+          answer_id?: string | null
+          answer_ja?: string | null
           answer_ka?: string | null
           answer_kk?: string | null
+          answer_ko?: string | null
+          answer_nl?: string | null
+          answer_pl?: string | null
+          answer_pt?: string | null
           answer_ru?: string | null
+          answer_sv?: string | null
           answer_tr?: string | null
           answer_uz?: string | null
+          answer_vi?: string | null
+          answer_zh?: string | null
           category?: string | null
           created_at?: string | null
           id?: string
@@ -4277,11 +7000,23 @@ export type Database = {
           question_az?: string | null
           question_de?: string | null
           question_en?: string | null
+          question_es?: string | null
+          question_fr?: string | null
+          question_hi?: string | null
+          question_id?: string | null
+          question_ja?: string | null
           question_ka?: string | null
           question_kk?: string | null
+          question_ko?: string | null
+          question_nl?: string | null
+          question_pl?: string | null
+          question_pt?: string | null
           question_ru?: string | null
+          question_sv?: string | null
           question_tr?: string | null
           question_uz?: string | null
+          question_vi?: string | null
+          question_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -4354,11 +7089,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           emergency_level: string | null
           icon: string | null
           id: string
@@ -4369,11 +7116,23 @@ export type Database = {
           title_az: string
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
         }
         Insert: {
           color?: string | null
@@ -4382,11 +7141,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emergency_level?: string | null
           icon?: string | null
           id?: string
@@ -4397,11 +7168,23 @@ export type Database = {
           title_az: string
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Update: {
           color?: string | null
@@ -4410,11 +7193,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emergency_level?: string | null
           icon?: string | null
           id?: string
@@ -4425,11 +7220,23 @@ export type Database = {
           title_az?: string
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Relationships: []
       }
@@ -4445,11 +7252,23 @@ export type Database = {
           instruction_az: string
           instruction_de: string | null
           instruction_en: string | null
+          instruction_es: string | null
+          instruction_fr: string | null
+          instruction_hi: string | null
+          instruction_id: string | null
+          instruction_ja: string | null
           instruction_ka: string | null
           instruction_kk: string | null
+          instruction_ko: string | null
+          instruction_nl: string | null
+          instruction_pl: string | null
+          instruction_pt: string | null
           instruction_ru: string | null
+          instruction_sv: string | null
           instruction_tr: string | null
           instruction_uz: string | null
+          instruction_vi: string | null
+          instruction_zh: string | null
           is_critical: boolean | null
           scenario_id: string
           step_number: number
@@ -4458,11 +7277,23 @@ export type Database = {
           title_az: string
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
         }
         Insert: {
           animation_url?: string | null
@@ -4475,11 +7306,23 @@ export type Database = {
           instruction_az: string
           instruction_de?: string | null
           instruction_en?: string | null
+          instruction_es?: string | null
+          instruction_fr?: string | null
+          instruction_hi?: string | null
+          instruction_id?: string | null
+          instruction_ja?: string | null
           instruction_ka?: string | null
           instruction_kk?: string | null
+          instruction_ko?: string | null
+          instruction_nl?: string | null
+          instruction_pl?: string | null
+          instruction_pt?: string | null
           instruction_ru?: string | null
+          instruction_sv?: string | null
           instruction_tr?: string | null
           instruction_uz?: string | null
+          instruction_vi?: string | null
+          instruction_zh?: string | null
           is_critical?: boolean | null
           scenario_id: string
           step_number: number
@@ -4488,11 +7331,23 @@ export type Database = {
           title_az: string
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Update: {
           animation_url?: string | null
@@ -4505,11 +7360,23 @@ export type Database = {
           instruction_az?: string
           instruction_de?: string | null
           instruction_en?: string | null
+          instruction_es?: string | null
+          instruction_fr?: string | null
+          instruction_hi?: string | null
+          instruction_id?: string | null
+          instruction_ja?: string | null
           instruction_ka?: string | null
           instruction_kk?: string | null
+          instruction_ko?: string | null
+          instruction_nl?: string | null
+          instruction_pl?: string | null
+          instruction_pt?: string | null
           instruction_ru?: string | null
+          instruction_sv?: string | null
           instruction_tr?: string | null
           instruction_uz?: string | null
+          instruction_vi?: string | null
+          instruction_zh?: string | null
           is_critical?: boolean | null
           scenario_id?: string
           step_number?: number
@@ -4518,11 +7385,23 @@ export type Database = {
           title_az?: string
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Relationships: [
           {
@@ -4608,11 +7487,23 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_es: string | null
+          content_fr: string | null
+          content_hi: string | null
+          content_id: string | null
+          content_ja: string | null
           content_ka: string | null
           content_kk: string | null
+          content_ko: string | null
+          content_nl: string | null
+          content_pl: string | null
+          content_pt: string | null
           content_ru: string | null
+          content_sv: string | null
           content_tr: string | null
           content_uz: string | null
+          content_vi: string | null
+          content_zh: string | null
           created_at: string | null
           emoji: string | null
           id: string
@@ -4624,11 +7515,23 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
         }
         Insert: {
           category?: string | null
@@ -4637,11 +7540,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           emoji?: string | null
           id?: string
@@ -4653,11 +7568,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Update: {
           category?: string | null
@@ -4666,11 +7593,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           emoji?: string | null
           id?: string
@@ -4682,11 +7621,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Relationships: []
       }
@@ -4704,11 +7655,23 @@ export type Database = {
           tip_text_az: string | null
           tip_text_de: string | null
           tip_text_en: string | null
+          tip_text_es: string | null
+          tip_text_fr: string | null
+          tip_text_hi: string | null
+          tip_text_id: string | null
+          tip_text_ja: string | null
           tip_text_ka: string | null
           tip_text_kk: string | null
+          tip_text_ko: string | null
+          tip_text_nl: string | null
+          tip_text_pl: string | null
+          tip_text_pt: string | null
           tip_text_ru: string | null
+          tip_text_sv: string | null
           tip_text_tr: string | null
           tip_text_uz: string | null
+          tip_text_vi: string | null
+          tip_text_zh: string | null
         }
         Insert: {
           category?: string | null
@@ -4723,11 +7686,23 @@ export type Database = {
           tip_text_az?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_es?: string | null
+          tip_text_fr?: string | null
+          tip_text_hi?: string | null
+          tip_text_id?: string | null
+          tip_text_ja?: string | null
           tip_text_ka?: string | null
           tip_text_kk?: string | null
+          tip_text_ko?: string | null
+          tip_text_nl?: string | null
+          tip_text_pl?: string | null
+          tip_text_pt?: string | null
           tip_text_ru?: string | null
+          tip_text_sv?: string | null
           tip_text_tr?: string | null
           tip_text_uz?: string | null
+          tip_text_vi?: string | null
+          tip_text_zh?: string | null
         }
         Update: {
           category?: string | null
@@ -4742,11 +7717,23 @@ export type Database = {
           tip_text_az?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_es?: string | null
+          tip_text_fr?: string | null
+          tip_text_hi?: string | null
+          tip_text_id?: string | null
+          tip_text_ja?: string | null
           tip_text_ka?: string | null
           tip_text_kk?: string | null
+          tip_text_ko?: string | null
+          tip_text_nl?: string | null
+          tip_text_pl?: string | null
+          tip_text_pt?: string | null
           tip_text_ru?: string | null
+          tip_text_sv?: string | null
           tip_text_tr?: string | null
           tip_text_uz?: string | null
+          tip_text_vi?: string | null
+          tip_text_zh?: string | null
         }
         Relationships: []
       }
@@ -4805,8 +7792,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number | null
           symptom_id: string
         }
@@ -4819,8 +7818,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
           symptom_id: string
         }
@@ -4833,8 +7844,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
           symptom_id?: string
         }
@@ -4852,11 +7875,23 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
           label_ka: string | null
           label_kk: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
           label_uz: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number | null
           symptom_key: string
         }
@@ -4871,11 +7906,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
           symptom_key: string
         }
@@ -4890,11 +7937,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
           symptom_key?: string
         }
@@ -4907,8 +7966,20 @@ export type Database = {
           fruit_name: string
           fruit_name_az: string | null
           fruit_name_en: string | null
+          fruit_name_es: string | null
+          fruit_name_fr: string | null
+          fruit_name_hi: string | null
+          fruit_name_id: string | null
+          fruit_name_ja: string | null
+          fruit_name_ko: string | null
+          fruit_name_nl: string | null
+          fruit_name_pl: string | null
+          fruit_name_pt: string | null
           fruit_name_ru: string | null
+          fruit_name_sv: string | null
           fruit_name_tr: string | null
+          fruit_name_vi: string | null
+          fruit_name_zh: string | null
           id: string
           image_url: string | null
           length_cm: number | null
@@ -4922,8 +7993,20 @@ export type Database = {
           fruit_name: string
           fruit_name_az?: string | null
           fruit_name_en?: string | null
+          fruit_name_es?: string | null
+          fruit_name_fr?: string | null
+          fruit_name_hi?: string | null
+          fruit_name_id?: string | null
+          fruit_name_ja?: string | null
+          fruit_name_ko?: string | null
+          fruit_name_nl?: string | null
+          fruit_name_pl?: string | null
+          fruit_name_pt?: string | null
           fruit_name_ru?: string | null
+          fruit_name_sv?: string | null
           fruit_name_tr?: string | null
+          fruit_name_vi?: string | null
+          fruit_name_zh?: string | null
           id?: string
           image_url?: string | null
           length_cm?: number | null
@@ -4937,8 +8020,20 @@ export type Database = {
           fruit_name?: string
           fruit_name_az?: string | null
           fruit_name_en?: string | null
+          fruit_name_es?: string | null
+          fruit_name_fr?: string | null
+          fruit_name_hi?: string | null
+          fruit_name_id?: string | null
+          fruit_name_ja?: string | null
+          fruit_name_ko?: string | null
+          fruit_name_nl?: string | null
+          fruit_name_pl?: string | null
+          fruit_name_pt?: string | null
           fruit_name_ru?: string | null
+          fruit_name_sv?: string | null
           fruit_name_tr?: string | null
+          fruit_name_vi?: string | null
+          fruit_name_zh?: string | null
           id?: string
           image_url?: string | null
           length_cm?: number | null
@@ -5187,11 +8282,23 @@ export type Database = {
           address_az: string | null
           address_de: string | null
           address_en: string | null
+          address_es: string | null
+          address_fr: string | null
+          address_hi: string | null
+          address_id: string | null
+          address_ja: string | null
           address_ka: string | null
           address_kk: string | null
+          address_ko: string | null
+          address_nl: string | null
+          address_pl: string | null
+          address_pt: string | null
           address_ru: string | null
+          address_sv: string | null
           address_tr: string | null
           address_uz: string | null
+          address_vi: string | null
+          address_zh: string | null
           city: string | null
           country_code: string
           created_at: string | null
@@ -5200,11 +8307,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           email: string | null
           id: string
           image_url: string | null
@@ -5217,11 +8336,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           phone: string | null
           provider_type: string
           rating: number | null
@@ -5233,11 +8364,23 @@ export type Database = {
           specialty_az: string | null
           specialty_de: string | null
           specialty_en: string | null
+          specialty_es: string | null
+          specialty_fr: string | null
+          specialty_hi: string | null
+          specialty_id: string | null
+          specialty_ja: string | null
           specialty_ka: string | null
           specialty_kk: string | null
+          specialty_ko: string | null
+          specialty_nl: string | null
+          specialty_pl: string | null
+          specialty_pt: string | null
           specialty_ru: string | null
+          specialty_sv: string | null
           specialty_tr: string | null
           specialty_uz: string | null
+          specialty_vi: string | null
+          specialty_zh: string | null
           updated_at: string | null
           website: string | null
           working_hours: Json | null
@@ -5249,11 +8392,23 @@ export type Database = {
           address_az?: string | null
           address_de?: string | null
           address_en?: string | null
+          address_es?: string | null
+          address_fr?: string | null
+          address_hi?: string | null
+          address_id?: string | null
+          address_ja?: string | null
           address_ka?: string | null
           address_kk?: string | null
+          address_ko?: string | null
+          address_nl?: string | null
+          address_pl?: string | null
+          address_pt?: string | null
           address_ru?: string | null
+          address_sv?: string | null
           address_tr?: string | null
           address_uz?: string | null
+          address_vi?: string | null
+          address_zh?: string | null
           city?: string | null
           country_code?: string
           created_at?: string | null
@@ -5262,11 +8417,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           email?: string | null
           id?: string
           image_url?: string | null
@@ -5279,11 +8446,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           phone?: string | null
           provider_type?: string
           rating?: number | null
@@ -5295,11 +8474,23 @@ export type Database = {
           specialty_az?: string | null
           specialty_de?: string | null
           specialty_en?: string | null
+          specialty_es?: string | null
+          specialty_fr?: string | null
+          specialty_hi?: string | null
+          specialty_id?: string | null
+          specialty_ja?: string | null
           specialty_ka?: string | null
           specialty_kk?: string | null
+          specialty_ko?: string | null
+          specialty_nl?: string | null
+          specialty_pl?: string | null
+          specialty_pt?: string | null
           specialty_ru?: string | null
+          specialty_sv?: string | null
           specialty_tr?: string | null
           specialty_uz?: string | null
+          specialty_vi?: string | null
+          specialty_zh?: string | null
           updated_at?: string | null
           website?: string | null
           working_hours?: Json | null
@@ -5311,11 +8502,23 @@ export type Database = {
           address_az?: string | null
           address_de?: string | null
           address_en?: string | null
+          address_es?: string | null
+          address_fr?: string | null
+          address_hi?: string | null
+          address_id?: string | null
+          address_ja?: string | null
           address_ka?: string | null
           address_kk?: string | null
+          address_ko?: string | null
+          address_nl?: string | null
+          address_pl?: string | null
+          address_pt?: string | null
           address_ru?: string | null
+          address_sv?: string | null
           address_tr?: string | null
           address_uz?: string | null
+          address_vi?: string | null
+          address_zh?: string | null
           city?: string | null
           country_code?: string
           created_at?: string | null
@@ -5324,11 +8527,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           email?: string | null
           id?: string
           image_url?: string | null
@@ -5341,11 +8556,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           phone?: string | null
           provider_type?: string
           rating?: number | null
@@ -5357,11 +8584,23 @@ export type Database = {
           specialty_az?: string | null
           specialty_de?: string | null
           specialty_en?: string | null
+          specialty_es?: string | null
+          specialty_fr?: string | null
+          specialty_hi?: string | null
+          specialty_id?: string | null
+          specialty_ja?: string | null
           specialty_ka?: string | null
           specialty_kk?: string | null
+          specialty_ko?: string | null
+          specialty_nl?: string | null
+          specialty_pl?: string | null
+          specialty_pt?: string | null
           specialty_ru?: string | null
+          specialty_sv?: string | null
           specialty_tr?: string | null
           specialty_uz?: string | null
+          specialty_vi?: string | null
+          specialty_zh?: string | null
           updated_at?: string | null
           website?: string | null
           working_hours?: Json | null
@@ -5379,8 +8618,20 @@ export type Database = {
           name: string
           name_az: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -5393,8 +8644,20 @@ export type Database = {
           name: string
           name_az?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -5407,8 +8670,20 @@ export type Database = {
           name?: string
           name_az?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -5422,8 +8697,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number | null
           step_key: string
         }
@@ -5435,8 +8722,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
           step_key: string
         }
@@ -5448,8 +8747,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
           step_key?: string
         }
@@ -5560,20 +8871,44 @@ export type Database = {
           item_name_az: string | null
           item_name_de: string | null
           item_name_en: string | null
+          item_name_es: string | null
+          item_name_fr: string | null
+          item_name_hi: string | null
+          item_name_id: string | null
+          item_name_ja: string | null
           item_name_ka: string | null
           item_name_kk: string | null
+          item_name_ko: string | null
+          item_name_nl: string | null
+          item_name_pl: string | null
+          item_name_pt: string | null
           item_name_ru: string | null
+          item_name_sv: string | null
           item_name_tr: string | null
           item_name_uz: string | null
+          item_name_vi: string | null
+          item_name_zh: string | null
           notes: string | null
           notes_ar: string | null
           notes_de: string | null
           notes_en: string | null
+          notes_es: string | null
+          notes_fr: string | null
+          notes_hi: string | null
+          notes_id: string | null
+          notes_ja: string | null
           notes_ka: string | null
           notes_kk: string | null
+          notes_ko: string | null
+          notes_nl: string | null
+          notes_pl: string | null
+          notes_pt: string | null
           notes_ru: string | null
+          notes_sv: string | null
           notes_tr: string | null
           notes_uz: string | null
+          notes_vi: string | null
+          notes_zh: string | null
           priority: number | null
           sort_order: number | null
           updated_at: string
@@ -5589,20 +8924,44 @@ export type Database = {
           item_name_az?: string | null
           item_name_de?: string | null
           item_name_en?: string | null
+          item_name_es?: string | null
+          item_name_fr?: string | null
+          item_name_hi?: string | null
+          item_name_id?: string | null
+          item_name_ja?: string | null
           item_name_ka?: string | null
           item_name_kk?: string | null
+          item_name_ko?: string | null
+          item_name_nl?: string | null
+          item_name_pl?: string | null
+          item_name_pt?: string | null
           item_name_ru?: string | null
+          item_name_sv?: string | null
           item_name_tr?: string | null
           item_name_uz?: string | null
+          item_name_vi?: string | null
+          item_name_zh?: string | null
           notes?: string | null
           notes_ar?: string | null
           notes_de?: string | null
           notes_en?: string | null
+          notes_es?: string | null
+          notes_fr?: string | null
+          notes_hi?: string | null
+          notes_id?: string | null
+          notes_ja?: string | null
           notes_ka?: string | null
           notes_kk?: string | null
+          notes_ko?: string | null
+          notes_nl?: string | null
+          notes_pl?: string | null
+          notes_pt?: string | null
           notes_ru?: string | null
+          notes_sv?: string | null
           notes_tr?: string | null
           notes_uz?: string | null
+          notes_vi?: string | null
+          notes_zh?: string | null
           priority?: number | null
           sort_order?: number | null
           updated_at?: string
@@ -5618,20 +8977,44 @@ export type Database = {
           item_name_az?: string | null
           item_name_de?: string | null
           item_name_en?: string | null
+          item_name_es?: string | null
+          item_name_fr?: string | null
+          item_name_hi?: string | null
+          item_name_id?: string | null
+          item_name_ja?: string | null
           item_name_ka?: string | null
           item_name_kk?: string | null
+          item_name_ko?: string | null
+          item_name_nl?: string | null
+          item_name_pl?: string | null
+          item_name_pt?: string | null
           item_name_ru?: string | null
+          item_name_sv?: string | null
           item_name_tr?: string | null
           item_name_uz?: string | null
+          item_name_vi?: string | null
+          item_name_zh?: string | null
           notes?: string | null
           notes_ar?: string | null
           notes_de?: string | null
           notes_en?: string | null
+          notes_es?: string | null
+          notes_fr?: string | null
+          notes_hi?: string | null
+          notes_id?: string | null
+          notes_ja?: string | null
           notes_ka?: string | null
           notes_kk?: string | null
+          notes_ko?: string | null
+          notes_nl?: string | null
+          notes_pl?: string | null
+          notes_pt?: string | null
           notes_ru?: string | null
+          notes_sv?: string | null
           notes_tr?: string | null
           notes_uz?: string | null
+          notes_vi?: string | null
+          notes_zh?: string | null
           priority?: number | null
           sort_order?: number | null
           updated_at?: string
@@ -5646,11 +9029,23 @@ export type Database = {
           description_ar: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           gradient: string
           icon_name: string
           id: string
@@ -5660,20 +9055,44 @@ export type Database = {
           subtitle_ar: string | null
           subtitle_de: string | null
           subtitle_en: string | null
+          subtitle_es: string | null
+          subtitle_fr: string | null
+          subtitle_hi: string | null
+          subtitle_id: string | null
+          subtitle_ja: string | null
           subtitle_ka: string | null
           subtitle_kk: string | null
+          subtitle_ko: string | null
+          subtitle_nl: string | null
+          subtitle_pl: string | null
+          subtitle_pt: string | null
           subtitle_ru: string | null
+          subtitle_sv: string | null
           subtitle_tr: string | null
           subtitle_uz: string | null
+          subtitle_vi: string | null
+          subtitle_zh: string | null
           title: string
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string
         }
         Insert: {
@@ -5683,11 +9102,23 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           gradient?: string
           icon_name?: string
           id?: string
@@ -5697,20 +9128,44 @@ export type Database = {
           subtitle_ar?: string | null
           subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_es?: string | null
+          subtitle_fr?: string | null
+          subtitle_hi?: string | null
+          subtitle_id?: string | null
+          subtitle_ja?: string | null
           subtitle_ka?: string | null
           subtitle_kk?: string | null
+          subtitle_ko?: string | null
+          subtitle_nl?: string | null
+          subtitle_pl?: string | null
+          subtitle_pt?: string | null
           subtitle_ru?: string | null
+          subtitle_sv?: string | null
           subtitle_tr?: string | null
           subtitle_uz?: string | null
+          subtitle_vi?: string | null
+          subtitle_zh?: string | null
           title: string
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
         }
         Update: {
@@ -5720,11 +9175,23 @@ export type Database = {
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           gradient?: string
           icon_name?: string
           id?: string
@@ -5734,20 +9201,44 @@ export type Database = {
           subtitle_ar?: string | null
           subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_es?: string | null
+          subtitle_fr?: string | null
+          subtitle_hi?: string | null
+          subtitle_id?: string | null
+          subtitle_ja?: string | null
           subtitle_ka?: string | null
           subtitle_kk?: string | null
+          subtitle_ko?: string | null
+          subtitle_nl?: string | null
+          subtitle_pl?: string | null
+          subtitle_pt?: string | null
           subtitle_ru?: string | null
+          subtitle_sv?: string | null
           subtitle_tr?: string | null
           subtitle_uz?: string | null
+          subtitle_vi?: string | null
+          subtitle_zh?: string | null
           title?: string
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -5789,11 +9280,23 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_es: string | null
+          content_fr: string | null
+          content_hi: string | null
+          content_id: string | null
+          content_ja: string | null
           content_ka: string | null
           content_kk: string | null
+          content_ko: string | null
+          content_nl: string | null
+          content_pl: string | null
+          content_pt: string | null
           content_ru: string | null
+          content_sv: string | null
           content_tr: string | null
           content_uz: string | null
+          content_vi: string | null
+          content_zh: string | null
           created_at: string | null
           document_type: string
           effective_date: string | null
@@ -5804,11 +9307,23 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string | null
           version: string | null
         }
@@ -5818,11 +9333,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           document_type: string
           effective_date?: string | null
@@ -5833,11 +9360,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
           version?: string | null
         }
@@ -5847,11 +9386,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           document_type?: string
           effective_date?: string | null
@@ -5862,11 +9413,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
           version?: string | null
         }
@@ -5882,8 +9445,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -5895,8 +9470,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -5908,8 +9495,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -6018,15 +9617,39 @@ export type Database = {
           description: string | null
           description_az: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           is_active: boolean | null
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           updated_at: string | null
           value: number
         }
@@ -6035,15 +9658,39 @@ export type Database = {
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           updated_at?: string | null
           value: number
         }
@@ -6052,15 +9699,39 @@ export type Database = {
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           updated_at?: string | null
           value?: number
         }
@@ -6074,11 +9745,23 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_es: string | null
+          content_fr: string | null
+          content_hi: string | null
+          content_id: string | null
+          content_ja: string | null
           content_ka: string | null
           content_kk: string | null
+          content_ko: string | null
+          content_nl: string | null
+          content_pl: string | null
+          content_pt: string | null
           content_ru: string | null
+          content_sv: string | null
           content_tr: string | null
           content_uz: string | null
+          content_vi: string | null
+          content_zh: string | null
           created_at: string | null
           icon: string | null
           id: string
@@ -6089,11 +9772,23 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string | null
         }
         Insert: {
@@ -6103,11 +9798,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           icon?: string | null
           id?: string
@@ -6118,11 +9825,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -6132,11 +9851,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           icon?: string | null
           id?: string
@@ -6147,11 +9878,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -6205,11 +9948,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
           time_range: string | null
         }
@@ -6225,11 +9980,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
           time_range?: string | null
         }
@@ -6245,11 +10012,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
           time_range?: string | null
         }
@@ -6259,12 +10038,27 @@ export type Database = {
         Row: {
           category: string | null
           content: string
+          content_ar: string | null
           content_az: string | null
+          content_de: string | null
           content_en: string | null
+          content_es: string | null
+          content_fr: string | null
+          content_hi: string | null
+          content_id: string | null
+          content_ja: string | null
           content_ka: string | null
+          content_kk: string | null
+          content_ko: string | null
+          content_nl: string | null
+          content_pl: string | null
+          content_pt: string | null
           content_ru: string | null
+          content_sv: string | null
           content_tr: string | null
           content_uz: string | null
+          content_vi: string | null
+          content_zh: string | null
           created_at: string | null
           emoji: string | null
           id: string
@@ -6272,23 +10066,53 @@ export type Database = {
           phase: string
           sort_order: number | null
           title: string
+          title_ar: string | null
           title_az: string | null
+          title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
+          title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string | null
         }
         Insert: {
           category?: string | null
           content: string
+          content_ar?: string | null
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
+          content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           emoji?: string | null
           id?: string
@@ -6296,23 +10120,53 @@ export type Database = {
           phase: string
           sort_order?: number | null
           title: string
+          title_ar?: string | null
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
+          title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Update: {
           category?: string | null
           content?: string
+          content_ar?: string | null
           content_az?: string | null
+          content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
+          content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           emoji?: string | null
           id?: string
@@ -6320,12 +10174,27 @@ export type Database = {
           phase?: string
           sort_order?: number | null
           title?: string
+          title_ar?: string | null
           title_az?: string | null
+          title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
+          title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -6343,11 +10212,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           is_active: boolean | null
           is_emergency: boolean | null
@@ -6356,11 +10237,23 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           phone: string | null
           resource_type: string
           sort_order: number | null
@@ -6378,11 +10271,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           is_emergency?: boolean | null
@@ -6391,11 +10296,23 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           phone?: string | null
           resource_type: string
           sort_order?: number | null
@@ -6413,11 +10330,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           is_emergency?: boolean | null
@@ -6426,17 +10355,401 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           phone?: string | null
           resource_type?: string
           sort_order?: number | null
           website?: string | null
         }
         Relationships: []
+      }
+      moderator_actions: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_role: string
+          after_data: Json | null
+          args_hash: string
+          before_data: Json | null
+          created_at: string
+          id: string
+          note: string
+          public_detail: string
+          reason: string
+          response: Json | null
+          subject_id: string | null
+          subject_kind: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_role: string
+          after_data?: Json | null
+          args_hash: string
+          before_data?: Json | null
+          created_at?: string
+          id: string
+          note?: string
+          public_detail?: string
+          reason: string
+          response?: Json | null
+          subject_id?: string | null
+          subject_kind: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_role?: string
+          after_data?: Json | null
+          args_hash?: string
+          before_data?: Json | null
+          created_at?: string
+          id?: string
+          note?: string
+          public_detail?: string
+          reason?: string
+          response?: Json | null
+          subject_id?: string | null
+          subject_kind?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      moderator_appeals: {
+        Row: {
+          action_id: string
+          body: string
+          created_at: string
+          id: string
+          response: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          state: string
+          user_id: string
+        }
+        Insert: {
+          action_id: string
+          body: string
+          created_at?: string
+          id: string
+          response?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          state?: string
+          user_id: string
+        }
+        Update: {
+          action_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          response?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          state?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderator_appeals_action_id_fkey"
+            columns: ["action_id"]
+            isOneToOne: false
+            referencedRelation: "moderator_actions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      moderator_ip_observations: {
+        Row: {
+          address: unknown
+          event_id: string | null
+          first_seen_at: string
+          id: string
+          last_seen_at: string
+          proposed_user_id: string | null
+          source: string
+          trusted: boolean
+          user_id: string | null
+        }
+        Insert: {
+          address: unknown
+          event_id?: string | null
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          proposed_user_id?: string | null
+          source: string
+          trusted?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          address?: unknown
+          event_id?: string | null
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          proposed_user_id?: string | null
+          source?: string
+          trusted?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      moderator_ip_rules: {
+        Row: {
+          address: unknown
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          issuer_role: string
+          note: string
+          observation_id: string | null
+          reason: string
+          revoked_at: string | null
+          revoked_by: string | null
+        }
+        Insert: {
+          address: unknown
+          created_at?: string
+          created_by?: string | null
+          expires_at: string
+          id: string
+          issuer_role: string
+          note?: string
+          observation_id?: string | null
+          reason: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+        }
+        Update: {
+          address?: unknown
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          issuer_role?: string
+          note?: string
+          observation_id?: string | null
+          reason?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderator_ip_rules_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "moderator_actions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      moderator_restrictions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          issuer_role: string
+          legacy_block_id: string | null
+          public_detail: string
+          reason: string
+          revoked_at: string | null
+          revoked_by: string | null
+          scope: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id: string
+          issuer_role: string
+          legacy_block_id?: string | null
+          public_detail?: string
+          reason: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          scope: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          issuer_role?: string
+          legacy_block_id?: string | null
+          public_detail?: string
+          reason?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          scope?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderator_restrictions_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "moderator_actions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moderator_restrictions_legacy_block_id_fkey"
+            columns: ["legacy_block_id"]
+            isOneToOne: false
+            referencedRelation: "user_blocks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      moderator_runtime_settings: {
+        Row: {
+          id: string
+          installed_at: string
+          ip_mode: string
+          previous_auth_hook: string | null
+          previous_pre_request: string | null
+          trusted_since: string | null
+        }
+        Insert: {
+          id: string
+          installed_at?: string
+          ip_mode?: string
+          previous_auth_hook?: string | null
+          previous_pre_request?: string | null
+          trusted_since?: string | null
+        }
+        Update: {
+          id?: string
+          installed_at?: string
+          ip_mode?: string
+          previous_auth_hook?: string | null
+          previous_pre_request?: string | null
+          trusted_since?: string | null
+        }
+        Relationships: []
+      }
+      moderator_tasks: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          id: string
+          resolved_at: string | null
+          revision: number
+          source_id: string
+          source_kind: string
+          state: string
+          subject_id: string | null
+          subject_kind: string
+          summary: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          id?: string
+          resolved_at?: string | null
+          revision?: number
+          source_id: string
+          source_kind: string
+          state?: string
+          subject_id?: string | null
+          subject_kind: string
+          summary?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          id?: string
+          resolved_at?: string | null
+          revision?: number
+          source_id?: string
+          source_kind?: string
+          state?: string
+          subject_id?: string | null
+          subject_kind?: string
+          summary?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      moderator_warnings: {
+        Row: {
+          acknowledged_at: string | null
+          claim_id: string | null
+          claim_owner: string | null
+          claim_until: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          public_detail: string
+          reason: string
+          revoked_at: string | null
+          shown_at: string | null
+          user_id: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          claim_id?: string | null
+          claim_owner?: string | null
+          claim_until?: string | null
+          created_at?: string
+          created_by?: string | null
+          id: string
+          public_detail?: string
+          reason: string
+          revoked_at?: string | null
+          shown_at?: string | null
+          user_id: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          claim_id?: string | null
+          claim_owner?: string | null
+          claim_until?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          public_detail?: string
+          reason?: string
+          revoked_at?: string | null
+          shown_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderator_warnings_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "moderator_actions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mom_friendly_places: {
         Row: {
@@ -6445,11 +10758,23 @@ export type Database = {
           address_az: string | null
           address_de: string | null
           address_en: string | null
+          address_es: string | null
+          address_fr: string | null
+          address_hi: string | null
+          address_id: string | null
+          address_ja: string | null
           address_ka: string | null
           address_kk: string | null
+          address_ko: string | null
+          address_nl: string | null
+          address_pl: string | null
+          address_pt: string | null
           address_ru: string | null
+          address_sv: string | null
           address_tr: string | null
           address_uz: string | null
+          address_vi: string | null
+          address_zh: string | null
           avg_rating: number | null
           category: Database["public"]["Enums"]["place_category"]
           created_at: string | null
@@ -6459,11 +10784,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           has_breastfeeding_room: boolean | null
           has_changing_table: boolean | null
           has_elevator: boolean | null
@@ -6484,11 +10821,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           phone: string | null
           review_count: number | null
           updated_at: string | null
@@ -6501,11 +10850,23 @@ export type Database = {
           address_az?: string | null
           address_de?: string | null
           address_en?: string | null
+          address_es?: string | null
+          address_fr?: string | null
+          address_hi?: string | null
+          address_id?: string | null
+          address_ja?: string | null
           address_ka?: string | null
           address_kk?: string | null
+          address_ko?: string | null
+          address_nl?: string | null
+          address_pl?: string | null
+          address_pt?: string | null
           address_ru?: string | null
+          address_sv?: string | null
           address_tr?: string | null
           address_uz?: string | null
+          address_vi?: string | null
+          address_zh?: string | null
           avg_rating?: number | null
           category?: Database["public"]["Enums"]["place_category"]
           created_at?: string | null
@@ -6515,11 +10876,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           has_breastfeeding_room?: boolean | null
           has_changing_table?: boolean | null
           has_elevator?: boolean | null
@@ -6540,11 +10913,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           phone?: string | null
           review_count?: number | null
           updated_at?: string | null
@@ -6557,11 +10942,23 @@ export type Database = {
           address_az?: string | null
           address_de?: string | null
           address_en?: string | null
+          address_es?: string | null
+          address_fr?: string | null
+          address_hi?: string | null
+          address_id?: string | null
+          address_ja?: string | null
           address_ka?: string | null
           address_kk?: string | null
+          address_ko?: string | null
+          address_nl?: string | null
+          address_pl?: string | null
+          address_pt?: string | null
           address_ru?: string | null
+          address_sv?: string | null
           address_tr?: string | null
           address_uz?: string | null
+          address_vi?: string | null
+          address_zh?: string | null
           avg_rating?: number | null
           category?: Database["public"]["Enums"]["place_category"]
           created_at?: string | null
@@ -6571,11 +10968,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           has_breastfeeding_room?: boolean | null
           has_changing_table?: boolean | null
           has_elevator?: boolean | null
@@ -6596,11 +11005,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           phone?: string | null
           review_count?: number | null
           updated_at?: string | null
@@ -6619,11 +11040,23 @@ export type Database = {
           message_ar: string | null
           message_de: string | null
           message_en: string | null
+          message_es: string | null
+          message_fr: string | null
+          message_hi: string | null
+          message_id: string | null
+          message_ja: string | null
           message_ka: string | null
           message_kk: string | null
+          message_ko: string | null
+          message_nl: string | null
+          message_pl: string | null
+          message_pt: string | null
           message_ru: string | null
+          message_sv: string | null
           message_tr: string | null
           message_uz: string | null
+          message_vi: string | null
+          message_zh: string | null
           updated_at: string
         }
         Insert: {
@@ -6635,11 +11068,23 @@ export type Database = {
           message_ar?: string | null
           message_de?: string | null
           message_en?: string | null
+          message_es?: string | null
+          message_fr?: string | null
+          message_hi?: string | null
+          message_id?: string | null
+          message_ja?: string | null
           message_ka?: string | null
           message_kk?: string | null
+          message_ko?: string | null
+          message_nl?: string | null
+          message_pl?: string | null
+          message_pt?: string | null
           message_ru?: string | null
+          message_sv?: string | null
           message_tr?: string | null
           message_uz?: string | null
+          message_vi?: string | null
+          message_zh?: string | null
           updated_at?: string
         }
         Update: {
@@ -6651,11 +11096,23 @@ export type Database = {
           message_ar?: string | null
           message_de?: string | null
           message_en?: string | null
+          message_es?: string | null
+          message_fr?: string | null
+          message_hi?: string | null
+          message_id?: string | null
+          message_ja?: string | null
           message_ka?: string | null
           message_kk?: string | null
+          message_ko?: string | null
+          message_nl?: string | null
+          message_pl?: string | null
+          message_pt?: string | null
           message_ru?: string | null
+          message_sv?: string | null
           message_tr?: string | null
           message_uz?: string | null
+          message_vi?: string | null
+          message_zh?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -6666,11 +11123,23 @@ export type Database = {
           body_ar: string | null
           body_de: string | null
           body_en: string | null
+          body_es: string | null
+          body_fr: string | null
+          body_hi: string | null
+          body_id: string | null
+          body_ja: string | null
           body_ka: string | null
           body_kk: string | null
+          body_ko: string | null
+          body_nl: string | null
+          body_pl: string | null
+          body_pt: string | null
           body_ru: string | null
+          body_sv: string | null
           body_tr: string | null
           body_uz: string | null
+          body_vi: string | null
+          body_zh: string | null
           calendar_day_offset: number | null
           calendar_months: number | null
           created_at: string
@@ -6683,11 +11152,23 @@ export type Database = {
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string
         }
         Insert: {
@@ -6695,11 +11176,23 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_es?: string | null
+          body_fr?: string | null
+          body_hi?: string | null
+          body_id?: string | null
+          body_ja?: string | null
           body_ka?: string | null
           body_kk?: string | null
+          body_ko?: string | null
+          body_nl?: string | null
+          body_pl?: string | null
+          body_pt?: string | null
           body_ru?: string | null
+          body_sv?: string | null
           body_tr?: string | null
           body_uz?: string | null
+          body_vi?: string | null
+          body_zh?: string | null
           calendar_day_offset?: number | null
           calendar_months?: number | null
           created_at?: string
@@ -6712,11 +11205,23 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
         }
         Update: {
@@ -6724,11 +11229,23 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_es?: string | null
+          body_fr?: string | null
+          body_hi?: string | null
+          body_id?: string | null
+          body_ja?: string | null
           body_ka?: string | null
           body_kk?: string | null
+          body_ko?: string | null
+          body_nl?: string | null
+          body_pl?: string | null
+          body_pt?: string | null
           body_ru?: string | null
+          body_sv?: string | null
           body_tr?: string | null
           body_uz?: string | null
+          body_vi?: string | null
+          body_zh?: string | null
           calendar_day_offset?: number | null
           calendar_months?: number | null
           created_at?: string
@@ -6741,11 +11258,23 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -6792,11 +11321,23 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
           label_ka: string | null
           label_kk: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
           label_uz: string | null
+          label_vi: string | null
+          label_zh: string | null
           mood_value: number
           sort_order: number | null
         }
@@ -6811,11 +11352,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           mood_value: number
           sort_order?: number | null
         }
@@ -6830,11 +11383,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           mood_value?: number
           sort_order?: number | null
         }
@@ -6852,11 +11417,23 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
           label_ka: string | null
           label_kk: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
           label_uz: string | null
+          label_vi: string | null
+          label_zh: string | null
           value: number
         }
         Insert: {
@@ -6870,11 +11447,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           value: number
         }
         Update: {
@@ -6888,11 +11477,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           value?: number
         }
         Relationships: []
@@ -6909,11 +11510,23 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
           label_ka: string | null
           label_kk: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
           label_uz: string | null
+          label_vi: string | null
+          label_zh: string | null
           option_id: string
           sort_order: number | null
         }
@@ -6928,11 +11541,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           option_id: string
           sort_order?: number | null
         }
@@ -6947,11 +11572,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           option_id?: string
           sort_order?: number | null
         }
@@ -7029,11 +11666,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           emoji: string | null
           id: string
           is_active: boolean | null
@@ -7042,11 +11691,23 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
           label_ka: string | null
           label_kk: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
           label_uz: string | null
+          label_vi: string | null
+          label_zh: string | null
           max_db: number | null
           min_db: number
           sort_order: number | null
@@ -7060,11 +11721,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
@@ -7073,11 +11746,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           max_db?: number | null
           min_db: number
           sort_order?: number | null
@@ -7091,11 +11776,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
@@ -7104,11 +11801,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           max_db?: number | null
           min_db?: number
           sort_order?: number | null
@@ -7268,11 +11977,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           is_active: boolean | null
           life_stage: string
@@ -7287,11 +12008,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           life_stage: string
@@ -7306,11 +12039,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           life_stage?: string
@@ -7327,11 +12072,23 @@ export type Database = {
           content_ar: string | null
           content_de: string | null
           content_en: string | null
+          content_es: string | null
+          content_fr: string | null
+          content_hi: string | null
+          content_id: string | null
+          content_ja: string | null
           content_ka: string | null
           content_kk: string | null
+          content_ko: string | null
+          content_nl: string | null
+          content_pl: string | null
+          content_pt: string | null
           content_ru: string | null
+          content_sv: string | null
           content_tr: string | null
           content_uz: string | null
+          content_vi: string | null
+          content_zh: string | null
           created_at: string
           id: string
           is_active: boolean | null
@@ -7340,11 +12097,23 @@ export type Database = {
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           trimester: number | null
           updated_at: string
         }
@@ -7355,11 +12124,23 @@ export type Database = {
           content_ar?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string
           id?: string
           is_active?: boolean | null
@@ -7368,11 +12149,23 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           trimester?: number | null
           updated_at?: string
         }
@@ -7383,11 +12176,23 @@ export type Database = {
           content_ar?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string
           id?: string
           is_active?: boolean | null
@@ -7396,11 +12201,23 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           trimester?: number | null
           updated_at?: string
         }
@@ -7415,11 +12232,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           emoji: string | null
           icon_name: string | null
           id: string
@@ -7431,21 +12260,45 @@ export type Database = {
           subtitle_az: string | null
           subtitle_de: string | null
           subtitle_en: string | null
+          subtitle_es: string | null
+          subtitle_fr: string | null
+          subtitle_hi: string | null
+          subtitle_id: string | null
+          subtitle_ja: string | null
           subtitle_ka: string | null
           subtitle_kk: string | null
+          subtitle_ko: string | null
+          subtitle_nl: string | null
+          subtitle_pl: string | null
+          subtitle_pt: string | null
           subtitle_ru: string | null
+          subtitle_sv: string | null
           subtitle_tr: string | null
           subtitle_uz: string | null
+          subtitle_vi: string | null
+          subtitle_zh: string | null
           title: string
           title_ar: string | null
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
         }
         Insert: {
           bg_gradient?: string | null
@@ -7455,11 +12308,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           icon_name?: string | null
           id?: string
@@ -7471,21 +12336,45 @@ export type Database = {
           subtitle_az?: string | null
           subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_es?: string | null
+          subtitle_fr?: string | null
+          subtitle_hi?: string | null
+          subtitle_id?: string | null
+          subtitle_ja?: string | null
           subtitle_ka?: string | null
           subtitle_kk?: string | null
+          subtitle_ko?: string | null
+          subtitle_nl?: string | null
+          subtitle_pl?: string | null
+          subtitle_pt?: string | null
           subtitle_ru?: string | null
+          subtitle_sv?: string | null
           subtitle_tr?: string | null
           subtitle_uz?: string | null
+          subtitle_vi?: string | null
+          subtitle_zh?: string | null
           title: string
           title_ar?: string | null
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Update: {
           bg_gradient?: string | null
@@ -7495,11 +12384,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           icon_name?: string | null
           id?: string
@@ -7511,21 +12412,45 @@ export type Database = {
           subtitle_az?: string | null
           subtitle_de?: string | null
           subtitle_en?: string | null
+          subtitle_es?: string | null
+          subtitle_fr?: string | null
+          subtitle_hi?: string | null
+          subtitle_id?: string | null
+          subtitle_ja?: string | null
           subtitle_ka?: string | null
           subtitle_kk?: string | null
+          subtitle_ko?: string | null
+          subtitle_nl?: string | null
+          subtitle_pl?: string | null
+          subtitle_pt?: string | null
           subtitle_ru?: string | null
+          subtitle_sv?: string | null
           subtitle_tr?: string | null
           subtitle_uz?: string | null
+          subtitle_vi?: string | null
+          subtitle_zh?: string | null
           title?: string
           title_ar?: string | null
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Relationships: []
       }
@@ -7616,16 +12541,40 @@ export type Database = {
           description: string | null
           description_az: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
+          description_vi: string | null
+          description_zh: string | null
           emoji: string
           id: string
           is_active: boolean | null
           name: string
           name_az: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
           unlock_condition: string | null
           unlock_threshold: number | null
@@ -7636,16 +12585,40 @@ export type Database = {
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string
           id?: string
           is_active?: boolean | null
           name: string
           name_az?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
           unlock_condition?: string | null
           unlock_threshold?: number | null
@@ -7656,16 +12629,40 @@ export type Database = {
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string
           id?: string
           is_active?: boolean | null
           name?: string
           name_az?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
           unlock_condition?: string | null
           unlock_threshold?: number | null
@@ -7685,11 +12682,23 @@ export type Database = {
           tip_text_az: string | null
           tip_text_de: string | null
           tip_text_en: string | null
+          tip_text_es: string | null
+          tip_text_fr: string | null
+          tip_text_hi: string | null
+          tip_text_id: string | null
+          tip_text_ja: string | null
           tip_text_ka: string | null
           tip_text_kk: string | null
+          tip_text_ko: string | null
+          tip_text_nl: string | null
+          tip_text_pl: string | null
+          tip_text_pt: string | null
           tip_text_ru: string | null
+          tip_text_sv: string | null
           tip_text_tr: string | null
           tip_text_uz: string | null
+          tip_text_vi: string | null
+          tip_text_zh: string | null
           updated_at: string | null
           week_number: number | null
         }
@@ -7705,11 +12714,23 @@ export type Database = {
           tip_text_az?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_es?: string | null
+          tip_text_fr?: string | null
+          tip_text_hi?: string | null
+          tip_text_id?: string | null
+          tip_text_ja?: string | null
           tip_text_ka?: string | null
           tip_text_kk?: string | null
+          tip_text_ko?: string | null
+          tip_text_nl?: string | null
+          tip_text_pl?: string | null
+          tip_text_pt?: string | null
           tip_text_ru?: string | null
+          tip_text_sv?: string | null
           tip_text_tr?: string | null
           tip_text_uz?: string | null
+          tip_text_vi?: string | null
+          tip_text_zh?: string | null
           updated_at?: string | null
           week_number?: number | null
         }
@@ -7725,11 +12746,23 @@ export type Database = {
           tip_text_az?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_es?: string | null
+          tip_text_fr?: string | null
+          tip_text_hi?: string | null
+          tip_text_id?: string | null
+          tip_text_ja?: string | null
           tip_text_ka?: string | null
           tip_text_kk?: string | null
+          tip_text_ko?: string | null
+          tip_text_nl?: string | null
+          tip_text_pl?: string | null
+          tip_text_pt?: string | null
           tip_text_ru?: string | null
+          tip_text_sv?: string | null
           tip_text_tr?: string | null
           tip_text_uz?: string | null
+          tip_text_vi?: string | null
+          tip_text_zh?: string | null
           updated_at?: string | null
           week_number?: number | null
         }
@@ -7744,8 +12777,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           menu_key: string
           route: string
           sort_order: number | null
@@ -7758,8 +12803,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           menu_key: string
           route: string
           sort_order?: number | null
@@ -7772,8 +12829,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           menu_key?: string
           route?: string
           sort_order?: number | null
@@ -8021,11 +13090,23 @@ export type Database = {
           label_az: string
           label_de: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
           label_ka: string | null
           label_kk: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
           label_uz: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number
           updated_at: string
         }
@@ -8039,11 +13120,23 @@ export type Database = {
           label_az: string
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number
           updated_at?: string
         }
@@ -8057,11 +13150,23 @@ export type Database = {
           label_az?: string
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number
           updated_at?: string
         }
@@ -8071,21 +13176,93 @@ export type Database = {
         Row: {
           address: string | null
           address_en: string | null
+          address_es: string | null
+          address_fr: string | null
+          address_hi: string | null
+          address_id: string | null
+          address_ja: string | null
+          address_ko: string | null
+          address_nl: string | null
+          address_pl: string | null
+          address_pt: string | null
+          address_sv: string | null
+          address_vi: string | null
+          address_zh: string | null
           category_key: string
           city: string | null
           city_en: string | null
+          city_es: string | null
+          city_fr: string | null
+          city_hi: string | null
+          city_id: string | null
+          city_ja: string | null
+          city_ko: string | null
+          city_nl: string | null
+          city_pl: string | null
+          city_pt: string | null
+          city_sv: string | null
+          city_vi: string | null
+          city_zh: string | null
           countries: string[] | null
           cover_url: string | null
           created_at: string
           description: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
+          description_sv: string | null
+          description_vi: string | null
+          description_zh: string | null
           discount_label: string
           discount_label_en: string | null
+          discount_label_es: string | null
+          discount_label_fr: string | null
+          discount_label_hi: string | null
+          discount_label_id: string | null
+          discount_label_ja: string | null
+          discount_label_ko: string | null
+          discount_label_nl: string | null
+          discount_label_pl: string | null
+          discount_label_pt: string | null
+          discount_label_sv: string | null
+          discount_label_vi: string | null
+          discount_label_zh: string | null
           discount_terms: string | null
           discount_terms_en: string | null
+          discount_terms_es: string | null
+          discount_terms_fr: string | null
+          discount_terms_hi: string | null
+          discount_terms_id: string | null
+          discount_terms_ja: string | null
+          discount_terms_ko: string | null
+          discount_terms_nl: string | null
+          discount_terms_pl: string | null
+          discount_terms_pt: string | null
+          discount_terms_sv: string | null
+          discount_terms_vi: string | null
+          discount_terms_zh: string | null
           discount_value: number | null
           district: string | null
           district_en: string | null
+          district_es: string | null
+          district_fr: string | null
+          district_hi: string | null
+          district_id: string | null
+          district_ja: string | null
+          district_ko: string | null
+          district_nl: string | null
+          district_pl: string | null
+          district_pt: string | null
+          district_sv: string | null
+          district_vi: string | null
+          district_zh: string | null
           gallery_urls: string[] | null
           id: string
           instagram: string | null
@@ -8096,6 +13273,18 @@ export type Database = {
           longitude: number | null
           name: string
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
+          name_sv: string | null
+          name_vi: string | null
+          name_zh: string | null
           phone: string | null
           pin_hash: string
           qr_ttl_seconds: number
@@ -8110,21 +13299,93 @@ export type Database = {
         Insert: {
           address?: string | null
           address_en?: string | null
+          address_es?: string | null
+          address_fr?: string | null
+          address_hi?: string | null
+          address_id?: string | null
+          address_ja?: string | null
+          address_ko?: string | null
+          address_nl?: string | null
+          address_pl?: string | null
+          address_pt?: string | null
+          address_sv?: string | null
+          address_vi?: string | null
+          address_zh?: string | null
           category_key: string
           city?: string | null
           city_en?: string | null
+          city_es?: string | null
+          city_fr?: string | null
+          city_hi?: string | null
+          city_id?: string | null
+          city_ja?: string | null
+          city_ko?: string | null
+          city_nl?: string | null
+          city_pl?: string | null
+          city_pt?: string | null
+          city_sv?: string | null
+          city_vi?: string | null
+          city_zh?: string | null
           countries?: string[] | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
+          description_sv?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           discount_label: string
           discount_label_en?: string | null
+          discount_label_es?: string | null
+          discount_label_fr?: string | null
+          discount_label_hi?: string | null
+          discount_label_id?: string | null
+          discount_label_ja?: string | null
+          discount_label_ko?: string | null
+          discount_label_nl?: string | null
+          discount_label_pl?: string | null
+          discount_label_pt?: string | null
+          discount_label_sv?: string | null
+          discount_label_vi?: string | null
+          discount_label_zh?: string | null
           discount_terms?: string | null
           discount_terms_en?: string | null
+          discount_terms_es?: string | null
+          discount_terms_fr?: string | null
+          discount_terms_hi?: string | null
+          discount_terms_id?: string | null
+          discount_terms_ja?: string | null
+          discount_terms_ko?: string | null
+          discount_terms_nl?: string | null
+          discount_terms_pl?: string | null
+          discount_terms_pt?: string | null
+          discount_terms_sv?: string | null
+          discount_terms_vi?: string | null
+          discount_terms_zh?: string | null
           discount_value?: number | null
           district?: string | null
           district_en?: string | null
+          district_es?: string | null
+          district_fr?: string | null
+          district_hi?: string | null
+          district_id?: string | null
+          district_ja?: string | null
+          district_ko?: string | null
+          district_nl?: string | null
+          district_pl?: string | null
+          district_pt?: string | null
+          district_sv?: string | null
+          district_vi?: string | null
+          district_zh?: string | null
           gallery_urls?: string[] | null
           id?: string
           instagram?: string | null
@@ -8135,6 +13396,18 @@ export type Database = {
           longitude?: number | null
           name: string
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
+          name_sv?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           phone?: string | null
           pin_hash: string
           qr_ttl_seconds?: number
@@ -8149,21 +13422,93 @@ export type Database = {
         Update: {
           address?: string | null
           address_en?: string | null
+          address_es?: string | null
+          address_fr?: string | null
+          address_hi?: string | null
+          address_id?: string | null
+          address_ja?: string | null
+          address_ko?: string | null
+          address_nl?: string | null
+          address_pl?: string | null
+          address_pt?: string | null
+          address_sv?: string | null
+          address_vi?: string | null
+          address_zh?: string | null
           category_key?: string
           city?: string | null
           city_en?: string | null
+          city_es?: string | null
+          city_fr?: string | null
+          city_hi?: string | null
+          city_id?: string | null
+          city_ja?: string | null
+          city_ko?: string | null
+          city_nl?: string | null
+          city_pl?: string | null
+          city_pt?: string | null
+          city_sv?: string | null
+          city_vi?: string | null
+          city_zh?: string | null
           countries?: string[] | null
           cover_url?: string | null
           created_at?: string
           description?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
+          description_sv?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           discount_label?: string
           discount_label_en?: string | null
+          discount_label_es?: string | null
+          discount_label_fr?: string | null
+          discount_label_hi?: string | null
+          discount_label_id?: string | null
+          discount_label_ja?: string | null
+          discount_label_ko?: string | null
+          discount_label_nl?: string | null
+          discount_label_pl?: string | null
+          discount_label_pt?: string | null
+          discount_label_sv?: string | null
+          discount_label_vi?: string | null
+          discount_label_zh?: string | null
           discount_terms?: string | null
           discount_terms_en?: string | null
+          discount_terms_es?: string | null
+          discount_terms_fr?: string | null
+          discount_terms_hi?: string | null
+          discount_terms_id?: string | null
+          discount_terms_ja?: string | null
+          discount_terms_ko?: string | null
+          discount_terms_nl?: string | null
+          discount_terms_pl?: string | null
+          discount_terms_pt?: string | null
+          discount_terms_sv?: string | null
+          discount_terms_vi?: string | null
+          discount_terms_zh?: string | null
           discount_value?: number | null
           district?: string | null
           district_en?: string | null
+          district_es?: string | null
+          district_fr?: string | null
+          district_hi?: string | null
+          district_id?: string | null
+          district_ja?: string | null
+          district_ko?: string | null
+          district_nl?: string | null
+          district_pl?: string | null
+          district_pt?: string | null
+          district_sv?: string | null
+          district_vi?: string | null
+          district_zh?: string | null
           gallery_urls?: string[] | null
           id?: string
           instagram?: string | null
@@ -8174,6 +13519,18 @@ export type Database = {
           longitude?: number | null
           name?: string
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
+          name_sv?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           phone?: string | null
           pin_hash?: string
           qr_ttl_seconds?: number
@@ -8202,16 +13559,40 @@ export type Database = {
           description: string | null
           description_az: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
+          description_vi: string | null
+          description_zh: string | null
           icon: string | null
           id: string
           is_active: boolean | null
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           method_key: string
           sort_order: number | null
           updated_at: string | null
@@ -8222,16 +13603,40 @@ export type Database = {
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean | null
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           method_key: string
           sort_order?: number | null
           updated_at?: string | null
@@ -8242,16 +13647,40 @@ export type Database = {
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean | null
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           method_key?: string
           sort_order?: number | null
           updated_at?: string | null
@@ -8368,11 +13797,23 @@ export type Database = {
           category_name_az: string | null
           category_name_de: string | null
           category_name_en: string | null
+          category_name_es: string | null
+          category_name_fr: string | null
+          category_name_hi: string | null
+          category_name_id: string | null
+          category_name_ja: string | null
           category_name_ka: string | null
           category_name_kk: string | null
+          category_name_ko: string | null
+          category_name_nl: string | null
+          category_name_pl: string | null
+          category_name_pt: string | null
           category_name_ru: string | null
+          category_name_sv: string | null
           category_name_tr: string | null
           category_name_uz: string | null
+          category_name_vi: string | null
+          category_name_zh: string | null
           created_at: string | null
           gender: string | null
           id: string
@@ -8387,11 +13828,23 @@ export type Database = {
           theme_name_az: string | null
           theme_name_de: string | null
           theme_name_en: string | null
+          theme_name_es: string | null
+          theme_name_fr: string | null
+          theme_name_hi: string | null
+          theme_name_id: string | null
+          theme_name_ja: string | null
           theme_name_ka: string | null
           theme_name_kk: string | null
+          theme_name_ko: string | null
+          theme_name_nl: string | null
+          theme_name_pl: string | null
+          theme_name_pt: string | null
           theme_name_ru: string | null
+          theme_name_sv: string | null
           theme_name_tr: string | null
           theme_name_uz: string | null
+          theme_name_vi: string | null
+          theme_name_zh: string | null
           updated_at: string | null
         }
         Insert: {
@@ -8401,11 +13854,23 @@ export type Database = {
           category_name_az?: string | null
           category_name_de?: string | null
           category_name_en?: string | null
+          category_name_es?: string | null
+          category_name_fr?: string | null
+          category_name_hi?: string | null
+          category_name_id?: string | null
+          category_name_ja?: string | null
           category_name_ka?: string | null
           category_name_kk?: string | null
+          category_name_ko?: string | null
+          category_name_nl?: string | null
+          category_name_pl?: string | null
+          category_name_pt?: string | null
           category_name_ru?: string | null
+          category_name_sv?: string | null
           category_name_tr?: string | null
           category_name_uz?: string | null
+          category_name_vi?: string | null
+          category_name_zh?: string | null
           created_at?: string | null
           gender?: string | null
           id?: string
@@ -8420,11 +13885,23 @@ export type Database = {
           theme_name_az?: string | null
           theme_name_de?: string | null
           theme_name_en?: string | null
+          theme_name_es?: string | null
+          theme_name_fr?: string | null
+          theme_name_hi?: string | null
+          theme_name_id?: string | null
+          theme_name_ja?: string | null
           theme_name_ka?: string | null
           theme_name_kk?: string | null
+          theme_name_ko?: string | null
+          theme_name_nl?: string | null
+          theme_name_pl?: string | null
+          theme_name_pt?: string | null
           theme_name_ru?: string | null
+          theme_name_sv?: string | null
           theme_name_tr?: string | null
           theme_name_uz?: string | null
+          theme_name_vi?: string | null
+          theme_name_zh?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -8434,11 +13911,23 @@ export type Database = {
           category_name_az?: string | null
           category_name_de?: string | null
           category_name_en?: string | null
+          category_name_es?: string | null
+          category_name_fr?: string | null
+          category_name_hi?: string | null
+          category_name_id?: string | null
+          category_name_ja?: string | null
           category_name_ka?: string | null
           category_name_kk?: string | null
+          category_name_ko?: string | null
+          category_name_nl?: string | null
+          category_name_pl?: string | null
+          category_name_pt?: string | null
           category_name_ru?: string | null
+          category_name_sv?: string | null
           category_name_tr?: string | null
           category_name_uz?: string | null
+          category_name_vi?: string | null
+          category_name_zh?: string | null
           created_at?: string | null
           gender?: string | null
           id?: string
@@ -8453,11 +13942,23 @@ export type Database = {
           theme_name_az?: string | null
           theme_name_de?: string | null
           theme_name_en?: string | null
+          theme_name_es?: string | null
+          theme_name_fr?: string | null
+          theme_name_hi?: string | null
+          theme_name_id?: string | null
+          theme_name_ja?: string | null
           theme_name_ka?: string | null
           theme_name_kk?: string | null
+          theme_name_ko?: string | null
+          theme_name_nl?: string | null
+          theme_name_pl?: string | null
+          theme_name_pt?: string | null
           theme_name_ru?: string | null
+          theme_name_sv?: string | null
           theme_name_tr?: string | null
           theme_name_uz?: string | null
+          theme_name_vi?: string | null
+          theme_name_zh?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -8470,11 +13971,23 @@ export type Database = {
           color_name_az: string | null
           color_name_de: string | null
           color_name_en: string | null
+          color_name_es: string | null
+          color_name_fr: string | null
+          color_name_hi: string | null
+          color_name_id: string | null
+          color_name_ja: string | null
           color_name_ka: string | null
           color_name_kk: string | null
+          color_name_ko: string | null
+          color_name_nl: string | null
+          color_name_pl: string | null
+          color_name_pt: string | null
           color_name_ru: string | null
+          color_name_sv: string | null
           color_name_tr: string | null
           color_name_uz: string | null
+          color_name_vi: string | null
+          color_name_zh: string | null
           created_at: string | null
           hex_value: string | null
           id: string
@@ -8488,11 +14001,23 @@ export type Database = {
           color_name_az?: string | null
           color_name_de?: string | null
           color_name_en?: string | null
+          color_name_es?: string | null
+          color_name_fr?: string | null
+          color_name_hi?: string | null
+          color_name_id?: string | null
+          color_name_ja?: string | null
           color_name_ka?: string | null
           color_name_kk?: string | null
+          color_name_ko?: string | null
+          color_name_nl?: string | null
+          color_name_pl?: string | null
+          color_name_pt?: string | null
           color_name_ru?: string | null
+          color_name_sv?: string | null
           color_name_tr?: string | null
           color_name_uz?: string | null
+          color_name_vi?: string | null
+          color_name_zh?: string | null
           created_at?: string | null
           hex_value?: string | null
           id?: string
@@ -8506,11 +14031,23 @@ export type Database = {
           color_name_az?: string | null
           color_name_de?: string | null
           color_name_en?: string | null
+          color_name_es?: string | null
+          color_name_fr?: string | null
+          color_name_hi?: string | null
+          color_name_id?: string | null
+          color_name_ja?: string | null
           color_name_ka?: string | null
           color_name_kk?: string | null
+          color_name_ko?: string | null
+          color_name_nl?: string | null
+          color_name_pl?: string | null
+          color_name_pt?: string | null
           color_name_ru?: string | null
+          color_name_sv?: string | null
           color_name_tr?: string | null
           color_name_uz?: string | null
+          color_name_vi?: string | null
+          color_name_zh?: string | null
           created_at?: string | null
           hex_value?: string | null
           id?: string
@@ -8527,11 +14064,23 @@ export type Database = {
           color_name_az: string | null
           color_name_de: string | null
           color_name_en: string | null
+          color_name_es: string | null
+          color_name_fr: string | null
+          color_name_hi: string | null
+          color_name_id: string | null
+          color_name_ja: string | null
           color_name_ka: string | null
           color_name_kk: string | null
+          color_name_ko: string | null
+          color_name_nl: string | null
+          color_name_pl: string | null
+          color_name_pt: string | null
           color_name_ru: string | null
+          color_name_sv: string | null
           color_name_tr: string | null
           color_name_uz: string | null
+          color_name_vi: string | null
+          color_name_zh: string | null
           created_at: string | null
           hex_value: string | null
           id: string
@@ -8545,11 +14094,23 @@ export type Database = {
           color_name_az?: string | null
           color_name_de?: string | null
           color_name_en?: string | null
+          color_name_es?: string | null
+          color_name_fr?: string | null
+          color_name_hi?: string | null
+          color_name_id?: string | null
+          color_name_ja?: string | null
           color_name_ka?: string | null
           color_name_kk?: string | null
+          color_name_ko?: string | null
+          color_name_nl?: string | null
+          color_name_pl?: string | null
+          color_name_pt?: string | null
           color_name_ru?: string | null
+          color_name_sv?: string | null
           color_name_tr?: string | null
           color_name_uz?: string | null
+          color_name_vi?: string | null
+          color_name_zh?: string | null
           created_at?: string | null
           hex_value?: string | null
           id?: string
@@ -8563,11 +14124,23 @@ export type Database = {
           color_name_az?: string | null
           color_name_de?: string | null
           color_name_en?: string | null
+          color_name_es?: string | null
+          color_name_fr?: string | null
+          color_name_hi?: string | null
+          color_name_id?: string | null
+          color_name_ja?: string | null
           color_name_ka?: string | null
           color_name_kk?: string | null
+          color_name_ko?: string | null
+          color_name_nl?: string | null
+          color_name_pl?: string | null
+          color_name_pt?: string | null
           color_name_ru?: string | null
+          color_name_sv?: string | null
           color_name_tr?: string | null
           color_name_uz?: string | null
+          color_name_vi?: string | null
+          color_name_zh?: string | null
           created_at?: string | null
           hex_value?: string | null
           id?: string
@@ -8589,11 +14162,23 @@ export type Database = {
           style_name_az: string | null
           style_name_de: string | null
           style_name_en: string | null
+          style_name_es: string | null
+          style_name_fr: string | null
+          style_name_hi: string | null
+          style_name_id: string | null
+          style_name_ja: string | null
           style_name_ka: string | null
           style_name_kk: string | null
+          style_name_ko: string | null
+          style_name_nl: string | null
+          style_name_pl: string | null
+          style_name_pt: string | null
           style_name_ru: string | null
+          style_name_sv: string | null
           style_name_tr: string | null
           style_name_uz: string | null
+          style_name_vi: string | null
+          style_name_zh: string | null
         }
         Insert: {
           created_at?: string | null
@@ -8607,11 +14192,23 @@ export type Database = {
           style_name_az?: string | null
           style_name_de?: string | null
           style_name_en?: string | null
+          style_name_es?: string | null
+          style_name_fr?: string | null
+          style_name_hi?: string | null
+          style_name_id?: string | null
+          style_name_ja?: string | null
           style_name_ka?: string | null
           style_name_kk?: string | null
+          style_name_ko?: string | null
+          style_name_nl?: string | null
+          style_name_pl?: string | null
+          style_name_pt?: string | null
           style_name_ru?: string | null
+          style_name_sv?: string | null
           style_name_tr?: string | null
           style_name_uz?: string | null
+          style_name_vi?: string | null
+          style_name_zh?: string | null
         }
         Update: {
           created_at?: string | null
@@ -8625,11 +14222,23 @@ export type Database = {
           style_name_az?: string | null
           style_name_de?: string | null
           style_name_en?: string | null
+          style_name_es?: string | null
+          style_name_fr?: string | null
+          style_name_hi?: string | null
+          style_name_id?: string | null
+          style_name_ja?: string | null
           style_name_ka?: string | null
           style_name_kk?: string | null
+          style_name_ko?: string | null
+          style_name_nl?: string | null
+          style_name_pl?: string | null
+          style_name_pt?: string | null
           style_name_ru?: string | null
+          style_name_sv?: string | null
           style_name_tr?: string | null
           style_name_uz?: string | null
+          style_name_vi?: string | null
+          style_name_zh?: string | null
         }
         Relationships: []
       }
@@ -8647,11 +14256,23 @@ export type Database = {
           style_name_az: string | null
           style_name_de: string | null
           style_name_en: string | null
+          style_name_es: string | null
+          style_name_fr: string | null
+          style_name_hi: string | null
+          style_name_id: string | null
+          style_name_ja: string | null
           style_name_ka: string | null
           style_name_kk: string | null
+          style_name_ko: string | null
+          style_name_nl: string | null
+          style_name_pl: string | null
+          style_name_pt: string | null
           style_name_ru: string | null
+          style_name_sv: string | null
           style_name_tr: string | null
           style_name_uz: string | null
+          style_name_vi: string | null
+          style_name_zh: string | null
         }
         Insert: {
           created_at?: string | null
@@ -8666,11 +14287,23 @@ export type Database = {
           style_name_az?: string | null
           style_name_de?: string | null
           style_name_en?: string | null
+          style_name_es?: string | null
+          style_name_fr?: string | null
+          style_name_hi?: string | null
+          style_name_id?: string | null
+          style_name_ja?: string | null
           style_name_ka?: string | null
           style_name_kk?: string | null
+          style_name_ko?: string | null
+          style_name_nl?: string | null
+          style_name_pl?: string | null
+          style_name_pt?: string | null
           style_name_ru?: string | null
+          style_name_sv?: string | null
           style_name_tr?: string | null
           style_name_uz?: string | null
+          style_name_vi?: string | null
+          style_name_zh?: string | null
         }
         Update: {
           created_at?: string | null
@@ -8685,11 +14318,23 @@ export type Database = {
           style_name_az?: string | null
           style_name_de?: string | null
           style_name_en?: string | null
+          style_name_es?: string | null
+          style_name_fr?: string | null
+          style_name_hi?: string | null
+          style_name_id?: string | null
+          style_name_ja?: string | null
           style_name_ka?: string | null
           style_name_kk?: string | null
+          style_name_ko?: string | null
+          style_name_nl?: string | null
+          style_name_pl?: string | null
+          style_name_pt?: string | null
           style_name_ru?: string | null
+          style_name_sv?: string | null
           style_name_tr?: string | null
           style_name_uz?: string | null
+          style_name_vi?: string | null
+          style_name_zh?: string | null
         }
         Relationships: []
       }
@@ -8706,11 +14351,23 @@ export type Database = {
           outfit_name_az: string | null
           outfit_name_de: string | null
           outfit_name_en: string | null
+          outfit_name_es: string | null
+          outfit_name_fr: string | null
+          outfit_name_hi: string | null
+          outfit_name_id: string | null
+          outfit_name_ja: string | null
           outfit_name_ka: string | null
           outfit_name_kk: string | null
+          outfit_name_ko: string | null
+          outfit_name_nl: string | null
+          outfit_name_pl: string | null
+          outfit_name_pt: string | null
           outfit_name_ru: string | null
+          outfit_name_sv: string | null
           outfit_name_tr: string | null
           outfit_name_uz: string | null
+          outfit_name_vi: string | null
+          outfit_name_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -8725,11 +14382,23 @@ export type Database = {
           outfit_name_az?: string | null
           outfit_name_de?: string | null
           outfit_name_en?: string | null
+          outfit_name_es?: string | null
+          outfit_name_fr?: string | null
+          outfit_name_hi?: string | null
+          outfit_name_id?: string | null
+          outfit_name_ja?: string | null
           outfit_name_ka?: string | null
           outfit_name_kk?: string | null
+          outfit_name_ko?: string | null
+          outfit_name_nl?: string | null
+          outfit_name_pl?: string | null
+          outfit_name_pt?: string | null
           outfit_name_ru?: string | null
+          outfit_name_sv?: string | null
           outfit_name_tr?: string | null
           outfit_name_uz?: string | null
+          outfit_name_vi?: string | null
+          outfit_name_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -8744,11 +14413,23 @@ export type Database = {
           outfit_name_az?: string | null
           outfit_name_de?: string | null
           outfit_name_en?: string | null
+          outfit_name_es?: string | null
+          outfit_name_fr?: string | null
+          outfit_name_hi?: string | null
+          outfit_name_id?: string | null
+          outfit_name_ja?: string | null
           outfit_name_ka?: string | null
           outfit_name_kk?: string | null
+          outfit_name_ko?: string | null
+          outfit_name_nl?: string | null
+          outfit_name_pl?: string | null
+          outfit_name_pt?: string | null
           outfit_name_ru?: string | null
+          outfit_name_sv?: string | null
           outfit_name_tr?: string | null
           outfit_name_uz?: string | null
+          outfit_name_vi?: string | null
+          outfit_name_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -8764,8 +14445,20 @@ export type Database = {
           name: string
           name_az: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
+          name_vi: string | null
+          name_zh: string | null
           preview_url: string | null
           prompt_text: string | null
           sort_order: number | null
@@ -8780,8 +14473,20 @@ export type Database = {
           name: string
           name_az?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           preview_url?: string | null
           prompt_text?: string | null
           sort_order?: number | null
@@ -8796,8 +14501,20 @@ export type Database = {
           name?: string
           name_az?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           preview_url?: string | null
           prompt_text?: string | null
           sort_order?: number | null
@@ -8816,11 +14533,23 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
           label_ka: string | null
           label_kk: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
           label_uz: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -8834,11 +14563,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -8852,11 +14593,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -8874,11 +14627,23 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
           label_ka: string | null
           label_kk: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
           label_uz: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -8893,11 +14658,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -8912,11 +14689,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -9011,11 +14800,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           difficulty_level: string | null
           duration_minutes: number | null
           id: string
@@ -9025,11 +14826,23 @@ export type Database = {
           instructions_az: string | null
           instructions_de: string | null
           instructions_en: string | null
+          instructions_es: string | null
+          instructions_fr: string | null
+          instructions_hi: string | null
+          instructions_id: string | null
+          instructions_ja: string | null
           instructions_ka: string | null
           instructions_kk: string | null
+          instructions_ko: string | null
+          instructions_nl: string | null
+          instructions_pl: string | null
+          instructions_pt: string | null
           instructions_ru: string | null
+          instructions_sv: string | null
           instructions_tr: string | null
           instructions_uz: string | null
+          instructions_vi: string | null
+          instructions_zh: string | null
           is_active: boolean | null
           max_age_days: number
           min_age_days: number
@@ -9041,11 +14854,23 @@ export type Database = {
           title_az: string
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           video_url: string | null
         }
         Insert: {
@@ -9055,11 +14880,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           difficulty_level?: string | null
           duration_minutes?: number | null
           id?: string
@@ -9069,11 +14906,23 @@ export type Database = {
           instructions_az?: string | null
           instructions_de?: string | null
           instructions_en?: string | null
+          instructions_es?: string | null
+          instructions_fr?: string | null
+          instructions_hi?: string | null
+          instructions_id?: string | null
+          instructions_ja?: string | null
           instructions_ka?: string | null
           instructions_kk?: string | null
+          instructions_ko?: string | null
+          instructions_nl?: string | null
+          instructions_pl?: string | null
+          instructions_pt?: string | null
           instructions_ru?: string | null
+          instructions_sv?: string | null
           instructions_tr?: string | null
           instructions_uz?: string | null
+          instructions_vi?: string | null
+          instructions_zh?: string | null
           is_active?: boolean | null
           max_age_days?: number
           min_age_days?: number
@@ -9085,11 +14934,23 @@ export type Database = {
           title_az: string
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           video_url?: string | null
         }
         Update: {
@@ -9099,11 +14960,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           difficulty_level?: string | null
           duration_minutes?: number | null
           id?: string
@@ -9113,11 +14986,23 @@ export type Database = {
           instructions_az?: string | null
           instructions_de?: string | null
           instructions_en?: string | null
+          instructions_es?: string | null
+          instructions_fr?: string | null
+          instructions_hi?: string | null
+          instructions_id?: string | null
+          instructions_ja?: string | null
           instructions_ka?: string | null
           instructions_kk?: string | null
+          instructions_ko?: string | null
+          instructions_nl?: string | null
+          instructions_pl?: string | null
+          instructions_pt?: string | null
           instructions_ru?: string | null
+          instructions_sv?: string | null
           instructions_tr?: string | null
           instructions_uz?: string | null
+          instructions_vi?: string | null
+          instructions_zh?: string | null
           is_active?: boolean | null
           max_age_days?: number
           min_age_days?: number
@@ -9129,11 +15014,23 @@ export type Database = {
           title_az?: string
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           video_url?: string | null
         }
         Relationships: []
@@ -9184,11 +15081,23 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -9201,11 +15110,23 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -9218,11 +15139,23 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -9266,8 +15199,20 @@ export type Database = {
           created_at: string | null
           description_az: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
+          description_vi: string | null
+          description_zh: string | null
           emoji: string | null
           hex_color: string | null
           id: string
@@ -9275,8 +15220,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number | null
           status: string | null
         }
@@ -9285,8 +15242,20 @@ export type Database = {
           created_at?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           hex_color?: string | null
           id?: string
@@ -9294,8 +15263,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
           status?: string | null
         }
@@ -9304,8 +15285,20 @@ export type Database = {
           created_at?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           hex_color?: string | null
           id?: string
@@ -9313,8 +15306,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
           status?: string | null
         }
@@ -9328,7 +15333,14 @@ export type Database = {
           image_url: string | null
           is_active: boolean | null
           is_anonymous: boolean
+          is_pinned: boolean | null
           likes_count: number | null
+          moderation_action_id: string | null
+          moderation_edited_at: string | null
+          moderation_edited_by: string | null
+          moderation_reason: string | null
+          moderation_removed_at: string | null
+          moderation_version: number | null
           parent_comment_id: string | null
           post_id: string
           updated_at: string
@@ -9341,7 +15353,14 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           is_anonymous?: boolean
+          is_pinned?: boolean | null
           likes_count?: number | null
+          moderation_action_id?: string | null
+          moderation_edited_at?: string | null
+          moderation_edited_by?: string | null
+          moderation_reason?: string | null
+          moderation_removed_at?: string | null
+          moderation_version?: number | null
           parent_comment_id?: string | null
           post_id: string
           updated_at?: string
@@ -9354,7 +15373,14 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean | null
           is_anonymous?: boolean
+          is_pinned?: boolean | null
           likes_count?: number | null
+          moderation_action_id?: string | null
+          moderation_edited_at?: string | null
+          moderation_edited_by?: string | null
+          moderation_reason?: string | null
+          moderation_removed_at?: string | null
+          moderation_version?: number | null
           parent_comment_id?: string | null
           post_id?: string
           updated_at?: string
@@ -9492,88 +15518,196 @@ export type Database = {
           baby_development_ar: string | null
           baby_development_de: string | null
           baby_development_en: string | null
+          baby_development_es: string | null
+          baby_development_fr: string | null
+          baby_development_hi: string | null
+          baby_development_id: string | null
+          baby_development_ja: string | null
           baby_development_ka: string | null
           baby_development_kk: string | null
+          baby_development_ko: string | null
+          baby_development_nl: string | null
+          baby_development_pl: string | null
+          baby_development_pt: string | null
           baby_development_ru: string | null
+          baby_development_sv: string | null
           baby_development_tr: string | null
           baby_development_uz: string | null
+          baby_development_vi: string | null
+          baby_development_zh: string | null
           baby_message: string | null
           baby_message_ar: string | null
           baby_message_de: string | null
           baby_message_en: string | null
+          baby_message_es: string | null
+          baby_message_fr: string | null
+          baby_message_hi: string | null
+          baby_message_id: string | null
+          baby_message_ja: string | null
           baby_message_ka: string | null
           baby_message_kk: string | null
+          baby_message_ko: string | null
+          baby_message_nl: string | null
+          baby_message_pl: string | null
+          baby_message_pt: string | null
           baby_message_ru: string | null
+          baby_message_sv: string | null
           baby_message_tr: string | null
           baby_message_uz: string | null
+          baby_message_vi: string | null
+          baby_message_zh: string | null
           baby_size_cm: number | null
           baby_size_fruit: string | null
           baby_size_fruit_ar: string | null
           baby_size_fruit_de: string | null
           baby_size_fruit_en: string | null
+          baby_size_fruit_es: string | null
+          baby_size_fruit_fr: string | null
+          baby_size_fruit_hi: string | null
+          baby_size_fruit_id: string | null
+          baby_size_fruit_ja: string | null
           baby_size_fruit_ka: string | null
           baby_size_fruit_kk: string | null
+          baby_size_fruit_ko: string | null
+          baby_size_fruit_nl: string | null
+          baby_size_fruit_pl: string | null
+          baby_size_fruit_pt: string | null
           baby_size_fruit_ru: string | null
+          baby_size_fruit_sv: string | null
           baby_size_fruit_tr: string | null
           baby_size_fruit_uz: string | null
+          baby_size_fruit_vi: string | null
+          baby_size_fruit_zh: string | null
           baby_weight_gram: number | null
           body_changes: string | null
           body_changes_ar: string | null
           body_changes_de: string | null
           body_changes_en: string | null
+          body_changes_es: string | null
+          body_changes_fr: string | null
+          body_changes_hi: string | null
+          body_changes_id: string | null
+          body_changes_ja: string | null
           body_changes_ka: string | null
           body_changes_kk: string | null
+          body_changes_ko: string | null
+          body_changes_nl: string | null
+          body_changes_pl: string | null
+          body_changes_pt: string | null
           body_changes_ru: string | null
+          body_changes_sv: string | null
           body_changes_tr: string | null
           body_changes_uz: string | null
+          body_changes_vi: string | null
+          body_changes_zh: string | null
           created_at: string
           daily_tip: string | null
           daily_tip_ar: string | null
           daily_tip_de: string | null
           daily_tip_en: string | null
+          daily_tip_es: string | null
+          daily_tip_fr: string | null
+          daily_tip_hi: string | null
+          daily_tip_id: string | null
+          daily_tip_ja: string | null
           daily_tip_ka: string | null
           daily_tip_kk: string | null
+          daily_tip_ko: string | null
+          daily_tip_nl: string | null
+          daily_tip_pl: string | null
+          daily_tip_pt: string | null
           daily_tip_ru: string | null
+          daily_tip_sv: string | null
           daily_tip_tr: string | null
           daily_tip_uz: string | null
+          daily_tip_vi: string | null
+          daily_tip_zh: string | null
           day_number: number | null
           days_until_birth: number | null
           doctor_visit_tip: string | null
           doctor_visit_tip_ar: string | null
           doctor_visit_tip_de: string | null
           doctor_visit_tip_en: string | null
+          doctor_visit_tip_es: string | null
+          doctor_visit_tip_fr: string | null
+          doctor_visit_tip_hi: string | null
+          doctor_visit_tip_id: string | null
+          doctor_visit_tip_ja: string | null
           doctor_visit_tip_ka: string | null
           doctor_visit_tip_kk: string | null
+          doctor_visit_tip_ko: string | null
+          doctor_visit_tip_nl: string | null
+          doctor_visit_tip_pl: string | null
+          doctor_visit_tip_pt: string | null
           doctor_visit_tip_ru: string | null
+          doctor_visit_tip_sv: string | null
           doctor_visit_tip_tr: string | null
           doctor_visit_tip_uz: string | null
+          doctor_visit_tip_vi: string | null
+          doctor_visit_tip_zh: string | null
           emotional_tip: string | null
           emotional_tip_ar: string | null
           emotional_tip_de: string | null
           emotional_tip_en: string | null
+          emotional_tip_es: string | null
+          emotional_tip_fr: string | null
+          emotional_tip_hi: string | null
+          emotional_tip_id: string | null
+          emotional_tip_ja: string | null
           emotional_tip_ka: string | null
           emotional_tip_kk: string | null
+          emotional_tip_ko: string | null
+          emotional_tip_nl: string | null
+          emotional_tip_pl: string | null
+          emotional_tip_pt: string | null
           emotional_tip_ru: string | null
+          emotional_tip_sv: string | null
           emotional_tip_tr: string | null
           emotional_tip_uz: string | null
+          emotional_tip_vi: string | null
+          emotional_tip_zh: string | null
           exercise_tip: string | null
           exercise_tip_ar: string | null
           exercise_tip_de: string | null
           exercise_tip_en: string | null
+          exercise_tip_es: string | null
+          exercise_tip_fr: string | null
+          exercise_tip_hi: string | null
+          exercise_tip_id: string | null
+          exercise_tip_ja: string | null
           exercise_tip_ka: string | null
           exercise_tip_kk: string | null
+          exercise_tip_ko: string | null
+          exercise_tip_nl: string | null
+          exercise_tip_pl: string | null
+          exercise_tip_pt: string | null
           exercise_tip_ru: string | null
+          exercise_tip_sv: string | null
           exercise_tip_tr: string | null
           exercise_tip_uz: string | null
+          exercise_tip_vi: string | null
+          exercise_tip_zh: string | null
           foods_to_avoid: string[] | null
           foods_to_avoid_ar: string[] | null
           foods_to_avoid_de: string[] | null
           foods_to_avoid_en: string[] | null
+          foods_to_avoid_es: string[] | null
+          foods_to_avoid_fr: string[] | null
+          foods_to_avoid_hi: string[] | null
+          foods_to_avoid_id: string[] | null
+          foods_to_avoid_ja: string[] | null
           foods_to_avoid_ka: string[] | null
           foods_to_avoid_kk: string[] | null
+          foods_to_avoid_ko: string[] | null
+          foods_to_avoid_nl: string[] | null
+          foods_to_avoid_pl: string[] | null
+          foods_to_avoid_pt: string[] | null
           foods_to_avoid_ru: string[] | null
+          foods_to_avoid_sv: string[] | null
           foods_to_avoid_tr: string[] | null
           foods_to_avoid_uz: string[] | null
+          foods_to_avoid_vi: string[] | null
+          foods_to_avoid_zh: string[] | null
           id: string
           image_url: string | null
           is_active: boolean | null
@@ -9581,76 +15715,184 @@ export type Database = {
           mother_symptoms_ar: string[] | null
           mother_symptoms_de: string[] | null
           mother_symptoms_en: string[] | null
+          mother_symptoms_es: string[] | null
+          mother_symptoms_fr: string[] | null
+          mother_symptoms_hi: string[] | null
+          mother_symptoms_id: string[] | null
+          mother_symptoms_ja: string[] | null
           mother_symptoms_ka: string[] | null
           mother_symptoms_kk: string[] | null
+          mother_symptoms_ko: string[] | null
+          mother_symptoms_nl: string[] | null
+          mother_symptoms_pl: string[] | null
+          mother_symptoms_pt: string[] | null
           mother_symptoms_ru: string[] | null
+          mother_symptoms_sv: string[] | null
           mother_symptoms_tr: string[] | null
           mother_symptoms_uz: string[] | null
+          mother_symptoms_vi: string[] | null
+          mother_symptoms_zh: string[] | null
           mother_tips: string | null
           mother_tips_ar: string | null
           mother_tips_de: string | null
           mother_tips_en: string | null
+          mother_tips_es: string | null
+          mother_tips_fr: string | null
+          mother_tips_hi: string | null
+          mother_tips_id: string | null
+          mother_tips_ja: string | null
           mother_tips_ka: string | null
           mother_tips_kk: string | null
+          mother_tips_ko: string | null
+          mother_tips_nl: string | null
+          mother_tips_pl: string | null
+          mother_tips_pt: string | null
           mother_tips_ru: string | null
+          mother_tips_sv: string | null
           mother_tips_tr: string | null
           mother_tips_uz: string | null
+          mother_tips_vi: string | null
+          mother_tips_zh: string | null
           mother_warnings: string | null
           mother_warnings_ar: string | null
           mother_warnings_de: string | null
           mother_warnings_en: string | null
+          mother_warnings_es: string | null
+          mother_warnings_fr: string | null
+          mother_warnings_hi: string | null
+          mother_warnings_id: string | null
+          mother_warnings_ja: string | null
           mother_warnings_ka: string | null
           mother_warnings_kk: string | null
+          mother_warnings_ko: string | null
+          mother_warnings_nl: string | null
+          mother_warnings_pl: string | null
+          mother_warnings_pt: string | null
           mother_warnings_ru: string | null
+          mother_warnings_sv: string | null
           mother_warnings_tr: string | null
           mother_warnings_uz: string | null
+          mother_warnings_vi: string | null
+          mother_warnings_zh: string | null
           multiples_tip_az: string | null
+          multiples_tip_es: string | null
+          multiples_tip_fr: string | null
+          multiples_tip_hi: string | null
+          multiples_tip_id: string | null
+          multiples_tip_ja: string | null
+          multiples_tip_ko: string | null
+          multiples_tip_nl: string | null
+          multiples_tip_pl: string | null
+          multiples_tip_pt: string | null
+          multiples_tip_sv: string | null
+          multiples_tip_vi: string | null
+          multiples_tip_zh: string | null
           nutrition_tip: string | null
           nutrition_tip_ar: string | null
           nutrition_tip_de: string | null
           nutrition_tip_en: string | null
+          nutrition_tip_es: string | null
+          nutrition_tip_fr: string | null
+          nutrition_tip_hi: string | null
+          nutrition_tip_id: string | null
+          nutrition_tip_ja: string | null
           nutrition_tip_ka: string | null
           nutrition_tip_kk: string | null
+          nutrition_tip_ko: string | null
+          nutrition_tip_nl: string | null
+          nutrition_tip_pl: string | null
+          nutrition_tip_pt: string | null
           nutrition_tip_ru: string | null
+          nutrition_tip_sv: string | null
           nutrition_tip_tr: string | null
           nutrition_tip_uz: string | null
+          nutrition_tip_vi: string | null
+          nutrition_tip_zh: string | null
           partner_tip: string | null
           partner_tip_ar: string | null
           partner_tip_de: string | null
           partner_tip_en: string | null
+          partner_tip_es: string | null
+          partner_tip_fr: string | null
+          partner_tip_hi: string | null
+          partner_tip_id: string | null
+          partner_tip_ja: string | null
           partner_tip_ka: string | null
           partner_tip_kk: string | null
+          partner_tip_ko: string | null
+          partner_tip_nl: string | null
+          partner_tip_pl: string | null
+          partner_tip_pt: string | null
           partner_tip_ru: string | null
+          partner_tip_sv: string | null
           partner_tip_tr: string | null
           partner_tip_uz: string | null
+          partner_tip_vi: string | null
+          partner_tip_zh: string | null
           pregnancy_day: number | null
           recommended_exercises: string[] | null
           recommended_exercises_ar: string[] | null
           recommended_exercises_de: string[] | null
           recommended_exercises_en: string[] | null
+          recommended_exercises_es: string[] | null
+          recommended_exercises_fr: string[] | null
+          recommended_exercises_hi: string[] | null
+          recommended_exercises_id: string[] | null
+          recommended_exercises_ja: string[] | null
           recommended_exercises_ka: string[] | null
           recommended_exercises_kk: string[] | null
+          recommended_exercises_ko: string[] | null
+          recommended_exercises_nl: string[] | null
+          recommended_exercises_pl: string[] | null
+          recommended_exercises_pt: string[] | null
           recommended_exercises_ru: string[] | null
+          recommended_exercises_sv: string[] | null
           recommended_exercises_tr: string[] | null
           recommended_exercises_uz: string[] | null
+          recommended_exercises_vi: string[] | null
+          recommended_exercises_zh: string[] | null
           recommended_foods: string[] | null
           recommended_foods_ar: string[] | null
           recommended_foods_de: string[] | null
           recommended_foods_en: string[] | null
+          recommended_foods_es: string[] | null
+          recommended_foods_fr: string[] | null
+          recommended_foods_hi: string[] | null
+          recommended_foods_id: string[] | null
+          recommended_foods_ja: string[] | null
           recommended_foods_ka: string[] | null
           recommended_foods_kk: string[] | null
+          recommended_foods_ko: string[] | null
+          recommended_foods_nl: string[] | null
+          recommended_foods_pl: string[] | null
+          recommended_foods_pt: string[] | null
           recommended_foods_ru: string[] | null
+          recommended_foods_sv: string[] | null
           recommended_foods_tr: string[] | null
           recommended_foods_uz: string[] | null
+          recommended_foods_vi: string[] | null
+          recommended_foods_zh: string[] | null
           tests_to_do: string[] | null
           tests_to_do_ar: string[] | null
           tests_to_do_de: string[] | null
           tests_to_do_en: string[] | null
+          tests_to_do_es: string[] | null
+          tests_to_do_fr: string[] | null
+          tests_to_do_hi: string[] | null
+          tests_to_do_id: string[] | null
+          tests_to_do_ja: string[] | null
           tests_to_do_ka: string[] | null
           tests_to_do_kk: string[] | null
+          tests_to_do_ko: string[] | null
+          tests_to_do_nl: string[] | null
+          tests_to_do_pl: string[] | null
+          tests_to_do_pt: string[] | null
           tests_to_do_ru: string[] | null
+          tests_to_do_sv: string[] | null
           tests_to_do_tr: string[] | null
           tests_to_do_uz: string[] | null
+          tests_to_do_vi: string[] | null
+          tests_to_do_zh: string[] | null
           updated_at: string
           video_url: string | null
           week_number: number
@@ -9660,88 +15902,196 @@ export type Database = {
           baby_development_ar?: string | null
           baby_development_de?: string | null
           baby_development_en?: string | null
+          baby_development_es?: string | null
+          baby_development_fr?: string | null
+          baby_development_hi?: string | null
+          baby_development_id?: string | null
+          baby_development_ja?: string | null
           baby_development_ka?: string | null
           baby_development_kk?: string | null
+          baby_development_ko?: string | null
+          baby_development_nl?: string | null
+          baby_development_pl?: string | null
+          baby_development_pt?: string | null
           baby_development_ru?: string | null
+          baby_development_sv?: string | null
           baby_development_tr?: string | null
           baby_development_uz?: string | null
+          baby_development_vi?: string | null
+          baby_development_zh?: string | null
           baby_message?: string | null
           baby_message_ar?: string | null
           baby_message_de?: string | null
           baby_message_en?: string | null
+          baby_message_es?: string | null
+          baby_message_fr?: string | null
+          baby_message_hi?: string | null
+          baby_message_id?: string | null
+          baby_message_ja?: string | null
           baby_message_ka?: string | null
           baby_message_kk?: string | null
+          baby_message_ko?: string | null
+          baby_message_nl?: string | null
+          baby_message_pl?: string | null
+          baby_message_pt?: string | null
           baby_message_ru?: string | null
+          baby_message_sv?: string | null
           baby_message_tr?: string | null
           baby_message_uz?: string | null
+          baby_message_vi?: string | null
+          baby_message_zh?: string | null
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
           baby_size_fruit_ar?: string | null
           baby_size_fruit_de?: string | null
           baby_size_fruit_en?: string | null
+          baby_size_fruit_es?: string | null
+          baby_size_fruit_fr?: string | null
+          baby_size_fruit_hi?: string | null
+          baby_size_fruit_id?: string | null
+          baby_size_fruit_ja?: string | null
           baby_size_fruit_ka?: string | null
           baby_size_fruit_kk?: string | null
+          baby_size_fruit_ko?: string | null
+          baby_size_fruit_nl?: string | null
+          baby_size_fruit_pl?: string | null
+          baby_size_fruit_pt?: string | null
           baby_size_fruit_ru?: string | null
+          baby_size_fruit_sv?: string | null
           baby_size_fruit_tr?: string | null
           baby_size_fruit_uz?: string | null
+          baby_size_fruit_vi?: string | null
+          baby_size_fruit_zh?: string | null
           baby_weight_gram?: number | null
           body_changes?: string | null
           body_changes_ar?: string | null
           body_changes_de?: string | null
           body_changes_en?: string | null
+          body_changes_es?: string | null
+          body_changes_fr?: string | null
+          body_changes_hi?: string | null
+          body_changes_id?: string | null
+          body_changes_ja?: string | null
           body_changes_ka?: string | null
           body_changes_kk?: string | null
+          body_changes_ko?: string | null
+          body_changes_nl?: string | null
+          body_changes_pl?: string | null
+          body_changes_pt?: string | null
           body_changes_ru?: string | null
+          body_changes_sv?: string | null
           body_changes_tr?: string | null
           body_changes_uz?: string | null
+          body_changes_vi?: string | null
+          body_changes_zh?: string | null
           created_at?: string
           daily_tip?: string | null
           daily_tip_ar?: string | null
           daily_tip_de?: string | null
           daily_tip_en?: string | null
+          daily_tip_es?: string | null
+          daily_tip_fr?: string | null
+          daily_tip_hi?: string | null
+          daily_tip_id?: string | null
+          daily_tip_ja?: string | null
           daily_tip_ka?: string | null
           daily_tip_kk?: string | null
+          daily_tip_ko?: string | null
+          daily_tip_nl?: string | null
+          daily_tip_pl?: string | null
+          daily_tip_pt?: string | null
           daily_tip_ru?: string | null
+          daily_tip_sv?: string | null
           daily_tip_tr?: string | null
           daily_tip_uz?: string | null
+          daily_tip_vi?: string | null
+          daily_tip_zh?: string | null
           day_number?: number | null
           days_until_birth?: number | null
           doctor_visit_tip?: string | null
           doctor_visit_tip_ar?: string | null
           doctor_visit_tip_de?: string | null
           doctor_visit_tip_en?: string | null
+          doctor_visit_tip_es?: string | null
+          doctor_visit_tip_fr?: string | null
+          doctor_visit_tip_hi?: string | null
+          doctor_visit_tip_id?: string | null
+          doctor_visit_tip_ja?: string | null
           doctor_visit_tip_ka?: string | null
           doctor_visit_tip_kk?: string | null
+          doctor_visit_tip_ko?: string | null
+          doctor_visit_tip_nl?: string | null
+          doctor_visit_tip_pl?: string | null
+          doctor_visit_tip_pt?: string | null
           doctor_visit_tip_ru?: string | null
+          doctor_visit_tip_sv?: string | null
           doctor_visit_tip_tr?: string | null
           doctor_visit_tip_uz?: string | null
+          doctor_visit_tip_vi?: string | null
+          doctor_visit_tip_zh?: string | null
           emotional_tip?: string | null
           emotional_tip_ar?: string | null
           emotional_tip_de?: string | null
           emotional_tip_en?: string | null
+          emotional_tip_es?: string | null
+          emotional_tip_fr?: string | null
+          emotional_tip_hi?: string | null
+          emotional_tip_id?: string | null
+          emotional_tip_ja?: string | null
           emotional_tip_ka?: string | null
           emotional_tip_kk?: string | null
+          emotional_tip_ko?: string | null
+          emotional_tip_nl?: string | null
+          emotional_tip_pl?: string | null
+          emotional_tip_pt?: string | null
           emotional_tip_ru?: string | null
+          emotional_tip_sv?: string | null
           emotional_tip_tr?: string | null
           emotional_tip_uz?: string | null
+          emotional_tip_vi?: string | null
+          emotional_tip_zh?: string | null
           exercise_tip?: string | null
           exercise_tip_ar?: string | null
           exercise_tip_de?: string | null
           exercise_tip_en?: string | null
+          exercise_tip_es?: string | null
+          exercise_tip_fr?: string | null
+          exercise_tip_hi?: string | null
+          exercise_tip_id?: string | null
+          exercise_tip_ja?: string | null
           exercise_tip_ka?: string | null
           exercise_tip_kk?: string | null
+          exercise_tip_ko?: string | null
+          exercise_tip_nl?: string | null
+          exercise_tip_pl?: string | null
+          exercise_tip_pt?: string | null
           exercise_tip_ru?: string | null
+          exercise_tip_sv?: string | null
           exercise_tip_tr?: string | null
           exercise_tip_uz?: string | null
+          exercise_tip_vi?: string | null
+          exercise_tip_zh?: string | null
           foods_to_avoid?: string[] | null
           foods_to_avoid_ar?: string[] | null
           foods_to_avoid_de?: string[] | null
           foods_to_avoid_en?: string[] | null
+          foods_to_avoid_es?: string[] | null
+          foods_to_avoid_fr?: string[] | null
+          foods_to_avoid_hi?: string[] | null
+          foods_to_avoid_id?: string[] | null
+          foods_to_avoid_ja?: string[] | null
           foods_to_avoid_ka?: string[] | null
           foods_to_avoid_kk?: string[] | null
+          foods_to_avoid_ko?: string[] | null
+          foods_to_avoid_nl?: string[] | null
+          foods_to_avoid_pl?: string[] | null
+          foods_to_avoid_pt?: string[] | null
           foods_to_avoid_ru?: string[] | null
+          foods_to_avoid_sv?: string[] | null
           foods_to_avoid_tr?: string[] | null
           foods_to_avoid_uz?: string[] | null
+          foods_to_avoid_vi?: string[] | null
+          foods_to_avoid_zh?: string[] | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
@@ -9749,76 +16099,184 @@ export type Database = {
           mother_symptoms_ar?: string[] | null
           mother_symptoms_de?: string[] | null
           mother_symptoms_en?: string[] | null
+          mother_symptoms_es?: string[] | null
+          mother_symptoms_fr?: string[] | null
+          mother_symptoms_hi?: string[] | null
+          mother_symptoms_id?: string[] | null
+          mother_symptoms_ja?: string[] | null
           mother_symptoms_ka?: string[] | null
           mother_symptoms_kk?: string[] | null
+          mother_symptoms_ko?: string[] | null
+          mother_symptoms_nl?: string[] | null
+          mother_symptoms_pl?: string[] | null
+          mother_symptoms_pt?: string[] | null
           mother_symptoms_ru?: string[] | null
+          mother_symptoms_sv?: string[] | null
           mother_symptoms_tr?: string[] | null
           mother_symptoms_uz?: string[] | null
+          mother_symptoms_vi?: string[] | null
+          mother_symptoms_zh?: string[] | null
           mother_tips?: string | null
           mother_tips_ar?: string | null
           mother_tips_de?: string | null
           mother_tips_en?: string | null
+          mother_tips_es?: string | null
+          mother_tips_fr?: string | null
+          mother_tips_hi?: string | null
+          mother_tips_id?: string | null
+          mother_tips_ja?: string | null
           mother_tips_ka?: string | null
           mother_tips_kk?: string | null
+          mother_tips_ko?: string | null
+          mother_tips_nl?: string | null
+          mother_tips_pl?: string | null
+          mother_tips_pt?: string | null
           mother_tips_ru?: string | null
+          mother_tips_sv?: string | null
           mother_tips_tr?: string | null
           mother_tips_uz?: string | null
+          mother_tips_vi?: string | null
+          mother_tips_zh?: string | null
           mother_warnings?: string | null
           mother_warnings_ar?: string | null
           mother_warnings_de?: string | null
           mother_warnings_en?: string | null
+          mother_warnings_es?: string | null
+          mother_warnings_fr?: string | null
+          mother_warnings_hi?: string | null
+          mother_warnings_id?: string | null
+          mother_warnings_ja?: string | null
           mother_warnings_ka?: string | null
           mother_warnings_kk?: string | null
+          mother_warnings_ko?: string | null
+          mother_warnings_nl?: string | null
+          mother_warnings_pl?: string | null
+          mother_warnings_pt?: string | null
           mother_warnings_ru?: string | null
+          mother_warnings_sv?: string | null
           mother_warnings_tr?: string | null
           mother_warnings_uz?: string | null
+          mother_warnings_vi?: string | null
+          mother_warnings_zh?: string | null
           multiples_tip_az?: string | null
+          multiples_tip_es?: string | null
+          multiples_tip_fr?: string | null
+          multiples_tip_hi?: string | null
+          multiples_tip_id?: string | null
+          multiples_tip_ja?: string | null
+          multiples_tip_ko?: string | null
+          multiples_tip_nl?: string | null
+          multiples_tip_pl?: string | null
+          multiples_tip_pt?: string | null
+          multiples_tip_sv?: string | null
+          multiples_tip_vi?: string | null
+          multiples_tip_zh?: string | null
           nutrition_tip?: string | null
           nutrition_tip_ar?: string | null
           nutrition_tip_de?: string | null
           nutrition_tip_en?: string | null
+          nutrition_tip_es?: string | null
+          nutrition_tip_fr?: string | null
+          nutrition_tip_hi?: string | null
+          nutrition_tip_id?: string | null
+          nutrition_tip_ja?: string | null
           nutrition_tip_ka?: string | null
           nutrition_tip_kk?: string | null
+          nutrition_tip_ko?: string | null
+          nutrition_tip_nl?: string | null
+          nutrition_tip_pl?: string | null
+          nutrition_tip_pt?: string | null
           nutrition_tip_ru?: string | null
+          nutrition_tip_sv?: string | null
           nutrition_tip_tr?: string | null
           nutrition_tip_uz?: string | null
+          nutrition_tip_vi?: string | null
+          nutrition_tip_zh?: string | null
           partner_tip?: string | null
           partner_tip_ar?: string | null
           partner_tip_de?: string | null
           partner_tip_en?: string | null
+          partner_tip_es?: string | null
+          partner_tip_fr?: string | null
+          partner_tip_hi?: string | null
+          partner_tip_id?: string | null
+          partner_tip_ja?: string | null
           partner_tip_ka?: string | null
           partner_tip_kk?: string | null
+          partner_tip_ko?: string | null
+          partner_tip_nl?: string | null
+          partner_tip_pl?: string | null
+          partner_tip_pt?: string | null
           partner_tip_ru?: string | null
+          partner_tip_sv?: string | null
           partner_tip_tr?: string | null
           partner_tip_uz?: string | null
+          partner_tip_vi?: string | null
+          partner_tip_zh?: string | null
           pregnancy_day?: number | null
           recommended_exercises?: string[] | null
           recommended_exercises_ar?: string[] | null
           recommended_exercises_de?: string[] | null
           recommended_exercises_en?: string[] | null
+          recommended_exercises_es?: string[] | null
+          recommended_exercises_fr?: string[] | null
+          recommended_exercises_hi?: string[] | null
+          recommended_exercises_id?: string[] | null
+          recommended_exercises_ja?: string[] | null
           recommended_exercises_ka?: string[] | null
           recommended_exercises_kk?: string[] | null
+          recommended_exercises_ko?: string[] | null
+          recommended_exercises_nl?: string[] | null
+          recommended_exercises_pl?: string[] | null
+          recommended_exercises_pt?: string[] | null
           recommended_exercises_ru?: string[] | null
+          recommended_exercises_sv?: string[] | null
           recommended_exercises_tr?: string[] | null
           recommended_exercises_uz?: string[] | null
+          recommended_exercises_vi?: string[] | null
+          recommended_exercises_zh?: string[] | null
           recommended_foods?: string[] | null
           recommended_foods_ar?: string[] | null
           recommended_foods_de?: string[] | null
           recommended_foods_en?: string[] | null
+          recommended_foods_es?: string[] | null
+          recommended_foods_fr?: string[] | null
+          recommended_foods_hi?: string[] | null
+          recommended_foods_id?: string[] | null
+          recommended_foods_ja?: string[] | null
           recommended_foods_ka?: string[] | null
           recommended_foods_kk?: string[] | null
+          recommended_foods_ko?: string[] | null
+          recommended_foods_nl?: string[] | null
+          recommended_foods_pl?: string[] | null
+          recommended_foods_pt?: string[] | null
           recommended_foods_ru?: string[] | null
+          recommended_foods_sv?: string[] | null
           recommended_foods_tr?: string[] | null
           recommended_foods_uz?: string[] | null
+          recommended_foods_vi?: string[] | null
+          recommended_foods_zh?: string[] | null
           tests_to_do?: string[] | null
           tests_to_do_ar?: string[] | null
           tests_to_do_de?: string[] | null
           tests_to_do_en?: string[] | null
+          tests_to_do_es?: string[] | null
+          tests_to_do_fr?: string[] | null
+          tests_to_do_hi?: string[] | null
+          tests_to_do_id?: string[] | null
+          tests_to_do_ja?: string[] | null
           tests_to_do_ka?: string[] | null
           tests_to_do_kk?: string[] | null
+          tests_to_do_ko?: string[] | null
+          tests_to_do_nl?: string[] | null
+          tests_to_do_pl?: string[] | null
+          tests_to_do_pt?: string[] | null
           tests_to_do_ru?: string[] | null
+          tests_to_do_sv?: string[] | null
           tests_to_do_tr?: string[] | null
           tests_to_do_uz?: string[] | null
+          tests_to_do_vi?: string[] | null
+          tests_to_do_zh?: string[] | null
           updated_at?: string
           video_url?: string | null
           week_number: number
@@ -9828,88 +16286,196 @@ export type Database = {
           baby_development_ar?: string | null
           baby_development_de?: string | null
           baby_development_en?: string | null
+          baby_development_es?: string | null
+          baby_development_fr?: string | null
+          baby_development_hi?: string | null
+          baby_development_id?: string | null
+          baby_development_ja?: string | null
           baby_development_ka?: string | null
           baby_development_kk?: string | null
+          baby_development_ko?: string | null
+          baby_development_nl?: string | null
+          baby_development_pl?: string | null
+          baby_development_pt?: string | null
           baby_development_ru?: string | null
+          baby_development_sv?: string | null
           baby_development_tr?: string | null
           baby_development_uz?: string | null
+          baby_development_vi?: string | null
+          baby_development_zh?: string | null
           baby_message?: string | null
           baby_message_ar?: string | null
           baby_message_de?: string | null
           baby_message_en?: string | null
+          baby_message_es?: string | null
+          baby_message_fr?: string | null
+          baby_message_hi?: string | null
+          baby_message_id?: string | null
+          baby_message_ja?: string | null
           baby_message_ka?: string | null
           baby_message_kk?: string | null
+          baby_message_ko?: string | null
+          baby_message_nl?: string | null
+          baby_message_pl?: string | null
+          baby_message_pt?: string | null
           baby_message_ru?: string | null
+          baby_message_sv?: string | null
           baby_message_tr?: string | null
           baby_message_uz?: string | null
+          baby_message_vi?: string | null
+          baby_message_zh?: string | null
           baby_size_cm?: number | null
           baby_size_fruit?: string | null
           baby_size_fruit_ar?: string | null
           baby_size_fruit_de?: string | null
           baby_size_fruit_en?: string | null
+          baby_size_fruit_es?: string | null
+          baby_size_fruit_fr?: string | null
+          baby_size_fruit_hi?: string | null
+          baby_size_fruit_id?: string | null
+          baby_size_fruit_ja?: string | null
           baby_size_fruit_ka?: string | null
           baby_size_fruit_kk?: string | null
+          baby_size_fruit_ko?: string | null
+          baby_size_fruit_nl?: string | null
+          baby_size_fruit_pl?: string | null
+          baby_size_fruit_pt?: string | null
           baby_size_fruit_ru?: string | null
+          baby_size_fruit_sv?: string | null
           baby_size_fruit_tr?: string | null
           baby_size_fruit_uz?: string | null
+          baby_size_fruit_vi?: string | null
+          baby_size_fruit_zh?: string | null
           baby_weight_gram?: number | null
           body_changes?: string | null
           body_changes_ar?: string | null
           body_changes_de?: string | null
           body_changes_en?: string | null
+          body_changes_es?: string | null
+          body_changes_fr?: string | null
+          body_changes_hi?: string | null
+          body_changes_id?: string | null
+          body_changes_ja?: string | null
           body_changes_ka?: string | null
           body_changes_kk?: string | null
+          body_changes_ko?: string | null
+          body_changes_nl?: string | null
+          body_changes_pl?: string | null
+          body_changes_pt?: string | null
           body_changes_ru?: string | null
+          body_changes_sv?: string | null
           body_changes_tr?: string | null
           body_changes_uz?: string | null
+          body_changes_vi?: string | null
+          body_changes_zh?: string | null
           created_at?: string
           daily_tip?: string | null
           daily_tip_ar?: string | null
           daily_tip_de?: string | null
           daily_tip_en?: string | null
+          daily_tip_es?: string | null
+          daily_tip_fr?: string | null
+          daily_tip_hi?: string | null
+          daily_tip_id?: string | null
+          daily_tip_ja?: string | null
           daily_tip_ka?: string | null
           daily_tip_kk?: string | null
+          daily_tip_ko?: string | null
+          daily_tip_nl?: string | null
+          daily_tip_pl?: string | null
+          daily_tip_pt?: string | null
           daily_tip_ru?: string | null
+          daily_tip_sv?: string | null
           daily_tip_tr?: string | null
           daily_tip_uz?: string | null
+          daily_tip_vi?: string | null
+          daily_tip_zh?: string | null
           day_number?: number | null
           days_until_birth?: number | null
           doctor_visit_tip?: string | null
           doctor_visit_tip_ar?: string | null
           doctor_visit_tip_de?: string | null
           doctor_visit_tip_en?: string | null
+          doctor_visit_tip_es?: string | null
+          doctor_visit_tip_fr?: string | null
+          doctor_visit_tip_hi?: string | null
+          doctor_visit_tip_id?: string | null
+          doctor_visit_tip_ja?: string | null
           doctor_visit_tip_ka?: string | null
           doctor_visit_tip_kk?: string | null
+          doctor_visit_tip_ko?: string | null
+          doctor_visit_tip_nl?: string | null
+          doctor_visit_tip_pl?: string | null
+          doctor_visit_tip_pt?: string | null
           doctor_visit_tip_ru?: string | null
+          doctor_visit_tip_sv?: string | null
           doctor_visit_tip_tr?: string | null
           doctor_visit_tip_uz?: string | null
+          doctor_visit_tip_vi?: string | null
+          doctor_visit_tip_zh?: string | null
           emotional_tip?: string | null
           emotional_tip_ar?: string | null
           emotional_tip_de?: string | null
           emotional_tip_en?: string | null
+          emotional_tip_es?: string | null
+          emotional_tip_fr?: string | null
+          emotional_tip_hi?: string | null
+          emotional_tip_id?: string | null
+          emotional_tip_ja?: string | null
           emotional_tip_ka?: string | null
           emotional_tip_kk?: string | null
+          emotional_tip_ko?: string | null
+          emotional_tip_nl?: string | null
+          emotional_tip_pl?: string | null
+          emotional_tip_pt?: string | null
           emotional_tip_ru?: string | null
+          emotional_tip_sv?: string | null
           emotional_tip_tr?: string | null
           emotional_tip_uz?: string | null
+          emotional_tip_vi?: string | null
+          emotional_tip_zh?: string | null
           exercise_tip?: string | null
           exercise_tip_ar?: string | null
           exercise_tip_de?: string | null
           exercise_tip_en?: string | null
+          exercise_tip_es?: string | null
+          exercise_tip_fr?: string | null
+          exercise_tip_hi?: string | null
+          exercise_tip_id?: string | null
+          exercise_tip_ja?: string | null
           exercise_tip_ka?: string | null
           exercise_tip_kk?: string | null
+          exercise_tip_ko?: string | null
+          exercise_tip_nl?: string | null
+          exercise_tip_pl?: string | null
+          exercise_tip_pt?: string | null
           exercise_tip_ru?: string | null
+          exercise_tip_sv?: string | null
           exercise_tip_tr?: string | null
           exercise_tip_uz?: string | null
+          exercise_tip_vi?: string | null
+          exercise_tip_zh?: string | null
           foods_to_avoid?: string[] | null
           foods_to_avoid_ar?: string[] | null
           foods_to_avoid_de?: string[] | null
           foods_to_avoid_en?: string[] | null
+          foods_to_avoid_es?: string[] | null
+          foods_to_avoid_fr?: string[] | null
+          foods_to_avoid_hi?: string[] | null
+          foods_to_avoid_id?: string[] | null
+          foods_to_avoid_ja?: string[] | null
           foods_to_avoid_ka?: string[] | null
           foods_to_avoid_kk?: string[] | null
+          foods_to_avoid_ko?: string[] | null
+          foods_to_avoid_nl?: string[] | null
+          foods_to_avoid_pl?: string[] | null
+          foods_to_avoid_pt?: string[] | null
           foods_to_avoid_ru?: string[] | null
+          foods_to_avoid_sv?: string[] | null
           foods_to_avoid_tr?: string[] | null
           foods_to_avoid_uz?: string[] | null
+          foods_to_avoid_vi?: string[] | null
+          foods_to_avoid_zh?: string[] | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
@@ -9917,76 +16483,184 @@ export type Database = {
           mother_symptoms_ar?: string[] | null
           mother_symptoms_de?: string[] | null
           mother_symptoms_en?: string[] | null
+          mother_symptoms_es?: string[] | null
+          mother_symptoms_fr?: string[] | null
+          mother_symptoms_hi?: string[] | null
+          mother_symptoms_id?: string[] | null
+          mother_symptoms_ja?: string[] | null
           mother_symptoms_ka?: string[] | null
           mother_symptoms_kk?: string[] | null
+          mother_symptoms_ko?: string[] | null
+          mother_symptoms_nl?: string[] | null
+          mother_symptoms_pl?: string[] | null
+          mother_symptoms_pt?: string[] | null
           mother_symptoms_ru?: string[] | null
+          mother_symptoms_sv?: string[] | null
           mother_symptoms_tr?: string[] | null
           mother_symptoms_uz?: string[] | null
+          mother_symptoms_vi?: string[] | null
+          mother_symptoms_zh?: string[] | null
           mother_tips?: string | null
           mother_tips_ar?: string | null
           mother_tips_de?: string | null
           mother_tips_en?: string | null
+          mother_tips_es?: string | null
+          mother_tips_fr?: string | null
+          mother_tips_hi?: string | null
+          mother_tips_id?: string | null
+          mother_tips_ja?: string | null
           mother_tips_ka?: string | null
           mother_tips_kk?: string | null
+          mother_tips_ko?: string | null
+          mother_tips_nl?: string | null
+          mother_tips_pl?: string | null
+          mother_tips_pt?: string | null
           mother_tips_ru?: string | null
+          mother_tips_sv?: string | null
           mother_tips_tr?: string | null
           mother_tips_uz?: string | null
+          mother_tips_vi?: string | null
+          mother_tips_zh?: string | null
           mother_warnings?: string | null
           mother_warnings_ar?: string | null
           mother_warnings_de?: string | null
           mother_warnings_en?: string | null
+          mother_warnings_es?: string | null
+          mother_warnings_fr?: string | null
+          mother_warnings_hi?: string | null
+          mother_warnings_id?: string | null
+          mother_warnings_ja?: string | null
           mother_warnings_ka?: string | null
           mother_warnings_kk?: string | null
+          mother_warnings_ko?: string | null
+          mother_warnings_nl?: string | null
+          mother_warnings_pl?: string | null
+          mother_warnings_pt?: string | null
           mother_warnings_ru?: string | null
+          mother_warnings_sv?: string | null
           mother_warnings_tr?: string | null
           mother_warnings_uz?: string | null
+          mother_warnings_vi?: string | null
+          mother_warnings_zh?: string | null
           multiples_tip_az?: string | null
+          multiples_tip_es?: string | null
+          multiples_tip_fr?: string | null
+          multiples_tip_hi?: string | null
+          multiples_tip_id?: string | null
+          multiples_tip_ja?: string | null
+          multiples_tip_ko?: string | null
+          multiples_tip_nl?: string | null
+          multiples_tip_pl?: string | null
+          multiples_tip_pt?: string | null
+          multiples_tip_sv?: string | null
+          multiples_tip_vi?: string | null
+          multiples_tip_zh?: string | null
           nutrition_tip?: string | null
           nutrition_tip_ar?: string | null
           nutrition_tip_de?: string | null
           nutrition_tip_en?: string | null
+          nutrition_tip_es?: string | null
+          nutrition_tip_fr?: string | null
+          nutrition_tip_hi?: string | null
+          nutrition_tip_id?: string | null
+          nutrition_tip_ja?: string | null
           nutrition_tip_ka?: string | null
           nutrition_tip_kk?: string | null
+          nutrition_tip_ko?: string | null
+          nutrition_tip_nl?: string | null
+          nutrition_tip_pl?: string | null
+          nutrition_tip_pt?: string | null
           nutrition_tip_ru?: string | null
+          nutrition_tip_sv?: string | null
           nutrition_tip_tr?: string | null
           nutrition_tip_uz?: string | null
+          nutrition_tip_vi?: string | null
+          nutrition_tip_zh?: string | null
           partner_tip?: string | null
           partner_tip_ar?: string | null
           partner_tip_de?: string | null
           partner_tip_en?: string | null
+          partner_tip_es?: string | null
+          partner_tip_fr?: string | null
+          partner_tip_hi?: string | null
+          partner_tip_id?: string | null
+          partner_tip_ja?: string | null
           partner_tip_ka?: string | null
           partner_tip_kk?: string | null
+          partner_tip_ko?: string | null
+          partner_tip_nl?: string | null
+          partner_tip_pl?: string | null
+          partner_tip_pt?: string | null
           partner_tip_ru?: string | null
+          partner_tip_sv?: string | null
           partner_tip_tr?: string | null
           partner_tip_uz?: string | null
+          partner_tip_vi?: string | null
+          partner_tip_zh?: string | null
           pregnancy_day?: number | null
           recommended_exercises?: string[] | null
           recommended_exercises_ar?: string[] | null
           recommended_exercises_de?: string[] | null
           recommended_exercises_en?: string[] | null
+          recommended_exercises_es?: string[] | null
+          recommended_exercises_fr?: string[] | null
+          recommended_exercises_hi?: string[] | null
+          recommended_exercises_id?: string[] | null
+          recommended_exercises_ja?: string[] | null
           recommended_exercises_ka?: string[] | null
           recommended_exercises_kk?: string[] | null
+          recommended_exercises_ko?: string[] | null
+          recommended_exercises_nl?: string[] | null
+          recommended_exercises_pl?: string[] | null
+          recommended_exercises_pt?: string[] | null
           recommended_exercises_ru?: string[] | null
+          recommended_exercises_sv?: string[] | null
           recommended_exercises_tr?: string[] | null
           recommended_exercises_uz?: string[] | null
+          recommended_exercises_vi?: string[] | null
+          recommended_exercises_zh?: string[] | null
           recommended_foods?: string[] | null
           recommended_foods_ar?: string[] | null
           recommended_foods_de?: string[] | null
           recommended_foods_en?: string[] | null
+          recommended_foods_es?: string[] | null
+          recommended_foods_fr?: string[] | null
+          recommended_foods_hi?: string[] | null
+          recommended_foods_id?: string[] | null
+          recommended_foods_ja?: string[] | null
           recommended_foods_ka?: string[] | null
           recommended_foods_kk?: string[] | null
+          recommended_foods_ko?: string[] | null
+          recommended_foods_nl?: string[] | null
+          recommended_foods_pl?: string[] | null
+          recommended_foods_pt?: string[] | null
           recommended_foods_ru?: string[] | null
+          recommended_foods_sv?: string[] | null
           recommended_foods_tr?: string[] | null
           recommended_foods_uz?: string[] | null
+          recommended_foods_vi?: string[] | null
+          recommended_foods_zh?: string[] | null
           tests_to_do?: string[] | null
           tests_to_do_ar?: string[] | null
           tests_to_do_de?: string[] | null
           tests_to_do_en?: string[] | null
+          tests_to_do_es?: string[] | null
+          tests_to_do_fr?: string[] | null
+          tests_to_do_hi?: string[] | null
+          tests_to_do_id?: string[] | null
+          tests_to_do_ja?: string[] | null
           tests_to_do_ka?: string[] | null
           tests_to_do_kk?: string[] | null
+          tests_to_do_ko?: string[] | null
+          tests_to_do_nl?: string[] | null
+          tests_to_do_pl?: string[] | null
+          tests_to_do_pt?: string[] | null
           tests_to_do_ru?: string[] | null
+          tests_to_do_sv?: string[] | null
           tests_to_do_tr?: string[] | null
           tests_to_do_uz?: string[] | null
+          tests_to_do_vi?: string[] | null
+          tests_to_do_zh?: string[] | null
           updated_at?: string
           video_url?: string | null
           week_number?: number
@@ -9999,11 +16673,23 @@ export type Database = {
           body_ar: string | null
           body_de: string | null
           body_en: string | null
+          body_es: string | null
+          body_fr: string | null
+          body_hi: string | null
+          body_id: string | null
+          body_ja: string | null
           body_ka: string | null
           body_kk: string | null
+          body_ko: string | null
+          body_nl: string | null
+          body_pl: string | null
+          body_pt: string | null
           body_ru: string | null
+          body_sv: string | null
           body_tr: string | null
           body_uz: string | null
+          body_vi: string | null
+          body_zh: string | null
           created_at: string | null
           day_number: number
           emoji: string | null
@@ -10014,11 +16700,23 @@ export type Database = {
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string | null
         }
         Insert: {
@@ -10026,11 +16724,23 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_es?: string | null
+          body_fr?: string | null
+          body_hi?: string | null
+          body_id?: string | null
+          body_ja?: string | null
           body_ka?: string | null
           body_kk?: string | null
+          body_ko?: string | null
+          body_nl?: string | null
+          body_pl?: string | null
+          body_pt?: string | null
           body_ru?: string | null
+          body_sv?: string | null
           body_tr?: string | null
           body_uz?: string | null
+          body_vi?: string | null
+          body_zh?: string | null
           created_at?: string | null
           day_number: number
           emoji?: string | null
@@ -10041,11 +16751,23 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -10053,11 +16775,23 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_es?: string | null
+          body_fr?: string | null
+          body_hi?: string | null
+          body_id?: string | null
+          body_ja?: string | null
           body_ka?: string | null
           body_kk?: string | null
+          body_ko?: string | null
+          body_nl?: string | null
+          body_pl?: string | null
+          body_pt?: string | null
           body_ru?: string | null
+          body_sv?: string | null
           body_tr?: string | null
           body_uz?: string | null
+          body_vi?: string | null
+          body_zh?: string | null
           created_at?: string | null
           day_number?: number
           emoji?: string | null
@@ -10068,11 +16802,23 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -10085,11 +16831,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           image_url: string
           is_active: boolean
@@ -10099,11 +16857,23 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string
         }
         Insert: {
@@ -10113,11 +16883,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url: string
           is_active?: boolean
@@ -10127,11 +16909,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
         }
         Update: {
@@ -10141,11 +16935,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url?: string
           is_active?: boolean
@@ -10155,11 +16961,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -10172,11 +16990,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           icon: string | null
           id: string
           is_active: boolean | null
@@ -10189,11 +17019,23 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string | null
         }
         Insert: {
@@ -10203,11 +17045,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean | null
@@ -10220,11 +17074,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -10234,11 +17100,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean | null
@@ -10251,11 +17129,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -10267,11 +17157,23 @@ export type Database = {
           badge_text_az: string | null
           badge_text_de: string | null
           badge_text_en: string | null
+          badge_text_es: string | null
+          badge_text_fr: string | null
+          badge_text_hi: string | null
+          badge_text_id: string | null
+          badge_text_ja: string | null
           badge_text_ka: string | null
           badge_text_kk: string | null
+          badge_text_ko: string | null
+          badge_text_nl: string | null
+          badge_text_pl: string | null
+          badge_text_pt: string | null
           badge_text_ru: string | null
+          badge_text_sv: string | null
           badge_text_tr: string | null
           badge_text_uz: string | null
+          badge_text_vi: string | null
+          badge_text_zh: string | null
           created_at: string | null
           currency: string | null
           description: string | null
@@ -10279,11 +17181,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           is_active: boolean | null
           is_popular: boolean | null
@@ -10292,11 +17206,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           plan_key: string
           price_monthly: number | null
           price_yearly: number | null
@@ -10309,11 +17235,23 @@ export type Database = {
           badge_text_az?: string | null
           badge_text_de?: string | null
           badge_text_en?: string | null
+          badge_text_es?: string | null
+          badge_text_fr?: string | null
+          badge_text_hi?: string | null
+          badge_text_id?: string | null
+          badge_text_ja?: string | null
           badge_text_ka?: string | null
           badge_text_kk?: string | null
+          badge_text_ko?: string | null
+          badge_text_nl?: string | null
+          badge_text_pl?: string | null
+          badge_text_pt?: string | null
           badge_text_ru?: string | null
+          badge_text_sv?: string | null
           badge_text_tr?: string | null
           badge_text_uz?: string | null
+          badge_text_vi?: string | null
+          badge_text_zh?: string | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
@@ -10321,11 +17259,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           is_popular?: boolean | null
@@ -10334,11 +17284,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           plan_key: string
           price_monthly?: number | null
           price_yearly?: number | null
@@ -10351,11 +17313,23 @@ export type Database = {
           badge_text_az?: string | null
           badge_text_de?: string | null
           badge_text_en?: string | null
+          badge_text_es?: string | null
+          badge_text_fr?: string | null
+          badge_text_hi?: string | null
+          badge_text_id?: string | null
+          badge_text_ja?: string | null
           badge_text_ka?: string | null
           badge_text_kk?: string | null
+          badge_text_ko?: string | null
+          badge_text_nl?: string | null
+          badge_text_pl?: string | null
+          badge_text_pt?: string | null
           badge_text_ru?: string | null
+          badge_text_sv?: string | null
           badge_text_tr?: string | null
           badge_text_uz?: string | null
+          badge_text_vi?: string | null
+          badge_text_zh?: string | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
@@ -10363,11 +17337,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           is_popular?: boolean | null
@@ -10376,11 +17362,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           plan_key?: string
           price_monthly?: number | null
           price_yearly?: number | null
@@ -10400,8 +17398,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -10414,8 +17424,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -10428,8 +17450,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -10440,21 +17474,45 @@ export type Database = {
           category_ar: string | null
           category_de: string | null
           category_en: string | null
+          category_es: string | null
+          category_fr: string | null
+          category_hi: string | null
+          category_id: string | null
+          category_ja: string | null
           category_ka: string | null
           category_kk: string | null
+          category_ko: string | null
+          category_nl: string | null
+          category_pl: string | null
+          category_pt: string | null
           category_ru: string | null
+          category_sv: string | null
           category_tr: string | null
           category_uz: string | null
+          category_vi: string | null
+          category_zh: string | null
           created_at: string
           description: string | null
           description_ar: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           image_url: string | null
           is_active: boolean | null
@@ -10462,11 +17520,23 @@ export type Database = {
           name_ar: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           original_price: number | null
           price: number
           rating: number | null
@@ -10478,21 +17548,45 @@ export type Database = {
           category_ar?: string | null
           category_de?: string | null
           category_en?: string | null
+          category_es?: string | null
+          category_fr?: string | null
+          category_hi?: string | null
+          category_id?: string | null
+          category_ja?: string | null
           category_ka?: string | null
           category_kk?: string | null
+          category_ko?: string | null
+          category_nl?: string | null
+          category_pl?: string | null
+          category_pt?: string | null
           category_ru?: string | null
+          category_sv?: string | null
           category_tr?: string | null
           category_uz?: string | null
+          category_vi?: string | null
+          category_zh?: string | null
           created_at?: string
           description?: string | null
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
@@ -10500,11 +17594,23 @@ export type Database = {
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           original_price?: number | null
           price?: number
           rating?: number | null
@@ -10516,21 +17622,45 @@ export type Database = {
           category_ar?: string | null
           category_de?: string | null
           category_en?: string | null
+          category_es?: string | null
+          category_fr?: string | null
+          category_hi?: string | null
+          category_id?: string | null
+          category_ja?: string | null
           category_ka?: string | null
           category_kk?: string | null
+          category_ko?: string | null
+          category_nl?: string | null
+          category_pl?: string | null
+          category_pt?: string | null
           category_ru?: string | null
+          category_sv?: string | null
           category_tr?: string | null
           category_uz?: string | null
+          category_vi?: string | null
+          category_zh?: string | null
           created_at?: string
           description?: string | null
           description_ar?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           image_url?: string | null
           is_active?: boolean | null
@@ -10538,11 +17668,23 @@ export type Database = {
           name_ar?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           original_price?: number | null
           price?: number
           rating?: number | null
@@ -10686,8 +17828,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number | null
           type_key: string
         }
@@ -10700,8 +17854,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
           type_key: string
         }
@@ -10714,8 +17880,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
           type_key?: string
         }
@@ -10772,8 +17950,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           life_stage: string
           sort_order: number | null
           tool_key: string
@@ -10789,8 +17979,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           life_stage?: string
           sort_order?: number | null
           tool_key: string
@@ -10806,8 +18008,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           life_stage?: string
           sort_order?: number | null
           tool_key?: string
@@ -10827,11 +18041,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -10846,11 +18072,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -10865,11 +18103,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -10883,8 +18133,20 @@ export type Database = {
           name: string
           name_az: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
           tag_id: string
         }
@@ -10896,8 +18158,20 @@ export type Database = {
           name: string
           name_az?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
           tag_id: string
         }
@@ -10909,8 +18183,20 @@ export type Database = {
           name?: string
           name_az?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
           tag_id?: string
         }
@@ -10985,11 +18271,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -11003,11 +18301,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -11021,11 +18331,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -11039,11 +18361,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           is_active: boolean | null
           item_name_az: string | null
@@ -11055,11 +18389,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           notes: string | null
           notes_en: string | null
           safety_level: string
@@ -11074,11 +18420,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           item_name_az?: string | null
@@ -11090,11 +18448,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           notes?: string | null
           notes_en?: string | null
           safety_level?: string
@@ -11109,11 +18479,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           item_name_az?: string | null
@@ -11125,11 +18507,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           notes?: string | null
           notes_en?: string | null
           safety_level?: string
@@ -11173,11 +18567,23 @@ export type Database = {
           body_ar: string | null
           body_de: string | null
           body_en: string | null
+          body_es: string | null
+          body_fr: string | null
+          body_hi: string | null
+          body_id: string | null
+          body_ja: string | null
           body_ka: string | null
           body_kk: string | null
+          body_ko: string | null
+          body_nl: string | null
+          body_pl: string | null
+          body_pt: string | null
           body_ru: string | null
+          body_sv: string | null
           body_tr: string | null
           body_uz: string | null
+          body_vi: string | null
+          body_zh: string | null
           created_at: string | null
           id: string
           is_active: boolean | null
@@ -11188,11 +18594,23 @@ export type Database = {
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string | null
         }
         Insert: {
@@ -11200,11 +18618,23 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_es?: string | null
+          body_fr?: string | null
+          body_hi?: string | null
+          body_id?: string | null
+          body_ja?: string | null
           body_ka?: string | null
           body_kk?: string | null
+          body_ko?: string | null
+          body_nl?: string | null
+          body_pl?: string | null
+          body_pt?: string | null
           body_ru?: string | null
+          body_sv?: string | null
           body_tr?: string | null
           body_uz?: string | null
+          body_vi?: string | null
+          body_zh?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -11215,11 +18645,23 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -11227,11 +18669,23 @@ export type Database = {
           body_ar?: string | null
           body_de?: string | null
           body_en?: string | null
+          body_es?: string | null
+          body_fr?: string | null
+          body_hi?: string | null
+          body_id?: string | null
+          body_ja?: string | null
           body_ka?: string | null
           body_kk?: string | null
+          body_ko?: string | null
+          body_nl?: string | null
+          body_pl?: string | null
+          body_pt?: string | null
           body_ru?: string | null
+          body_sv?: string | null
           body_tr?: string | null
           body_uz?: string | null
+          body_vi?: string | null
+          body_zh?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -11242,11 +18696,23 @@ export type Database = {
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -11263,11 +18729,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -11281,11 +18759,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -11299,11 +18789,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -11355,8 +18857,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           skill_key: string
           sort_order: number | null
         }
@@ -11370,8 +18884,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           skill_key: string
           sort_order?: number | null
         }
@@ -11385,8 +18911,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           skill_key?: string
           sort_order?: number | null
         }
@@ -11431,6 +18969,27 @@ export type Database = {
           message?: string | null
           receiver_id?: string
           sender_id?: string
+        }
+        Relationships: []
+      }
+      source_community_worker_control: {
+        Row: {
+          enabled: boolean
+          singleton: boolean
+          token_sha256: string | null
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          singleton?: boolean
+          token_sha256?: string | null
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          singleton?: boolean
+          token_sha256?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -11611,11 +19170,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -11629,11 +19200,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -11647,11 +19230,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -11744,8 +19339,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           sort_order: number | null
         }
         Insert: {
@@ -11758,8 +19365,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
         }
         Update: {
@@ -11772,8 +19391,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           sort_order?: number | null
         }
         Relationships: []
@@ -11787,11 +19418,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           difficulty: string | null
           difficulty_en: string | null
           emoji: string | null
@@ -11806,11 +19449,23 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
         }
         Insert: {
           category?: string
@@ -11820,11 +19475,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           difficulty?: string | null
           difficulty_en?: string | null
           emoji?: string | null
@@ -11839,11 +19506,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Update: {
           category?: string
@@ -11853,11 +19532,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           difficulty?: string | null
           difficulty_en?: string | null
           emoji?: string | null
@@ -11872,11 +19563,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
         }
         Relationships: []
       }
@@ -11891,11 +19594,23 @@ export type Database = {
           label_az: string | null
           label_de: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
           label_ka: string | null
           label_kk: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
           label_uz: string | null
+          label_vi: string | null
+          label_zh: string | null
           life_stages: string[] | null
           sort_order: number | null
           symptom_key: string
@@ -11910,11 +19625,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           life_stages?: string[] | null
           sort_order?: number | null
           symptom_key: string
@@ -11929,11 +19656,23 @@ export type Database = {
           label_az?: string | null
           label_de?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
           label_ka?: string | null
           label_kk?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
           label_uz?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           life_stages?: string[] | null
           sort_order?: number | null
           symptom_key?: string
@@ -11948,11 +19687,23 @@ export type Database = {
           content_az: string | null
           content_de: string | null
           content_en: string | null
+          content_es: string | null
+          content_fr: string | null
+          content_hi: string | null
+          content_id: string | null
+          content_ja: string | null
           content_ka: string | null
           content_kk: string | null
+          content_ko: string | null
+          content_nl: string | null
+          content_pl: string | null
+          content_pt: string | null
           content_ru: string | null
+          content_sv: string | null
           content_tr: string | null
           content_uz: string | null
+          content_vi: string | null
+          content_zh: string | null
           created_at: string | null
           emoji: string | null
           id: string
@@ -11963,11 +19714,23 @@ export type Database = {
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string | null
         }
         Insert: {
@@ -11977,11 +19740,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           emoji?: string | null
           id?: string
@@ -11992,11 +19767,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -12006,11 +19793,23 @@ export type Database = {
           content_az?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string | null
           emoji?: string | null
           id?: string
@@ -12021,11 +19820,23 @@ export type Database = {
           title_az?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -12038,11 +19849,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           emoji: string | null
           id: string
           is_active: boolean | null
@@ -12051,21 +19874,45 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           relief_tips: string[] | null
           relief_tips_ar: string | null
           relief_tips_az: string[] | null
           relief_tips_de: string | null
           relief_tips_en: string | null
+          relief_tips_es: string | null
+          relief_tips_fr: string | null
+          relief_tips_hi: string | null
+          relief_tips_id: string | null
+          relief_tips_ja: string | null
           relief_tips_ka: string | null
           relief_tips_kk: string | null
+          relief_tips_ko: string | null
+          relief_tips_nl: string | null
+          relief_tips_pl: string | null
+          relief_tips_pt: string | null
           relief_tips_ru: string | null
+          relief_tips_sv: string | null
           relief_tips_tr: string | null
           relief_tips_uz: string | null
+          relief_tips_vi: string | null
+          relief_tips_zh: string | null
           severity: string | null
           severity_en: string | null
           sort_order: number | null
@@ -12077,11 +19924,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
@@ -12090,21 +19949,45 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           relief_tips?: string[] | null
           relief_tips_ar?: string | null
           relief_tips_az?: string[] | null
           relief_tips_de?: string | null
           relief_tips_en?: string | null
+          relief_tips_es?: string | null
+          relief_tips_fr?: string | null
+          relief_tips_hi?: string | null
+          relief_tips_id?: string | null
+          relief_tips_ja?: string | null
           relief_tips_ka?: string | null
           relief_tips_kk?: string | null
+          relief_tips_ko?: string | null
+          relief_tips_nl?: string | null
+          relief_tips_pl?: string | null
+          relief_tips_pt?: string | null
           relief_tips_ru?: string | null
+          relief_tips_sv?: string | null
           relief_tips_tr?: string | null
           relief_tips_uz?: string | null
+          relief_tips_vi?: string | null
+          relief_tips_zh?: string | null
           severity?: string | null
           severity_en?: string | null
           sort_order?: number | null
@@ -12116,11 +19999,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
@@ -12129,21 +20024,45 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           relief_tips?: string[] | null
           relief_tips_ar?: string | null
           relief_tips_az?: string[] | null
           relief_tips_de?: string | null
           relief_tips_en?: string | null
+          relief_tips_es?: string | null
+          relief_tips_fr?: string | null
+          relief_tips_hi?: string | null
+          relief_tips_id?: string | null
+          relief_tips_ja?: string | null
           relief_tips_ka?: string | null
           relief_tips_kk?: string | null
+          relief_tips_ko?: string | null
+          relief_tips_nl?: string | null
+          relief_tips_pl?: string | null
+          relief_tips_pt?: string | null
           relief_tips_ru?: string | null
+          relief_tips_sv?: string | null
           relief_tips_tr?: string | null
           relief_tips_uz?: string | null
+          relief_tips_vi?: string | null
+          relief_tips_zh?: string | null
           severity?: string | null
           severity_en?: string | null
           sort_order?: number | null
@@ -12154,8 +20073,20 @@ export type Database = {
         Row: {
           clothing_tip_az: string | null
           clothing_tip_en: string | null
+          clothing_tip_es: string | null
+          clothing_tip_fr: string | null
+          clothing_tip_hi: string | null
+          clothing_tip_id: string | null
+          clothing_tip_ja: string | null
+          clothing_tip_ko: string | null
+          clothing_tip_nl: string | null
+          clothing_tip_pl: string | null
+          clothing_tip_pt: string | null
           clothing_tip_ru: string | null
+          clothing_tip_sv: string | null
           clothing_tip_tr: string | null
+          clothing_tip_vi: string | null
+          clothing_tip_zh: string | null
           created_at: string | null
           emoji: string
           id: string
@@ -12163,8 +20094,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           max_temp: number
           min_temp: number
           sort_order: number | null
@@ -12172,8 +20115,20 @@ export type Database = {
         Insert: {
           clothing_tip_az?: string | null
           clothing_tip_en?: string | null
+          clothing_tip_es?: string | null
+          clothing_tip_fr?: string | null
+          clothing_tip_hi?: string | null
+          clothing_tip_id?: string | null
+          clothing_tip_ja?: string | null
+          clothing_tip_ko?: string | null
+          clothing_tip_nl?: string | null
+          clothing_tip_pl?: string | null
+          clothing_tip_pt?: string | null
           clothing_tip_ru?: string | null
+          clothing_tip_sv?: string | null
           clothing_tip_tr?: string | null
+          clothing_tip_vi?: string | null
+          clothing_tip_zh?: string | null
           created_at?: string | null
           emoji: string
           id?: string
@@ -12181,8 +20136,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           max_temp: number
           min_temp: number
           sort_order?: number | null
@@ -12190,8 +20157,20 @@ export type Database = {
         Update: {
           clothing_tip_az?: string | null
           clothing_tip_en?: string | null
+          clothing_tip_es?: string | null
+          clothing_tip_fr?: string | null
+          clothing_tip_hi?: string | null
+          clothing_tip_id?: string | null
+          clothing_tip_ja?: string | null
+          clothing_tip_ko?: string | null
+          clothing_tip_nl?: string | null
+          clothing_tip_pl?: string | null
+          clothing_tip_pt?: string | null
           clothing_tip_ru?: string | null
+          clothing_tip_sv?: string | null
           clothing_tip_tr?: string | null
+          clothing_tip_vi?: string | null
+          clothing_tip_zh?: string | null
           created_at?: string | null
           emoji?: string
           id?: string
@@ -12199,8 +20178,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           max_temp?: number
           min_temp?: number
           sort_order?: number | null
@@ -12216,8 +20207,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           option_key: string
           sort_order: number | null
         }
@@ -12229,8 +20232,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           option_key: string
           sort_order?: number | null
         }
@@ -12242,8 +20257,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           option_key?: string
           sort_order?: number | null
         }
@@ -12262,11 +20289,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           display_name: string | null
           display_name_az: string | null
           display_name_en: string | null
@@ -12297,31 +20336,67 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           partner_description: string | null
           partner_description_ar: string | null
           partner_description_az: string | null
           partner_description_de: string | null
           partner_description_en: string | null
+          partner_description_es: string | null
+          partner_description_fr: string | null
+          partner_description_hi: string | null
+          partner_description_id: string | null
+          partner_description_ja: string | null
           partner_description_ka: string | null
           partner_description_kk: string | null
+          partner_description_ko: string | null
+          partner_description_nl: string | null
+          partner_description_pl: string | null
+          partner_description_pt: string | null
           partner_description_ru: string | null
+          partner_description_sv: string | null
           partner_description_tr: string | null
           partner_description_uz: string | null
+          partner_description_vi: string | null
+          partner_description_zh: string | null
           partner_name: string | null
           partner_name_ar: string | null
           partner_name_az: string | null
           partner_name_de: string | null
           partner_name_en: string | null
+          partner_name_es: string | null
+          partner_name_fr: string | null
+          partner_name_hi: string | null
+          partner_name_id: string | null
+          partner_name_ja: string | null
           partner_name_ka: string | null
           partner_name_kk: string | null
+          partner_name_ko: string | null
+          partner_name_nl: string | null
+          partner_name_pl: string | null
+          partner_name_pt: string | null
           partner_name_ru: string | null
+          partner_name_sv: string | null
           partner_name_tr: string | null
           partner_name_uz: string | null
+          partner_name_vi: string | null
+          partner_name_zh: string | null
           premium_limit: number | null
           premium_type: string | null
           quick_access_gradient: string | null
@@ -12343,11 +20418,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           display_name?: string | null
           display_name_az?: string | null
           display_name_en?: string | null
@@ -12378,31 +20465,67 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           partner_description?: string | null
           partner_description_ar?: string | null
           partner_description_az?: string | null
           partner_description_de?: string | null
           partner_description_en?: string | null
+          partner_description_es?: string | null
+          partner_description_fr?: string | null
+          partner_description_hi?: string | null
+          partner_description_id?: string | null
+          partner_description_ja?: string | null
           partner_description_ka?: string | null
           partner_description_kk?: string | null
+          partner_description_ko?: string | null
+          partner_description_nl?: string | null
+          partner_description_pl?: string | null
+          partner_description_pt?: string | null
           partner_description_ru?: string | null
+          partner_description_sv?: string | null
           partner_description_tr?: string | null
           partner_description_uz?: string | null
+          partner_description_vi?: string | null
+          partner_description_zh?: string | null
           partner_name?: string | null
           partner_name_ar?: string | null
           partner_name_az?: string | null
           partner_name_de?: string | null
           partner_name_en?: string | null
+          partner_name_es?: string | null
+          partner_name_fr?: string | null
+          partner_name_hi?: string | null
+          partner_name_id?: string | null
+          partner_name_ja?: string | null
           partner_name_ka?: string | null
           partner_name_kk?: string | null
+          partner_name_ko?: string | null
+          partner_name_nl?: string | null
+          partner_name_pl?: string | null
+          partner_name_pt?: string | null
           partner_name_ru?: string | null
+          partner_name_sv?: string | null
           partner_name_tr?: string | null
           partner_name_uz?: string | null
+          partner_name_vi?: string | null
+          partner_name_zh?: string | null
           premium_limit?: number | null
           premium_type?: string | null
           quick_access_gradient?: string | null
@@ -12424,11 +20547,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           display_name?: string | null
           display_name_az?: string | null
           display_name_en?: string | null
@@ -12459,31 +20594,67 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           partner_description?: string | null
           partner_description_ar?: string | null
           partner_description_az?: string | null
           partner_description_de?: string | null
           partner_description_en?: string | null
+          partner_description_es?: string | null
+          partner_description_fr?: string | null
+          partner_description_hi?: string | null
+          partner_description_id?: string | null
+          partner_description_ja?: string | null
           partner_description_ka?: string | null
           partner_description_kk?: string | null
+          partner_description_ko?: string | null
+          partner_description_nl?: string | null
+          partner_description_pl?: string | null
+          partner_description_pt?: string | null
           partner_description_ru?: string | null
+          partner_description_sv?: string | null
           partner_description_tr?: string | null
           partner_description_uz?: string | null
+          partner_description_vi?: string | null
+          partner_description_zh?: string | null
           partner_name?: string | null
           partner_name_ar?: string | null
           partner_name_az?: string | null
           partner_name_de?: string | null
           partner_name_en?: string | null
+          partner_name_es?: string | null
+          partner_name_fr?: string | null
+          partner_name_hi?: string | null
+          partner_name_id?: string | null
+          partner_name_ja?: string | null
           partner_name_ka?: string | null
           partner_name_kk?: string | null
+          partner_name_ko?: string | null
+          partner_name_nl?: string | null
+          partner_name_pl?: string | null
+          partner_name_pt?: string | null
           partner_name_ru?: string | null
+          partner_name_sv?: string | null
           partner_name_tr?: string | null
           partner_name_uz?: string | null
+          partner_name_vi?: string | null
+          partner_name_zh?: string | null
           premium_limit?: number | null
           premium_type?: string | null
           quick_access_gradient?: string | null
@@ -12543,8 +20714,20 @@ export type Database = {
           label: string
           label_az: string | null
           label_en: string | null
+          label_es: string | null
+          label_fr: string | null
+          label_hi: string | null
+          label_id: string | null
+          label_ja: string | null
+          label_ko: string | null
+          label_nl: string | null
+          label_pl: string | null
+          label_pt: string | null
           label_ru: string | null
+          label_sv: string | null
           label_tr: string | null
+          label_vi: string | null
+          label_zh: string | null
           trimester_number: number
         }
         Insert: {
@@ -12556,8 +20739,20 @@ export type Database = {
           label: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           trimester_number: number
         }
         Update: {
@@ -12569,8 +20764,20 @@ export type Database = {
           label?: string
           label_az?: string | null
           label_en?: string | null
+          label_es?: string | null
+          label_fr?: string | null
+          label_hi?: string | null
+          label_id?: string | null
+          label_ja?: string | null
+          label_ko?: string | null
+          label_nl?: string | null
+          label_pl?: string | null
+          label_pt?: string | null
           label_ru?: string | null
+          label_sv?: string | null
           label_tr?: string | null
+          label_vi?: string | null
+          label_zh?: string | null
           trimester_number?: number
         }
         Relationships: []
@@ -12586,11 +20793,23 @@ export type Database = {
           tip_text_ar: string | null
           tip_text_de: string | null
           tip_text_en: string | null
+          tip_text_es: string | null
+          tip_text_fr: string | null
+          tip_text_hi: string | null
+          tip_text_id: string | null
+          tip_text_ja: string | null
           tip_text_ka: string | null
           tip_text_kk: string | null
+          tip_text_ko: string | null
+          tip_text_nl: string | null
+          tip_text_pl: string | null
+          tip_text_pt: string | null
           tip_text_ru: string | null
+          tip_text_sv: string | null
           tip_text_tr: string | null
           tip_text_uz: string | null
+          tip_text_vi: string | null
+          tip_text_zh: string | null
           trimester: number
           updated_at: string | null
         }
@@ -12604,11 +20823,23 @@ export type Database = {
           tip_text_ar?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_es?: string | null
+          tip_text_fr?: string | null
+          tip_text_hi?: string | null
+          tip_text_id?: string | null
+          tip_text_ja?: string | null
           tip_text_ka?: string | null
           tip_text_kk?: string | null
+          tip_text_ko?: string | null
+          tip_text_nl?: string | null
+          tip_text_pl?: string | null
+          tip_text_pt?: string | null
           tip_text_ru?: string | null
+          tip_text_sv?: string | null
           tip_text_tr?: string | null
           tip_text_uz?: string | null
+          tip_text_vi?: string | null
+          tip_text_zh?: string | null
           trimester: number
           updated_at?: string | null
         }
@@ -12622,11 +20853,23 @@ export type Database = {
           tip_text_ar?: string | null
           tip_text_de?: string | null
           tip_text_en?: string | null
+          tip_text_es?: string | null
+          tip_text_fr?: string | null
+          tip_text_hi?: string | null
+          tip_text_id?: string | null
+          tip_text_ja?: string | null
           tip_text_ka?: string | null
           tip_text_kk?: string | null
+          tip_text_ko?: string | null
+          tip_text_nl?: string | null
+          tip_text_pl?: string | null
+          tip_text_pt?: string | null
           tip_text_ru?: string | null
+          tip_text_sv?: string | null
           tip_text_tr?: string | null
           tip_text_uz?: string | null
+          tip_text_vi?: string | null
+          tip_text_zh?: string | null
           trimester?: number
           updated_at?: string | null
         }
@@ -12764,6 +21007,7 @@ export type Database = {
           sort_order: number | null
           updated_at: string | null
           user_id: string
+          vaccine_country_code: string | null
         }
         Insert: {
           avatar_emoji?: string | null
@@ -12779,6 +21023,7 @@ export type Database = {
           sort_order?: number | null
           updated_at?: string | null
           user_id: string
+          vaccine_country_code?: string | null
         }
         Update: {
           avatar_emoji?: string | null
@@ -12794,6 +21039,7 @@ export type Database = {
           sort_order?: number | null
           updated_at?: string | null
           user_id?: string
+          vaccine_country_code?: string | null
         }
         Relationships: []
       }
@@ -12948,16 +21194,19 @@ export type Database = {
         Row: {
           id: string
           role: Database["public"]["Enums"]["app_role"]
+          show_admin_badge: boolean | null
           user_id: string
         }
         Insert: {
           id?: string
           role: Database["public"]["Enums"]["app_role"]
+          show_admin_badge?: boolean | null
           user_id: string
         }
         Update: {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          show_admin_badge?: boolean | null
           user_id?: string
         }
         Relationships: []
@@ -13061,11 +21310,24 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
+          schedule_meta: Json | null
           sort_order: number
           source_label: string | null
           source_url: string | null
@@ -13082,11 +21344,24 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en: string
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
+          schedule_meta?: Json | null
           sort_order?: number
           source_label?: string | null
           source_url?: string | null
@@ -13103,11 +21378,24 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
+          schedule_meta?: Json | null
           sort_order?: number
           source_label?: string | null
           source_url?: string | null
@@ -13121,22 +21409,46 @@ export type Database = {
           age_label_az: string
           age_label_de: string | null
           age_label_en: string | null
+          age_label_es: string | null
+          age_label_fr: string | null
+          age_label_hi: string | null
+          age_label_id: string | null
+          age_label_ja: string | null
           age_label_ka: string | null
           age_label_kk: string | null
+          age_label_ko: string | null
+          age_label_nl: string | null
+          age_label_pl: string | null
+          age_label_pt: string | null
           age_label_ru: string | null
+          age_label_sv: string | null
           age_label_tr: string | null
           age_label_uz: string | null
+          age_label_vi: string | null
+          age_label_zh: string | null
           country_code: string
           created_at: string
           dose_label_ar: string | null
           dose_label_az: string
           dose_label_de: string | null
           dose_label_en: string | null
+          dose_label_es: string | null
+          dose_label_fr: string | null
+          dose_label_hi: string | null
+          dose_label_id: string | null
+          dose_label_ja: string | null
           dose_label_ka: string | null
           dose_label_kk: string | null
+          dose_label_ko: string | null
+          dose_label_nl: string | null
+          dose_label_pl: string | null
+          dose_label_pt: string | null
           dose_label_ru: string | null
+          dose_label_sv: string | null
           dose_label_tr: string | null
           dose_label_uz: string | null
+          dose_label_vi: string | null
+          dose_label_zh: string | null
           dose_number: number
           id: string
           max_age_days: number | null
@@ -13145,12 +21457,25 @@ export type Database = {
           notes_az: string | null
           notes_de: string | null
           notes_en: string | null
+          notes_es: string | null
+          notes_fr: string | null
+          notes_hi: string | null
+          notes_id: string | null
+          notes_ja: string | null
           notes_ka: string | null
           notes_kk: string | null
+          notes_ko: string | null
+          notes_nl: string | null
+          notes_pl: string | null
+          notes_pt: string | null
           notes_ru: string | null
+          notes_sv: string | null
           notes_tr: string | null
           notes_uz: string | null
+          notes_vi: string | null
+          notes_zh: string | null
           recommended_age_days: number
+          schedule_meta: Json | null
           sort_order: number
           updated_at: string
           vaccine_id: string
@@ -13160,22 +21485,46 @@ export type Database = {
           age_label_az: string
           age_label_de?: string | null
           age_label_en?: string | null
+          age_label_es?: string | null
+          age_label_fr?: string | null
+          age_label_hi?: string | null
+          age_label_id?: string | null
+          age_label_ja?: string | null
           age_label_ka?: string | null
           age_label_kk?: string | null
+          age_label_ko?: string | null
+          age_label_nl?: string | null
+          age_label_pl?: string | null
+          age_label_pt?: string | null
           age_label_ru?: string | null
+          age_label_sv?: string | null
           age_label_tr?: string | null
           age_label_uz?: string | null
+          age_label_vi?: string | null
+          age_label_zh?: string | null
           country_code: string
           created_at?: string
           dose_label_ar?: string | null
           dose_label_az: string
           dose_label_de?: string | null
           dose_label_en?: string | null
+          dose_label_es?: string | null
+          dose_label_fr?: string | null
+          dose_label_hi?: string | null
+          dose_label_id?: string | null
+          dose_label_ja?: string | null
           dose_label_ka?: string | null
           dose_label_kk?: string | null
+          dose_label_ko?: string | null
+          dose_label_nl?: string | null
+          dose_label_pl?: string | null
+          dose_label_pt?: string | null
           dose_label_ru?: string | null
+          dose_label_sv?: string | null
           dose_label_tr?: string | null
           dose_label_uz?: string | null
+          dose_label_vi?: string | null
+          dose_label_zh?: string | null
           dose_number?: number
           id?: string
           max_age_days?: number | null
@@ -13184,12 +21533,25 @@ export type Database = {
           notes_az?: string | null
           notes_de?: string | null
           notes_en?: string | null
+          notes_es?: string | null
+          notes_fr?: string | null
+          notes_hi?: string | null
+          notes_id?: string | null
+          notes_ja?: string | null
           notes_ka?: string | null
           notes_kk?: string | null
+          notes_ko?: string | null
+          notes_nl?: string | null
+          notes_pl?: string | null
+          notes_pt?: string | null
           notes_ru?: string | null
+          notes_sv?: string | null
           notes_tr?: string | null
           notes_uz?: string | null
+          notes_vi?: string | null
+          notes_zh?: string | null
           recommended_age_days: number
+          schedule_meta?: Json | null
           sort_order?: number
           updated_at?: string
           vaccine_id: string
@@ -13199,22 +21561,46 @@ export type Database = {
           age_label_az?: string
           age_label_de?: string | null
           age_label_en?: string | null
+          age_label_es?: string | null
+          age_label_fr?: string | null
+          age_label_hi?: string | null
+          age_label_id?: string | null
+          age_label_ja?: string | null
           age_label_ka?: string | null
           age_label_kk?: string | null
+          age_label_ko?: string | null
+          age_label_nl?: string | null
+          age_label_pl?: string | null
+          age_label_pt?: string | null
           age_label_ru?: string | null
+          age_label_sv?: string | null
           age_label_tr?: string | null
           age_label_uz?: string | null
+          age_label_vi?: string | null
+          age_label_zh?: string | null
           country_code?: string
           created_at?: string
           dose_label_ar?: string | null
           dose_label_az?: string
           dose_label_de?: string | null
           dose_label_en?: string | null
+          dose_label_es?: string | null
+          dose_label_fr?: string | null
+          dose_label_hi?: string | null
+          dose_label_id?: string | null
+          dose_label_ja?: string | null
           dose_label_ka?: string | null
           dose_label_kk?: string | null
+          dose_label_ko?: string | null
+          dose_label_nl?: string | null
+          dose_label_pl?: string | null
+          dose_label_pt?: string | null
           dose_label_ru?: string | null
+          dose_label_sv?: string | null
           dose_label_tr?: string | null
           dose_label_uz?: string | null
+          dose_label_vi?: string | null
+          dose_label_zh?: string | null
           dose_number?: number
           id?: string
           max_age_days?: number | null
@@ -13223,12 +21609,25 @@ export type Database = {
           notes_az?: string | null
           notes_de?: string | null
           notes_en?: string | null
+          notes_es?: string | null
+          notes_fr?: string | null
+          notes_hi?: string | null
+          notes_id?: string | null
+          notes_ja?: string | null
           notes_ka?: string | null
           notes_kk?: string | null
+          notes_ko?: string | null
+          notes_nl?: string | null
+          notes_pl?: string | null
+          notes_pt?: string | null
           notes_ru?: string | null
+          notes_sv?: string | null
           notes_tr?: string | null
           notes_uz?: string | null
+          notes_vi?: string | null
+          notes_zh?: string | null
           recommended_age_days?: number
+          schedule_meta?: Json | null
           sort_order?: number
           updated_at?: string
           vaccine_id?: string
@@ -13251,31 +21650,67 @@ export type Database = {
           contraindications_az: string | null
           contraindications_de: string | null
           contraindications_en: string | null
+          contraindications_es: string | null
+          contraindications_fr: string | null
+          contraindications_hi: string | null
+          contraindications_id: string | null
+          contraindications_ja: string | null
           contraindications_ka: string | null
           contraindications_kk: string | null
+          contraindications_ko: string | null
+          contraindications_nl: string | null
+          contraindications_pl: string | null
+          contraindications_pt: string | null
           contraindications_ru: string | null
+          contraindications_sv: string | null
           contraindications_tr: string | null
           contraindications_uz: string | null
+          contraindications_vi: string | null
+          contraindications_zh: string | null
           country_code: string
           created_at: string
           disease_ar: string | null
           disease_az: string | null
           disease_de: string | null
           disease_en: string | null
+          disease_es: string | null
+          disease_fr: string | null
+          disease_hi: string | null
+          disease_id: string | null
+          disease_ja: string | null
           disease_ka: string | null
           disease_kk: string | null
+          disease_ko: string | null
+          disease_nl: string | null
+          disease_pl: string | null
+          disease_pt: string | null
           disease_ru: string | null
+          disease_sv: string | null
           disease_tr: string | null
           disease_uz: string | null
+          disease_vi: string | null
+          disease_zh: string | null
           full_description_ar: string | null
           full_description_az: string | null
           full_description_de: string | null
           full_description_en: string | null
+          full_description_es: string | null
+          full_description_fr: string | null
+          full_description_hi: string | null
+          full_description_id: string | null
+          full_description_ja: string | null
           full_description_ka: string | null
           full_description_kk: string | null
+          full_description_ko: string | null
+          full_description_nl: string | null
+          full_description_pl: string | null
+          full_description_pt: string | null
           full_description_ru: string | null
+          full_description_sv: string | null
           full_description_tr: string | null
           full_description_uz: string | null
+          full_description_vi: string | null
+          full_description_zh: string | null
           id: string
           is_active: boolean
           is_mandatory: boolean
@@ -13283,38 +21718,86 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           route_ar: string | null
           route_az: string | null
           route_de: string | null
           route_en: string | null
+          route_es: string | null
+          route_fr: string | null
+          route_hi: string | null
+          route_id: string | null
+          route_ja: string | null
           route_ka: string | null
           route_kk: string | null
+          route_ko: string | null
+          route_nl: string | null
+          route_pl: string | null
+          route_pt: string | null
           route_ru: string | null
+          route_sv: string | null
           route_tr: string | null
           route_uz: string | null
+          route_vi: string | null
+          route_zh: string | null
           short_description_ar: string | null
           short_description_az: string | null
           short_description_de: string | null
           short_description_en: string | null
+          short_description_es: string | null
+          short_description_fr: string | null
+          short_description_hi: string | null
+          short_description_id: string | null
+          short_description_ja: string | null
           short_description_ka: string | null
           short_description_kk: string | null
+          short_description_ko: string | null
+          short_description_nl: string | null
+          short_description_pl: string | null
+          short_description_pt: string | null
           short_description_ru: string | null
+          short_description_sv: string | null
           short_description_tr: string | null
           short_description_uz: string | null
+          short_description_vi: string | null
+          short_description_zh: string | null
           side_effects_ar: string | null
           side_effects_az: string | null
           side_effects_de: string | null
           side_effects_en: string | null
+          side_effects_es: string | null
+          side_effects_fr: string | null
+          side_effects_hi: string | null
+          side_effects_id: string | null
+          side_effects_ja: string | null
           side_effects_ka: string | null
           side_effects_kk: string | null
+          side_effects_ko: string | null
+          side_effects_nl: string | null
+          side_effects_pl: string | null
+          side_effects_pt: string | null
           side_effects_ru: string | null
+          side_effects_sv: string | null
           side_effects_tr: string | null
           side_effects_uz: string | null
+          side_effects_vi: string | null
+          side_effects_zh: string | null
           sort_order: number
           source_url: string | null
           updated_at: string
@@ -13326,31 +21809,67 @@ export type Database = {
           contraindications_az?: string | null
           contraindications_de?: string | null
           contraindications_en?: string | null
+          contraindications_es?: string | null
+          contraindications_fr?: string | null
+          contraindications_hi?: string | null
+          contraindications_id?: string | null
+          contraindications_ja?: string | null
           contraindications_ka?: string | null
           contraindications_kk?: string | null
+          contraindications_ko?: string | null
+          contraindications_nl?: string | null
+          contraindications_pl?: string | null
+          contraindications_pt?: string | null
           contraindications_ru?: string | null
+          contraindications_sv?: string | null
           contraindications_tr?: string | null
           contraindications_uz?: string | null
+          contraindications_vi?: string | null
+          contraindications_zh?: string | null
           country_code: string
           created_at?: string
           disease_ar?: string | null
           disease_az?: string | null
           disease_de?: string | null
           disease_en?: string | null
+          disease_es?: string | null
+          disease_fr?: string | null
+          disease_hi?: string | null
+          disease_id?: string | null
+          disease_ja?: string | null
           disease_ka?: string | null
           disease_kk?: string | null
+          disease_ko?: string | null
+          disease_nl?: string | null
+          disease_pl?: string | null
+          disease_pt?: string | null
           disease_ru?: string | null
+          disease_sv?: string | null
           disease_tr?: string | null
           disease_uz?: string | null
+          disease_vi?: string | null
+          disease_zh?: string | null
           full_description_ar?: string | null
           full_description_az?: string | null
           full_description_de?: string | null
           full_description_en?: string | null
+          full_description_es?: string | null
+          full_description_fr?: string | null
+          full_description_hi?: string | null
+          full_description_id?: string | null
+          full_description_ja?: string | null
           full_description_ka?: string | null
           full_description_kk?: string | null
+          full_description_ko?: string | null
+          full_description_nl?: string | null
+          full_description_pl?: string | null
+          full_description_pt?: string | null
           full_description_ru?: string | null
+          full_description_sv?: string | null
           full_description_tr?: string | null
           full_description_uz?: string | null
+          full_description_vi?: string | null
+          full_description_zh?: string | null
           id?: string
           is_active?: boolean
           is_mandatory?: boolean
@@ -13358,38 +21877,86 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           route_ar?: string | null
           route_az?: string | null
           route_de?: string | null
           route_en?: string | null
+          route_es?: string | null
+          route_fr?: string | null
+          route_hi?: string | null
+          route_id?: string | null
+          route_ja?: string | null
           route_ka?: string | null
           route_kk?: string | null
+          route_ko?: string | null
+          route_nl?: string | null
+          route_pl?: string | null
+          route_pt?: string | null
           route_ru?: string | null
+          route_sv?: string | null
           route_tr?: string | null
           route_uz?: string | null
+          route_vi?: string | null
+          route_zh?: string | null
           short_description_ar?: string | null
           short_description_az?: string | null
           short_description_de?: string | null
           short_description_en?: string | null
+          short_description_es?: string | null
+          short_description_fr?: string | null
+          short_description_hi?: string | null
+          short_description_id?: string | null
+          short_description_ja?: string | null
           short_description_ka?: string | null
           short_description_kk?: string | null
+          short_description_ko?: string | null
+          short_description_nl?: string | null
+          short_description_pl?: string | null
+          short_description_pt?: string | null
           short_description_ru?: string | null
+          short_description_sv?: string | null
           short_description_tr?: string | null
           short_description_uz?: string | null
+          short_description_vi?: string | null
+          short_description_zh?: string | null
           side_effects_ar?: string | null
           side_effects_az?: string | null
           side_effects_de?: string | null
           side_effects_en?: string | null
+          side_effects_es?: string | null
+          side_effects_fr?: string | null
+          side_effects_hi?: string | null
+          side_effects_id?: string | null
+          side_effects_ja?: string | null
           side_effects_ka?: string | null
           side_effects_kk?: string | null
+          side_effects_ko?: string | null
+          side_effects_nl?: string | null
+          side_effects_pl?: string | null
+          side_effects_pt?: string | null
           side_effects_ru?: string | null
+          side_effects_sv?: string | null
           side_effects_tr?: string | null
           side_effects_uz?: string | null
+          side_effects_vi?: string | null
+          side_effects_zh?: string | null
           sort_order?: number
           source_url?: string | null
           updated_at?: string
@@ -13401,31 +21968,67 @@ export type Database = {
           contraindications_az?: string | null
           contraindications_de?: string | null
           contraindications_en?: string | null
+          contraindications_es?: string | null
+          contraindications_fr?: string | null
+          contraindications_hi?: string | null
+          contraindications_id?: string | null
+          contraindications_ja?: string | null
           contraindications_ka?: string | null
           contraindications_kk?: string | null
+          contraindications_ko?: string | null
+          contraindications_nl?: string | null
+          contraindications_pl?: string | null
+          contraindications_pt?: string | null
           contraindications_ru?: string | null
+          contraindications_sv?: string | null
           contraindications_tr?: string | null
           contraindications_uz?: string | null
+          contraindications_vi?: string | null
+          contraindications_zh?: string | null
           country_code?: string
           created_at?: string
           disease_ar?: string | null
           disease_az?: string | null
           disease_de?: string | null
           disease_en?: string | null
+          disease_es?: string | null
+          disease_fr?: string | null
+          disease_hi?: string | null
+          disease_id?: string | null
+          disease_ja?: string | null
           disease_ka?: string | null
           disease_kk?: string | null
+          disease_ko?: string | null
+          disease_nl?: string | null
+          disease_pl?: string | null
+          disease_pt?: string | null
           disease_ru?: string | null
+          disease_sv?: string | null
           disease_tr?: string | null
           disease_uz?: string | null
+          disease_vi?: string | null
+          disease_zh?: string | null
           full_description_ar?: string | null
           full_description_az?: string | null
           full_description_de?: string | null
           full_description_en?: string | null
+          full_description_es?: string | null
+          full_description_fr?: string | null
+          full_description_hi?: string | null
+          full_description_id?: string | null
+          full_description_ja?: string | null
           full_description_ka?: string | null
           full_description_kk?: string | null
+          full_description_ko?: string | null
+          full_description_nl?: string | null
+          full_description_pl?: string | null
+          full_description_pt?: string | null
           full_description_ru?: string | null
+          full_description_sv?: string | null
           full_description_tr?: string | null
           full_description_uz?: string | null
+          full_description_vi?: string | null
+          full_description_zh?: string | null
           id?: string
           is_active?: boolean
           is_mandatory?: boolean
@@ -13433,38 +22036,86 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           route_ar?: string | null
           route_az?: string | null
           route_de?: string | null
           route_en?: string | null
+          route_es?: string | null
+          route_fr?: string | null
+          route_hi?: string | null
+          route_id?: string | null
+          route_ja?: string | null
           route_ka?: string | null
           route_kk?: string | null
+          route_ko?: string | null
+          route_nl?: string | null
+          route_pl?: string | null
+          route_pt?: string | null
           route_ru?: string | null
+          route_sv?: string | null
           route_tr?: string | null
           route_uz?: string | null
+          route_vi?: string | null
+          route_zh?: string | null
           short_description_ar?: string | null
           short_description_az?: string | null
           short_description_de?: string | null
           short_description_en?: string | null
+          short_description_es?: string | null
+          short_description_fr?: string | null
+          short_description_hi?: string | null
+          short_description_id?: string | null
+          short_description_ja?: string | null
           short_description_ka?: string | null
           short_description_kk?: string | null
+          short_description_ko?: string | null
+          short_description_nl?: string | null
+          short_description_pl?: string | null
+          short_description_pt?: string | null
           short_description_ru?: string | null
+          short_description_sv?: string | null
           short_description_tr?: string | null
           short_description_uz?: string | null
+          short_description_vi?: string | null
+          short_description_zh?: string | null
           side_effects_ar?: string | null
           side_effects_az?: string | null
           side_effects_de?: string | null
           side_effects_en?: string | null
+          side_effects_es?: string | null
+          side_effects_fr?: string | null
+          side_effects_hi?: string | null
+          side_effects_id?: string | null
+          side_effects_ja?: string | null
           side_effects_ka?: string | null
           side_effects_kk?: string | null
+          side_effects_ko?: string | null
+          side_effects_nl?: string | null
+          side_effects_pl?: string | null
+          side_effects_pt?: string | null
           side_effects_ru?: string | null
+          side_effects_sv?: string | null
           side_effects_tr?: string | null
           side_effects_uz?: string | null
+          side_effects_vi?: string | null
+          side_effects_zh?: string | null
           sort_order?: number
           source_url?: string | null
           updated_at?: string
@@ -13523,40 +22174,88 @@ export type Database = {
           benefits_ar: string[] | null
           benefits_de: string[] | null
           benefits_en: string[] | null
+          benefits_es: string[] | null
+          benefits_fr: string[] | null
+          benefits_hi: string[] | null
+          benefits_id: string[] | null
+          benefits_ja: string[] | null
           benefits_ka: string[] | null
           benefits_kk: string[] | null
+          benefits_ko: string[] | null
+          benefits_nl: string[] | null
+          benefits_pl: string[] | null
+          benefits_pt: string[] | null
           benefits_ru: string[] | null
+          benefits_sv: string[] | null
           benefits_tr: string[] | null
           benefits_uz: string[] | null
+          benefits_vi: string[] | null
+          benefits_zh: string[] | null
           created_at: string
           description: string | null
           description_ar: string | null
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           dosage: string | null
           dosage_ar: string | null
           dosage_de: string | null
           dosage_en: string | null
+          dosage_es: string | null
+          dosage_fr: string | null
+          dosage_hi: string | null
+          dosage_id: string | null
+          dosage_ja: string | null
           dosage_ka: string | null
           dosage_kk: string | null
+          dosage_ko: string | null
+          dosage_nl: string | null
+          dosage_pl: string | null
+          dosage_pt: string | null
           dosage_ru: string | null
+          dosage_sv: string | null
           dosage_tr: string | null
           dosage_uz: string | null
+          dosage_vi: string | null
+          dosage_zh: string | null
           food_sources: string[] | null
           food_sources_ar: string[] | null
           food_sources_de: string[] | null
           food_sources_en: string[] | null
+          food_sources_es: string[] | null
+          food_sources_fr: string[] | null
+          food_sources_hi: string[] | null
+          food_sources_id: string[] | null
+          food_sources_ja: string[] | null
           food_sources_ka: string[] | null
           food_sources_kk: string[] | null
+          food_sources_ko: string[] | null
+          food_sources_nl: string[] | null
+          food_sources_pl: string[] | null
+          food_sources_pt: string[] | null
           food_sources_ru: string[] | null
+          food_sources_sv: string[] | null
           food_sources_tr: string[] | null
           food_sources_uz: string[] | null
+          food_sources_vi: string[] | null
+          food_sources_zh: string[] | null
           icon_emoji: string | null
           id: string
           importance: string | null
@@ -13570,11 +22269,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           sort_order: number | null
           trimester: number[] | null
           updated_at: string
@@ -13586,40 +22297,88 @@ export type Database = {
           benefits_ar?: string[] | null
           benefits_de?: string[] | null
           benefits_en?: string[] | null
+          benefits_es?: string[] | null
+          benefits_fr?: string[] | null
+          benefits_hi?: string[] | null
+          benefits_id?: string[] | null
+          benefits_ja?: string[] | null
           benefits_ka?: string[] | null
           benefits_kk?: string[] | null
+          benefits_ko?: string[] | null
+          benefits_nl?: string[] | null
+          benefits_pl?: string[] | null
+          benefits_pt?: string[] | null
           benefits_ru?: string[] | null
+          benefits_sv?: string[] | null
           benefits_tr?: string[] | null
           benefits_uz?: string[] | null
+          benefits_vi?: string[] | null
+          benefits_zh?: string[] | null
           created_at?: string
           description?: string | null
           description_ar?: string | null
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           dosage?: string | null
           dosage_ar?: string | null
           dosage_de?: string | null
           dosage_en?: string | null
+          dosage_es?: string | null
+          dosage_fr?: string | null
+          dosage_hi?: string | null
+          dosage_id?: string | null
+          dosage_ja?: string | null
           dosage_ka?: string | null
           dosage_kk?: string | null
+          dosage_ko?: string | null
+          dosage_nl?: string | null
+          dosage_pl?: string | null
+          dosage_pt?: string | null
           dosage_ru?: string | null
+          dosage_sv?: string | null
           dosage_tr?: string | null
           dosage_uz?: string | null
+          dosage_vi?: string | null
+          dosage_zh?: string | null
           food_sources?: string[] | null
           food_sources_ar?: string[] | null
           food_sources_de?: string[] | null
           food_sources_en?: string[] | null
+          food_sources_es?: string[] | null
+          food_sources_fr?: string[] | null
+          food_sources_hi?: string[] | null
+          food_sources_id?: string[] | null
+          food_sources_ja?: string[] | null
           food_sources_ka?: string[] | null
           food_sources_kk?: string[] | null
+          food_sources_ko?: string[] | null
+          food_sources_nl?: string[] | null
+          food_sources_pl?: string[] | null
+          food_sources_pt?: string[] | null
           food_sources_ru?: string[] | null
+          food_sources_sv?: string[] | null
           food_sources_tr?: string[] | null
           food_sources_uz?: string[] | null
+          food_sources_vi?: string[] | null
+          food_sources_zh?: string[] | null
           icon_emoji?: string | null
           id?: string
           importance?: string | null
@@ -13633,11 +22392,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
           trimester?: number[] | null
           updated_at?: string
@@ -13649,40 +22420,88 @@ export type Database = {
           benefits_ar?: string[] | null
           benefits_de?: string[] | null
           benefits_en?: string[] | null
+          benefits_es?: string[] | null
+          benefits_fr?: string[] | null
+          benefits_hi?: string[] | null
+          benefits_id?: string[] | null
+          benefits_ja?: string[] | null
           benefits_ka?: string[] | null
           benefits_kk?: string[] | null
+          benefits_ko?: string[] | null
+          benefits_nl?: string[] | null
+          benefits_pl?: string[] | null
+          benefits_pt?: string[] | null
           benefits_ru?: string[] | null
+          benefits_sv?: string[] | null
           benefits_tr?: string[] | null
           benefits_uz?: string[] | null
+          benefits_vi?: string[] | null
+          benefits_zh?: string[] | null
           created_at?: string
           description?: string | null
           description_ar?: string | null
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           dosage?: string | null
           dosage_ar?: string | null
           dosage_de?: string | null
           dosage_en?: string | null
+          dosage_es?: string | null
+          dosage_fr?: string | null
+          dosage_hi?: string | null
+          dosage_id?: string | null
+          dosage_ja?: string | null
           dosage_ka?: string | null
           dosage_kk?: string | null
+          dosage_ko?: string | null
+          dosage_nl?: string | null
+          dosage_pl?: string | null
+          dosage_pt?: string | null
           dosage_ru?: string | null
+          dosage_sv?: string | null
           dosage_tr?: string | null
           dosage_uz?: string | null
+          dosage_vi?: string | null
+          dosage_zh?: string | null
           food_sources?: string[] | null
           food_sources_ar?: string[] | null
           food_sources_de?: string[] | null
           food_sources_en?: string[] | null
+          food_sources_es?: string[] | null
+          food_sources_fr?: string[] | null
+          food_sources_hi?: string[] | null
+          food_sources_id?: string[] | null
+          food_sources_ja?: string[] | null
           food_sources_ka?: string[] | null
           food_sources_kk?: string[] | null
+          food_sources_ko?: string[] | null
+          food_sources_nl?: string[] | null
+          food_sources_pl?: string[] | null
+          food_sources_pt?: string[] | null
           food_sources_ru?: string[] | null
+          food_sources_sv?: string[] | null
           food_sources_tr?: string[] | null
           food_sources_uz?: string[] | null
+          food_sources_vi?: string[] | null
+          food_sources_zh?: string[] | null
           icon_emoji?: string | null
           id?: string
           importance?: string | null
@@ -13696,11 +22515,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           sort_order?: number | null
           trimester?: number[] | null
           updated_at?: string
@@ -13751,11 +22582,23 @@ export type Database = {
           content_ar: string | null
           content_de: string | null
           content_en: string | null
+          content_es: string | null
+          content_fr: string | null
+          content_hi: string | null
+          content_id: string | null
+          content_ja: string | null
           content_ka: string | null
           content_kk: string | null
+          content_ko: string | null
+          content_nl: string | null
+          content_pl: string | null
+          content_pt: string | null
           content_ru: string | null
+          content_sv: string | null
           content_tr: string | null
           content_uz: string | null
+          content_vi: string | null
+          content_zh: string | null
           created_at: string
           id: string
           image_url: string | null
@@ -13765,20 +22608,44 @@ export type Database = {
           tips_ar: Json | null
           tips_de: Json | null
           tips_en: Json | null
+          tips_es: Json | null
+          tips_fr: Json | null
+          tips_hi: Json | null
+          tips_id: Json | null
+          tips_ja: Json | null
           tips_ka: Json | null
           tips_kk: Json | null
+          tips_ko: Json | null
+          tips_nl: Json | null
+          tips_pl: Json | null
+          tips_pt: Json | null
           tips_ru: Json | null
+          tips_sv: Json | null
           tips_tr: Json | null
           tips_uz: Json | null
+          tips_vi: Json | null
+          tips_zh: Json | null
           title: string
           title_ar: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string
           week_number: number
         }
@@ -13787,11 +22654,23 @@ export type Database = {
           content_ar?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string
           id?: string
           image_url?: string | null
@@ -13801,20 +22680,44 @@ export type Database = {
           tips_ar?: Json | null
           tips_de?: Json | null
           tips_en?: Json | null
+          tips_es?: Json | null
+          tips_fr?: Json | null
+          tips_hi?: Json | null
+          tips_id?: Json | null
+          tips_ja?: Json | null
           tips_ka?: Json | null
           tips_kk?: Json | null
+          tips_ko?: Json | null
+          tips_nl?: Json | null
+          tips_pl?: Json | null
+          tips_pt?: Json | null
           tips_ru?: Json | null
+          tips_sv?: Json | null
           tips_tr?: Json | null
           tips_uz?: Json | null
+          tips_vi?: Json | null
+          tips_zh?: Json | null
           title: string
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
           week_number: number
         }
@@ -13823,11 +22726,23 @@ export type Database = {
           content_ar?: string | null
           content_de?: string | null
           content_en?: string | null
+          content_es?: string | null
+          content_fr?: string | null
+          content_hi?: string | null
+          content_id?: string | null
+          content_ja?: string | null
           content_ka?: string | null
           content_kk?: string | null
+          content_ko?: string | null
+          content_nl?: string | null
+          content_pl?: string | null
+          content_pt?: string | null
           content_ru?: string | null
+          content_sv?: string | null
           content_tr?: string | null
           content_uz?: string | null
+          content_vi?: string | null
+          content_zh?: string | null
           created_at?: string
           id?: string
           image_url?: string | null
@@ -13837,20 +22752,44 @@ export type Database = {
           tips_ar?: Json | null
           tips_de?: Json | null
           tips_en?: Json | null
+          tips_es?: Json | null
+          tips_fr?: Json | null
+          tips_hi?: Json | null
+          tips_id?: Json | null
+          tips_ja?: Json | null
           tips_ka?: Json | null
           tips_kk?: Json | null
+          tips_ko?: Json | null
+          tips_nl?: Json | null
+          tips_pl?: Json | null
+          tips_pt?: Json | null
           tips_ru?: Json | null
+          tips_sv?: Json | null
           tips_tr?: Json | null
           tips_uz?: Json | null
+          tips_vi?: Json | null
+          tips_zh?: Json | null
           title?: string
           title_ar?: string | null
           title_de?: string | null
           title_en?: string | null
+          title_es?: string | null
+          title_fr?: string | null
+          title_hi?: string | null
+          title_id?: string | null
+          title_ja?: string | null
           title_ka?: string | null
           title_kk?: string | null
+          title_ko?: string | null
+          title_nl?: string | null
+          title_pl?: string | null
+          title_pt?: string | null
           title_ru?: string | null
+          title_sv?: string | null
           title_tr?: string | null
           title_uz?: string | null
+          title_vi?: string | null
+          title_zh?: string | null
           updated_at?: string
           week_number?: number
         }
@@ -13892,11 +22831,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           is_active: boolean | null
           max_gain_kg: number
@@ -13912,11 +22863,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           max_gain_kg: number
@@ -13932,11 +22895,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           is_active?: boolean | null
           max_gain_kg?: number
@@ -13956,11 +22931,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           emoji: string | null
           id: string
           is_active: boolean | null
@@ -13969,11 +22956,23 @@ export type Database = {
           name_az: string | null
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           noise_type: string | null
           sort_order: number | null
         }
@@ -13986,11 +22985,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
@@ -13999,11 +23010,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           noise_type?: string | null
           sort_order?: number | null
         }
@@ -14016,11 +23039,23 @@ export type Database = {
           description_az?: string | null
           description_de?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
           description_ka?: string | null
           description_kk?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
           description_uz?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           emoji?: string | null
           id?: string
           is_active?: boolean | null
@@ -14029,11 +23064,23 @@ export type Database = {
           name_az?: string | null
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           noise_type?: string | null
           sort_order?: number | null
         }
@@ -14045,8 +23092,20 @@ export type Database = {
           description: string | null
           description_az: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
+          description_vi: string | null
+          description_zh: string | null
           id: string
           relationship_type: string | null
           sign1: string
@@ -14057,8 +23116,20 @@ export type Database = {
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           relationship_type?: string | null
           sign1: string
@@ -14069,8 +23140,20 @@ export type Database = {
           description?: string | null
           description_az?: string | null
           description_en?: string | null
+          description_es?: string | null
+          description_fr?: string | null
+          description_hi?: string | null
+          description_id?: string | null
+          description_ja?: string | null
+          description_ko?: string | null
+          description_nl?: string | null
+          description_pl?: string | null
+          description_pt?: string | null
           description_ru?: string | null
+          description_sv?: string | null
           description_tr?: string | null
+          description_vi?: string | null
+          description_zh?: string | null
           id?: string
           relationship_type?: string | null
           sign1?: string
@@ -14085,11 +23168,23 @@ export type Database = {
           characteristics_az: string[] | null
           characteristics_de: string | null
           characteristics_en: string | null
+          characteristics_es: string | null
+          characteristics_fr: string | null
+          characteristics_hi: string | null
+          characteristics_id: string | null
+          characteristics_ja: string | null
           characteristics_ka: string | null
           characteristics_kk: string | null
+          characteristics_ko: string | null
+          characteristics_nl: string | null
+          characteristics_pl: string | null
+          characteristics_pt: string | null
           characteristics_ru: string | null
+          characteristics_sv: string | null
           characteristics_tr: string | null
           characteristics_uz: string | null
+          characteristics_vi: string | null
+          characteristics_zh: string | null
           color: string | null
           element: string | null
           end_date: string
@@ -14099,11 +23194,23 @@ export type Database = {
           name_az: string
           name_de: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
           name_ka: string | null
           name_kk: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
           name_ru: string | null
+          name_sv: string | null
           name_tr: string | null
           name_uz: string | null
+          name_vi: string | null
+          name_zh: string | null
           ruling_planet: string | null
           sort_order: number | null
           start_date: string
@@ -14115,11 +23222,23 @@ export type Database = {
           characteristics_az?: string[] | null
           characteristics_de?: string | null
           characteristics_en?: string | null
+          characteristics_es?: string | null
+          characteristics_fr?: string | null
+          characteristics_hi?: string | null
+          characteristics_id?: string | null
+          characteristics_ja?: string | null
           characteristics_ka?: string | null
           characteristics_kk?: string | null
+          characteristics_ko?: string | null
+          characteristics_nl?: string | null
+          characteristics_pl?: string | null
+          characteristics_pt?: string | null
           characteristics_ru?: string | null
+          characteristics_sv?: string | null
           characteristics_tr?: string | null
           characteristics_uz?: string | null
+          characteristics_vi?: string | null
+          characteristics_zh?: string | null
           color?: string | null
           element?: string | null
           end_date: string
@@ -14129,11 +23248,23 @@ export type Database = {
           name_az: string
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           ruling_planet?: string | null
           sort_order?: number | null
           start_date: string
@@ -14145,11 +23276,23 @@ export type Database = {
           characteristics_az?: string[] | null
           characteristics_de?: string | null
           characteristics_en?: string | null
+          characteristics_es?: string | null
+          characteristics_fr?: string | null
+          characteristics_hi?: string | null
+          characteristics_id?: string | null
+          characteristics_ja?: string | null
           characteristics_ka?: string | null
           characteristics_kk?: string | null
+          characteristics_ko?: string | null
+          characteristics_nl?: string | null
+          characteristics_pl?: string | null
+          characteristics_pt?: string | null
           characteristics_ru?: string | null
+          characteristics_sv?: string | null
           characteristics_tr?: string | null
           characteristics_uz?: string | null
+          characteristics_vi?: string | null
+          characteristics_zh?: string | null
           color?: string | null
           element?: string | null
           end_date?: string
@@ -14159,11 +23302,23 @@ export type Database = {
           name_az?: string
           name_de?: string | null
           name_en?: string | null
+          name_es?: string | null
+          name_fr?: string | null
+          name_hi?: string | null
+          name_id?: string | null
+          name_ja?: string | null
           name_ka?: string | null
           name_kk?: string | null
+          name_ko?: string | null
+          name_nl?: string | null
+          name_pl?: string | null
+          name_pt?: string | null
           name_ru?: string | null
+          name_sv?: string | null
           name_tr?: string | null
           name_uz?: string | null
+          name_vi?: string | null
+          name_zh?: string | null
           ruling_planet?: string | null
           sort_order?: number | null
           start_date?: string
@@ -14177,21 +23332,93 @@ export type Database = {
         Row: {
           address: string | null
           address_en: string | null
+          address_es: string | null
+          address_fr: string | null
+          address_hi: string | null
+          address_id: string | null
+          address_ja: string | null
+          address_ko: string | null
+          address_nl: string | null
+          address_pl: string | null
+          address_pt: string | null
+          address_sv: string | null
+          address_vi: string | null
+          address_zh: string | null
           category_key: string | null
           city: string | null
           city_en: string | null
+          city_es: string | null
+          city_fr: string | null
+          city_hi: string | null
+          city_id: string | null
+          city_ja: string | null
+          city_ko: string | null
+          city_nl: string | null
+          city_pl: string | null
+          city_pt: string | null
+          city_sv: string | null
+          city_vi: string | null
+          city_zh: string | null
           countries: string[] | null
           cover_url: string | null
           created_at: string | null
           description: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
+          description_sv: string | null
+          description_vi: string | null
+          description_zh: string | null
           discount_label: string | null
           discount_label_en: string | null
+          discount_label_es: string | null
+          discount_label_fr: string | null
+          discount_label_hi: string | null
+          discount_label_id: string | null
+          discount_label_ja: string | null
+          discount_label_ko: string | null
+          discount_label_nl: string | null
+          discount_label_pl: string | null
+          discount_label_pt: string | null
+          discount_label_sv: string | null
+          discount_label_vi: string | null
+          discount_label_zh: string | null
           discount_terms: string | null
           discount_terms_en: string | null
+          discount_terms_es: string | null
+          discount_terms_fr: string | null
+          discount_terms_hi: string | null
+          discount_terms_id: string | null
+          discount_terms_ja: string | null
+          discount_terms_ko: string | null
+          discount_terms_nl: string | null
+          discount_terms_pl: string | null
+          discount_terms_pt: string | null
+          discount_terms_sv: string | null
+          discount_terms_vi: string | null
+          discount_terms_zh: string | null
           discount_value: number | null
           district: string | null
           district_en: string | null
+          district_es: string | null
+          district_fr: string | null
+          district_hi: string | null
+          district_id: string | null
+          district_ja: string | null
+          district_ko: string | null
+          district_nl: string | null
+          district_pl: string | null
+          district_pt: string | null
+          district_sv: string | null
+          district_vi: string | null
+          district_zh: string | null
           gallery_urls: string[] | null
           id: string | null
           instagram: string | null
@@ -14202,6 +23429,18 @@ export type Database = {
           longitude: number | null
           name: string | null
           name_en: string | null
+          name_es: string | null
+          name_fr: string | null
+          name_hi: string | null
+          name_id: string | null
+          name_ja: string | null
+          name_ko: string | null
+          name_nl: string | null
+          name_pl: string | null
+          name_pt: string | null
+          name_sv: string | null
+          name_vi: string | null
+          name_zh: string | null
           phone: string | null
           qr_ttl_seconds: number | null
           redemption_cooldown_hours: number | null
@@ -14211,82 +23450,6 @@ export type Database = {
           updated_at: string | null
           website: string | null
           working_hours: Json | null
-        }
-        Insert: {
-          address?: string | null
-          address_en?: string | null
-          category_key?: string | null
-          city?: string | null
-          city_en?: string | null
-          countries?: string[] | null
-          cover_url?: string | null
-          created_at?: string | null
-          description?: string | null
-          description_en?: string | null
-          discount_label?: string | null
-          discount_label_en?: string | null
-          discount_terms?: string | null
-          discount_terms_en?: string | null
-          discount_value?: number | null
-          district?: string | null
-          district_en?: string | null
-          gallery_urls?: string[] | null
-          id?: string | null
-          instagram?: string | null
-          is_active?: boolean | null
-          is_featured?: boolean | null
-          latitude?: number | null
-          logo_url?: string | null
-          longitude?: number | null
-          name?: string | null
-          name_en?: string | null
-          phone?: string | null
-          qr_ttl_seconds?: number | null
-          redemption_cooldown_hours?: number | null
-          redemption_lifetime_limit?: number | null
-          slug?: string | null
-          sort_order?: number | null
-          updated_at?: string | null
-          website?: string | null
-          working_hours?: Json | null
-        }
-        Update: {
-          address?: string | null
-          address_en?: string | null
-          category_key?: string | null
-          city?: string | null
-          city_en?: string | null
-          countries?: string[] | null
-          cover_url?: string | null
-          created_at?: string | null
-          description?: string | null
-          description_en?: string | null
-          discount_label?: string | null
-          discount_label_en?: string | null
-          discount_terms?: string | null
-          discount_terms_en?: string | null
-          discount_value?: number | null
-          district?: string | null
-          district_en?: string | null
-          gallery_urls?: string[] | null
-          id?: string | null
-          instagram?: string | null
-          is_active?: boolean | null
-          is_featured?: boolean | null
-          latitude?: number | null
-          logo_url?: string | null
-          longitude?: number | null
-          name?: string | null
-          name_en?: string | null
-          phone?: string | null
-          qr_ttl_seconds?: number | null
-          redemption_cooldown_hours?: number | null
-          redemption_lifetime_limit?: number | null
-          slug?: string | null
-          sort_order?: number | null
-          updated_at?: string | null
-          website?: string | null
-          working_hours?: Json | null
         }
         Relationships: [
           {
@@ -14303,6 +23466,34 @@ export type Database = {
       _grant_premium_days: {
         Args: { p_days: number; p_user: string }
         Returns: undefined
+      }
+      ack_my_moderator_warning_v1: {
+        Args: { p_actor: string; p_claim: string; p_warning: string }
+        Returns: boolean
+      }
+      admin_assert_access_v1: { Args: never; Returns: undefined }
+      admin_community_ad_decide_v1: {
+        Args: {
+          p_action: string
+          p_id: string
+          p_note: string
+          p_reason: string
+          p_request: string
+          p_revision: number
+          p_updated_at: string
+        }
+        Returns: Json
+      }
+      admin_community_ad_queue_v1: {
+        Args: {
+          p_language?: string
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_since?: string
+          p_state?: string
+        }
+        Returns: Json
       }
       admin_country_features: {
         Args: { _country: string; _from: string; _limit?: number; _to: string }
@@ -14343,6 +23534,98 @@ export type Database = {
           new_users: number
         }[]
       }
+      admin_insight_filters_v1: { Args: { p_filters?: Json }; Returns: Json }
+      admin_insights_v1: {
+        Args: { p_filters?: Json; p_from: string; p_to: string }
+        Returns: Json
+      }
+      admin_matches_insight_v1: {
+        Args: {
+          access_kind: string
+          billing_cycle: string
+          country: string
+          email: string
+          expires_at: string
+          f: Json
+          language: string
+          module: string
+          name: string
+          subscription_status: string
+        }
+        Returns: boolean
+      }
+      admin_member_facts_v1: {
+        Args: never
+        Returns: {
+          access_kind: string
+          billing_basis: string
+          billing_cycle: string
+          cancelled_at: string
+          country: string
+          email: string
+          expires_at: string
+          is_trial: boolean
+          joined_at: string
+          language: string
+          module: string
+          name: string
+          product_id: string
+          subscription_status: string
+          user_id: string
+        }[]
+      }
+      admin_members_v1: {
+        Args: { p_filters?: Json; p_page?: number; p_size?: number }
+        Returns: Json
+      }
+      admin_notification_audience_v1: {
+        Args: { p_segment: Json }
+        Returns: {
+          eligible: boolean
+          platform: string
+          reason: string
+          token_hash: string
+          token_id: string
+          user_id: string
+        }[]
+      }
+      admin_notification_cancel_v1: { Args: { p_id: string }; Returns: Json }
+      admin_notification_claim_v1: {
+        Args: { p_claim: string; p_id: string; p_limit?: number }
+        Returns: Json
+      }
+      admin_notification_create_v1: {
+        Args: {
+          p_body: string
+          p_fingerprint: string
+          p_id: string
+          p_segment: Json
+          p_title: string
+        }
+        Returns: Json
+      }
+      admin_notification_finish_v1: {
+        Args: { p_claim: string; p_id: string; p_results: Json }
+        Returns: Json
+      }
+      admin_notification_list_v1: { Args: { p_limit?: number }; Returns: Json }
+      admin_notification_preview_v1: {
+        Args: { p_segment: Json }
+        Returns: Json
+      }
+      admin_notification_quiet_v1: {
+        Args: { enabled: boolean; end_at: string; start_at: string }
+        Returns: boolean
+      }
+      admin_notification_segment_v1: {
+        Args: { p_segment: Json }
+        Returns: Json
+      }
+      admin_notification_status_v1: { Args: { p_id: string }; Returns: Json }
+      admin_retry_community_ad_delivery_v1: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
       admin_set_source_admob_emergency_v1: {
         Args: { p_disabled: boolean }
         Returns: Json
@@ -14382,6 +23665,18 @@ export type Database = {
         }
         Returns: string
       }
+      chat_create_group_v4: {
+        Args: {
+          p_actor: string
+          p_description?: string
+          p_id: string
+          p_language: string
+          p_members?: string[]
+          p_name: string
+          p_visibility?: string
+        }
+        Returns: string
+      }
       chat_delete_group_message_v3: {
         Args: { p_actor: string; p_group: string; p_message: string }
         Returns: Json
@@ -14397,6 +23692,10 @@ export type Database = {
       }
       chat_group_admin_v2: { Args: { p_group: string }; Returns: boolean }
       chat_group_cards_v3: { Args: { p_groups: string[] }; Returns: Json[] }
+      chat_group_cards_v4: {
+        Args: { p_groups: string[]; p_language: string }
+        Returns: Json[]
+      }
       chat_group_member_v2: { Args: { p_group: string }; Returns: boolean }
       chat_group_members_v2: {
         Args: { p_group: string }
@@ -14423,6 +23722,15 @@ export type Database = {
       chat_groups_v2: { Args: never; Returns: Json[] }
       chat_groups_v3: {
         Args: { p_group?: string; p_scope?: string; p_search?: string }
+        Returns: Json[]
+      }
+      chat_groups_v4: {
+        Args: {
+          p_group?: string
+          p_language: string
+          p_scope?: string
+          p_search?: string
+        }
         Returns: Json[]
       }
       chat_manage_members_v2: {
@@ -14504,12 +23812,135 @@ export type Database = {
         }
         Returns: boolean
       }
+      claim_community_ad_deliveries_v1: {
+        Args: { p_claim: string; p_limit?: number; p_review_ids?: string[] }
+        Returns: Json
+      }
+      claim_community_ad_reviews_v1: {
+        Args: { p_claim: string; p_limit?: number; p_review_ids?: string[] }
+        Returns: Json
+      }
+      claim_my_moderator_warning_v1: {
+        Args: { p_actor: string; p_claim: string }
+        Returns: Json
+      }
+      community_ad_admin_v1: { Args: never; Returns: undefined }
+      community_ad_case_v1: { Args: { p_id: string }; Returns: Json }
+      community_ad_delivery_payload_v1: {
+        Args: { p_claim: string; p_id: string }
+        Returns: Json
+      }
+      community_ad_hash_v1: { Args: { p: Json }; Returns: string }
+      community_ad_media_delete_allowed_v1: {
+        Args: { p_bucket: string; p_name: string }
+        Returns: boolean
+      }
+      community_ad_media_key_v1: {
+        Args: { p_author: string; p_url: string }
+        Returns: string
+      }
+      community_ad_media_ready_v1: {
+        Args: { p_author: string; p_urls: string[] }
+        Returns: boolean
+      }
+      community_ad_media_referenced_v1: {
+        Args: { p_bucket: string; p_name: string }
+        Returns: boolean
+      }
+      community_ad_notice_copy_v1: {
+        Args: { p_language: string; p_state: string }
+        Returns: Json
+      }
+      community_ad_notify_v1: {
+        Args: { p_event: string; p_review: string; p_technical?: boolean }
+        Returns: undefined
+      }
+      community_ad_payload_v1: { Args: { p: Json }; Returns: Json }
+      community_ad_service_v1: { Args: never; Returns: undefined }
+      community_ad_worker_heartbeat_v1: {
+        Args: { p_report: Json; p_run: string }
+        Returns: undefined
+      }
+      community_blog_visible_v1: {
+        Args: { p_blog: string; p_user: string }
+        Returns: boolean
+      }
+      community_comments_v2: {
+        Args: { p_post: string }
+        Returns: {
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_anonymous: boolean
+          is_pinned: boolean | null
+          likes_count: number | null
+          moderation_action_id: string | null
+          moderation_edited_at: string | null
+          moderation_edited_by: string | null
+          moderation_reason: string | null
+          moderation_removed_at: string | null
+          moderation_version: number | null
+          parent_comment_id: string | null
+          post_id: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "post_comments"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      community_language_valid_v1: { Args: { value: string }; Returns: boolean }
       community_premium_active_v2: {
         Args: { p_user: string }
         Returns: boolean
       }
       confirm_referral_conversion: {
         Args: { p_referred_user_id: string }
+        Returns: Json
+      }
+      customerio_activity_event_v1: {
+        Args: { event_name: string }
+        Returns: boolean
+      }
+      customerio_audience_dirty_v1: {
+        Args: { actor: string }
+        Returns: undefined
+      }
+      customerio_audience_enqueue_household_v1: {
+        Args: { actor: string }
+        Returns: undefined
+      }
+      customerio_audience_traits_v1: { Args: { actor: string }; Returns: Json }
+      customerio_audience_v1: {
+        Args: { p_action: string; p_options?: Json }
+        Returns: Json
+      }
+      customerio_enqueue_v1: { Args: { actor: string }; Returns: undefined }
+      customerio_iso_v1: { Args: { value: string }; Returns: string }
+      customerio_profile_event_base_v1: {
+        Args: { actor: string }
+        Returns: Json
+      }
+      customerio_profile_event_v1: { Args: { actor: string }; Returns: Json }
+      customerio_source_grant_v1: { Args: { actor: string }; Returns: Json }
+      customerio_sync_v1: {
+        Args: { p_action: string; p_options?: Json }
+        Returns: Json
+      }
+      customerio_writer_open_v1: { Args: never; Returns: boolean }
+      edit_community_post_v1: {
+        Args: {
+          p_actor: string
+          p_content: string
+          p_expected_revision?: number
+          p_language: string
+          p_post: string
+        }
         Returns: Json
       }
       find_partner_by_code: {
@@ -14520,6 +23951,24 @@ export type Database = {
           name: string
           user_id: string
         }[]
+      }
+      finish_community_ad_delivery_v1: {
+        Args: {
+          p_claim: string
+          p_code?: string
+          p_id: string
+          p_state: string
+        }
+        Returns: boolean
+      }
+      finish_community_ad_review_v1: {
+        Args: {
+          p_claim: string
+          p_content_hash: string
+          p_id: string
+          p_result: Json
+        }
+        Returns: Json
       }
       generate_partner_code: { Args: never; Returns: string }
       get_active_payment_methods: {
@@ -14539,6 +23988,7 @@ export type Database = {
         }[]
       }
       get_active_users_count: { Args: { _since: string }; Returns: number }
+      get_admin_console_contract_v1: { Args: never; Returns: Json }
       get_anacan_account_projection_contract_v1: { Args: never; Returns: Json }
       get_anacan_notification_contract_v1: { Args: never; Returns: Json }
       get_anacan_runtime_contract_v1: { Args: never; Returns: Json }
@@ -14552,11 +24002,23 @@ export type Database = {
           description_az: string | null
           description_de: string | null
           description_en: string | null
+          description_es: string | null
+          description_fr: string | null
+          description_hi: string | null
+          description_id: string | null
+          description_ja: string | null
           description_ka: string | null
           description_kk: string | null
+          description_ko: string | null
+          description_nl: string | null
+          description_pl: string | null
+          description_pt: string | null
           description_ru: string | null
+          description_sv: string | null
           description_tr: string | null
           description_uz: string | null
+          description_vi: string | null
+          description_zh: string | null
           duration_days: number | null
           emoji: string | null
           id: string
@@ -14569,31 +24031,67 @@ export type Database = {
           symptoms_az: string[] | null
           symptoms_de: string | null
           symptoms_en: string | null
+          symptoms_es: string | null
+          symptoms_fr: string | null
+          symptoms_hi: string | null
+          symptoms_id: string | null
+          symptoms_ja: string | null
           symptoms_ka: string | null
           symptoms_kk: string | null
+          symptoms_ko: string | null
+          symptoms_nl: string | null
+          symptoms_pl: string | null
+          symptoms_pt: string | null
           symptoms_ru: string | null
+          symptoms_sv: string | null
           symptoms_tr: string | null
           symptoms_uz: string | null
+          symptoms_vi: string | null
+          symptoms_zh: string | null
           tips: string[] | null
           tips_ar: string | null
           tips_az: string[] | null
           tips_de: string | null
           tips_en: string | null
+          tips_es: string | null
+          tips_fr: string | null
+          tips_hi: string | null
+          tips_id: string | null
+          tips_ja: string | null
           tips_ka: string | null
           tips_kk: string | null
+          tips_ko: string | null
+          tips_nl: string | null
+          tips_pl: string | null
+          tips_pt: string | null
           tips_ru: string | null
+          tips_sv: string | null
           tips_tr: string | null
           tips_uz: string | null
+          tips_vi: string | null
+          tips_zh: string | null
           title: string
           title_ar: string | null
           title_az: string | null
           title_de: string | null
           title_en: string | null
+          title_es: string | null
+          title_fr: string | null
+          title_hi: string | null
+          title_id: string | null
+          title_ja: string | null
           title_ka: string | null
           title_kk: string | null
+          title_ko: string | null
+          title_nl: string | null
+          title_pl: string | null
+          title_pt: string | null
           title_ru: string | null
+          title_sv: string | null
           title_tr: string | null
           title_uz: string | null
+          title_vi: string | null
+          title_zh: string | null
           updated_at: string
           week_end: number
           week_start: number
@@ -14606,6 +24104,7 @@ export type Database = {
         }
       }
       get_chat_contract_v2: { Args: never; Returns: Json }
+      get_community_ad_moderation_contract_v1: { Args: never; Returns: Json }
       get_community_connections: {
         Args: {
           p_direction: string
@@ -14636,7 +24135,12 @@ export type Database = {
           p_view?: string
         }
         Returns: {
+          ad_moderated_at: string | null
+          ad_moderation_revision: number | null
+          ad_moderation_state: string | null
+          blog_post_id: string | null
           comments_count: number | null
+          comments_locked: boolean | null
           content: string
           created_at: string
           group_id: string | null
@@ -14647,6 +24151,12 @@ export type Database = {
           language: string | null
           likes_count: number | null
           media_urls: string[] | null
+          moderation_action_id: string | null
+          moderation_edited_at: string | null
+          moderation_edited_by: string | null
+          moderation_reason: string | null
+          moderation_removed_at: string | null
+          moderation_version: number | null
           tagged_group_ids: string[] | null
           updated_at: string
           user_id: string
@@ -14658,18 +24168,72 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_community_feed_v2: {
+        Args: {
+          p_author_id?: string
+          p_group_id?: string
+          p_language: string
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_view?: string
+        }
+        Returns: {
+          ad_moderated_at: string | null
+          ad_moderation_revision: number | null
+          ad_moderation_state: string | null
+          blog_post_id: string | null
+          comments_count: number | null
+          comments_locked: boolean | null
+          content: string
+          created_at: string
+          group_id: string | null
+          id: string
+          is_active: boolean | null
+          is_anonymous: boolean
+          is_pinned: boolean | null
+          language: string | null
+          likes_count: number | null
+          media_urls: string[] | null
+          moderation_action_id: string | null
+          moderation_edited_at: string | null
+          moderation_edited_by: string | null
+          moderation_reason: string | null
+          moderation_removed_at: string | null
+          moderation_version: number | null
+          tagged_group_ids: string[] | null
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "community_posts"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_community_language_contract_v1: { Args: never; Returns: Json }
       get_community_profile_stats: {
         Args: { p_user_id: string }
         Returns: Json
       }
+      get_customerio_audience_contract_v1: { Args: never; Returns: Json }
+      get_customerio_sync_contract_v1: { Args: never; Returns: Json }
+      get_followup36_contract_v1: { Args: never; Returns: Json }
+      get_followup37_contract_v1: { Args: never; Returns: Json }
       get_group_chat_contract_v3: { Args: never; Returns: Json }
       get_linked_partner_premium: { Args: never; Returns: boolean }
       get_linked_partner_user_id: {
         Args: { _user_id: string }
         Returns: string
       }
+      get_localization_contract_v1: { Args: never; Returns: Json }
+      get_moderator_access_v1: { Args: never; Returns: Json }
+      get_moderator_contract_v1: { Args: never; Returns: Json }
+      get_my_moderation_status_v1: { Args: { p_actor: string }; Returns: Json }
       get_notification_admin_status: { Args: never; Returns: Json }
       get_or_create_referral_code: { Args: never; Returns: string }
+      get_premium_access_v1: { Args: { p_user_id?: string }; Returns: Json }
       get_public_app_setting: { Args: { p_key: string }; Returns: Json }
       get_public_community_profiles_v2: {
         Args: { p_user_ids: string[] }
@@ -14686,11 +24250,13 @@ export type Database = {
           verified_until: string
         }[]
       }
+      get_regional_catalog_contract_v1: { Args: never; Returns: Json }
       get_source_admob_configuration_v1: {
         Args: { p_expected_revision?: number }
         Returns: Json
       }
       get_source_admob_contract_v1: { Args: never; Returns: Json }
+      get_source_community_worker_contract_v1: { Args: never; Returns: Json }
       get_user_linked_partner_id: {
         Args: { _user_id: string }
         Returns: string
@@ -14738,6 +24304,195 @@ export type Database = {
         }
         Returns: boolean
       }
+      moderator_action_detail_v1: { Args: { p_id: string }; Returns: Json }
+      moderator_ad_case_v1: { Args: { p_id: string }; Returns: Json }
+      moderator_ad_decide_v1: {
+        Args: {
+          p_action: string
+          p_id: string
+          p_note: string
+          p_reason: string
+          p_request: string
+          p_revision: number
+          p_updated_at: string
+        }
+        Returns: Json
+      }
+      moderator_ad_queue_v1: {
+        Args: {
+          p_language?: string
+          p_limit?: number
+          p_offset?: number
+          p_search?: string
+          p_since?: string
+          p_state?: string
+        }
+        Returns: Json
+      }
+      moderator_assert_v1: { Args: never; Returns: string }
+      moderator_before_user_created_v1: { Args: { event: Json }; Returns: Json }
+      moderator_begin_action_v1: {
+        Args: {
+          p_action: string
+          p_args: Json
+          p_detail: string
+          p_kind: string
+          p_note: string
+          p_reason: string
+          p_request: string
+          p_subject: string
+          p_user: string
+        }
+        Returns: Json
+      }
+      moderator_content_action_v1: {
+        Args: {
+          p_action: string
+          p_content?: string
+          p_id: string
+          p_kind: string
+          p_note?: string
+          p_reason: string
+          p_request?: string
+          p_version: number
+        }
+        Returns: Json
+      }
+      moderator_content_body_v1: {
+        Args: { p: Json; p_kind: string }
+        Returns: Json
+      }
+      moderator_content_detail_v1: {
+        Args: { p_id: string; p_kind: string }
+        Returns: Json
+      }
+      moderator_content_query_v1: {
+        Args: {
+          p_kind: string
+          p_language?: string
+          p_limit?: number
+          p_offset?: number
+          p_removed?: boolean
+          p_search?: string
+          p_user?: string
+        }
+        Returns: Json
+      }
+      moderator_content_record_v1: {
+        Args: { p_id: string; p_kind: string; p_lock?: boolean }
+        Returns: Json
+      }
+      moderator_copy_v1: {
+        Args: { p_key: string; p_language: string }
+        Returns: string
+      }
+      moderator_current_role_v1: { Args: never; Returns: string }
+      moderator_function_access_v1: {
+        Args: { p_function: string; p_user: string }
+        Returns: boolean
+      }
+      moderator_hash_v1: { Args: { p: Json }; Returns: string }
+      moderator_ip_action_v1: {
+        Args: {
+          p_action: string
+          p_note: string
+          p_observation: string
+          p_reason: string
+          p_request: string
+          p_rule: string
+          p_seconds: number
+        }
+        Returns: Json
+      }
+      moderator_ip_rules_v1: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: Json
+      }
+      moderator_ip_v1: { Args: { p_value: string }; Returns: unknown }
+      moderator_notice_v1: {
+        Args: {
+          p_action: string
+          p_kind: string
+          p_subject?: string
+          p_subject_kind?: string
+          p_user: string
+        }
+        Returns: undefined
+      }
+      moderator_observe_ip_v1: {
+        Args: {
+          p_address: unknown
+          p_event?: string
+          p_proposed?: string
+          p_source: string
+          p_trusted: boolean
+          p_user: string
+        }
+        Returns: undefined
+      }
+      moderator_pre_request_v1: { Args: never; Returns: undefined }
+      moderator_query_v1: {
+        Args: {
+          p_filters?: Json
+          p_limit?: number
+          p_offset?: number
+          p_view: string
+        }
+        Returns: Json
+      }
+      moderator_reason_valid_v1: { Args: { p: string }; Returns: boolean }
+      moderator_recheck_post_v1: { Args: { p_id: string }; Returns: undefined }
+      moderator_report_decide_v1: {
+        Args: { p_decision: string; p_report: string; p_request: string }
+        Returns: Json
+      }
+      moderator_retry_ad_delivery_v1: {
+        Args: { p_id: string }
+        Returns: boolean
+      }
+      moderator_role_v1: { Args: { p_user?: string }; Returns: string }
+      moderator_source_writable_v1: { Args: never; Returns: boolean }
+      moderator_target_v1: {
+        Args: { p_sanction?: boolean; p_user: string }
+        Returns: undefined
+      }
+      moderator_task_action_v1: {
+        Args: {
+          p_action: string
+          p_id: string
+          p_note?: string
+          p_reply?: string
+          p_request?: string
+          p_revision: number
+        }
+        Returns: Json
+      }
+      moderator_user_action_v1: {
+        Args: {
+          p_action: string
+          p_detail?: string
+          p_options?: Json
+          p_reason: string
+          p_request?: string
+          p_user: string
+        }
+        Returns: Json
+      }
+      moderator_user_network_v1: { Args: { p_user: string }; Returns: Json }
+      my_community_ad_reviews_v1: {
+        Args: {
+          p_actor: string
+          p_limit?: number
+          p_offset?: number
+          p_post?: string
+        }
+        Returns: Json
+      }
+      my_moderator_decisions_v1: {
+        Args: { p_actor: string; p_limit?: number }
+        Returns: Json
+      }
+      premium_grant_state_v1: { Args: { p_user_id: string }; Returns: Json }
       record_period_days: {
         Args: {
           p_complete?: boolean
@@ -14764,6 +24519,25 @@ export type Database = {
         }
         Returns: string
       }
+      search_share_blogs_v1: {
+        Args: {
+          p_ids?: string[]
+          p_language: string
+          p_limit?: number
+          p_search?: string
+        }
+        Returns: {
+          cover_image_url: string
+          excerpt: string
+          id: string
+          slug: string
+          title: string
+        }[]
+      }
+      set_admin_badge_visibility_v1: {
+        Args: { p_actor: string; p_target: string; p_visible: boolean }
+        Returns: Json
+      }
       set_community_bookmark: {
         Args: {
           p_expected_user_id: string
@@ -14780,6 +24554,24 @@ export type Database = {
         }
         Returns: Json
       }
+      source_community_worker_v1: {
+        Args: { p_args?: Json; p_function: string }
+        Returns: Json
+      }
+      submit_community_post_v1: {
+        Args: {
+          p_actor: string
+          p_blog_post_id?: string
+          p_content: string
+          p_group_id?: string
+          p_id: string
+          p_is_anonymous?: boolean
+          p_language: string
+          p_media_urls?: string[]
+          p_tagged_group_ids?: string[]
+        }
+        Returns: Json
+      }
       submit_game_score_v1: {
         Args: {
           p_expected_user_id: string
@@ -14787,6 +24579,15 @@ export type Database = {
           p_level: number
           p_score: number
           p_submission_id: string
+        }
+        Returns: Json
+      }
+      submit_moderator_appeal_v1: {
+        Args: {
+          p_action: string
+          p_actor: string
+          p_body: string
+          p_id: string
         }
         Returns: Json
       }
