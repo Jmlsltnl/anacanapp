@@ -1,6 +1,3 @@
-// supabase/functions/admin-set-subscription/index.ts
-import { createClient as createClient2 } from "npm:@supabase/supabase-js@2";
-
 // supabase/functions/_shared/auth.ts
 import { createClient } from "npm:@supabase/supabase-js@2";
 async function checkModerationAccess(userId, functionName = "source-authenticated-function") {
@@ -69,58 +66,38 @@ async function requireAdmin(req) {
   return { userId: r.user.id, error: null };
 }
 
-// supabase/functions/admin-set-subscription/index.ts
-var corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"
-};
-var VALID_PLANS = /* @__PURE__ */ new Set(["free", "premium", "premium_plus"]);
-var VALID_STATUSES = /* @__PURE__ */ new Set(["active", "cancelled", "expired"]);
+// supabase/functions/admin-revenue-metrics/index.ts
+var cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization,apikey,x-client-info,content-type", "Cache-Control": "no-store" };
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  const json = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  const json = (value, status = 200) => new Response(JSON.stringify(value), { status, headers: { ...cors, "Content-Type": "application/json" } });
+  if (req.method === "OPTIONS") return new Response(null, { headers: cors });
+  if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
+  const admin = await requireAdmin(req);
+  if (admin.error) return admin.error;
+  const checkedAt = (/* @__PURE__ */ new Date()).toISOString();
+  const unavailable = (reason) => json({ available: false, scope: "project", checkedAt, reason });
+  const key = Deno.env.get("REVENUECAT_SECRET_API_KEY");
+  if (!key) return unavailable("not_configured");
   try {
-    const admin = await requireAdmin(req);
-    if (admin.error) return admin.error;
-    const body = await req.json().catch(() => ({}));
-    const targetUserId = body.targetUserId;
-    const planType = body.planType;
-    const status = body.status || "active";
-    if (!targetUserId || typeof targetUserId !== "string") {
-      return json({ error: "targetUserId t\u0259l\u0259b olunur" }, 400);
-    }
-    if (!planType || !VALID_PLANS.has(planType)) {
-      return json({ error: "Etibars\u0131z plan tipi" }, 400);
-    }
-    if (!VALID_STATUSES.has(status)) {
-      return json({ error: "Etibars\u0131z status" }, 400);
-    }
-    const supabase = createClient2(
-      Deno.env.get("SUPABASE_URL"),
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
-    );
-    const isPremium = planType === "premium" || planType === "premium_plus";
-    const { data: subscription, error: subError } = await supabase.from("subscriptions").upsert(
-      {
-        user_id: targetUserId,
-        plan_type: planType,
-        status,
-        updated_at: (/* @__PURE__ */ new Date()).toISOString()
-      },
-      { onConflict: "user_id" }
-    ).select().single();
-    if (subError) {
-      console.error("[admin-set-subscription] subscriptions upsert error:", subError);
-      return json({ error: "Abun\u0259lik yenil\u0259n\u0259 bilm\u0259di", detail: subError.message }, 500);
-    }
-    const { error: profileError } = await supabase.from("profiles").update({ is_premium: isPremium }).eq("user_id", targetUserId);
-    if (profileError) {
-      console.error("[admin-set-subscription] profiles update error:", profileError);
-      return json({ error: "Profil yenil\u0259n\u0259 bilm\u0259di", detail: profileError.message }, 500);
-    }
-    return json({ success: true, subscription });
-  } catch (err) {
-    console.error("[admin-set-subscription] error:", err);
-    return json({ error: err.message }, 500);
+    const response = await fetch("https://api.revenuecat.com/v2/projects/a3647ee8/metrics/overview", {
+      headers: { Authorization: `Bearer ${key}` },
+      redirect: "error",
+      signal: AbortSignal.timeout(15e3)
+    });
+    if (response.status === 401 || response.status === 403) return unavailable("permission_required");
+    if (!response.ok) return unavailable("provider_unavailable");
+    const value = await response.json();
+    if (!Array.isArray(value.metrics) || value.metrics.length > 50) return unavailable("invalid_provider_response");
+    const metrics = value.metrics.filter((item) => typeof item.id === "string" && /^[a-z0-9_]{1,80}$/.test(item.id) && typeof item.name === "string" && Number.isFinite(item.value) && typeof item.unit === "string").map((item) => ({
+      id: item.id,
+      name: item.name.slice(0, 100),
+      value: item.value,
+      unit: item.unit.slice(0, 24),
+      ...typeof item.description === "string" ? { description: item.description.slice(0, 400) } : {}
+    }));
+    if (!metrics.length) return unavailable("invalid_provider_response");
+    return json({ available: true, scope: "project", checkedAt, metrics });
+  } catch {
+    return unavailable("provider_unavailable");
   }
 });

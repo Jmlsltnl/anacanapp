@@ -68,3 +68,12 @@ verify_jwt = false
 
 [functions.translate-post]
 verify_jwt = false
+
+[functions.admin-revenue-metrics]
+verify_jwt = false
+
+[functions.admin-notification-dispatch]
+verify_jwt = false
+
+[functions.revenuecat-webhook]
+verify_jwt = false
