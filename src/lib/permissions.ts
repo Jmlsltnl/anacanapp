@@ -22,14 +22,14 @@ export async function requestCameraPermission(): Promise<PermissionResult> {
   try {
     const status = await Camera.checkPermissions();
     
-    if (status.camera === 'granted' && status.photos === 'granted') {
+    if (status.camera === 'granted') {
       return { granted: true, status: 'granted' };
     }
 
     // Request permissions
-    const requested = await Camera.requestPermissions({ permissions: ['camera', 'photos'] });
+    const requested = await Camera.requestPermissions({ permissions: ['camera'] });
     
-    const granted = requested.camera === 'granted' && requested.photos === 'granted';
+    const granted = requested.camera === 'granted';
     return { 
       granted, 
       status: granted ? 'granted' : 'denied' 
@@ -46,6 +46,7 @@ export async function requestCameraPermission(): Promise<PermissionResult> {
 export async function requestLocationPermission(): Promise<PermissionResult> {
   if (!Capacitor.isNativePlatform()) {
     // Web platform - use standard geolocation API
+    if (!navigator.geolocation) return { granted: false, status: 'prompt' };
     return new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition(
         () => resolve({ granted: true, status: 'granted' }),
@@ -61,24 +62,18 @@ export async function requestLocationPermission(): Promise<PermissionResult> {
     });
   }
 
-  try {
-    const status = await Geolocation.checkPermissions();
-    
-    if (status.location === 'granted') {
-      return { granted: true, status: 'granted' };
-    }
-
-    const requested = await Geolocation.requestPermissions();
-    const granted = requested.location === 'granted';
-    
-    return { 
-      granted, 
-      status: granted ? 'granted' : 'denied' 
-    };
-  } catch (error) {
-    console.error('Location permission error:', error);
-    return { granted: false, status: 'denied' };
+  // Approximate location is sufficient for weather. A disabled location
+  // service throws separately; it must not be reported as an app denial.
+  const status = await Geolocation.checkPermissions();
+  if (status.location === 'granted' || status.coarseLocation === 'granted') {
+    return { granted: true, status: 'granted' };
   }
+
+  const requested = await Geolocation.requestPermissions({
+    permissions: [Capacitor.getPlatform() === 'android' ? 'coarseLocation' : 'location'],
+  });
+  const granted = requested.location === 'granted' || requested.coarseLocation === 'granted';
+  return { granted, status: granted ? 'granted' : 'denied' };
 }
 
 /**
@@ -94,10 +89,10 @@ export async function requestMicrophonePermission(): Promise<PermissionResult> {
     stream.getTracks().forEach(track => track.stop());
     
     return { granted: true, status: 'granted' };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Microphone permission error:', error);
-    
-    if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+    const name = error && typeof error === 'object' && 'name' in error ? error.name : '';
+    if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
       return { granted: false, status: 'denied' };
     }
     
@@ -141,10 +136,11 @@ export async function takePhoto(): Promise<string | null> {
       return `data:image/jpeg;base64,${image.base64String}`;
     }
     return null;
-  } catch (error: any) {
+  } catch (error) {
     console.error('Take photo error:', error);
     // If user cancelled, don't throw
-    if (error.message?.includes('cancelled') || error.message?.includes('User cancelled')) {
+    const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : '';
+    if (message.toLowerCase().includes('cancelled')) {
       return null;
     }
     throw error;
@@ -161,16 +157,8 @@ export async function pickFromGallery(): Promise<string | null> {
   }
 
   try {
-    // Request photo library permissions first on native
-    const permStatus = await Camera.checkPermissions();
-    
-    if (permStatus.photos !== 'granted') {
-      const requested = await Camera.requestPermissions({ permissions: ['photos'] });
-      if (requested.photos !== 'granted') {
-        throw new Error('Photo library permission denied');
-      }
-    }
-
+    // The system picker grants access to the selected image without requiring
+    // full-library access (including Android Photo Picker and iOS limited access).
     const image = await Camera.getPhoto({
       quality: 85,
       allowEditing: false,
@@ -184,10 +172,11 @@ export async function pickFromGallery(): Promise<string | null> {
       return `data:image/jpeg;base64,${image.base64String}`;
     }
     return null;
-  } catch (error: any) {
+  } catch (error) {
     console.error('Pick from gallery error:', error);
     // If user cancelled, don't throw
-    if (error.message?.includes('cancelled') || error.message?.includes('User cancelled')) {
+    const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : '';
+    if (message.toLowerCase().includes('cancelled')) {
       return null;
     }
     throw error;
@@ -198,16 +187,15 @@ export async function pickFromGallery(): Promise<string | null> {
  * Get current position with proper permission handling
  */
 export async function getCurrentPosition(): Promise<GeolocationPosition> {
-  const permission = await requestLocationPermission();
-  
-  if (!permission.granted) {
-    throw new Error('Location permission denied');
-  }
-
   if (Capacitor.isNativePlatform()) {
+    const permission = await requestLocationPermission();
+    if (!permission.granted) {
+      throw new DOMException('Location permission denied', 'NotAllowedError');
+    }
     const position = await Geolocation.getCurrentPosition({
-      enableHighAccuracy: true,
+      enableHighAccuracy: false,
       timeout: 10000,
+      maximumAge: 60000,
     });
 
     // Convert Capacitor position to standard GeolocationPosition format
@@ -224,9 +212,10 @@ export async function getCurrentPosition(): Promise<GeolocationPosition> {
       timestamp: position.timestamp,
     } as GeolocationPosition;
   } else {
+    if (!navigator.geolocation) throw new Error('Geolocation is unavailable');
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true,
+        enableHighAccuracy: false,
         timeout: 10000,
         maximumAge: 60000,
       });

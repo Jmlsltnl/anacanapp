@@ -16,6 +16,7 @@ import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { getBackendConfig } from '@/integrations/supabase/backend-config';
 import { useAISuggestedQuestions } from '@/hooks/useDynamicTools';
 import { getPregnancyDay } from '@/lib/pregnancy-utils';
 import { getPhaseInfoForDate } from '@/lib/cycle-utils';
@@ -465,13 +466,13 @@ const AIChatScreen = forwardRef<HTMLDivElement>((_, ref) => {
       if (!session?.access_token) {
         throw new Error(tr("aichatscreen_sessiya_tapilmadi_yeniden_daxi_455503", "Sessiya tap\u0131lmad\u0131. Yenid\u0259n daxil olun."));
       }
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/dr-anacan-chat`, {
+      const response = await fetch(`${getBackendConfig().url}/functions/v1/dr-anacan-chat`, {
         method: 'POST',
         signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
-          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+          'apikey': getBackendConfig().publishableKey
         },
         body: JSON.stringify({
           messages: conversationHistory,

@@ -23746,6 +23746,8 @@ export type Database = {
       }
     }
     Functions: {
+      ensure_secure_partner_code: { Args: never; Returns: string }
+      link_partner_by_code: { Args: { p_partner_code: string }; Returns: Json }
       _grant_premium_days: {
         Args: { p_days: number; p_user: string }
         Returns: undefined

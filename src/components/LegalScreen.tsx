@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getLocaleTag } from '@/lib/i18n';
-import { tr } from '@/lib/tr';
+import { tr, mapRowTranslation } from '@/lib/tr';
+import { NEW_LANGUAGE_CODES } from '@/lib/app-languages';
 import { ArrowLeft, FileText, Shield, Scale, AlertTriangle, CreditCard, Database, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -53,6 +54,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
 
   // 6 dil: az→az, en→en/base, ru→ru||en, tr→tr||en, kk→kk||ru||en, de→de||en (fallback az)
   const pickTitle = (d: any): string => {
+    if ((NEW_LANGUAGE_CODES as readonly string[]).includes(language)) return mapRowTranslation(d, language, ['title'])?.title || '';
     if (language === 'az') return d.title_az || d.title;
     if (language === 'ru') return d.title_ru || d.title_en || d.title || d.title_az;
     if (language === 'tr') return d.title_tr || d.title_en || d.title || d.title_az;
@@ -64,6 +66,7 @@ const LegalScreen = ({ onBack, initialDocument }: LegalScreenProps) => {
     return d.title_en || d.title || d.title_az;
   };
   const pickContent = (d: any): string => {
+    if ((NEW_LANGUAGE_CODES as readonly string[]).includes(language)) return mapRowTranslation(d, language, ['content'])?.content || '';
     if (language === 'az') return d.content_az || d.content;
     if (language === 'ru') return d.content_ru || d.content_en || d.content || d.content_az;
     if (language === 'tr') return d.content_tr || d.content_en || d.content || d.content_az;

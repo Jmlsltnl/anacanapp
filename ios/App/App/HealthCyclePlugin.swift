@@ -28,7 +28,7 @@ public class HealthCyclePlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     @objc func isAvailable(_ call: CAPPluginCall) {
-        call.resolve(["available": HKHealthStore.isHealthDataAvailable()])
+        call.resolve(["available": HKHealthStore.isHealthDataAvailable(), "apiVersion": 2])
     }
 
     @objc func requestWritePermission(_ call: CAPPluginCall) {
@@ -59,21 +59,33 @@ public class HealthCyclePlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
         let endStr = call.getString("endDate") ?? startStr
-        let flowStr = call.getString("flow") ?? "medium"
+        let flowStr = call.getString("flow") ?? "unspecified"
+        let startsCycle = call.getBool("cycleStart") ?? true
 
         let flowValue: HKCategoryValueMenstrualFlow
         switch flowStr {
         case "light": flowValue = .light
+        case "medium": flowValue = .medium
         case "heavy": flowValue = .heavy
-        default: flowValue = .medium
+        case "none": flowValue = .none
+        case "unspecified", "clear": flowValue = .unspecified
+        default: call.reject("invalid_flow"); return
         }
 
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        formatter.isLenient = false
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
         guard let startDate = formatter.date(from: startStr),
-              let endDate = formatter.date(from: endStr),
-              startDate <= endDate else {
+               let endDate = formatter.date(from: endStr),
+               formatter.string(from: startDate) == startStr,
+               formatter.string(from: endDate) == endStr,
+               startDate <= endDate,
+               endDate <= calendar.startOfDay(for: Date()),
+               (calendar.dateComponents([.day], from: startDate, to: endDate).day ?? 91) < 90 else {
             call.reject("invalid_dates")
             return
         }
@@ -81,31 +93,45 @@ public class HealthCyclePlugin: CAPPlugin, CAPBridgedPlugin {
         var samples: [HKCategorySample] = []
         var day = startDate
         var isFirst = true
-        let calendar = Calendar(identifier: .gregorian)
 
         while day <= endDate {
             // Günorta — timezone kənar hallarından qaçmaq üçün
             let sampleStart = calendar.date(byAdding: .hour, value: 12, to: day) ?? day
             let sampleEnd = calendar.date(byAdding: .minute, value: 1, to: sampleStart) ?? sampleStart
-            let metadata: [String: Any] = [HKMetadataKeyMenstrualCycleStart: isFirst]
-            samples.append(HKCategorySample(
+            let metadata: [String: Any] = [
+                HKMetadataKeyMenstrualCycleStart: startsCycle && isFirst && flowStr != "none",
+                HKMetadataKeySyncIdentifier: "anacan-menstrual-day-\(formatter.string(from: day))",
+                HKMetadataKeySyncVersion: Int(Date().timeIntervalSince1970 * 1000)
+            ]
+            if flowStr != "clear" { samples.append(HKCategorySample(
                 type: type,
                 value: flowValue.rawValue,
                 start: sampleStart,
                 end: sampleEnd,
                 metadata: metadata
-            ))
+            )) }
             isFirst = false
             guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
             day = next
         }
 
-        store.save(samples) { success, error in
-            if let error = error {
-                call.reject("write_failed: \(error.localizedDescription)")
+        // Delete only this app's records for the selected local day(s), including
+        // legacy duplicates. Records written by Apple Health/other apps are retained.
+        let through = calendar.date(byAdding: .day, value: 1, to: endDate)!
+        let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            HKQuery.predicateForSamples(withStart: startDate, end: through, options: .strictStartDate),
+            HKQuery.predicateForObjects(from: HKSource.default())
+        ])
+        store.deleteObjects(of: type, predicate: predicate) { _, _, deleteError in
+            if deleteError != nil { call.reject("delete_failed"); return }
+            if samples.isEmpty { call.resolve(["written": 0, "success": true]); return }
+            self.store.save(samples) { success, error in
+            if error != nil {
+                call.reject("write_failed")
                 return
             }
             call.resolve(["written": samples.count, "success": success])
+            }
         }
     }
 }

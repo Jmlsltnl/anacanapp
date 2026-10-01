@@ -11,9 +11,11 @@ import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { getPhaseInfoForDate, getCycleDayForDate } from '@/lib/cycle-utils';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, parseISO } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { tr } from "@/lib/tr";
+import { usePeriodDayLogs } from '@/hooks/usePeriodDayLogs';
+import { hasPeriodFlow } from '@/lib/period-flow';
 
 interface CalendarScreenProps {
   onBack: () => void;
@@ -55,12 +57,13 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
 
   const { appointments, addAppointment, deleteAppointment } = useAppointments();
   const { logs } = useDailyLogs();
+  const { data: periodDays = [] } = usePeriodDayLogs();
   const cycleData = getCycleData();
   const pregData = getPregnancyData();
 
   // Get last period date
   const lastPeriodDate = cycleData?.lastPeriodDate ?
-  new Date(cycleData.lastPeriodDate) :
+  (typeof cycleData.lastPeriodDate === 'string' ? parseISO(cycleData.lastPeriodDate) : new Date(cycleData.lastPeriodDate)) :
   new Date();
 
   // Generate calendar days
@@ -96,9 +99,11 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
     // Cycle-based events for flow stage
     if (lifeStage === 'flow' && cycleData) {
       const phaseInfo = getPhaseInfoForDate(day, lastPeriodDate, cycleLength, periodLength);
-
-      if (phaseInfo.isPeriodDay) {
-        events.push({ type: 'period', label: 'Menstruasiya', color: DOT.period });
+      const period = periodDays.find(log => log.log_date === dateStr);
+      if (period && hasPeriodFlow(period.flow_intensity)) {
+        events.push({ type: 'period', label: tr('flow_had_flow', 'Axın oldu'), color: DOT.period });
+      } else if (!period && phaseInfo.isPeriodDay) {
+        events.push({ type: 'period', label: tr('flow_predicted_period', 'Proqnozlaşdırılan period'), color: DOT.period });
       }
 
       if (phaseInfo.isOvulationDay) {
@@ -124,8 +129,9 @@ const CalendarScreen = ({ onBack }: CalendarScreenProps) => {
     if (lifeStage !== 'flow' || !cycleData) return {};
 
     const phaseInfo = getPhaseInfoForDate(day, lastPeriodDate, cycleLength, periodLength);
-
-    if (phaseInfo.isPeriodDay) return { bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
+    const period = periodDays.find(log => log.log_date === format(day, 'yyyy-MM-dd'));
+    if (period && hasPeriodFlow(period.flow_intensity)) return { bg: 'var(--a-pink-2)', ink: 'var(--a-pink-ink)' };
+    if (!period && phaseInfo.isPeriodDay) return { bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
     if (phaseInfo.isOvulationDay) return { bg: 'var(--a-yellow-1)', ink: 'var(--a-yellow-ink)' };
     if (phaseInfo.isFertileDay) return { bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' };
     return {};

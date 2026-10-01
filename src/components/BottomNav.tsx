@@ -4,6 +4,7 @@ import { RiApps2AiLine } from 'react-icons/ri';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useUnreadCommunityPosts } from '@/hooks/useUnreadCommunityPosts';
 import { tr } from "@/lib/tr";
+import { useChatChromeHidden } from '@/hooks/useChatChrome';
 
 interface BottomNavProps {
   activeTab: string;
@@ -20,6 +21,7 @@ interface BottomNavProps {
 const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps) => {
   const { unreadCount } = useUnreadMessages();
   const { unreadCount: communityUnread } = useUnreadCommunityPosts();
+  const hiddenForChat = useChatChromeHidden();
 
   const womanTabs = [
     { id: 'home', label: tr("bottomnav_esas_6d87f7", 'Əsas'), icon: Home },
@@ -40,8 +42,10 @@ const BottomNav = ({ activeTab, onTabChange, isPartner = false }: BottomNavProps
 
   const visibleWomanTabs = womanTabs;
 
+  if (hiddenForChat) return null;
+
   return (
-    <div className="a-nav-wrap a-scope">
+    <div className="a-nav-wrap a-scope" data-ad-bottom-nav>
       <nav className="a-nav" aria-label="Primary">
         {(isPartner ? partnerTabs : visibleWomanTabs).map((tab) => {
           const Icon = tab.icon;

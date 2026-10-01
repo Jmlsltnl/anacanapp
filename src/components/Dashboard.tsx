@@ -46,6 +46,7 @@ import FeedingHistoryPanel from '@/components/baby/FeedingHistoryPanel';
 import SleepHistoryPanel from '@/components/baby/SleepHistoryPanel';
 import QuickStatsWidget from '@/components/mommy/QuickStatsWidget';
 import PremiumBlurGate from '@/components/premium/PremiumBlurGate';
+import AdFreePremiumOffer from '@/components/premium/AdFreePremiumOffer';
 import GrowthTrackerWidget from '@/components/mommy/GrowthTrackerWidget';
 import DevelopmentTipsWidget from '@/components/mommy/DevelopmentTipsWidget';
 import PrematurityBackfillCard from '@/components/mommy/PrematurityBackfillCard';
@@ -53,14 +54,15 @@ import BabyCrisisWidget from '@/components/mommy/BabyCrisisWidget';
 import ChildSelector from '@/components/mommy/ChildSelector';
 import TeethingWidget from '@/components/mommy/TeethingWidget';
 import BannerSlot from '@/components/banners/BannerSlot';
+import { AdInlineAnchor } from '@/components/ads/AdExperienceProvider';
 import DailySummaryAutoSync from '@/components/partner/DailySummaryAutoSync';
 import PartnerCareCard from '@/components/partner/v2/PartnerCareCard';
 import RedFlagBanner from '@/components/dashboard/RedFlagBanner';
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
-import WinBackCard from '@/components/WinBackCard';
 import FlowDashboard from '@/components/flow/FlowDashboard';
 import BirthOnboardingModal from '@/components/BirthOnboardingModal';
 import WaterWidget from '@/components/dashboard/WaterWidget';
+import { MommyPeriodBanner } from '@/components/mommy/MommyPeriodTracker';
 import MotherSleepWidget from '@/components/dashboard/MotherSleepWidget';
 
 // Fetus images by month
@@ -358,6 +360,12 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
           </span>
           <motion.img
             src={fetusImageSrc}
+            onError={(event) => {
+              const fallback = FETUS_IMAGES[fetusMonth] || FETUS_IMAGES[1];
+              if (event.currentTarget.src !== new URL(fallback, window.location.href).href) {
+                event.currentTarget.src = fallback;
+              }
+            }}
             alt={`${selectedWeek} ${tr("dashboard_week_baby", "həftəlik körpə")}`}
             style={{ width: 156, height: 156, objectFit: 'contain', filter: 'drop-shadow(0 18px 22px rgba(217, 108, 74, 0.3))' }}
             initial={{ scale: 0.8, opacity: 0 }}
@@ -494,7 +502,7 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
         <div className="a-section-head">
           <h2 className="a-section-title a-heading">{tr("dashboard_korpenin_inkisafi_269d83", "Körpənin inkişafı")}</h2>
         </div>
-        <div className="a-trio" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
+        <div className="a-trio" style={{ gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 6 }}>
           {[
           { icon: '👀', label: tr("dashboard_goz_fbc05e", 'Göz'), active: weeklyDevelopment.eyes },
           { icon: '👂', label: tr("dashboard_qulaq_93ab", 'Qulaq'), active: weeklyDevelopment.ears },
@@ -505,15 +513,19 @@ const BumpDashboard = ({ onNavigateToTool }: {onNavigateToTool?: (tool: string) 
           <motion.div
             key={item.label}
             className="a-trio-item"
-            style={{ padding: '12px 2px', opacity: item.active ? 1 : 0.45 }}
+            style={{ padding: '12px 2px', minWidth: 0, opacity: item.active ? 1 : 0.65, cursor: 'default' }}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.3 + index * 0.08 }}>
             
-              <span className="a-trio-icon" style={{ background: item.active ? 'var(--a-peach-1)' : 'var(--a-surface-soft)', fontSize: 18 }}>
+              <span className="a-trio-icon" aria-hidden="true" style={{
+                background: item.active ? 'var(--a-peach-1)' : 'var(--a-surface-soft)',
+                width: 32, height: 36, fontSize: 22, fontWeight: 400, lineHeight: 1,
+                fontFamily: '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif',
+              }}>
                 {item.icon}
               </span>
-              <p className="a-trio-label" style={item.active ? { color: 'var(--a-ink)' } : undefined}>
+              <p className="a-trio-label" style={{ overflowWrap: 'anywhere', ...(item.active ? { color: 'var(--a-ink)' } : {}) }}>
                 {item.label}
               </p>
             </motion.div>
@@ -851,6 +863,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
     birthDate: new Date(selectedChild.birth_date),
     gender: selectedChild.gender as 'boy' | 'girl',
     ageInDays: childAge.days,
+    dayNumber: childAge.dayNumber,
     ageInMonths: childAge.months,
     ageRemainingDays: childAge.remainingDays
   } : null;
@@ -859,7 +872,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
   // mesajı) korreksiya olunmuş yaşla seçilir — premature deyilsə correctedDays/
   // correctedMonths xronoloji ilə eynidir, heç nə dəyişmir.
   const babyAgeMonths = (childAge?.correctionApplied ? childAge.correctedMonths : childAge?.months) || 1;
-  const contentDay = childAge ? (childAge.correctionApplied ? childAge.correctedDays : childAge.days) : 0;
+  const contentDay = childAge ? (childAge.correctionApplied ? childAge.correctedDayNumber : childAge.dayNumber) : 0;
   const { imageUrl: babyIllustration, title: illustrationTitle, description: illustrationDescription } = useBabyIllustrationByMonth(Math.max(1, Math.min(36, babyAgeMonths)));
   const { data: dailyInfo } = useBabyDailyInfoByDay(contentDay > 0 ? contentDay : null);
   const { data: mommyMessage } = useMommyDailyMessageByDay(contentDay > 0 ? contentDay : null);
@@ -873,7 +886,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
   // Get today's stats from database
   const todayStats = getTodayStats();
 
-  // AI norma analizi (Yuxu/Qidalanma/Bez kartlarının altı) — 1 çağırış, 3 bölmə
+  // Each tracker is analyzed only when its own button is pressed.
   const aiInsightStats = useMemo(() => ({
     sleepMinutes: todayStats.sleepMinutes || Math.round((todayStats.sleepHours || 0) * 60),
     sleepCount: todayStats.sleepLogs.length,
@@ -1124,11 +1137,11 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
 
   // Calculate exact age using real calendar months
   const exactMonths = babyData.ageInMonths;
-  const remainingDays = (babyData as any).ageRemainingDays ?? babyData.ageInDays % 30;
+  const remainingDays = babyData.ageRemainingDays;
 
   // Editorial hero headline template (anacan-demo design)
   const heroHeadlineTpl = tr('mommy_hero_headline', '{days} gündür {name} həyatınızdadır')
-    .replace('{days}', String(babyData.ageInDays));
+    .replace('{days}', String(babyData.dayNumber));
   const [heroBefore, heroAfter = ''] = heroHeadlineTpl.split('{name}');
 
   return (
@@ -1136,7 +1149,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
       {/* Editorial hero */}
       <section className="a-hero-min a-fade-in">
         <p className="a-hero-eyebrow">
-          {tr('mommy_hero_day_label', 'Gün')} <strong>{babyData.ageInDays}</strong> · {babyData.name}
+          {tr('mommy_hero_day_label', 'Gün')} <strong>{babyData.dayNumber}</strong> · {babyData.name}
         </p>
         <h1 className="a-hero-headline a-heading">
           {heroBefore}<em>{babyData.name}</em>{heroAfter}
@@ -1152,6 +1165,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
       </section>
 
       {/* Premature backfill — yalnız due_date məlum olmayanda görünür */}
+      <MommyPeriodBanner onOpen={() => onNavigate?.('mommy-period')} />
       {selectedChild &&
       <PrematurityBackfillCard child={selectedChild} onSaved={refetchChildren} />
       }
@@ -1188,7 +1202,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
                 <p className="a-today-info-meta">
                   {tr('mommy_hero_day_label', 'Gün')} {contentDay}
                   {childAge?.correctionApplied && <> ({tr('preemie_corrected_short', 'korreksiya')})</>}
-                  {' '}· {exactMonths} {tr('mommy_meta_months', 'ay')}, {remainingDays} {tr('mommy_meta_days', 'gün')}
+                  {' '}· {babyData.ageInDays === 0 ? tr('pregnancy_utils_first_day', '1-ci gün') : <>{exactMonths} {tr('mommy_meta_months', 'ay')}, {remainingDays} {tr('mommy_meta_days', 'gün')}</>}
                 </p>
               </div>
               <span className="a-today-info-badge">{tr('dashboard_daily_badge', 'Gündəlik')}</span>
@@ -1212,7 +1226,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
           <div className="a-cta a-fade-in">
             <div className="a-cta-top">
               <span className="a-cta-badge">
-                {tr('mommy_hero_day_label', 'Gün')} {babyData?.ageInDays} · {tr('dashboard_message_for_mom', 'Anaya Mesaj')}
+                {tr('mommy_hero_day_label', 'Gün')} {contentDay} · {tr('dashboard_message_for_mom', 'Anaya Mesaj')}
               </span>
               <span className="a-cta-deco">
                 <Heart size={18} strokeWidth={2} />
@@ -2009,10 +2023,12 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
 
           {/* Top Banner Slot */}
           <BannerSlot placement="home_top" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mb-2" />
+          <AdFreePremiumOffer position="top" />
 
           {lifeStage === 'mommy' && <MommyDashboard onNavigateToTool={onNavigateToTool} onNavigate={onNavigate} />}
           {lifeStage === 'bump' && <BumpDashboard onNavigateToTool={onNavigateToTool} />}
           {lifeStage === 'flow' && <FlowDashboard />}
+          <AdInlineAnchor id="home_banner" />
 
           {/* Daily summary auto-syncs to partner in background */}
           {lifeStage === 'bump' && profile?.linked_partner_id && <DailySummaryAutoSync />}
@@ -2027,15 +2043,12 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
           {/* Recent Blog Posts */}
           {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage={lifeStage} variant="anacan" />}
 
-          {/* Win-back: yalnız ləğv etmiş/bitmiş istifadəçilərə */}
-          <WinBackCard variant="banner" />
-
-
           {/* Bottom Banner Slot */}
           <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-2" />
 
           {/* Small medical disclaimer — Google Play Health Content policy */}
           <MedicalDisclaimer variant="anacan" />
+          <AdFreePremiumOffer position="bottom" />
         </div>
       </div>
     );
@@ -2078,19 +2091,18 @@ const Dashboard = ({ onOpenChat, onNavigateToTool, onNavigate }: DashboardProps)
 
       {/* Top Banner Slot */}
       <BannerSlot placement="home_top" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mb-2" />
+      <AdFreePremiumOffer position="top" />
 
       {/* Recent Blog Posts - filtered by life stage (partner uses bump stage content) */}
       {onNavigate && <RecentBlogPosts onNavigate={onNavigate} lifeStage="bump" />}
 
-      {/* Win-back: yalnız ləğv etmiş/bitmiş istifadəçilərə */}
-      <WinBackCard variant="banner" />
-
-
+      <AdInlineAnchor id="home_banner" />
       {/* Bottom Banner Slot */}
       <BannerSlot placement="home_bottom" onNavigate={() => {}} onToolOpen={onNavigateToTool} className="mt-2" />
 
       {/* Small medical disclaimer for all modules — Google Play Health Content policy */}
       <MedicalDisclaimer variant="inline" className="mt-3 px-1" />
+      <AdFreePremiumOffer position="bottom" />
     </div>);
 
 };

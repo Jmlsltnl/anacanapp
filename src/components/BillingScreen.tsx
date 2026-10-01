@@ -19,10 +19,9 @@ import { useBillingConfig } from '@/hooks/usePaywallConfig';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
 import { getPlatform, isNativePlatform, REVENUECAT_CONFIG } from '@/lib/revenuecat';
 import { getDynamicIcon } from '@/lib/dynamicIcon';
-import WinBackCard from '@/components/WinBackCard';
 import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
-import { tr, getPersistedLanguage } from "@/lib/tr";
+import { tr } from "@/lib/tr";
 
 interface PaymentEntry {
   productId: string;
@@ -328,14 +327,10 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
 
           <div className="p-2 grid grid-cols-1 gap-1">
             {allFeaturesList.map((f, i) => {
-              const feat = 'title_en' in f ? f : null;
-              // Bütün dillər üzrə seçim: <lang> → (kk/uz üçün ru körpüsü) → en → base
-              const bLang = getPersistedLanguage();
-              const text = feat
-                ? (bLang === 'az'
-                    ? feat.title_az || feat.title
-                    : (feat as any)[`title_${bLang}`] || (bLang === 'kk' || bLang === 'uz' || bLang === 'ka' ? (feat as any).title_ru : null) || feat.title_en || feat.title)
-                : (f as any).text;
+              // The hook has already resolved server and source-bound copy.
+              // A second fallback here could replace it with English or AZ.
+              const feat = f;
+              const text = f.title;
               return (
                 <div key={i} className="flex items-center gap-3 p-2 rounded-xl transition-colors">
                   <div className="w-8 h-8 flex items-center justify-center shrink-0" style={{ borderRadius: 10, background: 'var(--a-peach-1)' }}>
@@ -354,9 +349,6 @@ const BillingScreen = ({ onBack }: BillingScreenProps) => {
             })}
           </div>
         </div>
-
-        {/* Win-back: ləğv edilmiş / bitmiş abunəliklər üçün geri qayıtma təklifi */}
-        <WinBackCard variant="card" />
 
         {/* Compact Payment History */}
         {isPremium && subscription && payments.length > 0 && (

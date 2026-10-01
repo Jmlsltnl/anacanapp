@@ -6,12 +6,11 @@ import { getTranslatedTip } from '@/lib/tip-translations';
 import { useUserStore } from '@/store/userStore';
 import { useShallow } from 'zustand/react/shallow';
 import { usePhaseTips, PHASE_INFO, CATEGORY_INFO, MenstrualPhase, TipCategory } from '@/hooks/usePhaseTips';
-import { format, differenceInDays } from 'date-fns';
+import { format, differenceInDays, differenceInCalendarDays, eachDayOfInterval, parseISO, startOfDay } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { Calendar } from '@/components/ui/calendar';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,13 +41,13 @@ import { useCycleHistory } from '@/hooks/useCycleHistory';
 import { computeAdaptiveCycleStats, refineOvulation } from '@/lib/cycle-predictions';
 import { useFlowDailyLogs } from '@/hooks/useFlowDailyLogs';
 import PremiumGate from '@/components/premium/PremiumGate';
+import { usePeriodDayLogs, useRecordPeriodDays } from '@/hooks/usePeriodDayLogs';
+import { hasPeriodFlow } from '@/lib/period-flow';
 const FlowDashboard = () => {
-  const { getCycleData, cycleLength, periodLength, setLastPeriodDate, language } = useUserStore(
-    useShallow((s) => ({ getCycleData: s.getCycleData, cycleLength: s.cycleLength, periodLength: s.periodLength, setLastPeriodDate: s.setLastPeriodDate, language: s.language }))
+  const { getCycleData, cycleLength, periodLength, language } = useUserStore(
+    useShallow((s) => ({ getCycleData: s.getCycleData, cycleLength: s.cycleLength, periodLength: s.periodLength, language: s.language }))
   );
   const cycleData = getCycleData();
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
 
   // Adaptiv proqnoz statistikası (cycle_history-dən öyrənir)
   const { data: cycleHistoryData = [] } = useCycleHistory();
@@ -58,160 +57,43 @@ const FlowDashboard = () => {
   const [showPeriodConfirm, setShowPeriodConfirm] = useState(false);
   const [showPeriodEndConfirm, setShowPeriodEndConfirm] = useState(false);
   const [markingPeriod, setMarkingPeriod] = useState(false);
-  const [periodStartDate, setPeriodStartDate] = useState<Date>(new Date());
+  const [periodStartDates, setPeriodStartDates] = useState<Date[]>([new Date()]);
   const [periodEndDate, setPeriodEndDate] = useState<Date>(new Date());
+  const recordPeriod = useRecordPeriodDays();
+  const { data: periodDays = [] } = usePeriodDayLogs();
 
   const handleMarkPeriodStarted = async () => {
     setMarkingPeriod(true);
     try {
-      const selectedDay = new Date(periodStartDate);
-      selectedDay.setHours(0, 0, 0, 0);
-
-      // Update local store
-      setLastPeriodDate(selectedDay);
-
-      // Sync to database
-      if (user?.id) {
-        // TZ DÜZƏLİŞİ: toISOString() UTC+4-də tarixi 1 gün geri sürüşdürürdü
-        const dateStr = format(selectedDay, 'yyyy-MM-dd');
-
-        // Update profile
-        await supabase.
-        from('profiles').
-        update({ last_period_date: dateStr }).
-        eq('user_id', user.id);
-
-        // Təqvim loqları ilə sinxron qalsın: başlanğıc günü period_day_logs-a
-        // da yazılır (əvvəllər yazılmırdı → təqvimə sonrakı BİR toxunuş LMP-ni
-        // köhnə blokun tarixinə GERİ çəkirdi)
-        await supabase.
-        from('period_day_logs').
-        upsert(
-          { user_id: user.id, log_date: dateStr, flow_intensity: 'medium' },
-          { onConflict: 'user_id,log_date', ignoreDuplicates: true }
-        );
-
-        // Log to cycle_history — single() boş tarixçədə partlayırdı → maybeSingle
-        const { data: lastCycle } = await supabase.
-        from('cycle_history').
-        select('cycle_number, start_date').
-        eq('user_id', user.id).
-        order('cycle_number', { ascending: false }).
-        limit(1).
-        maybeSingle();
-
-        // REDAKTƏ ≠ YENİ TSİKL: yeni tarix son tsiklin ±12 günü daxilindədirsə
-        // istifadəçi CARİ tsiklin başlanğıcını DÜZƏLDİR — əvvəlki tsiklə
-        // toxunulmur, dublikat yaradılmır (bug: "əvvəlki tsiklin tarixi dəyişir")
-        const startDiff = lastCycle?.start_date ?
-        differenceInDays(selectedDay, new Date(lastCycle.start_date)) :
-        null;
-
-        if (lastCycle && startDiff !== null && Math.abs(startDiff) <= 12) {
-          await supabase.
-          from('cycle_history').
-          update({ start_date: dateStr }).
-          eq('user_id', user.id).
-          eq('cycle_number', lastCycle.cycle_number);
-        } else {
-          // Yeni tsikl: əvvəlkini sanity-qoruma ilə bağla (15-60 gün xarici → null)
-          if (lastCycle?.start_date && startDiff !== null) {
-            await supabase.
-            from('cycle_history').
-            update({
-              end_date: dateStr,
-              cycle_length: startDiff >= 15 && startDiff <= 60 ? startDiff : null
-            }).
-            eq('user_id', user.id).
-            eq('cycle_number', lastCycle.cycle_number);
-          }
-
-          await supabase.
-          from('cycle_history').
-          insert({
-            user_id: user.id,
-            cycle_number: (lastCycle?.cycle_number || 0) + 1,
-            start_date: dateStr,
-            period_length: periodLength
-          });
-        }
-
-        queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
-        queryClient.invalidateQueries({ queryKey: ['period-day-logs'] });
-      }
-
-      toast.success(tr("flowdashboard_period_baslangici_qeyd_edildi_6961a5", "Period ba\u015Flan\u011F\u0131c\u0131 qeyd edildi! \uD83E\uDE78"), {
-        description: format(selectedDay, 'd MMMM yyyy', { locale: getCurrentDateLocale() })
+      await recordPeriod.mutateAsync({ dates: periodStartDates, flow: 'unspecified', preserveExisting: true });
+      toast.success(tr('flow_days_saved', 'Period günləri qeyd edildi'), {
+        description: tr('flow_selected_day_count', '{count} gün seçilib').replace('{count}', String(periodStartDates.length)),
       });
-
-      // Health inteqrasiyası aktivdirsə → Apple Health / Health Connect-ə yaz (arxa planda)
-      import('@/lib/healthCycle').then((m) =>
-      m.writePeriodToHealth(selectedDay, periodLength || 5)
-      ).catch(() => {});
+      setShowPeriodConfirm(false);
     } catch (error) {
       console.error('Error marking period:', error);
       toast.error(tr("flowdashboard_xeta_bas_verdi_yeniden_cehd_ed_816221", "X\u0259ta ba\u015F verdi, yenid\u0259n c\u0259hd edin"));
     } finally {
       setMarkingPeriod(false);
-      setShowPeriodConfirm(false);
     }
   };
 
   const handleMarkPeriodEnded = async () => {
     setMarkingPeriod(true);
     try {
-      const selectedDay = new Date(periodEndDate);
-      selectedDay.setHours(0, 0, 0, 0);
-
-      if (user?.id && cycleData?.lastPeriodDate) {
-        const lastPeriod = new Date(cycleData.lastPeriodDate);
-        const actualPeriodLength = differenceInDays(selectedDay, lastPeriod) + 1;
-
-        if (actualPeriodLength < 1) {
-          toast.error(tr("flowdashboard_bitis_tarixi_baslangic_tarixin_6fa84f", "Biti\u015F tarixi ba\u015Flan\u011F\u0131c tarixind\u0259n \u0259vv\u0259l ola bilm\u0259z"));
-          setMarkingPeriod(false);
-          setShowPeriodEndConfirm(false);
-          return;
-        }
-
-        // Update profile period_length
-        await supabase.
-        from('profiles').
-        update({ period_length: actualPeriodLength }).
-        eq('user_id', user.id);
-
-        // Update current cycle's period_length in cycle_history
-        const { data: currentCycle } = await supabase.
-        from('cycle_history').
-        select('cycle_number').
-        eq('user_id', user.id).
-        order('cycle_number', { ascending: false }).
-        limit(1).
-        single();
-
-        if (currentCycle) {
-          await supabase.
-          from('cycle_history').
-          update({ period_length: actualPeriodLength }).
-          eq('user_id', user.id).
-          eq('cycle_number', currentCycle.cycle_number);
-        }
-
-        // Update local store
-        useUserStore.getState().setPeriodLength(actualPeriodLength);
-
-        queryClient.invalidateQueries({ queryKey: ['cycle-history'] });
-
-        toast.success(tr("flowdashboard_period_bitisi_qeyd_edildi_7aef98", "Period biti\u015Fi qeyd edildi! \u2705"), {
-          description: tr("flowdashboard_period_duration_notice_f7c1d3", "Period {days} gün davam etdi").replace("{days}", String(actualPeriodLength))
-        });
-      }
+      if (!cycleData?.lastPeriodDate) return;
+      const start = startOfDay(typeof cycleData.lastPeriodDate === 'string' ? parseISO(cycleData.lastPeriodDate) : new Date(cycleData.lastPeriodDate));
+      const end = startOfDay(periodEndDate);
+      const actualPeriodLength = differenceInCalendarDays(end, start) + 1;
+      if (actualPeriodLength < 1 || actualPeriodLength > 90) throw new Error('INVALID_PERIOD_RANGE');
+      await recordPeriod.mutateAsync({ dates: eachDayOfInterval({ start, end }), flow: 'unspecified', complete: true, preserveExisting: true });
+      toast.success(tr('flowdashboard_period_bitisi_qeyd_edildi_7aef98', 'Period bitişi qeyd edildi! ✅'));
+      setShowPeriodEndConfirm(false);
     } catch (error) {
       console.error('Error marking period end:', error);
       toast.error(tr("flowdashboard_xeta_bas_verdi_yeniden_cehd_ed_816221", "X\u0259ta ba\u015F verdi, yenid\u0259n c\u0259hd edin"));
     } finally {
       setMarkingPeriod(false);
-      setShowPeriodEndConfirm(false);
     }
   };
 
@@ -251,13 +133,14 @@ const FlowDashboard = () => {
 
   // Get last period date
   const lastPeriodDate = cycleData?.lastPeriodDate ?
-  new Date(cycleData.lastPeriodDate) :
+  (typeof cycleData.lastPeriodDate === 'string' ? parseISO(cycleData.lastPeriodDate) : new Date(cycleData.lastPeriodDate)) :
   new Date();
 
   // Calculate current phase using accurate utility
   const today = new Date();
   const currentPhaseInfo = getPhaseInfoForDate(today, lastPeriodDate, cycleLength, periodLength);
-  const currentPhase: MenstrualPhase = currentPhaseInfo.phase;
+  const todayPeriod = periodDays.find(log => log.log_date === format(today, 'yyyy-MM-dd'));
+  const currentPhase: MenstrualPhase = todayPeriod && hasPeriodFlow(todayPeriod.flow_intensity) ? 'menstrual' : currentPhaseInfo.phase;
   const currentDay = currentPhaseInfo.dayInCycle;
 
   // Calculate next period and fertile window
@@ -411,17 +294,17 @@ const FlowDashboard = () => {
           {/* Period Action Buttons */}
           <div className="mt-4 flex gap-2">
             <motion.button
-              onClick={() => setShowPeriodConfirm(true)}
+              onClick={() => { setPeriodStartDates([new Date()]); setShowPeriodConfirm(true); }}
               className="a-cta-btn"
               style={{ flex: 1, justifyContent: 'center', background: 'var(--a-ink)', color: 'var(--a-bg)', height: 46 }}
               whileTap={{ scale: 0.97 }}>
               
               <CircleDot size={16} strokeWidth={2.2} />
-              {tr("flowdashboard_periodum_basladi_86bd73", "Periodum ba\u015Flad\u0131")}
+              {tr('flow_record_days', 'Period günlərini qeyd et')}
             </motion.button>
-            {currentPhase === 'menstrual' &&
+            {currentPhase === 'menstrual' && cycleData?.lastPeriodDate &&
             <motion.button
-              onClick={() => setShowPeriodEndConfirm(true)}
+              onClick={() => { setPeriodEndDate(new Date()); setShowPeriodEndConfirm(true); }}
               className="a-cta-btn"
               style={{ flex: 1, justifyContent: 'center', background: 'var(--a-grad-pink)', color: 'var(--a-alert-ink)', height: 46 }}
               whileTap={{ scale: 0.97 }}>
@@ -433,14 +316,14 @@ const FlowDashboard = () => {
         </motion.div>
       </section>
 
-      {/* Water Tracking Widget */}
-      <div className="a-section">
-        <WaterWidget variant="anacan" />
-      </div>
-
       {/* Interactive Period Calendar (Apple Health style) */}
       <div className="a-section">
         <FlowPeriodCalendar />
+      </div>
+
+      {/* Water Tracking Widget */}
+      <div className="a-section">
+        <WaterWidget variant="anacan" />
       </div>
 
       {/* Phase Tips Section (anacan-demo PhaseTips) */}
@@ -502,23 +385,7 @@ const FlowDashboard = () => {
                     </span>
                     <div style={{ minWidth: 0 }}>
                       <p className="a-list-title">
-                        {language === 'en' ?
-                    tip.title_en || tip.title :
-                    language === 'ru' ?
-                    tip.title_ru || getTranslatedTip(tip.title_az || tip.title, language) :
-                    language === 'tr' ?
-                    tip.title_tr || getTranslatedTip(tip.title_az || tip.title, language) :
-                    language === 'kk' ?
-                    (tip as any).title_kk || tip.title_ru || getTranslatedTip(tip.title_az || tip.title, language) :
-                    language === 'uz' ?
-                    (tip as any).title_uz || tip.title_ru || getTranslatedTip(tip.title_az || tip.title, language) :
-                    language === 'ka' ?
-                    (tip as any).title_ka || tip.title_ru || getTranslatedTip(tip.title_az || tip.title, language) :
-                    language === 'de' ?
-                    (tip as any).title_de || tip.title_en || getTranslatedTip(tip.title_az || tip.title, language) :
-                    language === 'ar' ?
-                    (tip as any).title_ar || tip.title_en || getTranslatedTip(tip.title_az || tip.title, language) :
-                    tip.title_az || tip.title}
+                    {tip.title}
                       </p>
                       <span className="a-list-value" style={{ color: PHASE_INFO[currentPhase].color }}>
                         {CATEGORY_INFO[tip.category].labelAz}
@@ -526,23 +393,7 @@ const FlowDashboard = () => {
                     </div>
                   </div>
                   <p style={{ margin: '10px 0 0', fontSize: 12, lineHeight: 1.55, color: 'var(--a-ink-soft)' }}>
-                    {language === 'en' ?
-                tip.content_en || tip.content :
-                language === 'ru' ?
-                tip.content_ru || getTranslatedTip(tip.content_az || tip.content, language) :
-                language === 'tr' ?
-                tip.content_tr || getTranslatedTip(tip.content_az || tip.content, language) :
-                language === 'kk' ?
-                (tip as any).content_kk || tip.content_ru || getTranslatedTip(tip.content_az || tip.content, language) :
-                language === 'uz' ?
-                (tip as any).content_uz || tip.content_ru || getTranslatedTip(tip.content_az || tip.content, language) :
-                language === 'ka' ?
-                (tip as any).content_ka || tip.content_ru || getTranslatedTip(tip.content_az || tip.content, language) :
-                language === 'de' ?
-                (tip as any).content_de || tip.content_en || getTranslatedTip(tip.content_az || tip.content, language) :
-                language === 'ar' ?
-                (tip as any).content_ar || tip.content_en || getTranslatedTip(tip.content_az || tip.content, language) :
-                tip.content_az || tip.content}
+                {tip.content}
                   </p>
                 </motion.div>
             )}
@@ -770,33 +621,33 @@ const FlowDashboard = () => {
       {/* Period Start Confirmation Dialog */}
       <AlertDialog open={showPeriodConfirm} onOpenChange={(open) => {
         setShowPeriodConfirm(open);
-        if (open) setPeriodStartDate(new Date());
+        if (open) setPeriodStartDates([new Date()]);
       }}>
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>{tr("flowdashboard_period_baslangici_c90515", "🩸 Period başlanğıcı")}</AlertDialogTitle>
+            <AlertDialogTitle>{tr('flow_record_days', 'Period günlərini qeyd et')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {tr("flowdashboard_periodunuzun_basladigi_tarixi__454aab", "Periodunuzun ba\u015Flad\u0131\u011F\u0131 tarixi se\xE7in:")}
+              {tr('flow_select_observed_days', 'Axın olan günləri seçin. Hər gün ayrıca qeyd olunur; gələcək günlər proqnoz olaraq qalır.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex justify-center py-2">
             <Calendar
-              mode="single"
-              selected={periodStartDate}
-              onSelect={(date) => date && setPeriodStartDate(date)}
+              mode="multiple"
+              selected={periodStartDates}
+              onSelect={(dates) => setPeriodStartDates(dates ?? [])}
               disabled={(date) => date > new Date()}
               locale={getCurrentDateLocale()}
               className="rounded-xl border pointer-events-auto" />
             
           </div>
           <p className="text-sm text-center text-muted-foreground">
-            {tr("flowdashboard_secilen_tarix_104372", "Seçilən tarix:")} <strong>{format(periodStartDate, 'd MMMM yyyy', { locale: getCurrentDateLocale() })}</strong>
+            {tr('flow_selected_day_count', '{count} gün seçilib').replace('{count}', String(periodStartDates.length))}
           </p>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={markingPeriod}>{tr("flowdashboard_legv_et_b5e49c", "Ləğv et")}</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleMarkPeriodStarted}
-              disabled={markingPeriod}
+              onClick={(event) => { event.preventDefault(); void handleMarkPeriodStarted(); }}
+              disabled={markingPeriod || periodStartDates.length === 0}
               className="bg-red-500 hover:bg-red-600">
               
               {markingPeriod ? tr("untranslated_qeyd_edilir_df7cba", "Qeyd edilir...") : tr("flow_qeyd_et", 'Qeyd et')}
@@ -822,7 +673,7 @@ const FlowDashboard = () => {
               mode="single"
               selected={periodEndDate}
               onSelect={(date) => date && setPeriodEndDate(date)}
-              disabled={(date) => date > new Date() || (cycleData?.lastPeriodDate ? date < new Date(cycleData.lastPeriodDate) : false)}
+              disabled={(date) => date > new Date() || (cycleData?.lastPeriodDate ? date < startOfDay(lastPeriodDate) : false)}
               locale={getCurrentDateLocale()}
               className="rounded-xl border pointer-events-auto" />
             
@@ -830,13 +681,13 @@ const FlowDashboard = () => {
           <p className="text-sm text-center text-muted-foreground">
             {tr("flowdashboard_secilen_tarix_104372", "Seçilən tarix:")} <strong>{format(periodEndDate, 'd MMMM yyyy', { locale: getCurrentDateLocale() })}</strong>
             {cycleData?.lastPeriodDate &&
-            <> • Period: <strong>{differenceInDays(periodEndDate, new Date(cycleData.lastPeriodDate)) + 1} {tr("flowdashboard_gun_54e78d", "gün")}</strong></>
+            <> • Period: <strong>{differenceInCalendarDays(periodEndDate, lastPeriodDate) + 1} {tr("flowdashboard_gun_54e78d", "gün")}</strong></>
             }
           </p>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={markingPeriod}>{tr("flowdashboard_legv_et_b5e49c", "Ləğv et")}</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleMarkPeriodEnded}
+              onClick={(event) => { event.preventDefault(); void handleMarkPeriodEnded(); }}
               disabled={markingPeriod}
               className="bg-green-600 hover:bg-green-700">
               

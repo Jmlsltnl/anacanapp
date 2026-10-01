@@ -53,7 +53,15 @@
   </head>
 
   <body style="margin: 0; padding: 0; background-color: #faf7f4;">
-    <div id="root" style="height: 100%;"></div>
+    <div id="root" style="height: 100%;">
+      <div class="anacan-startup" role="status" aria-label="Anacan" aria-busy="true" data-startup-screen>
+        <div class="anacan-startup-brand">
+          <img class="anacan-startup-mark" src="/brand-mark.png" width="96" height="96" alt="" fetchpriority="high" />
+          <p class="anacan-startup-name">Anacan</p>
+          <span class="anacan-startup-progress" aria-hidden="true"><span></span></span>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -2,7 +2,7 @@ import { tr } from "@/lib/tr";import { motion } from 'framer-motion';
 import { Shield, ArrowUpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Capacitor } from '@capacitor/core';
-import logoImage from '@/assets/logo.png';
+import logoImage from '@/assets/brand-mark.png';
 
 interface ForceUpdateScreenProps {
   title: string;

@@ -95,6 +95,7 @@ const FloatingTimerWidget = () => {
       {!expanded ?
       <motion.button
         key="mini"
+        data-ad-block="true"
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0, opacity: 0 }}
@@ -131,6 +132,7 @@ const FloatingTimerWidget = () => {
 
       <motion.div
         key="panel"
+        data-ad-block="true"
         initial={{ x: rtlX(60, isRtl), opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: rtlX(60, isRtl), opacity: 0 }}

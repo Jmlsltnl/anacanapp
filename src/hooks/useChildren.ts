@@ -12,6 +12,8 @@ export interface Child {
   /** Orijinal gözlənilən doğum tarixi (EDD). NULL = məlum deyil. Premature aşkarlanması + korreksiya yaşı bundan hesablanır. */
   due_date?: string | null;
   gender: 'boy' | 'girl' | 'unknown';
+  country_code?: string | null;
+  vaccine_country_code?: string | null;
   avatar_emoji: string;
   is_active: boolean;
   sort_order: number;
@@ -255,6 +257,7 @@ export const useChildren = () => {
 
     return {
       days: age.totalDays,
+      dayNumber: age.dayNumber,
       weeks,
       months: age.months,
       years: age.years,
@@ -263,6 +266,7 @@ export const useChildren = () => {
       displayText: age.displayText,
       // Korreksiya olunmuş (premature deyilsə xronoloji ilə eynidir):
       correctedDays: corrected.totalDays,
+      correctedDayNumber: corrected.dayNumber,
       correctedWeeks: Math.floor(corrected.totalDays / 7),
       correctedMonths: corrected.months,
       correctedDisplayText: corrected.displayText,

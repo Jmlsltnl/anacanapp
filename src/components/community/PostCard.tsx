@@ -1,10 +1,11 @@
 import { useState, useRef, useCallback, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Flag, Pencil, EyeOff, Languages, Pin, PinOff, ImagePlus, X, Loader2, Ban } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MoreHorizontal, Send, Trash2, Flag, Pencil, EyeOff, Languages, Pin, PinOff, ImagePlus, X, Loader2, Ban, Bookmark } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
-import { CommunityPost, useToggleLike, usePostComments, useCreateComment, useEditPost, useDeletePost, useTogglePinPost } from '@/hooks/useCommunity';
+import { CommunityPost, PostComment, useToggleLike, usePostComments, useCreateComment, useEditPost, useDeletePost, useTogglePinPost } from '@/hooks/useCommunity';
 import { useAutoGrowTextarea } from '@/hooks/useAutoGrowTextarea';
+import { useCommunityBookmark } from '@/hooks/useCommunitySocial';
 import { useUserStore } from '@/store/userStore';
 import { isFeedLang } from '@/lib/langDetect';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -28,6 +29,12 @@ import {
 '@/components/ui/dialog';
 import BlockUserDialog from '@/components/moderation/BlockUserDialog';
 import PhotoGalleryViewer from '@/components/PhotoGalleryViewer';
+import CommunityBlogCard from './CommunityBlogCard';
+import ModeratorActionMenu from '@/components/moderation/ModeratorActionMenu';
+import ModeratorActionDialog from '@/components/moderation/ModeratorActionDialog';
+import RestrictionNote from '@/components/moderation/RestrictionNote';
+import { useMyModerationStatus } from '@/hooks/useModerator';
+import { moderatorText } from '@/lib/moderator-i18n';
 
 interface PostCardProps {
   post: CommunityPost;
@@ -71,7 +78,10 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [forceShowComments]);
   const [commentText, setCommentText] = useState('');
-  const { ref: commentTextareaRef } = useAutoGrowTextarea(commentText, 110);
+  const { ref: commentTextareaRef } = useAutoGrowTextarea(commentText, 180);
+  const [replyTo, setReplyTo] = useState<{ id: string; name: string } | null>(null);
+  const composerRef = useRef<HTMLDivElement>(null);
+  const submittingComment = useRef(false);
   const [commentAnonymous, setCommentAnonymous] = useState(false);
   // Şərhə şəkil əlavə etmə — post composer-indəki uploadMedia (CreatePostScreen.tsx)
   // ilə eyni bucket/pattern (community-media, ${user.id}/... yolu).
@@ -81,6 +91,7 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
   const commentFileInputRef = useRef<HTMLInputElement>(null);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
+  const [showModeratorRemove, setShowModeratorRemove] = useState(false);
   // Post şəkillərini app daxilində açan lightbox (brauzerə yönləndirmə YOXDUR)
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
   const [imageViewerIndex, setImageViewerIndex] = useState(0);
@@ -95,6 +106,7 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
   const { isAdmin, user, profile } = useAuth();
   const { toast } = useToast();
   const uiLang = useUserStore((s) => s.language) || 'az';
+  const { data: moderationStatus } = useMyModerationStatus();
 
   const toggleLike = useToggleLike();
   // showComments ötürülür — panel açılmayınca sorğu/realtime kanal yaranmır
@@ -105,6 +117,18 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
   const editPost = useEditPost();
   const deletePost = useDeletePost();
   const togglePin = useTogglePinPost();
+  const bookmark = useCommunityBookmark(post.id);
+
+  useEffect(() => () => {
+    if (commentImagePreview) URL.revokeObjectURL(commentImagePreview);
+  }, [commentImagePreview]);
+
+  const handleReply = useCallback((comment: PostComment) => {
+    if (!user || submittingComment.current) return;
+    setReplyTo({ id: comment.id, name: comment.author?.name || tr('usecommunity_anonim', 'Anonim') });
+    commentTextareaRef.current?.focus({ preventScroll: true });
+    requestAnimationFrame(() => composerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+  }, [user, commentTextareaRef]);
 
   const isOwnPost = user?.id === post.user_id;
   const isAnonymous = (post as any).is_anonymous === true;
@@ -150,8 +174,10 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
   };
 
   const handleComment = async () => {
+    if (moderationStatus?.comment || post.comments_locked) return;
     const content = commentText.trim();
-    if (!content && !commentImageFile) return;
+    if ((!content && !commentImageFile) || !user || submittingComment.current) return;
+    submittingComment.current = true;
     hapticFeedback.light();
 
     let imageUrl: string | null = null;
@@ -161,27 +187,35 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
         imageUrl = await uploadCommentImage(commentImageFile);
       } catch (e: any) {
         setUploadingCommentImage(false);
+        submittingComment.current = false;
         toast({ title: tr("postcard_xeta_3cdbb6", 'Xəta'), description: e?.message, variant: 'destructive' });
         return;
       }
       setUploadingCommentImage(false);
     }
 
-    // Dərhal təmizlə (optimistic UX) — createComment artıq özü optimistic
-    // əlavə edir və uğursuz olarsa geri qaytarır + toast göstərir
-    // (əvvəllər burada heç bir xəta idarəetməsi yox idi, uğursuz olsa belə
-    // input sükutla təmizlənirdi, şərh isə görünmürdü).
-    setCommentText('');
-    setCommentImageFile(null);
-    setCommentImagePreview(null);
-    createComment.mutate({
-      postId: post.id, content, imageUrl, postAuthorId: post.user_id,
-      commenterName: profile?.name || user?.user_metadata?.name || tr("postcard_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
-      isAnonymous: commentAnonymous
-    });
+    try {
+      await createComment.mutateAsync({
+        postId: post.id, content, imageUrl, postAuthorId: post.user_id,
+        expectedUserId: user.id,
+        parentCommentId: replyTo?.id ?? null,
+        commenterName: profile?.name || user.user_metadata?.name || tr('postcard_i_stifadeci_b6bdd6', 'İstifadəçi'),
+        isAnonymous: commentAnonymous,
+      });
+      setCommentText('');
+      setCommentImageFile(null);
+      setCommentImagePreview(null);
+      setCommentAnonymous(false);
+      setReplyTo(null);
+    } catch {
+      // The mutation reports the error. Keep the complete draft and reply target.
+    } finally {
+      submittingComment.current = false;
+    }
   };
 
   const handleDeletePost = () => {
+    if (isAdmin && !isOwnPost) { setShowModeratorRemove(true); return; }
     if (!confirm(tr("postcard_bu_postu_silmek_isteyirsiniz_2fbc75", "Bu postu silm\u0259k ist\u0259yirsiniz?"))) return;
     hapticFeedback.medium();
     deletePost.mutate(post.id);
@@ -200,7 +234,7 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
     setShowTranslation(false);
     setTranslation(null);
     postTranslationCache.delete(`${post.id}:${uiLang}`);
-    editPost.mutate({ postId: post.id, content, currentLanguage: post.language }, { onSuccess: () => setIsEditing(false) });
+    editPost.mutate({ postId: post.id, content, currentLanguage: post.language, expectedRevision: post.ad_moderation_revision }, { onSuccess: () => setIsEditing(false) });
   };
 
   // ── Tərcümə: post dili ≠ UI dili olduqda "Tərcüməni gör" düyməsi ──
@@ -267,12 +301,14 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
   // Hamilə/Ana/Flow — anonim postlarda göstərilmir (enrichPosts() onsuz da null verir, əlavə qoruma)
   const authorLifeStage = isAnonymous ? null : getLifeStageMeta(post.author?.life_stage);
   const handleAvatarClick = () => {if (post.user_id && onUserClick && (!isAnonymous || isAdmin)) onUserClick(post.user_id);};
-  const topLevelComments = comments.filter((c) => !c.parent_comment_id);
+  const commentIds = new Set(comments.map((comment) => comment.id));
+  const topLevelComments = comments.filter((c) => !c.parent_comment_id || !commentIds.has(c.parent_comment_id));
 
   return (
     <>
       <motion.article
-        className="a-post a-fade-in"
+        className="a-post a-fade-in community-native-text"
+        data-post-id={post.id}
         transition={{ duration: 0.1 }}>
         
         {/* Pinlənmiş göstəricisi — yalnız feed-in ən üstündə görünən postlarda */}
@@ -323,8 +359,7 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
                 post.author?.name || tr("postcard_i_stifadeci_b6bdd6", "İstifadəçi")}
               </motion.button>
               {!isAnonymous && authorVerified && <VerifiedTick />}
-              {!isAnonymous && <UserBadge type={authorBadge} />}
-              {isAnonymous && isAdmin && <UserBadge type={authorBadge} />}
+              {!isAnonymous && <UserBadge type={authorBadge} premium={post.author?.is_premium} />}
               {isAnonymous && <span className="a-post-anon">({tr("untranslated_anonim_89j5l6", "Anonim")})</span>}
             </div>
             <span className="a-post-time">
@@ -337,6 +372,8 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
               scroll kilidi (react-remove-scroll) qoyur; feed refetch nəticəsində
               post remount olanda kilid asılı qalıb bütün app-ın scroll-unu dondura
               bilirdi. Non-modal menyu üçün kilidə ehtiyac yoxdur. */}
+          <ModeratorActionMenu target={{ kind: 'post', id: post.id, userId: post.user_id, name: post.author?.name, content: post.content,
+            version: post.moderation_version || 0, isPinned: post.is_pinned, removed: !!post.moderation_removed_at, commentsLocked: !!post.comments_locked }} />
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <button
@@ -344,7 +381,7 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
                 <MoreHorizontal size={16} />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-popover border-border/20 z-50 rounded-xl shadow-xl min-w-[150px]">
+            <DropdownMenuContent align="end" className="community-post-menu bg-popover border-border/20 z-50 rounded-xl shadow-xl min-w-[150px]">
               {isOwnPost &&
               <DropdownMenuItem onClick={() => {setEditContent(post.content);setIsEditing(true);}} className="text-foreground text-[11px] rounded-lg">
                   <Pencil className="w-3 h-3 me-2" /> {tr("postcard_redakte_et_66cf3b", "Redakt\u0259 et")}
@@ -378,6 +415,9 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
         </div>
 
         {/* Content */}
+        {post.moderation_edited_at && <p className="text-xs text-muted-foreground mb-2">{moderatorText('edited_marker', uiLang)}</p>}
+        {post.comments_locked && <p className="rounded-xl bg-muted/50 p-3 mb-3 text-xs">{moderatorText('comments_closed', uiLang)}</p>}
+        {showComments && <RestrictionNote scope="comment" />}
         {isEditing ?
         <div className="space-y-2" style={{ paddingBottom: 4 }}>
             <Textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className="min-h-[70px] rounded-xl resize-none text-[13px]" style={{ background: 'var(--a-surface-soft)', border: '1px solid var(--a-line-strong)', color: 'var(--a-ink)' }} autoFocus />
@@ -394,7 +434,7 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
               {(showTranslation && translation ? translation : post.content).split(/(\s+)/).map((word, index) => {
               if (word.startsWith('#')) return <span key={index} className="a-post-tag">{word}</span>;
               if (word.startsWith('@')) return <span key={index} style={{ color: 'var(--a-blue-2)', fontWeight: 700 }}>{word}</span>;
-              if (/^https?:\/\/\S+/.test(word)) return <a key={index} href={word} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--a-blue-2)', textDecoration: 'underline', wordBreak: 'break-all' }} onClick={(e) => e.stopPropagation()}>{word}</a>;
+              if (/^(?:https?:\/\/|anacan:\/\/)\S+/.test(word)) return <CommentText key={index} content={word} allowLinks />;
               return word;
             })}
             </p>
@@ -436,20 +476,30 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
           </div>
         }
 
+        {!!post.tagged_group_ids?.length && <GroupPostTags ids={post.tagged_group_ids}/>}
+        {post.blog_post_id && <CommunityBlogCard id={post.blog_post_id} />}
+
         {/* Actions (anacan-demo post footer) */}
         <div className="a-post-footer">
-          <motion.button onClick={handleLike} className={`a-post-action${post.is_liked ? ' liked' : ''}`} whileTap={{ scale: 0.8 }}>
+          <motion.button onClick={handleLike} aria-label={tr('commentreply_beyen', 'Bəyən')} aria-pressed={!!post.is_liked} className={`a-post-action${post.is_liked ? ' liked' : ''}`} whileTap={{ scale: 0.8 }}>
             <motion.span animate={post.is_liked ? { scale: [1, 1.3, 1] } : {}} transition={{ duration: 0.3 }} style={{ display: 'inline-flex' }}>
-              <Heart size={15} strokeWidth={2.2} fill={post.is_liked ? 'currentColor' : 'none'} />
+              <Heart size={19} strokeWidth={2} fill={post.is_liked ? 'currentColor' : 'none'} />
             </motion.span>
             {post.likes_count > 0 && <span>{post.likes_count}</span>}
           </motion.button>
-          <motion.button onClick={() => setShowComments(!showComments)} className="a-post-action" style={showComments ? { color: 'var(--a-accent-ink)' } : undefined} whileTap={{ scale: 0.8 }}>
-            <MessageCircle size={15} strokeWidth={2.2} />
+          <motion.button onClick={() => setShowComments(!showComments)} aria-label={tr('community_comments', 'Şərhlər')} aria-expanded={showComments} className="a-post-action" style={showComments ? { color: 'var(--a-accent-ink)' } : undefined} whileTap={{ scale: 0.8 }}>
+            <MessageCircle size={19} strokeWidth={2} />
             {post.comments_count > 0 && <span>{post.comments_count}</span>}
           </motion.button>
-          <motion.button onClick={handleShare} className="a-post-action" whileTap={{ scale: 0.8 }}>
-            <Share2 size={14} strokeWidth={2.2} />
+          <motion.button onClick={handleShare} aria-label={tr('community_share', 'Paylaş')} className="a-post-action" whileTap={{ scale: 0.8 }}>
+            <Share2 size={18} strokeWidth={2} />
+          </motion.button>
+          <motion.button type="button" className="a-post-action ms-auto" disabled={!user || bookmark.isPending}
+            aria-pressed={!!post.is_saved} aria-busy={bookmark.isPending}
+            aria-label={post.is_saved ? tr('community_unsave_post', 'Saxlanmışlardan çıxar') : tr('community_save_post', 'Paylaşımı saxla')}
+            style={post.is_saved ? { color: 'var(--a-accent-ink)' } : undefined}
+            onClick={() => { hapticFeedback.light(); bookmark.setSaved(!post.is_saved); }} whileTap={{ scale: 0.9 }}>
+            <Bookmark size={19} strokeWidth={2} fill={post.is_saved ? 'currentColor' : 'none'} />
           </motion.button>
         </div>
 
@@ -465,6 +515,11 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
             style={{ borderTop: '1px solid var(--a-line)', marginTop: 12 }}>
             
               <div className="space-y-3" style={{ paddingTop: 12 }}>
+                <div ref={composerRef} className="community-comment-composer" data-reply-to={replyTo?.id || ''}>
+                  {replyTo && <div className="community-reply-target">
+                    <span>{tr('community_replying_to', '{name} üçün cavab').replace('{name}', replyTo.name)}</span>
+                    <button type="button" onClick={() => setReplyTo(null)} disabled={createComment.isPending || uploadingCommentImage} aria-label={tr('community_cancel_reply', 'Cavabı ləğv et')}><X size={16} /></button>
+                  </div>}
                 {commentImagePreview &&
               <div style={{ position: 'relative', width: 64, height: 64 }}>
                     <img src={commentImagePreview} alt="" style={{ width: 64, height: 64, borderRadius: 12, objectFit: 'cover' }} />
@@ -476,47 +531,41 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
                     </button>
                   </div>
               }
-                <div className="flex gap-2.5 items-end">
-                  <input type="file" accept="image/*" ref={commentFileInputRef} onChange={handleCommentImageSelect} style={{ display: 'none' }} />
-                  <button
-                  type="button"
-                  onClick={() => commentFileInputRef.current?.click()}
-                  disabled={uploadingCommentImage}
-                  style={{ width: 36, height: 36, borderRadius: 999, flexShrink: 0, background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)', display: 'grid', placeItems: 'center', border: 'none', cursor: 'pointer' }}
-                  aria-label={tr("postcard_sekil_elave_et", "Şəkil əlavə et")}>
-                    <ImagePlus size={16} />
-                  </button>
                   <textarea
                   ref={commentTextareaRef}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  placeholder={commentAnonymous ? tr("postcard_anonim_serh_yaz_9af1ca", "Anonim \u015F\u0259rh yaz...") : tr("postcard_serh_yaz_54a89a", "Şərh yaz...")}
+                  aria-label={tr('community_comment_text', 'Şərh və ya cavab yaz')}
+                  disabled={createComment.isPending || uploadingCommentImage}
+                  placeholder={replyTo ? tr('community_reply_placeholder', 'Cavabınızı yazın...') : commentAnonymous ? tr("postcard_anonim_serh_yaz_9af1ca", "Anonim \u015F\u0259rh yaz...") : tr("postcard_serh_yaz_54a89a", "Şərh yaz...")}
                   className="a-input"
-                  rows={1}
-                  style={{ borderRadius: 18, resize: 'none', lineHeight: 1.4, overflowY: 'hidden' }}
+                   rows={1}
+                  dir="auto"
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
+                    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && !e.nativeEvent.isComposing) {
                       e.preventDefault();
                       handleComment();
                     }
                   }} />
                 
+                <div className="community-composer-actions">
+                  <input type="file" accept="image/*" ref={commentFileInputRef} onChange={handleCommentImageSelect} style={{ display: 'none' }} />
+                  <button type="button" onClick={() => commentFileInputRef.current?.click()} disabled={uploadingCommentImage || createComment.isPending} className="a-icon-btn" aria-label={tr('postcard_sekil_elave_et', 'Şəkil əlavə et')}>
+                    <ImagePlus size={18} />
+                  </button>
+                  <button type="button" onClick={() => setCommentAnonymous((v) => !v)} disabled={uploadingCommentImage || createComment.isPending} aria-pressed={commentAnonymous} className={`a-tag${commentAnonymous ? ' on' : ''}`}>
+                    <EyeOff size={14} />{tr('postcard_anonim_olaraq_yaz_abc123', 'Anonim olaraq yaz')}
+                  </button>
                   <button
                   onClick={handleComment}
+                  aria-label={tr('postcard_gonder_3f11bd', 'Göndər')}
                   disabled={(!commentText.trim() && !commentImageFile) || createComment.isPending || uploadingCommentImage}
-                  style={{ width: 36, height: 36, borderRadius: 999, flexShrink: 0, background: 'var(--a-ink)', color: 'var(--a-bg)', display: 'grid', placeItems: 'center', border: 'none', cursor: 'pointer', opacity: !commentText.trim() && !commentImageFile ? 0.4 : 1 }}>
-                    {uploadingCommentImage ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                  className="a-icon-btn ms-auto disabled:opacity-40"
+                  style={{ background: 'var(--a-accent-ink)', color: 'var(--a-bg)' }}>
+                    {uploadingCommentImage || createComment.isPending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                   </button>
                 </div>
-                <button
-                type="button"
-                onClick={() => setCommentAnonymous((v) => !v)}
-                className={`a-tag${commentAnonymous ? ' on' : ''}`}
-                style={{ cursor: 'pointer' }}>
-                
-                  <span style={{ width: 12, height: 12, borderRadius: 999, border: commentAnonymous ? '1px solid var(--a-peach-2)' : '1px solid var(--a-ink-faint)', background: commentAnonymous ? 'var(--a-peach-2)' : 'transparent' }} />
-                  {tr("postcard_anonim_olaraq_yaz_abc123", "Anonim olaraq yaz")}
-                </button>
+                </div>
                 {commentsLoading ?
               <div className="text-center py-4">
                     <div className="w-5 h-5 rounded-full animate-spin mx-auto" style={{ border: '2px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
@@ -526,7 +575,7 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
 
               <div className="space-y-2">
                     {topLevelComments.map((comment) =>
-                <CommentReply key={comment.id} comment={comment} postId={post.id} postAuthorId={post.user_id} allComments={comments} onRefetch={refetchComments} onUserClick={onUserClick} highlightCommentId={highlightCommentId} />
+                <CommentReply key={comment.id} comment={comment} postId={post.id} allComments={comments} onReply={handleReply} onRefetch={refetchComments} onUserClick={onUserClick} highlightCommentId={highlightCommentId} />
                 )}
                   </div>
               }
@@ -552,6 +601,8 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
       </Dialog>
 
       {/* Admin: istifadəçini blokla (yalnız açılanda mount olunur — feed performansı) */}
+      {showModeratorRemove && <ModeratorActionDialog target={{ kind: 'post', id: post.id, userId: post.user_id, name: post.author?.name, content: post.content }}
+        action="remove" onClose={() => setShowModeratorRemove(false)} />}
       {showBlockDialog &&
       <BlockUserDialog
         open={showBlockDialog}
@@ -575,3 +626,5 @@ const PostCard = memo(({ post, groupId, onUserClick, forceShowComments, highligh
 PostCard.displayName = 'PostCard';
 
 export default PostCard;
+import GroupPostTags from './GroupPostTags';
+import CommentText from './CommentText';

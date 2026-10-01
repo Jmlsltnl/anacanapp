@@ -18,13 +18,18 @@
  * `deepLinkTarget` prop-u, SinglePostView.tsx).
  */
 
+import { validate as isUuid } from 'uuid';
+import { getBackendConfig } from '@/integrations/supabase/backend-config';
+import type { CommunityDeepLinkTarget } from '@/components/community/CommunityScreen';
+
 export interface PushNavIntent {
   tab?: string;
   screen?: string;
   /** Qadın tərəfdə partner söhbəti (MessagesScreen) */
   motherChat?: boolean;
+  shoppingList?: boolean;
   /** Community-yə keçəndə MƏHZ hansı post/şərh/story-nin açılacağı (bax CommunityDeepLinkTarget) */
-  communityTarget?: { postId?: string; commentId?: string; storyId?: string };
+  communityTarget?: CommunityDeepLinkTarget;
 }
 
 export const PUSH_NAV_EVENT = 'anacan-push-nav';
@@ -41,11 +46,33 @@ export function intentFromPushData(data: Record<string, any>): PushNavIntent | n
     case 'love':
     case 'thank_you':
       return { motherChat: true }; // Index rola görə partner chat tab-ına çevirir
+    case 'direct_message':
+      return {
+        tab: 'community',
+        communityTarget: typeof data.sender_id === 'string' && isUuid(data.sender_id)
+          ? { dmUserId: data.sender_id.toLowerCase() }
+          : { conversations: true },
+      };
+    case 'shopping_list':
+      return { shoppingList: true };
+    case 'group_message':
+    case 'group_invite':
+    case 'group_join_request':
+      return typeof data.groupId === 'string' && isUuid(data.groupId)
+        ? { tab: 'community', communityTarget: { groupId: data.groupId.toLowerCase() } }
+        : { tab: 'community' };
     case 'community_like':
     case 'community_comment':
       return { tab: 'community', communityTarget: { postId: data?.postId } };
+    case 'community_moderation':
+      return typeof data.postId === 'string' && isUuid(data.postId)
+        ? { tab: 'community', communityTarget: { postId: data.postId.toLowerCase() } }
+        : { tab: 'community' };
+    case 'moderation_action':
+      return { screen: 'moderation-history' };
     case 'community_reply':
-      return { tab: 'community', communityTarget: { postId: data?.postId, commentId: data?.commentId } };
+      return { tab: 'community', communityTarget: { postId: data?.postId,
+        commentId: typeof data.interactionId === 'string' && isUuid(data.interactionId) ? data.interactionId : data?.commentId } };
     case 'comment_like':
       return { tab: 'community', communityTarget: { postId: data?.postId, commentId: data?.commentId } };
     case 'story_like':
@@ -68,9 +95,11 @@ export function intentFromPushData(data: Record<string, any>): PushNavIntent | n
     case 'pill_reminder':
       return { tab: 'home' };
     case 'sos':
+    case 'sos_alert':
     case 'birth':
-      // AlertReceiver realtime overlay-i onsuz da açılır — tətbiqi açmaq kifayətdir
-      return null;
+    case 'birth_alert':
+      // Home mounts AlertReceiver even when a sub-screen was open.
+      return { tab: 'home' };
     default:
       return null;
   }
@@ -78,11 +107,32 @@ export function intentFromPushData(data: Record<string, any>): PushNavIntent | n
 
 /** Push toxunuşunda çağırılır (useDeviceToken). */
 export function navigateFromPush(data: Record<string, any>): void {
-  // Açıq URL deeplink-i varsa ona üstünlük ver
-  if (data?.deeplink && typeof data.deeplink === 'string') {
+  // Preserve explicit links only within the app's registered schemes/origins.
+  if (typeof data?.deeplink === 'string' && data.deeplink.trim()) {
     try {
-      window.location.href = data.deeplink;
-      return;
+      const url = new URL(data.deeplink, window.location.href);
+      const trustedOrigins = [
+        window.location.origin,
+        'https://anacan.az',
+        'https://www.anacan.az',
+        'https://app.anacan.az',
+        'https://anacanapp.lovable.app',
+      ];
+      try {
+        const configured = new URL(getBackendConfig().url);
+        if (configured.protocol === 'https:' && !configured.username && !configured.password) {
+          trustedOrigins.push(configured.origin);
+        }
+      } catch { /* An absent/invalid build URL grants no extra origin. */ }
+
+      const appScheme = ['anacan:', 'com.atlasoon.anacan:'].includes(url.protocol)
+        && url.href.startsWith(`${url.protocol}//`);
+      if (!url.username && !url.password && (appScheme ||
+        (url.protocol === 'https:' && trustedOrigins.includes(url.origin)))) {
+        window.location.href = url.href;
+        pending = null;
+        return;
+      }
     } catch {/* aşağıdakı intent yolu ilə davam */}
   }
 

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Image, Video, Send, Loader2, Play, Smile, Hash, AtSign, EyeOff, X, Languages } from 'lucide-react';
 import EmojiPicker, { EmojiClickData, Theme } from 'emoji-picker-react';
@@ -12,11 +12,19 @@ import { useTheme } from 'next-themes';
 import { useUserStore } from '@/store/userStore';
 import { detectLang, FEED_LANGS, FeedLang, isFeedLang } from '@/lib/langDetect';
 import { tr } from "@/lib/tr";
+import { GroupTagPicker } from './GroupPostTags';
+import { useBlogAttachment } from '@/hooks/useBlogAttachment';
+import BlogAttachmentPicker from './BlogAttachmentPicker';
+import { blogCommand, type SharedBlog, validSharedBlog } from '@/lib/community-blog';
+import { feature37Text } from '@/lib/feature37-i18n';
+import { useMyModerationStatus } from '@/hooks/useModerator';
+import RestrictionNote from '@/components/moderation/RestrictionNote';
 
 interface CreatePostScreenProps {
   onBack: () => void;
   groupId: string | null;
   groups: CommunityGroup[];
+  initialBlog?: SharedBlog | null;
 }
 
 interface Suggestion {
@@ -45,7 +53,7 @@ const POPULAR_HASHTAGS = [
 ];
 
 
-const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) => {
+const CreatePostScreen = ({ onBack, groupId, groups, initialBlog }: CreatePostScreenProps) => {
   const [content, setContent] = useState('');
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(groupId);
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
@@ -53,6 +61,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
   const [isUploading, setIsUploading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [taggedGroupIds, setTaggedGroupIds] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [cursorPosition, setCursorPosition] = useState(0);
@@ -67,8 +76,11 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const blog = useBlogAttachment(content, setContent, textareaRef);
+  useEffect(() => { if (validSharedBlog(initialBlog)) blog.setSelected(initialBlog); }, [initialBlog]);
 
   const createPost = useCreatePost();
+  const { data: moderationStatus } = useMyModerationStatus();
   const { toast } = useToast();
   const { theme } = useTheme();
 
@@ -87,6 +99,8 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
     const cursorPos = e.target.selectionStart;
     setContent(newContent);
     setCursorPosition(cursorPos);
+    blog.setCursor(cursorPos);
+    if (blogCommand(newContent, cursorPos)) { setShowSuggestions(false); setSuggestions([]); return; }
     const textBeforeCursor = newContent.substring(0, cursorPos);
     const words = textBeforeCursor.split(/\s/);
     const currentWord = words[words.length - 1];
@@ -156,12 +170,14 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
   };
 
   const handleSubmit = async () => {
-    if (!content.trim() && mediaFiles.length === 0) {toast({ title: tr("createpostscreen_bos_paylasim_47b52d", 'Boş paylaşım'), description: tr("createpostscreen_metn_yazin_ve_ya_media_elave_edin_18fa25", 'Mətn yazın və ya media əlavə edin'), variant: 'destructive' });return;}
+    if (moderationStatus?.post) return;
+    if (!content.trim() && mediaFiles.length === 0 && !blog.selected) {toast({ title: tr("createpostscreen_bos_paylasim_47b52d", 'Boş paylaşım'), description: tr("createpostscreen_metn_yazin_ve_ya_media_elave_edin_18fa25", 'Mətn yazın və ya media əlavə edin'), variant: 'destructive' });return;}
     hapticFeedback.medium();
     setIsUploading(true);
     try {
       const mediaUrls = await uploadMedia();
-      await createPost.mutateAsync({ groupId: selectedGroupId, content: content.trim() || '📷', mediaUrls, isAnonymous, language: postLang });
+      await createPost.mutateAsync({ groupId: selectedGroupId, content: content.trim() || (blog.selected ? '📖' : '📷'), mediaUrls, isAnonymous, language: postLang, taggedGroupIds, blogPostId: blog.selected?.id });
+      blog.setSelected(null);
       mediaPreviews.forEach((p) => URL.revokeObjectURL(p.url));
       setContent('');setMediaFiles([]);setMediaPreviews([]);
       onBack();
@@ -176,7 +192,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
     setMediaPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const canSubmit = (content.trim() || mediaFiles.length > 0) && !isUploading && !createPost.isPending;
+  const canSubmit = (content.trim() || mediaFiles.length > 0 || !!blog.selected) && !blog.command && !isUploading && !createPost.isPending && !moderationStatus?.post;
 
   return (
     <div className="a-scope min-h-screen flex flex-col" style={{ background: 'var(--a-bg)' }}>
@@ -204,6 +220,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
 
         {/* Content */}
         <div className="flex-1 space-y-4 pb-32">
+          <RestrictionNote scope="post" />
           {/* Content textarea — white card */}
           <div className="relative">
             <div className="a-card" style={{ padding: 6 }}>
@@ -211,7 +228,8 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
                 ref={textareaRef}
                 value={content}
                 onChange={handleContentChange}
-                placeholder={tr("createpostscreen_ne_dusunursunuz_474859", "Nə düşünürsünüz? ✨")}
+                onSelect={event => blog.setCursor(event.currentTarget.selectionStart)}
+                placeholder={blog.selected ? feature37Text('blog_caption', uiLang) : tr("createpostscreen_ne_dusunursunuz_474859", "Nə düşünürsünüz? ✨")}
                 className="min-h-[180px] resize-none border-0 bg-transparent shadow-none focus-visible:ring-0 pe-12 leading-relaxed"
                 style={{ fontSize: 14, color: 'var(--a-ink)' }}
                 autoFocus />
@@ -253,6 +271,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
           </div>
 
           {/* Quick Hashtags */}
+          <BlogAttachmentPicker attachment={blog} />
           <div className="flex flex-wrap gap-1.5">
             {POPULAR_HASHTAGS.slice(0, 6).map((tag) =>
             <button key={tag} onClick={() => setContent((prev) => prev + (prev ? ' ' : '') + `#${tag}`)} className="a-tag">
@@ -304,6 +323,8 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
             {mediaFiles.length > 0 && <span className="ms-auto" style={{ fontSize: 10, fontWeight: 600, color: 'var(--a-ink-soft)' }}>{mediaFiles.length}/4</span>}
           </div>
 
+          <GroupTagPicker value={taggedGroupIds} onChange={setTaggedGroupIds} disabled={isUploading || isAnonymous}/>
+
           {/* Post dili — yazdıqca avtomatik aşkarlanır, çiplə düzəldilə bilər.
               Feed bu dilə görə filtrlənir (UI dilinə görə YOX). */}
           <div className="flex items-center gap-1.5 flex-wrap">
@@ -325,7 +346,7 @@ const CreatePostScreen = ({ onBack, groupId, groups }: CreatePostScreenProps) =>
           {/* Anonymous Toggle */}
           <button
             type="button"
-            onClick={() => setIsAnonymous(!isAnonymous)}
+            onClick={() => { if (!isAnonymous) setTaggedGroupIds([]); setIsAnonymous(!isAnonymous); }}
             className="w-full flex items-center gap-3 transition-all"
             style={{
               background: 'var(--a-surface)',

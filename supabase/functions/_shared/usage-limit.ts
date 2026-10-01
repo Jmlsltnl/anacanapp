@@ -48,6 +48,9 @@ function adminClient(): SupabaseAdmin {
 }
 
 async function isPremiumUser(admin: SupabaseAdmin, userId: string): Promise<boolean> {
+  const access = await admin.rpc('get_premium_access_v1', { p_user_id: userId });
+  if (!access.error && access.data?.protocol === 'anacan-premium-access-v1') return access.data.own?.active === true || access.data.household?.active === true;
+  if (access.error?.code !== 'PGRST202') return false;
   const now = new Date();
 
   const { data: sub } = await admin
@@ -60,7 +63,7 @@ async function isPremiumUser(admin: SupabaseAdmin, userId: string): Promise<bool
     (sub.plan_type === 'premium' || sub.plan_type === 'premium_plus') &&
     (sub.status === 'active' || sub.status === 'cancelled') &&
     (!sub.expires_at || new Date(sub.expires_at) > now);
-  if (subOk) return true;
+  if (sub) return subOk;
 
   const { data: profile } = await admin
     .from('profiles')

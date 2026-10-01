@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { getBackendConfig } from '@/integrations/supabase/backend-config';
+import { CUSTOMER_IO_CONSENT_EVENT } from '@/lib/customerio';
 
 /**
  * Privacy toggle-larının DB persist-i (user_preferences).
@@ -63,16 +65,22 @@ export const usePrivacyPreferences = () => {
   const updatePref = useCallback(async (key: keyof PrivacyPrefs, value: boolean): Promise<boolean> => {
     if (!user) return false;
     const prev = prefs;
+    const notifyAnalytics = (allowed: boolean) => window.dispatchEvent(new CustomEvent(CUSTOMER_IO_CONSENT_EVENT, {
+      detail: { userId: user.id, backend: getBackendConfig().url, allowed },
+    }));
+    if (key === 'privacy_share_analytics' && !value) notifyAnalytics(false);
     setPrefs((p) => ({ ...p, [key]: value })); // optimistic
     try {
       const { error } = await (supabase as any).
       from('user_preferences').
       upsert({ user_id: user.id, [key]: value }, { onConflict: 'user_id' });
       if (error) throw error;
+      if (key === 'privacy_share_analytics') notifyAnalytics(value);
       return true;
     } catch (e) {
       console.error('privacy pref save failed:', e);
       setPrefs(prev); // revert
+      if (key === 'privacy_share_analytics') notifyAnalytics(prev.privacy_share_analytics);
       return false;
     }
   }, [user, prefs]);

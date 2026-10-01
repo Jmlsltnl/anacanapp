@@ -1,357 +1,136 @@
-﻿import { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Grid3X3, Film, Settings, Crown, Shield, MessageCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { ArrowLeft, Bookmark, Film, Grid3X3, MessageCircle, Pencil, Plus } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/useAuth';
-import PostCard from './PostCard';
-import { CommunityPost } from '@/hooks/useCommunity';
-import { VerifiedTick, isVerifiedActive } from './UserBadge';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { useCommunityProfileStats, type ConnectionDirection } from '@/hooks/useCommunitySocial';
+import { useStories, useToggleStoryLike } from '@/hooks/useStories';
 import { getPublicProfileCard } from '@/lib/public-profile-cards';
 import { getLifeStageMeta } from '@/lib/lifeStageLabel';
-import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
-import { tr } from "@/lib/tr";
-
-interface UserProfile {
-  user_id: string;
-  name: string;
-  avatar_url: string | null;
-  life_stage: string | null;
-  is_premium: boolean;
-  badge_type: string | null;
-  is_verified?: boolean | null;
-  verified_until?: string | null;
-  created_at: string;
-}
-
-interface UserStory {
-  id: string;
-  media_url: string;
-  media_type: 'image' | 'video';
-  created_at: string;
-}
+import { tr } from '@/lib/tr';
+import { UserBadge, VerifiedTick, isVerifiedActive } from './UserBadge';
+import CommunityPostFeed from './CommunityPostFeed';
+import CommunityConnections from './CommunityConnections';
+import FollowButton from './FollowButton';
+import StoryViewer from './StoryViewer';
 
 interface UserProfileScreenProps {
   userId: string;
   onBack: () => void;
+  onUserClick: (userId: string) => void;
   onSendMessage?: (userId: string, name: string, avatar: string | null) => void;
+  onEditProfile?: () => void;
+  onCreatePost?: () => void;
 }
 
-const UserProfileScreen = ({ userId, onBack, onSendMessage }: UserProfileScreenProps) => {
-  useScrollToTop();
-  const { isAdmin } = useAuth();
-
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [stories, setStories] = useState<UserStory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'posts' | 'stories'>('posts');
-  const [isCurrentUser, setIsCurrentUser] = useState(false);
-
-  // Postlar react-query-dÉ™ â€” useToggleLike-Ä±n optimistic patch-i ['user-posts']
-  // cache-ini yenilÉ™diyi Ã¼Ã§Ã¼n Ã¼rÉ™k burada da dÉ™rhal iÅŸlÉ™yir.
-  // (ÆvvÉ™llÉ™r is_liked: false hardcode idi vÉ™ local state heÃ§ vaxt yenilÉ™nmirdi.)
-  const { data: posts = [], isLoading: postsLoading } = useQuery({
-    queryKey: ['user-posts', userId, isAdmin],
-    queryFn: async (): Promise<CommunityPost[]> => {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-
-      // Anonim yazılan postlar profil səhifəsində göstərilmir (admin istisna) —
-      // əks halda profilə keçid edəndə "kim yazıb" birbaşa aydın olur, anonimliyin
-      // mənası qalmır. Admin moderasiya üçün görməyə davam edir.
-      let postsQuery = supabase.
-      from('community_posts').
-      select('*').
-      eq('user_id', userId).
-      eq('is_active', true);
-      if (!isAdmin) {
-        postsQuery = postsQuery.eq('is_anonymous', false);
-      }
-
-      const [cardData, { data: postsData }] = await Promise.all([
-      // getPublicProfileCard: is_verified/verified_until sütunları hələ
-      // yaradılmayıbsa (Duzelis10.sql işlədilməyib) belə, ad/avatar/nişan
-      // göstərilməsini pozmayan təhlükəsiz fallback-lə gəlir.
-      getPublicProfileCard(userId),
-      postsQuery.order('created_at', { ascending: false })]
-      );
-
-      // Cari istifadÉ™Ã§inin bÉ™yÉ™ndiklÉ™ri â€” tÉ™k batch sorÄŸu
-      const likedSet = new Set<string>();
-      if (currentUser && postsData && postsData.length > 0) {
-        const { data: likeRows } = await supabase.
-        from('post_likes').
-        select('post_id').
-        eq('user_id', currentUser.id).
-        in('post_id', postsData.map((p: any) => p.id));
-        (likeRows || []).forEach((r: any) => likedSet.add(r.post_id));
-      }
-
-      return (postsData || []).map((post: any) => ({
-        ...post,
-        author: {
-          name: cardData?.name || tr("userprofilescreen_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
-          avatar_url: cardData?.avatar_url || null,
-          badge_type: cardData?.badge_type || null,
-          is_verified: cardData?.is_verified || false,
-          verified_until: cardData?.verified_until || null
-        },
-        is_liked: likedSet.has(post.id)
-      })) as CommunityPost[];
-    },
-    enabled: !!userId
+export default function UserProfileScreen({ userId, onBack, onUserClick, onSendMessage, onEditProfile, onCreatePost }: UserProfileScreenProps) {
+  const { user } = useAuth();
+  const isCurrentUser = user?.id === userId;
+  const [activeTab, setActiveTab] = useState<'posts' | 'stories' | 'saved'>('posts');
+  const [connections, setConnections] = useState<ConnectionDirection | null>(null);
+  const [openStoryId, setOpenStoryId] = useState<string | null>(null);
+  useScrollToTop([userId, activeTab]);
+  const profileQuery = useQuery({
+    queryKey: ['community-profile-card', user?.id ?? null, userId],
+    queryFn: () => getPublicProfileCard(userId),
+    enabled: !!userId,
+    staleTime: 10000,
   });
+  const statsQuery = useCommunityProfileStats(userId);
+  const { storyGroups, isLoading: storiesLoading, markAsViewed, deleteStory } = useStories(null);
+  const toggleStoryLike = useToggleStoryLike();
+  const storyGroup = storyGroups.find((group) => group.user_id === userId);
+  const profile = profileQuery.data;
+  const stats = statsQuery.data;
+  const lifeStage = getLifeStageMeta(profile?.life_stage);
+  const verified = isVerifiedActive(profile?.is_verified, profile?.verified_until);
 
-  const stats = useMemo(() => ({
-    postsCount: posts.length,
-    storiesCount: stories.length,
-    likesCount: posts.reduce((sum, p) => sum + (p.likes_count || 0), 0)
-  }), [posts, stories]);
+  useEffect(() => { setActiveTab('posts'); setConnections(null); setOpenStoryId(null); }, [userId]);
+  useEffect(() => { if (!storyGroup) setOpenStoryId(null); }, [storyGroup]);
 
-  useEffect(() => {
-    fetchUserData();
-  }, [userId]);
-
-  const fetchUserData = async () => {
-    setLoading(true);
-
-    try {
-      // Check if current user
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      setIsCurrentUser(currentUser?.id === userId);
-
-      // Fetch profile (public-safe projection for Community) — getPublicProfileCard
-      // özündə fallback var (is_verified/verified_until sütunları hələ mövcud
-      // olmasa belə, əsas profil sorğusu pozulmur).
-      const profileData = await getPublicProfileCard(userId);
-
-      if (profileData) {
-        setProfile(profileData as unknown as UserProfile);
-      }
-
-      // Fetch stories - community_stories doesn't have is_active column
-      const { data: storiesData } = await supabase.
-      from('community_stories').
-      select('id, media_url, media_type, created_at').
-      eq('user_id', userId).
-      gte('expires_at', new Date().toISOString()) // Only show non-expired stories
-      .order('created_at', { ascending: false });
-
-      if (storiesData) {
-        setStories(storiesData as UserStory[]);
-      }
-    } catch (err) {
-      console.error('Error fetching user data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Palitra konvensiyasÄ±: tint fon + sabit ink
-  const getBadgeLabel = (type: string | null) => {
-    if (!type) return null;
-    switch (type) {
-      case 'admin':return { label: 'Admin', icon: Shield, bg: 'var(--a-pink-1)', ink: 'var(--a-alert-ink)' };
-      case 'premium':return { label: 'Premium', icon: Crown, bg: 'var(--a-yellow-1)', ink: 'var(--a-yellow-ink)' };
-      case 'moderator':return { label: 'Moderator', icon: Shield, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' };
-      default:return null;
-    }
-  };
-
-  if (loading || postsLoading) {
-    return (
-      <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
-        <div className="w-8 h-8 rounded-full animate-spin"
-        style={{ border: '3px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
-      </div>);
-
-  }
-
-  if (!profile) {
-    return (
-      <div className="a-scope safe-top min-h-screen" style={{ background: 'var(--a-bg)' }}>
-        <div className="a-shell">
-          <header className="a-topbar">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
-                <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
-              </motion.button>
-              <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("untranslated_profil_v8b0sk", "Profil")}</p>
-            </div>
-          </header>
-          <div className="a-card" style={{ textAlign: 'center', padding: '38px 18px' }}>
-            <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("userprofilescreen_istifadeci_tapilmadi_4e2156", "Ä°stifadÉ™Ã§i tapÄ±lmadÄ±")}</p>
-          </div>
+  return <div className="a-scope community-native-text min-h-screen pb-24" style={{ background: 'var(--a-bg)' }} data-community-profile={userId}>
+    <div className="a-shell">
+      <header className="a-topbar">
+        <div className="flex min-w-0 items-center gap-3">
+          <button onClick={onBack} className="a-icon-btn" aria-label={tr('common_geri', 'Geri')}><ArrowLeft size={18} className="rtl:rotate-180" /></button>
+          <h1 className="a-wordmark" style={{ fontSize: 18 }}>{isCurrentUser ? tr('community_my_profile', 'Cəmiyyət profilim') : tr('untranslated_profil_v8b0sk', 'Profil')}</h1>
         </div>
-      </div>);
+        {isCurrentUser && onEditProfile && <button onClick={onEditProfile} className="a-icon-btn" aria-label={tr('community_edit_profile', 'Profili redaktə et')}><Pencil size={18} /></button>}
+      </header>
 
-  }
-
-  const badge = getBadgeLabel(profile.badge_type);
-  const lifeStage = getLifeStageMeta(profile.life_stage);
-  const verified = isVerifiedActive(profile.is_verified, profile.verified_until);
-
-  return (
-    <div className="a-scope safe-top min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
-      <div className="a-shell">
-        {/* Top bar */}
-        <header className="a-topbar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={tr("common_geri", "Geri")}>
-              <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
-            </motion.button>
-            <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("untranslated_profil_v8b0sk", "Profil")}</p>
-          </div>
-          {isCurrentUser &&
-          <div className="a-topbar-actions">
-              <motion.button className="a-icon-btn" whileTap={{ scale: 0.95 }} aria-label={tr("common_parametrler", "ParametrlÉ™r")}>
-                <Settings size={16} strokeWidth={2} />
-              </motion.button>
-            </div>
-          }
-        </header>
-
-        {/* Profile Card */}
-        <div className="a-card" style={{ padding: 18, marginBottom: 14 }}>
+      {profileQuery.isPending ? <div className="a-card space-y-4" role="status" aria-label={tr('community_loading', 'Yüklənir')}>
+        <Skeleton className="h-20 w-20 rounded-full" /><Skeleton className="h-6 w-40" /><Skeleton className="h-20 w-full" />
+      </div> : !profile ? <div className="a-card text-center py-8">
+        <p>{profileQuery.isError ? tr('community_load_failed', 'Məlumat yüklənmədi. Yenidən cəhd edin.') : tr('community_profile_missing', 'İstifadəçi tapılmadı')}</p>
+        {profileQuery.isError && <button className="a-btn-soft mt-3" onClick={() => void profileQuery.refetch()}>{tr('community_retry', 'Yenidən yoxla')}</button>}
+      </div> : <>
+        <section className="a-card community-profile-card">
           <div className="flex items-start gap-4">
-            <Avatar className="w-20 h-20" style={{ border: '3px solid var(--a-peach-1)' }}>
+            <Avatar className="h-20 w-20 shrink-0" style={{ border: '3px solid var(--a-peach-1)' }}>
               <AvatarImage src={profile.avatar_url || undefined} />
-              <AvatarFallback style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', fontSize: 24, fontWeight: 800 }}>
-                {profile.name?.charAt(0) || tr("common_initial_i", "Ä°")}
-              </AvatarFallback>
+              <AvatarFallback style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', fontSize: 28, fontWeight: 800 }}>{profile.name?.charAt(0) || 'A'}</AvatarFallback>
             </Avatar>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 style={{ fontSize: 19, fontWeight: 800, letterSpacing: '-0.01em', color: 'var(--a-ink)' }}>{profile.name}</h2>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-xl font-extrabold break-words">{profile.name || tr('usecommunity_istifadeci_b6bdd6', 'İstifadəçi')}</h2>
                 {verified && <VerifiedTick size={17} />}
-                {badge &&
-                <span className="inline-flex items-center gap-1"
-                style={{ background: badge.bg, color: badge.ink, borderRadius: 999, padding: '3px 10px', fontSize: 10.5, fontWeight: 800 }}>
-                    <badge.icon className="w-3 h-3" />
-                    {badge.label}
-                  </span>
-                }
+                <UserBadge type={profile.badge_type as 'admin' | 'premium' | 'moderator' | null} premium={profile.is_premium ?? undefined} />
               </div>
-
-              {lifeStage &&
-              <span className="inline-block mt-1.5"
-              style={{ background: lifeStage.bg, color: lifeStage.ink, borderRadius: 999, padding: '3px 10px', fontSize: 10.5, fontWeight: 700 }}>
-                  {lifeStage.label}
-                </span>
-              }
-
-              <p className="mt-2" style={{ fontSize: 11, color: 'var(--a-ink-soft)' }}>
-                {formatDistanceToNow(new Date(profile.created_at), { addSuffix: true, locale: getCurrentDateLocale() })} {tr("userprofilescreen_qosuldu_78ba1a", "qo\u015Fuldu")}
-              </p>
+              {lifeStage && <span className="inline-block rounded-full px-3 py-1 mt-2 text-xs font-bold" style={{ background: lifeStage.bg, color: lifeStage.ink }}>{lifeStage.label}</span>}
+              {profile.created_at && <p className="mt-2 text-xs" style={{ color: 'var(--a-ink-soft)' }}>
+                {formatDistanceToNow(new Date(profile.created_at), { addSuffix: true, locale: getCurrentDateLocale() })} {tr('userprofilescreen_qosuldu_78ba1a', 'qoşuldu')}
+              </p>}
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2.5 mt-5">
+          <div className="community-profile-stats">
             {[
-            { value: stats.postsCount, label: 'Post' },
-            { value: stats.storiesCount, label: 'Story' },
-            { value: stats.likesCount, label: tr("userprofilescreen_beyenme_488df4", "BÉ™yÉ™nmÉ™") }].
-            map((s) =>
-            <div key={s.label} className="text-center" style={{ background: 'var(--a-surface-soft)', borderRadius: 16, padding: '12px 8px' }}>
-                <p style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--a-ink)' }}>{s.value}</p>
-                <p style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--a-ink-soft)', marginTop: 1 }}>{s.label}</p>
-              </div>
-            )}
+              { id: 'posts', label: tr('userprofilescreen_postlar', 'Postlar'), count: stats?.posts_count, open: () => setActiveTab('posts') },
+              { id: 'followers', label: tr('community_followers', 'İzləyicilər'), count: stats?.followers_count, open: () => setConnections('followers') },
+              { id: 'following', label: tr('community_following_people', 'İzlədikləri'), count: stats?.following_count, open: () => setConnections('following') },
+            ].map((stat) => <button type="button" key={stat.id} onClick={stat.open} data-profile-stat={stat.id}>
+              <strong>{stat.count ?? '—'}</strong><span>{stat.label}</span>
+            </button>)}
           </div>
+          {statsQuery.isError && <div role="alert" className="text-sm mt-3">
+            <p>{tr('community_load_failed', 'Məlumat yüklənmədi. Yenidən cəhd edin.')}</p>
+            <button className="a-btn-soft mt-2" onClick={() => void statsQuery.refetch()}>{tr('community_retry', 'Yenidən yoxla')}</button>
+          </div>}
+          {!!stats?.likes_count && <p className="text-xs mt-3 text-center" style={{ color: 'var(--a-ink-soft)' }}>{stats.likes_count} {tr('community_received_likes', 'bəyənmə')}</p>}
 
-          {/* Message Button */}
-          {!isCurrentUser && onSendMessage && profile &&
-          <motion.button
-            onClick={() => onSendMessage(profile.user_id, profile.name, profile.avatar_url)}
-            className="a-btn-solid w-full mt-4 justify-center"
-            style={{ height: 44, fontSize: 13 }}
-            whileTap={{ scale: 0.97 }}>
+          {!isCurrentUser && <div className="community-profile-actions">
+            <FollowButton userId={userId} isFollowing={stats?.is_following || false} loading={!stats} />
+            {onSendMessage && <button className="a-btn-soft" onClick={() => onSendMessage(userId, profile.name || tr('usecommunity_istifadeci_b6bdd6', 'İstifadəçi'), profile.avatar_url)}>
+              <MessageCircle size={17} />{tr('community_message', 'Mesaj yaz')}
+            </button>}
+          </div>}
+          {isCurrentUser && onCreatePost && <button className="a-btn-solid w-full justify-center mt-4" onClick={onCreatePost}><Plus size={17} />{tr('groupfeed_paylasim_yarat_69bdcd', 'Paylaşım yarat')}</button>}
+        </section>
 
-              <MessageCircle size={15} />
-              {tr("userprofilescreen_mesaj_gonder_ad33c9", "Mesaj gÃ¶ndÉ™r")}
-            </motion.button>
-          }
+        <div className="community-feed-tabs hide-scrollbar mt-4" role="tablist" aria-label={tr('community_profile_sections', 'Profil bölmələri')}>
+          <button className={`a-tab${activeTab === 'posts' ? ' active' : ''}`} role="tab" aria-selected={activeTab === 'posts'} onClick={() => setActiveTab('posts')}><Grid3X3 size={15} />{isCurrentUser ? tr('community_my_posts', 'Mənim postlarım') : tr('userprofilescreen_postlar', 'Postlar')}</button>
+          <button className={`a-tab${activeTab === 'stories' ? ' active' : ''}`} role="tab" aria-selected={activeTab === 'stories'} onClick={() => setActiveTab('stories')}><Film size={15} />{tr('community_stories', 'Hekayələr')}</button>
+          {isCurrentUser && <button className={`a-tab${activeTab === 'saved' ? ' active' : ''}`} role="tab" aria-selected={activeTab === 'saved'} onClick={() => setActiveTab('saved')}><Bookmark size={15} />{tr('community_saved', 'Saxlanmışlar')}</button>}
         </div>
 
-        {/* Tabs */}
-        <div className="a-tabs" style={{ marginBottom: 14 }}>
-          <button onClick={() => setActiveTab('posts')} className={`a-tab ${activeTab === 'posts' ? 'active' : ''}`}>
-            <span className="inline-flex items-center gap-1.5"><Grid3X3 size={13} />{tr("userprofilescreen_postlar", "Postlar")}</span>
-          </button>
-          <button onClick={() => setActiveTab('stories')} className={`a-tab ${activeTab === 'stories' ? 'active' : ''}`}>
-            <span className="inline-flex items-center gap-1.5"><Film size={13} />{tr("userprofilescreen_story_ler_670373", "Story-lÉ™r")}</span>
-          </button>
-        </div>
-
-        {activeTab === 'posts' &&
-        <div className="space-y-4">
-            {posts.length === 0 ?
-          <div className="a-card" style={{ textAlign: 'center', padding: '34px 18px' }}>
-                <div className="mx-auto mb-4 flex items-center justify-center"
-            style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--a-surface-soft)' }}>
-                  <Grid3X3 size={26} style={{ color: 'var(--a-ink-faint)' }} />
-                </div>
-                <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("userprofilescreen_hele_post_yoxdur_a26a62", "HÉ™lÉ™ post yoxdur")}</p>
-              </div> :
-
-          posts.map((post) =>
-          <PostCard key={post.id} post={post} groupId={post.group_id} />
-          )
-          }
-          </div>
-        }
-
-        {activeTab === 'stories' &&
-        <div>
-            {stories.length === 0 ?
-          <div className="a-card" style={{ textAlign: 'center', padding: '34px 18px' }}>
-                <div className="mx-auto mb-4 flex items-center justify-center"
-            style={{ width: 64, height: 64, borderRadius: 999, background: 'var(--a-surface-soft)' }}>
-                  <Film size={26} style={{ color: 'var(--a-ink-faint)' }} />
-                </div>
-                <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("userprofilescreen_hele_story_yoxdur_d7ad34", "HÉ™lÉ™ story yoxdur")}</p>
-              </div> :
-
+        {activeTab === 'posts' && <CommunityPostFeed view="profile" authorId={userId} onUserClick={onUserClick} onCreatePost={isCurrentUser ? onCreatePost : undefined} />}
+        {activeTab === 'saved' && isCurrentUser && <CommunityPostFeed view="saved" onUserClick={onUserClick} onExplore={onBack} />}
+        {activeTab === 'stories' && (storiesLoading ? <Skeleton className="h-40 rounded-2xl" /> : !storyGroup?.stories.length ? <div className="a-card text-center py-8"><Film size={28} className="mx-auto mb-3" /><p className="text-sm">{tr('community_stories_empty', 'Aktiv hekayə yoxdur')}</p></div> :
           <div className="grid grid-cols-3 gap-2">
-                {stories.map((story) =>
-            <motion.div
-              key={story.id}
-              className="relative aspect-[9/16] overflow-hidden"
-              style={{ borderRadius: 16, background: 'var(--a-surface-soft)', boxShadow: 'var(--a-card-shadow)' }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}>
-
-                    {story.media_type === 'video' ?
-              <video
-                src={story.media_url}
-                className="w-full h-full object-cover"
-                muted /> :
-
-
-              <img
-                src={story.media_url}
-                alt="Story"
-                className="w-full h-full object-cover" />
-
-              }
-                    <div className="absolute bottom-2 start-2 end-2">
-                      <span className="text-white/90 bg-black/40 px-2 py-0.5 rounded-full" style={{ fontSize: 10 }}>
-                        {formatDistanceToNow(new Date(story.created_at), { addSuffix: false, locale: getCurrentDateLocale() })}
-                      </span>
-                    </div>
-                  </motion.div>
-            )}
-              </div>
-          }
-          </div>
-        }
-      </div>
-    </div>);
-
-};
-
-export default UserProfileScreen;
+            {storyGroup.stories.map((story) => <button key={story.id} onClick={() => setOpenStoryId(story.id)} className="relative aspect-[9/16] overflow-hidden rounded-2xl" aria-label={tr('community_open_story', 'Hekayəni aç')}>
+              {story.media_type === 'video' ? <video src={story.media_url} className="w-full h-full object-cover" muted playsInline preload="metadata" /> : <img src={story.media_url} alt="" className="w-full h-full object-cover" loading="lazy" />}
+              <span className="absolute bottom-2 start-2 text-white text-xs rounded-full bg-black/50 px-2 py-1">{formatDistanceToNow(new Date(story.created_at), { locale: getCurrentDateLocale() })}</span>
+            </button>)}
+          </div>)}
+      </>}
+    </div>
+    {connections && <CommunityConnections userId={userId} direction={connections} onClose={() => setConnections(null)} onUserClick={onUserClick} />}
+    {openStoryId && storyGroup && <StoryViewer storyGroups={[storyGroup]} initialGroupIndex={0} initialStoryId={openStoryId}
+      onClose={() => setOpenStoryId(null)} onViewed={markAsViewed} onDelete={deleteStory}
+      likePending={toggleStoryLike.isPending} onToggleLike={(storyId, isLiked) => toggleStoryLike.mutate({ storyId, isLiked })} />}
+  </div>;
+}

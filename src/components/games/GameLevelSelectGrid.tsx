@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Lock, Star, LucideIcon } from 'lucide-react';
 import { hapticFeedback } from '@/lib/native';
 import { trTierName } from './tierLabels';
+import { tr } from '@/lib/tr';
+import type { ReactNode } from 'react';
 import type { GameProgress } from '@/hooks/useLocalGameProgress';
 
 export interface LevelSection {
@@ -22,6 +24,9 @@ interface GameLevelSelectGridProps {
   unlockedLabel: string;
   totalLevels: number;
   accentGradient?: string;
+  footer?: ReactNode;
+  levelLabel?: (level: number) => string;
+  backLabel?: string;
 }
 
 const GameLevelSelectGrid = ({
@@ -37,13 +42,16 @@ const GameLevelSelectGrid = ({
   unlockedLabel,
   totalLevels,
   accentGradient = 'from-primary to-orange-500',
+  footer,
+  levelLabel,
+  backLabel,
 }: GameLevelSelectGridProps) => {
   return (
     <div className="a-scope min-h-screen pb-10" style={{ background: 'var(--a-bg)' }}>
       <div className="a-shell">
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label="Back">
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={backLabel ?? tr('common_back', 'Geri')}>
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div style={{ minWidth: 0 }}>
@@ -83,6 +91,8 @@ const GameLevelSelectGrid = ({
                     transition={{ delay: Math.min((sectionIndex * 10 + index) * 0.012, 0.4) }}
                     whileTap={unlocked ? { scale: 0.93 } : undefined}
                     disabled={!unlocked}
+                    data-game-level={level}
+                    aria-label={levelLabel?.(level)}
                     onClick={() => {
                       if (!unlocked) return;
                       hapticFeedback.light();
@@ -129,6 +139,8 @@ const GameLevelSelectGrid = ({
             </div>
           </div>
         ))}
+
+        {footer}
 
         <div className="mt-2 a-card flex items-center gap-3" style={{ padding: '14px 16px' }}>
           <span className="a-list-icon" style={{ background: 'var(--a-grad-yellow)' }}>

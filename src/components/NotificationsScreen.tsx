@@ -1,22 +1,26 @@
 ﻿import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { getLocaleTag } from '@/lib/i18n';
-import { ArrowLeft, Bell, Check, Trash2, Calendar, Heart, Pill, Gift, MessageCircle, Reply, Megaphone } from 'lucide-react';
-import { useNotifications } from '@/hooks/useNotifications';
+import { ArrowLeft, Bell, Check, Trash2, Calendar, Heart, Pill, Gift, MessageCircle, Reply, Megaphone, ChevronDown, UserPlus } from 'lucide-react';
+import { useNotifications, type Notification } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { tr } from "@/lib/tr";
 import { useUserStore } from '@/store/userStore';
+import { moderatorText } from '@/lib/moderator-i18n';
 
 export interface NotificationCommunityTarget {
   postId?: string;
   commentId?: string;
   storyId?: string;
+  userId?: string;
+  groupId?: string;
 }
 
 interface NotificationsScreenProps {
   onBack: () => void;
   onNavigateToCommunity?: (target?: NotificationCommunityTarget) => void;
+  onNavigateToModeration?: () => void;
 }
 
 type FilterType = 'all' | 'community' | 'system';
@@ -27,13 +31,16 @@ type FilterType = 'all' | 'community' | 'system';
 // (nə naviqasiya, nə "Community" filtri, nə "Görmək üçün toxun" işarəsi).
 const communityTypes = [
   'community_like', 'community_comment', 'community_reply',
-  'comment_like', 'story_like', 'story_reply',
+  'comment_like', 'story_like', 'story_reply', 'community_follow',
+  'group_message', 'group_invite', 'group_join_request',
+  'community_moderation',
 ];
 
-const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScreenProps) => {
+const NotificationsScreen = ({ onBack, onNavigateToCommunity, onNavigateToModeration }: NotificationsScreenProps) => {
   useScrollToTop();
   useScreenAnalytics('Notifications', 'Notifications');
   const [filter, setFilter] = useState<FilterType>('all');
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(() => new Set());
 
   const { notifications, loading, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
 
@@ -53,6 +60,7 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
       case 'community_reply':return { icon: Reply, bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
       case 'story_like':return { icon: Heart, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
       case 'story_reply':return { icon: Reply, bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
+      case 'community_follow':return { icon: UserPlus, bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' };
       case 'reminder':return { icon: Bell, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' };
       case 'appointment':return { icon: Calendar, bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
       case 'tip':return { icon: Pill, bg: 'var(--a-green-1)', ink: 'var(--a-green-ink)' };
@@ -82,13 +90,32 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
   // (heç bir konkret post/şərh/story olmadan) keçirdi. `action_data` sütunu
   // (send-push-notification/index.ts artıq bunu yazır) burada oxunub, konkret
   // hədəf Index.tsx-ə → CommunityScreen-ə → SinglePostView-a qədər aparılır.
-  const handleNotificationClick = (notification: any) => {
+  const handleExpand = (notification: Notification) => {
+    if (!notification.is_read) void markAsRead(notification.id);
+    setExpandedIds((current) => {
+      const next = new Set(current);
+      if (next.has(notification.id)) next.delete(notification.id);
+      else next.add(notification.id);
+      return next;
+    });
+  };
+
+  const handleNotificationClick = (notification: Notification) => {
     if (!notification.is_read) markAsRead(notification.id);
     if (!communityTypes.includes(notification.notification_type) || !onNavigateToCommunity) return;
 
     const actionData = notification.action_data || {};
     const type = notification.action_type || notification.notification_type;
 
+    if (['group_message','group_invite','group_join_request'].includes(type)) {
+      onNavigateToCommunity({ groupId: actionData.groupId });
+      return;
+    }
+
+    if (type === 'community_follow') {
+      onNavigateToCommunity({ userId: actionData.userId });
+      return;
+    }
     if (type === 'story_like' || type === 'story_reply') {
       onNavigateToCommunity({ storyId: actionData.storyId });
       return;
@@ -154,16 +181,17 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
 
         <div className="space-y-2.5">
             {filteredNotifications.map((notification, index) => {
-            const { icon: Icon, bg, ink } = getNotificationIcon(notification.notification_type);
-            const isCommunity = communityTypes.includes(notification.notification_type);
+             const { icon: Icon, bg, ink } = getNotificationIcon(notification.notification_type);
+             const isCommunity = communityTypes.includes(notification.notification_type);
+             const expanded = expandedIds.has(notification.id);
+             const messageId = `notification-message-${notification.id}`;
             return (
               <motion.div
                 key={notification.id}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03 }}
-                onClick={() => handleNotificationClick(notification)}
-                className={isCommunity ? 'cursor-pointer active:scale-[0.99]' : ''}
+                data-notification-id={notification.id}
                 style={{
                   background: 'var(--a-surface)',
                   borderRadius: 'var(--a-radius-md)',
@@ -173,35 +201,40 @@ const NotificationsScreen = ({ onBack, onNavigateToCommunity }: NotificationsScr
                   transition: 'border-color 0.2s, transform 0.1s'
                 }}>
 
-                  <div className="flex items-start gap-3">
-                    <div className="flex items-center justify-center flex-shrink-0"
+                  <button type="button" onClick={() => handleExpand(notification)} aria-label={notification.title} aria-expanded={expanded} aria-controls={messageId} className="flex w-full min-w-0 items-start gap-3 text-start">
+                    <span className="flex items-center justify-center flex-shrink-0"
                   style={{ width: 40, height: 40, borderRadius: 14, background: bg }}>
                       <Icon size={17} style={{ color: ink }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 style={{ fontSize: 12.5, fontWeight: 700, color: notification.is_read ? 'var(--a-ink)' : 'var(--a-accent-ink)', lineHeight: 1.3 }}>
+                    </span>
+                    <span className="flex-1 min-w-0">
+                      <span className="flex flex-wrap items-start justify-between gap-1.5">
+                        <span style={{ fontSize: 15, fontWeight: 700, color: notification.is_read ? 'var(--a-ink)' : 'var(--a-accent-ink)', lineHeight: 1.4, overflowWrap: 'anywhere' }}>
                           {notification.title}
-                        </h3>
-                        <span className="whitespace-nowrap" style={{ fontSize: 9.5, fontWeight: 500, color: 'var(--a-ink-faint)' }}>{formatTime(notification.created_at)}</span>
-                      </div>
-                      <p className="mt-0.5 leading-relaxed line-clamp-2" style={{ fontSize: 11.5, color: 'var(--a-ink-soft)' }}>{notification.message}</p>
-                      {isCommunity &&
-                    <p className="mt-1.5" style={{ fontSize: 9.5, fontWeight: 700, color: 'var(--a-accent-ink)' }}>{tr("notificationsscreen_gormek_ucun_toxun_04883f", "Görmək üçün toxun →")}</p>
-                    }
-                    </div>
-                  </div>
-                  <div className="flex gap-1.5 mt-2.5 justify-end">
+                        </span>
+                        <span className="whitespace-nowrap" style={{ fontSize: 11, fontWeight: 500, color: 'var(--a-ink-faint)' }}>{formatTime(notification.created_at)}</span>
+                      </span>
+                      <span id={messageId} className={`mt-1 leading-relaxed ${expanded ? 'block whitespace-pre-wrap' : 'line-clamp-2'}`} style={{ fontSize: 14, color: 'var(--a-ink-soft)', overflowWrap: 'anywhere' }}>{notification.message}</span>
+                      <span className="mt-2 inline-flex items-center gap-1" style={{ fontSize: 12, fontWeight: 700, color: 'var(--a-accent-ink)' }}>
+                        {expanded ? tr('notifications_collapse', 'Yığ') : tr('notifications_read_full', 'Tam mətni oxu')}
+                        <ChevronDown size={14} className={expanded ? 'rotate-180' : ''} />
+                      </span>
+                    </span>
+                  </button>
+                  <div className="flex flex-wrap gap-2 mt-3 justify-end">
+                    {notification.notification_type === 'moderation_action' && onNavigateToModeration && <button type="button" className="a-btn-soft me-auto" onClick={() => { void markAsRead(notification.id); onNavigateToModeration(); }}>{moderatorText('details')}</button>}
+                    {isCommunity && onNavigateToCommunity && <button type="button" onClick={() => handleNotificationClick(notification)} className="a-btn-soft me-auto" style={{ fontSize: 12 }}>
+                      {notification.notification_type === 'community_follow' ? tr('community_view_profile', 'Profilə bax') : tr('notifications_open_content', 'Paylaşıma keç')}
+                    </button>}
                     {!notification.is_read &&
                   <button onClick={(e) => {e.stopPropagation();markAsRead(notification.id);}}
-                  style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', borderRadius: 999, padding: '4px 11px', fontSize: 9.5, fontWeight: 700 }}>
+                  style={{ background: 'var(--a-peach-1)', color: 'var(--a-accent-ink)', borderRadius: 999, padding: '7px 12px', fontSize: 12, fontWeight: 700 }}>
                         {tr("notificationsscreen_read", "Oxundu")}
                       </button>
                   }
                     <button onClick={(e) => {e.stopPropagation();deleteNotification(notification.id);}}
                   className="inline-flex items-center gap-1"
-                  style={{ background: 'var(--a-alert-bg)', color: 'var(--a-alert-ink)', borderRadius: 999, padding: '4px 11px', fontSize: 9.5, fontWeight: 700 }}>
-                      <Trash2 size={10} />{tr("notificationsscreen_delete", "Sil")}
+                  style={{ background: 'var(--a-alert-bg)', color: 'var(--a-alert-ink)', borderRadius: 999, padding: '7px 12px', fontSize: 12, fontWeight: 700 }}>
+                      <Trash2 size={13} />{tr("notificationsscreen_delete", "Sil")}
                     </button>
                   </div>
                 </motion.div>);

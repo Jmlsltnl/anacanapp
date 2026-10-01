@@ -3,13 +3,12 @@ import { createPortal } from 'react-dom';
 import { tr } from '@/lib/tr';
 import { Globe, Check } from 'lucide-react';
 import { useUserStore } from '@/store/userStore';
-import { clearTranslationCache, ensureLanguageReady, fetchActiveLanguages } from '@/lib/i18n';
+import { ensureLanguageReady, fetchActiveLanguages } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
+import { APP_LANGUAGES } from '@/lib/app-languages';
 
 // İlkin/fallback siyahı — app_languages sorğusu gələnə qədər və ya xəta halında.
-const FALLBACK_LANGS = [
-{ code: 'az', label: tr("languageselector_azerbaycan_733e93", "Azərbaycan"), native: tr("languageselector_azerbaycan_733e93", "Az\u0259rbaycan") },
-{ code: 'en', label: 'English', native: 'English' }];
+const FALLBACK_LANGS = APP_LANGUAGES.map(language => ({ code: language.code as string, label: language.native_name as string, native: language.native_name as string }));
 
 
 
@@ -19,6 +18,7 @@ export default function LanguageSelector() {
   const [open, setOpen] = useState(false);
   const [enabled, setEnabled] = useState(true);
   const [switching, setSwitching] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [langs, setLangs] = useState(FALLBACK_LANGS);
 
   // Removed feature flag check so the language selector is always enabled for all users.
@@ -31,22 +31,26 @@ export default function LanguageSelector() {
   }, []);
 
   const change = async (code: string) => {
+    if (switching) return;
     if (code === language) {setOpen(false);return;}
-    setSwitching(true);
-    clearTranslationCache();
+    setSwitching(true); setLoadError(false);
     // Lokal seed dərhal hazırdır (şəbəkəsiz); DB overlay-i reload-dan sonra
     // App boot onsuz da arxa planda edir — zəif internetdə istifadəçini gözlətmirik.
-    if (code !== 'az') await ensureLanguageReady(code);
+    try { await ensureLanguageReady(code); }
+    catch { setSwitching(false); setLoadError(true); return; }
     setLanguage(code);
     // Persist to user_preferences so server-side (cron, edge fns) honors the choice
+    const actor = useUserStore.getState().userId;
+    const controller = new AbortController();
+    let timer: ReturnType<typeof setTimeout>;
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.
-        from('user_preferences').
-        upsert({ user_id: user.id, language: code }, { onConflict: 'user_id' });
-      }
-    } catch (e) {console.warn('lang persist failed', e);}
+      await Promise.race([(async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (actor && session?.user.id === actor && !controller.signal.aborted) await supabase.from('user_preferences')
+          .upsert({ user_id: actor, language: code }, { onConflict: 'user_id' }).abortSignal(controller.signal);
+      })(), new Promise<void>(resolve => { timer = setTimeout(() => { controller.abort(); resolve(); }, 3000); })]);
+    } catch { /* Local selection is durable even while the backend is offline. */ }
+    finally { clearTimeout(timer!); }
     setSwitching(false);
     setOpen(false);
     // Force re-render of the app
@@ -81,11 +85,12 @@ export default function LanguageSelector() {
         onClick={() => !switching && setOpen(false)}>
         
           <div
-          className="bg-card w-full max-w-sm rounded-3xl p-4 shadow-2xl"
+          className="bg-card w-full max-w-sm max-h-[85dvh] flex flex-col rounded-3xl p-4 shadow-2xl"
           onClick={(e) => e.stopPropagation()}>
           
-            <h3 className="text-base font-bold text-foreground mb-3 px-1">{tr("untranslated_dil_language_7oaxzb", "Dil / Language")}</h3>
-            <div className="space-y-2">
+            <h3 className="text-base font-bold text-foreground mb-3 px-1 shrink-0">{tr("untranslated_dil_language_7oaxzb", "Dil / Language")}</h3>
+            {loadError && <p role="alert" className="text-sm text-destructive mb-3">{tr('language_bundle_retry', 'Dil yüklənmədi. Yenidən cəhd edin.')}</p>}
+            <div className="space-y-2 min-h-0 overflow-y-auto overscroll-contain">
               {langs.map((l) =>
             <button
               key={l.code}

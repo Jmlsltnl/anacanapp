@@ -5,6 +5,11 @@ import PostCard from './PostCard';
 import PostSeenObserver from './PostSeenObserver';
 import { Skeleton } from '@/components/ui/skeleton';
 import { tr } from '@/lib/tr';
+import { isHeldPost } from '@/lib/community-moderation';
+import MyModeratedPosts from './MyModeratedPosts';
+import { moderatorText } from '@/lib/moderator-i18n';
+import { moderatorReason } from '@/lib/moderator';
+import { PUSH_NAV_EVENT } from '@/lib/pushNav';
 
 interface SinglePostViewProps {
   postId: string;
@@ -28,10 +33,10 @@ const SinglePostView = ({ postId, commentId, onBack, onUserClick }: SinglePostVi
   const { data: post, isLoading } = useSinglePost(postId);
 
   return (
-    <div className="min-h-screen pb-24">
+    <div className="a-scope community-native-text min-h-screen pb-24" style={{ background: 'var(--a-bg)' }}>
       <div className="sticky top-0 z-40 bg-background/70 backdrop-blur-3xl">
         <div className="px-5 py-3 flex items-center gap-3">
-          <motion.button onClick={onBack} className="w-9 h-9 rounded-full bg-muted/40 flex items-center justify-center" whileTap={{ scale: 0.9 }}>
+          <motion.button onClick={onBack} aria-label={tr('common_geri', 'Geri')} className="w-9 h-9 rounded-full bg-muted/40 flex items-center justify-center" whileTap={{ scale: 0.9 }}>
             <ArrowLeft className="rtl:rotate-180 w-4 h-4 text-foreground" />
           </motion.button>
           <h1 className="text-[16px] font-black text-foreground truncate leading-tight">
@@ -60,6 +65,12 @@ const SinglePostView = ({ postId, commentId, onBack, onUserClick }: SinglePostVi
               {tr('singlepostview_not_found_subtitle', 'Bu paylaşım silinmiş ola bilər, ya da onu görmək üçün icazəniz yoxdur.')}
             </p>
           </motion.div>
+        ) : post.moderation_removed_at ? (
+          <section className="a-card space-y-3"><h2 className="font-bold">{moderatorText('removed_marker')}</h2><p className="text-sm">{moderatorText('removed_body')}</p><p className="text-sm font-medium">{moderatorReason(post.moderation_reason)}</p>
+            <button className="a-btn-soft min-h-11" onClick={() => window.dispatchEvent(new CustomEvent(PUSH_NAV_EVENT, { detail: { screen: 'moderation-history' } }))}>{moderatorText('appeal')}</button>
+          </section>
+        ) : isHeldPost(post.ad_moderation_state) ? (
+          <MyModeratedPosts postId={post.id} onRemoved={onBack} />
         ) : (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
             <PostSeenObserver postId={post.id} createdAt={post.created_at} postUserId={post.user_id}>

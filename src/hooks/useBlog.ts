@@ -133,7 +133,7 @@ export const useBlog = () => {
     }
   }, [language]);
 
-  const getPostBySlug = async (slug: string): Promise<BlogPost | null> => {
+  const getPostBySlug = useCallback(async (slug: string): Promise<BlogPost | null> => {
     try {
       const { data, error } = await supabase
         .from('blog_posts')
@@ -144,17 +144,13 @@ export const useBlog = () => {
 
       if (error) throw error;
       
-      // Increment view count using RPC function (bypasses RLS)
-      if (data) {
-        await supabase.rpc('increment_blog_view_count', { post_id: data.id });
-      }
-      
+      if (data && !passesCountryFilter(data, userCountry)) return null;
       return data ? mapRowTranslation(data as BlogPost, language, ['title', 'content', 'excerpt']) : null;
     } catch (error) {
       console.error('Error fetching post:', error);
       return null;
     }
-  };
+  }, [language, userCountry]);
 
   const getPostsByCategory = useCallback((categorySlug: string) => {
     return posts.filter(p => p.category === categorySlug);

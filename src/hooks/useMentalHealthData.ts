@@ -2,6 +2,7 @@ import { tr, mapRowsTranslation } from "@/lib/tr";
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserStore } from '@/store/userStore';
+import { NEW_LANGUAGE_CODES } from '@/lib/app-languages';
 
 export interface EPDSQuestion {
   id: string;
@@ -61,13 +62,14 @@ export const useEPDSQuestionsDB = () => {
       order('sort_order');
 
       if (error) throw error;
-      const mapped = mapRowsTranslation(data, language, ['question_text']);
+      const expanded = (NEW_LANGUAGE_CODES as readonly string[]).includes(language);
+      const mapped = mapRowsTranslation(data, language, expanded ? ['question_text', 'options'] : ['question_text']);
       return (mapped || []).map((q) => ({
         ...q,
         options: (q.options as any[] || []).map((o) => ({
           value: o.value,
           // de/ar üçün en (base `text` sahəsi ingiliscədir) körpüsü, kk/uz/ka üçün ru körpüsü
-          text: language === 'az' ? (o.text_az ?? o.text) :
+          text: expanded ? (o[`text_${language}`] ?? o.text ?? o.text_az) : language === 'az' ? (o.text_az ?? o.text) :
                 language === 'de' ? (o.text_de ?? o.text ?? o.text_az) :
                 language === 'ar' ? (o.text_ar ?? o.text ?? o.text_az) :
                 language === 'kk' ? (o.text_kk ?? o.text_ru ?? o.text_az ?? o.text) :

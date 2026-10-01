@@ -6,7 +6,9 @@ import { useVitaminSchedules, VitaminSchedule } from '@/hooks/useVitaminSchedule
 import { toast } from 'sonner';
 import { hapticFeedback } from '@/lib/native';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
-import { tr } from "@/lib/tr";
+import { tr, mapRowTranslation } from "@/lib/tr";
+import { weekdayLabels } from '@/lib/date-utils';
+import { NEW_LANGUAGE_CODES } from '@/lib/app-languages';
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,6 +34,7 @@ const VITAMIN_PRESETS = [
 
 
 const getDayLabels = (language: string) => {
+  if ((NEW_LANGUAGE_CODES as readonly string[]).includes(language)) return weekdayLabels(language);
   if (language === 'en') return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   if (language === 'ru') return ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
   if (language === 'tr') return ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
@@ -58,9 +61,7 @@ const VitaminTracker = ({ onBack }: VitaminTrackerProps) => {
   });
 
   // Vitamin adını istifadəçi dilində qaytar (kk/uz/ka→ru, de/ar→en körpüsü)
-  const locVitName = (v: any): string =>
-  language === 'az' ? (v.name_az || v.name) :
-  (v[`name_${language}`] || (language === 'kk' || language === 'uz' || language === 'ka' ? v.name_ru : null) || v.name_en || v.name);
+  const locVitName = (v: any): string => mapRowTranslation(v, language, ['name'])?.name || '';
 
   const dynamicPresets = dbVitamins.length > 0 ? dbVitamins.map(v => ({
     name: locVitName(v),

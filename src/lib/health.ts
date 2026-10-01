@@ -1,34 +1,23 @@
 import { Capacitor } from '@capacitor/core';
 import { Health, type HealthPermission } from 'capacitor-health';
 
-/**
- * Apple Health (iOS) / Google Health Connect (Android) vahid wrapper-i.
- * Yalnız OXUMA: addım, kalori, məşqlər. Web-də qəzasız no-op.
- *
- * Native tərəf:
- *  - iOS: HealthKit entitlement + NSHealth*UsageDescription (Info.plist) ✓
- *  - Android: AndroidManifest icazələri + PermissionsRationaleActivity ✓
- */
+/** Apple Health reads on native iOS; Android cycle writes live in healthCycle.ts. */
 
 export const HEALTH_CONNECTED_KEY = 'anacan_health_connected';
 
-// GOOGLE PLAY "Minimum Scope" (2026-08-26 rəddi): yalnız real göstərilən
-// feature-lərin icazələri soruşulur. READ_ACTIVE_CALORIES / READ_DISTANCE /
-// READ_HEART_RATE SİLİNDİ — bunlar yalnız məşq sətrində dekorativ detal idi,
-// müstəqil feature deyildi (AndroidManifest-dən də çıxarılıb).
+// iOS only. Android must not request health read permissions.
 const PERMISSIONS: HealthPermission[] = [
-'READ_STEPS',
-'READ_WORKOUTS',
-// Rahatlama/nəfəs məşqləri (MentalHealthTracker) ilə əlaqəli — Apple Health/Health
-// Connect-dəki mindfulness dəqiqələrini oxumaq üçün (əvvəllər soruşulmurdu belə).
-'READ_MINDFULNESS'];
-
+  'READ_STEPS',
+  'READ_WORKOUTS',
+  'READ_MINDFULNESS'
+];
 
 export const isNativeHealthPlatform = (): boolean => Capacitor.isNativePlatform();
+export const readsSupported = (): boolean => isNativeHealthPlatform() && Capacitor.getPlatform() === 'ios';
 
-/** Health API mövcuddur? (Android-da false = Health Connect quraşdırılmayıb) */
+/** Whether Apple Health reads are available on this device. */
 export async function isHealthAvailable(): Promise<boolean> {
-  if (!isNativeHealthPlatform()) return false;
+  if (!readsSupported()) return false;
   try {
     const { available } = await Health.isHealthAvailable();
     return available;
@@ -39,7 +28,7 @@ export async function isHealthAvailable(): Promise<boolean> {
 
 /** İcazələri istə. iOS-da nəticə həmişə "granted" fərz olunur (HealthKit gizlilik modeli). */
 export async function requestHealthPermissions(): Promise<boolean> {
-  if (!isNativeHealthPlatform()) return false;
+  if (!readsSupported()) return false;
   try {
     await Health.requestHealthPermissions({ permissions: PERMISSIONS });
     localStorage.setItem(HEALTH_CONNECTED_KEY, String(Date.now()));
@@ -52,6 +41,7 @@ export async function requestHealthPermissions(): Promise<boolean> {
 
 /** İstifadəçi bu cihazda health-i qoşub? (lokal bayraq) */
 export function isHealthConnected(): boolean {
+  if (!readsSupported()) return false;
   try {
     return !!localStorage.getItem(HEALTH_CONNECTED_KEY);
   } catch {
@@ -73,7 +63,7 @@ export interface DailyHealthSample {
 
 /** Günlük bucket-lərlə aqreqasiya (addım və ya mindfulness dəqiqəsi). */
 async function queryDaily(dataType: 'steps' | 'mindfulness', days: number): Promise<DailyHealthSample[]> {
-  if (!isNativeHealthPlatform()) return [];
+  if (!readsSupported()) return [];
   const end = new Date();
   const start = new Date();
   start.setDate(start.getDate() - (days - 1));
@@ -97,9 +87,7 @@ async function queryDaily(dataType: 'steps' | 'mindfulness', days: number): Prom
 }
 
 export const getDailySteps = (days = 7) => queryDaily('steps', days);
-/** Mindfulness (rahatlama/meditasiya) dəqiqələri — Apple-ın öz Mindfulness app-ı,
- *  Health Connect-ə yazan digər tətbiqlər və s. mənbələrdən. Yalnız OXUMA —
- *  bu paket mindfulness YAZMAĞI dəstəkləmir (native tərəfdən API yoxdur). */
+/** Read mindfulness minutes from Apple Health; no mindfulness writes. */
 export const getDailyMindfulness = (days = 7) => queryDaily('mindfulness', days);
 
 export async function getTodaySteps(): Promise<number> {
@@ -123,11 +111,9 @@ export interface HealthWorkout {
   sourceName: string;
 }
 
-/** Son N günün məşqləri (növ, tarix, müddət). Google Play "Minimum Scope"
- *  siyasətinə uyğun olaraq məsafə/nəbz detalları SİLİNDİ — müvafiq icazələr
- *  (READ_DISTANCE/READ_HEART_RATE) artıq soruşulmur. */
+/** Recent Apple Health workouts, without heart rate, route or step details. */
 export async function getRecentWorkouts(days = 7): Promise<HealthWorkout[]> {
-  if (!isNativeHealthPlatform()) return [];
+  if (!readsSupported()) return [];
   const end = new Date();
   const start = new Date();
   start.setDate(start.getDate() - days);

@@ -268,10 +268,11 @@ const BloodPressureTracker = ({ onBack }: Props) => {
             {tr('bp_thresholds_title', '📋 İstinad hədləri')}
           </p>
           <div className="space-y-1" style={{ fontSize: 11, color: 'var(--a-disclaimer-ink)', lineHeight: 1.6 }}>
-            <p>💚 {tr('bp_th_normal', 'Normal')}: &lt;120/80</p>
-            <p>🟡 {tr('bp_cat_elevated', 'Yüksəlmiş')}: 120-129/&lt;80</p>
-            <p>🟠 {tr('bp_cat_stage1', 'Hipertenziya I')}: 130-139/80-89</p>
-            <p>🔴 {tr('bp_cat_stage2', 'Hipertenziya II')}: ≥140/90{isPregnant ? ` — ${tr('bp_th_preeclampsia', 'hamiləlikdə preeklampsiya riski, həkimə bildirin')}` : ''}</p>
+            <p>💚 {tr('bp_th_normal', 'Normal')}: {isPregnant ? '90–129 / 60–84' : '90–119 / 60–79'}</p>
+            <p>🟡 {tr('bp_cat_elevated', 'Yüksəlmiş')}: {isPregnant ? '130–139 / 85–89' : '120–129 / <80'}</p>
+            {!isPregnant && <p>🟠 {tr('bp_cat_monitor', 'Yüksəlmiş — izləyin')}: 130–139 / 80–89</p>}
+            <p>🔴 {tr('bp_cat_high_reading', 'Yüksək təzyiq')}: ≥140/90{isPregnant ? ` — ${tr('bp_th_preeclampsia', 'hamiləlikdə preeklampsiya riski, həkimə bildirin')}` : ''}</p>
+            {isPregnant && <p>🚨 {tr('bp_urgent_eyebrow', 'Təcili')}: ≥160/110 — {tr('bp_th_crisis', 'dərhal 103')}</p>}
             <p>🚨 {tr('bp_cat_crisis', 'Hipertonik böhran')}: ≥180/120 — {tr('bp_th_crisis', 'dərhal 103')}</p>
           </div>
           <p className="mt-2" style={{ fontSize: 10, color: 'var(--a-disclaimer-ink)', opacity: 0.8 }}>

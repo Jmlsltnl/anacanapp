@@ -5,6 +5,8 @@ import { ArrowLeft, Pause, Play, Trophy, RotateCcw, Home, Puzzle, Target, Sparkl
 import { tr } from '@/lib/tr';
 import { hapticFeedback } from '@/lib/native';
 import { trTierName } from '../tierLabels';
+import { useGameAds, type GameReviveBenefits } from '@/hooks/useGameAds';
+import GameReviveAction from '../GameReviveAction';
 import {
   Board,
   Pos,
@@ -74,6 +76,12 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
   // happens to re-run (e.g. due to a parent re-render recreating the
   // onLevelComplete prop reference right as a round ends).
   const completedRef = useRef(false);
+  const restoreRound = useCallback((benefits: GameReviveBenefits) => {
+    genRef.current++; completedRef.current = false;
+    setMovesLeft(value => Math.max(0, value) + benefits.moves); setBusy(false); setSelected(null); setInvalidPair(null);
+    phaseRef.current = 'playing'; setPhase('playing');
+  }, []);
+  const gameAds = useGameAds('birlesdir', phase, restoreRound);
   // Pending window.setTimeout ids (bonus banner / shuffle notice auto-clear)
   // so they can be cancelled on unmount instead of firing setState on a
   // component that's no longer mounted (e.g. player exits mid-animation).
@@ -311,8 +319,7 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
   };
 
   const handleRetry = () => {
-    resetGame();
-    setPhase('playing');
+    void gameAds.transition(() => { resetGame(); gameAds.resetRound(); setPhase('playing'); });
   };
 
   // Win / lose watcher — only evaluated once the board has fully settled (busy === false).
@@ -385,14 +392,14 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-b from-violet-50 via-rose-50 to-amber-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-b from-violet-50 via-rose-50 to-amber-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800" data-ad-block="true" data-ad-allow={gameAds.allowedPlacements} data-game-phase={phase} data-game-moves={movesLeft} data-game-score={score}>
       <div className="flex-shrink-0" style={{ height: 'env(safe-area-inset-top)' }} />
 
       {/* HUD */}
       <div className="flex-shrink-0 px-3 pt-2 pb-2 bg-background/70 backdrop-blur-md border-b border-border/40 relative z-20">
         <div className="flex items-center gap-2">
           <motion.button
-            onClick={() => (phase === 'playing' ? setPhase('paused') : onExit())}
+            onClick={() => (phase === 'playing' ? setPhase('paused') : void gameAds.transition(onExit))}
             whileTap={{ scale: 0.9 }}
             className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center flex-shrink-0"
           >
@@ -558,7 +565,7 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
             </motion.button>
             <motion.button
               whileTap={{ scale: 0.95 }}
-              onClick={onExit}
+              onClick={() => { void gameAds.transition(onExit); }}
               className="w-48 py-3 rounded-2xl bg-muted text-foreground font-semibold flex items-center justify-center gap-2"
             >
               <Home className="w-4 h-4" /> {tr('birlesdir_menu_button', 'Menyu')}
@@ -602,7 +609,7 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
               {level < TOTAL_LEVELS && onNextLevel && (
                 <motion.button
                   whileTap={{ scale: 0.95 }}
-                  onClick={onNextLevel}
+                  onClick={() => { void gameAds.transition(onNextLevel); }}
                   className="py-3 rounded-2xl bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold shadow-button"
                 >
                   {tr('birlesdir_next_level_button', 'Növbəti səviyyə')}
@@ -617,7 +624,7 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                onClick={onExit}
+                onClick={() => { void gameAds.transition(onExit); }}
                 className="py-3 rounded-2xl bg-muted/60 text-muted-foreground font-medium flex items-center justify-center gap-2"
               >
                 <Home className="w-4 h-4" /> {tr('birlesdir_menu_button', 'Menyu')}
@@ -637,6 +644,7 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
               {tr('birlesdir_your_score_prefix', 'Xalınız')}: <span className="font-bold text-foreground">{score}</span> / {config.targetScore}
             </p>
             <div className="flex flex-col gap-2 w-full max-w-[260px] mt-3">
+              <GameReviveAction ads={gameAds} game="match" />
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={handleRetry}
@@ -646,7 +654,7 @@ const BirlesdirGame = ({ level, onExit, onLevelComplete, onNextLevel }: Birlesdi
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                onClick={onExit}
+                onClick={() => { void gameAds.transition(onExit); }}
                 className="py-3 rounded-2xl bg-muted text-foreground font-semibold flex items-center justify-center gap-2"
               >
                 <Home className="w-4 h-4" /> {tr('birlesdir_menu_button', 'Menyu')}

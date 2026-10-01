@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useLayoutEffect } from 'react';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { cancelScrollRestoration } from '@/lib/scrollMemory';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Clock, Eye, Heart, Bookmark, MessageCircle,
@@ -12,9 +14,12 @@ import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useToast } from '@/hooks/use-toast';
 import RelatedPosts from './RelatedPosts';
+import BlogShareDialog from './BlogShareDialog';
 import MarkdownContent from '@/components/MarkdownContent';
 import HtmlContent from '@/components/ui/HtmlContent';
 import { tr } from "@/lib/tr";
+import { followupText } from '@/lib/followup-i18n';
+import { AdInlineAnchor, AdSurface, useAdExit } from '@/components/ads/AdExperienceProvider';
 
 interface BlogPostDetailProps {
   post: BlogPost;
@@ -25,6 +30,9 @@ interface BlogPostDetailProps {
 }
 
 const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: BlogPostDetailProps) => {
+  const leaveArticle = useAdExit('article_exit_interstitial', onBack);
+  useLayoutEffect(() => { cancelScrollRestoration(); }, [post.id]);
+  useScrollToTop([post.id]);
   const { user } = useAuth();
   const { toast } = useToast();
   const {
@@ -45,6 +53,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
   const [replyContent, setReplyContent] = useState('');
   const [expandedComments, setExpandedComments] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const handleAddComment = async () => {
     if (!user) {
@@ -89,14 +98,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
     );
   };
 
-  const handleShare = async () => {
-    const { nativeShare } = await import('@/lib/native');
-    await nativeShare({
-      title: post.title,
-      text: post.excerpt || '',
-      url: window.location.href
-    });
-  };
+  const handleShare = () => setShareOpen(true);
 
   const renderComment = (comment: BlogComment, isReply = false) =>
   <motion.div
@@ -227,7 +229,8 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
 
   return (
-    <div className="a-scope min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="a-scope min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }} data-blog-post={post.id}>
+      <AdSurface id="blog_article_banner" />
       {/* Hero Image */}
       <div className="relative">
         {post.cover_image_url ?
@@ -245,9 +248,10 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         
         {/* Floating Back Button */}
         <motion.button
+          aria-label={tr('common_geri', 'Geri')}
           onClick={(e) => {
             e.stopPropagation();
-            onBack();
+            void leaveArticle();
           }}
           className="absolute start-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center cursor-pointer"
           style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)', border: 'none' }}
@@ -258,6 +262,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
         {/* Floating Share Button */}
         <motion.button
+          aria-label={followupText('share_blog')}
           onClick={(e) => {
             e.stopPropagation();
             handleShare();
@@ -383,6 +388,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         </motion.div>
 
         {/* Comments Section */}
+        <AdInlineAnchor id="blog_article_banner" />
         <motion.div
           className="mt-3 a-card"
           initial={{ opacity: 0, y: 20 }}
@@ -439,7 +445,8 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           }
         </motion.div>
 
-        {/* Related Posts */}
+      <BlogShareDialog open={shareOpen} onOpenChange={setShareOpen} slug={post.slug} title={post.title} blog={{ id:post.id,slug:post.slug,title:post.title,excerpt:post.excerpt,cover_image_url:post.cover_image_url }} />
+      {/* Related Posts */}
         <RelatedPosts
           currentPost={post}
           allPosts={allPosts}

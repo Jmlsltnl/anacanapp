@@ -16,11 +16,9 @@ const PeriodDelayBanner = () => {
   const stats = useCycleStats();
   const navigate = useNavigate();
 
-  if (!lastPeriodDate) return null;
-
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const lpd = new Date(lastPeriodDate);
+  const lpd = lastPeriodDate ? new Date(lastPeriodDate) : new Date(today);
   lpd.setHours(0, 0, 0, 0);
   const daysSince = Math.floor((today.getTime() - lpd.getTime()) / (1000 * 60 * 60 * 24));
   const avgCycle = stats.averageCycleLength || cycleLength || 28;
@@ -28,7 +26,7 @@ const PeriodDelayBanner = () => {
 
   // Throttled notification: only insert into notifications once per 24h
   useEffect(() => {
-    if (delayDays < 3 || !user?.id) return;
+    if (!lastPeriodDate || delayDays < 3 || !user?.id) return;
     let cancelled = false;
     (async () => {
       const { data: prefs } = await supabase.
@@ -54,9 +52,9 @@ const PeriodDelayBanner = () => {
       eq('user_id', user.id);
     })();
     return () => {cancelled = true;};
-  }, [delayDays, user?.id]);
+  }, [delayDays, user?.id, lastPeriodDate]);
 
-  if (delayDays < 3) return null;
+  if (!lastPeriodDate || delayDays < 3) return null;
 
   return (
     <section className="a-section" style={{ marginTop: 8 }}>

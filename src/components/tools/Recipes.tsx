@@ -1,5 +1,7 @@
 import { useState, useMemo, forwardRef } from 'react';
 import { tr } from '@/lib/tr';
+import { getCachedTranslation } from '@/lib/i18n';
+import { NEW_LANGUAGE_CODES } from '@/lib/app-languages';
 import { motion } from 'framer-motion';
 import {
   Search, Clock, Heart,
@@ -16,6 +18,7 @@ import { resetAppScrollPosition } from '@/lib/scroll';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { PremiumModal } from '@/components/PremiumModal';
 import { ToolPage, ToolHeader } from './anacan/ToolKit';
+import { AdInlineAnchor, AdSurface, useAdExit } from '@/components/ads/AdExperienceProvider';
 
 interface RecipesProps {
   onBack: () => void;
@@ -100,7 +103,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
 
   // Robust translated category name helper
   const getTranslatedCategoryName = useMemo(() => {
-    return (cat: string | undefined | null): string => {
+    return (cat: string | undefined | null, localizedLabel?: string): string => {
       if (!cat) return '';
       
       const normalized = cat.trim().toLowerCase();
@@ -172,13 +175,15 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
       };
 
       if (dictionary[normalized]) {
+        if ((NEW_LANGUAGE_CODES as readonly string[]).includes(language)) return getCachedTranslation(`recipe_category.${normalized}`, language) || dictionary[normalized].en;
         const langKey = (['az', 'en', 'ru', 'tr', 'kk', 'de', 'ar', 'uz', 'ka'] as const).includes(language as any) ? (language as keyof LangMap) : 'az';
         // uz/ka lüğətdə yoxdur → ru körpüsü (kk ilə eyni məntiq)
         return dictionary[normalized][langKey] || dictionary[normalized].ru;
       }
 
       // 3. Fallback to capitalization if nothing matches
-      return cat.charAt(0).toUpperCase() + cat.slice(1);
+      const label = localizedLabel || cat;
+      return label.charAt(0).toUpperCase() + label.slice(1).replace(/_/g, ' ');
     };
   }, [dbRecipeCategories, language]);
 
@@ -252,15 +257,17 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
   };
 
   const totalTime = (recipe: Recipe) => (recipe.prep_time || 0) + (recipe.cook_time || 0);
+  const leaveRecipe = useAdExit('recipe_exit_interstitial', handleBackFromDetail, !!selectedRecipe);
 
   // Recipe Detail View - scroll to top on open
   if (selectedRecipe && (isPremium || isRecipeFree(selectedRecipe))) {
     return (
       <div ref={ref} key={`recipe-${selectedRecipe.id}`}>
+        <AdSurface id="recipes_banner" />
         <ToolPage>
           <ToolHeader
-            onBack={handleBackFromDetail}
-            eyebrow={getTranslatedCategoryName(selectedRecipe.category)}
+            onBack={() => { void leaveRecipe(); }}
+            eyebrow={getTranslatedCategoryName(selectedRecipe.category, selectedRecipe.categoryLabel)}
             title={selectedRecipe.title}
             actions={
             <button className="a-icon-btn" onClick={(e) => toggleFavorite(selectedRecipe.id, e as any)} aria-label="Favorite">
@@ -339,6 +346,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
             }
 
             {/* Ingredients Section */}
+            <AdInlineAnchor id="recipes_banner" />
             {selectedRecipe.ingredients && selectedRecipe.ingredients.length > 0 &&
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -442,6 +450,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
 
   return (
     <div ref={ref}>
+      <AdSurface id="recipes_banner" />
       <ToolPage>
         <ToolHeader
           onBack={onBack}
@@ -469,6 +478,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
         }
 
         {/* Search */}
+        <AdInlineAnchor id="recipes_banner" />
         <motion.div
           className="a-search mb-3"
           initial={{ y: 20, opacity: 0 }}
@@ -597,7 +607,7 @@ const Recipes = forwardRef<HTMLDivElement, RecipesProps>(({ onBack }, ref) => {
                     <h3 className="font-bold text-sm line-clamp-2 mb-1" style={{ color: 'var(--a-ink)' }}>{recipe.title}</h3>
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)' }}>
-                        {getTranslatedCategoryName(recipe.category)}
+                        {getTranslatedCategoryName(recipe.category, recipe.categoryLabel)}
                       </span>
                       <div className="flex items-center gap-1.5">
                         {!isRecipeFree(recipe) &&

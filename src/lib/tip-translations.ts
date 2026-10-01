@@ -1,3 +1,5 @@
+import { getCachedTranslation } from './i18n';
+
 export const TIP_TRANSLATIONS: Record<string, Record<string, string>> = {
   "Enerji Artımı": {
     "en": "Energy Boost",
@@ -184,6 +186,8 @@ export const TIP_TRANSLATIONS: Record<string, Record<string, string>> = {
 export const getTranslatedTip = (text: string, lang: string): string => {
   if (!text) return '';
   if (lang === 'az') return text;
+  const bundled = getCachedTranslation(`tip.${text}`, lang);
+  if (bundled) return bundled;
   
   // Try exact match (uz/ka üçün ru körpüsü: uz/ka tərcüməsi yoxdursa rus mətn az-dan faydalıdır)
   if (TIP_TRANSLATIONS[text] && (TIP_TRANSLATIONS[text][lang] || ((lang === 'uz' || lang === 'ka') && TIP_TRANSLATIONS[text]['ru']))) {
@@ -194,6 +198,8 @@ export const getTranslatedTip = (text: string, lang: string): string => {
   const trimmedText = text.trim().toLowerCase();
   for (const [key, translations] of Object.entries(TIP_TRANSLATIONS)) {
     if (key.trim().toLowerCase() === trimmedText) {
+      const cached = getCachedTranslation(`tip.${key}`, lang);
+      if (cached) return cached;
       if (translations[lang]) return translations[lang];
       if ((lang === 'uz' || lang === 'ka') && translations['ru']) return translations['ru'];
     }

@@ -1,6 +1,8 @@
 import { tr } from "@/lib/tr";import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { isAzureBackend } from '@/integrations/supabase/backend-config';
 import { useAuth } from './useAuth';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   isNativePlatform,
   hasRevenueCatPlugin,
@@ -8,14 +10,17 @@ import {
   identifyUser,
   checkEntitlement,
   getOfferings,
+  getIntroEligibility,
   purchasePackage,
   restorePurchases as rcRestore,
   presentPaywall,
   presentCustomerCenter,
   RC_PRODUCTS,
   RC_OFFERING_ID,
+  REVENUECAT_ENABLED,
   REVENUECAT_CONFIG } from
 '@/lib/revenuecat';
+import { isoPeriod, type PaidPurchaseRequest } from '@/lib/onboarding-billing';
 
 export interface RCPackage {
   identifier: string;
@@ -54,11 +59,17 @@ interface SyncOptions {
 
 interface UseInAppPurchaseReturn {
   packages: RCPackage[];
+  offerings: Record<string, RCPackage[]>;
+  introEligibility: Record<string, number>;
   isLoading: boolean;
   isPurchasing: boolean;
   error: string | null;
   isSupported: boolean;
   isPro: boolean;
+  purchaseStatus: 'idle' | 'cancelled' | 'failed' | 'pending' | 'active';
+  purchaseExact: (pkg: RCPackage, selection: PaidPurchaseRequest) => Promise<boolean>;
+  reloadOfferings: () => Promise<void>;
+  retryActivation: () => Promise<boolean>;
   purchaseByIdentifier: (identifier: string) => Promise<boolean>;
   purchaseMonthly: () => Promise<boolean>;
   purchaseYearly: () => Promise<boolean>;
@@ -72,19 +83,58 @@ interface UseInAppPurchaseReturn {
 
 export function useInAppPurchase(): UseInAppPurchaseReturn {
   const { user, refreshProfile } = useAuth();
+  const queryClient = useQueryClient();
   const [packages, setPackages] = useState<RCPackage[]>([]);
+  const [offerings, setOfferings] = useState<Record<string, RCPackage[]>>({});
+  const [introEligibility, setIntroEligibility] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSupported, setIsSupported] = useState(false);
   const [isPro, setIsPro] = useState(false);
+  const [purchaseStatus, setPurchaseStatus] = useState<UseInAppPurchaseReturn['purchaseStatus']>('idle');
+  const purchaseLock = useRef(false);
+  const ownerRef = useRef(user?.id); ownerRef.current = user?.id;
   const syncWithDatabaseRef = useRef<((opts?: SyncOptions) => Promise<boolean>) | null>(null);
 
+  const reloadOfferings = useCallback(async () => {
+    const owner = user?.id;
+    if (!owner || !isNativePlatform() || !hasRevenueCatPlugin()) return;
+    setIsLoading(true);
+    try {
+      const loaded = await getOfferings();
+      if (ownerRef.current !== owner) return;
+      const mapPackage = (pkg: any): RCPackage => {
+        const defaultOption = pkg.product?.defaultOption;
+        const basePrice = pkg.product?.subscriptionOptions?.find((option: any) => option.isBasePlan)?.fullPricePhase?.price;
+        return { identifier: pkg.identifier, packageType: pkg.packageType, product: {
+          identifier: pkg.product?.identifier || '', title: pkg.product?.title || '', description: pkg.product?.description || '',
+          priceString: basePrice?.formatted || pkg.product?.priceString || '', price: basePrice ? Number(basePrice.amountMicros) / 1e6 : pkg.product?.price || 0,
+          currencyCode: basePrice?.currencyCode || pkg.product?.currencyCode || '', defaultOptionId: defaultOption?.id || null,
+          defaultOptionHasFreeTrial: !!defaultOption?.freePhase, defaultOptionTrialPeriod: isoPeriod(defaultOption?.freePhase?.billingPeriod),
+          defaultOptionTags: Array.isArray(defaultOption?.tags) ? defaultOption.tags : [],
+          subscriptionOptions: Array.isArray(pkg.product?.subscriptionOptions) ? pkg.product.subscriptionOptions.map((option: any) => ({
+            id: option?.id || '', isBasePlan: !!option?.isBasePlan, tags: Array.isArray(option?.tags) ? option.tags : [], hasFreeTrial: !!option?.freePhase,
+            trialPeriod: isoPeriod(option?.freePhase?.billingPeriod), fullPricePeriod: isoPeriod(option?.fullPricePhase?.billingPeriod),
+          })) : [],
+        }, _raw: pkg };
+      };
+      const all: Record<string, RCPackage[]> = Object.fromEntries(Object.entries(loaded?.all || {}).map(([id, offering]) =>
+        [id, ((offering as any)?.availablePackages || []).map(mapPackage)]));
+      const active = all[RC_OFFERING_ID]?.length ? all[RC_OFFERING_ID] : (loaded?.current?.availablePackages || []).map(mapPackage);
+      const introProducts = [...new Set(Object.values(all).flat().filter(pkg => pkg._raw?.product?.introPrice).map(pkg => pkg.product.identifier))];
+      const eligibility = introProducts.length ? await getIntroEligibility(introProducts) : {};
+      if (ownerRef.current !== owner) return;
+      setOfferings(all); setPackages(active); setIntroEligibility(eligibility);
+    } finally { if (ownerRef.current === owner) setIsLoading(false); }
+  }, [user?.id]);
 
   // Initialize RevenueCat
   useEffect(() => {
     const init = async () => {
-      if (!isNativePlatform()) {
+      const owner = user?.id;
+      setPackages([]); setOfferings({}); setIntroEligibility({}); setPurchaseStatus('idle');
+      if (!isNativePlatform() || !user) {
         setIsSupported(false);
         setIsLoading(false);
         return;
@@ -99,77 +149,37 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
       try {
         await initRevenueCat(user?.id);
         if (user?.id) await identifyUser(user.id);
+        if (ownerRef.current !== owner) return;
 
         setIsSupported(true);
 
         // Check entitlements (yalnız ANİ UI göstəricisi üçün — DB yazısı YOX,
         // bax syncWithDatabase: real yazı yalnız server-side edge function
         // vasitəsilə, RevenueCat-ın öz REST API-sindən müstəqil təsdiqlə olur).
-        const ent = await checkEntitlement();
-        setIsPro(ent.isPro);
+        await checkEntitlement();
 
         // Hər açılışda / login-də DB-ni RC-nin HƏQİQİ vəziyyəti ilə sinxronla —
         // istifadəçi heç bir paywall ekranı açmasa belə (məs. auto-renew olub,
         // ya ləğv edilib) DB köhnəlmiş qalmasın (əvvəllər YALNIZ ent.isPro=true
         // olanda sync olunurdu — indi hər iki istiqamətdə, hər açılışda).
         if (user?.id) {
-          syncWithDatabaseRef.current?.();
+          if (isAzureBackend()) await syncWithDatabaseRef.current?.();
+          else syncWithDatabaseRef.current?.();
         }
 
-        // Load offerings — YENİ build versiyalı offering-i üstün tutur
-        // (pricing_2026: $3.99 ay trial-sız / $29.99 il). Tapılmasa current-ə
-        // düşür. Köhnə build-lər bu kodu daşımadığından current-də qalır →
-        // qiymət/trial dəyişikliyini görmürlər.
-        const offerings = await getOfferings();
-        const activeOffering =
-        offerings?.all?.[RC_OFFERING_ID]?.availablePackages?.length ?
-        offerings.all[RC_OFFERING_ID] :
-        offerings?.current;
-        if (activeOffering?.availablePackages) {
-          const pkgs: RCPackage[] = activeOffering.availablePackages.map((pkg: any) => {
-            const defaultOption = pkg.product?.defaultOption;
-            const subscriptionOptions = Array.isArray(pkg.product?.subscriptionOptions) ?
-            pkg.product.subscriptionOptions.map((option: any) => ({
-              id: option?.id || '',
-              isBasePlan: !!option?.isBasePlan,
-              tags: Array.isArray(option?.tags) ? option.tags : [],
-              hasFreeTrial: !!option?.freePhase,
-              trialPeriod: option?.freePhase?.billingPeriod || null,
-              fullPricePeriod: option?.fullPricePhase?.billingPeriod || null
-            })) :
-            [];
-
-            return {
-              identifier: pkg.identifier,
-              packageType: pkg.packageType,
-              product: {
-                identifier: pkg.product?.identifier || '',
-                title: pkg.product?.title || '',
-                description: pkg.product?.description || '',
-                priceString: pkg.product?.priceString || '',
-                price: pkg.product?.price || 0,
-                currencyCode: pkg.product?.currencyCode || '',
-                defaultOptionId: defaultOption?.id || null,
-                defaultOptionHasFreeTrial: !!defaultOption?.freePhase,
-                defaultOptionTrialPeriod: defaultOption?.freePhase?.billingPeriod || null,
-                defaultOptionTags: Array.isArray(defaultOption?.tags) ? defaultOption.tags : [],
-                subscriptionOptions
-              },
-              _raw: pkg
-            };
-          });
-          setPackages(pkgs);
-        }
+        // Keep the normal offering and the dedicated last-chance offering apart.
+        // Store product/offer/cohort rules, not the offering name, set the price.
+        await reloadOfferings();
       } catch (err) {
         console.error('RevenueCat init error:', err);
         setError(tr("useinapppurchase_odenis_sistemi_yuklene_bilmedi_90af92", "\xD6d\u0259ni\u015F sistemi y\xFCkl\u0259n\u0259 bilm\u0259di"));
       } finally {
-        setIsLoading(false);
+        if (ownerRef.current === owner) setIsLoading(false);
       }
     };
 
     init();
-  }, [user?.id]);
+  }, [user?.id, reloadOfferings]);
 
   // Server-side sinxron — TƏK etibarlı yazı yolu (bax sync-revenuecat-entitlement
   // edge function). Edge function RevenueCat-ın öz REST API-sindən (məxfi
@@ -184,14 +194,17 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   // ödəyib "Premium aktivləşdi! 🎉" görürdü, DB isə səssizcə köhnə qalırdı.
   // Bir müştəri məhz bu səbəbdən Premium ala bilməyib şikayət etdi.
   const syncWithDatabase = useCallback(async (opts?: SyncOptions): Promise<boolean> => {
-    if (!user) return false;
+    if (!REVENUECAT_ENABLED || !user) return false;
+    const owner = user.id;
     const maxAttempts = opts?.expectPro ? 4 : 1;
     const delaysMs = [0, 1500, 3000, 6000];
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       if (delaysMs[attempt]) await new Promise((resolve) => setTimeout(resolve, delaysMs[attempt]));
+      if (ownerRef.current !== owner) return false;
       try {
         const { data, error } = await supabase.functions.invoke('sync-revenuecat-entitlement');
+        if (ownerRef.current !== owner) return false;
         if (error) {
           console.error(`sync-revenuecat-entitlement error (cəhd ${attempt + 1}/${maxAttempts}):`, error);
           continue;
@@ -199,6 +212,13 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
         if (typeof data?.isPro === 'boolean') setIsPro(data.isPro);
         // Refresh in-memory profile so the UI unlocks/locks premium immediately
         await refreshProfile();
+        if (typeof data?.isPro === 'boolean') {
+          // Public badges and shared entitlement queries must not keep the
+          // pre-purchase/pre-restore author snapshot after server confirmation.
+          const roots = new Set(['premium-access-v1','subscription','household-premium','community-feed','group-posts','post-comments','single-post',
+            'user-posts','community-connections','public-profile','community-profile','community-profile-card','chat-authors-v2']);
+          void queryClient.invalidateQueries({ predicate: ({ queryKey }) => roots.has(String(queryKey[0])) });
+        }
         if (!opts?.expectPro || data?.isPro === true) {
           return !!data?.isPro;
         }
@@ -209,56 +229,86 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
       }
     }
     return false;
-  }, [user, refreshProfile]);
+  }, [user, refreshProfile, queryClient]);
 
   useEffect(() => {
     syncWithDatabaseRef.current = syncWithDatabase;
   }, [syncWithDatabase]);
 
-  const executePurchase = useCallback(async (pkg: RCPackage): Promise<boolean> => {
+  const executePurchase = useCallback(async (pkg: RCPackage, selection?: PaidPurchaseRequest): Promise<boolean> => {
+    if (!user?.id || ownerRef.current !== user.id || purchaseLock.current || purchaseStatus === 'pending') return false;
+    const owner = user.id;
+    purchaseLock.current = true;
     setIsPurchasing(true);
+    setPurchaseStatus('idle');
     setError(null);
 
     try {
-      const result = await purchasePackage(pkg._raw);
+      await identifyUser(owner);
+      if (ownerRef.current !== owner) return false;
+      const result = await purchasePackage(pkg._raw, selection, owner);
+      if (ownerRef.current !== owner) return false;
 
       if (result.error === 'USER_CANCELLED') {
         setError(null);
+        setPurchaseStatus('cancelled');
         return false;
       }
 
       if (result.success) {
-        setIsPro(true);
         const entitlement = result.customerInfo?.entitlements?.active?.[REVENUECAT_CONFIG.ENTITLEMENT_ID];
         // DB yazısı + referral konversiya təsdiqi indi TAMAMİLƏ server-side
         // (sync-revenuecat-entitlement edge function RC-nin öz REST API-sini
         // çağırıb müstəqil təsdiqləyir — klient artıq bunu tətikləmir).
         // expectPro:true — RC serveri bu təzə alışı hələ "görməyə" bilər,
         // isPro:false gəlsə bir neçə dəfə təkrar sınanılsın.
-        await syncWithDatabase({ expectPro: true });
+        const confirmed = await syncWithDatabase({ expectPro: true });
+        if (ownerRef.current !== owner) return false;
+        if (!confirmed) {
+          setPurchaseStatus('pending');
+          setError(tr('useiap_activation_pending', 'Mağaza əməliyyatı alındı, Premium təsdiqi gözlənilir. Yenidən ödəniş etməyin; bir qədər sonra bərpanı sınayın.'));
+          return false;
+        }
+        setIsPro(true);
+        setPurchaseStatus('active');
 
         // Analytics: real qiymət/valyuta ilə (FB value-optimization + GA4 purchase).
         // Trial başlanğıcı ayrıca konversiyadır (Meta StartTrial / GA4).
-        const isTrial = (entitlement as any)?.periodType === 'TRIAL' || (entitlement as any)?.periodType === 'INTRO';
+        const isTrial = (entitlement as any)?.periodType === 'TRIAL';
         import('@/lib/analytics').then((m) => {
           if (isTrial) {
             m.analytics.logTrialStarted(pkg.identifier, pkg.product.price, pkg.product.currencyCode);
           } else {
-            m.analytics.logPremiumSubscribed(pkg.identifier, pkg.product.price, pkg.product.currencyCode);
+            m.analytics.logPremiumSubscribed(pkg.identifier, selection?.price ?? pkg.product.price, selection?.currency ?? pkg.product.currencyCode);
           }
         }).catch(() => {});
         return true;
       }
 
       setError(result.error || tr("useinapppurchase_alis_tamamlana_bilmedi_yeniden_8c3980", "Al\u0131\u015F tamamlana bilm\u0259di. Yenid\u0259n c\u0259hd edin."));
+      setPurchaseStatus('failed');
       return false;
     } catch (err: any) {
+      if (ownerRef.current !== owner) return false;
       console.error('Purchase error:', err);
+      setPurchaseStatus('failed');
       setError(tr("useinapppurchase_purchase_error", "Alış zamanı xəta: {error}").replace("{error}", err?.message || tr("useinapppurchase_namelum_xeta_aa30e7", "Nam\u0259lum x\u0259ta")));
       return false;
     } finally {
-      setIsPurchasing(false);
+      purchaseLock.current = false;
+      if (ownerRef.current === owner) setIsPurchasing(false);
     }
+  }, [syncWithDatabase, user?.id, purchaseStatus]);
+
+  const retryActivation = useCallback(async () => {
+    if (purchaseLock.current) return false;
+    purchaseLock.current = true; setIsPurchasing(true);
+    try {
+      const confirmed = await syncWithDatabase({ expectPro: true });
+      setPurchaseStatus(confirmed ? 'active' : 'pending');
+      if (confirmed) setError(null);
+      return confirmed;
+    } finally { purchaseLock.current = false; setIsPurchasing(false); }
   }, [syncWithDatabase]);
 
   const purchaseByIdentifier = useCallback(async (identifier: string): Promise<boolean> => {
@@ -283,17 +333,28 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   const purchaseLifetime = useCallback(() => purchaseByIdentifier(RC_PRODUCTS.LIFETIME), [purchaseByIdentifier]);
 
   const handleRestore = useCallback(async (): Promise<boolean> => {
+    if (!user?.id || ownerRef.current !== user.id) return false;
+    const owner = user.id;
     setIsLoading(true);
     setError(null);
     try {
-      const result = await rcRestore();
+      await identifyUser(owner);
+      if (ownerRef.current !== owner) return false;
+      const result = await rcRestore(owner);
+      if (ownerRef.current !== owner) return false;
       if (result.success) {
-        setIsPro(true);
         // Məhsul ID/tarixi ötürməyə ehtiyac yoxdur — edge function RC-dən
         // real, düzgün (illik/lifetime daxil) məlumatı özü çəkir (əvvəllər
         // bura parametr ötürülmürdü deyə həmişə "+1 ay" fallback-a düşürdü,
         // illik/lifetime abunəçiləri səhvən 1 ay sonra "bitmiş" göstərirdi).
-        await syncWithDatabase({ expectPro: true });
+        const confirmed = await syncWithDatabase({ expectPro: true });
+        if (!confirmed) {
+          setPurchaseStatus('pending');
+          setError(tr('useiap_activation_pending', 'Mağaza əməliyyatı alındı, Premium təsdiqi gözlənilir. Yenidən ödəniş etməyin; bir qədər sonra bərpanı sınayın.'));
+          return false;
+        }
+        setIsPro(true);
+        setPurchaseStatus('active');
         return true;
       }
       return false;
@@ -304,7 +365,7 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [syncWithDatabase]);
+  }, [syncWithDatabase, user?.id]);
 
   const showPaywall = useCallback(async (): Promise<boolean> => {
     const result = await presentPaywall();
@@ -313,8 +374,9 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
     // caller checks `result.available` only when needed.
     if (!result.available) return false;
     if (result.didPurchase) {
+      const confirmed = await syncWithDatabase({ expectPro: true });
+      if (!confirmed) return false;
       setIsPro(true);
-      await syncWithDatabase({ expectPro: true });
       return true;
     }
     return false;
@@ -324,8 +386,9 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
   const showPaywallSafe = useCallback(async (): Promise<{didPurchase: boolean;available: boolean;}> => {
     const result = await presentPaywall();
     if (result.available && result.didPurchase) {
+      const confirmed = await syncWithDatabase({ expectPro: true });
+      if (!confirmed) return { available: true, didPurchase: false };
       setIsPro(true);
-      await syncWithDatabase({ expectPro: true });
     }
     return result;
   }, [syncWithDatabase]);
@@ -338,7 +401,6 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
 
   const refreshEntitlements = useCallback(async () => {
     const ent = await checkEntitlement();
-    setIsPro(ent.isPro);
     // Customer Center-də istənilən dəyişiklik (ləğv/bərpa/itki) — hər iki
     // istiqamətdə server-side sinxronlanır (edge function RC-dən real vəziyyəti çəkir).
     await syncWithDatabase();
@@ -346,11 +408,17 @@ export function useInAppPurchase(): UseInAppPurchaseReturn {
 
   return {
     packages,
+    offerings,
+    introEligibility,
     isLoading,
     isPurchasing,
     error,
     isSupported,
     isPro,
+    purchaseStatus,
+    purchaseExact: executePurchase,
+    reloadOfferings,
+    retryActivation,
     purchaseByIdentifier,
     purchaseMonthly,
     purchaseYearly,
