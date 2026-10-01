@@ -14,6 +14,289 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_brand_audit: {
+        Row: {
+          action: string
+          actor_id: string | null
+          args_hash: string
+          brand_id: string | null
+          created_at: string
+          id: string
+          response: Json
+          target_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          args_hash: string
+          brand_id?: string | null
+          created_at?: string
+          id: string
+          response: Json
+          target_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          args_hash?: string
+          brand_id?: string | null
+          created_at?: string
+          id?: string
+          response?: Json
+          target_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_brand_audit_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "ad_brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_brand_creatives: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          banner_id: string | null
+          brand_id: string
+          deleted_at: string | null
+          id: string
+          legacy_clicks: number
+          legacy_views: number
+          revision: number
+          snapshot: Json
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          banner_id?: string | null
+          brand_id: string
+          deleted_at?: string | null
+          id: string
+          legacy_clicks?: number
+          legacy_views?: number
+          revision?: number
+          snapshot: Json
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          banner_id?: string | null
+          brand_id?: string
+          deleted_at?: string | null
+          id?: string
+          legacy_clicks?: number
+          legacy_views?: number
+          revision?: number
+          snapshot?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_brand_creatives_banner_id_fkey"
+            columns: ["banner_id"]
+            isOneToOne: true
+            referencedRelation: "banners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_brand_creatives_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "ad_brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_brand_members: {
+        Row: {
+          brand_id: string
+          created_at: string
+          created_by: string | null
+          is_active: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand_id: string
+          created_at?: string
+          created_by?: string | null
+          is_active?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand_id?: string
+          created_at?: string
+          created_by?: string | null
+          is_active?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_brand_members_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "ad_brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_brands: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          name: string
+          report_timezone: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id: string
+          is_active?: boolean
+          logo_url?: string | null
+          name: string
+          report_timezone?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name?: string
+          report_timezone?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      ad_delivery_receipts: {
+        Row: {
+          actor_id: string | null
+          brand_id: string
+          clicked_at: string | null
+          creative_id: string
+          expires_at: string
+          id: string
+          impression_at: string | null
+          impression_kind: string | null
+          issued_at: string
+          language: string
+          metric_day: string | null
+          placement: string
+          platform: string
+          revision: number
+        }
+        Insert: {
+          actor_id?: string | null
+          brand_id: string
+          clicked_at?: string | null
+          creative_id: string
+          expires_at: string
+          id: string
+          impression_at?: string | null
+          impression_kind?: string | null
+          issued_at?: string
+          language: string
+          metric_day?: string | null
+          placement: string
+          platform: string
+          revision: number
+        }
+        Update: {
+          actor_id?: string | null
+          brand_id?: string
+          clicked_at?: string | null
+          creative_id?: string
+          expires_at?: string
+          id?: string
+          impression_at?: string | null
+          impression_kind?: string | null
+          issued_at?: string
+          language?: string
+          metric_day?: string | null
+          placement?: string
+          platform?: string
+          revision?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_delivery_receipts_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "ad_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_delivery_receipts_creative_id_fkey"
+            columns: ["creative_id"]
+            isOneToOne: false
+            referencedRelation: "ad_brand_creatives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_metrics_daily: {
+        Row: {
+          brand_id: string
+          clicks: number
+          creative_id: string
+          impressions: number
+          metric_day: string
+          placement: string
+          platform: string
+          updated_at: string
+        }
+        Insert: {
+          brand_id: string
+          clicks?: number
+          creative_id: string
+          impressions?: number
+          metric_day: string
+          placement: string
+          platform: string
+          updated_at?: string
+        }
+        Update: {
+          brand_id?: string
+          clicks?: number
+          creative_id?: string
+          impressions?: number
+          metric_day?: string
+          placement?: string
+          platform?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_metrics_daily_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "ad_brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_metrics_daily_creative_id_fkey"
+            columns: ["creative_id"]
+            isOneToOne: false
+            referencedRelation: "ad_brand_creatives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_notification_deliveries: {
         Row: {
           campaign_id: string
@@ -23472,6 +23755,17 @@ export type Database = {
         Returns: boolean
       }
       admin_assert_access_v1: { Args: never; Returns: undefined }
+      admin_brand_action_v1: {
+        Args: {
+          p_action: string
+          p_brand: string
+          p_payload: Json
+          p_request: string
+          p_target: string
+        }
+        Returns: Json
+      }
+      admin_brand_workspace_v1: { Args: { p_brand?: string }; Returns: Json }
       admin_community_ad_decide_v1: {
         Args: {
           p_action: string
@@ -23639,6 +23933,33 @@ export type Database = {
         Returns: Json
       }
       anacan_source_writer_status_v1: { Args: never; Returns: Json }
+      brand_ad_report_v1: {
+        Args: {
+          p_ad?: string
+          p_brand: string
+          p_export?: boolean
+          p_from: string
+          p_limit?: number
+          p_offset?: number
+          p_placement?: string
+          p_search?: string
+          p_sort?: string
+          p_status?: string
+          p_to: string
+        }
+        Returns: Json
+      }
+      brand_ad_status_v1: {
+        Args: { p: Json; p_brand_active: boolean; p_deleted: string }
+        Returns: string
+      }
+      brand_ads_access_v1: { Args: { p_brand: string }; Returns: string }
+      brand_ads_admin_v1: { Args: never; Returns: string }
+      brand_banner_eligible_v1: {
+        Args: { p_actor: string; p_banner: string; p_language: string }
+        Returns: boolean
+      }
+      brand_banner_readable_v1: { Args: { p_banner: string }; Returns: boolean }
       can_redeem_partner_venue: {
         Args: { _user_id: string; _venue_id: string }
         Returns: Json
@@ -24103,6 +24424,12 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_banner_inventory_v2: {
+        Args: { p_actor: string; p_language: string; p_placement: string }
+        Returns: Json
+      }
+      get_brand_ads_contract_v1: { Args: never; Returns: Json }
+      get_brand_portal_access_v1: { Args: never; Returns: Json }
       get_chat_contract_v2: { Args: never; Returns: Json }
       get_community_ad_moderation_contract_v1: { Args: never; Returns: Json }
       get_community_connections: {
@@ -24296,6 +24623,16 @@ export type Database = {
         Args: { _scope?: string; _user_id: string }
         Returns: boolean
       }
+      issue_brand_ad_delivery_v1: {
+        Args: {
+          p_actor: string
+          p_banner: string
+          p_exposure: string
+          p_language: string
+          p_platform: string
+        }
+        Returns: Json
+      }
       link_partners: {
         Args: {
           p_my_profile_id: string
@@ -24479,6 +24816,7 @@ export type Database = {
         Returns: Json
       }
       moderator_user_network_v1: { Args: { p_user: string }; Returns: Json }
+      my_ad_brands_v1: { Args: never; Returns: Json }
       my_community_ad_reviews_v1: {
         Args: {
           p_actor: string
@@ -24493,6 +24831,15 @@ export type Database = {
         Returns: Json
       }
       premium_grant_state_v1: { Args: { p_user_id: string }; Returns: Json }
+      record_brand_ad_event_v1: {
+        Args: {
+          p_actor: string
+          p_delivery: string
+          p_event: string
+          p_visible_ms?: number
+        }
+        Returns: boolean
+      }
       record_period_days: {
         Args: {
           p_complete?: boolean

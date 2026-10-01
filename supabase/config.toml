@@ -77,3 +77,6 @@ verify_jwt = false
 
 [functions.revenuecat-webhook]
 verify_jwt = false
+
+[functions.brand-portal-accounts]
+verify_jwt = false
