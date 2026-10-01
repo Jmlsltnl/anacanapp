@@ -10,4 +10,4 @@
 - Keep credentials, signing material, and private sessions out of logs/chat/Git/archives; use existing private inputs and secret references. Why: prevent exposure.
 - Treat Source Auth-hook binding/IP enforcement as an operator dependency, not an installed setting; do not claim it enabled without authenticated proof. Why: supported hook configuration is unavailable here.
 
-Full dated release history, scoped implementation details, and delivery references: `docs/WORKTREE_HISTORY.md` and `docs/APPLICATION_BASELINE.md`. Read the relevant release contract before changing that area.
+Dated history and release links: `docs/WORKTREE_HISTORY.md`; read relevant contracts before changes.
