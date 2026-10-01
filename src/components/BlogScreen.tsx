@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Search, Clock, Eye, ChevronRight,
@@ -10,7 +10,7 @@ import { useSavedPosts } from '@/hooks/useBlogInteractions';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import { saveScroll, restoreScroll } from '@/lib/scrollMemory';
+import { saveScroll, restoreScroll, cancelScrollRestoration } from '@/lib/scrollMemory';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +18,8 @@ import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import BlogPostDetail from '@/components/blog/BlogPostDetail';
 import { tr } from "@/lib/tr";
+import { AdInlineAnchor, AdSurface } from '@/components/ads/AdExperienceProvider';
+import { followupText } from '@/lib/followup-i18n';
 
 interface BlogScreenProps {
   onBack: () => void;
@@ -30,13 +32,15 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
   useScreenAnalytics('Blog', 'Content');
 
   const { user } = useAuth();
-  const { posts, categories, featuredPosts, loading, searchPosts, getPostsByCategory } = useBlog();
+  const { posts, categories, featuredPosts, loading, searchPosts, getPostsByCategory, getPostBySlug } = useBlog();
   const { savedPosts } = useSavedPosts();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [showSaved, setShowSaved] = useState(false);
   const [openedFromHome, setOpenedFromHome] = useState(false);
+  const handledSlug = useRef<string | null>(null);
+  const [linkLoading, setLinkLoading] = useState(!!initialSlug), [linkMissing, setLinkMissing] = useState(false);
 
   // Set initial post when posts load and initialSlug is provided
   // Also increment view count when opening a post
@@ -49,19 +53,25 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
       }
     };
 
-    if (initialSlug && posts.length > 0 && !selectedPost) {
-      const post = posts.find((p) => p.slug === initialSlug);
-      if (post) {
-        setSelectedPost(post);
-        setOpenedFromHome(true);
-        incrementView(post.id);
-      }
-    }
-  }, [initialSlug, posts, selectedPost]);
+    if (!initialSlug) return;
+    let cancelled = false; setLinkLoading(true); setLinkMissing(false);
+    void getPostBySlug(initialSlug).then(post => {
+      if (cancelled) return;
+      setLinkLoading(false); setLinkMissing(!post);
+      if (!post) { setSelectedPost(null); return; }
+      if (handledSlug.current !== initialSlug) { handledSlug.current = initialSlug; void incrementView(post.id); }
+      cancelScrollRestoration(); setSelectedPost(post); setOpenedFromHome(true);
+    });
+    return () => { cancelled = true; };
+  }, [initialSlug, getPostBySlug]);
+  useEffect(() => {
+    if (!initialSlug) setSelectedPost(previous => posts.find(post => post.id === previous?.id) || previous);
+  }, [posts, initialSlug]);
 
   // Increment view count when selecting a post from list
-  const handleSelectPost = async (post: BlogPost) => {
-    saveScroll('blog'); // geri qayıdanda siyahı pozisiyası bərpa olunsun
+  const handleSelectPost = async (post: BlogPost, fromList = true) => {
+    if (fromList) saveScroll('blog');
+    cancelScrollRestoration();
     setSelectedPost(post);
     try {
       await supabase.rpc('increment_blog_view_count', { post_id: post.id });
@@ -101,9 +111,10 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
     }
   };
 
-  if (loading) {
+  if (loading || linkLoading) {
     return (
-      <div className="a-scope min-h-screen flex items-center justify-center overflow-x-hidden" style={{ background: 'var(--a-bg)' }}>
+      <div className="a-scope min-h-screen flex items-center justify-center overflow-x-hidden relative" style={{ background: 'var(--a-bg)' }}>
+        <button className="a-icon-btn absolute start-4 top-4" aria-label={tr('common_geri', 'Geri')} onClick={onBack}><ArrowLeft size={18} /></button>
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center animate-pulse" style={{ background: 'var(--a-grad-lav)' }}>
             <BookOpen size={28} style={{ color: 'var(--a-lav-ink)' }} />
@@ -114,15 +125,19 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
 
   }
 
+  if (linkMissing) return <div className="a-scope a-shell py-8"><button className="a-icon-btn" onClick={onBack}><ArrowLeft size={18} /></button>
+    <p role="status" className="a-list-title mt-4">{followupText('blog_unavailable')}</p></div>;
+
   if (selectedPost) {
     return (
       <BlogPostDetail
+        key={selectedPost.id}
         post={selectedPost}
         categories={categories}
         allPosts={posts}
         onBack={handleBackFromPost}
         onSelectPost={(post) => {
-          handleSelectPost(post);
+          handleSelectPost(post, false);
           setOpenedFromHome(false);
         }} />);
 
@@ -131,6 +146,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
 
   return (
     <div className="a-scope pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)', minHeight: '100vh' }}>
+      <AdSurface id="blog_list_banner" />
       <div className="a-shell">
         {/* Top bar */}
         <header className="a-topbar safe-area-top">
@@ -208,6 +224,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
         </motion.div>
 
         {/* Featured Posts */}
+        <AdInlineAnchor id="blog_list_banner" />
         {!selectedCategory && !searchQuery && !showSaved && featuredPosts.length > 0 &&
         <motion.section
           className="a-section"

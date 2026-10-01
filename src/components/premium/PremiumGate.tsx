@@ -29,7 +29,7 @@ const PremiumGate = ({ children, title, description, feature, emoji = '✨' }: P
   const { isAdmin } = useAuth();
   const [showPaywall, setShowPaywall] = useState(false);
 
-  if (isPremium || isAdmin) return <>{children}</>;
+  if (isPremium) return <>{children}</>;
 
   return (
     <>

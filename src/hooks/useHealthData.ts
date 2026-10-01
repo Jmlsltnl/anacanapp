@@ -1,25 +1,25 @@
 import { useQuery } from '@tanstack/react-query';
 import {
-  isHealthAvailable, isHealthConnected, isNativeHealthPlatform,
+  isHealthAvailable, isHealthConnected, readsSupported,
   getDailySteps, getDailyMindfulness, getRecentWorkouts } from
 '@/lib/health';
 
-/**
- * Apple Health / Health Connect məlumat hook-ları.
- * Yalnız native + qoşulu olduqda işləyir; RQ persist sayəsində offline-da son dəyərlər görünür.
- */
+/** iOS-only reads. Mask persisted query data on unsupported platforms as well. */
 
 export const useHealthAvailability = () => {
-  return useQuery({
+  const supported = readsSupported();
+  const query = useQuery({
     queryKey: ['health-available'],
     queryFn: isHealthAvailable,
-    enabled: isNativeHealthPlatform(),
+    enabled: supported,
     staleTime: 60 * 1000
   });
+  return supported ? query : { ...query, data: false };
 };
 
 export const useHealthDaily = (days = 7, connected = isHealthConnected()) => {
-  return useQuery({
+  const supported = readsSupported();
+  const query = useQuery({
     queryKey: ['health-daily', days],
     queryFn: async () => {
       const [steps, mindfulness] = await Promise.all([
@@ -28,17 +28,20 @@ export const useHealthDaily = (days = 7, connected = isHealthConnected()) => {
       );
       return { steps, mindfulness };
     },
-    enabled: isNativeHealthPlatform() && connected,
+    enabled: supported && connected,
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: true
   });
+  return supported ? query : { ...query, data: undefined };
 };
 
 export const useHealthWorkouts = (days = 7, connected = isHealthConnected()) => {
-  return useQuery({
+  const supported = readsSupported();
+  const query = useQuery({
     queryKey: ['health-workouts', days],
     queryFn: () => getRecentWorkouts(days),
-    enabled: isNativeHealthPlatform() && connected,
+    enabled: supported && connected,
     staleTime: 5 * 60 * 1000
   });
+  return supported ? query : { ...query, data: undefined };
 };

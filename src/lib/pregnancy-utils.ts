@@ -1,4 +1,5 @@
 import { tr } from '@/lib/tr';
+import { addMonths, differenceInCalendarDays, isValid, parseISO } from 'date-fns';
 /**
  * Centralized pregnancy & baby age calculation utilities
  * All pregnancy-related date calculations should use these functions
@@ -6,6 +7,13 @@ import { tr } from '@/lib/tr';
  */
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+const toLocalCalendarDate = (value: Date | string) =>
+  startOfDay(typeof value === 'string' ? parseISO(value) : value);
+
+/** Day-of-life/content index. Completed days/months remain zero-based ages. */
+export const getBabyDayNumber = (elapsedDays: number): number =>
+  Number.isFinite(elapsedDays) && elapsedDays >= 0 ? Math.floor(elapsedDays) + 1 : 0;
 
 /**
  * Calculate baby age using real calendar months (not 30-day approximation).
@@ -15,38 +23,35 @@ export const getRealCalendarAge = (birthDate: Date | string | null): {
   months: number;
   days: number;
   totalDays: number;
+  dayNumber: number;
   years: number;
   remainingMonths: number;
   displayText: string;
 } => {
-  if (!birthDate) return { months: 0, days: 0, totalDays: 0, years: 0, remainingMonths: 0, displayText: '' };
-  
-  const birth = startOfDay(new Date(birthDate));
+  const empty = { months: 0, days: 0, totalDays: 0, dayNumber: 0, years: 0, remainingMonths: 0, displayText: '' };
+  if (!birthDate) return empty;
+
+  const birth = toLocalCalendarDate(birthDate);
+  if (!isValid(birth)) return empty;
   const now = startOfDay(new Date());
-  
-  // Calculate total days
-  const totalDays = Math.floor((now.getTime() - birth.getTime()) / MS_PER_DAY);
-  
-  // Calculate full months using real calendar
-  let months = 0;
-  const tempDate = new Date(birth);
-  
-  while (true) {
-    const nextMonth = new Date(tempDate);
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    if (nextMonth > now) break;
-    months++;
-    tempDate.setMonth(tempDate.getMonth() + 1);
-  }
-  
-  // Remaining days after full months
-  const days = Math.floor((now.getTime() - tempDate.getTime()) / MS_PER_DAY);
+
+  // Calendar days ignore 23/25-hour DST days. Always anchor months to the
+  // original birthday so Jan 31 -> Feb 28 does not drift subsequent months.
+  const totalDays = differenceInCalendarDays(now, birth);
+  const dayNumber = getBabyDayNumber(totalDays);
+  let months = Math.max(0, (now.getFullYear() - birth.getFullYear()) * 12 + now.getMonth() - birth.getMonth());
+  if (months > 0 && addMonths(birth, months) > now) months--;
+  const days = differenceInCalendarDays(now, addMonths(birth, months));
   
   const years = Math.floor(months / 12);
   const remainingMonths = months % 12;
   
   let displayText = '';
-  if (years > 0) {
+  if (totalDays < 0) {
+    displayText = '';
+  } else if (totalDays === 0) {
+    displayText = tr('pregnancy_utils_first_day', '1-ci gün');
+  } else if (years > 0) {
     displayText = `${years} ${tr('pregnancy_utils_year','yaş')}${remainingMonths > 0 ? ` ${remainingMonths} ${tr('pregnancy_utils_month','ay')}` : ''}`;
   } else if (months > 0) {
     displayText = `${months} ${tr('pregnancy_utils_month','ay')} ${days} ${tr('pregnancy_utils_day','gün')}`;
@@ -54,7 +59,7 @@ export const getRealCalendarAge = (birthDate: Date | string | null): {
     displayText = `${totalDays} ${tr('pregnancy_utils_day','gün')}`;
   }
   
-  return { months, days, totalDays, years, remainingMonths, displayText };
+  return { months, days, totalDays, dayNumber, years, remainingMonths, displayText };
 };
 
 // ─── Premature (vaxtından əvvəl doğulmuş) körpə dəstəyi ────────────────────
@@ -97,11 +102,11 @@ export const getPrematurityInfo = (
   };
   if (!birthDate || !dueDate) return none;
 
-  const birth = startOfDay(new Date(birthDate));
-  const due = startOfDay(new Date(dueDate));
+  const birth = toLocalCalendarDate(birthDate);
+  const due = toLocalCalendarDate(dueDate);
   if (Number.isNaN(birth.getTime()) || Number.isNaN(due.getTime())) return none;
 
-  const daysBeforeDue = Math.round((due.getTime() - birth.getTime()) / MS_PER_DAY);
+  const daysBeforeDue = differenceInCalendarDays(due, birth);
   const gestationalDaysAtBirth = PREGNANCY_DURATION_DAYS - daysBeforeDue;
   if (
     gestationalDaysAtBirth < MIN_PLAUSIBLE_GESTATION_DAYS ||
@@ -125,7 +130,7 @@ export const getPrematurityInfo = (
   if (corrected.totalDays < 0) {
     // Körpə hələ orijinal termin tarixinə çatmayıb — 0-a clamp
     corrected = {
-      months: 0, days: 0, totalDays: 0, years: 0, remainingMonths: 0,
+      months: 0, days: 0, totalDays: 0, dayNumber: 1, years: 0, remainingMonths: 0,
       displayText: `0 ${tr('pregnancy_utils_day', 'gün')}`,
     };
   }

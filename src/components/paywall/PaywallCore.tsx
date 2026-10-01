@@ -4,9 +4,14 @@ import { Check, Crown, Loader2, RefreshCw, Shield, Sparkles, Star, Infinity as I
 import { useInAppPurchase, type RCPackage } from '@/hooks/useInAppPurchase';
 import { usePaywallConfig } from '@/hooks/usePaywallConfig';
 import { usePremiumConfig } from '@/hooks/usePremiumConfig';
-import { isNativePlatform } from '@/lib/revenuecat';
+import { getPlatform, isNativePlatform } from '@/lib/revenuecat';
+import { annualStorePlan, standardStorePlan } from '@/lib/onboarding-billing';
+import { onboardingText } from '@/lib/onboarding-i18n';
+import { useUserStore } from '@/store/userStore';
 import { useToast } from '@/hooks/use-toast';
 import { tr } from '@/lib/tr';
+import { followupText } from '@/lib/followup-i18n';
+import { appLanguageLocale } from '@/lib/app-languages';
 
 /**
  * Anacan Paywall Core — sıfırdan qurulmuş custom paywall (RevenueCat native UI YOX).
@@ -30,24 +35,18 @@ interface PaywallCoreProps {
   compact?: boolean;
 }
 
-/** ISO-8601 period (P3D, P1W...) → gün sayı */
-export const parseIsoTrialDays = (period?: string | null): number | null => {
-  if (!period) return null;
-  const m = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)W)?(?:(\d+)D)?$/i.exec(period);
-  if (!m) return null;
-  return Number(m[1] || 0) * 365 + Number(m[2] || 0) * 30 + Number(m[3] || 0) * 7 + Number(m[4] || 0);
-};
-
 const currencySign = (code?: string) =>
 code === 'AZN' ? '₼' : code === 'USD' ? '$' : code === 'EUR' ? '€' : code ? `${code} ` : '$';
 
 const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: PaywallCoreProps) => {
   const { toast } = useToast();
   const cfg = usePaywallConfig();
+  const language = useUserStore(state => state.language);
+  const text = (key: Parameters<typeof onboardingText>[1], values?: Record<string, string | number>) => onboardingText(language, key, values);
   const { features: dbFeatures } = usePremiumConfig();
   const {
     packages, isLoading, isPurchasing, error, isSupported,
-    purchaseByIdentifier, restorePurchases
+    purchaseByIdentifier, purchaseExact, introEligibility, restorePurchases
   } = useInAppPurchase();
 
   const isNative = isNativePlatform();
@@ -66,25 +65,21 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
   const yearlyPkg = useMemo(() => findPkg('ANNUAL', 'yearly'), [findPkg]);
   const monthlyPkg = useMemo(() => findPkg('MONTHLY', 'monthly'), [findPkg]);
   const lifetimePkg = useMemo(() => findPkg('LIFETIME', 'lifetime'), [findPkg]);
+  const yearlyPlan = annualStorePlan(yearlyPkg, getPlatform(), introEligibility[yearlyPkg?.product.identifier || '']);
+  const monthlyPlan = standardStorePlan(monthlyPkg, getPlatform(), 'monthly', introEligibility[monthlyPkg?.product.identifier || '']);
 
   // ── Qiymət hesablamaları (RC → fallback) ──
-  // Fallback = rəsmi qiymətlər: $3.99/ay, $29.99/il (pricing_2026)
+  // Web display reference only; native charges always use the actual store price.
   const sign = currencySign(yearlyPkg?.product.currencyCode || monthlyPkg?.product.currencyCode);
-  const monthlyPrice = monthlyPkg?.product.price ?? 3.99;
-  const yearlyPrice = yearlyPkg?.product.price ?? 29.99;
-  const monthlyStr = monthlyPkg?.product.priceString || `${sign}${monthlyPrice.toFixed(2)}`;
-  const yearlyStr = yearlyPkg?.product.priceString || `${sign}${yearlyPrice.toFixed(2)}`;
+  const monthlyPrice = monthlyPlan?.price ?? monthlyPkg?.product.price ?? 3.99;
+  const yearlyPrice = yearlyPlan?.price ?? yearlyPkg?.product.price ?? 29.99;
+  const monthlyStr = isNative && !monthlyPlan ? '—' : monthlyPlan?.priceString || monthlyPkg?.product.priceString || `${sign}${monthlyPrice.toFixed(2)}`;
+  const yearlyStr = isNative && !yearlyPlan ? '—' : yearlyPlan?.priceString || yearlyPkg?.product.priceString || `${sign}${yearlyPrice.toFixed(2)}`;
+  const annualDiscount = !!yearlyPlan && yearlyPlan.price < yearlyPlan.renewalPrice;
   const lifetimeStr = lifetimePkg?.product.priceString || '';
   const yearlyPerMonth = `${sign}${(yearlyPrice / 12).toFixed(2)}`;
-  const savings = monthlyPrice > 0 ? Math.max(0, Math.round((1 - yearlyPrice / 12 / monthlyPrice) * 100)) : 37;
-
-  const yearlyTrial = parseIsoTrialDays(yearlyPkg?.product.defaultOptionTrialPeriod);
-  const monthlyTrial = parseIsoTrialDays(monthlyPkg?.product.defaultOptionTrialPeriod);
-  const selectedTrial = selected === 'yearly' ? yearlyTrial : selected === 'monthly' ? monthlyTrial : null;
-  // Web fallback: trial yalnız İLLİK planda göstərilir (aylıqda trial ləğv edilib)
-  const effectiveTrial = isNative ?
-  selectedTrial :
-  cfg.free_trial_enabled && selected === 'yearly' ? cfg.free_trial_days : null;
+  const savings = annualDiscount ? Math.round((1 - yearlyPlan!.price / yearlyPlan!.renewalPrice) * 100)
+    : monthlyPrice > 0 ? Math.max(0, Math.round((1 - yearlyPrice / 12 / monthlyPrice) * 100)) : 0;
 
   // ── Xüsusiyyət siyahısı (DB → kurasiya olunmuş fallback) ──
   const FALLBACK_FEATURES = [
@@ -101,7 +96,7 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
     slice(0, 6).
     map((f) => ({ icon: f.icon || '✨', title: f.title }));
     return db.length >= 4 ? db : FALLBACK_FEATURES;
-  }, [dbFeatures]);
+  }, [dbFeatures, language]);
 
   const FEATURE_TINTS = [
   { bg: 'var(--a-peach-1)', ink: 'var(--a-accent-ink)' },
@@ -125,13 +120,14 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
     }
 
     const pkg = selected === 'yearly' ? yearlyPkg : selected === 'monthly' ? monthlyPkg : lifetimePkg;
-    if (!pkg) {
+    const plan = selected === 'yearly' ? yearlyPlan : selected === 'monthly' ? monthlyPlan : null;
+    if (!pkg || selected !== 'lifetime' && !plan) {
       toast({ title: tr('pw_no_product', 'Məhsul tapılmadı'), description: tr('pw_no_product_desc', 'Bir az sonra yenidən cəhd edin'), variant: 'destructive' });
       return;
     }
 
     import('@/lib/analytics').then((m) => m.analytics.logPaywallClicked(feature || 'general', selected)).catch(() => {});
-    const ok = await purchaseByIdentifier(pkg.identifier);
+    const ok = plan ? await purchaseExact(plan.pkg, plan.request) : await purchaseByIdentifier(pkg.identifier);
     if (ok) {
       toast({
         title: tr('pw_success_title', 'Premium aktivləşdirildi! 🎉'),
@@ -139,7 +135,7 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
       });
       onPurchased(selected);
     }
-  }, [isNative, isSupported, selected, yearlyPkg, monthlyPkg, lifetimePkg, purchaseByIdentifier, onPurchased, onNonNativeCta, toast, cfg.non_native_notice, feature]);
+  }, [isNative, isSupported, selected, yearlyPkg, monthlyPkg, lifetimePkg, yearlyPlan, monthlyPlan, purchaseExact, purchaseByIdentifier, onPurchased, onNonNativeCta, toast, cfg.non_native_notice, feature]);
 
   const handleRestore = useCallback(async () => {
     setRestoring(true);
@@ -153,19 +149,17 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
     }
   }, [restorePurchases, onPurchased, toast]);
 
-  const ctaText = effectiveTrial ?
-  tr('pw_cta_trial', '{days} gün pulsuz başla').replace('{days}', String(effectiveTrial)) :
-  cfg.cta_new_user;
+  const ctaText = text('premium_cta');
 
   const busy = isPurchasing || restoring;
 
   // ── Plan kartı ──
   const PlanCard = ({
-    plan, label, priceMain, priceMainSuffix, sub, badge, trialDays, icon
+    plan, label, priceMain, priceMainSuffix, sub, badge, icon, oldPrice
 
 
 
-  }: {plan: PlanKey;label: string;priceMain: string;priceMainSuffix?: string;sub: string;badge?: string;trialDays?: number | null;icon?: React.ReactNode;}) => {
+  }: {plan: PlanKey;label: string;priceMain: string;priceMainSuffix?: string;sub: string;badge?: string;icon?: React.ReactNode;oldPrice?: string;}) => {
     const active = selected === plan;
     return (
       <motion.button
@@ -210,16 +204,12 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
           <div className="flex-1 min-w-0">
             <p className="flex items-center gap-1.5" style={{ fontSize: 14.5, fontWeight: 800, color: 'var(--a-ink)', margin: 0 }}>
               {icon}{label}
-              {trialDays ?
-              <span style={{ background: 'var(--a-green-1)', color: 'var(--a-green-ink)', fontSize: 9, fontWeight: 800, borderRadius: 999, padding: '2px 8px' }}>
-                  {tr('pw_trial_chip', '{days} GÜN PULSUZ').replace('{days}', String(trialDays))}
-                </span> :
-              null}
             </p>
             <p style={{ fontSize: 10.5, color: 'var(--a-ink-soft)', margin: '2px 0 0' }}>{sub}</p>
           </div>
 
           <div className="text-end shrink-0">
+            {oldPrice && <del className="block text-xs" style={{ color: 'var(--a-ink-soft)' }}><bdi>{oldPrice}</bdi></del>}
             <p style={{ fontSize: 19, fontWeight: 900, color: 'var(--a-ink)', letterSpacing: '-0.02em', margin: 0 }}>
               {priceMain}
               {priceMainSuffix && <span style={{ fontSize: 10.5, fontWeight: 500, color: 'var(--a-ink-soft)' }}>{priceMainSuffix}</span>}
@@ -231,6 +221,9 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
 
   return (
     <div>
+      <p className="mb-4 rounded-xl px-4 py-3 text-center text-sm font-bold" style={{ background: 'var(--a-surface)', color: 'var(--a-ink)' }}>
+        {text('remove_ads_premium')}
+      </p>
       {/* Xəta */}
       {error &&
       <div role="alert" className="text-center mb-3"
@@ -264,7 +257,7 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
         <Star key={i} size={13} style={{ fill: '#ffc94d', color: '#ffc94d' }} />
         )}
         <span className="ms-1.5" style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--a-ink-soft)' }}>
-          {tr('pw_social_proof', '10,000+ qadın bizi seçib')}
+          {followupText('social_proof', language, { count: new Intl.NumberFormat(appLanguageLocale(language)).format(10000) })}
         </span>
       </div>
 
@@ -279,19 +272,18 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
           <PlanCard
           plan="yearly"
           label={cfg.yearly_label}
-          priceMain={yearlyPerMonth}
-          priceMainSuffix={cfg.yearly_suffix}
-          sub={`${yearlyStr}${cfg.yearly_total_suffix} · ${tr('pw_billed_yearly', 'ildə bir dəfə ödənilir')}`}
-          badge={cfg.savings_badge.replace('{percent}', String(savings))}
-          trialDays={yearlyTrial} />
+          priceMain={yearlyStr}
+          priceMainSuffix={cfg.yearly_total_suffix}
+          oldPrice={annualDiscount ? yearlyPlan!.renewalPriceString : undefined}
+          sub={isNative && !yearlyPlan ? text('store_unavailable') : annualDiscount ? text('first_year', { price: yearlyStr }) : `${yearlyPerMonth}${cfg.yearly_suffix} · ${tr('pw_billed_yearly', 'ildə bir dəfə ödənilir')}`}
+          badge={isNative && !yearlyPlan ? undefined : cfg.savings_badge.replace('{percent}', String(savings))} />
 
           <PlanCard
           plan="monthly"
           label={cfg.monthly_label}
           priceMain={monthlyStr}
           priceMainSuffix={cfg.monthly_suffix}
-          sub={tr('pw_flexible', 'Çevik — istənilən ay dayandır')}
-          trialDays={monthlyTrial} />
+          sub={isNative && !monthlyPlan ? text('store_unavailable') : tr('pw_flexible', 'Çevik — istənilən ay dayandır')} />
 
           {lifetimePkg &&
         <PlanCard
@@ -307,7 +299,7 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
       {/* ── CTA (shine effektli) ── */}
       <motion.button
         onClick={handlePurchase}
-        disabled={busy || isLoading && isNative}
+        disabled={busy || isLoading && isNative || isNative && selected !== 'lifetime' && !(selected === 'yearly' ? yearlyPlan : monthlyPlan)}
         whileTap={{ scale: busy ? 1 : 0.98 }}
         className="relative w-full overflow-hidden"
         style={{
@@ -337,12 +329,9 @@ const PaywallCore = ({ feature, onPurchased, onNonNativeCta, compact = false }: 
         }
       </motion.button>
 
-      {/* Trial qeydi */}
-      {effectiveTrial ?
-      <p className="text-center mt-2" style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--a-ink-soft)' }}>
-          {cfg.free_trial_note.replace('{days}', String(effectiveTrial))}
-        </p> :
-      null}
+      {selected === 'yearly' && yearlyPlan && <p className="text-center mt-2 text-xs" style={{ color: 'var(--a-ink-soft)' }}>
+        {text('charged_today', { price: yearlyPlan.priceString })} {text('renewal_year', { price: yearlyPlan.renewalPriceString })}
+      </p>}
 
       {/* ── Zəmanət sırası ── */}
       <div className="flex items-center justify-center gap-1.5 mt-2.5">

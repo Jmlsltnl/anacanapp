@@ -1,17 +1,6 @@
 import { registerPlugin, Capacitor } from '@capacitor/core';
 
-/**
- * HealthVitals — çəki / qan təzyiqi / qan şəkəri ölçmələrinin Apple Health /
- * Health Connect-ə YAZILMASI. (capacitor-health paketi bu tipləri dəstəkləmir —
- * HealthCycle plugini ilə eyni məntiq, ayrı, müstəqil native plugin.)
- * Native tərəf: ios/App/App/HealthVitalsPlugin.swift + android .../HealthVitalsPlugin.kt
- * Plugin yoxdursa (köhnə build / web) — qəzasız false qaytarır.
- *
- * Yalnız YAZMA (əvvəllər Weight/BloodPressure/BloodSugar Tracker-lərdə qeyd
- * olunan ölçmələr YALNIZ bizim Supabase-ə düşürdü — indi istifadəçi istəyərsə
- * eyni ölçmə Apple Health / Health Connect-ə də köçürülür ki, digər qoşulu
- * cihazlarla (Bluetooth BP monitoru və s.) vahid mənzərə olsun).
- */
+/** Optional Apple Health vitals writes on native iOS, separate from Supabase logs. */
 
 interface HealthVitalsPlugin {
   isAvailable(): Promise<{available: boolean;}>;
@@ -25,19 +14,22 @@ const HealthVitals = registerPlugin<HealthVitalsPlugin>('HealthVitals');
 
 export const VITALS_WRITE_KEY = 'anacan_health_vitals_write';
 
+const writesSupported = (): boolean => Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'ios';
+
 export const isVitalsWriteEnabled = (): boolean => {
+  if (!writesSupported()) return false;
   try {return localStorage.getItem(VITALS_WRITE_KEY) === '1';} catch {return false;}
 };
 
 export const setVitalsWriteEnabled = (on: boolean): void => {
   try {
-    if (on) localStorage.setItem(VITALS_WRITE_KEY, '1');else
+    if (on && writesSupported()) localStorage.setItem(VITALS_WRITE_KEY, '1');else
     localStorage.removeItem(VITALS_WRITE_KEY);
   } catch {/* boş */}
 };
 
 export async function isVitalsWriteAvailable(): Promise<boolean> {
-  if (!Capacitor.isNativePlatform()) return false;
+  if (!writesSupported()) return false;
   try {
     const { available } = await HealthVitals.isAvailable();
     return available;
@@ -47,6 +39,7 @@ export async function isVitalsWriteAvailable(): Promise<boolean> {
 }
 
 export async function requestVitalsWritePermission(): Promise<boolean> {
+  if (!writesSupported()) return false;
   try {
     const { granted } = await HealthVitals.requestWritePermission();
     return granted;

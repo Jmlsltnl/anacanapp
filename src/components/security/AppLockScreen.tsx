@@ -8,7 +8,7 @@ import {
   disableLock, clearBackgroundMark } from
 '@/lib/appLock';
 import { useAuth } from '@/hooks/useAuth';
-import logoImage from '@/assets/logo.png';
+import logoImage from '@/assets/brand-mark.png';
 import { tr } from '@/lib/tr';
 
 /**
@@ -84,7 +84,7 @@ const AppLockScreen = ({ onUnlock }: Props) => {
 
   return (
     <div
-      className="a-scope fixed inset-0 z-[400] flex flex-col items-center justify-center px-6"
+      className="a-scope fixed inset-0 z-[400] flex flex-col items-center justify-center px-6" data-ad-block="true"
       style={{
         background: 'var(--a-bg)',
         paddingTop: 'env(safe-area-inset-top)',

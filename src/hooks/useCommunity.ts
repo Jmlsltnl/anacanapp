@@ -1,13 +1,20 @@
-import { useState, useEffect, useCallback } from 'react';
-import { tr } from '@/lib/tr';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { tr } from '@/lib/chat-i18n';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { communityPostFilter, invalidateCommunityPosts, patchCommunityPost, restoreCommunityPostFields } from '@/lib/community-post-cache';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getPublicProfileCards } from '@/lib/public-profile-cards';
+import type { PushEventData } from '@/lib/push';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { detectLang, isFeedLang, FeedLang } from '@/lib/langDetect';
-import { defaultFeedLanguages } from '@/hooks/useFeedLanguages';
+import { matchesFeedLanguage } from '@/hooks/useFeedLanguages';
+import { normalizeAppLanguage } from '@/lib/app-languages';
+import { getBackendConfig } from '@/integrations/supabase/backend-config';
+import { moderationText } from '@/lib/community-moderation-i18n';
+import { moderationError, type AdReviewState } from '@/lib/community-moderation';
+import { moderatorError } from '@/lib/moderator';
 
 export interface CommunityGroup {
   id: string;
@@ -21,6 +28,7 @@ export interface CommunityGroup {
   auto_join_criteria: Record<string, any> | null;
   member_count: number;
   created_at: string;
+  discovery_language?: string | null;
 }
 
 export interface CommunityPost {
@@ -29,6 +37,8 @@ export interface CommunityPost {
   user_id: string;
   content: string;
   media_urls: string[] | null;
+  tagged_group_ids?: string[] | null;
+  blog_post_id?: string | null;
   likes_count: number;
   comments_count: number;
   is_pinned: boolean;
@@ -36,16 +46,29 @@ export interface CommunityPost {
   /** Postun MƏZMUN dili (az/en/ru/tr) — UI dili deyil; tərcümə düyməsi buna baxır */
   language?: string | null;
   created_at: string;
+  ad_moderation_state?: AdReviewState | null;
+  ad_moderation_revision?: number | null;
+  ad_moderated_at?: string | null;
+  moderation_version?: number | null;
+  moderation_removed_at?: string | null;
+  moderation_reason?: string | null;
+  moderation_action_id?: string | null;
+  moderation_edited_at?: string | null;
+  moderation_edited_by?: string | null;
+  comments_locked?: boolean | null;
   author?: {
     name: string;
     avatar_url: string | null;
     badge_type?: string;
+    is_premium?: boolean;
+    can_share_links?: boolean;
     is_verified?: boolean | null;
     verified_until?: string | null;
     /** Hamilə/Ana/Flow — anonim postlarda HƏMİŞƏ null (aşağı enrichPosts()-a bax) */
     life_stage?: string | null;
   };
   is_liked?: boolean;
+  is_saved?: boolean;
 }
 
 export interface PostComment {
@@ -58,10 +81,17 @@ export interface PostComment {
   likes_count: number;
   created_at: string;
   is_anonymous?: boolean;
+  is_pinned?: boolean | null;
+  moderation_version?: number | null;
+  moderation_removed_at?: string | null;
+  moderation_edited_at?: string | null;
+  moderation_edited_by?: string | null;
   author?: {
     name: string;
     avatar_url: string | null;
     badge_type?: string;
+    is_premium?: boolean;
+    can_share_links?: boolean;
     is_verified?: boolean | null;
     verified_until?: string | null;
     life_stage?: string | null;
@@ -70,18 +100,21 @@ export interface PostComment {
 }
 
 export const useCommunityGroups = () => {
+  const language = normalizeAppLanguage(useUserStore(state => state.language));
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ['community-groups'],
+    queryKey: ['community-groups', language, user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.
+      const { data, error } = await (supabase as any).
       from('community_groups').
       select('*').
       eq('is_active', true).
+      eq('discovery_language', language).
       order('group_type', { ascending: true }).
       order('name', { ascending: true });
 
       if (error) throw error;
-      return data as CommunityGroup[];
+      return ((data || []) as CommunityGroup[]).filter(group => group.discovery_language === language);
     }
   });
 };
@@ -113,16 +146,16 @@ export const useJoinGroup = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase.
-      from('group_memberships').
-      insert({ group_id: groupId, user_id: user.id });
+      const { data, error } = await (supabase as any).rpc('chat_group_action_v3', { p_actor: user.id, p_group: groupId, p_action: 'join' });
 
       if (error) throw error;
+      return data as { state: string };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['user-memberships'] });
       queryClient.invalidateQueries({ queryKey: ['community-groups'] });
-      toast({ title: tr("usecommunity_qrupa_qosuldunuz_bea9e3", "Qrupa qoşuldunuz! 🎉") });
+      queryClient.invalidateQueries({ queryKey: ['chat-groups-v3'] });
+      toast({ title: data?.state === 'requested' ? tr('group_pending','Təsdiq gözləyir') : tr("usecommunity_qrupa_qosuldunuz_bea9e3", "Qrupa qoşuldunuz! 🎉") });
     },
     onError: () => {
       toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
@@ -139,11 +172,7 @@ export const useLeaveGroup = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase.
-      from('group_memberships').
-      delete().
-      eq('group_id', groupId).
-      eq('user_id', user.id);
+      const { error } = await (supabase as any).rpc('chat_group_action_v3', { p_actor: user.id, p_group: groupId, p_action: 'leave' });
 
       if (error) throw error;
     },
@@ -156,19 +185,23 @@ export const useLeaveGroup = () => {
 };
 
 /** Postlara müəllif kartı + like statusu əlavə et (feed və backfill üçün ortaq) */
-const enrichPosts = async (posts: any[], userId?: string | null): Promise<CommunityPost[]> => {
-  const authorMap = await getPublicProfileCards((posts || []).map((p: any) => p.user_id));
+export const enrichPosts = async (posts: any[], userId?: string | null): Promise<CommunityPost[]> => {
+  if (!posts?.length) return [];
 
-  // İstifadəçinin bəyəndikləri — TƏK batch sorğu (əvvəllər hər post üçün ayrıca sorğu idi — N+1)
-  const likedSet = new Set<string>();
-  if (userId && posts && posts.length > 0) {
-    const { data: likeRows } = await supabase.
+  const [authorMap, { data: likeRows, error: likesError }, { data: bookmarks, error: bookmarksError }] = await Promise.all([
+    getPublicProfileCards(posts.map((p: any) => p.user_id)),
+    userId ? supabase.
     from('post_likes').
     select('post_id').
     eq('user_id', userId).
-    in('post_id', posts.map((p: any) => p.id));
-    (likeRows || []).forEach((r: any) => likedSet.add(r.post_id));
-  }
+    in('post_id', posts.map((p: any) => p.id)) : { data: [], error: null },
+    userId ? (supabase as any).from('community_post_bookmarks').select('post_id')
+      .eq('user_id', userId).in('post_id', posts.map((p) => p.id)) : { data: [], error: null },
+  ]);
+  if (likesError) throw likesError;
+  if (bookmarksError) throw bookmarksError;
+  const likedSet = new Set<string>((likeRows || []).map((r: any) => r.post_id));
+  const savedSet = new Set<string>((bookmarks || []).map((r: any) => r.post_id));
 
   return (posts || []).map((post: any) => {
     const isAnon = post.is_anonymous === true;
@@ -184,44 +217,25 @@ const enrichPosts = async (posts: any[], userId?: string | null): Promise<Commun
         name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
         avatar_url: authorData.avatar_url || null,
         badge_type: authorData.badge_type || null,
+        is_premium: authorData.is_premium === true,
+        can_share_links: authorData.can_share_links === true || ['admin', 'moderator'].includes(authorData.badge_type || ''),
         is_verified: authorData.is_verified || false,
         verified_until: authorData.verified_until || null,
         life_stage: authorData.life_stage || null
       } :
       { name: tr("usecommunity_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null, badge_type: null, is_verified: false, verified_until: null },
-      is_liked: likedSet.has(post.id)
+      is_liked: likedSet.has(post.id),
+      is_saved: savedSet.has(post.id),
     };
   }) as CommunityPost[];
 };
 
-/**
- * Qlobal feed üçün post-siyahısını istifadəçinin ölkəsinə görə dil PRİORİTETİ
- * ilə sıralayır (FİLTR DEYİL — heç bir post gizlədilmir). Pinlənmiş postlar
- * həmişə əvvəl qalır; hər iki qrup (pinlənmiş/adi) daxilində əvvəl prioritet
- * dildəki postlar, sonra digərləri (öz aralarında tarix sırası ilə).
- */
-function sortByLanguagePriority<T extends { is_pinned?: boolean; language?: string | null; created_at: string }>(
-  posts: T[],
-  priorityLangs: string[]
-): T[] {
-  const rank = (lang: string | null | undefined) => {
-    const idx = priorityLangs.indexOf(lang || 'az');
-    return idx === -1 ? priorityLangs.length : idx;
-  };
-  return [...posts].sort((a, b) => {
-    if (!!a.is_pinned !== !!b.is_pinned) return a.is_pinned ? -1 : 1;
-    const rankDiff = rank(a.language) - rank(b.language);
-    if (rankDiff !== 0) return rankDiff;
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-  });
-}
-
 export const useGroupPosts = (groupId: string | null) => {
-  const { profile } = useAuth();
-  const uiLang = useUserStore((s) => s.language) || 'az';
-  const countryCode = profile?.country_code || useUserStore.getState().countryCode;
+  const { user, loading: authLoading } = useAuth();
+  const userId = user?.id ?? null;
+  const uiLang = normalizeAppLanguage(useUserStore((s) => s.language));
   const queryClient = useQueryClient();
-  const queryKey = ['group-posts', groupId] as const;
+  const queryKey = ['group-posts', groupId, userId, uiLang] as const;
 
   // Real-time: yeni/redaktə/silinmiş postlar gələn kimi feed-i yenilə —
   // əvvəllər BUNUN ƏVƏZİNƏ heç nə yox idi, ona görə yeni postlar/dəyişikliklər
@@ -244,12 +258,12 @@ export const useGroupPosts = (groupId: string | null) => {
       const elapsed = now - lastInvalidatedAt;
       if (elapsed >= MIN_INVALIDATE_INTERVAL) {
         lastInvalidatedAt = now;
-        queryClient.invalidateQueries({ queryKey });
+        queryClient.invalidateQueries({ queryKey: ['group-posts', groupId] });
       } else if (pendingTimer === null) {
         pendingTimer = window.setTimeout(() => {
           pendingTimer = null;
           lastInvalidatedAt = Date.now();
-          queryClient.invalidateQueries({ queryKey });
+          queryClient.invalidateQueries({ queryKey: ['group-posts', groupId] });
         }, MIN_INVALIDATE_INTERVAL - elapsed);
       }
     };
@@ -267,6 +281,7 @@ export const useGroupPosts = (groupId: string | null) => {
           ...(groupId ? { filter: `group_id=eq.${groupId}` } : {})
         },
         (payload) => {
+          if (payload.eventType === 'INSERT' && !matchesFeedLanguage(payload.new as CommunityPost, uiLang)) return;
           if (!groupId) {
             const row: any = payload.new || payload.old;
             if (row?.group_id) return; // bu qlobal feed — qrup postlarını atla
@@ -280,24 +295,23 @@ export const useGroupPosts = (groupId: string | null) => {
       supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupId, queryClient]);
+  }, [groupId, queryClient, uiLang]);
 
   return useQuery({
     queryKey,
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-
       let query = supabase.
       from('community_posts').
       select('*').
       eq('is_active', true).
+      eq('language', uiLang).
       order('is_pinned', { ascending: false }).
       order('created_at', { ascending: false });
 
       if (groupId) {
         query = query.eq('group_id', groupId);
       } else {
-        // Qlobal feed — HEÇ BİR dil filtri yoxdur, bütün postlar gəlir.
+        // Global posts in the selected language; existing RLS still applies.
         query = query.is('group_id', null);
       }
 
@@ -310,13 +324,9 @@ export const useGroupPosts = (groupId: string | null) => {
       const { data: posts, error } = await query;
       if (error) throw error;
 
-      const enriched = await enrichPosts(posts || [], user?.id);
-      if (groupId) return enriched; // qrup feedi dil prioritetindən azaddır
-
-      const priorityLangs = defaultFeedLanguages(countryCode, uiLang);
-      return sortByLanguagePriority(enriched, priorityLangs);
+      return enrichPosts((posts || []).filter(post => matchesFeedLanguage(post, uiLang)), userId);
     },
-    enabled: groupId !== undefined
+    enabled: groupId !== undefined && !authLoading
   });
 };
 
@@ -329,10 +339,12 @@ export const useGroupPosts = (groupId: string | null) => {
  * başqa ölkədən/qrup üzvü olmadığın postu açmaq cəhdi sadəcə boş nəticə verər.
  */
 export const useSinglePost = (postId: string | null) => {
+  const { user, loading: authLoading } = useAuth();
+  const userId = user?.id ?? null;
+
   return useQuery({
-    queryKey: ['single-post', postId],
+    queryKey: ['single-post', postId, userId],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
       const { data: post, error } = await supabase
         .from('community_posts')
         .select('*')
@@ -340,21 +352,24 @@ export const useSinglePost = (postId: string | null) => {
         .maybeSingle();
       if (error) throw error;
       if (!post) return null;
-      const [enriched] = await enrichPosts([post], user?.id);
+      const [enriched] = await enrichPosts([post], userId);
       return enriched;
     },
-    enabled: !!postId
+    enabled: !!postId && !authLoading
   });
 };
 
 export const useCreatePost = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user: account } = useAuth();
+  const currentAccount = useRef(account?.id); currentAccount.current = account?.id;
+  const request = useRef<{ key: string; id: string } | null>(null);
 
   return useMutation({
-    mutationFn: async ({ groupId, content, mediaUrls, isAnonymous, language }: {groupId: string | null;content: string;mediaUrls?: string[];isAnonymous?: boolean;language?: FeedLang;}) => {
+    mutationFn: async ({ groupId, content, mediaUrls, isAnonymous, language, taggedGroupIds, blogPostId }: {groupId: string | null;content: string;mediaUrls?: string[];isAnonymous?: boolean;language?: FeedLang;taggedGroupIds?: string[];blogPostId?: string;}) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user || user.id !== currentAccount.current) throw new Error('COMMUNITY_ACTOR_MISMATCH');
 
       // Post dili = MƏZMUNUN dili (composer çipi > avtomatik aşkarlama > UI dili).
       // Əvvəllər UI dili yazılırdı — EN interfeysdə az yazan ananın postu az feedində görünmürdü.
@@ -362,27 +377,29 @@ export const useCreatePost = () => {
       const fallbackLang: FeedLang = isFeedLang(uiLang) ? uiLang : 'az';
       const postLanguage: FeedLang = language || detectLang(content, fallbackLang);
 
-      const { error } = await supabase.
-      from('community_posts').
-      insert([
-        {
-          group_id: groupId,
-          user_id: user.id,
-          content,
-          media_urls: mediaUrls || [],
-          is_anonymous: isAnonymous || false,
-          language: postLanguage
-        }
-      ]);
-
+      const backend = getBackendConfig().url;
+      const payload = { p_actor: user.id, p_content: content, p_language: postLanguage, p_group_id: groupId,
+        p_media_urls: mediaUrls || [], p_is_anonymous: !!isAnonymous, p_tagged_group_ids: [...new Set(taggedGroupIds || [])].slice(0, 3), p_blog_post_id: blogPostId || null };
+      const key = JSON.stringify([backend, payload]);
+      if (request.current?.key !== key) request.current = { key, id: crypto.randomUUID() };
+      const requestId = request.current.id;
+      const { data, error } = await (supabase as any).rpc('submit_community_post_v1', { ...payload, p_id: requestId });
       if (error) throw error;
+      if (!data?.id || !['checking', 'review', 'approved', 'rejected'].includes(data.state)) throw new Error('MODERATION_INVALID_RESPONSE');
+      return { ...data, actor: user.id, backend, requestId };
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['group-posts', variables.groupId] });
-      toast({ title: tr("usecommunity_paylasim_elave_edildi_379020", "Paylaşım əlavə edildi! ✨") });
+    onSuccess: async (data) => {
+      if (request.current?.id === data.requestId) request.current = null;
+      await invalidateCommunityPosts(queryClient);
+      await queryClient.invalidateQueries({ queryKey: ['community-ad-mine', data.backend, data.actor] });
+      if (data.actor !== currentAccount.current) return;
+      void import('@/lib/customerio').then(({ customerIo }) => customerIo.postCreated(data.actor, data.backend, data.requestId)).catch(() => {});
+      const language = useUserStore.getState().language;
+      const state = data.state as 'checking' | 'review' | 'approved' | 'rejected';
+      toast({ title: moderationText(`${state}_title`, language), description: moderationText(`${state}_body`, language) });
     },
-    onError: () => {
-      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    onError: (error) => {
+      toast({ title: moderationError(error, useUserStore.getState().language), variant: 'destructive' });
     }
   });
 };
@@ -392,7 +409,7 @@ export const useEditPost = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ postId, content, currentLanguage }: {postId: string;content: string;currentLanguage?: string | null;}) => {
+    mutationFn: async ({ postId, content, currentLanguage, expectedRevision }: {postId: string;content: string;currentLanguage?: string | null;expectedRevision?: number | null;}) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
@@ -401,20 +418,22 @@ export const useEditPost = () => {
       const uiLang = useUserStore.getState().language || 'az';
       const fallbackLang: FeedLang = isFeedLang(currentLanguage) ? currentLanguage : isFeedLang(uiLang) ? uiLang : 'az';
 
-      const { error } = await supabase.
-      from('community_posts').
-      update({ content, language: detectLang(content, fallbackLang) }).
-      eq('id', postId).
-      eq('user_id', user.id);
-
+      const { data, error } = await (supabase as any).rpc('edit_community_post_v1', {
+        p_actor: user.id, p_post: postId, p_content: content, p_language: detectLang(content, fallbackLang), p_expected_revision: expectedRevision ?? null,
+      });
       if (error) throw error;
+      if (!data) throw new Error('MODERATION_REVIEW_CONFLICT');
+      if (!['checking', 'review', 'approved', 'rejected'].includes(data.state)) throw new Error('MODERATION_REQUIRED');
+      return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['group-posts'] });
-      toast({ title: tr("usecommunity_post_redakte_edildi_c4540d", "Post redaktə edildi ✏️") });
+    onSuccess: async (data) => {
+      await invalidateCommunityPosts(queryClient);
+      await queryClient.invalidateQueries({ queryKey: ['community-ad-mine'] });
+      const state = data.state as 'checking' | 'review' | 'approved' | 'rejected';
+      toast({ title: moderationText(`${state}_title`, useUserStore.getState().language) });
     },
-    onError: () => {
-      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    onError: (error) => {
+      toast({ title: moderationError(error, useUserStore.getState().language), variant: 'destructive' });
     }
   });
 };
@@ -444,8 +463,8 @@ export const useDeletePost = () => {
       // RLS icazə verməyibsə 0 sətir silinir — bunu uğur kimi göstərmə
       if (!data || data.length === 0) throw new Error('Not permitted');
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['group-posts'] });
+    onSuccess: async () => {
+      await invalidateCommunityPosts(queryClient);
       toast({ title: tr("usecommunity_post_silindi", 'Post silindi') + ' 🗑️' });
     },
     onError: () => {
@@ -467,15 +486,15 @@ export const useTogglePinPost = () => {
 
   return useMutation({
     mutationFn: async ({ postId, pin }: { postId: string; pin: boolean }) => {
-      const { error } = await supabase.
-      from('community_posts').
-      update({ is_pinned: pin }).
-      eq('id', postId);
-
+      const { data: current, error: readError } = await (supabase as any).rpc('moderator_content_detail_v1', { p_kind: 'post', p_id: postId });
+      if (readError) throw readError;
+      if (!current) throw new Error('MODERATOR_CONTENT_UNAVAILABLE');
+      const { error } = await (supabase as any).rpc('moderator_content_action_v1', { p_kind: 'post', p_id: postId, p_version: current.version,
+        p_action: pin ? 'pin' : 'unpin', p_reason: 'other', p_content: null, p_note: '', p_request: crypto.randomUUID() });
       if (error) throw error;
     },
-    onSuccess: (_, { pin }) => {
-      queryClient.invalidateQueries({ queryKey: ['group-posts'] });
+    onSuccess: async (_, { pin }) => {
+      await invalidateCommunityPosts(queryClient);
       toast({
         title: pin ?
         tr("usecommunity_post_pinlendi", "📌 Post pinləndi") :
@@ -498,20 +517,13 @@ export const useTogglePinPost = () => {
  */
 export const useToggleLike = () => {
   const queryClient = useQueryClient();
-
-  // Postu bütün feed cache-lərində yenilə (ümumi feed, qrup feed-ləri, profil postları)
-  const patchPostInCaches = (postId: string, patch: (p: any) => any) => {
-    (['group-posts', 'user-posts'] as const).forEach((root) => {
-      queryClient.setQueriesData({ queryKey: [root] }, (old: any) =>
-      Array.isArray(old) ? old.map((p: any) => p.id === postId ? patch(p) : p) : old
-      );
-    });
-  };
+  const { user } = useAuth();
+  const viewerId = user?.id ?? null;
 
   return useMutation({
-    mutationFn: async ({ postId, isLiked, groupId }: {postId: string;isLiked: boolean;groupId: string | null;}) => {
+    mutationFn: async ({ postId, isLiked }: {postId: string;isLiked: boolean;groupId: string | null;}) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user || user.id !== viewerId) throw new Error('Not authenticated');
 
       if (isLiked) {
         const { error } = await supabase.
@@ -523,9 +535,11 @@ export const useToggleLike = () => {
         return;
       }
 
-      const { error } = await supabase.
+      const { data: like, error } = await supabase.
       from('post_likes').
-      insert({ post_id: postId, user_id: user.id });
+      insert({ post_id: postId, user_id: user.id }).
+      select('id').
+      single();
 
       if (error) {
         // 23505 = unikal açar (artıq bəyənilib) — double-tap yarışı, uğur say + push YOX
@@ -536,7 +550,7 @@ export const useToggleLike = () => {
       // Push bildirişi ARXA PLANDA — istifadəçini gözlətmir
       void (async () => {
         try {
-          const { data: post } = await supabase.from('community_posts').select('user_id').eq('id', postId).maybeSingle();
+          const { data: post } = await supabase.from('community_posts').select('id, user_id, group_id').eq('id', postId).maybeSingle();
           if (post && post.user_id !== user.id) {
             const { data: profile } = await supabase.from('public_profile_cards').select('name').eq('user_id', user.id).maybeSingle();
             const likerName = profile?.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i");
@@ -545,7 +559,13 @@ export const useToggleLike = () => {
               userId: post.user_id,
               title: tr("usecommunity_yeni_beyenme_3fd88a", "Yeni bəyənmə ❤️"),
               body: `${likerName} ${tr("usecommunity_paylasiminizi_beyendi", "paylaşımınızı bəyəndi")}`,
-              data: { type: 'community_like', postId, groupId, context: 'community_post' },
+              data: {
+                type: 'community_like',
+                context: 'community_post',
+                postId: post.id,
+                groupId: post.group_id,
+                interactionId: like.id
+              } satisfies PushEventData,
               kind: 'community_like'
             });
           }
@@ -553,27 +573,23 @@ export const useToggleLike = () => {
       })();
     },
     onMutate: async ({ postId, isLiked }) => {
-      // Uçuşdakı refetch-lər optimistic dəyəri əzməsin
-      await queryClient.cancelQueries({ queryKey: ['group-posts'] });
-      await queryClient.cancelQueries({ queryKey: ['user-posts'] });
-
-      // Rollback üçün snapshot
-      const prevGroup = queryClient.getQueriesData({ queryKey: ['group-posts'] });
-      const prevUser = queryClient.getQueriesData({ queryKey: ['user-posts'] });
-
-      patchPostInCaches(postId, (p) => ({
+      const filter = communityPostFilter(viewerId, true);
+      await queryClient.cancelQueries(filter);
+      const previous = queryClient.getQueriesData(filter);
+      patchCommunityPost(queryClient, viewerId, postId, (p) => ({
         ...p,
         is_liked: !isLiked,
         likes_count: Math.max(0, (p.likes_count || 0) + (isLiked ? -1 : 1))
-      }));
+      }), true);
 
-      return { prevGroup, prevUser };
+      return { previous, userId: viewerId };
     },
-    onError: (_err, _vars, ctx) => {
-      // Server xətası → köhnə vəziyyətə qaytar
-      ctx?.prevGroup?.forEach(([key, data]) => queryClient.setQueryData(key, data));
-      ctx?.prevUser?.forEach(([key, data]) => queryClient.setQueryData(key, data));
-    }
+    onError: (_err, vars, ctx) => {
+      if (ctx) restoreCommunityPostFields(queryClient, ctx.previous, vars.postId, ['is_liked', 'likes_count']);
+    },
+    onSettled: (_data, _error, _vars, ctx) => {
+      queryClient.invalidateQueries({ queryKey: ['community-profile-stats', ctx?.userId] });
+    },
   });
 };
 
@@ -599,9 +615,11 @@ export const useToggleCommentLike = () => {
         return;
       }
 
-      const { error } = await supabase.
+      const { data: like, error } = await supabase.
       from('comment_likes').
-      insert({ comment_id: commentId, user_id: user.id });
+      insert({ comment_id: commentId, user_id: user.id }).
+      select('id').
+      single();
       if (error) {
         if ((error as any).code === '23505') return; // artıq like edilib — səssiz uğur, push YOX
         throw error;
@@ -613,7 +631,7 @@ export const useToggleCommentLike = () => {
       void (async () => {
         try {
           const { data: comment } = await supabase.
-          from('post_comments').select('user_id, content, post_id').eq('id', commentId).maybeSingle();
+          from('post_comments').select('id, user_id, content, post_id').eq('id', commentId).maybeSingle();
           if (comment && (comment as any).user_id !== user.id) {
             const { data: profile } = await supabase.
             from('public_profile_cards').select('name').eq('user_id', user.id).maybeSingle();
@@ -626,7 +644,13 @@ export const useToggleCommentLike = () => {
               body: preview ? `${likerName}: ${preview}` : likerName,
               // postId: bildirişə klik edəndə MƏHZ bu postu (+ şərhi vurğulayaraq)
               // açmaq üçün lazımdır (bax SinglePostView.tsx, pushNav.ts).
-              data: { type: 'comment_like', commentId, postId: (comment as any).post_id, context: 'post_comment' },
+              data: {
+                type: 'comment_like',
+                context: 'post_comment',
+                commentId: (comment as any).id,
+                postId: (comment as any).post_id,
+                interactionId: like.id
+              } satisfies PushEventData,
               kind: 'comment_like'
             });
           }
@@ -685,13 +709,11 @@ export const usePostComments = (postId: string, enabled: boolean = true) => {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
 
-      const { data: comments, error } = await supabase.
-      from('post_comments').
-      select('*').
-      eq('post_id', postId).
-      eq('is_active', true).
-      order('created_at', { ascending: true });
-
+      let { data: comments, error } = await (supabase as any).rpc('community_comments_v2', { p_post: postId });
+      if (error && ['PGRST202', '42883'].includes(error.code) && !getBackendConfig().azure) {
+        const legacy = await supabase.from('post_comments').select('*').eq('post_id', postId).eq('is_active', true).order('created_at', { ascending: true });
+        comments = legacy.data; error = legacy.error;
+      }
       if (error) throw error;
 
       const authorMap = await getPublicProfileCards((comments || []).map((c: any) => c.user_id));
@@ -719,6 +741,8 @@ export const usePostComments = (postId: string, enabled: boolean = true) => {
             name: authorData.name || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"),
             avatar_url: authorData.avatar_url || null,
             badge_type: authorData.badge_type || null,
+            is_premium: authorData.is_premium === true,
+            can_share_links: authorData.can_share_links === true || ['admin', 'moderator'].includes(authorData.badge_type || ''),
             is_verified: authorData.is_verified || false,
             verified_until: authorData.verified_until || null,
             life_stage: authorData.life_stage || null
@@ -742,14 +766,14 @@ export const useCreateComment = () => {
       content,
       imageUrl,
       parentCommentId,
-      postAuthorId,
       commenterName,
-      isAnonymous
-    }: {postId: string;content: string;imageUrl?: string | null;parentCommentId?: string | null;postAuthorId?: string;commenterName?: string;isAnonymous?: boolean;}) => {
+      isAnonymous,
+      expectedUserId,
+    }: {postId: string;content: string;imageUrl?: string | null;parentCommentId?: string | null;postAuthorId?: string;commenterName?: string;isAnonymous?: boolean;expectedUserId?: string;}) => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!user || (expectedUserId && user.id !== expectedUserId)) throw new Error('Not authenticated');
 
-      const { error } = await supabase.
+      const { data: insertedComment, error } = await supabase.
       from('post_comments').
       insert({
         post_id: postId,
@@ -758,45 +782,56 @@ export const useCreateComment = () => {
         content,
         image_url: imageUrl || null,
         is_anonymous: isAnonymous || false
-      });
+      }).
+      select('id, post_id, parent_comment_id').
+      single();
 
       if (error) throw error;
 
       const preview = content.length > 50 ? `${content.slice(0, 50)}...` : content;
-      const senderName = isAnonymous ? tr("usecommunity_anonim", "Anonim") : commenterName?.trim() || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i");
+      const senderName = Array.from(isAnonymous ? tr("usecommunity_anonim", "Anonim") : commenterName?.trim() || tr("usecommunity_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")).slice(0, 30).join('');
 
-      // DÜZƏLİŞ: əvvəllər CAVABLAR (parentCommentId varkən) da HƏMİŞƏ post
-      // sahibinə göndərilirdi — parent şərhin əsl müəllifinə HEÇ VAXT
-      // getmirdi (kim kimə cavab verdiyi tamamilə nəzərə alınmırdı). İndi:
-      //   • Kök şərh (parentCommentId yox) → post sahibinə (əvvəlki kimi)
-      //   • Cavab (parentCommentId var) → parent şərhin DB-dən TƏZƏ oxunmuş
-      //     əsl müəllifinə (useToggleLike-ın "post.user_id-ni təzə oxu"
-      //     nümunəsi ilə eyni — klient tərəfindən ötürülən köhnə/səhv
-      //     prop-a etibar etmə).
+      // Resolve the recipient from persisted rows instead of trusting author
+      // props, and bind the push to the exact comment inserted above.
       try {
-        if (parentCommentId) {
+        if (insertedComment.parent_comment_id) {
           const { data: parentComment } = await supabase.
-          from('post_comments').select('user_id').eq('id', parentCommentId).maybeSingle();
+          from('post_comments').select('user_id, post_id').eq('id', insertedComment.parent_comment_id).maybeSingle();
           const parentAuthorId = (parentComment as any)?.user_id;
-          if (parentAuthorId && parentAuthorId !== user.id) {
+          if (parentAuthorId && parentAuthorId !== user.id && (parentComment as any).post_id === insertedComment.post_id) {
             const { invokeSendPush } = await import('@/lib/push');
             await invokeSendPush({
               userId: parentAuthorId,
-              title: tr("usecommunity_yeni_cavab_3b1b2c", "Yeni cavab 💬"),
-              body: `${senderName}: ${preview}`,
-              data: { type: 'community_reply', commentId: parentCommentId, postId, context: 'post_comment' },
+              title: `${senderName} ${tr('community_reply_notification', 'rəyinizə cavab yazdı')}`,
+              body: preview,
+              data: {
+                type: 'community_reply',
+                context: 'post_comment',
+                commentId: insertedComment.parent_comment_id,
+                postId: insertedComment.post_id,
+                interactionId: insertedComment.id
+              } satisfies PushEventData,
               kind: 'community_reply'
             });
           }
-        } else if (postAuthorId && postAuthorId !== user.id) {
-          const { invokeSendPush } = await import('@/lib/push');
-          await invokeSendPush({
-            userId: postAuthorId,
-            title: tr("usecommunity_yeni_serh_25bb56", "Yeni \u015F\u0259rh \uD83D\uDCAC"),
-            body: `${senderName}: ${preview}`,
-            data: { type: 'community_comment', postId, context: 'community_post' },
-            kind: 'community_comment'
-          });
+        } else {
+          const { data: post } = await supabase.
+          from('community_posts').select('user_id').eq('id', insertedComment.post_id).maybeSingle();
+          if (post?.user_id && post.user_id !== user.id) {
+            const { invokeSendPush } = await import('@/lib/push');
+            await invokeSendPush({
+              userId: post.user_id,
+              title: tr("usecommunity_yeni_serh_25bb56", "Yeni \u015F\u0259rh \uD83D\uDCAC"),
+              body: `${senderName}: ${preview}`,
+              data: {
+                type: 'community_comment',
+                context: 'community_post',
+                postId: insertedComment.post_id,
+                interactionId: insertedComment.id
+              } satisfies PushEventData,
+              kind: 'community_comment'
+            });
+          }
         }
       } catch (e) {console.error('Comment notification error:', e);}
     },
@@ -833,11 +868,14 @@ export const useCreateComment = () => {
     },
     onError: (err: any, vars, ctx) => {
       if (ctx?.prev !== undefined) queryClient.setQueryData(['post-comments', vars.postId], ctx.prev);
-      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), description: err?.message, variant: 'destructive' });
+      toast({ title: tr("usecommunity_xeta_bas_verdi_f22fba", "Xəta baş verdi"), description: err?.message === 'COMMENT_LINKS_STAFF_ONLY'
+        ? tr('community_links_staff_only', 'Rəylərdə linki yalnız administrator və moderator paylaşa bilər.') : err?.message, variant: 'destructive' });
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['post-comments', variables.postId] });
-      queryClient.invalidateQueries({ queryKey: ['group-posts'] });
+    onSuccess: async (_, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['post-comments', variables.postId] }),
+        invalidateCommunityPosts(queryClient),
+      ]);
     }
   });
 };
@@ -908,9 +946,11 @@ export const useDeleteComment = () => {
 
       if (error) throw error;
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['post-comments', variables.postId] });
-      queryClient.invalidateQueries({ queryKey: ['group-posts'] });
+    onSuccess: async (_, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['post-comments', variables.postId] }),
+        invalidateCommunityPosts(queryClient),
+      ]);
       toast({ title: tr("commentreply_serh_silindi_59cfe5", "Şərh silindi") + ' 🗑️' });
     },
     onError: () => {
@@ -920,88 +960,17 @@ export const useDeleteComment = () => {
 };
 
 export const useAutoJoinGroups = () => {
-  const queryClient = useQueryClient();
-
-  const autoJoin = useCallback(async (profile: {
+  // Messaging groups are joined explicitly; medical/life-stage categories no
+  // longer create memberships as a side effect of changing a profile.
+  const autoJoin = useCallback(async (_profile: {
     life_stage?: string;
     baby_birth_date?: string;
     baby_gender?: string;
     multiples_type?: string;
     due_date?: string;
   }) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    // Get all auto-join groups
-    const { data: groups } = await supabase.
-    from('community_groups').
-    select('*').
-    eq('is_active', true).
-    eq('is_auto_join', true);
-
-    if (!groups) return;
-
-    // Get user's current memberships
-    const { data: memberships } = await supabase.
-    from('group_memberships').
-    select('group_id').
-    eq('user_id', user.id);
-
-    const memberGroupIds = new Set(memberships?.map((m) => m.group_id) || []);
-
-    // Check each group's criteria
-    for (const group of groups) {
-      if (memberGroupIds.has(group.id)) continue;
-
-      const criteria = group.auto_join_criteria as Record<string, any> | null;
-      if (!criteria) continue;
-
-      let shouldJoin = true;
-
-      // Check life stage
-      if (criteria.life_stage && criteria.life_stage !== profile.life_stage) {
-        shouldJoin = false;
-      }
-
-      // Check birth month for mommy stage
-      if (criteria.birth_month && profile.baby_birth_date) {
-        const birthMonth = profile.baby_birth_date.substring(0, 7);
-        if (criteria.birth_month !== birthMonth) {
-          shouldJoin = false;
-        }
-      }
-
-      // Check baby gender
-      if (criteria.baby_gender && criteria.baby_gender !== profile.baby_gender) {
-        shouldJoin = false;
-      }
-
-      // Check multiples type
-      if (criteria.multiples_type && criteria.multiples_type !== profile.multiples_type) {
-        shouldJoin = false;
-      }
-
-      // Check pregnancy month
-      if (criteria.pregnancy_month && profile.due_date) {
-        const dueDate = new Date(profile.due_date);
-        const now = new Date();
-        const weeksPregnant = Math.floor((dueDate.getTime() - now.getTime()) / (7 * 24 * 60 * 60 * 1000));
-        const monthsPregnant = Math.ceil((40 - weeksPregnant) / 4);
-        if (criteria.pregnancy_month !== monthsPregnant) {
-          shouldJoin = false;
-        }
-      }
-
-      if (shouldJoin) {
-        await supabase.
-        from('group_memberships').
-        insert({ group_id: group.id, user_id: user.id }).
-        then(() => {});
-      }
-    }
-
-    queryClient.invalidateQueries({ queryKey: ['user-memberships'] });
-  }, [queryClient]);
+    return;
+  }, []);
 
   return { autoJoin };
 }; 

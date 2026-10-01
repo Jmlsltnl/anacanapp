@@ -58,10 +58,12 @@ const BabyMonthlyAlbum = lazy(() => import('./baby/BabyMonthlyAlbum'));
 const CakesScreen = lazy(() => import('./CakesScreen'));
 const MiniGamesHub = lazy(() => import('./games/MiniGamesHub'));
 import { PremiumModal } from './PremiumModal';
+import PremiumToolBoundary from './premium/PremiumToolBoundary';
 
 import { useToast } from '@/hooks/use-toast';
 import { useToolConfigs, ToolConfig } from '@/hooks/useDynamicTools';
 import BannerSlot from '@/components/banners/BannerSlot';
+import { AdInlineAnchor, AdSurface } from '@/components/ads/AdExperienceProvider';
 
 interface Tool {
   id: string;
@@ -122,6 +124,9 @@ const iconMap: Record<string, LucideIcon> = {
 import { Calculator } from 'lucide-react';
 import { tr } from "@/lib/tr";
 import { useDisabledTools } from '@/hooks/useDisabledTools';
+import { followupText } from '@/lib/followup-i18n';
+import { localizedCountryName } from '@/lib/app-languages';
+import { regionalCountry } from '@/lib/vaccine-schedule';
 
 interface ToolsHubProps {
   initialTool?: string | null;
@@ -162,7 +167,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
 
   // Freemium gate — hero/mini-games kimi birbaşa açılışlar üçün
   const gatedOpenTool = (toolId: string) => {
-    if (!isAdmin && !isPremium && !isToolFree(toolId)) {
+    if (!isPremium && !isToolFree(toolId)) {
       import('@/lib/analytics').then((m) => m.analytics.logPaywallShown(toolId)).catch(() => {});
       setShowPremiumModal(true);
       return;
@@ -177,6 +182,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   const { toast } = useToast();
   const pregData = getPregnancyData();
   const language = useUserStore((state) => state.language);
+  const storeCountry = useUserStore(state => state.countryCode);
   // Admins see ALL tools regardless of life stage
   const { data: toolConfigs = [], isLoading: toolsLoading } = useToolConfigs(isAdmin ? undefined : lifeStage || undefined);
 
@@ -206,7 +212,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
       config.partner_name :
       (config as any).display_name || config.name;
 
-      const description = hasPartner && config.requires_partner && config.partner_description ?
+      const description = ['names','baby-names'].includes(config.tool_id) ? followupText('names_country', language, { country: localizedCountryName(regionalCountry(language, profile?.country_code, storeCountry), language) }) : hasPartner && config.requires_partner && config.partner_description ?
       config.partner_description :
       config.description || '';
 
@@ -228,13 +234,13 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
         isLocked: getLockedStatus(config)
       };
     });
-  }, [toolConfigs, hasPartner, lifeStage, language, isNonAz, disabledTools]);
+  }, [toolConfigs, hasPartner, lifeStage, language, isNonAz, disabledTools, profile?.country_code, storeCountry]);
 
   // Set initial tool from props on mount (Dashboard qısayolları / banner deeplink-ləri)
   // Freemium: free olmayan alət premium-suz açılmır — paywall göstərilir.
   useEffect(() => {
     if (initialTool) {
-      if (!isAdmin && !isPremium && !isToolFree(initialTool)) {
+      if (!isPremium && !isToolFree(initialTool)) {
         import('@/lib/analytics').then((m) => m.analytics.logPaywallShown(initialTool)).catch(() => {});
         setShowPremiumModal(true);
         return;
@@ -262,11 +268,6 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
 
   const handleToolClick = (tool: Tool) => {
     // Admins bypass all restrictions
-    if (isAdmin) {
-      openTool(tool.id);
-      return;
-    }
-
     if (!isToolAvailable(tool)) {
       if (tool.minWeek && lifeStage === 'bump') {
         toast({
@@ -398,10 +399,11 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
   })();
 
   if (toolComponent) {
+    const config = toolConfigs.find(config => config.tool_id === activeTool);
+    const protectedTool = !isToolFree(activeTool!) || !!config?.is_premium || !!config && getLockedStatus(config);
     return (
-      <Suspense fallback={toolFallback}>
-        {toolComponent}
-      </Suspense>);
+      protectedTool ? <PremiumToolBoundary onClose={handleBack}><Suspense fallback={toolFallback}>{toolComponent}</Suspense></PremiumToolBoundary>
+        : <Suspense fallback={toolFallback}>{toolComponent}</Suspense>);
 
   }
 
@@ -428,6 +430,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
 
   return (
     <div className="a-scope pb-8 overflow-x-hidden" style={{ background: 'var(--a-bg)', minHeight: '100%' }}>
+      <AdSurface id="tools_banner" />
       <div className="a-shell">
         {/* Search header */}
         <div style={{ paddingTop: 14 }}>
@@ -532,6 +535,7 @@ const ToolsHub = ({ initialTool = null, onBack }: ToolsHubProps = {}) => {
           </div>
 
           {/* Tools Grid - anacan-demo 2 columns */}
+          <AdInlineAnchor id="tools_banner" />
           <div className="a-tool-grid">
             <AnimatePresence mode="popLayout">
               {displayedTools.map((tool, index) => {

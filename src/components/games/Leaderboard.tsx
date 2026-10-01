@@ -3,6 +3,8 @@ import { Trophy, Medal, User } from 'lucide-react';
 import { tr } from '@/lib/tr';
 import { useAuth } from '@/hooks/useAuth';
 import { useGameLeaderboard, useMyGameScore } from '@/hooks/useGameScores';
+import { gameScoreMessage } from '@/lib/game-score-messages';
+import { Link } from 'react-router-dom';
 
 interface LeaderboardProps {
   gameId: string;
@@ -16,13 +18,13 @@ const RANK_STYLES = [
 ];
 
 const Leaderboard = ({ gameId }: LeaderboardProps) => {
-  const { user } = useAuth();
-  const { data: entries = [], isLoading, isError } = useGameLeaderboard(gameId, 20);
+  const { user, loading } = useAuth();
+  const { data: entries = [], isLoading, isError, refetch } = useGameLeaderboard(gameId, 20);
   const { data: myScore } = useMyGameScore(gameId);
 
   const myRankIndex = entries.findIndex((e) => e.userId === user?.id);
 
-  if (isLoading) {
+  if (loading || isLoading) {
     return (
       <div className="flex items-center justify-center py-10">
         <div className="w-6 h-6 rounded-full animate-spin" style={{ border: '2px solid var(--a-peach-2)', borderTopColor: 'transparent' }} />
@@ -30,7 +32,20 @@ const Leaderboard = ({ gameId }: LeaderboardProps) => {
     );
   }
 
-  if (isError || entries.length === 0) {
+  if (!user) return <div className="a-card text-center" style={{ padding: '28px 18px' }}>
+    <User className="mx-auto mb-3 h-9 w-9 text-primary" />
+    <p className="a-list-title">{gameScoreMessage('loginTitle')}</p>
+    <p className="a-list-sub" style={{ whiteSpace: 'normal', marginBlock: 10 }}>{gameScoreMessage('loginDescription')}</p>
+    <Link to="/" className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">{gameScoreMessage('login')}</Link>
+  </div>;
+
+  if (isError) return <div className="a-card text-center" role="alert" style={{ padding: '28px 18px' }}>
+    <p className="a-list-title">{gameScoreMessage('loadingError')}</p>
+    <p className="a-list-sub" style={{ whiteSpace: 'normal', marginBlock: 10 }}>{gameScoreMessage('loadingDescription')}</p>
+    <button type="button" onClick={() => { void refetch(); }} className="rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">{gameScoreMessage('retry')}</button>
+  </div>;
+
+  if (entries.length === 0) {
     return (
       <div className="a-card text-center" style={{ padding: '34px 18px' }}>
         <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{ background: 'var(--a-surface-soft)' }}>

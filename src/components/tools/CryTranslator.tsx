@@ -1,13 +1,14 @@
-import { useState, useRef, useEffect, CSSProperties } from 'react';
+import { useState, useRef, useEffect, useCallback, CSSProperties } from 'react';
 import { getLocaleTag } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, Square, AlertCircle, CheckCircle, Clock, Loader2, History, Info, AlertTriangle, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import type { Tables } from '@/integrations/supabase/types';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import PremiumModal from '@/components/PremiumModal';
-import { requestMicrophonePermission } from '@/lib/permissions';
+import { createAudioRecorder, getAudioErrorToast, openMicrophone, releaseAudioRecording } from '@/lib/audioRecording';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { tr, getPersistedLanguage } from "@/lib/tr";
 import MedicalDisclaimer from '@/components/MedicalDisclaimer';
@@ -60,9 +61,13 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
   const [analysis, setAnalysis] = useState<CryAnalysis | null>(null);
   const [audioLevel, setAudioLevel] = useState(0);
   const [showHistory, setShowHistory] = useState(false);
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<Tables<'cry_analyses'>[]>([]);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const recordingControllerRef = useRef<AbortController | null>(null);
+  const mountedRef = useRef(true);
+  const recordingTimeRef = useRef(0);
   const audioChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -77,22 +82,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
   const isRecording = stage === 'recording';
   const isProcessing = stage === 'processing' || stage === 'analyzing';
 
-  useEffect(() => {
-    loadHistory();
-    return () => {
-      cleanup();
-    };
-  }, []);
-
-  const cleanup = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (animationRef.current) cancelAnimationFrame(animationRef.current);
-    if (audioContextRef.current) {
-      audioContextRef.current.close().catch(() => {});
-    }
-  };
-
-  const loadHistory = async () => {
+  const loadHistory = useCallback(async () => {
     if (!profile?.user_id) return;
     const { data } = await supabase.
     from('cry_analyses').
@@ -100,23 +90,68 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
     eq('user_id', profile.user_id).
     order('created_at', { ascending: false }).
     limit(10);
-    if (data) setHistory(data);
+    if (data && mountedRef.current) setHistory(data);
+  }, [profile?.user_id]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    const background = () => {
+      if (document.visibilityState === 'hidden' && (mediaRecorderRef.current?.state === 'recording' || streamRef.current)) {
+        recordingControllerRef.current?.abort(); recordingControllerRef.current = null; cleanup();
+        setStage(previous => previous === 'recording' ? 'idle' : previous);
+      }
+    };
+    document.addEventListener('visibilitychange', background);
+    return () => {
+      mountedRef.current = false;
+      document.removeEventListener('visibilitychange', background);
+      recordingControllerRef.current?.abort();
+      recordingControllerRef.current = null;
+      cleanup();
+    };
+  }, []);
+
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory]);
+
+  const cleanup = () => {
+    if (timerRef.current !== null) clearInterval(timerRef.current);
+    if (animationRef.current !== null) cancelAnimationFrame(animationRef.current);
+    timerRef.current = null;
+    animationRef.current = null;
+    analyserRef.current = null;
+    releaseAudioRecording(mediaRecorderRef.current, streamRef.current);
+    mediaRecorderRef.current = null;
+    streamRef.current = null;
+    audioChunksRef.current = [];
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
+    }
+  };
+
+  const cancelRecording = () => {
+    recordingControllerRef.current?.abort();
+    recordingControllerRef.current = null;
+    cleanup();
   };
 
   const startRecording = async () => {
+    if (recordingControllerRef.current || !mountedRef.current) return;
+    const controller = new AbortController();
+    recordingControllerRef.current = controller;
+    let stream: MediaStream | null = null;
     try {
-      const permission = await requestMicrophonePermission();
-
-      if (!permission.granted) {
-        toast({
-          title: tr("crytranslator_mikrofon_icazesi_lazimdir_711293", 'Mikrofon icazəsi lazımdır'),
-          description: tr("crytranslator_parametrlerden_mikrofon_icazesini_aktivl_f7008f", 'Parametrlərdən mikrofon icazəsini aktivləşdirin'),
-          variant: 'destructive'
-        });
+      if (typeof AudioContext === 'undefined') {
+        throw new DOMException('Audio analysis is unavailable', 'NotSupportedError');
+      }
+      stream = await openMicrophone();
+      if (controller.signal.aborted) {
+        releaseAudioRecording(null, stream);
         return;
       }
-
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
 
       // Set up audio analyzer
       const audioContext = new AudioContext();
@@ -129,7 +164,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
 
       // Animate audio level
       const updateLevel = () => {
-        if (!analyserRef.current) return;
+        if (controller.signal.aborted || !analyserRef.current) return;
         const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
         analyserRef.current.getByteFrequencyData(dataArray);
         const avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
@@ -138,140 +173,147 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
       };
       updateLevel();
 
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      // The deployed analyze-cry endpoint accepts WebM only.
+      const mediaRecorder = createAudioRecorder(stream, ['audio/webm']);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+        if (!controller.signal.aborted && e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+      mediaRecorder.onerror = (error) => {
+        if (controller.signal.aborted) return;
+        cancelRecording();
+        setStage('error');
+        toast(getAudioErrorToast(error, 'audio'));
       };
 
       mediaRecorder.start(100);
       setStage('recording');
+      recordingTimeRef.current = 0;
       setRecordingTime(0);
       setAnalysis(null);
 
       timerRef.current = setInterval(() => {
-        setRecordingTime((prev) => {
-          if (prev >= 10) {
-            stopRecording();
-            return 10;
-          }
-          return prev + 1;
-        });
+        recordingTimeRef.current += 1;
+        setRecordingTime(recordingTimeRef.current);
+        if (recordingTimeRef.current >= 10) stopRecording();
       }, 1000);
 
-    } catch (error: any) {
+    } catch (error) {
+      if (controller.signal.aborted) return;
       console.error('Recording error:', error);
+      cancelRecording();
       setStage('error');
-
-      if (error.name === 'NotAllowedError' || error.message?.includes('permission')) {
-        toast({
-          title: tr("crytranslator_mikrofon_icazesi_lazimdir_711293", 'Mikrofon icazəsi lazımdır'),
-          description: tr("crytranslator_parametrlerden_mikrofon_icazesini_aktivl_f7008f", 'Parametrlərdən mikrofon icazəsini aktivləşdirin'),
-          variant: 'destructive'
-        });
-      } else {
-        toast({
-          title: tr("crytranslator_mikrofon_xetasi_5f83b3", 'Mikrofon xətası'),
-          description: tr("crytranslator_mikrofona_giris_icazesi_verin_9b0425", 'Mikrofona giriş icazəsi verin'),
-          variant: 'destructive'
-        });
-      }
+      toast(getAudioErrorToast(error, stream ? 'audio' : 'microphone'));
     }
   };
 
-  const stopRecording = async () => {
-    if (!mediaRecorderRef.current || stage !== 'recording') return;
+  const stopRecording = () => {
+    const recorder = mediaRecorderRef.current;
+    const controller = recordingControllerRef.current;
+    if (!recorder || recorder.state !== 'recording' || !controller) return;
 
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    if (timerRef.current !== null) clearInterval(timerRef.current);
+    timerRef.current = null;
 
-    if (recordingTime < 3) {
+    const duration = recordingTimeRef.current;
+    if (duration < 3) {
       toast({
         title: tr("crytranslator_cox_qisa_12bf93", 'Çox qısa'),
         description: tr("crytranslator_minimum_3_saniye_ses_yazin_1b5970", 'Minimum 3 saniyə səs yazın'),
         variant: 'destructive'
       });
-      mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
+      cancelRecording();
       setStage('idle');
       return;
     }
 
     setStage('processing');
 
-    mediaRecorderRef.current.onstop = async () => {
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-      await analyzeAudio(audioBlob);
+    recorder.onstop = () => {
+      if (controller.signal.aborted) return;
+      const audioBlob = new Blob(audioChunksRef.current, { type: recorder.mimeType || audioChunksRef.current[0]?.type });
+      cleanup();
+      void analyzeAudio(audioBlob, duration, controller.signal);
     };
 
-    mediaRecorderRef.current.stop();
-    mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
+    try {
+      recorder.stop();
+    } catch (error) {
+      cancelRecording();
+      setStage('error');
+      toast(getAudioErrorToast(error, 'audio'));
+    }
   };
 
-  const analyzeAudio = async (audioBlob: Blob) => {
-    // Gündəlik pulsuz limit (premium → limitsiz)
-    const { allowed } = await checkAndConsume('cry_translator');
-    if (!allowed) {
-      setStage('idle');
-      setShowPremiumModal(true);
-      return;
-    }
-    setStage('analyzing');
-
+  const analyzeAudio = async (audioBlob: Blob, duration: number, signal: AbortSignal) => {
     try {
-      const reader = new FileReader();
-      reader.readAsDataURL(audioBlob);
+      if (signal.aborted) return;
+      if (!audioBlob.size || !audioBlob.type) throw new Error('No recorded audio or MIME type');
+      // Gündəlik pulsuz limit (premium → limitsiz)
+      const { allowed } = await checkAndConsume('cry_translator');
+      if (signal.aborted) return;
+      if (!allowed) {
+        setStage('idle');
+        setShowPremiumModal(true);
+        return;
+      }
+      setStage('analyzing');
 
-      reader.onloadend = async () => {
-        const base64Audio = (reader.result as string).split(',')[1];
+      const base64Audio = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve((reader.result as string).split(',')[1]);
+        reader.onerror = () => reject(reader.error || new Error('Audio read failed'));
+        reader.readAsDataURL(audioBlob);
+      });
+      if (signal.aborted) return;
 
-        // Calculate baby age in months and days
-        let babyContext = {};
-        if (profile?.baby_birth_date) {
-          const birthDate = new Date(profile.baby_birth_date);
-          const today = new Date();
-          const { getRealCalendarAge } = await import('@/lib/pregnancy-utils');
-          const age = getRealCalendarAge(profile.baby_birth_date);
-          babyContext = {
-            babyName: profile.baby_name || tr("crytranslator_korpe_fa2b51", "K\xF6rp\u0259"),
-            babyAgeMonths: age.months,
-            babyAgeDays: age.totalDays,
-            babyGender: profile.baby_gender
-          };
-        }
+      // Calculate baby age in months and days
+      let babyContext = {};
+      if (profile?.baby_birth_date) {
+        const { getRealCalendarAge } = await import('@/lib/pregnancy-utils');
+        const age = getRealCalendarAge(profile.baby_birth_date);
+        babyContext = {
+          babyName: profile.baby_name || tr("crytranslator_korpe_fa2b51", "K\xF6rp\u0259"),
+          babyAgeMonths: age.months,
+          babyAgeDays: age.totalDays,
+          babyGender: profile.baby_gender
+        };
+      }
+      if (signal.aborted) return;
 
-        const { data, error } = await supabase.functions.invoke('analyze-cry', {
-          body: {
-            audioBase64: base64Audio,
-            audioDuration: recordingTime,
-            userContext: babyContext,
-            language: getPersistedLanguage()
-          }
-        });
+      const { data, error } = await supabase.functions.invoke('analyze-cry', {
+        body: {
+          audioBase64: base64Audio,
+          audioDuration: duration,
+          userContext: babyContext,
+          language: getPersistedLanguage()
+        },
+        signal
+      });
+      if (signal.aborted) return;
+      if (error) throw error;
 
-        if (error) throw error;
+      if (data.success && data.analysis) {
+        const result = data.analysis as CryAnalysis;
+        setAnalysis(result);
 
-        if (data.success && data.analysis) {
-          const result = data.analysis as CryAnalysis;
-          setAnalysis(result);
-
-          // Determine final stage based on result
-          if (result.cryType === 'no_cry_detected') {
-            setStage('no_cry');
-          } else if (result.cryType === 'false_positive') {
-            setStage('false_positive');
-          } else {
-            setStage('complete');
-          }
-
-          loadHistory();
+        // Determine final stage based on result
+        if (result.cryType === 'no_cry_detected') {
+          setStage('no_cry');
+        } else if (result.cryType === 'false_positive') {
+          setStage('false_positive');
         } else {
-          throw new Error(data.error || 'Analysis failed');
+          setStage('complete');
         }
-      };
+
+        loadHistory();
+      } else {
+        throw new Error(data.error || 'Analysis failed');
+      }
     } catch (error) {
+      if (signal.aborted) return;
       console.error('Analysis error:', error);
       setStage('error');
       toast({
@@ -279,10 +321,13 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
         description: tr("crytranslator_yeniden_cehd_edin_0040c9", 'Yenidən cəhd edin'),
         variant: 'destructive'
       });
+    } finally {
+      if (recordingControllerRef.current?.signal === signal) recordingControllerRef.current = null;
     }
   };
 
   const resetAnalysis = () => {
+    cancelRecording();
     setStage('idle');
     setAnalysis(null);
     setRecordingTime(0);
@@ -324,7 +369,7 @@ const CryTranslator = ({ onBack }: CryTranslatorProps) => {
   return (
     <ToolPage>
       <ToolHeader
-        onBack={onBack}
+        onBack={() => { cancelRecording(); onBack(); }}
         eyebrow={tr("crytranslator_ai_ile_korpe_aglamasini_analiz_edin_e2e23c", "AI ilə körpə ağlamasını analiz edin")}
         title={tr("adminanalytics_aglama_analizi_0713b3", "Ağlama Analizi")}
         actions={

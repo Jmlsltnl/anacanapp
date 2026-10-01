@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +11,7 @@ import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AppLockGate from "@/components/security/AppLockGate";
 import Index from "./pages/Index";
+import BlogLink from './pages/BlogLink';
 import ResetPassword from "./pages/ResetPassword";
 import LegalPage from "./pages/LegalPage";
 import NotFound from "./pages/NotFound";
@@ -24,6 +25,19 @@ import { loadTranslations } from "@/lib/i18n";
 import { DirectionProvider } from "@radix-ui/react-direction";
 import { applyDocumentDirection, isRtlLang } from "@/lib/rtl";
 import { useUserStore } from "@/store/userStore";
+import { getBackendConfig } from '@/integrations/supabase/backend-config';
+import { AdExperienceProvider } from '@/components/ads/AdExperienceProvider';
+import '@/styles/ads.css';
+import '@/styles/keyboard.css';
+import { installKeyboardViewport } from '@/lib/keyboard-viewport';
+import { PremiumEntitlementMonitor } from '@/hooks/usePremiumEntitlement';
+import ScreenCaptureGuard from '@/components/security/ScreenCaptureGuard';
+import { Capacitor } from '@capacitor/core';
+import ModeratorEnforcement from '@/components/moderation/ModeratorEnforcement';
+import CustomerIoSession from '@/components/CustomerIoSession';
+const AdmobAdminPage = lazy(() => import('./pages/AdmobAdminPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
+const ModeratorPage = lazy(() => import('./pages/ModeratorPage'));
 
 // Offline-first: sorğu cache-i localStorage-da saxlanılır ki, şəbəkəsiz açılışda
 // son vəziyyət (dashboard datası, kontent, partner məlumatı və s.) dərhal görünsün.
@@ -54,12 +68,18 @@ const persister = createSyncStoragePersister({
 const persistOptions = {
   persister,
   maxAge: CACHE_MAX_AGE,
-  buster: 'anacan-rq-v1', // cache sxemi dəyişəndə artırın
+  // Keep source's offline cache on upgrade; do not hydrate source/preview query
+  // results after an admitted authority change (credentials are a separate store).
+  buster: getBackendConfig().sourceFirst && getBackendConfig().azure
+    ? `anacan-rq-v1:azure:${getBackendConfig().admission?.policy.handoffSha256}` : 'anacan-rq-v1',
   dehydrateOptions: {
     // Yalnız uğurlu sorğular persist olunur; admin dataları saxlanmır
     shouldDehydrateQuery: (query: any) =>
-    query.state.status === 'success' &&
-    !JSON.stringify(query.queryKey).toLowerCase().includes('admin')
+     query.state.status === 'success' &&
+     query.meta?.persist !== false &&
+    !['chat-media-v2', 'chat-media-v3', 'premium-access-v1', 'subscription', 'household-premium'].includes(query.queryKey[0]) &&
+    !JSON.stringify(query.queryKey).toLowerCase().includes('admin') &&
+    !JSON.stringify(query.queryKey).toLowerCase().includes('admob')
   }
 };
 
@@ -75,6 +95,17 @@ setTimeout(() => {
 }, 0);
 
 const App = () => {
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    let second = 0;
+    const first = requestAnimationFrame(() => {
+      second = requestAnimationFrame(() => {
+        void import('@capacitor/splash-screen').then(({ SplashScreen }) => SplashScreen.hide({ fadeOutDuration: 180 })).catch(() => {});
+      });
+    });
+    return () => { cancelAnimationFrame(first); cancelAnimationFrame(second); };
+  }, []);
+  useEffect(installKeyboardViewport, []);
   // Subscribe to language so the whole tree re-renders when the user switches
   // language. tr() reads language synchronously from the store, but without a
   // subscription nothing would re-render and translations would appear "stuck".
@@ -97,14 +128,20 @@ const App = () => {
           {/* Radix primitivləri (dropdown/select/dialog align) RTL-i buradan öyrənir */}
           <DirectionProvider dir={isRtlLang(language) ? 'rtl' : 'ltr'}>
           <AuthProvider>
+            <CustomerIoSession />
+            <PremiumEntitlementMonitor />
             <TooltipProvider>
               <Toaster />
               <Sonner />
               {/* Təhlükəsizlik kilidi — bütün ekranların üstündə (z-400) */}
               <AppLockGate />
+              <ScreenCaptureGuard />
               <BrowserRouter>
+                <AdExperienceProvider>
+                <ModeratorEnforcement>
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/blog/:slug" element={<BlogLink />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/legal/:docType" element={<LegalPage />} />
                   <Route path="/payment/success" element={<PaymentSuccess />} />
@@ -113,9 +150,15 @@ const App = () => {
                   <Route path="/revenuecat-debug" element={<RevenueCatDebug />} />
                   <Route path="/p/v/:token" element={<PartnerVerifyPage />} />
                   <Route path="/mini-games" element={<MiniGamesPage />} />
+                  <Route path="/admin/ads" element={<Suspense fallback={<div className="p-8 text-center">Yüklənir…</div>}><AdmobAdminPage /></Suspense>} />
+                  <Route path="/admin" element={<Suspense fallback={<div className="p-8 text-center">Yüklənir…</div>}><AdminPage /></Suspense>} />
+                  <Route path="/admin/:section" element={<Suspense fallback={<div className="p-8 text-center">Yüklənir…</div>}><AdminPage /></Suspense>} />
+                  <Route path="/moderator" element={<Suspense fallback={<div className="p-8 text-center">Yüklənir…</div>}><ModeratorPage /></Suspense>} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
+                </ModeratorEnforcement>
+                </AdExperienceProvider>
               </BrowserRouter>
             </TooltipProvider>
           </AuthProvider>

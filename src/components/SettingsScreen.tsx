@@ -1,10 +1,11 @@
 ﻿import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Capacitor } from '@capacitor/core';
 import {
   ArrowLeft, Bell, Moon, Sun, Lock,
   Smartphone, Trash2, ChevronRight,
   Volume2, Vibrate, Droplets, Dumbbell, Pill,
-  BellOff, Heart, MessageCircle, Users, Download, AlertTriangle, Loader2, HeartPulse } from
+  BellOff, Heart, MessageCircle, Users, Download, AlertTriangle, Loader2, HeartPulse, Megaphone } from
 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useNotificationSettings } from '@/hooks/useNotificationSettings';
@@ -216,6 +217,13 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
         </header>
 
         <div className="space-y-3">
+          {onNavigate && <SectionCard title={tr('ads_preferences_title', 'Reklam seçimləri')}>
+            <SettingRow icon={Megaphone} label={tr('ads_preferences_title', 'Reklam seçimləri')}
+              description={tr('ads_settings_description', 'Reklamsız fasilə və məxfilik seçimləri')}
+              onClick={() => onNavigate('ad-preferences')} tintBg="var(--a-lav-1)" tintInk="var(--a-lav-ink)">
+              <ChevronRight size={16} className="rtl:rotate-180" />
+            </SettingRow>
+          </SectionCard>}
           {/* Native App Indicator */}
           {!isNative &&
           <motion.div
@@ -398,7 +406,9 @@ const SettingsScreen = ({ onBack, onNavigate }: SettingsScreenProps) => {
             <SettingRow
               icon={HeartPulse}
               label={tr("settingsscreen_health_sync", "SaÄŸlamlÄ±q inteqrasiyasÄ±")}
-              description={tr("settingsscreen_health_sync_desc", "Apple Health / Health Connect â€” addÄ±m vÉ™ aktivlik")}
+              description={Capacitor.getPlatform() === 'android' ?
+                tr('health_android_cycle_only', 'Health Connect: yalnız period qeydlərinin yazılması') :
+                tr("settingsscreen_health_sync_desc", "Apple Health / Health Connect â€” addÄ±m vÉ™ aktivlik")}
               onClick={() => onNavigate?.('health-sync')}
               tintBg="var(--a-pink-1)" tintInk="var(--a-pink-ink)">
 

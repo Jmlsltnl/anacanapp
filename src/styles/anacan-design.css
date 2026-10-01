@@ -1255,6 +1255,19 @@
   margin-top: 2px;
 }
 
+.a-water-ring { grid-template-columns: minmax(0, 1fr); flex: 0 0 92px; }
+.a-water-ring .a-ring-inner { position: relative; min-width: 0; overflow: hidden; text-align: center; }
+.a-water-ring .a-ring-inner b {
+  position: absolute; inset-inline: 0; top: 50%; transform: translateY(-50%);
+  display: block; width: 100%; margin: 0; text-align: center; white-space: nowrap;
+  font-variant-numeric: tabular-nums; letter-spacing: 0;
+}
+.a-water-ring .a-ring-inner > span {
+  position: absolute; inset-inline: 5px; bottom: 6px; max-width: calc(100% - 10px);
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden; overflow-wrap: anywhere; white-space: normal; text-align: center; line-height: 1.1; margin: 0;
+}
+
 .a-quick-dots {
   display: flex;
   gap: 10px;
@@ -1798,7 +1811,7 @@
 }
 
 .a-post-name {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--a-ink);
 }
@@ -1860,7 +1873,7 @@
 
 .a-post-time {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--a-ink-faint);
   font-weight: 500;
   margin-top: 1px;
@@ -1868,8 +1881,8 @@
 
 .a-post-text {
   margin: 0;
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.65;
   color: var(--a-ink);
   white-space: pre-line;
   word-break: break-word;
@@ -1884,7 +1897,7 @@
 .a-post-footer {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 8px;
   margin-top: 13px;
   padding-top: 12px;
   border-top: 1px solid var(--a-line);
@@ -1894,7 +1907,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: 13px;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  border-radius: 12px;
+  font-variant-numeric: tabular-nums;
   font-weight: 700;
   color: var(--a-ink-soft);
   transition: color 150ms ease, transform 120ms ease;
@@ -1911,7 +1930,146 @@
   color: #e05575;
 }
 
+.community-comment-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--a-ink);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.community-comment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--a-ink-soft);
+}
+
+.community-comment-meta button { min-height: 30px; }
+
+.community-comment-composer {
+  width: 100%;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--a-line-strong);
+  border-radius: 18px;
+  background: var(--a-surface-soft);
+  scroll-margin-block: 90px;
+}
+
+.community-comment-composer textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  max-height: 180px;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 9px 10px;
+  resize: none;
+  border-radius: 12px;
+  background: var(--a-surface);
+}
+
+.community-composer-actions,
+.community-reply-target {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.community-composer-actions {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) 36px;
+  gap: 6px;
+  margin-top: 6px;
+}
+.community-composer-actions .a-tag {
+  min-width: 0;
+  min-height: 36px;
+  justify-content: center;
+  padding: 6px;
+  white-space: normal;
+  font-size: 12px;
+  cursor: pointer;
+}
+.community-reply-target { justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: var(--a-accent-ink); }
+.community-reply-target span { overflow-wrap: anywhere; min-width: 0; }
+.community-reply-target button { flex-shrink: 0; padding: 6px; }
+
+.community-count-badge {
+  position: absolute;
+  top: -4px;
+  inset-inline-end: -4px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #d74757;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.community-feed-tabs {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding: 3px 1px 10px;
+  margin-bottom: 8px;
+}
+.community-feed-tabs .a-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 10px 13px;
+  font-size: 13px;
+  white-space: nowrap;
+  border: 1px solid var(--a-line);
+  background: var(--a-surface);
+}
+.community-feed-tabs .a-tab.active { background: var(--a-peach-1); border-color: var(--a-peach-2); color: var(--a-accent-ink); }
+.community-connection-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--a-line); }
+.community-connection-row > button:last-child { flex-shrink: 0; font-size: 12px; padding: 8px 10px; }
+.community-post-menu [role="menuitem"] { font-size: 14px; min-height: 40px; }
+.community-profile-card { padding: 20px 16px; }
+.community-profile-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 20px; }
+.community-profile-stats button { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 12px 4px; background: var(--a-surface-soft); border-radius: 16px; }
+.community-profile-stats strong { font-size: 22px; font-weight: 800; color: var(--a-ink); }
+.community-profile-stats span { font-size: 12px; color: var(--a-ink-soft); overflow-wrap: anywhere; }
+.community-profile-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.community-profile-actions button { flex: 1 0 auto; justify-content: center; min-height: 44px; font-size: 13px; }
+
 /* ---------- AI chat ---------- */
+
+.story-editor { background: #09090b; color: #fff; overflow: hidden; }
+.story-editor-layout { height: 100%; min-height: 0; display: flex; flex-direction: column; }
+.story-editor-toolbar { display: flex; align-items: center; gap: 10px; padding: max(10px, env(safe-area-inset-top)) 14px 8px; flex-shrink: 0; }
+.story-editor-icon { width: 38px; height: 38px; display: grid; place-items: center; flex-shrink: 0; border-radius: 50%; background: #ffffff18; color: #fff; }
+.story-editor-icon:disabled, .story-editor-share:disabled { opacity: .45; }
+.story-editor-share { display: flex; align-items: center; gap: 7px; padding: 10px 16px; border-radius: 999px; background: #fff; color: #18181b; font-size: 14px; font-weight: 750; }
+.story-editor-slot { display: flex; align-items: center; justify-content: center; flex: 1; min-height: 0; overflow: hidden; }
+.story-editor-stage { position: relative; flex-shrink: 0; overflow: hidden; border-radius: 16px; background: #18181b; touch-action: none; user-select: none; outline: none; }
+.story-editor-stage:focus-visible { box-shadow: 0 0 0 2px #fff; }
+.story-editor-controls { flex-shrink: 0; min-width: 0; width: min(100%, 480px); height: 226px; max-height: 45%; overflow-y: auto; margin: 0 auto; padding: 10px 16px max(12px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 10px; border: 0; }
+.story-editor-options { display: flex; align-items: center; gap: 8px; }
+.story-editor-choice { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border-radius: 999px; background: #ffffff15; border: 1px solid #ffffff25; padding: 8px 11px; min-height: 36px; font-size: 12px; color: #fff; }
+.story-editor-choice[aria-pressed="true"] { background: #fff; color: #18181b; }
+.story-editor-swatches { display: flex; justify-content: center; gap: 14px; }
+.story-editor-swatches button { width: 25px; height: 25px; border: 2px solid #ffffff70; border-radius: 50%; }
+.story-editor-swatches button[aria-pressed="true"] { outline: 2px solid #fff; outline-offset: 3px; }
+.story-editor-text-input { min-width: 0; flex: 1; border: 1px solid #ffffff40; border-radius: 12px; background: #ffffff10; color: #fff; padding: 8px 12px; font-size: 16px; line-height: 1.4; resize: none; }
+.story-editor-text-input::placeholder { color: #ffffff80; }
 
 .a-chat-header {
   display: flex;
@@ -2257,6 +2415,28 @@
   font-size: 13px;
   color: var(--a-ink);
   outline: none;
+}
+
+/* Native iOS date inputs otherwise retain an intrinsic width inside cards. */
+.a-date-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.a-date-input::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: start;
+}
+
+.a-date-input::-webkit-datetime-edit {
+  min-width: 0;
+  padding: 0;
 }
 
 .a-input::placeholder {

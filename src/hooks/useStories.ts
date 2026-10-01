@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 import { getPublicProfileCards } from '@/lib/public-profile-cards';
+import type { StoryScene } from '@/lib/story-editor';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface Story {
   id: string;
@@ -13,6 +15,7 @@ export interface Story {
   media_url: string;
   media_type: 'image' | 'video';
   text_overlay: string | null;
+  editor_layout?: unknown;
   background_color: string | null;
   created_at: string;
   expires_at: string;
@@ -20,6 +23,8 @@ export interface Story {
   likes_count: number;
   is_liked?: boolean;
   replies_count: number;
+  moderation_version?: number | null;
+  moderation_removed_at?: string | null;
   author?: {
     name: string;
     avatar_url: string | null;
@@ -36,12 +41,13 @@ export interface UserStoryGroup {
 }
 
 export const useStories = (groupId?: string | null) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const userId = user?.id ?? null;
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: stories = [], isLoading } = useQuery({
-    queryKey: ['stories', groupId],
+  const { data: stories = [], isLoading, isFetching, refetch } = useQuery({
+    queryKey: ['stories', userId, groupId],
     queryFn: async () => {
       let query = supabase.
       from('community_stories').
@@ -53,54 +59,48 @@ export const useStories = (groupId?: string | null) => {
         query = query.eq('group_id', groupId);
       }
 
-      const { data, error } = await query;
+      const { data: sourceRows, error } = await query;
       if (error) throw error;
+      const data = (sourceRows || []).filter((row: any) => !row.moderation_removed_at);
+      if (!data?.length) return [];
 
-      const authorMap = await getPublicProfileCards((data || []).map((s: any) => s.user_id));
-
-      // İstifadəçinin bəyəndikləri — TƏK batch sorğu (post_likes-dəki enrichPosts nümunəsi ilə eyni, N+1 yox)
-      const likedSet = new Set<string>();
-      if (user && data && data.length > 0) {
-        const { data: likeRows } = await supabase.
+      const storyIds = data.map((s: any) => s.id);
+      const [authorMap, likes, views] = await Promise.all([
+        getPublicProfileCards(data.map((s: any) => s.user_id)),
+        userId ? supabase.
         from('story_likes' as any).
         select('story_id').
-        eq('user_id', user.id).
-        in('story_id', data.map((s: any) => s.id));
-        (likeRows || []).forEach((r: any) => likedSet.add(r.story_id));
-      }
+        eq('user_id', userId).
+        in('story_id', storyIds) : { data: [], error: null },
+        userId ? supabase.
+        from('story_views').
+        select('story_id').
+        eq('user_id', userId).
+        in('story_id', storyIds) : { data: [], error: null }
+      ]);
+      if (likes.error) throw likes.error;
+      if (views.error) throw views.error;
+      const likedSet = new Set<string>((likes.data || []).map((r: any) => r.story_id));
+      const viewedSet = new Set<string>((views.data || []).map((r: any) => r.story_id));
 
-      // Fetch author details and view status
-      const storiesWithDetails = await Promise.all(
-        (data || []).map(async (story: any) => {
-          const authorData = authorMap[story.user_id];
-
-          let isViewed = false;
-          if (user) {
-            const { data: viewData } = await supabase.
-            from('story_views').
-            select('id').
-            eq('story_id', story.id).
-            eq('user_id', user.id).
-            single();
-            isViewed = !!viewData;
-          }
-
-          return {
-            ...story,
-            likes_count: story.likes_count || 0,
-            is_liked: likedSet.has(story.id),
-            replies_count: story.replies_count || 0,
-            author: authorData ?
-            { name: authorData.name || tr("usestories_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null } :
-            { name: tr("usestories_istifadeci_b6bdd6", "İstifadəçi"), avatar_url: null },
-            is_viewed: isViewed
-          };
-        })
-      );
+      const storiesWithDetails = data.map((story: any) => {
+        const authorData = authorMap[story.user_id];
+        return {
+          ...story,
+          likes_count: story.likes_count || 0,
+          is_liked: likedSet.has(story.id),
+          replies_count: story.replies_count || 0,
+          author: authorData ?
+          { name: authorData.name || tr("usestories_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: authorData.avatar_url || null } :
+          { name: tr("usestories_istifadeci_b6bdd6", "\u0130stifad\u0259\xE7i"), avatar_url: null },
+          is_viewed: viewedSet.has(story.id)
+        };
+      });
 
       return storiesWithDetails as Story[];
     },
-    staleTime: 30000
+    staleTime: 30000,
+    enabled: !authLoading
   });
 
   // Group stories by user
@@ -145,35 +145,36 @@ export const useStories = (groupId?: string | null) => {
       mediaType,
       textOverlay,
       backgroundColor,
-      groupId: storyGroupId
-
-
-
-
-
-
-    }: {mediaUrl: string;mediaType: 'image' | 'video';textOverlay?: string;backgroundColor?: string;groupId?: string;}) => {
+      groupId: storyGroupId,
+      storyId,
+      editorLayout,
+    }: {mediaUrl: string;mediaType: 'image' | 'video';textOverlay?: string;backgroundColor?: string;groupId?: string;storyId?: string;editorLayout?: StoryScene | null;}) => {
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase.
-      from('community_stories').
-      insert({
+      const row = {
+        ...(storyId ? { id: storyId } : {}),
         user_id: user.id,
         group_id: storyGroupId || null,
         media_url: mediaUrl,
         media_type: mediaType,
         text_overlay: textOverlay || null,
-        background_color: backgroundColor || null
-      });
+        background_color: backgroundColor || null,
+        ...(editorLayout !== undefined ? { editor_layout: editorLayout as unknown as Json } : {}),
+      };
+      const { error } = storyId ? await (supabase as any).rpc('save_story_editor', {
+        p_expected_user_id: user.id, p_story_id: storyId, p_group_id: storyGroupId || null,
+        p_media_url: mediaUrl, p_media_type: mediaType, p_text_overlay: textOverlay || null,
+        p_background_color: backgroundColor || null, p_editor_layout: editorLayout || null,
+      }) : await supabase.from('community_stories').insert(row);
 
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stories'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['stories'] });
       toast({ title: tr("usestories_story_paylasildi_e1288f", "Story paylaşıldı! 📸") });
     },
-    onError: () => {
-      toast({ title: tr("usestories_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
+    onError: (_error, variables) => {
+      if (!variables.storyId) toast({ title: tr("usestories_xeta_bas_verdi_f22fba", "Xəta baş verdi"), variant: 'destructive' });
     }
   });
 
@@ -181,7 +182,7 @@ export const useStories = (groupId?: string | null) => {
     if (!user) return;
 
     try {
-      await supabase.
+      const { error } = await supabase.
       from('story_views').
       upsert({
         story_id: storyId,
@@ -189,6 +190,7 @@ export const useStories = (groupId?: string | null) => {
       }, {
         onConflict: 'story_id,user_id'
       });
+      if (error) throw error;
 
       // KRİTİK PERF/UX DÜZƏLİŞİ: əvvəllər burada invalidateQueries(['stories'])
       // çağırılırdı — HƏR baxılan story tam refetch + qrupların YENİDƏN
@@ -196,7 +198,7 @@ export const useStories = (groupId?: string | null) => {
       // sürüşürdü → "daxil olanda 2-3 story birdən keçir" bug-ı. İndi keş
       // yerində yamaqlanır (refetch YOX, sıra dəyişmir); StoriesBar halqaları
       // viewer bağlananda bir dəfə yenilənir (bax StoriesBar onClose).
-      queryClient.setQueriesData({ queryKey: ['stories'] }, (old: Story[] | undefined) => {
+      queryClient.setQueriesData({ queryKey: ['stories', user.id] }, (old: Story[] | undefined) => {
         if (!old) return old;
         return old.map((s) => s.id === storyId ? { ...s, is_viewed: true } : s);
       });
@@ -231,7 +233,10 @@ export const useStories = (groupId?: string | null) => {
     stories,
     storyGroups,
     isLoading,
+    isFetching,
+    refetch,
     createStory: createStoryMutation.mutate,
+    createStoryAsync: createStoryMutation.mutateAsync,
     isCreating: createStoryMutation.isPending,
     markAsViewed,
     deleteStory: deleteStory.mutate
@@ -247,10 +252,12 @@ export const useStories = (groupId?: string | null) => {
  */
 export const useToggleStoryLike = () => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const queryKey = ['stories', user?.id ?? null];
 
-  // ['stories', groupId] açarının bütün variantlarını (əsas lenta + hər qrup) yenilə
+  // Update every group for this viewer, without changing another user's flags.
   const patchStoryInCaches = (storyId: string, patch: (s: Story) => Story) => {
-    queryClient.setQueriesData({ queryKey: ['stories'] }, (old: any) =>
+    queryClient.setQueriesData({ queryKey }, (old: any) =>
     Array.isArray(old) ? old.map((s: Story) => s.id === storyId ? patch(s) : s) : old
     );
   };
@@ -270,15 +277,16 @@ export const useToggleStoryLike = () => {
         return;
       }
 
-      const { error } = await supabase.
-      from('story_likes' as any).
-      insert({ story_id: storyId, user_id: user.id });
+      const { data: insertedLike, error } = await supabase.
+      from('story_likes').
+      insert({ story_id: storyId, user_id: user.id }).select('id').single();
 
       if (error) {
         // 23505 = unikal açar (artıq bəyənilib) — double-tap yarışı, uğur say
         if ((error as any).code === '23505') return;
         throw error;
       }
+      if (!insertedLike?.id) return;
 
       // Push bildirişi ARXA PLANDA — story sahibinə (özünə deyilsə)
       void (async () => {
@@ -292,7 +300,7 @@ export const useToggleStoryLike = () => {
               userId: story.user_id,
               title: tr('usestories_yeni_beyenme_3fd88a', 'Yeni bəyənmə ❤️'),
               body: `${likerName} ${tr('usestories_story_nizi_beyendi', "story-nizi bəyəndi")}`,
-              data: { type: 'story_like', storyId, context: 'community_story' },
+              data: { type: 'story_like', storyId, context: 'community_story', interactionId: insertedLike.id },
               kind: 'story_like'
             });
           }
@@ -300,8 +308,8 @@ export const useToggleStoryLike = () => {
       })();
     },
     onMutate: async ({ storyId, isLiked }) => {
-      await queryClient.cancelQueries({ queryKey: ['stories'] });
-      const prev = queryClient.getQueriesData({ queryKey: ['stories'] });
+      await queryClient.cancelQueries({ queryKey });
+      const prev = queryClient.getQueriesData({ queryKey });
 
       patchStoryInCaches(storyId, (s) => ({
         ...s,

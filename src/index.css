@@ -521,13 +521,16 @@
   }
 }
 
-/* Community native compact text - applied only on Android/iOS native builds */
-.community-native-text p,
-.community-native-text .post-body,
+/* Community typography follows component sizes; inputs stay readable on iOS. */
+.community-native-text {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
 .community-native-text textarea,
 .community-native-text input[type="text"] {
-  font-size: 10pt !important;
-  line-height: 1.45 !important;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 /* Hide Lovable badge on every page */

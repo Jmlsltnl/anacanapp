@@ -17,6 +17,7 @@ export interface Recipe {
   image_url: string | null;
   is_active: boolean;
   // Frontend-only properties (not in DB but used for display)
+  categoryLabel?: string;
   emoji?: string;
   calories?: number;
   stage?: string;
@@ -95,13 +96,17 @@ export const useRecipes = () => {
       
       const mapped = mapRowsTranslation(data, language, ['title', 'description', 'category', 'ingredients', 'instructions', 'tags']);
       // Map DB data to our interface with defaults for missing fields
-      return mapped.map(item => ({
+      return mapped.map((item, index) => ({
         ...item,
+        // Category is also a filter/free-tier grouping key. Localized display
+        // text must not replace its source identity, even when labels differ.
+        category: data?.[index]?.category ?? '',
+        categoryLabel: item.category,
         ingredients: Array.isArray(item.ingredients) ? item.ingredients as string[] : [],
         instructions: Array.isArray(item.instructions) ? item.instructions as string[] : [],
         emoji: '🍽️', // Default emoji
         calories: 0,
-        stage: item.category,
+        stage: data?.[index]?.category ?? '',
         benefits: [],
       })) as Recipe[];
     },
@@ -127,17 +132,19 @@ export const useSafetyItems = () => {
   });
 };
 
-export const useBabyNames = () => {
+export const useBabyNames = (countryCode?: string) => {
   const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['baby_names', language],
+    queryKey: ['baby_names', language, countryCode],
     queryFn: async () => {
       // Hər dil öz ad dəstini görür: az→Azərbaycan, tr→Türk, ru→Rus, en→beynəlxalq,
       // kk→Qazax, de→Alman, ar→Ərəb (Duzelis2/3/4.sql ilə əlavə olundu — əvvəllər
       // kk→az, de/ar→en körpüsü ilə "yerli olmayan" adlar göstərilirdi).
       // lang sütunu 20260813150020 migrasiyası ilə gəlir; köhnə DB-lərdə (sütun yoxdursa)
       // origin_en markerinə fallback edirik.
-      const targetLang = ['az', 'en', 'ru', 'tr', 'kk', 'de', 'ar', 'uz', 'ka'].includes(language) ? language : 'az';
+      // Existing culturally curated collections retain their language. New UI
+      // languages start with the international collection and localized meanings.
+      const targetLang = nameCollectionLanguage(countryCode, language);
       let { data, error } = await (supabase as any)
         .from('baby_names_db')
         .select('*')
@@ -148,7 +155,7 @@ export const useBabyNames = () => {
       if (error && /lang/.test(error.message || '')) {
         // Fallback: lang sütunu hələ yoxdur (migrasiya tətbiq olunmayıb)
         let q = supabase.from('baby_names_db').select('*').eq('is_active', true);
-        q = language === 'en' ? q.not('origin_en', 'is', null) : q.is('origin_en', null);
+        q = targetLang === 'en' ? q.not('origin_en', 'is', null) : q.is('origin_en', null);
         ({ data, error } = await q.order('popularity', { ascending: false }));
       }
 
@@ -228,3 +235,4 @@ export const useWeeklyTips = (weekNumber?: number, lifeStage?: string) => {
     staleTime: 1000 * 60 * 5,
   });
 };
+import { nameCollectionLanguage } from '@/lib/name-collections';

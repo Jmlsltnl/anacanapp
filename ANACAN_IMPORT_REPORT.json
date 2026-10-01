@@ -1,0 +1,24 @@
+{
+  "zipSha256": "3d9fea4df4bb28ba2167d5ddba1193b1087456fb8af8525902dd18057d90dcb3",
+  "manifestSha256": "2966e01922577dd03d5d595e08c5be19dbc2dba5f41abea05757bfda49a7cb64",
+  "baseCommit": "841f79dd966708235bf2011b5eab7d9a26525193",
+  "preImportCommit": "6b4d1309139d4dc688137b47105ffcab5a2304cb",
+  "expected": 1914,
+  "matched": 1914,
+  "missing": [],
+  "mismatched": [],
+  "reviewedRemovals": {
+    "src/components/WinBackCard.tsx": "removed"
+  },
+  "modifiedOutsideManifest": [],
+  "install": "npm ci (package-lock.json) exit 0",
+  "build": "vite build exit 0 (chunk-size warnings only)",
+  "notChanged": [
+    ".env",
+    "server secrets",
+    "database/migrations",
+    "cron",
+    "auth-provider settings",
+    "edge function deployments"
+  ]
+}

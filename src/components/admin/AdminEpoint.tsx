@@ -14,6 +14,7 @@ import { useAllPaymentTransactions } from '@/hooks/useEpointPayment';
 import { LocalizedInput } from "./ui/LocalizedInput";
 import { LocalizedTextarea } from "./ui/LocalizedTextarea";
 import { useAdminLocalize } from "@/contexts/AdminLanguageContext";
+import { epointFunctionUrl } from '@/lib/epoint';
 
 const statusConfig: Record<string, {label: string;color: string;icon: any;}> = {
   pending: { label: tr("adminepoint_gozleyir_9ac18a", "Gözləyir"), color: 'bg-yellow-500/10 text-yellow-600', icon: Clock },
@@ -89,9 +90,11 @@ const AdminEpoint = () => {
         single();
 
         if (existing) {
-          await supabase.from('app_settings').update({ value: setting.value }).eq('key', setting.key);
+          const { error } = await supabase.from('app_settings').update({ value: setting.value }).eq('key', setting.key);
+          if (error) throw error;
         } else {
-          await supabase.from('app_settings').insert({ key: setting.key, value: setting.value, description: `Epoint ${setting.key}` });
+          const { error } = await supabase.from('app_settings').insert({ key: setting.key, value: setting.value, description: `Epoint ${setting.key}` });
+          if (error) throw error;
         }
       }
 
@@ -246,7 +249,7 @@ const AdminEpoint = () => {
                 <div className="p-3 rounded-lg bg-muted/50">
                   <p className="font-medium text-foreground mb-1">Result URL (Callback)</p>
                   <code className="text-xs text-primary break-all">
-                    {`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'tntbjulojatnrqmylorp'}.supabase.co/functions/v1/epoint-payment?action=callback`}
+                    {epointFunctionUrl('callback')}
                   </code>
                 </div>
                 <p className="text-muted-foreground">

@@ -15,7 +15,25 @@ describe('classifyBp', () => {
     expect(classifyBp(125, 75, false).category).toBe('elevated');
   });
 
-  it('classifies stage1 hypertension (130-139/80-89)', () => {
+  it('does not label a single 120/80 reading as hypertension in either life stage', () => {
+    for (const isPregnant of [true, false]) {
+      const reading = classifyBp(120, 80, isPregnant);
+      expect(reading.label).not.toMatch(/hipertenziya|hypertension/i);
+      expect(reading.pregnancyAlert).toBe('none');
+    }
+    expect(classifyBp(120, 80, true).category).toBe('normal');
+  });
+
+  it('keeps borderline pregnancy readings under observation without using adult stage1 labels', () => {
+    expect(classifyBp(129, 84, true).category).toBe('normal');
+    expect(classifyBp(130, 75, true).category).toBe('elevated');
+    expect(classifyBp(120, 85, true).category).toBe('elevated');
+    expect(classifyBp(139, 89, true).category).toBe('elevated');
+    expect(classifyBp(140, 80, true).category).toBe('stage2');
+    expect(classifyBp(120, 90, true).category).toBe('stage2');
+  });
+
+  it('preserves the adult AHA monitoring range (130-139/80-89)', () => {
     expect(classifyBp(135, 85, false).category).toBe('stage1');
     // Sistolik aşağı olsa da diastolik tək başına stage1 həddinə çatdıra bilər
     expect(classifyBp(125, 82, false).category).toBe('stage1');

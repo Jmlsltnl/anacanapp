@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Settings, Bell, Shield, HelpCircle, LogOut,
+  Settings, Shield, HelpCircle, LogOut,
   ChevronRight, Crown, Copy, Share2,
   Heart, Calendar, Palette, ShieldCheck, Edit, CreditCard, Info, ArrowLeft, X,
   MessageCircle, Baby, ShoppingCart, TrendingUp, Gift, Plus, Trash2, Users,
@@ -11,13 +11,13 @@ import { useUserStore } from '@/store/userStore';
 import { useShallow } from 'zustand/react/shallow';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { useNotifications } from '@/hooks/useNotifications';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useChildren, Child } from '@/hooks/useChildren';
 import { PremiumModal } from '@/components/PremiumModal';
 import { useSubscription } from '@/hooks/useSubscription';
 import { nativeShare } from '@/lib/native';
+import { getPartnerCodeForSharing, getPartnerLinkErrorMessage, isAzurePartnerPairingEnabled } from '@/lib/partner-link';
 import BannerSlot from '@/components/banners/BannerSlot';
 import LanguageSelector from '@/components/LanguageSelector';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 
 import countriesData from '../../countries.json';
 import { tr } from "@/lib/tr";
+import { lifeStageName } from '@/lib/stage-names';
+import { moderatorText } from '@/lib/moderator-i18n';
 
 interface ProfileScreenProps {
   onNavigate?: (screen: string) => void;
@@ -35,16 +37,16 @@ interface ProfileScreenProps {
 const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   useScrollToTop();
   useScreenAnalytics('Profile', 'Profile');
+  const language = useUserStore(state => state.language);
 
   const { name, email, lifeStage, role } = useUserStore(
     useShallow((s) => ({ name: s.name, email: s.email, lifeStage: s.lifeStage, role: s.role }))
   );
-  const { signOut, profile, isAdmin } = useAuth();
+  const { signOut, profile, isAdmin, isModerator, refreshProfile } = useAuth();
   const { toast } = useToast();
-  const { unreadCount } = useNotifications();
   const { children, addChild, updateChild, deleteChild, getChildAge } = useChildren();
   const { isPremium } = useSubscription();
-  const [partnerCode] = useState(profile?.partner_code || 'ANACAN-XXXX');
+  const [partnerCode, setPartnerCode] = useState(profile?.partner_code || 'ANACAN-XXXX');
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [showPartnerInfo, setShowPartnerInfo] = useState(false);
   const [showChildModal, setShowChildModal] = useState(false);
@@ -105,13 +107,14 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
   { id: 'billing', icon: CreditCard, label: tr("profilescreen_abuneliyim_f6c8ed", 'Abunəliyim') },
   { id: 'referral', icon: Gift, label: tr("profilescreen_referral", 'Dostunu dəvət et'), badge: tr("profilescreen_referral_badge", '+7 gün') },
   { id: 'partners', icon: Sparkles, label: tr("profilescreen_partnyor_endirimleri_e44036", "Partnyor Endirimləri"), badge: tr("profilescreen_badge_yeni", "Yeni") },
-  { id: 'notifications', icon: Bell, label: tr("profilescreen_bildirisler_54eb88", 'Bildirişlər'), badge: unreadCount > 0 ? String(unreadCount) : undefined },
   { id: 'doctor-report', icon: FileText, label: tr("profilescreen_hekim_hesabati", 'Həkim Hesabatı (PDF)') },
   { id: 'health-sync', icon: HeartPulse, label: tr("settingsscreen_health_sync", "Sağlamlıq inteqrasiyası") },
   { id: 'appearance', icon: Palette, label: tr("profilescreen_gorunus_165fe3", 'Görünüş') },
   { id: 'calendar', icon: Calendar, label: tr("profilescreen_teqvim_ayarlari_012790", 'Təqvim Ayarları') },
   { id: 'privacy', icon: Shield, label: tr("profilescreen_gizlilik", "Gizlilik") },
   { id: 'help', icon: HelpCircle, label: tr("profilescreen_yardim_da857a", 'Yardım') },
+  { id: 'moderation-history', icon: Shield, label: moderatorText('user_history', language) },
+  ...(isModerator || isAdmin ? [{ id: 'moderator', icon: ShieldCheck, label: moderatorText('open_panel', language) }] : []),
   ...(isAdmin ? [
   { id: 'shop', icon: ShoppingCart, label: tr("profilescreen_magaza_test_72b060", 'Mağaza (Test)'), badge: 'Beta' },
   { id: 'admin', icon: ShieldCheck, label: tr("profilescreen_admin_panel", "Admin Panel"), badge: 'Admin' }] :
@@ -119,14 +122,37 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
 
 
   const copyPartnerCode = async () => {
+    let code = partnerCode;
+    if (isAzurePartnerPairingEnabled()) {
+      try {
+        code = await getPartnerCodeForSharing(partnerCode);
+        setPartnerCode(code);
+        await refreshProfile();
+      } catch (error) {
+        toast({ title: getPartnerLinkErrorMessage(error), variant: 'destructive' });
+        return;
+      }
+    }
     await nativeShare({
       title: tr("profile_partnyor_kodu", 'Partnyor Kodu'),
-      text: `${tr("profile_partnyor_kodum", 'Partnyor kodum')}: ${partnerCode}`
+      text: `${tr("profile_partnyor_kodum", 'Partnyor kodum')}: ${code}`
     });
   };
 
   const sharePartnerCode = async () => {
-    const shareText = `${tr("profile_share_partner_text", "Anacan tətbiqinə qoşul və hamiləlik səyahətimizdə mənə dəstək ol! Partnyor kodum:")} ${partnerCode}\n\n${tr("profile_download_app", "Tətbiqi yüklə:")} https://anacanapp.lovable.app`;
+    let code = partnerCode;
+    if (isAzurePartnerPairingEnabled()) {
+      try {
+        code = await getPartnerCodeForSharing(partnerCode);
+        setPartnerCode(code);
+        await refreshProfile();
+      } catch (error) {
+        toast({ title: getPartnerLinkErrorMessage(error), variant: 'destructive' });
+        return;
+      }
+    }
+    const shareUrl = isAzurePartnerPairingEnabled() ? window.location.origin : 'https://anacanapp.lovable.app';
+    const shareText = `${tr("profile_share_partner_text", "Anacan tətbiqinə qoşul və hamiləlik səyahətimizdə mənə dəstək ol! Partnyor kodum:")} ${code}\n\n${tr("profile_download_app", "Tətbiqi yüklə:")} ${shareUrl}`;
 
     const success = await nativeShare({
       title: tr("profile_partnyor_kodu", 'Partnyor Kodu'),
@@ -151,9 +177,9 @@ const ProfileScreen = ({ onNavigate }: ProfileScreenProps) => {
 
   const getStageInfo = () => {
     switch (lifeStage) {
-      case 'flow':return { name: 'Menstruasiya', emoji: '🌸', color: 'flow' };
-      case 'bump':return { name: tr("profilescreen_hamilelik_e86feb", "Hamiləlik"), emoji: '🤰', color: 'bump' };
-      case 'mommy':return { name: tr("profilescreen_analiq_9e762d", "Analıq"), emoji: '👶', color: 'mommy' };
+      case 'flow':return { name: lifeStageName('flow', language), emoji: '🌸', color: 'flow' };
+      case 'bump':return { name: lifeStageName('bump', language), emoji: '🤰', color: 'bump' };
+      case 'mommy':return { name: lifeStageName('mommy', language), emoji: '👶', color: 'mommy' };
       default:return { name: tr("profilescreen_secilmeyib_11e27e", "Seçilməyib"), emoji: '✨', color: 'primary' };
     }
   };

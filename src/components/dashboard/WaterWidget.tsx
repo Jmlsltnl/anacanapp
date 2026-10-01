@@ -3,6 +3,7 @@ import { Droplets, Plus } from 'lucide-react';
 import { useDailyLogs } from '@/hooks/useDailyLogs';
 import { useUserStore } from '@/store/userStore';
 import { tr } from '@/lib/tr';
+import { appLanguageLocale } from '@/lib/app-languages';
 
 // Fallback targets for different life stages
 const fallbackTargets = {
@@ -19,6 +20,7 @@ interface WaterWidgetProps {
 export default function WaterWidget({ variant = 'default' }: WaterWidgetProps) {
   const { todayLog, updateWaterIntake } = useDailyLogs();
   const lifeStage = useUserStore((s) => s.lifeStage);
+  const language = useUserStore((s) => s.language);
   
   const waterGlasses = todayLog?.water_intake || 0;
   const stage = lifeStage || 'flow';
@@ -36,9 +38,9 @@ export default function WaterWidget({ variant = 'default' }: WaterWidgetProps) {
           </span>
         </div>
         <div className="a-ring-hero">
-          <div className="a-ring" style={{ '--pct': percentage } as React.CSSProperties}>
+          <div className="a-ring a-water-ring" style={{ '--pct': percentage } as React.CSSProperties}>
             <div className="a-ring-inner">
-              <b>{Math.round(percentage)}%</b>
+              <b data-water-percentage><bdi>{new Intl.NumberFormat(appLanguageLocale(language), { style: 'percent', maximumFractionDigits: 0 }).format(percentage / 100)}</bdi></b>
               <span>{tr('mommy_daily_goal', 'günlük hədəf')}</span>
             </div>
           </div>

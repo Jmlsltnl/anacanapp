@@ -1,13 +1,12 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { saveScroll, restoreScroll } from '@/lib/scrollMemory';
-import SplashScreen from '@/components/SplashScreen';
+import SplashScreen, { needsBrandSplash } from '@/components/SplashScreen';
+import StartupScreen from '@/components/StartupScreen';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import logoImage from '@/assets/logo.png';
 import AppIntroduction from '@/components/AppIntroduction';
 import InitialLanguageScreen from '@/components/InitialLanguageScreen';
 import AuthScreen from '@/components/AuthScreen';
-import OnboardingScreen from '@/components/OnboardingScreen';
 import BottomNav from '@/components/BottomNav';
 import AppRatingPrompt from '@/components/AppRatingPrompt';
 import FloatingTimerWidget from '@/components/FloatingTimerWidget';
@@ -29,6 +28,11 @@ import { pushBackHandler } from '@/lib/backButton';
 import { PUSH_NAV_EVENT, consumePendingPushNav, type PushNavIntent } from '@/lib/pushNav';
 import { isCakesAvailable } from '@/lib/freemium';
 import type { CommunityDeepLinkTarget } from '@/components/community/CommunityScreen';
+import { AdSurface } from '@/components/ads/AdExperienceProvider';
+import { getBackendConfig } from '@/integrations/supabase/backend-config';
+import { hasPendingOnboarding } from '@/lib/onboarding-model';
+import { clearPendingBlog, pendingBlog, rememberBlog } from '@/lib/blog-links';
+import BlogLinkHost from '@/components/blog/BlogLinkHost';
 
 // PremiumOnboarding.PENDING_FUNNEL_KEY ilə sinxron saxlanmalıdır
 // (lazy chunk-u pozmamaq üçün static import edilmir)
@@ -36,7 +40,6 @@ const PENDING_FUNNEL_KEY = 'anacan_pending_funnel';
 
 // Lazy load heavy screens
 const PremiumOnboarding = lazy(() => import('@/components/onboarding/PremiumOnboarding'));
-const ReverseTrialFunnel = lazy(() => import('@/components/funnel/ReverseTrialFunnel'));
 const Dashboard = lazy(() => import('@/components/Dashboard'));
 const ToolsHub = lazy(() => import('@/components/ToolsHub'));
 const DoctorReportScreen = lazy(() => import('@/components/DoctorReportScreen'));
@@ -53,6 +56,8 @@ const HealthSyncScreen = lazy(() => import('@/components/HealthSyncScreen'));
 const ReferralScreen = lazy(() => import('@/components/ReferralScreen'));
 const CalendarScreen = lazy(() => import('@/components/CalendarScreen'));
 const AdminPanel = lazy(() => import('@/components/AdminPanel'));
+const ModeratorPanel = lazy(() => import('@/components/moderation/ModeratorPanel'));
+const MyModerationDecisions = lazy(() => import('@/components/moderation/MyModerationDecisions'));
 const MotherChatScreen = lazy(() => import('@/components/MotherChatScreen'));
 const MessagesScreen = lazy(() => import('@/components/MessagesScreen'));
 const CommunityScreen = lazy(() => import('@/components/community/CommunityScreen'));
@@ -64,6 +69,7 @@ const AppearanceScreen = lazy(() => import('@/components/AppearanceScreen'));
 const UserProfileScreen = lazy(() => import('@/components/community/UserProfileScreen'));
 const BillingScreen = lazy(() => import('@/components/BillingScreen'));
 const BlogScreen = lazy(() => import('@/components/BlogScreen'));
+const MommyPeriodTracker = lazy(() => import('@/components/mommy/MommyPeriodTracker'));
 const LegalScreen = lazy(() => import('@/components/LegalScreen'));
 const NameVotingScreen = lazy(() => import('@/components/partner/NameVotingScreen'));
 const PartnerHospitalBagScreen = lazy(() => import('@/components/partner/PartnerHospitalBagScreen'));
@@ -81,15 +87,9 @@ const LiveContractionsScreen = lazy(() => import('@/components/partner/v2/LiveCo
 const PartnerSharingScreen = lazy(() => import('@/components/partner/v2/PartnerSharingScreen'));
 const AlertReceiver = lazy(() => import('@/components/partner/v2/AlertReceiver'));
 const PartnersScreen = lazy(() => import('@/components/partners/PartnersScreen'));
+const AdPreferencesScreen = lazy(() => import('@/components/ads/AdPreferencesScreen'));
 
-const suspenseFallback = (
-  <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="flex flex-col items-center gap-4">
-      <img src={logoImage} alt="Anacan" className="w-16 h-16 object-contain animate-pulse" />
-      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-    </div>
-  </div>
-);
+const suspenseFallback = <StartupScreen />;
 
 const pageVariants = {
   initial: { opacity: 0, y: 10 },
@@ -104,11 +104,11 @@ type SwipeRestoreState =
   | { type: 'user-profile'; value: string }
   | null;
 
-const Index = () => {
-  const [showSplash, setShowSplash] = useState(true);
+const IndexContent = ({ blogOverlayOpen }: { blogOverlayOpen: boolean }) => {
+  const [showSplash, setShowSplash] = useState(needsBrandSplash);
   const [showIntro, setShowIntro] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
-  const [activeScreen, _setActiveScreen] = useState<string | null>(null);
+  const [activeScreen, _setActiveScreen] = useState<string | null>(() => { const slug = pendingBlog(); return slug ? `blog/${slug}` : null; });
   // Bildiriş/push-tap/deeplink ilə "Community-də MƏHZ bu postu/şərhi/story-ni
   // aç" niyyəti — CommunityScreen-ə prop kimi ötürülür (bax applyIntent,
   // handleDeeplink, NotificationsScreen çağırışı aşağıda).
@@ -148,7 +148,25 @@ const Index = () => {
     }))
   );
   const { isAdmin, loading, profile, user, profileLoaded } = useAuth();
-  const { forceUpdate, isLoading: forceUpdateLoading } = useForceUpdate();
+  useEffect(() => {
+    if (isAuthenticated && profileLoaded) {
+      const slug = pendingBlog();
+      if (slug) { setActiveScreen(`blog/${slug}`); clearPendingBlog(); }
+    }
+  }, [isAuthenticated, profileLoaded, setActiveScreen]);
+  const appliedAdPreviewLink = useRef(false);
+  useEffect(() => {
+    if (!isAdmin || !profileLoaded || appliedAdPreviewLink.current) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('ad_preview') !== '1') return;
+    appliedAdPreviewLink.current = true;
+    const screen = params.get('ad_screen');
+    if (screen === 'home' || screen === 'community' || screen === 'tools') setActiveTab(screen);
+    else if (screen === 'blog' || screen === 'article') setActiveScreen('blog');
+    else if (screen === 'recipes' || screen === 'names') { setActiveTab('tools'); setActiveTool(screen); setToolOpenedFromDashboard(false); }
+    else if (screen === 'ad_preferences') setActiveScreen('ad-preferences');
+  }, [isAdmin, profileLoaded, setActiveScreen]);
+  const { forceUpdate, updateRequired, isLoading: forceUpdateLoading } = useForceUpdate();
   // Moderasiya: tam blok (block_type='full') → tətbiq əvəzinə blok ekranı
   const { data: activeBlock } = useActiveBlock();
   // Premium onboarding (funnel ilə) — app_settings ilə idarə olunur; setting yoxdursa AKTİVDİR
@@ -194,19 +212,43 @@ const Index = () => {
 
   // Push bildirişi naviqasiyası: toxunuş → düzgün ekran/tab
   useEffect(() => {
+    if (!isAuthenticated || loading || !profileLoaded) return;
+
     const applyIntent = (intent: PushNavIntent) => {
+      // Push taps replace the current nested navigation, not just its tab.
+      setShowAdmin(false);
+      setViewingUserId(null);
+      setShowMotherChat(false);
+      setActiveScreen(null);
+      setActiveTool(null);
+      setToolOpenedFromDashboard(false);
+      setCommunityDeepLink(null);
+      swipeRestoreRef.current = null;
+      // ToolsHub reads initialTool only on mount.
+      setToolsResetKey((key) => key + 1);
+
       if (intent.motherChat) {
         // Partner rolunda söhbət ayrıca tab-dır; qadında MessagesScreen
         if (role === 'partner') setActiveTab('chat');else
         setShowMotherChat(true);
         return;
       }
+      if (intent.shoppingList) {
+        if (role === 'partner') {
+          setActiveTab('home');
+          setActiveScreen('partner-shopping');
+        } else {
+          setActiveTab('tools');
+          setActiveTool('shopping');
+          setToolOpenedFromDashboard(true);
+        }
+        return;
+      }
       if (intent.screen) {setActiveScreen(intent.screen);return;}
       if (intent.tab) {
-        setActiveScreen(null);
         setActiveTab(intent.tab);
-        if (intent.tab === 'community' && intent.communityTarget) {
-          setCommunityDeepLink(intent.communityTarget);
+        if (intent.tab === 'community') {
+          setCommunityDeepLink(intent.communityTarget ?? {});
         }
       }
     };
@@ -217,11 +259,14 @@ const Index = () => {
 
     const onPushNav = (e: Event) => {
       const intent = (e as CustomEvent<PushNavIntent>).detail;
-      if (intent) applyIntent(intent);
+      if (intent) {
+        consumePendingPushNav();
+        applyIntent(intent);
+      }
     };
     window.addEventListener(PUSH_NAV_EVENT, onPushNav);
     return () => window.removeEventListener(PUSH_NAV_EVENT, onPushNav);
-  }, [role]);
+  }, [role, isAuthenticated, loading, profileLoaded, setActiveScreen]);
 
   // Android hardware geri: ekran iyerarxiyasını addım-addım bağla
   // (sub-screen → tool → user-profil → söhbət → tab → home; sonra backButton.ts çıxış idarə edir)
@@ -270,6 +315,7 @@ const Index = () => {
         setToolOpenedFromDashboard(false);
         break;
       case 'screen':
+        if (parsed.params.screen.startsWith('blog/')) rememberBlog(parsed.params.screen.slice(5));
         setActiveScreen(parsed.params.screen);
         break;
       case 'messages':
@@ -392,7 +438,7 @@ const Index = () => {
     onSwipeForward: handleSwipeForward,
     edgeWidth: 55,
     threshold: 35,
-    enabled: isAuthenticated && !showSplash && !showIntro && !showAdmin
+    enabled: isAuthenticated && !showSplash && !showIntro && !showAdmin && !blogOverlayOpen
   });
 
   // Bypass language screen for existing users (who have seen intro or are logged in)
@@ -414,11 +460,12 @@ const Index = () => {
   };
 
   const renderContent = () => {
-    if (role === 'partner') {
+    if (role === 'partner' && activeTab !== 'community') {
       switch (activeTab) {
         case 'home':
           return (
             <motion.div key="partner-home" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+              <AdSurface id="home_banner" />
               <PartnerHomeScreen onNavigate={setActiveScreen} onOpenChat={() => setActiveTab('chat')} />
             </motion.div>
           );
@@ -431,7 +478,7 @@ const Index = () => {
         case 'chat':
           return (
             <motion.div key="partner-chat" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="h-full">
-              <PartnerChatScreen onBack={() => setActiveTab('home')} />
+              <MessagesScreen onBack={() => setActiveTab('home')} partnerProfileId={profile?.linked_partner_id} />
             </motion.div>
           );
         case 'ai':
@@ -455,6 +502,7 @@ const Index = () => {
       case 'home':
         return (
           <motion.div key="home" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+            <AdSurface id="home_banner" />
             <Dashboard onOpenChat={() => setShowMotherChat(true)} onNavigateToTool={handleNavigateToTool} onNavigate={setActiveScreen} />
           </motion.div>
         );
@@ -479,6 +527,8 @@ const Index = () => {
         return (
           <motion.div key="community" variants={pageVariants} initial="initial" animate="animate" exit="exit">
             <CommunityScreen
+              onOpenNotifications={() => setActiveScreen('notifications')}
+              onEditProfile={() => { if (user) setCommunityDeepLink({ userId: user.id }); setActiveScreen('edit-profile'); }}
               deepLinkTarget={communityDeepLink}
               onDeepLinkConsumed={() => setCommunityDeepLink(null)}
             />
@@ -532,24 +582,11 @@ const Index = () => {
 
   // Loading state
   if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background gap-4">
-        <img src={logoImage} alt="Anacan" className="w-16 h-16 object-contain animate-pulse" />
-        <div className="flex gap-1.5">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="w-2 h-2 rounded-full bg-primary animate-pulse"
-              style={{ animationDelay: `${i * 200}ms` }}
-            />
-          ))}
-        </div>
-      </div>
-    );
+    return <StartupScreen />;
   }
 
   // Force Update check
-  if (!forceUpdateLoading && forceUpdate?.enabled) {
+  if (!forceUpdateLoading && updateRequired && forceUpdate) {
     const ForceUpdateScreen = lazy(() => import('@/components/ForceUpdateScreen'));
     return (
       <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}>
@@ -600,31 +637,28 @@ const Index = () => {
   // onboarding GÖSTƏRMƏ — köhnə istifadəçi hər login-də modul seçiminə atılırdı.
   // Onboarding yalnız profil yüklənəndən SONRA hələ də isOnboarded=false qalıbsa
   // (həqiqətən yeni istifadəçi) və ya ad hələ soruşulmayıbsa açılır.
-  if ((!isOnboarded && !isPartnerUser) || needsName) {
+  const pendingJourney = !!user && !isPartnerUser && hasPendingOnboarding(user.id, getBackendConfig().url, profile?.onboarding_answers);
+  // Pre-v3 used an unbound "1" flag. It cannot identify the account after logout,
+  // so it must not enroll a different/existing user in a new purchase funnel.
+  const legacyPending = isOnboarded && !hasCompletedFunnel && !isPartnerUser && (() => {
+    try {
+      const value = JSON.parse(localStorage.getItem(PENDING_FUNNEL_KEY) || 'null');
+      return value?.userId === user?.id && value?.backend === getBackendConfig().url;
+    } catch { return false; }
+  })();
+  if ((!isOnboarded && !isPartnerUser) || needsName || pendingJourney || legacyPending) {
     if (!profileLoaded) {
       return suspenseFallback;
     }
-    return premiumOnboardingEnabled ?
-    <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PremiumOnboarding /></ErrorBoundary></Suspense> :
-    <OnboardingScreen />;
+    return <Suspense fallback={suspenseFallback}><ErrorBoundary key={`onboarding:${user?.id}`}>
+      <PremiumOnboarding key={`${getBackendConfig().url}:${user?.id}`} legacyPending={legacyPending} offerEnabled={premiumOnboardingEnabled}
+        onComplete={() => { setFunnelCompleted(true); }} />
+    </ErrorBoundary></Suspense>;
   }
 
   // Premium funnel: yalnız YENİ qeydiyyatdan dərhal sonra (PENDING_FUNNEL_KEY bayrağı).
   // Köhnə istifadəçilər / re-login / flag off → funnel atlanır (davranış dəyişməz).
   if (!hasCompletedFunnel) {
-    const pendingFunnel = (() => {
-      try {return localStorage.getItem(PENDING_FUNNEL_KEY) === '1';} catch {return false;}
-    })();
-    if (premiumOnboardingEnabled && !isPartnerUser && pendingFunnel) {
-      return (
-        <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}>
-          <ReverseTrialFunnel
-            onComplete={() => {
-              try {localStorage.removeItem(PENDING_FUNNEL_KEY);} catch {/* boş */}
-              setFunnelCompleted(true);
-            }} />
-        </ErrorBoundary></Suspense>);
-    }
     setFunnelCompleted(true);
   }
 
@@ -637,12 +671,21 @@ const Index = () => {
 
   // User Profile View (Community)
   if (viewingUserId) {
-    return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><UserProfileScreen userId={viewingUserId} onBack={() => setViewingUserId(null)} /></ErrorBoundary></Suspense>;
+    return <div className="a-subscreen" data-subscreen><Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><UserProfileScreen
+      key={viewingUserId} userId={viewingUserId} onBack={() => setViewingUserId(null)} onUserClick={setViewingUserId}
+      onSendMessage={(userId) => { setViewingUserId(null); setActiveTab('community'); setCommunityDeepLink({ dmUserId: userId }); }}
+      onEditProfile={() => { setViewingUserId(null); setActiveTab('community'); if (user) setCommunityDeepLink({ userId: user.id }); setActiveScreen('edit-profile'); }}
+    /></ErrorBoundary></Suspense></div>;
   }
 
   // Sub-screens
-  if (activeScreen === 'notifications') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><NotificationsScreen onBack={() => setActiveScreen(null)} onNavigateToCommunity={(target) => { setActiveScreen(null); setActiveTab('community'); if (target) setCommunityDeepLink(target); }} /></ErrorBoundary></Suspense>;
+  const subScreen = (() => {
+  if (activeScreen === 'mommy-period' && lifeStage === 'mommy') return <Suspense fallback={suspenseFallback}><ErrorBoundary><MommyPeriodTracker onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'moderator') return <Suspense fallback={suspenseFallback}><ErrorBoundary><ModeratorPanel onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'moderation-history') return <Suspense fallback={suspenseFallback}><ErrorBoundary><MyModerationDecisions onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'notifications') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><NotificationsScreen onBack={() => setActiveScreen(null)} onNavigateToModeration={() => setActiveScreen('moderation-history')} onNavigateToCommunity={(target) => { setActiveScreen(null); setActiveTab('community'); if (target) setCommunityDeepLink(target); }} /></ErrorBoundary></Suspense>;
   if (activeScreen === 'settings') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><SettingsScreen onBack={() => setActiveScreen(null)} onNavigate={setActiveScreen} /></ErrorBoundary></Suspense>;
+  if (activeScreen === 'ad-preferences') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><AdPreferencesScreen onBack={() => setActiveScreen('settings')} /></ErrorBoundary></Suspense>;
   if (activeScreen === 'health-sync') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><HealthSyncScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
   if (activeScreen === 'referral') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><ReferralScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
   if (activeScreen === 'doctor-report') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><DoctorReportScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
@@ -675,6 +718,9 @@ const Index = () => {
   if (activeScreen === 'live-contractions' && role === 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><LiveContractionsScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
   if (activeScreen === 'partner-sharing' && role !== 'partner') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PartnerSharingScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
   if (activeScreen === 'partners') return <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}><PartnersScreen onBack={() => setActiveScreen(null)} /></ErrorBoundary></Suspense>;
+  return null;
+  })();
+  if (subScreen) return <div className="a-subscreen" data-subscreen>{subScreen}</div>;
 
   // Messages screen (unified: partner + community DMs)
   if (showMotherChat) {
@@ -682,7 +728,7 @@ const Index = () => {
       <Suspense fallback={suspenseFallback}><ErrorBoundary key={String(activeScreen)}>
         <MessagesScreen 
           onBack={() => setShowMotherChat(false)} 
-          partnerId={profile?.linked_partner_id}
+          partnerProfileId={profile?.linked_partner_id}
         />
       </ErrorBoundary></Suspense>
     );
@@ -701,6 +747,8 @@ const Index = () => {
   return (
     <div
       className={`fixed inset-0 flex flex-col overflow-hidden ${isAnacanRedesignHome ? '' : 'bg-background'}`}
+      data-app-viewport
+      data-main-dashboard={activeTab === 'home' && !blogOverlayOpen ? 'true' : undefined}
       style={isAnacanRedesignHome ? { background: 'var(--a-bg)' } : undefined}
     >
       {/* App Rating Prompt */}
@@ -750,4 +798,5 @@ const Index = () => {
   );
 };
 
+const Index = () => <BlogLinkHost>{open => <IndexContent blogOverlayOpen={open} />}</BlogLinkHost>;
 export default Index;

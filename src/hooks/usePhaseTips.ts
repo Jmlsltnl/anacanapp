@@ -1,5 +1,7 @@
-import { tr } from "@/lib/tr";import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { tr, mapRowsTranslation } from "@/lib/tr";import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useUserStore } from '@/store/userStore';
+import { mapFollowupContent } from '@/lib/followup-content';
 
 export type MenstrualPhase = 'menstrual' | 'follicular' | 'ovulation' | 'luteal';
 export type TipCategory = 'general' | 'nutrition' | 'exercise' | 'selfcare' | 'mood' | 'intimacy';
@@ -29,25 +31,26 @@ export interface PhaseTip extends PhaseTipLoc {
 }
 
 export const PHASE_INFO: Record<MenstrualPhase, {label: string;labelAz: string;emoji: string;color: string;days: string;}> = {
-  menstrual: { label: 'Menstrual', labelAz: tr("usephasetips_menstrual_faza", 'Menstrual Faza'), emoji: '🩸', color: '#dc2626', days: '1-5' },
-  follicular: { label: 'Follicular', labelAz: tr("usephasetips_follikulyar_faza", 'Follikulyar Faza'), emoji: '🌱', color: '#16a34a', days: '6-13' },
-  ovulation: { label: 'Ovulation', labelAz: tr("usephasetips_ovulyasiya_fazasi_6f38a1", "Ovulyasiya Fazası"), emoji: '🌸', color: '#ec4899', days: '14-16' },
-  luteal: { label: 'Luteal', labelAz: tr("usephasetips_luteal_faza", 'Luteal Faza'), emoji: '🌙', color: '#8b5cf6', days: '17-28' }
+  menstrual: { label: 'Menstrual', get labelAz() { return tr("usephasetips_menstrual_faza", 'Menstrual Faza'); }, emoji: '🩸', color: '#dc2626', days: '1-5' },
+  follicular: { label: 'Follicular', get labelAz() { return tr("usephasetips_follikulyar_faza", 'Follikulyar Faza'); }, emoji: '🌱', color: '#16a34a', days: '6-13' },
+  ovulation: { label: 'Ovulation', get labelAz() { return tr("usephasetips_ovulyasiya_fazasi_6f38a1", "Ovulyasiya Fazası"); }, emoji: '🌸', color: '#ec4899', days: '14-16' },
+  luteal: { label: 'Luteal', get labelAz() { return tr("usephasetips_luteal_faza", 'Luteal Faza'); }, emoji: '🌙', color: '#8b5cf6', days: '17-28' }
 };
 
 export const CATEGORY_INFO: Record<TipCategory, {label: string;labelAz: string;emoji: string;}> = {
-  general: { label: 'General', labelAz: tr("usephasetips_umumi_1b5521", "Ümumi"), emoji: '💡' },
-  nutrition: { label: 'Nutrition', labelAz: tr("usephasetips_qidalanma", 'Qidalanma'), emoji: '🥗' },
-  exercise: { label: 'Exercise', labelAz: tr("usephasetips_mesq_046a80", "Məşq"), emoji: '🏃' },
-  selfcare: { label: 'Self-care', labelAz: tr("usephasetips_ozune_qulluq_8253b4", "Özünə Qulluq"), emoji: '💆' },
-  mood: { label: 'Mood', labelAz: tr("usephasetips_ehval_0457f9", "Əhval"), emoji: '😊' },
-  intimacy: { label: 'Intimacy', labelAz: tr("usephasetips_yaxinliq_5a99bb", "Yaxınlıq"), emoji: '💕' }
+  general: { label: 'General', get labelAz() { return tr("usephasetips_umumi_1b5521", "Ümumi"); }, emoji: '💡' },
+  nutrition: { label: 'Nutrition', get labelAz() { return tr("usephasetips_qidalanma", 'Qidalanma'); }, emoji: '🥗' },
+  exercise: { label: 'Exercise', get labelAz() { return tr("usephasetips_mesq_046a80", "Məşq"); }, emoji: '🏃' },
+  selfcare: { label: 'Self-care', get labelAz() { return tr("usephasetips_ozune_qulluq_8253b4", "Özünə Qulluq"); }, emoji: '💆' },
+  mood: { label: 'Mood', get labelAz() { return tr("usephasetips_ehval_0457f9", "Əhval"); }, emoji: '😊' },
+  intimacy: { label: 'Intimacy', get labelAz() { return tr("usephasetips_yaxinliq_5a99bb", "Yaxınlıq"); }, emoji: '💕' }
 };
 
 // Hook for fetching tips by phase (public use)
 export const usePhaseTips = (phase: MenstrualPhase) => {
+  const language = useUserStore(state => state.language);
   return useQuery({
-    queryKey: ['phase-tips', phase],
+    queryKey: ['phase-tips', phase, language],
     queryFn: async () => {
       const { data, error } = await supabase.
       from('menstruation_phase_tips').
@@ -57,7 +60,7 @@ export const usePhaseTips = (phase: MenstrualPhase) => {
       order('sort_order', { ascending: true });
 
       if (error) throw error;
-      return data as PhaseTip[];
+      return mapFollowupContent(data, language, ['title', 'content']) as PhaseTip[];
     },
     staleTime: 5 * 60 * 1000 // 5 minutes
   });

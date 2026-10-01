@@ -1,5 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { quotaManagedStorage } from '@/lib/local-storage';
+import { normalizeAppLanguage } from '@/lib/app-languages';
 import type { LifeStage, UserRole, DailyLog, CycleData, PregnancyData, BabyData, DeliveryType, PostpartumData } from '@/types/anacan';
 import { FRUIT_SIZES } from '@/types/anacan';
 import { getPregnancyWeek, getDayInWeek, getTrimester, calculateDueDate, getRealCalendarAge } from '@/lib/pregnancy-utils';
@@ -165,6 +167,7 @@ export const useUserStore = create<UserState>()(
       setDeliveryType: (deliveryType) => set({ deliveryType }),
 
   setLanguage: (lang) => {
+    lang = normalizeAppLanguage(lang);
     set({ language: lang });
     // KRİTİK: getLocaleTag() bunu oxuyur — tarix/ay/həftə adlarının
     // düzgün lokalda formatlanması üçün (əvvəllər yazılmırdı → həmişə az-AZ idi)
@@ -313,6 +316,7 @@ export const useUserStore = create<UserState>()(
     }),
     {
       name: 'anacan-user-store',
+      storage: createJSONStorage(() => quotaManagedStorage(localStorage, { bestEffort: true })),
       partialize: (state) => ({
         isAuthenticated: state.isAuthenticated,
         isOnboarded: state.isOnboarded,

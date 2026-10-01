@@ -17,6 +17,8 @@ import {
 import { tr } from '@/lib/tr';
 import { hapticFeedback } from '@/lib/native';
 import { trTierName } from '../tierLabels';
+import { useGameAds, type GameReviveBenefits } from '@/hooks/useGameAds';
+import GameReviveAction from '../GameReviveAction';
 import {
   GOOD_ITEMS,
   BAD_ITEMS,
@@ -95,6 +97,14 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
   // happens to re-run (e.g. due to a parent re-render recreating the
   // onLevelComplete prop reference right as a round ends).
   const completedRef = useRef(false);
+  const restoreRound = useCallback((benefits: GameReviveBenefits) => {
+    livesRef.current = Math.min(config.lives, benefits.lives);
+    setLives(livesRef.current); setTimeLeft(value => Math.max(value, benefits.seconds));
+    objectsRef.current = []; setObjects([]); setFloatingTexts([]);
+    completedRef.current = false; lastFrameRef.current = 0; spawnAccumulatorRef.current = 0;
+    phaseRef.current = 'playing'; setPhase('playing');
+  }, [config.lives]);
+  const gameAds = useGameAds('saglam-sebet', phase, restoreRound);
   // Pending window.setTimeout ids (floating +/- text, catch pulse, shake)
   // so they can be cancelled on unmount instead of firing setState on a
   // component that's no longer mounted (e.g. player exits mid-animation).
@@ -338,9 +348,9 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
   };
 
   const handleRetry = () => {
-    resetGame();
-    startCountdown();
-    onRetry?.();
+    void gameAds.transition(() => {
+      resetGame(); gameAds.resetRound(); startCountdown(); onRetry?.();
+    });
   };
 
   // Pointer / touch drag handling for the basket
@@ -361,7 +371,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
   // PORTAL: transform-lu valideynlərdə (motion kartlar) fixed overlay stacking
   // context tələsinə düşüb nav-ın altında qalırdı → səbət görünmürdü.
   return createPortal(
-    <div className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-b from-sky-100 via-emerald-50 to-amber-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="fixed inset-0 z-[60] flex flex-col bg-gradient-to-b from-sky-100 via-emerald-50 to-amber-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800" data-ad-block="true" data-ad-allow={gameAds.allowedPlacements} data-game-phase={phase} data-game-lives={lives} data-game-score={score}>
       {/* Status bar spacer */}
       <div className="flex-shrink-0" style={{ height: 'env(safe-area-inset-top)' }} />
 
@@ -369,7 +379,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
       <div className="flex-shrink-0 px-3 pt-2 pb-2 bg-background/70 backdrop-blur-md border-b border-border/40 relative z-20">
         <div className="flex items-center gap-2">
           <motion.button
-            onClick={() => (phase === 'playing' ? setPhase('paused') : onExit())}
+            onClick={() => (phase === 'playing' ? setPhase('paused') : void gameAds.transition(onExit))}
             whileTap={{ scale: 0.9 }}
             className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center flex-shrink-0"
           >
@@ -583,7 +593,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
             </motion.button>
             <motion.button
               whileTap={{ scale: 0.95 }}
-              onClick={onExit}
+              onClick={() => { void gameAds.transition(onExit); }}
               className="w-48 py-3 rounded-2xl bg-muted text-foreground font-semibold flex items-center justify-center gap-2"
             >
               <Home className="w-4 h-4" /> {tr('saglamsebet_menu_button', 'Menyu')}
@@ -624,7 +634,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
               {level < TOTAL_LEVELS && onNextLevel && (
                 <motion.button
                   whileTap={{ scale: 0.95 }}
-                  onClick={onNextLevel}
+                  onClick={() => { void gameAds.transition(onNextLevel); }}
                   className="py-3 rounded-2xl gradient-primary text-white font-bold shadow-button"
                 >
                   {tr('saglamsebet_next_level_button', 'Növbəti səviyyə')}
@@ -639,7 +649,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                onClick={onExit}
+                onClick={() => { void gameAds.transition(onExit); }}
                 className="py-3 rounded-2xl bg-muted/60 text-muted-foreground font-medium flex items-center justify-center gap-2"
               >
                 <Home className="w-4 h-4" /> {tr('saglamsebet_menu_button', 'Menyu')}
@@ -663,6 +673,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
               {tr('saglamsebet_your_score_prefix', 'Xalınız')}: <span className="font-bold text-foreground">{score}</span> / {config.targetScore}
             </p>
             <div className="flex flex-col gap-2 w-full max-w-[260px] mt-3">
+              <GameReviveAction ads={gameAds} game="basket" />
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={handleRetry}
@@ -672,7 +683,7 @@ const SaglamSebetGame = ({ level, onExit, onLevelComplete, onRetry, onNextLevel 
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                onClick={onExit}
+                onClick={() => { void gameAds.transition(onExit); }}
                 className="py-3 rounded-2xl bg-muted text-foreground font-semibold flex items-center justify-center gap-2"
               >
                 <Home className="w-4 h-4" /> {tr('saglamsebet_menu_button', 'Menyu')}

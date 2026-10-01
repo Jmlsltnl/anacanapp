@@ -1,4 +1,4 @@
-import { tr } from "@/lib/tr";import { lazy, Suspense, useState } from 'react';
+import { tr } from "@/lib/tr";import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Sparkles, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,15 @@ const fallback =
 const PartnerAIPremiumGate = () => {
   const { isPremium, loading } = useSubscription();
   const [showModal, setShowModal] = useState(false);
+  const hadPremium = useRef(false);
+
+  useEffect(() => {
+    if (isPremium) { hadPremium.current = true; return; }
+    if (hadPremium.current) {
+      hadPremium.current = false;
+      setShowModal(true);
+    }
+  }, [isPremium]);
 
   if (loading) return fallback;
 

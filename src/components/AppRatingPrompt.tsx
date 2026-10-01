@@ -4,9 +4,11 @@ import { Star, X, Clock } from 'lucide-react';
 import { useAppRating, openAppStore, requestNativeReview } from '@/hooks/useAppRating';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/native';
+import { useAdSafetyBlock } from '@/components/ads/AdExperienceProvider';
 
 const AppRatingPrompt = () => {
   const { shouldShowPrompt, recordAction } = useAppRating();
+  useAdSafetyBlock(shouldShowPrompt);
   const [selectedStars, setSelectedStars] = useState(0);
   const [hoveredStars, setHoveredStars] = useState(0);
 
@@ -45,7 +47,7 @@ const AppRatingPrompt = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+        className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" data-ad-block="true"
         onClick={handleLater}>
         
           <motion.div

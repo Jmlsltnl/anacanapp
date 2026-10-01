@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { getLocaleTag } from '@/lib/i18n';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -24,6 +24,12 @@ import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 
 import { maternityRules, MaternityRule } from '@/data/maternityRules';
+import { REGIONAL_MATERNITY_COUNTRIES, isRegionalMaternityCountry } from '@/lib/maternity-regional';
+import { localizedCountryName } from '@/lib/app-languages';
+import { regionalCountry } from '@/lib/vaccine-schedule';
+import RegionalMaternityCalculator from './RegionalMaternityCalculator';
+
+const maternityCountryCodes = [...new Set([...maternityRules.map(rule => rule.code), ...REGIONAL_MATERNITY_COUNTRIES])];
 
 interface MaternityCalculatorProps {
   onBack: () => void;
@@ -47,11 +53,15 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
   // 27 ölkəni dəstəklədiyi üçün siyahıda olmayan ölkələr üçün dilə-əsaslı təxminə enirik;
   // istifadəçi istənilən vaxt açılan siyahıdan dəyişə bilər.
   const [selectedCountryCode, setSelectedCountryCode] = useState<string>(() => {
-    const realCountry = (profile as any)?.country_code || storeCountryCode;
-    const supported = maternityRules.some((r) => r.code === realCountry);
-    if (realCountry && supported) return realCountry;
-    return language === 'tr' ? 'TR' : language === 'ru' || language === 'kk' || language === 'uz' ? 'RU' : language === 'ka' ? 'GE' : language === 'de' ? 'DE' : language === 'ar' ? 'SA' : 'AZ';
+    const country = regionalCountry(language, profile?.country_code, storeCountryCode);
+    return maternityCountryCodes.includes(country) ? country : 'AZ';
   });
+  const countryChosen = useRef(false);
+  useEffect(() => {
+    if (countryChosen.current) return;
+    const country = regionalCountry(language, profile?.country_code, storeCountryCode);
+    if (maternityCountryCodes.includes(country)) setSelectedCountryCode(country);
+  }, [profile?.country_code, storeCountryCode, language]);
   const [eddDate, setEddDate] = useState<string>('');
   const [role, setRole] = useState<'mother' | 'father'>('mother');
 
@@ -78,6 +88,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
   
   const [result, setResult] = useState<any>(null);
   const [expandedGuideline, setExpandedGuideline] = useState<string | null>(null);
+  const chooseCountry = (country: string) => { countryChosen.current = true; setSelectedCountryCode(country); setResult(null); setSalary(''); };
 
   const selectedRule = useMemo(() => {
     return maternityRules.find(r => r.code === selectedCountryCode) || maternityRules[0];
@@ -231,6 +242,9 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
         icon: g.icon
       }));
 
+  if (isRegionalMaternityCountry(selectedCountryCode)) return <RegionalMaternityCalculator key={selectedCountryCode} country={selectedCountryCode}
+    countries={maternityCountryCodes} initialDueDate={eddDate || profile?.due_date?.slice(0, 10)} onCountryChange={chooseCountry} onBack={onBack} />;
+
   if (loading) {
     return (
       <div className="a-scope min-h-screen flex items-center justify-center" style={{ background: 'var(--a-bg)' }}>
@@ -252,7 +266,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
-              <p className="a-eyebrow">{isAZ ? selectedRule.name_az : selectedRule.name_en} {selectedRule.flag}</p>
+              <p className="a-eyebrow">{localizedCountryName(selectedCountryCode, language)} {selectedRule.flag}</p>
               <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("maternitycalculator_title_3c7a2d", "Dekret Kalkulyatoru")}</p>
             </div>
           </div>
@@ -284,15 +298,14 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               <div className="a-card-head" style={{ marginBottom: 10 }}>
                 <h3 className="a-card-title a-heading">🌍 {tr("country", "Ölkə")}</h3>
               </div>
-              <Select value={selectedCountryCode} onValueChange={setSelectedCountryCode}>
+              <Select value={selectedCountryCode} onValueChange={chooseCountry}>
                 <SelectTrigger className="h-12 rounded-xl border-0 text-sm font-semibold" style={{ background: 'var(--a-surface-soft)', color: 'var(--a-ink)' }}>
                   <SelectValue placeholder={tr("select_country", "Ölkə seçin")} />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
-                  {maternityRules.map((country) => (
-                    <SelectItem key={country.code} value={country.code} className="text-base py-3">
-                      <span className="me-2 text-xl">{country.flag}</span>
-                      {isAZ ? country.name_az : country.name_en}
+                  {maternityCountryCodes.map((code) => (
+                    <SelectItem key={code} value={code} className="text-base py-3">
+                      {localizedCountryName(code, language)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -332,16 +345,20 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="a-card">
-              <div className="a-card-head" style={{ marginBottom: 10 }}>
-                <h3 className="a-card-title a-heading">📅 {tr("maternitycalculator_edd_date", "Təxmini Doğuş Tarixi (EDD)")}</h3>
+              className="a-card min-w-0">
+              <div className="a-card-head min-w-0" style={{ marginBottom: 10 }}>
+                <h3 id="maternity-edd-label" className="a-card-title a-heading flex min-w-0 items-start gap-2" style={{ lineHeight: 1.4 }}>
+                  <span aria-hidden="true" className="shrink-0">📅</span>
+                  <span className="min-w-0" style={{ overflowWrap: 'anywhere' }}>{tr("maternitycalculator_edd_date", "Təxmini Doğuş Tarixi (EDD)")}</span>
+                </h3>
               </div>
               <input
                 type="date"
+                aria-labelledby="maternity-edd-label"
                 value={eddDate}
                 onChange={(e) => setEddDate(e.target.value)}
-                className="a-input"
-                style={{ width: '100%', padding: '13px 14px', fontSize: 14 }}
+                className="a-input a-date-input"
+                style={{ padding: '13px 14px', fontSize: 14 }}
               />
             </motion.div>
 
@@ -475,7 +492,7 @@ const MaternityCalculator = ({ onBack }: MaternityCalculatorProps) => {
                         <div className="relative">
                           <span className="absolute top-1 w-4 h-4 rounded-full" style={{ insetInlineStart: -33, background: 'var(--a-yellow-1)', border: '2.5px solid var(--a-yellow-2)' }} />
                           <p className="a-list-title">{formatDate(new Date(eddDate))}</p>
-                          <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{tr("maternitycalculator_edd_date", "Təxmini Doğuş Tarixi (EDD)")}</p>
+                          <p className="a-list-sub" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{tr("maternitycalculator_edd_date", "Təxmini Doğuş Tarixi (EDD)")}</p>
                         </div>
                       )}
                       

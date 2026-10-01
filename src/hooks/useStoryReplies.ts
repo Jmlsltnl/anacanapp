@@ -86,14 +86,14 @@ export const useCreateStoryReply = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase.
-      from('story_replies' as any).
-      insert({ story_id: storyId, user_id: user.id, content });
+      const { data: insertedReply, error } = await supabase.
+      from('story_replies').
+      insert({ story_id: storyId, user_id: user.id, content }).select('id').single();
 
       if (error) throw error;
 
       // Push bildirişi ARXA PLANDA — story sahibinə (özünə deyilsə)
-      if (storyAuthorId && storyAuthorId !== user.id) {
+      if (storyAuthorId && storyAuthorId !== user.id && insertedReply?.id) {
         void (async () => {
           try {
             const preview = content.length > 50 ? `${content.slice(0, 50)}...` : content;
@@ -102,7 +102,7 @@ export const useCreateStoryReply = () => {
               userId: storyAuthorId,
               title: tr('usestoryreplies_yeni_cavab_923a12', 'Yeni cavab 💬'),
               body: `${replierName || tr("usestoryreplies_i_stifadeci_b6bdd6", "\u0130stifad\u0259\xE7i")}: ${preview}`,
-              data: { type: 'story_reply', storyId, context: 'community_story' },
+              data: { type: 'story_reply', storyId, context: 'community_story', interactionId: insertedReply.id },
               kind: 'story_reply'
             });
           } catch (e) {console.error('Story reply notification error:', e);}

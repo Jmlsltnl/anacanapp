@@ -64,11 +64,13 @@ export function parseDeeplink(url: string): ParsedDeeplink | null {
   let path = '';
 
   try {
-    if (url.startsWith('anacan://')) {
-      // anacan://tool/baby-names → /tool/baby-names
-      path = '/' + url.replace('anacan://', '');
-    } else if (url.includes('app.anacan.az')) {
+    if (url.startsWith('anacan://') || url.startsWith('com.atlasoon.anacan://')) {
       const parsed = new URL(url);
+      if (parsed.username || parsed.password || parsed.port) return null;
+      path = '/' + parsed.hostname + parsed.pathname;
+    } else if (/^https:\/\//.test(url)) {
+      const parsed = new URL(url);
+      if (!['app.anacan.az','api.anacan.az'].includes(parsed.hostname) || parsed.username || parsed.password || parsed.port) return null;
       path = parsed.pathname;
     } else if (url.startsWith('/')) {
       path = url;
@@ -107,7 +109,10 @@ export function parseDeeplink(url: string): ParsedDeeplink | null {
   // Blog
   if (path === '/blog') return { action: 'screen', params: { screen: 'blog' } };
   const blogMatch = path.match(/^\/blog\/([^/]+)$/);
-  if (blogMatch) return { action: 'screen', params: { screen: `blog/${blogMatch[1]}` } };
+  if (blogMatch) {
+    try { const slug = decodeURIComponent(blogMatch[1]); if (/[\s/\\\u0000-\u001f<>]/.test(slug) || slug === '.' || slug === '..') return null;
+      return { action: 'screen', params: { screen: `blog/${slug}` } }; } catch { return null; }
+  }
 
   // Messages
   if (path === '/messages') return { action: 'messages', params: {} };
@@ -156,14 +161,13 @@ format: 'scheme' | 'universal' = 'universal')
 export function initDeeplinkListener(handler: (parsed: ParsedDeeplink) => void) {
   if (!Capacitor.isNativePlatform()) return () => {};
 
-  let cleanup: (() => void) | undefined;
+  let cleanup: (() => void) | undefined, cancelled = false;
 
-  import('@capacitor/app').then(({ App }) => {
+  import('@capacitor/app').then(async ({ App }) => {
     // Handle app opened via URL (cold start or background)
     const listener = App.addListener('appUrlOpen', (event) => {
-      console.log('[Deeplink] URL received:', event.url);
       const parsed = parseDeeplink(event.url);
-      if (parsed) {
+      if (parsed && !cancelled) {
         handler(parsed);
       }
     });
@@ -171,9 +175,16 @@ export function initDeeplinkListener(handler: (parsed: ParsedDeeplink) => void) 
     cleanup = () => {
       listener.then((l) => l.remove());
     };
+    if (cancelled) { cleanup(); return; }
+    if (!launchLinkChecked) {
+      launchLinkChecked = true;
+      const launch = await App.getLaunchUrl().catch(() => undefined);
+      if (launch?.url && !cancelled) { const parsed = parseDeeplink(launch.url); if (parsed) handler(parsed); }
+    }
   }).catch((err) => {
     console.warn('[Deeplink] Failed to init listener:', err);
   });
 
-  return () => cleanup?.();
+  return () => { cancelled = true; cleanup?.(); };
 }
+let launchLinkChecked = false;

@@ -7,9 +7,12 @@ import {
 import { usePartnerWeeklyStats } from '@/hooks/usePartnerWeeklyStats';
 import { useIsRtl, rtlX } from '@/lib/rtl';
 import { useUserStore } from '@/store/userStore';
+import { weekdayLabels } from '@/lib/date-utils';
+import { NEW_LANGUAGE_CODES } from '@/lib/app-languages';
 
 // Həftə günü qısaltmaları (bazar = index 0) — VitaminTracker ilə eyni sistem
 const getDayLabels = (language: string) => {
+  if ((NEW_LANGUAGE_CODES as readonly string[]).includes(language)) return weekdayLabels(language);
   if (language === 'en') return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   if (language === 'ru') return ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
   if (language === 'tr') return ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];

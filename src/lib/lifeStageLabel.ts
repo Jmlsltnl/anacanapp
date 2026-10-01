@@ -1,4 +1,4 @@
-import { tr } from '@/lib/tr';
+import { lifeStageName } from './stage-names';
 
 export interface LifeStageMeta {
   label: string;
@@ -15,11 +15,11 @@ export interface LifeStageMeta {
 export function getLifeStageMeta(stage?: string | null): LifeStageMeta | null {
   switch (stage) {
     case 'flow':
-      return { label: 'Flow', bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
+      return { label: lifeStageName('flow'), bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' };
     case 'bump':
-      return { label: tr('userprofilescreen_hamile_0080af', 'Hamilə'), bg: 'var(--a-peach-1)', ink: 'var(--a-accent-ink)' };
+      return { label: lifeStageName('bump'), bg: 'var(--a-peach-1)', ink: 'var(--a-accent-ink)' };
     case 'mommy':
-      return { label: tr('common_ana', 'Ana'), bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
+      return { label: lifeStageName('mommy'), bg: 'var(--a-lav-1)', ink: 'var(--a-lav-ink)' };
     case 'partner':
       return { label: 'Partner', bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' };
     default:

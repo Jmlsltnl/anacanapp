@@ -15,6 +15,8 @@ import { useFlowDailyLog, useSaveFlowDailyLog, useFlowSymptoms, FlowDailyLog } f
 import { useUserStore } from '@/store/userStore';
 import { toast } from 'sonner';
 import { tr } from "@/lib/tr";
+import { usePeriodDayLogs } from '@/hooks/usePeriodDayLogs';
+import { periodFlowLabel } from '@/lib/period-flow';
 
 interface FlowDailyLoggerProps {
   date?: Date;
@@ -38,7 +40,8 @@ const ENERGY_OPTIONS = [
 { value: 5, icon: Sparkles, label: tr("flowdailylogger_cox_yuksek_c4d475", 'Çox yüksək'), color: 'text-amber-500' }];
 
 
-const FLOW_OPTIONS = [
+const flowOptions = () => [
+{ value: 'unspecified', label: tr('flow_had_flow', 'Axın oldu'), emoji: '🩸', color: 'bg-red-100' },
 { value: 'none', label: tr("common_yoxdur", 'Yoxdur'), emoji: '⚪', color: 'bg-slate-100' },
 { value: 'spotting', label: tr("flowdailylogger_lekelenme_8e7b1e", 'Ləkələnmə'), emoji: '🔵', color: 'bg-blue-100' },
 { value: 'light', label: tr("flowdailylogger_yungul_2a8010", 'Yüngül'), emoji: '🩸', color: 'bg-red-100' },
@@ -87,11 +90,15 @@ const OPK_OPTIONS = [
 const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDailyLoggerProps) => {
   const dateStr = format(date, 'yyyy-MM-dd');
   const { data: existingLog, isLoading } = useFlowDailyLog(dateStr);
+  const { data: periodLogs = [] } = usePeriodDayLogs();
+  const periodLog = periodLogs.find(log => log.log_date === dateStr);
+  const existingFlow = periodLog ? periodFlowLabel(periodLog.flow_intensity) : existingLog?.flow_intensity ?? null;
   const { data: symptoms = [] } = useFlowSymptoms();
   const saveLog = useSaveFlowDailyLog();
   const language = useUserStore((s) => s.language);
 
   const [expanded, setExpanded] = useState(!compact);
+  const [flowEdited, setFlowEdited] = useState(false);
   const [formData, setFormData] = useState<Partial<FlowDailyLog>>({
     mood: null,
     energy_level: null,
@@ -110,25 +117,24 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
   });
 
   useEffect(() => {
-    if (existingLog) {
       setFormData({
-        mood: existingLog.mood,
-        energy_level: existingLog.energy_level,
-        symptoms: existingLog.symptoms || [],
-        pain_level: existingLog.pain_level,
-        flow_intensity: existingLog.flow_intensity,
-        sleep_hours: existingLog.sleep_hours,
-        sleep_quality: existingLog.sleep_quality,
-        temperature: existingLog.temperature,
-        water_glasses: existingLog.water_glasses || 0,
-        notes: existingLog.notes,
-        cervical_mucus: (existingLog as any).cervical_mucus ?? null,
-        sexual_activity: (existingLog as any).sexual_activity ?? null,
-        libido: (existingLog as any).libido ?? null,
-        ovulation_test: (existingLog as any).ovulation_test ?? null
+        mood: existingLog?.mood ?? null,
+        energy_level: existingLog?.energy_level ?? null,
+        symptoms: existingLog?.symptoms || [],
+        pain_level: existingLog?.pain_level ?? null,
+        flow_intensity: existingFlow,
+        sleep_hours: existingLog?.sleep_hours ?? null,
+        sleep_quality: existingLog?.sleep_quality ?? null,
+        temperature: existingLog?.temperature ?? null,
+        water_glasses: existingLog?.water_glasses || 0,
+        notes: existingLog?.notes ?? null,
+        cervical_mucus: existingLog?.cervical_mucus ?? null,
+        sexual_activity: existingLog?.sexual_activity ?? null,
+        libido: existingLog?.libido ?? null,
+        ovulation_test: existingLog?.ovulation_test ?? null
       });
-    }
-  }, [existingLog]);
+      setFlowEdited(false);
+  }, [dateStr, existingLog, existingFlow]);
 
   const toggleSymptom = (symptomKey: string) => {
     setFormData((prev) => ({
@@ -143,7 +149,8 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
     try {
       await saveLog.mutateAsync({
         log_date: dateStr,
-        ...formData
+        ...formData,
+        flow_intensity: flowEdited ? formData.flow_intensity : undefined,
       });
       toast.success(tr("flowdailylogger_gundelik_qeyd_saxlanildi_03bc8a", "G\xFCnd\u0259lik qeyd saxlan\u0131ld\u0131!"));
       onSave?.();
@@ -157,7 +164,7 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
     energy_level: existingLog?.energy_level ?? null,
     symptoms: existingLog?.symptoms || [],
     pain_level: existingLog?.pain_level ?? null,
-    flow_intensity: existingLog?.flow_intensity ?? null,
+    flow_intensity: existingFlow,
     sleep_hours: existingLog?.sleep_hours ?? null,
     sleep_quality: existingLog?.sleep_quality ?? null,
     temperature: existingLog?.temperature ?? null,
@@ -271,13 +278,14 @@ const FlowDailyLogger = ({ date = new Date(), compact = false, onSave }: FlowDai
                   <Droplets className="w-4 h-4 text-red-500" /> {tr("flowdailylogger_qanaxma_e42bdc", "Qanaxma")}
                 </label>
                 <div className="flex gap-2 flex-wrap">
-                  {FLOW_OPTIONS.map((option) =>
+                  {flowOptions().map((option) =>
                 <button
                   key={option.value}
-                  onClick={() => setFormData((prev) => ({
+                  aria-pressed={formData.flow_intensity === option.value}
+                  onClick={() => { setFlowEdited(true); setFormData((prev) => ({
                     ...prev,
                     flow_intensity: option.value as FlowDailyLog['flow_intensity']
-                  }))}
+                  })); }}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   formData.flow_intensity === option.value ?
                   `${option.color} border-2 border-red-300` :

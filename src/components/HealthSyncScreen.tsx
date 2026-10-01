@@ -3,7 +3,7 @@ import { getLocaleTag } from '@/lib/i18n';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Activity, Footprints, HeartPulse, Link2, Settings2, Download, Dumbbell, Wind } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -27,25 +27,29 @@ interface Props {
   onBack: () => void;
 }
 
-/**
- * Sağlamlıq inteqrasiyası — Apple Health (iOS) / Health Connect (Android).
- * Qoşulma, günlük addım/kalori, son məşqlər.
- */
+/** Apple Health integration on iOS; optional cycle writes only on Android. */
 const HealthSyncScreen = ({ onBack }: Props) => {
   useScrollToTop();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const isIos = Capacitor.getPlatform() === 'ios';
+  const isAndroid = isNativeHealthPlatform() && Capacitor.getPlatform() === 'android';
   const platformName = isIos ? 'Apple Health' : 'Health Connect';
 
   const [connected, setConnected] = useState(isHealthConnected());
   const [connecting, setConnecting] = useState(false);
 
-  // Tsikl yazma toggle-u (yalnız flow istifadəçiləri üçün göstərilir)
+  // Flow users can enable cycle writes; prior Android opt-ins can always be disabled.
   const lifeStage = useUserStore((s) => s.lifeStage);
   const [cycleWrite, setCycleWrite] = useState(isCycleWriteEnabled());
   const [cycleWriteBusy, setCycleWriteBusy] = useState(false);
+  const { data: cycleAvailable } = useQuery({
+    queryKey: ['health-cycle-write-available'],
+    queryFn: isCycleWriteAvailable,
+    enabled: isAndroid,
+    staleTime: 60 * 1000
+  });
 
   const toggleCycleWrite = async (on: boolean) => {
     if (!on) {
@@ -59,7 +63,9 @@ const HealthSyncScreen = ({ onBack }: Props) => {
       setCycleWriteBusy(false);
       toast({
         title: tr('hc_write_unavailable', 'Mövcud deyil'),
-        description: tr('hc_write_unavailable_desc', 'Yazma üçün tətbiqin yeni native build-i lazımdır'),
+        description: isAndroid ?
+          tr('health_android_unavailable_desc', 'Health Connect bu cihazda əlçatan deyil. Quraşdırılması və ya yenilənməsi tələb oluna bilər.') :
+          tr('hc_write_unavailable_desc', 'Yazma üçün tətbiqin yeni native build-i lazımdır'),
         variant: 'destructive'
       });
       return;
@@ -75,8 +81,7 @@ const HealthSyncScreen = ({ onBack }: Props) => {
     }
   };
 
-  // Çəki / qan təzyiqi / qan şəkəri yazma toggle-u — bütün mərhələlərdə göstərilir
-  // (WeightTracker/BloodPressureTracker hər 3 mərhələdə, BloodSugarTracker bump+mommy-də var)
+  // Vitals writes remain available on iOS only.
   const [vitalsWrite, setVitalsWrite] = useState(isVitalsWriteEnabled());
   const [vitalsWriteBusy, setVitalsWriteBusy] = useState(false);
 
@@ -108,7 +113,7 @@ const HealthSyncScreen = ({ onBack }: Props) => {
     }
   };
 
-  const { data: available, isLoading: availLoading } = useHealthAvailability();
+  const { isLoading: availLoading } = useHealthAvailability();
   const { data: daily } = useHealthDaily(7, connected);
   const { data: workouts = [] } = useHealthWorkouts(7, connected);
 
@@ -178,27 +183,34 @@ const HealthSyncScreen = ({ onBack }: Props) => {
             </p>
           </div> :
 
-        availLoading ?
-        <div className="a-card animate-pulse" style={{ height: 120 }} /> :
-
-        available === false && !isIos ?
-        // Android: Health Connect quraşdırılmayıb
+        isAndroid ?
         <motion.div className="a-card" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
               <div className="flex items-center gap-3 mb-3">
                 <span className="a-list-icon" style={{ background: 'var(--a-grad-blue)', color: 'var(--a-blue-ink)' }}>
-                  <Download size={17} strokeWidth={2} />
+                  <HeartPulse size={17} strokeWidth={2} />
                 </span>
                 <div>
-                  <p className="a-list-title">{tr('health_hc_missing', 'Health Connect quraşdırılmayıb')}</p>
+                  <p className="a-list-title">{tr('health_android_cycle_only', 'Health Connect: yalnız period qeydlərinin yazılması')}</p>
                   <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>
-                    {tr('health_hc_missing_desc', 'Addım və aktivlik məlumatları üçün Google Health Connect lazımdır.')}
+                    {tr('health_android_flow_only', 'Bu inteqrasiya yalnız Flow rejimində period qeydlərini yazmaq üçündür. Health Connect-dən məlumat oxunmur.')}
                   </p>
                 </div>
               </div>
-              <button className="a-cta-btn w-full" style={{ justifyContent: 'center', height: 48 }} onClick={installHealthConnect}>
-                {tr('health_hc_install', 'Play Store-dan quraşdır')}
-              </button>
+              {cycleAvailable === false &&
+              <>
+                <p className="a-list-sub" style={{ whiteSpace: 'normal', marginBottom: 12 }}>
+                  {tr('health_android_unavailable_desc', 'Health Connect bu cihazda əlçatan deyil. Quraşdırılması və ya yenilənməsi tələb oluna bilər.')}
+                </p>
+                <button className="a-cta-btn w-full" style={{ justifyContent: 'center', height: 48 }} onClick={installHealthConnect}>
+                  <Download size={17} strokeWidth={2} />
+                  {tr('health_hc_install', 'Play Store-dan quraşdır')}
+                </button>
+              </>
+              }
             </motion.div> :
+
+        availLoading ?
+        <div className="a-card animate-pulse" style={{ height: 120 }} /> :
 
         !connected ?
         <motion.div className="a-card text-center" style={{ padding: '26px 18px' }} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
@@ -291,9 +303,13 @@ const HealthSyncScreen = ({ onBack }: Props) => {
             )}
               </motion.div>
           }
+          </>
+        }
 
-            {/* Tsikl yazma (yalnız flow) */}
-            {lifeStage === 'flow' &&
+        {isNativeHealthPlatform() && (isAndroid || (!availLoading && connected)) &&
+          <>
+            {/* Cycle writing is independent of the reader connection on Android. */}
+            {(lifeStage === 'flow' || (isAndroid && cycleWrite)) &&
           <div className="a-card flex items-center gap-3" style={{ marginTop: 12, padding: '14px 16px' }}>
                 <span className="a-list-icon shrink-0" style={{ background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)' }}>
                   🩸
@@ -301,19 +317,22 @@ const HealthSyncScreen = ({ onBack }: Props) => {
                 <div className="flex-1 min-w-0">
                   <p className="a-list-title" style={{ fontSize: 14 }}>{tr('hc_write_title', 'Tsikli Health-ə yaz')}</p>
                   <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>
-                    {tr('hc_write_desc', 'Period qeydləriniz avtomatik Apple Health / Health Connect-ə əlavə olunur')}
+                    {isAndroid ?
+                      tr('health_android_cycle_write_desc', 'Aktiv etdikdən sonra ana ekranda "Periodum başladı" ilə yeni qeyd əlavə edin. Əvvəlki qeydlər köçürülmür.') :
+                      tr('hc_write_desc', 'Period qeydləriniz avtomatik Apple Health / Health Connect-ə əlavə olunur')}
                   </p>
                 </div>
                 <Switch
               className="data-[state=checked]:bg-[var(--a-peach-2)]"
+              aria-label={tr('hc_write_title', 'Tsikli Health-ə yaz')}
               checked={cycleWrite}
-              disabled={cycleWriteBusy}
+              disabled={cycleWriteBusy || (isAndroid && !cycleWrite && (lifeStage !== 'flow' || !cycleAvailable))}
               onCheckedChange={toggleCycleWrite} />
               </div>
           }
 
-            {/* Çəki/QT/QŞ yazma — bütün mərhələlərdə (WeightTracker/BloodPressureTracker/
-                BloodSugarTracker-in mövcud olduğu yerlərdə) */}
+            {/* Vitals writing is iOS-only. */}
+            {isIos &&
             <div className="a-card flex items-center gap-3" style={{ marginTop: 12, padding: '14px 16px' }}>
               <span className="a-list-icon shrink-0" style={{ background: 'var(--a-blue-1)', color: 'var(--a-blue-ink)' }}>
                 <HeartPulse size={16} strokeWidth={2} />
@@ -330,6 +349,7 @@ const HealthSyncScreen = ({ onBack }: Props) => {
                 disabled={vitalsWriteBusy}
                 onCheckedChange={toggleVitalsWrite} />
             </div>
+            }
 
             {/* İdarəetmə */}
             <div className="a-list-card" style={{ marginTop: 12 }}>
@@ -342,6 +362,7 @@ const HealthSyncScreen = ({ onBack }: Props) => {
                   <p className="a-list-sub" style={{ whiteSpace: 'normal' }}>{`${platformName} ${tr('health_open_settings_desc', 'icazələrini idarə edin')}`}</p>
                 </div>
               </button>
+              {isIos &&
               <button className="a-list-row w-full text-start" style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={handleDisconnect}>
                 <span className="a-list-icon" style={{ background: 'var(--a-pink-1)', color: 'var(--a-pink-ink)' }}>
                   <Link2 size={17} strokeWidth={2} />
@@ -350,10 +371,13 @@ const HealthSyncScreen = ({ onBack }: Props) => {
                   <p className="a-list-title" style={{ fontSize: 14, color: 'var(--a-pink-ink)' }}>{tr('health_disconnect_btn', 'Əlaqəni kəs')}</p>
                 </div>
               </button>
+              }
             </div>
 
             <p className="a-teaser text-center" style={{ marginTop: 14 }}>
-              {tr('health_privacy_note', 'Sağlamlıq məlumatlarınız yalnız cihazınızda oxunur — serverlərimizə göndərilmir.')}
+              {isAndroid ?
+                tr('health_android_privacy_note', 'Bu seçim yalnız Health Connect-ə yazmanı idarə edir. Tətbiqdə daxil etdiyiniz sağlamlıq qeydləri hesabınızda saxlanmağa davam edir.') :
+                tr('health_privacy_note', 'Sağlamlıq məlumatlarınız yalnız cihazınızda oxunur — serverlərimizə göndərilmir.')}
             </p>
           </>
         }

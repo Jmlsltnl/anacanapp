@@ -10,6 +10,7 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import { useNoiseThresholdsDB } from '@/hooks/useMentalHealthData';
 import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
+import { getAudioErrorToast, openMicrophone, releaseAudioRecording } from '@/lib/audioRecording';
 
 interface NoiseMeterProps {
   onBack: () => void;
@@ -48,6 +49,7 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   }, [noiseThresholdsDB]);
 
   const [isListening, setIsListening] = useState(false);
+  const [hasMeasurement, setHasMeasurement] = useState(false);
   const [currentDb, setCurrentDb] = useState(0);
   const [avgDb, setAvgDb] = useState(0);
   const [maxDb, setMaxDb] = useState(0);
@@ -57,6 +59,8 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const listeningControllerRef = useRef<AbortController | null>(null);
+  const mountedRef = useRef(true);
   const animationRef = useRef<number | null>(null);
   const dbHistoryRef = useRef<number[]>([]);
 
@@ -73,11 +77,22 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
       decibel_level: db,
       is_too_loud: isTooLoud
     });
-  }, [profile?.user_id]);
+  }, [profile?.user_id, NOISE_THRESHOLDS.acceptable]);
 
   const startListening = async () => {
+    if (listeningControllerRef.current || !mountedRef.current) return;
+    const controller = new AbortController();
+    listeningControllerRef.current = controller;
+    let stream: MediaStream | null = null;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (typeof AudioContext === 'undefined') {
+        throw new DOMException('Audio analysis is unavailable', 'NotSupportedError');
+      }
+      stream = await openMicrophone();
+      if (controller.signal.aborted) {
+        releaseAudioRecording(null, stream);
+        return;
+      }
       streamRef.current = stream;
 
       const audioContext = new AudioContext();
@@ -92,10 +107,13 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
 
       setIsListening(true);
       dbHistoryRef.current = [];
+      setHasMeasurement(false);
+      setCurrentDb(0);
+      setAvgDb(0);
       setMaxDb(0);
 
       const updateLevel = () => {
-        if (!analyserRef.current) return;
+        if (controller.signal.aborted || !analyserRef.current) return;
 
         const dataArray = new Float32Array(analyserRef.current.frequencyBinCount);
         analyserRef.current.getFloatTimeDomainData(dataArray);
@@ -113,6 +131,7 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
         const db = Math.max(0, Math.min(120, 20 * Math.log10(rms) + 94));
 
         setCurrentDb(Math.round(db));
+        setHasMeasurement(true);
 
         // Update history for averaging
         dbHistoryRef.current.push(db);
@@ -138,39 +157,53 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
       updateLevel();
 
     } catch (error) {
-      toast({
-        title: tr("noisemeter_mikrofon_xetasi_5f83b3", 'Mikrofon xətası'),
-        description: tr("noisemeter_mikrofona_giris_icazesi_verin_9b0425", 'Mikrofona giriş icazəsi verin'),
-        variant: 'destructive'
-      });
+      if (controller.signal.aborted) return;
+      cleanup();
+      setIsListening(false);
+      toast(getAudioErrorToast(error, stream ? 'audio' : 'microphone'));
+    }
+  };
+
+  const cleanup = () => {
+    listeningControllerRef.current?.abort();
+    listeningControllerRef.current = null;
+    if (animationRef.current !== null) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+    analyserRef.current = null;
+    releaseAudioRecording(null, streamRef.current);
+    streamRef.current = null;
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
     }
   };
 
   const stopListening = async () => {
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-    }
-    if (audioContextRef.current) {
-      await audioContextRef.current.close();
-    }
-
+    const wasListening = !!streamRef.current;
+    cleanup();
     setIsListening(false);
 
-    // Save average reading to database
-    if (avgDb > 0) {
-      await saveToDatabase(avgDb);
+    // Keep the result locally even when the database is slow or unavailable.
+    // A measured 0 dB is a result too; it is not the initial idle state.
+    if (wasListening && dbHistoryRef.current.length > 0 && mountedRef.current) {
+      setCurrentDb(avgDb);
       setHistory((prev) => [...prev.slice(-9), { db: avgDb, time: new Date() }]);
+      await saveToDatabase(avgDb);
     }
   };
 
   useEffect(() => {
+    mountedRef.current = true;
+    const background = () => {
+      if (document.visibilityState === 'hidden') { cleanup(); setIsListening(false); }
+    };
+    document.addEventListener('visibilitychange', background);
     return () => {
-      if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      if (streamRef.current) streamRef.current.getTracks().forEach((track) => track.stop());
-      if (audioContextRef.current) audioContextRef.current.close();
+      mountedRef.current = false;
+      document.removeEventListener('visibilitychange', background);
+      cleanup();
     };
   }, []);
 
@@ -195,7 +228,7 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
   return (
     <ToolPage>
       <ToolHeader
-        onBack={onBack}
+        onBack={() => { cleanup(); onBack(); }}
         eyebrow={tr("noisemeter_korpe_yuxusu_ucun_ideal_muhit_4a6c06", "Körpə yuxusu üçün ideal mühit")}
         title={tr("noisemeter_ses_kuy_olcer_68f0b6", "Səs-Küy Ölçər")} />
 
@@ -246,25 +279,11 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
             </div>
 
             {/* Status Label */}
-            <div className="mt-4 px-4 py-2 rounded-full" style={{ background: isListening ? noiseLevel.soft : 'var(--a-surface-soft)' }}>
-              <span className="font-bold" style={{ color: isListening ? noiseLevel.color : 'var(--a-ink-soft)' }}>
-                {isListening ? noiseLevel.label : tr("noisemeter_olcum_basladilmayib_46107a", 'Ölçüm başladılmayıb')}
+            <div className="mt-4 px-4 py-2 rounded-full" style={{ background: hasMeasurement ? noiseLevel.soft : 'var(--a-surface-soft)' }}>
+              <span className="font-bold" style={{ color: hasMeasurement ? noiseLevel.color : 'var(--a-ink-soft)' }}>
+                {hasMeasurement ? noiseLevel.label : tr("noisemeter_olcum_basladilmayib_46107a", 'Ölçüm başladılmayıb')}
               </span>
             </div>
-
-            {/* Stats */}
-            {isListening &&
-            <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-xs">
-                <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-surface-soft)' }}>
-                  <p className="a-list-sub" style={{ margin: 0 }}>{tr("untranslated_orta_yslkg0", "Orta")}</p>
-                  <p className="a-heading" style={{ margin: 0, fontSize: 20 }}>{avgDb} dB</p>
-                </div>
-                <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-surface-soft)' }}>
-                  <p className="a-list-sub" style={{ margin: 0 }}>{tr("untranslated_maks_6z8ju8", "Maks")}</p>
-                  <p className="a-heading" style={{ margin: 0, fontSize: 20 }}>{maxDb} dB</p>
-                </div>
-              </div>
-            }
 
             {/* Control Button */}
             <motion.button
@@ -273,6 +292,7 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
               { background: 'var(--a-pink-2)', border: 'none', color: '#fff', boxShadow: '0 14px 30px -12px rgba(255, 138, 164, 0.7)', cursor: 'pointer' } :
               { background: 'var(--a-grad-cta)', border: '1px solid var(--a-btn-border)', color: 'var(--a-accent-ink)', boxShadow: 'var(--a-card-shadow)', cursor: 'pointer' }}
               whileTap={{ scale: 0.95 }}
+              aria-label={isListening ? tr("noisemeter_dayandirmaq_ucun_toxunun_d02de1", "Dayandırmaq üçün toxunun") : tr("noisemeter_baslamaq_ucun_toxunun_ee2514", "Başlamaq üçün toxunun")}
               onClick={isListening ? stopListening : startListening}>
               
               {isListening ?
@@ -284,6 +304,23 @@ const NoiseMeter = ({ onBack }: NoiseMeterProps) => {
             <p className="mt-2 text-sm font-semibold" style={{ margin: '8px 0 0', color: 'var(--a-ink-soft)' }}>
               {isListening ? tr("noisemeter_dayandirmaq_ucun_toxunun_d02de1", "Dayand\u0131rmaq \xFC\xE7\xFCn toxunun") : tr("noisemeter_baslamaq_ucun_toxunun_ee2514", "Ba\u015Flamaq \xFC\xE7\xFCn toxunun")}
             </p>
+
+            {/* Live statistics stay directly below the control after stopping. */}
+            {hasMeasurement &&
+            <div className="mt-4 w-full max-w-xs" role={isListening ? undefined : 'status'}>
+                {!isListening && <p className="a-list-title text-center mb-2">{tr('noisemeter_last_result', 'Son ölçmənin nəticəsi')}</p>}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-surface-soft)' }}>
+                    <p className="a-list-sub" style={{ margin: 0 }}>{tr("untranslated_orta_yslkg0", "Orta")}</p>
+                    <p className="a-heading" style={{ margin: 0, fontSize: 20 }}>{avgDb} dB</p>
+                  </div>
+                  <div className="rounded-2xl p-3 text-center" style={{ background: 'var(--a-surface-soft)' }}>
+                    <p className="a-list-sub" style={{ margin: 0 }}>{tr("untranslated_maks_6z8ju8", "Maks")}</p>
+                    <p className="a-heading" style={{ margin: 0, fontSize: 20 }}>{maxDb} dB</p>
+                  </div>
+                </div>
+              </div>
+            }
           </div>
         </div>
 

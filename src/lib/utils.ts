@@ -31,6 +31,18 @@ export function getOrdinal(num: number, lang: string): string {
   if (lang === 'ar') {
     return `${num}`;
   }
+  if (lang === 'zh') return `第${num}`;
+  if (lang === 'id') return `ke-${num}`;
+  if (lang === 'fr') return num === 1 ? '1er' : `${num}e`;
+  if (lang === 'es') return `${num}.º`;
+  if (lang === 'pt') return `${num}.º`;
+  if (lang === 'vi') return `thứ ${num}`;
+  if (lang === 'hi') return `${num}वाँ`;
+  if (lang === 'ja') return `第${num}`;
+  if (lang === 'ko') return `${num}번째`;
+  if (lang === 'pl') return `${num}.`;
+  if (lang === 'nl') return `${num}e`;
+  if (lang === 'sv') return `${num}:${[1, 2].includes(num % 10) && ![11, 12].includes(num % 100) ? 'a' : 'e'}`;
   
   // AZ by default
   const lastDigit = num % 10;

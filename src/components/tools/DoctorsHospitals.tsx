@@ -16,6 +16,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import ProviderReviews from './doctors/ProviderReviews';
 import { tr, mapRowsTranslation } from "@/lib/tr";
 import { useUserStore } from '@/store/userStore';
+import { localizedCountryName } from '@/lib/app-languages';
+import { regionalCountry } from '@/lib/vaccine-schedule';
+import { getBackendConfig } from '@/integrations/supabase/backend-config';
 
 interface DoctorsHospitalsProps {
   onBack: () => void;
@@ -59,13 +62,13 @@ interface HealthcareProvider {
   sort_order?: number | null;
 }
 
-const providerTypeLabels: Record<string, {label: string;icon: typeof Stethoscope;}> = {
+const getProviderTypeLabels = (): Record<string, {label: string;icon: typeof Stethoscope;}> => ({
   hospital: { label: tr("doctorshospitals_xestexana_04539b", 'Xəstəxana'), icon: Building2 },
   clinic: { label: tr("doctorshospitals_klinika_3c7a2d", "Klinika"), icon: Building2 },
   doctor: { label: tr("doctorshospitals_hekim_c127f7", 'Həkim'), icon: User }
-};
+});
 
-const specialtyCategories = [
+const getSpecialtyCategories = () => [
 { id: 'all', label: tr("doctorshospitals_hamisi_c73c4d", 'Hamısı'), emoji: '✨' },
 { id: 'hospital', label: tr("doctorshospitals_xestexana_04539b", 'Xəstəxana'), emoji: '🏥' },
 { id: 'gynecology', label: tr("common_ginekologiya", 'Ginekologiya'), emoji: '👩‍⚕️' },
@@ -74,7 +77,7 @@ const specialtyCategories = [
 { id: 'mammology', label: tr("common_mamologiya", 'Mamologiya'), emoji: '🩺' }];
 
 
-const dayLabels: Record<string, string> = {
+const getDayLabels = (): Record<string, string> => ({
   monday: tr("doctorshospitals_bazar_ertesi_4c733b", "Bazar ert\u0259si"),
   tuesday: tr("doctorshospitals_cersenbe_axsami_01435c", "\xC7\u0259r\u015F\u0259nb\u0259 ax\u015Fam\u0131"),
   wednesday: tr("doctorshospitals_cersenbe_50bb90", "\xC7\u0259r\u015F\u0259nb\u0259"),
@@ -82,7 +85,7 @@ const dayLabels: Record<string, string> = {
   friday: tr("doctorshospitals_cume_faba24", "C\xFCm\u0259"),
   saturday: tr("doctorshospitals_senbe_02045c", "\u015E\u0259nb\u0259"),
   sunday: tr("common_bazar", 'Bazar')
-};
+});
 
 const parseDescription = (text: string) => {
   if (!text) return { basicDescription: '' };
@@ -139,20 +142,19 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
   const [selectedProvider, setSelectedProvider] = useState<HealthcareProvider | null>(null);
   const [showReservationModal, setShowReservationModal] = useState(false);
   const language = useUserStore((state) => state.language);
+  const providerTypeLabels = getProviderTypeLabels();
+  const specialtyCategories = getSpecialtyCategories();
   const storeCountry = useUserStore((state) => state.countryCode);
   const { profile: dhProfile } = useAuth();
-  // İstifadəçinin QEYDİYYATDA seçdiyi ÖLKƏSİ — bu siyahı YALNIZ bununla təyin olunur.
-  // Dil (language) siyahının HANSI ölkə göstərəcəyinə TƏSİR ETMİR, yalnız mövcud
-  // sətirlərin ad/ixtisas/təsvir mətnini tərcümə edir. Bu səhifədə əl ilə ölkə
-  // dəyişmək mümkün deyil (bilərəkdən) — dəyişmək üçün Ayarlar/Profil-dən ölkəni
-  // yeniləmək lazımdır.
-  const activeCountry = ((dhProfile as any)?.country_code || storeCountry || 'AZ') as string;
+  // Saved account country is authoritative; language only suggests a country
+  // when no country has been selected. This never writes the account country.
+  const activeCountry = regionalCountry(language, dhProfile?.country_code, storeCountry);
 
   const { data: providers = [], isLoading } = useQuery({
     // QEYD: queryKey-də `language` YOXDUR — dil dəyişəndə sorğu YENİDƏN getmir,
     // yalnız aşağıdakı mapRowsTranslation həmin renderdə mətni tərcümə edir.
     // Bununla siyahının tərkibi (hansı provider-lər göstərilir) heç vaxt dilə bağlı olmur.
-    queryKey: ['healthcare-providers', activeCountry],
+    queryKey: ['healthcare-providers', activeCountry, getBackendConfig().url],
     queryFn: async () => {
       const { data, error } = (await supabase.
       from('healthcare_providers').
@@ -217,10 +219,11 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
     console.log('Reservation feature is disabled');
   };
 
-  if (selectedProvider) {
+  const selected = translatedProviders.find(provider => provider.id === selectedProvider?.id);
+  if (selected) {
     return (
       <ProviderDetail
-        provider={selectedProvider}
+        provider={selected}
         onBack={() => setSelectedProvider(null)}
         onReserve={handleReservation} />);
 
@@ -242,6 +245,7 @@ const DoctorsHospitals = ({ onBack }: DoctorsHospitalsProps) => {
             </div>
           </div>
         </header>
+        <p className="a-list-sub" data-testid="healthcare-country">{localizedCountryName(activeCountry, language)}</p>
 
         {/* Search */}
         <div className="a-search">
@@ -373,6 +377,8 @@ interface ProviderDetailProps {
 }
 
 const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) => {
+  const providerTypeLabels = getProviderTypeLabels();
+  const dayLabels = getDayLabels();
   const TypeIcon = providerTypeLabels[provider.provider_type]?.icon || Building2;
   const queryClient = useQueryClient();
 
@@ -460,7 +466,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
             }
           </p>
 
-          <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
+          {currentReviewCount > 0 && <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
             <div className="flex items-center gap-0.5">
               {[1, 2, 3, 4, 5].map((star) =>
               <Star
@@ -472,7 +478,7 @@ const ProviderDetail = ({ provider, onBack, onReserve }: ProviderDetailProps) =>
             </div>
             <span style={{ fontSize: 13, fontWeight: 800, color: 'var(--a-ink)' }}>{currentRating > 0 ? currentRating.toFixed(1) : '0.0'}</span>
             <span className="a-list-sub" style={{ margin: 0 }}>({currentReviewCount} {tr("doctorshospitals_rey_f2285f", "rəy)")}</span>
-          </div>
+          </div>}
 
           {/* Detailed Badges */}
           {(parsedDesc.experience || parsedDesc.languages || parsedDesc.education) &&

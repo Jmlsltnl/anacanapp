@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
+import type { PushEventData } from '@/lib/push';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
 
@@ -141,22 +142,31 @@ export const useDirectMessages = (otherUserId?: string) => {
 
       if (error) throw error;
 
-      // Send push notification
-      try {
-        const { invokeSendPush } = await import('@/lib/push');
-        await invokeSendPush({
-          userId: otherUserId,
-          title: tr("directmessages_yeni_mesaj", 'Yeni mesaj') + ' 💬',
-          body: type === 'text' ? content.length > 60 ? content.slice(0, 60) + '...' : content :
-          type === 'image' ? tr("usedirectmessages_sekil_gonderdi_9e8836", "\uD83D\uDCF7 \u015E\u0259kil g\xF6nd\u0259rdi") :
-          type === 'video' ? tr("usedirectmessages_video_gonderdi_41246c", "\uD83C\uDFA5 Video g\xF6nd\u0259rdi") :
-          type === 'audio' ? tr("usedirectmessages_ses_mesaji_gonderdi_5b803e", "\uD83C\uDFA4 S\u0259s mesaj\u0131 g\xF6nd\u0259rdi") :
-          tr("directmessages_yeni_mesaj", 'Yeni mesaj'),
-          data: { type: 'direct_message', sender_id: user.id, context: 'direct_message' },
-          kind: 'direct_message'
-        });
-      } catch (pushErr) {
-        console.warn('Push notification failed:', pushErr);
+      // The Azure function verifies the exact persisted row. Unsupported message
+      // types remain stored, but are not submitted to a contract that rejects them.
+      if (['text', 'image', 'video', 'audio'].includes(data.message_type)) {
+        try {
+          const { invokeSendPush } = await import('@/lib/push');
+          await invokeSendPush({
+            userId: data.receiver_id,
+            title: tr("directmessages_yeni_mesaj", 'Yeni mesaj') + ' 💬',
+            body: data.message_type === 'text' ? (data.content || '').length > 60 ? `${data.content!.slice(0, 60)}...` : data.content || tr("directmessages_yeni_mesaj", 'Yeni mesaj') :
+            data.message_type === 'image' ? tr("usedirectmessages_sekil_gonderdi_9e8836", "\uD83D\uDCF7 \u015E\u0259kil g\xF6nd\u0259rdi") :
+            data.message_type === 'video' ? tr("usedirectmessages_video_gonderdi_41246c", "\uD83C\uDFA5 Video g\xF6nd\u0259rdi") :
+            data.message_type === 'audio' ? tr("usedirectmessages_ses_mesaji_gonderdi_5b803e", "\uD83C\uDFA4 S\u0259s mesaj\u0131 g\xF6nd\u0259rdi") :
+            tr("directmessages_yeni_mesaj", 'Yeni mesaj'),
+            data: {
+              type: 'direct_message',
+              context: 'direct_message',
+              sender_id: data.sender_id,
+              messageId: data.id,
+              interactionId: data.id
+            } satisfies PushEventData,
+            kind: 'direct_message'
+          });
+        } catch (pushErr) {
+          console.warn('Push notification failed:', pushErr);
+        }
       }
 
       if (data) {
@@ -174,8 +184,8 @@ export const useDirectMessages = (otherUserId?: string) => {
     }
   };
 
-  const uploadMedia = async (file: Blob, type: 'image' | 'video' | 'audio') => {
-    if (!user) return null;
+  const uploadMedia = async (file: Blob, type: 'image' | 'video' | 'audio', signal?: AbortSignal) => {
+    if (!user || signal?.aborted) return null;
     
     let ext = 'jpg';
     let contentType = 'image/jpeg';
@@ -199,11 +209,21 @@ export const useDirectMessages = (otherUserId?: string) => {
 
     const fileName = `${user.id}/${Date.now()}.${ext}`;
 
+    // Let the request finish so cancellation can remove the exact uploaded path.
     const { data, error } = await supabase.storage.
     from('chat-media').
     upload(fileName, file, { contentType, upsert: false });
 
     if (error) throw error;
+    if (signal?.aborted) {
+      try {
+        const { error: removalError } = await supabase.storage.from('chat-media').remove([data.path]);
+        if (removalError) throw removalError;
+      } catch {
+        console.error('Failed to remove cancelled chat media upload');
+      }
+      return null;
+    }
     const { data: { publicUrl } } = supabase.storage.from('chat-media').getPublicUrl(data.path);
     return publicUrl;
   };

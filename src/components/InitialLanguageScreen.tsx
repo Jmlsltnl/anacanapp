@@ -2,14 +2,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/store/userStore';
 import { useShallow } from 'zustand/react/shallow';
 import { Check, Search, ChevronLeft, Globe } from 'lucide-react';
-import { clearTranslationCache, ensureLanguageReady, loadTranslations, fetchActiveLanguages } from '@/lib/i18n';
+import { ensureLanguageReady, loadTranslations, fetchActiveLanguages } from '@/lib/i18n';
 import { isRtlLang, rtlX } from '@/lib/rtl';
-import logoImage from '@/assets/logo.png';
+import logoImage from '@/assets/brand-mark.png';
 import { useState, useMemo, useEffect } from 'react';
 import countriesData from '../../countries.json';
+import { APP_LANGUAGES, NEW_LANGUAGE_CODES, localizedCountryName } from '@/lib/app-languages';
+import { startupText, type StartupKey } from '@/lib/startup-i18n';
 
 // flagcdn ölkə kodu xəritəsi (dil kodu → bayraq kodu)
-const FLAG_BY_CODE: Record<string, string> = { az: 'az', en: 'gb', ru: 'ru', tr: 'tr', kk: 'kz', uz: 'uz', ka: 'ge', de: 'de', ar: 'sa' };
+const FLAG_BY_CODE: Record<string, string> = Object.fromEntries(APP_LANGUAGES.map(language => [language.code, language.flag]));
+const FLAG_IMAGES: Record<string, string> = Object.fromEntries(countriesData.map(country => [country.isoAlpha2.toLowerCase(),
+  country.flag.startsWith('data:') ? country.flag : `data:image/png;base64,${country.flag}`]));
 
 /**
  * Cihazın/brauzerin dil-regionundan ("ar-SA", "ru-RU", "de-DE" və s.) ölkə kodunu
@@ -42,22 +46,8 @@ function guessCountryFromLocale(countries: { isoAlpha2: string }[]): string | nu
 }
 
 // İlkin/fallback siyahı — app_languages sorğusu gələnə qədər və ya offline halda.
-const FALLBACK_LANGS = [
-  {
-    code: 'az',
-    label: 'Azərbaycan',
-    nativeLabel: 'Azərbaycan',
-    subLabel: 'Azerbaijani',
-    flag: 'az',
-  },
-  {
-    code: 'en',
-    label: 'English',
-    nativeLabel: 'English',
-    subLabel: 'English',
-    flag: 'gb',
-  },
-];
+const FALLBACK_LANGS = APP_LANGUAGES.map(language => ({ code: language.code as string,
+  label: language.native_name as string, nativeLabel: language.native_name as string, subLabel: language.name as string, flag: language.flag as string }));
 
 export default function InitialLanguageScreen() {
   const { setLanguage, setHasSelectedLanguage, setCountryCode } = useUserStore(
@@ -66,6 +56,7 @@ export default function InitialLanguageScreen() {
   const [step, setStep] = useState<1 | 2>(1);
   const [selectedLang, setSelectedLang] = useState<string>(useUserStore.getState().language || 'az');
   const [isSwitching, setIsSwitching] = useState(false);
+  const [languageError, setLanguageError] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [langs, setLangs] = useState(FALLBACK_LANGS);
   // Cihaz dil-regionundan təxmin edilən ölkə — siyahının başında göstərilir və işarələnir,
@@ -93,23 +84,25 @@ export default function InitialLanguageScreen() {
   const handleLangSelect = (code: string) => {
     if (isSwitching) return;
     setSelectedLang(code);
+    setLanguageError(false);
   };
 
   const handleContinue = async () => {
     if (isSwitching || !selectedLang) return;
     setIsSwitching(true);
-    clearTranslationCache();
-    if (selectedLang !== 'az') {
+    setLanguageError(false);
+    try {
+      if (selectedLang !== 'az') {
       // Lokal seed dərhal (şəbəkəsiz); DB overlay arxa planda gəlir —
       // zəif internetdə "Davam et" düyməsi saniyələrlə asılı qalmır.
-      await ensureLanguageReady(selectedLang);
-      void loadTranslations(selectedLang);
-    }
-    setLanguage(selectedLang);
-    setTimeout(() => {
+        await ensureLanguageReady(selectedLang);
+        void loadTranslations(selectedLang);
+      }
+      setLanguage(selectedLang);
+      await new Promise(resolve => setTimeout(resolve, 300));
       setStep(2);
-      setIsSwitching(false);
-    }, 300);
+    } catch { setLanguageError(true); }
+    finally { setIsSwitching(false); }
   };
 
   const handleCountrySelect = (code: string) => {
@@ -127,7 +120,8 @@ export default function InitialLanguageScreen() {
   const filteredCountries = useMemo(() => {
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      return countriesData.filter(c => c.name.toLowerCase().includes(lowerQuery));
+      return countriesData.filter(c => c.name.toLowerCase().includes(lowerQuery)
+        || localizedCountryName(c.isoAlpha2, selectedLang, c.name).toLowerCase().includes(lowerQuery));
     }
     // Axtarış yoxdursa təxmin edilən ölkəni siyahının başına çıxarırıq (görünən ilk seçim olsun).
     if (guessedCountry) {
@@ -140,22 +134,23 @@ export default function InitialLanguageScreen() {
       }
     }
     return countriesData;
-  }, [searchQuery, guessedCountry]);
+  }, [searchQuery, guessedCountry, selectedLang]);
 
   // Seçilmiş dilə görə addım keçidi istiqaməti (store/dir asinxron yenilənməzdən əvvəl
   // dərhal məlumdur, çünki selectedLang lokal state-dir).
   const isRtl = isRtlLang(selectedLang);
 
   // Bu ekran tərcümə yüklənməzdən ƏVVƏL göstərilir — mətnlər inline saxlanır.
-  const L = (m: Record<string, string>) => m[selectedLang] ?? m.az;
+  const L = (key: StartupKey, m: Record<string, string>) => startupText(selectedLang, key, m[selectedLang] ?? m.az);
+  const expandedLanguage = (NEW_LANGUAGE_CODES as readonly string[]).includes(selectedLang);
   const t = {
-    selectCountry: L({ az: 'Ölkə seçin', en: 'Select Country', ru: 'Выберите страну', tr: 'Ülke seçin', kk: 'Елді таңдаңыз', uz: 'Mamlakatni tanlang', ka: 'აირჩიეთ ქვეყანა', de: 'Land auswählen', ar: 'اختاري الدولة' }),
-    selectCountryCap: 'SELECT COUNTRY',
-    searchPlaceholder: L({ az: 'Axtar', en: 'Search', ru: 'Поиск', tr: 'Ara', kk: 'Іздеу', uz: 'Qidirish', ka: 'ძებნა', de: 'Suchen', ar: 'بحث' }),
-    noneFound: L({ az: 'Ölkə tapılmadı', en: 'No countries found', ru: 'Страны не найдены', tr: 'Ülke bulunamadı', kk: 'Ел табылмады', uz: 'Mamlakat topilmadi', ka: 'ქვეყანა ვერ მოიძებნა', de: 'Kein Land gefunden', ar: 'لم يتم العثور على دولة' }),
-    selectLanguage: L({ az: 'Dil seçin', en: 'Select Language', ru: 'Выберите язык', tr: 'Dil seçin', kk: 'Тілді таңдаңыз', uz: 'Tilni tanlang', ka: 'აირჩიეთ ენა', de: 'Sprache auswählen', ar: 'اختاري اللغة' }),
-    selectLanguageCap: 'SELECT LANGUAGE',
-    continue: L({ az: 'Davam et', en: 'Continue', ru: 'Продолжить', tr: 'Devam et', kk: 'Жалғастыру', uz: 'Davom etish', ka: 'გაგრძელება', de: 'Weiter', ar: 'متابعة' }),
+    selectCountry: L('selectCountry', { az: 'Ölkə seçin', en: 'Select Country', ru: 'Выберите страну', tr: 'Ülke seçin', kk: 'Елді таңдаңыз', uz: 'Mamlakatni tanlang', ka: 'აირჩიეთ ქვეყანა', de: 'Land auswählen', ar: 'اختاري الدولة' }),
+    selectCountryCap: expandedLanguage ? 'ANACAN' : 'SELECT COUNTRY',
+    searchPlaceholder: L('searchPlaceholder', { az: 'Axtar', en: 'Search', ru: 'Поиск', tr: 'Ara', kk: 'Іздеу', uz: 'Qidirish', ka: 'ძებნა', de: 'Suchen', ar: 'بحث' }),
+    noneFound: L('noneFound', { az: 'Ölkə tapılmadı', en: 'No countries found', ru: 'Страны не найдены', tr: 'Ülke bulunamadı', kk: 'Ел табылмады', uz: 'Mamlakat topilmadi', ka: 'ქვეყანა ვერ მოიძებნა', de: 'Kein Land gefunden', ar: 'لم يتم العثور على دولة' }),
+    selectLanguage: L('selectLanguage', { az: 'Dil seçin', en: 'Select Language', ru: 'Выберите язык', tr: 'Dil seçin', kk: 'Тілді таңдаңыз', uz: 'Tilni tanlang', ka: 'აირჩიეთ ენა', de: 'Sprache auswählen', ar: 'اختاري اللغة' }),
+    selectLanguageCap: expandedLanguage ? 'ANACAN' : 'SELECT LANGUAGE',
+    continue: L('continue', { az: 'Davam et', en: 'Continue', ru: 'Продолжить', tr: 'Devam et', kk: 'Жалғастыру', uz: 'Davom etish', ka: 'გაგრძელება', de: 'Weiter', ar: 'متابعة' }),
     continueEn: 'Continue',
   };
 
@@ -227,7 +222,7 @@ export default function InitialLanguageScreen() {
                       >
                         <div className="mb-2.5 rounded-md overflow-hidden" style={{ border: '1px solid var(--a-line)', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}>
                           <img
-                            src={`https://flagcdn.com/w40/${lang.flag}.png`}
+                            src={FLAG_IMAGES[lang.flag]}
                             alt={lang.code}
                             className="w-9 h-6 object-cover"
                           />
@@ -256,7 +251,8 @@ export default function InitialLanguageScreen() {
               </div>
 
               {/* Continue — sabit alt zolaq (menyu kimi), grid scroll olunsa belə HƏMİŞƏ görünür */}
-              <div className="shrink-0 pt-4">
+               <div className="shrink-0 pt-4">
+                 {languageError && <p role="alert" className="mb-2 text-sm text-center">{startupText(selectedLang, 'connectionPending', 'Bağlantı hazırlanır. Bir qədər sonra yenidən cəhd edin.')}</p>}
                 <motion.button
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -268,12 +264,12 @@ export default function InitialLanguageScreen() {
                   style={{ background: 'var(--a-peach-2)', fontSize: 14, fontWeight: 700, boxShadow: '0 16px 32px -12px rgba(217, 108, 74, 0.6)' }}
                 >
                   {t.continue}
-                  <span className="font-normal opacity-70 mx-1.5">·</span>
-                  <span className="font-medium opacity-90">{t.continueEn}</span>
+                   {!expandedLanguage && <><span className="font-normal opacity-70 mx-1.5">·</span>
+                   <span className="font-medium opacity-90">{t.continueEn}</span></>}
                 </motion.button>
 
                 <p className="text-center mt-3 leading-relaxed" style={{ fontSize: 11, color: 'var(--a-on-bg-soft)' }}>
-                  {L({
+                   {L('languageHint', {
                     az: 'Dili sonradan tənzimləmələrdən dəyişə bilərsiniz',
                     en: 'You can change the language later in settings',
                     ru: 'Язык можно изменить позже в настройках',
@@ -301,7 +297,7 @@ export default function InitialLanguageScreen() {
                 <button
                   onClick={() => setStep(1)}
                   className="a-icon-btn"
-                  aria-label="Back"
+                   aria-label={startupText(selectedLang, 'back', 'Back')}
                 >
                   <ChevronLeft className="rtl:rotate-180" size={18} strokeWidth={2.5} />
                 </button>
@@ -348,12 +344,12 @@ export default function InitialLanguageScreen() {
                         <div className="w-6 h-4 me-3 overflow-hidden rounded-sm flex-shrink-0" style={{ border: '1px solid var(--a-line)' }}>
                           <img
                             src={country.flag.startsWith('data:') ? country.flag : `data:image/png;base64,${country.flag}`}
-                            alt={country.name}
+                            alt={localizedCountryName(country.isoAlpha2, selectedLang, country.name)}
                             className="w-full h-full object-cover"
                           />
                         </div>
                         <span className="text-start flex-1" style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--a-ink)' }}>
-                          {country.name}
+                          {localizedCountryName(country.isoAlpha2, selectedLang, country.name)}
                         </span>
                         {isGuessed && (
                           <span className="flex items-center gap-1 me-2" style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--a-peach-2)' }}>

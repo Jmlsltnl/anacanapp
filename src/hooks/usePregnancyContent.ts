@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { tr } from "@/lib/tr";
+import { tr, mapRowTranslation } from "@/lib/tr";
+import { NEW_LANGUAGE_CODES } from '@/lib/app-languages';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchAllRows } from '@/lib/supabaseFetchAll';
 import { useUserStore } from '@/store/userStore';
@@ -30,6 +31,7 @@ const TRANSLATABLE_FIELDS = [
 
 function applyLanguage<T extends Record<string, any> | null>(row: T, lang: string): T {
   if (!row || lang === 'az') return row;
+  if ((NEW_LANGUAGE_CODES as readonly string[]).includes(lang)) return mapRowTranslation(row, lang, [...TRANSLATABLE_FIELDS]) as T;
   const out: any = { ...row };
   for (const f of TRANSLATABLE_FIELDS) {
     const langVal = (row as any)[`${f}_${lang}`];

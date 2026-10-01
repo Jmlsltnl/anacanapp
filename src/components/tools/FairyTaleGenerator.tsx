@@ -1,4 +1,4 @@
-import { useState, CSSProperties, ReactNode } from 'react';
+import { useEffect, useState, CSSProperties, ReactNode } from 'react';
 import { Sparkles, Heart, Trash2, Loader2, Wand2, Clock, BookOpenCheck, Globe, X, Baby, PenLine, ListChecks } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,12 +14,16 @@ import PremiumModal from '@/components/PremiumModal';
 import { ToolPage, ToolHeader } from './anacan/ToolKit';
 import { tr, getPersistedLanguage } from "@/lib/tr";
 import { useIsRtl, rtlX } from '@/lib/rtl';
+import { APP_LANGUAGES, normalizeAppLanguage } from '@/lib/app-languages';
+import { useUserStore } from '@/store/userStore';
+import { followupText } from '@/lib/followup-i18n';
+import { exampleChildName } from '@/lib/fiction-names';
 
 interface FairyTaleGeneratorProps {
   onBack: () => void;
 }
 
-const MORAL_LESSONS = [
+const getMoralLessons = () => [
   { value: 'sharing', label: tr("fairytalegenerator_bolusmek_df3fa9", 'Bölüşmək'), emoji: '🤝' },
   { value: 'kindness', label: tr("fairytalegenerator_mehribanliq_7e25e6", 'Mehribanlıq'), emoji: '💕' },
   { value: 'bravery', label: tr("fairytalegenerator_cesaret_326b71", 'Cəsarət'), emoji: '🦁' },
@@ -38,9 +42,9 @@ const MORAL_LESSONS = [
   { value: 'nature_love', label: tr("fairytalegenerator_tebiet_sevgisi_801736", 'Təbiət sevgisi'), emoji: '🌿' }];
 
 
-const HERO_SUGGESTIONS = [
+const getHeroSuggestions = () => [
   { emoji: '🧸', label: tr("fairytalegenerator_ayi_balasi_f0fdaa", 'Ayı Balası') },
-  { emoji: '🦄', label: 'Unicorn' },
+  { emoji: '🦄', label: followupText('fairytale_unicorn') },
   { emoji: '🐰', label: tr("fairytalegenerator_dovsan_a53a5c", 'Dovşan') },
   { emoji: '🦋', label: tr("fairytalegenerator_kepenek_d4da32", 'Kəpənək') },
   { emoji: '🐱', label: tr("fairytalegenerator_pisik_be8848", 'Pişik') },
@@ -57,14 +61,14 @@ const HERO_SUGGESTIONS = [
   { emoji: '🐉', label: tr("fairytalegenerator_ejdaha_b4feca", 'Əjdaha') }];
 
 
-const AGE_RANGES = [
+const getAgeRanges = () => [
   { value: '0-2', label: tr("fairytalegenerator_0_2_yas_0fca24", '0-2 yaş'), emoji: '👶', desc: tr("fairytalegenerator_cox_sade_fbc365", "\xC7ox sad\u0259") },
   { value: '3-5', label: tr("fairytalegenerator_3_5_yas_023631", '3-5 yaş'), emoji: '🧒', desc: tr("fairytalegenerator_sade_620f92", "Sad\u0259") },
   { value: '6-9', label: tr("fairytalegenerator_6_9_yas_345fa4", '6-9 yaş'), emoji: '👧', desc: tr("fairytalegenerator_orta_3c7a2d", "Orta") },
   { value: '10-12', label: tr("fairytalegenerator_10_12_yas_c393ca", '10-12 yaş'), emoji: '🧑', desc: tr("fairytalegenerator_murekkeb_43a904", "M\xFCr\u0259kk\u0259b") }];
 
 
-const STORY_STYLES = [
+const getStoryStyles = () => [
   { value: '', label: tr("fairytalegenerator_klassik_3c7a2d", "Klassik"), emoji: '📖' },
   { value: 'funny', label: tr("fairytalegenerator_gulmeli_8f7f56", 'Gülməli'), emoji: '😂' },
   { value: 'adventure', label: tr("fairytalegenerator_macera_bc3bdc", 'Macəra'), emoji: '🗺️' },
@@ -72,42 +76,38 @@ const STORY_STYLES = [
   { value: 'lullaby', label: tr("fairytalegenerator_laylay_3c7a2d", "Laylay"), emoji: '🌙' }];
 
 
-const LANGUAGES = [
-  { code: 'az', label: tr("fairytalegenerator_azerbaycan_733e93", 'Azərbaycan'), flag: 'az' },
-  { code: 'en', label: 'English', flag: 'gb' },
-  { code: 'ru', label: 'Русский', flag: 'ru' },
-  { code: 'tr', label: tr("fairytalegenerator_turkce_299adc", 'Türkçe'), flag: 'tr' },
-  { code: 'kk', label: 'Қазақша', flag: 'kz' },
-  { code: 'uz', label: "O'zbekcha", flag: 'uz' },
-  { code: 'ka', label: 'ქართული', flag: 'ge' },
-  { code: 'de', label: 'Deutsch', flag: 'de' },
-  { code: 'ar', label: 'العربية', flag: 'sa' }];
+const LANGUAGES = APP_LANGUAGES.map(item => ({ code: item.code, label: item.native_name, flag: item.flag }));
 
 
 // Shared select-pill styles (lav accent)
-const pillOn: CSSProperties = { background: 'var(--a-lav-2)', color: '#fff', border: '1px solid transparent', cursor: 'pointer' };
+const pillOn: CSSProperties = { background: 'var(--a-lav-2)', color: 'var(--a-lav-ink)', border: '1px solid transparent', cursor: 'pointer' };
 const pillOff: CSSProperties = { background: 'var(--a-surface-soft)', color: 'var(--a-ink-soft)', border: '1px solid transparent', cursor: 'pointer' };
 
 const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   useScreenAnalytics('FairyTaleGenerator', 'Tools');
   const isRtl = useIsRtl();
+  const language = normalizeAppLanguage(useUserStore(state => state.language));
+  const MORAL_LESSONS = getMoralLessons(), HERO_SUGGESTIONS = getHeroSuggestions(), AGE_RANGES = getAgeRanges(), STORY_STYLES = getStoryStyles();
   const [selectedTale, setSelectedTale] = useState<FairyTale | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [createMode, setCreateMode] = useState<'wizard' | 'direct'>('wizard');
   const [createStep, setCreateStep] = useState(1);
   const [customPrompt, setCustomPrompt] = useState('');
   const [directChildName, setDirectChildName] = useState('');
-  const [directLanguage, setDirectLanguage] = useState('az');
+  const [directLanguage, setDirectLanguage] = useState<string>(language);
   const [directAgeRange, setDirectAgeRange] = useState('3-5');
   const [formData, setFormData] = useState({
     child_name: '',
     theme: '',
     hero: '',
     moral_lesson: '',
-    language: 'az',
+    language: language as string,
     age_range: '3-5',
     story_style: ''
   });
+  useEffect(() => {
+    if (!showCreate) { setDirectLanguage(language); setFormData(value => ({ ...value, language })); }
+  }, [language, showCreate]);
 
   const { data: tales = [], isLoading } = useFairyTales();
   const { data: themes = [] } = useFairyTaleThemes();
@@ -115,13 +115,14 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
   const toggleFavorite = useToggleFavorite();
   const deleteTale = useDeleteFairyTale();
   const incrementPlayCount = useIncrementPlayCount();
-  const { checkAndConsume } = useSubscription();
+  const { peekRemainingDaily } = useSubscription();
   const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   const handleGenerate = async () => {
-    // Gündəlik pulsuz limit (premium → limitsiz)
-    const { allowed } = await checkAndConsume('fairy_tale');
-    if (!allowed) {
+    // The server owns consumption; an invalid form must not spend an allowance.
+    if (createMode === 'direct' ? !customPrompt.trim() : !formData.child_name.trim() || !formData.theme) return;
+    const { remaining } = await peekRemainingDaily('fairy_tale');
+    if (remaining <= 0) {
       setShowPremiumModal(true);
       return;
     }
@@ -132,7 +133,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
       }
       try {
         const result = await generateTale.mutateAsync({
-          child_name: directChildName || tr("fairytalegenerator_usaq_3e06e3", "U\u015Faq"),
+          child_name: directChildName || exampleChildName(directLanguage),
           language: directLanguage,
           age_range: directAgeRange,
           custom_prompt: customPrompt
@@ -164,7 +165,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
       });
       setShowCreate(false);
       setSelectedTale(result);
-      setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '', language: 'az', age_range: '3-5', story_style: '' });
+      setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '', language, age_range: '3-5', story_style: '' });
       setCreateStep(1);
     } catch (error) {
 
@@ -178,7 +179,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
     setCreateMode('wizard');
     setCustomPrompt('');
     setDirectChildName('');
-    setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '', language: 'az', age_range: '3-5', story_style: '' });
+    setFormData({ child_name: '', theme: '', hero: '', moral_lesson: '', language, age_range: '3-5', story_style: '' });
   };
 
   const favoriteTales = tales.filter((t) => t.is_favorite);
@@ -286,7 +287,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                 <div className="text-6xl mb-4">📚</div>
                 <h3 className="a-list-title mb-2" style={{ margin: '0 0 8px' }}>{tr("fairytalegenerator_hele_nagil_yoxdur_f0166c", "Hələ nağıl yoxdur")}</h3>
                 <p className="a-list-sub mb-4" style={{ margin: '0 0 16px', whiteSpace: 'normal' }}>{tr("fairytalegenerator_ilk_sehrli_nagilinizi_yaradin_efa8d2", "İlk sehrli nağılınızı yaradın!")}</p>
-                <button onClick={() => setShowCreate(true)} className="a-cta-btn mx-auto" style={{ background: 'var(--a-lav-2)', color: '#fff' }}>
+                <button data-fairytale-create onClick={() => setShowCreate(true)} className="a-cta-btn mx-auto" style={{ background: 'var(--a-lav-2)', color: '#fff' }}>
                   <Sparkles size={15} strokeWidth={2.2} />
                   {tr("fairytalegenerator_nagil_yarat_11707d", "Na\u011F\u0131l Yarat")}
                 </button>
@@ -404,7 +405,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                   className="a-input w-full"
                   value={directChildName}
                   onChange={(e) => setDirectChildName(e.target.value)}
-                  placeholder={tr('ft_child_name_ph', 'Məsələn: Aysel, Murad...')} />
+                  placeholder={followupText('fairytale_name_placeholder', language, { name: exampleChildName(directLanguage) })} />
 
               </div>
 
@@ -429,11 +430,14 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                     <button
                       key={lang.code}
                       type="button"
+                      data-story-language={lang.code}
+                      aria-label={lang.label}
+                      aria-pressed={directLanguage === lang.code}
                       onClick={() => setDirectLanguage(lang.code)}
                       className="rounded-xl transition-all flex flex-col items-center justify-center gap-1"
                       style={{ ...(directLanguage === lang.code ? pillOn : pillOff), height: 56, padding: 0 }}>
                       <img src={`https://flagcdn.com/w40/${lang.flag}.png`} alt={lang.code} style={{ width: 24, height: 17, objectFit: 'cover', borderRadius: 3 }} />
-                      <span className="text-[10.5px] font-bold uppercase tracking-wide">{lang.code}</span>
+                      <span className="text-[10.5px] font-semibold leading-tight px-1 break-words">{lang.label}</span>
                     </button>
                   )}
                 </div>
@@ -501,7 +505,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                         className="a-input w-full text-lg"
                         value={formData.child_name}
                         onChange={(e) => setFormData({ ...formData, child_name: e.target.value })}
-                        placeholder={tr('ft_child_names_ph', 'Məsələn: Aysel, Murad, Ləman...')}
+                        placeholder={followupText('fairytale_name_placeholder', language, { name: exampleChildName(formData.language) })}
                         autoFocus />
 
                     </div>
@@ -534,11 +538,14 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                           <button
                             key={lang.code}
                             type="button"
+                            data-story-language={lang.code}
+                            aria-label={lang.label}
+                            aria-pressed={formData.language === lang.code}
                             onClick={() => setFormData({ ...formData, language: lang.code })}
                             className="rounded-xl transition-all flex flex-col items-center justify-center gap-1"
                             style={{ ...(formData.language === lang.code ? pillOn : pillOff), height: 58, padding: 0 }}>
                             <img src={`https://flagcdn.com/w40/${lang.flag}.png`} alt={lang.code} style={{ width: 26, height: 18, objectFit: 'cover', borderRadius: 3 }} />
-                            <span className="text-[10.5px] font-bold uppercase tracking-wide">{lang.code}</span>
+                            <span className="text-[10.5px] font-semibold leading-tight px-1 break-words">{lang.label}</span>
                           </button>
                         )}
                       </div>
@@ -643,7 +650,7 @@ const FairyTaleGenerator = ({ onBack }: FairyTaleGeneratorProps) => {
                         className="a-input w-full"
                         value={formData.hero}
                         onChange={(e) => setFormData({ ...formData, hero: e.target.value })}
-                        placeholder={tr("fairytalegenerator_ve_ya_ozunuz_yazin_cb37bc", "Və ya özünüz yazın...")} />
+                        placeholder={followupText('fairytale_hero_placeholder', language)} />
 
                     </div>
 

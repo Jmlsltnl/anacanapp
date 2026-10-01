@@ -44,6 +44,7 @@ import { supabase } from '@/integrations/supabase/client';
 import PushDiagnosticsCard from './PushDiagnosticsCard';
 import NotificationOpsCard from './NotificationOpsCard';
 import BulkTimeManager from './BulkTimeManager';
+import AdminNotificationCampaigns from './AdminNotificationCampaigns';
 
 const audienceLabels: Record<string, {label: string;icon: any;color: string;}> = {
   all: { label: tr("adminpushnotifications_hami_c33b89", "Hamı"), icon: Users, color: 'bg-blue-500' },
@@ -54,7 +55,8 @@ const audienceLabels: Record<string, {label: string;icon: any;color: string;}> =
 };
 
 const AdminPushNotifications = () => {
-  const [activeTab, setActiveTab] = useState('scheduled');
+  const [activeTab, setActiveTab] = useState('bulk');
+  const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -66,10 +68,9 @@ const AdminPushNotifications = () => {
       </div>
 
 
-      <NotificationOpsCard />
-      <PushDiagnosticsCard />
+      <details className="rounded-xl border p-4" onToggle={event => setDiagnosticsOpen(event.currentTarget.open)}><summary className="cursor-pointer text-sm font-semibold">Bildiriş servisi və cihaz diaqnostikası</summary>{diagnosticsOpen && <div className="mt-4 space-y-4"><NotificationOpsCard /><PushDiagnosticsCard /></div>}</details>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="flex w-full h-auto justify-start overflow-x-auto gap-1 p-1">
           <TabsTrigger value="scheduled" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
             {tr("adminpushnotifications_gundelik_a7880f", "G\xFCnd\u0259lik")}
@@ -88,7 +89,7 @@ const AdminPushNotifications = () => {
           </TabsTrigger>
           <TabsTrigger value="bulk" className="flex items-center gap-2">
             <Zap className="h-4 w-4" />
-            Bulk
+            Kampaniyalar
           </TabsTrigger>
           <TabsTrigger value="time-manager" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
@@ -113,7 +114,7 @@ const AdminPushNotifications = () => {
         </TabsContent>
 
         <TabsContent value="bulk" className="mt-6">
-          <BulkPushTab />
+          <AdminNotificationCampaigns />
         </TabsContent>
 
         <TabsContent value="time-manager" className="mt-6">
@@ -1093,7 +1094,7 @@ const RecentFlowLogs = () => {
 };
 
 // ==================== BULK PUSH TAB ====================
-const BulkPushTab = () => {
+const LegacyBulkPushTab = () => {
   const { data: history = [], isLoading, refetch: refetchHistory } = useBulkPushNotifications();
   const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useAudienceStats();
   const createBulk = useCreateBulkPushNotification();

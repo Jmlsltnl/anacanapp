@@ -21,6 +21,8 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 export const ENTITLEMENT_ID = 'Anacan LLC Pro';
 
 interface RCSubscription {
+  refunded_at?: string | null;
+  purchase_date?: string | null;
   expires_date: string | null;
   period_type?: 'normal' | 'trial' | 'intro';
   unsubscribe_detected_at?: string | null;
@@ -62,7 +64,7 @@ export async function fetchRevenueCatSubscriber(appUserId: string): Promise<RCFe
 
 export interface SyncResult {
   ok: boolean;
-  reason?: 'no_secret_key' | 'rc_api_error';
+  reason?: 'no_secret_key' | 'rc_api_error' | 'db_write_failed';
   rcStatus?: number;
   rcDetail?: string;
   isPro?: boolean;
@@ -98,10 +100,11 @@ export async function syncEntitlementForUser(userId: string): Promise<SyncResult
 
   const entitlement = rc.subscriber?.entitlements?.[ENTITLEMENT_ID];
   const now = Date.now();
-  const isPro = !!entitlement && (!entitlement.expires_date || new Date(entitlement.expires_date).getTime() > now);
-
   const productId = entitlement?.product_identifier || null;
   const sub = productId ? rc.subscriber?.subscriptions?.[productId] : undefined;
+  if (sub?.refunded_at != null && !Number.isFinite(Date.parse(sub.refunded_at)) || sub?.purchase_date != null && !Number.isFinite(Date.parse(sub.purchase_date))) return { ok: false, reason: 'rc_api_error' };
+  const refunded = !!sub?.refunded_at && (!sub.purchase_date || Date.parse(sub.refunded_at) >= Date.parse(sub.purchase_date));
+  const isPro = !!entitlement && !refunded && (!entitlement.expires_date || new Date(entitlement.expires_date).getTime() > now);
   const willRenew = isPro ? !sub?.unsubscribe_detected_at : false;
   const periodType = (sub?.period_type || null); // 'normal' | 'trial' | 'intro' | null
   const expiresAt = entitlement?.expires_date || null;
@@ -152,13 +155,13 @@ export async function syncEntitlementForUser(userId: string): Promise<SyncResult
     is_trial: isTrial,
     cancelled_at: cancelledAt,
   }, { onConflict: 'user_id' });
-  if (subError) console.error('[revenuecat-sync] subscriptions upsert error:', subError);
+  if (subError) return { ok: false, reason: 'db_write_failed' };
 
   const { error: profileError } = await admin.from('profiles').update({
     is_premium: isPro,
     premium_until: isPro ? expiresAtIso : null,
   }).eq('user_id', userId);
-  if (profileError) console.error('[revenuecat-sync] profiles update error:', profileError);
+  if (profileError) return { ok: false, reason: 'db_write_failed' };
 
   // Referral: YALNIZ burada, RC-nin öz REST API-sindən müstəqil təsdiqləndikdən
   // sonra — klient artıq 'converted' göndərə bilmir (bax Duzelis33.sql).

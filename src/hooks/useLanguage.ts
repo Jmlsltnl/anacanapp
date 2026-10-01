@@ -1,25 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useUserStore } from '@/store/userStore';
 import { useCallback, useEffect, useMemo } from 'react';
-import { loadTranslations, clearTranslationCache } from '@/lib/i18n';
+import { loadTranslations, ensureLanguageReady, fetchActiveLanguages } from '@/lib/i18n';
+import { resolveAppLanguages, normalizeAppLanguage } from '@/lib/app-languages';
 
 export function useLanguage() {
   const language = useUserStore(state => state.language);
   const setLanguage = useUserStore(state => state.setLanguage);
   
   // Fetch active languages from DB
-  const { data: languages = [], isLoading } = useQuery({
+  const { data: languages = resolveAppLanguages(), isLoading } = useQuery({
     queryKey: ['app-languages'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('app_languages')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
-      if (error) throw error;
-      return data;
-    },
+    queryFn: fetchActiveLanguages,
     staleTime: 1000 * 60 * 30, // 30 min cache
   });
   
@@ -30,10 +22,12 @@ export function useLanguage() {
     }
   }, [language]);
   
-  const changeLanguage = useCallback((lang: string) => {
+  const changeLanguage = useCallback(async (lang: string) => {
+    lang = normalizeAppLanguage(lang);
     if (lang === language) return;
-    clearTranslationCache();
+    await ensureLanguageReady(lang);
     setLanguage(lang);
+    window.location.reload();
   }, [language, setLanguage]);
 
   // Extract disabled_tools for the current language

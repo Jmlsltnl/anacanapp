@@ -1,15 +1,16 @@
 import { tr } from '@/lib/tr';
 
 /**
- * Qan təzyiqi təsnifatı — AHA + hamiləlik (preeklampsiya) hədləri.
+ * Qan təzyiqi aralıqları — böyüklər üçün AHA, hamiləlik üçün ayrıca hədlər.
  * Hamiləlikdə: ≥140/90 = hipertenziya (həkim), ≥160/110 = ağır (təcili).
+ * Aralıq etiketi tək bir ölçmədən hipertenziya diaqnozu qoymur.
  */
 
 export type BpCategory =
 'low' // <90/60
-| 'normal' // <120/80
-| 'elevated' // 120-129 / <80
-| 'stage1' // 130-139 / 80-89
+| 'normal' // AHA: <120/80; hamiləlikdə: <130/85 (aşağı həddən yuxarı)
+| 'elevated' // AHA: 120-129 / <80; hamiləlikdə: 130-139 və ya 85-89
+| 'stage1' // AHA izləmə aralığı: 130-139 və ya 80-89; diaqnoz deyil
 | 'stage2' // ≥140 / ≥90
 | 'crisis'; // ≥180 / ≥120
 
@@ -29,8 +30,9 @@ export function classifyBp(systolic: number, diastolic: number, isPregnant: bool
   let category: BpCategory;
   if (systolic >= 180 || diastolic >= 120) category = 'crisis';else
   if (systolic >= 140 || diastolic >= 90) category = 'stage2';else
-  if (systolic >= 130 || diastolic >= 80) category = 'stage1';else
-  if (systolic >= 120) category = 'elevated';else
+  if (isPregnant && (systolic >= 130 || diastolic >= 85)) category = 'elevated';else
+  if (!isPregnant && (systolic >= 130 || diastolic >= 80)) category = 'stage1';else
+  if (!isPregnant && systolic >= 120) category = 'elevated';else
   if (systolic < 90 || diastolic < 60) category = 'low';else
   category = 'normal';
 
@@ -61,13 +63,13 @@ export function classifyBp(systolic: number, diastolic: number, isPregnant: bool
       guidance: tr('bp_guide_elevated', 'Duz qəbulunu azaldın, istirahət edin və müntəzəm ölçün.')
     },
     stage1: {
-      label: tr('bp_cat_stage1', 'Hipertenziya I'),
+      label: tr('bp_cat_monitor', 'Yüksəlmiş — izləyin'),
       emoji: '🟠',
       bg: 'var(--a-peach-1)', ink: 'var(--a-accent-ink)',
-      guidance: tr('bp_guide_stage1', 'Bir neçə gün ardıcıl yüksəkdirsə həkiminizlə məsləhətləşin.')
+      guidance: tr('bp_guide_monitor', 'Tək ölçmə hipertenziya diaqnozu deyil. Dincəldikdən sonra yenidən ölçün; bu aralıq təkrarlanırsa həkiminizlə məsləhətləşin.')
     },
     stage2: {
-      label: tr('bp_cat_stage2', 'Hipertenziya II'),
+      label: tr('bp_cat_high_reading', 'Yüksək təzyiq'),
       emoji: '🔴',
       bg: 'var(--a-alert-bg)', ink: 'var(--a-alert-ink)',
       guidance: tr('bp_guide_stage2', 'Bu gün həkiminizlə əlaqə saxlayın.')

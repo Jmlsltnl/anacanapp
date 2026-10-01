@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ShoppingBasket, ChevronRight, Trophy, Gamepad2, Sparkles, Puzzle, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ShoppingBasket, ChevronRight, Trophy, Gamepad2, Sparkles, Puzzle, RotateCcw, FlaskConical } from 'lucide-react';
 import { tr } from '@/lib/tr';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
@@ -14,6 +14,11 @@ import BirlesdirLevels from './birlesdir/BirlesdirLevels';
 import BirlesdirGame from './birlesdir/BirlesdirGame';
 import { TOTAL_LEVELS as BIRLESDIR_TOTAL_LEVELS } from './birlesdir/levelConfig';
 import Leaderboard from './Leaderboard';
+import ColorSortGame from './color-sort/ColorSortGame';
+import ColorSortLevels from './color-sort/ColorSortLevels';
+import { COLOR_SORT_ID, INITIAL_LEVEL_COUNT, MAX_LEVEL_COUNT } from './color-sort/difficulty';
+import { useColorSortLibrary } from './color-sort/useColorSortLibrary';
+import { useColorSortText } from './color-sort/useColorSortText';
 
 interface MiniGamesHubProps {
   onBack: () => void;
@@ -46,10 +51,22 @@ const GAMES = [
     gradient: 'from-violet-500 to-fuchsia-500',
     totalLevels: BIRLESDIR_TOTAL_LEVELS,
   },
+  {
+    id: COLOR_SORT_ID,
+    titleKey: 'colorsort_title',
+    title: 'Rəng çeşidləmə',
+    descKey: 'colorsort_card_desc',
+    desc: 'Rəngli vitaminləri çeşidlə, hər qabda bir rəng topla',
+    icon: FlaskConical,
+    gradient: 'from-cyan-500 to-teal-600',
+    totalLevels: INITIAL_LEVEL_COUNT,
+  },
 ];
 
 const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
   useScreenAnalytics('MiniGamesHub', 'MiniGames');
+  const { t } = useColorSortText();
+  const colorSortLibrary = useColorSortLibrary();
 
   const [activeTab, setActiveTab] = useState<Tab>('games');
   const [view, setView] = useState<View>('hub');
@@ -63,13 +80,15 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
   // Hooks must be called unconditionally — one instance per game.
   const saglamSebetProgress = useLocalGameProgress(SAGLAM_SEBET_ID);
   const birlesdirProgress = useLocalGameProgress(BIRLESDIR_ID);
+  const colorSortProgress = useLocalGameProgress(COLOR_SORT_ID);
   const submitSaglamSebetScore = useSubmitGameScore(SAGLAM_SEBET_ID);
   const submitBirlesdirScore = useSubmitGameScore(BIRLESDIR_ID);
+  const submitColorSortScore = useSubmitGameScore(COLOR_SORT_ID);
 
   const isSaglamSebet = selectedGameId === SAGLAM_SEBET_ID;
-  const progress = isSaglamSebet ? saglamSebetProgress : birlesdirProgress;
-  const submitScore = isSaglamSebet ? submitSaglamSebetScore : submitBirlesdirScore;
-  const totalLevelsForSelected = isSaglamSebet ? SAGLAM_SEBET_TOTAL_LEVELS : BIRLESDIR_TOTAL_LEVELS;
+  const isColorSort = selectedGameId === COLOR_SORT_ID;
+  const progress = isSaglamSebet ? saglamSebetProgress : isColorSort ? colorSortProgress : birlesdirProgress;
+  const submitScore = isSaglamSebet ? submitSaglamSebetScore : isColorSort ? submitColorSortScore : submitBirlesdirScore;
 
   // Memoized so child games' win/lose-watcher effects (which list these as
   // dependencies) don't re-fire on every parent re-render — e.g. the score
@@ -99,7 +118,7 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
         score: result.score,
       });
     },
-    // progress/submitScore are re-derived every render from one of two stable
+    // progress/submitScore are re-derived every render from the per-game stable
     // hook instances (see comment above) — their .recordLevelResult/.mutate
     // values stay referentially stable for as long as selectedGameId doesn't
     // change, which is always true for the duration of a single game session.
@@ -115,6 +134,10 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
     () => setSelectedLevel((prev) => Math.min(prev + 1, BIRLESDIR_TOTAL_LEVELS)),
     []
   );
+  const handleNextColorSortLevel = useCallback(() => {
+    if (selectedLevel >= colorSortLibrary.levelCount) colorSortLibrary.addLevels();
+    setSelectedLevel(Math.min(selectedLevel + 1, MAX_LEVEL_COUNT));
+  }, [selectedLevel, colorSortLibrary.levelCount, colorSortLibrary.addLevels]);
 
   if (view === 'game') {
     // Local failure domain: if the (animation/timer-heavy, portal-rendered)
@@ -137,6 +160,12 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
       </div>
     );
 
+    if (isColorSort) {
+      return <ErrorBoundary fallback={gameCrashFallback}>
+        <ColorSortGame key={selectedLevel} level={selectedLevel} levelCount={colorSortLibrary.levelCount}
+          onExit={handleExitToLevels} onLevelComplete={handleLevelComplete} onNextLevel={handleNextColorSortLevel} />
+      </ErrorBoundary>;
+    }
     if (isSaglamSebet) {
       return (
         <ErrorBoundary fallback={gameCrashFallback}>
@@ -164,6 +193,11 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
   }
 
   if (view === 'levels') {
+    if (isColorSort) {
+      return <ColorSortLevels progress={progress.progress} isLevelUnlocked={progress.isLevelUnlocked}
+        onSelectLevel={handleSelectLevel} onBack={() => setView('hub')}
+        levelCount={colorSortLibrary.levelCount} onAddLevels={colorSortLibrary.addLevels} />;
+    }
     if (isSaglamSebet) {
       return (
         <SaglamSebetLevels
@@ -190,7 +224,7 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
         {/* Header */}
         <header className="a-topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label="Back">
+            <motion.button onClick={onBack} className="a-icon-btn" whileTap={{ scale: 0.9 }} aria-label={t('back')}>
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div style={{ minWidth: 0 }}>
@@ -225,11 +259,13 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
           {activeTab === 'games' ? (
             <motion.div key="games" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               {GAMES.map((game) => {
-                const gameProgress = game.id === SAGLAM_SEBET_ID ? saglamSebetProgress.progress : birlesdirProgress.progress;
+                const gameProgress = game.id === SAGLAM_SEBET_ID ? saglamSebetProgress.progress : game.id === COLOR_SORT_ID ? colorSortProgress.progress : birlesdirProgress.progress;
+                const totalLevels = game.id === COLOR_SORT_ID ? colorSortLibrary.levelCount : game.totalLevels;
                 const Icon = game.icon;
                 return (
                   <motion.button
                     key={game.id}
+                    data-game-id={game.id}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => openGame(game.id)}
                     className={`w-full relative overflow-hidden rounded-3xl bg-gradient-to-br ${game.gradient} p-4 text-start shadow-xl mb-4`}
@@ -249,18 +285,18 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
                               <Sparkles className="w-2.5 h-2.5" /> {tr('minigames_badge_new', 'Yeni')}
                             </span>
                           </div>
-                          <h3 className="text-white font-bold text-base">{tr(game.titleKey, game.title)}</h3>
-                          <p className="text-white/80 text-xs">{tr(game.descKey, game.desc)}</p>
+                          <h3 className="text-white font-bold text-base">{game.id === COLOR_SORT_ID ? t('title') : tr(game.titleKey, game.title)}</h3>
+                          <p className="text-white/80 text-xs">{game.id === COLOR_SORT_ID ? t('card_desc') : tr(game.descKey, game.desc)}</p>
                         </div>
                         <ChevronRight className="rtl:rotate-180 w-5 h-5 text-white/70 flex-shrink-0" />
                       </div>
 
                       <div className="flex items-center gap-3 text-white/90 text-[11px]">
                         <span className="px-2 py-1 rounded-full bg-white/15 font-medium">
-                          {game.totalLevels} {tr('minigames_levels_short', 'səviyyə')}
+                          {totalLevels} {tr('minigames_levels_short', 'səviyyə')}
                         </span>
                         <span className="px-2 py-1 rounded-full bg-white/15 font-medium">
-                          {Math.min(gameProgress.unlockedLevel, game.totalLevels)}/{game.totalLevels}{' '}
+                          {Math.min(gameProgress.unlockedLevel, totalLevels)}/{totalLevels}{' '}
                           {tr('minigames_unlocked_short', 'açıq')}
                         </span>
                         {gameProgress.bestScoreOverall > 0 && (
@@ -289,12 +325,12 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
             </motion.div>
           ) : (
             <motion.div key="leaderboard" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-stretch gap-2 mb-3">
                 {GAMES.map((game) => (
                   <button
                     key={game.id}
                     onClick={() => setLeaderboardGameId(game.id)}
-                    className={`flex-1 py-2 rounded-full text-xs font-bold transition-all ${
+                    className={`flex-1 min-w-0 px-2 py-2 rounded-2xl text-xs font-bold transition-all break-words ${
                       leaderboardGameId === game.id
                         ? `bg-gradient-to-r ${game.gradient} text-white shadow-button`
                         : ''
@@ -303,7 +339,7 @@ const MiniGamesHub = ({ onBack }: MiniGamesHubProps) => {
                     { border: 'none', cursor: 'pointer' } :
                     { background: 'var(--a-surface)', color: 'var(--a-ink-soft)', border: '1px solid var(--a-line)', cursor: 'pointer' }}
                   >
-                    {tr(game.titleKey, game.title)}
+                    {game.id === COLOR_SORT_ID ? t('title') : tr(game.titleKey, game.title)}
                   </button>
                 ))}
               </div>

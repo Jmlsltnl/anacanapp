@@ -23,11 +23,16 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { fetchAllRows } from '@/lib/supabaseFetchAll';
+import { useAuth } from '@/hooks/useAuth';
+import { followupText } from '@/lib/followup-i18n';
+import { useQueryClient } from '@tanstack/react-query';
+import { Switch } from '@/components/ui/switch';
 
 interface UserRole {
   id: string;
   user_id: string;
   role: 'admin' | 'user' | 'moderator';
+  show_admin_badge?: boolean | null;
   profile?: {
     name: string;
     email: string | null;
@@ -42,6 +47,20 @@ const AdminSecurity = () => {
   const [selectedRole, setSelectedRole] = useState<'admin' | 'user' | 'moderator'>('user');
   const [profiles, setProfiles] = useState<any[]>([]);
   const { toast } = useToast();
+  const { user } = useAuth(), queryClient = useQueryClient();
+  const [changingBadge, setChangingBadge] = useState<string | null>(null);
+  const setBadge = async (target: string, visible: boolean) => {
+    if (!user || changingBadge) return;
+    setChangingBadge(target);
+    try {
+      const { data, error } = await (supabase as any).rpc('set_admin_badge_visibility_v1', { p_actor: user.id, p_target: target, p_visible: visible });
+      if (error || data?.user_id !== target || data?.show_admin_badge !== visible) throw new Error('ADMIN_BADGE_WRITE_UNCONFIRMED');
+      setRoles(rows => rows.map(row => row.user_id === target && row.role === 'admin' ? { ...row, show_admin_badge: visible } : row));
+      await queryClient.invalidateQueries({ predicate: query => ['community-feed','group-posts','single-post','community-profile-card','chat-authors-v2','stories'].includes(String(query.queryKey[0])) });
+      toast({ title: followupText('admin_badge_saved') });
+    } catch { toast({ title: followupText('admin_badge_failed'), variant: 'destructive' }); }
+    finally { setChangingBadge(null); }
+  };
 
   useEffect(() => {
     fetchRoles();
@@ -326,6 +345,10 @@ const AdminSecurity = () => {
                           <div>
                             <p className="font-medium">{profile?.name || tr("adminsecurity_namelum_134662", "Nam\u0259lum")}</p>
                             <p className="text-sm text-muted-foreground">{profile?.email}</p>
+                            {role.role === 'admin' && <label className="mt-2 flex items-center gap-2 text-xs" title={followupText('admin_badge_description')}>
+                              <Switch checked={role.show_admin_badge !== false} disabled={!!changingBadge} onCheckedChange={value => void setBadge(role.user_id, value)} aria-label={`${followupText('admin_badge')}: ${profile?.name || role.user_id}`} />
+                              {followupText('admin_badge')}
+                            </label>}
                           </div>
                         </div>
                       </td>

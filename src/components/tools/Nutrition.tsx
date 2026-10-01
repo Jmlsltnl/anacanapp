@@ -18,6 +18,7 @@ import { useScreenAnalytics } from '@/hooks/useScreenAnalytics';
 import VitaminsTab from './VitaminsTab';
 import { ToolPage, ToolHeader, ToolLoading } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
+import { NEW_LANGUAGE_CODES } from '@/lib/app-languages';
 import { useIsRtl, rtlX } from '@/lib/rtl';
 
 interface NutritionProps {
@@ -73,7 +74,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
     if (n.length < 2 || customFood.calories || aiCalLoading) return;
     setAiCalLoading(true);
     try {
-      const { data } = await supabase.functions.invoke('food-calories', { body: { name: n } });
+      const { data } = await supabase.functions.invoke('food-calories', { body: { name: n, language } });
       if (data?.found && data?.calories) {
         // İstifadəçi bu arada özü yazmayıbsa doldur
         setCustomFood((prev) => prev.calories ? prev : { ...prev, calories: String(data.calories) });
@@ -126,6 +127,10 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
         if (m.meal_id === 'nursing') {
           mealName = language === 'en' ? 'Nursing' : language === 'ru' ? 'Грудное вскармливание' : language === 'tr' ? 'Emzirme' : language === 'kk' ? 'Емізу' : language === 'uz' ? 'Emizish' : language === 'ka' ? 'ძუძუთი კვება' : language === 'de' ? 'Stillen' : language === 'ar' ? 'رضاعة' : 'Əmizdirmə';
           mealTime = language === 'en' ? 'Anytime' : language === 'ru' ? 'В любое время' : language === 'tr' ? 'Her zaman' : language === 'kk' ? 'Кез келген уақытта' : language === 'uz' ? 'Istalgan vaqtda' : language === 'ka' ? 'ნებისმიერ დროს' : language === 'de' ? 'Jederzeit' : language === 'ar' ? 'في أي وقت' : 'İstənilən vaxt';
+          if ((NEW_LANGUAGE_CODES as readonly string[]).includes(language)) {
+            mealName = tr('nutrition_nursing_label', 'Əmizdirmə');
+            mealTime = tr('nutrition_any_time', 'İstənilən vaxt');
+          }
         } else {
           // QEYD: bu düzəliş əvvəllər YALNIZ language==='en' üçün işləyirdi — digər dillərdə
           // (ru/tr/kk/de/ar) DB-dən gələn xam Azərbaycan mətni (məs. "İstənilən vaxt") olduğu
@@ -142,6 +147,7 @@ const Nutrition = forwardRef<HTMLDivElement, NutritionProps>(({ onBack }, ref) =
           };
           if (MEAL_NAME_TR[mealName]?.[language]) mealName = MEAL_NAME_TR[mealName][language];
           if (mealTime === 'İstənilən vaxt' && MEAL_TIME_TR[language]) mealTime = MEAL_TIME_TR[language];
+          if (mealTime === 'İstənilən vaxt' && (NEW_LANGUAGE_CODES as readonly string[]).includes(language)) mealTime = tr('nutrition_any_time', 'İstənilən vaxt');
         }
 
         return {

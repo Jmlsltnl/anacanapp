@@ -16,7 +16,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Instant
-import java.time.ZoneOffset
+import java.time.ZoneId
+import java.time.LocalDate
+import androidx.health.connect.client.time.TimeRangeFilter
 
 /**
  * HealthCycle — menstruasiya məlumatının Google Health Connect-ə YAZILMASI.
@@ -45,6 +47,7 @@ class HealthCyclePlugin : Plugin() {
     fun isAvailable(call: PluginCall) {
         val ret = JSObject()
         ret.put("available", client() != null)
+        ret.put("apiVersion", 2)
         call.resolve(ret)
     }
 
@@ -99,12 +102,16 @@ class HealthCyclePlugin : Plugin() {
         }
         val startStr = call.getString("startDate") ?: run { call.reject("startDate_required"); return }
         val endStr = call.getString("endDate") ?: startStr
-        val flowStr = call.getString("flow") ?: "medium"
+        val flowStr = call.getString("flow") ?: "unspecified"
+        if (flowStr !in setOf("unspecified", "light", "medium", "heavy", "none", "clear")) {
+            call.reject("invalid_flow"); return
+        }
 
         val flowValue = when (flowStr) {
             "light" -> MenstruationFlowRecord.FLOW_LIGHT
             "heavy" -> MenstruationFlowRecord.FLOW_HEAVY
-            else -> MenstruationFlowRecord.FLOW_MEDIUM
+            "medium" -> MenstruationFlowRecord.FLOW_MEDIUM
+            else -> MenstruationFlowRecord.FLOW_UNKNOWN
         }
 
         scope.launch {
@@ -117,15 +124,23 @@ class HealthCyclePlugin : Plugin() {
 
                 val start = java.time.LocalDate.parse(startStr)
                 val end = java.time.LocalDate.parse(endStr)
+                val zone = ZoneId.systemDefault()
+                if (start.isAfter(end) || end.isAfter(LocalDate.now(zone)) || java.time.temporal.ChronoUnit.DAYS.between(start, end) >= 90) {
+                    call.reject("invalid_dates"); return@launch
+                }
+                // Health Connect limits deletion to records authored by this app.
+                hc.deleteRecords(MenstruationFlowRecord::class,
+                    TimeRangeFilter.between(start.atStartOfDay(zone).toInstant(), end.plusDays(1).atStartOfDay(zone).toInstant()))
                 val records = mutableListOf<MenstruationFlowRecord>()
                 var d = start
-                while (!d.isAfter(end)) {
+                while (!d.isAfter(end) && flowStr != "none" && flowStr != "clear") {
                     // Günorta vaxtı — timezone kənarlarından qaçmaq üçün
-                    val time: Instant = d.atTime(12, 0).toInstant(ZoneOffset.UTC)
+                    val local = d.atTime(12, 0).atZone(zone)
+                    val time: Instant = local.toInstant()
                     records.add(
                         MenstruationFlowRecord(
                             time = time,
-                            zoneOffset = ZoneOffset.UTC,
+                            zoneOffset = local.offset,
                             flow = flowValue,
                             metadata = Metadata.manualEntry()
                         )
@@ -133,7 +148,7 @@ class HealthCyclePlugin : Plugin() {
                     d = d.plusDays(1)
                 }
 
-                hc.insertRecords(records)
+                if (records.isNotEmpty()) hc.insertRecords(records)
                 val ret = JSObject()
                 ret.put("written", records.size)
                 call.resolve(ret)

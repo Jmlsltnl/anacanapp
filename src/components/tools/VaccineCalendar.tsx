@@ -1,5 +1,12 @@
-import { tr, getPersistedLanguage } from "@/lib/tr";import { useMemo, useState } from 'react';
+import { tr, getPersistedLanguage } from "@/lib/tr";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { format, parseISO } from 'date-fns';
 import { getLocaleTag } from '@/lib/i18n';
+import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/hooks/useAuth';
+import { localizedCountryName } from '@/lib/app-languages';
+import { regionalText } from '@/lib/regional-i18n';
+import { regionalCountry, vaccineEligible, vaccineStatus, vaccineTiming } from '@/lib/vaccine-schedule';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Syringe, CheckCircle2, Clock, AlertTriangle, Ban,
@@ -22,7 +29,6 @@ import {
 '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface Props {
   onBack: () => void;
@@ -35,23 +41,18 @@ const STATUS = {
   pending: { label: () => tr("vaccinecalendar_gozlemede_80f70e", "G\xF6zl\u0259m\u0259d\u0259"), icon: Clock, bg: 'var(--a-yellow-1)', ink: 'var(--a-warn-ink)' },
   overdue: { label: () => tr("vaccinecalendar_gecikdi", "Gecikdi"), icon: AlertTriangle, bg: 'var(--a-pink-1)', ink: 'var(--a-pink-ink)' },
   skipped: { label: () => tr("vaccinecalendar_buraxildi_61c6a0", "Burax\u0131ld\u0131"), icon: Ban, bg: 'var(--a-surface-soft)', ink: 'var(--a-ink-soft)' },
-  future: { label: () => tr("vaccinecalendar_novbede_b7ecbc", "N\xF6vb\u0259d\u0259"), icon: Clock, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' }
+  future: { label: () => tr("vaccinecalendar_novbede_b7ecbc", "N\xF6vb\u0259d\u0259"), icon: Clock, bg: 'var(--a-blue-1)', ink: 'var(--a-blue-ink)' },
+  conditional: { label: () => regionalText('conditional', getPersistedLanguage()), icon: Info, bg: 'var(--a-surface-soft)', ink: 'var(--a-ink-soft)' },
+  seasonal: { label: () => regionalText('seasonal', getPersistedLanguage()), icon: CalendarIcon, bg: 'var(--a-surface-soft)', ink: 'var(--a-ink-soft)' },
+  interval: { label: () => regionalText('interval', getPersistedLanguage()), icon: Info, bg: 'var(--a-surface-soft)', ink: 'var(--a-ink-soft)' }
 } as const;
 
 type StatusKey = keyof typeof STATUS;
 
-const dayDiffFromBirth = (birthDate: string) => {
-  const b = new Date(birthDate + 'T00:00:00');
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return Math.floor((today.getTime() - b.getTime()) / 86400000);
-};
-
 const formatVaccineDate = (iso: string) => {
-  const d = new Date(iso);
-  const lang = getPersistedLanguage();
+  const d = parseISO(iso);
   const locale = getLocaleTag();
-  return d.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric' });
+  return d.toLocaleDateString(locale, { day: '2-digit', month: 'long', year: 'numeric', calendar: 'gregory' });
 };
 
 const translateVaccineLabel = (text: string | undefined | null, lang: string): string => {
@@ -116,15 +117,6 @@ const translateVaccineLabel = (text: string | undefined | null, lang: string): s
   return translated;
 };
 
-const computeStatus = (row: VaccineScheduleRow, ageDays: number, log?: ChildVaccination | null): StatusKey => {
-  if (log?.administered_at) return 'done';
-  if (log?.is_skipped) return 'skipped';
-  const max = row.max_age_days ?? row.recommended_age_days + 60;
-  if (ageDays > max) return 'overdue';
-  if (ageDays >= (row.min_age_days ?? row.recommended_age_days)) return 'pending';
-  return 'future';
-};
-
 const groupByAge = (rows: VaccineScheduleRow[], lang: string) => {
   const groups = new Map<string, {label: string;days: number;rows: VaccineScheduleRow[];}>();
   rows.forEach((r) => {
@@ -137,49 +129,61 @@ const groupByAge = (rows: VaccineScheduleRow[], lang: string) => {
 };
 
 export default function VaccineCalendar({ onBack }: Props) {
-  const { children, selectedChild, setSelectedChild, getChildAge } = useChildren();
+  const { children, selectedChild, setSelectedChild, getChildAge, refetch: refetchChildren } = useChildren();
+  const { user, profile } = useAuth();
   const { data: countries = [] } = useVaccineCountries();
   const { toast } = useToast();
-  const qc = useQueryClient();
-  const lang = getPersistedLanguage();
+  const lang = useUserStore(state => state.language);
+  const storedCountry = useUserStore(state => state.countryCode);
+  const accountCountry = regionalCountry(lang, profile?.country_code, storedCountry);
+  const orderedCountries = useMemo(() => [...countries].sort((a, b) => Number(b.code === accountCountry) - Number(a.code === accountCountry)), [countries, accountCountry]);
+  const [countryOverride, setCountryOverride] = useState<{ childId: string; code: string } | null>(null);
+  const [savingCountry, setSavingCountry] = useState(false);
+  const effectiveCountry = countryOverride && countryOverride.childId === selectedChild?.id ? countryOverride.code
+    : regionalCountry(lang, selectedChild?.vaccine_country_code, profile?.country_code, storedCountry, selectedChild?.country_code);
 
-  // Uşaq üçün ölkə seçilməyibsə, default tətbiq dilinə görə (tr→TR, ru→RU, kk→KZ, uz→UZ, ka→GE, de→DE, ar→SA, əks halda AZ)
-  const langDefaultCountry = lang === 'tr' ? 'TR' : lang === 'ru' ? 'RU' : lang === 'kk' ? 'KZ' : lang === 'uz' ? 'UZ' : lang === 'ka' ? 'GE' : lang === 'de' ? 'DE' : lang === 'ar' ? 'SA' : 'AZ';
-  const childCountry = (selectedChild as any)?.country_code || langDefaultCountry;
-  const [countryCode, setCountryCode] = useState<string>(childCountry);
-  const effectiveCountry = countryCode || childCountry;
-
-  const { data: schedule = [], isLoading: schedLoading } = useVaccineScheduleForCountry(effectiveCountry);
+  const { data: schedule = [], isLoading: schedLoading, error: scheduleError, refetch: refetchSchedule } = useVaccineScheduleForCountry(effectiveCountry);
   const { data: logs = [] } = useChildVaccinations(selectedChild?.id || null);
   const upsert = useUpsertChildVaccination();
   const del = useDeleteChildVaccination();
 
   const [tab, setTab] = useState<TabKey>('upcoming');
-  const [detailRow, setDetailRow] = useState<VaccineScheduleRow | null>(null);
+  const [detailRowId, setDetailRowId] = useState<string | null>(null);
+  const setDetailRow = (row: VaccineScheduleRow | null) => setDetailRowId(row?.id || null);
   const [actionRow, setActionRow] = useState<VaccineScheduleRow | null>(null);
+  const [actionChildId, setActionChildId] = useState<string | null>(null);
   const [actionMode, setActionMode] = useState<'done' | 'skip' | null>(null);
-
-  const ageDays = selectedChild ? getChildAge(selectedChild).days : 0;
+  const actionScope = useRef('');
+  actionScope.current = `${selectedChild?.id}:${effectiveCountry}:${actionRow?.id}`;
+  useEffect(() => {
+    setDetailRowId(null); setActionRow(null); setActionChildId(null); setActionMode(null);
+  }, [selectedChild?.id, effectiveCountry]);
 
   const rowsWithStatus = useMemo(() => {
     const logMap = new Map(logs.map((l) => [l.vaccine_schedule_id, l]));
-    return schedule.map((r) => {
+    return schedule.filter(r => {
+      const log = logMap.get(r.id);
+      return selectedChild && (r.vaccine.is_active || !!log)
+        && vaccineEligible(r, selectedChild.birth_date, selectedChild.gender, log);
+    }).map((r) => {
       const log = logMap.get(r.id) || null;
-      return { row: r, log, status: computeStatus(r, ageDays, log) };
+      return { row: r, log, status: vaccineStatus(r, selectedChild!.birth_date, logMap) };
     });
-  }, [schedule, logs, ageDays]);
+  }, [schedule, logs, selectedChild]);
+  const detailRow = rowsWithStatus.find(item => item.row.id === detailRowId)?.row || null;
 
   const stats = useMemo(() => {
-    const total = rowsWithStatus.length;
-    const done = rowsWithStatus.filter((x) => x.status === 'done').length;
-    const overdue = rowsWithStatus.filter((x) => x.status === 'overdue').length;
-    const upcoming = rowsWithStatus.filter((x) => x.status === 'pending' || x.status === 'overdue').length;
+    const routine = rowsWithStatus.filter(x => !vaccineTiming(x.row) || vaccineTiming(x.row)?.kind === 'routine');
+    const total = routine.length;
+    const done = routine.filter((x) => x.status === 'done').length;
+    const overdue = routine.filter((x) => x.status === 'overdue').length;
+    const upcoming = routine.filter((x) => ['pending', 'overdue', 'interval'].includes(x.status)).length;
     const pct = total ? Math.round(done / total * 100) : 0;
     return { total, done, overdue, upcoming, pct };
   }, [rowsWithStatus]);
 
   const upcomingRows = rowsWithStatus.
-  filter((x) => x.status === 'overdue' || x.status === 'pending' || x.status === 'future').
+   filter((x) => ['overdue', 'pending', 'future', 'interval'].includes(x.status)).
   sort((a, b) => a.row.recommended_age_days - b.row.recommended_age_days).
   slice(0, 30);
 
@@ -187,15 +191,23 @@ export default function VaccineCalendar({ onBack }: Props) {
   filter((x) => x.status === 'done').
   sort((a, b) => (b.log?.administered_at || '').localeCompare(a.log?.administered_at || ''));
 
-  const groupedAll = useMemo(() => groupByAge(schedule, lang), [schedule, lang]);
+  const groupedAll = useMemo(() => groupByAge(rowsWithStatus.map(item => item.row), lang), [rowsWithStatus, lang]);
   const country = countries.find((c) => c.code === effectiveCountry);
 
   const handleChangeCountry = async (code: string) => {
-    setCountryCode(code);
-    if (selectedChild) {
-      await supabase.from('user_children').update({ country_code: code } as any).eq('id', selectedChild.id);
-      qc.invalidateQueries({ queryKey: ['children'] });
-    }
+    if (!selectedChild || !user || savingCountry || !countries.some(country => country.code === code)) return;
+    const childId = selectedChild.id;
+    setSavingCountry(true);
+    try {
+      const { data, error } = await (supabase as any).from('user_children').update({ vaccine_country_code: code })
+        .eq('id', childId).eq('user_id', user.id).select('id,vaccine_country_code').maybeSingle();
+      if (error || data?.id !== childId || data?.vaccine_country_code !== code) throw new Error('VACCINE_COUNTRY_WRITE_UNCONFIRMED');
+      setCountryOverride({ childId, code });
+      await refetchChildren();
+      window.dispatchEvent(new Event('anacan:children-updated'));
+    } catch {
+      toast({ title: regionalText('countrySaveFailed', lang), variant: 'destructive' });
+    } finally { setSavingCountry(false); }
   };
 
   const renderStatusBadge = (s: StatusKey) => {
@@ -232,7 +244,7 @@ export default function VaccineCalendar({ onBack }: Props) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
               <h4 className="a-list-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{translateVaccineLabel(row.vaccine.name, lang)}</h4>
-              {!row.vaccine.is_mandatory &&
+              {!vaccineTiming(row) && !row.vaccine.is_mandatory &&
               <span className="a-tag" style={{ cursor: 'default', padding: '3px 8px', fontSize: 9.5 }}>{tr("vaccinecalendar_konullu_6b1c0e", "k\xF6n\xFCll\xFC")}</span>
               }
             </div>
@@ -299,19 +311,19 @@ export default function VaccineCalendar({ onBack }: Props) {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="a-tag" style={{ cursor: 'pointer', flexShrink: 0 }}>
+                <button className="a-tag" data-testid="vaccine-country" disabled={savingCountry} style={{ cursor: 'pointer', flexShrink: 0, maxWidth: '60%' }}>
                   {country?.flag_emoji && !country.flag_emoji.startsWith('data:') && country.flag_emoji.length > 10 ? (
                     <img src={`data:image/png;base64,${country.flag_emoji}`} alt="" style={{ width: 15, height: 11, objectFit: 'cover', borderRadius: 2 }} />
                   ) : (
                     <span>{country?.flag_emoji || '🌍'}</span>
                   )}
-                  <span style={{ fontWeight: 700 }}>{country?.name || effectiveCountry}</span>
+                  <span style={{ fontWeight: 700, overflowWrap: 'anywhere' }}>{country?.name || localizedCountryName(effectiveCountry, lang)}</span>
                   <ChevronDown size={11} />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                {countries.map((c) =>
-                <DropdownMenuItem key={c.code} onClick={() => handleChangeCountry(c.code)}>
+                {orderedCountries.map((c) =>
+                <DropdownMenuItem key={c.code} disabled={savingCountry} onClick={() => handleChangeCountry(c.code)}>
                   <span className="flex items-center gap-2">
                     {c.flag_emoji && !c.flag_emoji.startsWith('data:') && c.flag_emoji.length > 10 ? (
                       <img src={`data:image/png;base64,${c.flag_emoji}`} alt="" className="w-4 h-3 object-cover rounded-sm" />
@@ -349,12 +361,17 @@ export default function VaccineCalendar({ onBack }: Props) {
             </div>
           </div>
 
-          {/* PREMATURE QEYDİ: peyvəndlər korreksiya olunmuş yaşla YOX, real
+            {/* PREMATURE QEYDİ: peyvəndlər korreksiya olunmuş yaşla YOX, real
               (xronoloji) yaşla vurulur — WHO/AAP standartı. İstifadəçi
               çaşqınlığının qarşısını almaq üçün premature körpələrdə göstərilir. */}
           {getChildAge(selectedChild).isPremature &&
           <p style={{ marginTop: 10, fontSize: 11, color: 'var(--a-ink-soft)', background: 'var(--a-surface-soft)', borderRadius: 10, padding: '8px 10px' }}>
               ℹ️ {tr('vaccine_preemie_note', 'Vaxtından əvvəl doğulan körpələrdə peyvəndlər korreksiya olunmuş yaşa görə DEYİL, real doğum tarixinə görə vurulur (beynəlxalq standart). Təqvim dəyişməz qalır.')}
+            </p>
+          }
+          {country?.schedule_meta?.notes?.[lang] &&
+            <p className="a-list-sub" style={{ marginTop: 10, whiteSpace: 'pre-line', overflowWrap: 'anywhere' }} data-testid="vaccine-programme-note">
+              {country.schedule_meta.notes[lang]}
             </p>
           }
         </div>
@@ -379,8 +396,12 @@ export default function VaccineCalendar({ onBack }: Props) {
 
         <div className="mt-3 space-y-2.5">
           {schedLoading && <p className="a-list-sub text-center" style={{ padding: '24px 0', margin: 0 }}>{tr("vaccinecalendar_yuklenir_5557de", "Y\xFCkl\u0259nir...")}</p>}
+          {scheduleError && <div className="a-card" role="alert">
+            <p className="a-list-sub">{regionalText('scheduleError', lang)}</p>
+            <Button variant="outline" onClick={() => void refetchSchedule()}>{regionalText('retry', lang)}</Button>
+          </div>}
 
-          {!schedLoading && schedule.length === 0 &&
+          {!schedLoading && !scheduleError && schedule.length === 0 &&
           <div className="a-card" style={{ textAlign: 'center', padding: '28px 18px' }}>
               <Globe size={36} style={{ color: 'var(--a-ink-faint)', margin: '0 auto 8px' }} />
               <p className="a-list-title" style={{ marginBottom: 3 }}>{tr("vaccinecalendar_bu_olke_ucun_qrafik_hele_hazir_726119", "Bu \xF6lk\u0259 \xFC\xE7\xFCn qrafik h\u0259l\u0259 haz\u0131rlanmay\u0131b")}</p>
@@ -476,20 +497,24 @@ export default function VaccineCalendar({ onBack }: Props) {
               <DetailRow label={tr("vaccinecalendar_eks_gosterisler_f34875", "Əks-göstərişlər")} value={translateVaccineLabel(detailRow.vaccine.contraindications, lang)} />
               }
                 {detailRow.notes && <DetailRow label={tr("untranslated_qeyd_z0999u", "Qeyd")} value={translateVaccineLabel(detailRow.notes, lang)} />}
+                {vaccineTiming(detailRow)?.source_url && <a href={vaccineTiming(detailRow)!.source_url} target="_blank" rel="noopener noreferrer"
+                  className="a-list-sub" style={{ display: 'inline-flex', gap: 6, alignItems: 'center', overflowWrap: 'anywhere' }}>
+                  <ExternalLink size={12} />{regionalText('source', lang)}: {vaccineTiming(detailRow)!.source_label}
+                </a>}
 
                 {/* Actions */}
                 <div className="grid grid-cols-2 gap-2 pt-2">
                   <button
                   className="a-cta-btn"
                   style={{ justifyContent: 'center', background: 'var(--a-green-2)' }}
-                  onClick={() => {setActionRow(detailRow);setActionMode('done');setDetailRow(null);}}>
+                  onClick={() => {setActionRow(detailRow);setActionChildId(selectedChild.id);setActionMode('done');setDetailRow(null);}}>
                   
                     <CheckCircle2 size={15} strokeWidth={2.2} /> {tr("vaccinecalendar_vuruldu", "Vuruldu")}
                   </button>
                   <button
                   className="a-btn-soft"
                   style={{ justifyContent: 'center' }}
-                  onClick={() => {setActionRow(detailRow);setActionMode('skip');setDetailRow(null);}}>
+                  onClick={() => {setActionRow(detailRow);setActionChildId(selectedChild.id);setActionMode('skip');setDetailRow(null);}}>
                   
                     <Ban size={15} strokeWidth={2.2} /> {tr("vaccinecalendar_buraxildi_61c6a0", "Burax\u0131ld\u0131")}
                   </button>
@@ -520,18 +545,21 @@ export default function VaccineCalendar({ onBack }: Props) {
 
       {/* Action dialog */}
       <ActionDialog
+        key={`${selectedChild.id}:${effectiveCountry}:${actionRow?.id}:${actionMode}`}
         open={!!actionRow && !!actionMode}
         mode={actionMode}
         row={actionRow}
         onClose={() => {setActionRow(null);setActionMode(null);}}
         onSubmit={async (payload) => {
-          if (!actionRow || !selectedChild) return;
+          if (!actionRow || !selectedChild || actionChildId !== selectedChild.id || actionRow.country_code !== effectiveCountry) return;
+          const scope = actionScope.current;
           await upsert.mutateAsync({
             child_id: selectedChild.id,
             vaccine_schedule_id: actionRow.id,
             country_code: effectiveCountry,
             ...payload
           });
+          if (actionScope.current !== scope) return;
           toast({ title: tr("vaccinecalendar_yadda_saxlandi_f72ffd", "Yadda saxland\u0131"), description: actionRow.vaccine.name });
           setActionRow(null);
           setActionMode(null);
@@ -582,12 +610,21 @@ function ActionDialog({
   open, mode, row, onClose, onSubmit
 }: {open: boolean;mode: 'done' | 'skip' | null;row: VaccineScheduleRow | null;onClose: () => void;onSubmit: (payload: any) => Promise<void>;}) {
   const lang = getPersistedLanguage();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = format(new Date(), 'yyyy-MM-dd');
   const [date, setDate] = useState(today);
   const [location, setLocation] = useState('');
   const [batch, setBatch] = useState('');
   const [notes, setNotes] = useState('');
   const [reason, setReason] = useState('');
+  const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
+  const submit = async (payload: Record<string, unknown>) => {
+    if (saving) return;
+    setSaving(true);
+    try { await onSubmit(payload); }
+    catch { toast({ title: tr('usecommunity_xeta_bas_verdi_f22fba', 'Xəta baş verdi'), variant: 'destructive' }); }
+    finally { setSaving(false); }
+  };
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -618,7 +655,8 @@ function ActionDialog({
             </div>
             <Button
             className="w-full bg-emerald-500 hover:bg-emerald-600"
-            onClick={() => onSubmit({
+            disabled={saving || !date || date > today}
+            onClick={() => void submit({
               administered_at: date, is_skipped: false, skip_reason: null,
               location_az: location || null, batch_number: batch || null, notes: notes || null
             })}>{tr("untranslated_yadda_saxla_bpdu9v", "Yadda saxla")}</Button>
@@ -632,7 +670,8 @@ function ActionDialog({
             <Button
             variant="outline"
             className="w-full"
-            onClick={() => onSubmit({
+            disabled={saving}
+            onClick={() => void submit({
               administered_at: null, is_skipped: true, skip_reason: reason || null
             })}>
               {tr("vaccinecalendar_tesdiq_et_87b1a4", "T\u0259sdiq et")}

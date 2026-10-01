@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
+import type { PushEventData } from '@/lib/push';
 import { useAuth } from './useAuth';
 
 export interface ShoppingItem {
@@ -80,7 +81,7 @@ export const useShoppingItems = () => {
       
       // Send push notification to partner (max 1/day)
       if (partnerUserId) {
-        await notifyPartnerAboutShopping(partnerUserId, item.name);
+        await notifyPartnerAboutShopping(partnerUserId, data.name, data.id);
       }
 
       await fetchItems();
@@ -91,7 +92,7 @@ export const useShoppingItems = () => {
     }
   };
 
-  const notifyPartnerAboutShopping = async (partnerUserId: string, itemName: string) => {
+  const notifyPartnerAboutShopping = async (partnerUserId: string, itemName: string, interactionId: string) => {
     try {
       // Check if we already sent a shopping notification today
       const today = new Date().toISOString().split('T')[0];
@@ -108,7 +109,11 @@ export const useShoppingItems = () => {
         userId: partnerUserId,
         title: tr("useshoppingitems_alisveris_siyahisina_elave_5d9c87", "🛒 Alışveriş siyahısına əlavə"),
         body: `${adderName} "${itemName}" ${tr("useshoppingitems_elave_etdi_siyahini_yoxla", "əlavə etdi. Siyahını yoxla!")}`,
-        data: { type: 'shopping_list', context: 'partner' },
+        data: {
+          type: 'shopping_list',
+          context: 'partner',
+          interactionId
+        } satisfies PushEventData,
         kind: 'shopping_list'
       });
 

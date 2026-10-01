@@ -12,6 +12,12 @@ import { hapticFeedback } from '@/lib/native';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from 'next-themes';
 import { tr } from "@/lib/tr";
+import { GroupTagPicker } from './GroupPostTags';
+import { useBlogAttachment } from '@/hooks/useBlogAttachment';
+import BlogAttachmentPicker from './BlogAttachmentPicker';
+import { blogCommand } from '@/lib/community-blog';
+import { useMyModerationStatus } from '@/hooks/useModerator';
+import RestrictionNote from '@/components/moderation/RestrictionNote';
 
 interface CreatePostModalProps {
   isOpen: boolean;
@@ -54,6 +60,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   const [isUploading, setIsUploading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [taggedGroupIds, setTaggedGroupIds] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [suggestionType, setSuggestionType] = useState<'user' | 'hashtag' | null>(null);
@@ -62,8 +69,10 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const blog = useBlogAttachment(content, setContent, textareaRef, isOpen);
 
   const createPost = useCreatePost();
+  const { data: moderationStatus } = useMyModerationStatus();
   const { toast } = useToast();
   const { theme } = useTheme();
 
@@ -82,6 +91,8 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
     const cursorPos = e.target.selectionStart;
     setContent(newContent);
     setCursorPosition(cursorPos);
+    blog.setCursor(cursorPos);
+    if (blogCommand(newContent, cursorPos)) { setShowSuggestions(false); setSuggestions([]); return; }
     const textBeforeCursor = newContent.substring(0, cursorPos);
     const words = textBeforeCursor.split(/\s/);
     const currentWord = words[words.length - 1];
@@ -153,12 +164,14 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   };
 
   const handleSubmit = async () => {
-    if (!content.trim() && mediaFiles.length === 0) {toast({ title: tr("createpostmodal_bos_paylasim_47b52d", 'Boş paylaşım'), description: tr("createpostmodal_metn_yazin_ve_ya_media_elave_edin_18fa25", 'Mətn yazın və ya media əlavə edin'), variant: 'destructive' });return;}
+    if (moderationStatus?.post) return;
+    if (!content.trim() && mediaFiles.length === 0 && !blog.selected) {toast({ title: tr("createpostmodal_bos_paylasim_47b52d", 'Boş paylaşım'), description: tr("createpostmodal_metn_yazin_ve_ya_media_elave_edin_18fa25", 'Mətn yazın və ya media əlavə edin'), variant: 'destructive' });return;}
     hapticFeedback.medium();
     setIsUploading(true);
     try {
       const mediaUrls = await uploadMedia();
-      await createPost.mutateAsync({ groupId: selectedGroupId, content: content.trim() || '📷', mediaUrls, isAnonymous });
+      await createPost.mutateAsync({ groupId: selectedGroupId, content: content.trim() || (blog.selected ? '📖' : '📷'), mediaUrls, isAnonymous, taggedGroupIds, blogPostId: blog.selected?.id });
+      blog.setSelected(null);
       mediaPreviews.forEach((p) => URL.revokeObjectURL(p.url));
       setContent('');setMediaFiles([]);setMediaPreviews([]);onClose();
     } catch (error) {
@@ -173,8 +186,9 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
   };
 
   const handleClose = () => {
+    blog.setSelected(null);
     mediaPreviews.forEach((p) => URL.revokeObjectURL(p.url));
-    setContent('');setMediaFiles([]);setMediaPreviews([]);setShowEmojiPicker(false);setShowSuggestions(false);setIsAnonymous(false);
+    setContent('');setMediaFiles([]);setMediaPreviews([]);setShowEmojiPicker(false);setShowSuggestions(false);setIsAnonymous(false);setTaggedGroupIds([]);
     onClose();
   };
 
@@ -216,11 +230,13 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
               {/* Group Selector removed as per request */}
 
               {/* Content */}
+              <RestrictionNote scope="post" />
               <div className="relative">
                 <Textarea
                 ref={textareaRef}
                 value={content}
                 onChange={handleContentChange}
+                onSelect={event => blog.setCursor(event.currentTarget.selectionStart)}
                 placeholder={tr("createpostmodal_ne_dusunursunuz_474859", "Nə düşünürsünüz? ✨")}
                 className="min-h-[130px] rounded-2xl resize-none text-[14px] bg-muted/25 border-border/25 focus:border-primary/30 pe-12 leading-relaxed" />
               
@@ -257,6 +273,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
               </div>
 
               {/* Quick Hashtags */}
+              <BlogAttachmentPicker attachment={blog} />
               <div className="flex flex-wrap gap-1.5">
                 {POPULAR_HASHTAGS.slice(0, 5).map((tag) =>
               <button key={tag} onClick={() => setContent((prev) => prev + (prev ? ' ' : '') + `#${tag}`)}
@@ -309,10 +326,12 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
                 {mediaFiles.length > 0 && <span className="text-[10px] text-muted-foreground/60 font-medium ms-auto">{mediaFiles.length}/4</span>}
               </div>
 
+              <GroupTagPicker value={taggedGroupIds} onChange={setTaggedGroupIds} disabled={isUploading || isAnonymous}/>
+
               {/* Anonymous Toggle */}
               <button
               type="button"
-              onClick={() => setIsAnonymous(!isAnonymous)}
+              onClick={() => { if (!isAnonymous) setTaggedGroupIds([]); setIsAnonymous(!isAnonymous); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
               isAnonymous ? 'bg-primary/15 border border-primary/30' : 'bg-muted/25 border border-border/25'}`
               }>
@@ -332,7 +351,7 @@ const CreatePostModal = ({ isOpen, onClose, groupId, groups }: CreatePostModalPr
               {/* Submit */}
               <Button
               onClick={handleSubmit}
-              disabled={!content.trim() && mediaFiles.length === 0 || isUploading || createPost.isPending}
+              disabled={!content.trim() && mediaFiles.length === 0 && !blog.selected || !!blog.command || isUploading || createPost.isPending || moderationStatus?.post}
               className="w-full h-11 rounded-full gradient-primary font-bold text-[13px] shadow-lg shadow-primary/20">
               
                 {isUploading || createPost.isPending ?
