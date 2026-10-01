@@ -494,7 +494,7 @@
   },
   "modifiedOutsideManifest": [],
   "install": "unchanged (existing package-lock.json and dependencies)",
-  "build": "pending",
+  "build": "preview build OK (2026-10-01T08:35:51Z); manual production build not run",
   "notChanged": [
     ".env",
     "server secrets",
@@ -503,5 +503,7 @@
     "auth-provider settings",
     "edge function deployments"
   ],
-  "deltaFiles": 10
+  "deltaFiles": 10,
+  "focusedTests": "OnboardingJourney 40 passed; onboarding-billing 7 passed",
+  "verificationNote": "481 missing manifest entries are ignored and absent in this checkout; all 1440 available entries match; no files were added beyond the reviewed delta."
 }
