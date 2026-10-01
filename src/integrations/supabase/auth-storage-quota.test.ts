@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { brokeredPreviewStorage } from './previewAuthStorage';
+import { brokeredPreviewStorage } from './authStorage';
 import { LEGACY_AUTH_STORAGE_KEY } from './auth-storage-key';
 import { QuotaStorage } from '@/test/quota-storage';
 
