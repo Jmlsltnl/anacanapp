@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Check, Coffee, X } from 'lucide-react';
+import { Coffee, X } from 'lucide-react';
 import { useInAppPurchase } from '@/hooks/useInAppPurchase';
 import { useSubscription } from '@/hooks/useSubscription';
 import { getPlatform } from '@/lib/revenuecat';
@@ -8,6 +8,7 @@ import { onboardingText, onboardingLocale, type OnboardingCopyKey } from '@/lib/
 import type { OnboardingStage, OnboardingOutcome } from '@/lib/onboarding-model';
 import { OnboardingCompanion } from './OnboardingCompanion';
 import { OnboardingButton } from './OnboardingFrame';
+import { OnboardingBenefits } from './OnboardingBenefits';
 
 export default function OnboardingPaywall({ stage, language, mode, initialPlan, onPlanChange, offerSeen, pending, onPending, onOffer, onSkip, onSuccess, onLegal }: {
   stage: OnboardingStage; language: string; mode: 'paywall' | 'offer'; initialPlan: 'yearly' | 'monthly'; offerSeen: boolean; pending: boolean;
@@ -77,24 +78,24 @@ export default function OnboardingPaywall({ stage, language, mode, initialPlan, 
       <bdi>{value ? t(kind === 'yearly' ? 'per_year' : 'per_month', { price: value.priceString }) : t('price_unavailable')}</bdi>
     </span></div>
     {value && value.price < value.renewalPrice && <small>{t('first_year', { price: value.priceString })}</small>}
-    <small>{value && kind === 'yearly' ? t('equivalent_month', { price: new Intl.NumberFormat(onboardingLocale(language), { style: 'currency', currency: value.currency }).format(value.price / 12) }) : t('flexible_plan')}</small>
+    {value && <small>{kind === 'yearly' ? t('equivalent_month', { price: new Intl.NumberFormat(onboardingLocale(language), { style: 'currency', currency: value.currency }).format(value.price / 12) }) : t('flexible_plan')}</small>}
   </button>;
 
   return <div className="onb-paywall" data-testid="onboarding-paywall">
     <div className="onb-payment-top"><button type="button" className="onb-icon" disabled={busy} onClick={() => void close()} aria-label={t('close')}><X size={21} /></button>
       {platform !== 'web' && <button type="button" disabled={busy || iap.isLoading || !iap.isSupported} onClick={() => void restore()}>{t('restore')}</button>}
     </div>
-    <OnboardingCompanion stage={stage} pose={mode === 'offer' ? 'exit' : 'paywall'} language={language} size={mode === 'offer' ? 'compact' : 'tiny'} />
-    <h1 tabIndex={-1}>{t(mode === 'offer' ? 'coffee_title' : 'premium_title')}</h1>
-    <p className="onb-sub">{t(mode === 'offer' ? 'coffee_sub' : 'premium_sub')}</p>
-    <p className="onb-feedback">{t('remove_ads_premium')}</p>
-    <ul className="onb-list">{(['premium_ai', 'premium_reports', 'premium_noads'] as const).map(key => <li key={key}><Check size={18} aria-hidden="true" /><span>{t(key)}</span></li>)}</ul>
+    <div className="onb-summary-heading"><div>
+      <h1 tabIndex={-1}>{t(mode === 'offer' ? 'coffee_title' : 'premium_title')}</h1>
+      <p className="onb-sub">{t(mode === 'offer' ? 'coffee_sub' : 'premium_sub')}</p>
+    </div><OnboardingCompanion stage={stage} pose={mode === 'offer' ? 'exit' : 'paywall'} language={language} size="tiny" /></div>
+    <OnboardingBenefits stage={stage} page={mode} language={language} />
     {waiting ? <p className="onb-feedback" role="status">{t('purchase_pending')}</p>
       : platform === 'web' ? <p className="onb-feedback">{t('mobile_purchase')}</p>
       : iap.isLoading ? <p role="status" className="onb-note">{t('loading_prices')}</p>
-      : mode === 'offer' && monthly ? <div className="onb-offer"><Coffee size={32} className="mx-auto mb-3" aria-hidden="true" />
-        <strong><bdi>{monthly.priceString}</bdi></strong><p>{t('per_month', { price: monthly.priceString })}</p></div>
-      : mode === 'paywall' ? <>{card('yearly', yearly)}{card('monthly', monthly)}</>
+      : mode === 'offer' && monthly ? <div className="onb-offer"><Coffee size={28} aria-hidden="true" />
+        <strong><bdi>{t('per_month', { price: monthly.priceString })}</bdi></strong></div>
+      : mode === 'paywall' ? <div className="onb-plans">{card('yearly', yearly)}{card('monthly', monthly)}</div>
       : <p className="onb-feedback">{t('store_unavailable')}</p>}
     {mode === 'offer' && !waiting && <p className="onb-note">{t('once_only')}</p>}
     {(message || iap.purchaseStatus === 'failed') && !waiting && <p className="onb-error" role="alert">{t(message || 'purchase_failed')}</p>}
@@ -106,8 +107,8 @@ export default function OnboardingPaywall({ stage, language, mode, initialPlan, 
       {platform !== 'web' && !choice && !iap.isLoading && !waiting && <OnboardingButton secondary busy={busy} onClick={() => void run(iap.reloadOfferings)}>{t('retry')}</OnboardingButton>}
       <OnboardingButton data-testid="onb-skip-premium" secondary busy={busy} onClick={() => void close()}>{t(mode === 'offer' ? 'decline' : 'continue_free')}</OnboardingButton>
     </div>
-    {choice && !waiting && prices(choice)}
-    <p className="onb-note">{t('manage_store')}</p>
+    <div className="onb-payment-disclosure">{choice && !waiting && prices(choice)}
+      <p className="onb-note">{t('manage_store')}</p></div>
     <div className="onb-legal"><button type="button" disabled={busy} onClick={() => onLegal('terms_of_service')}>{t('terms')}</button>
       <button type="button" disabled={busy} onClick={() => onLegal('privacy_policy')}>{t('privacy')}</button></div>
   </div>;

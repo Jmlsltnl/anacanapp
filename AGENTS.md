@@ -8,6 +8,14 @@
   future fixes/features against Azure; the old Lovable/Supabase deployment is a
   legacy migration/compatibility source, not a parallel development target.
 - Current baseline and delivery links: `docs/APPLICATION_BASELINE.md`.
+- The 2026-10-01 compact onboarding followup replaces the results/support/Premium/
+  coffee-offer benefit lists for Mommy, Bump and Flow. The reviewed24-key copy is
+  bundled in all21 languages in `scripts/i18n/onboarding-features-copy.json`, with
+  page/stage selection in `src/lib/onboarding-features.ts`. Keep these explicit
+  lists separate from question-answer labels and old remote Premium copy. The
+  existing real-store pricing, restore/pending/one-time-offer and Source persistence
+  contracts remain. Contract and web publication receipts: `docs/ONBOARDING_COMPACT.md`.
+  This web/code update does not replace the delivered native43/Store43 packages.
 - On2026-10-01 the user requested bringing the current application files into
   parity with the existing Lovable project, enabling the Source Auth hook there,
   and a web-only brand advertising portal with brand-scoped email/password login.

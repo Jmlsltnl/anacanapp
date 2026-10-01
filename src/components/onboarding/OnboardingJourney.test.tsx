@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useUserStore } from '@/store/userStore';
 import { ONBOARDING_LANGUAGES, onboardingText } from '@/lib/onboarding-i18n';
@@ -104,6 +104,43 @@ describe('complete localized journeys', () => {
     expect(localStorage.getItem(onboardingDraftKey(mocks.actor, mocks.backend))).toBeNull();
   });
 });
+it.each([
+  { stage: 'mommy' as const,
+    plan: ['Yuxu rejimi izləmə', 'Qidalanma izləmə', 'İnkişaf mərhələləri', 'Ağlama analizi', 'Hava və geyim'],
+    support: ['Anacan AI', 'Həkim PDF', 'Partnyor hesabı', 'Bəyaz səslər və ağıllı nağıllar', 'Peyvənd təqvimi', 'Sağlam reseptlər', 'Diş çıxarma izləyicisi', 'Mental sağlamlıq və məşqlər', 'Reklamsız təcrübə'],
+    mental: 'Mental sağlamlıq və məşqlər' },
+  { stage: 'bump' as const,
+    plan: ['Fetal böyümə izləyici', 'Qidalanmaya nəzarət', 'Təhlükəsizlik sorğusu', 'Təpik və sancı ölçən', 'Çəki, qan təzyiqi və şəkəri izləyicisi'],
+    support: ['Anacan AI', 'Həkim PDF', 'Partnyor hesabı', 'Sağlam reseptlər', 'Xəstəxana çantası və ortaq alış-veriş', 'Hamiləlik albomu, vitamin izləyici', 'Mental sağlamlıq və idman', 'Reklamsız təcrübə'],
+    mental: 'Mental sağlamlıq və idman' },
+  { stage: 'flow' as const,
+    plan: ['Əhval gündəliyi', 'Qidalanmaya nəzarət', 'Vitamin izləyicisi', 'Sağlam reseptlər', 'Mental sağlamlıq və idman'],
+    support: ['Anacan AI', 'Həkim PDF', 'Partnyor hesabı', 'Sağlam reseptlər', 'Qidalanmaya nəzarət', 'Vitamin izləyicisi', 'Mental sağlamlıq və idman', 'Reklamsız təcrübə'],
+    mental: 'Mental sağlamlıq və idman' },
+])('$stage shows the requested benefits through results, support, Premium and monthly offer', async ({ stage, plan, support, mental }) => {
+  mocks.native = true;
+  render(<OnboardingJourney />); await travel(stage, 'results');
+  const benefits = () => within(screen.getByTestId('onboarding-benefits')).getAllByRole('listitem').map(item => item.textContent);
+  expect(benefits()).toEqual(plan);
+  await click(screen.getByRole('button', { name: onboardingText('az', 'view_plan') }));
+  expect(step()).toBe('features'); expect(benefits()).toEqual(support);
+  await click(document.querySelector('.onb-footer .onb-primary'));
+  expect(step()).toBe('paywall');
+  const premium = ['Anacan AI', 'Həkim PDF', 'Partnyor hesabı', mental, 'Reklamsız təcrübə'];
+  expect(benefits()).toEqual(premium);
+  expect(screen.getByText(onboardingText('az', 'charged_today', { price: '$19.99' }))).toBeInTheDocument();
+  expect(screen.getByText(onboardingText('az', 'renewal_year', { price: '$29.99' }))).toBeInTheDocument();
+  await click(screen.getByRole('button', { name: onboardingText('az', 'close') }));
+  expect(step()).toBe('offer'); expect(benefits()).toEqual(premium);
+  const progress = screen.getByRole('progressbar');
+  expect(progress).toHaveAttribute('aria-valuenow', progress.getAttribute('aria-valuemax'));
+  expect(screen.getByText(onboardingText('az', 'renewal_month', { price: '$3.99' }))).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: onboardingText('az', 'restore') })).toBeEnabled();
+  expect(screen.getByRole('button', { name: onboardingText('az', 'terms') })).toBeEnabled();
+  expect(screen.getByRole('button', { name: onboardingText('az', 'privacy') })).toBeEnabled();
+  expect(mocks.save).toHaveBeenCalledTimes(1); expect(mocks.claim).toHaveBeenCalledTimes(1);
+  expect(mocks.purchase).not.toHaveBeenCalled();
+});
 it('stays on an unsuccessful save, keeps answers, and recovers on retry', async () => {
   mocks.save.mockRejectedValueOnce(new Error('ONBOARDING_CHILD_SAVE_FAILED'));
   render(<OnboardingJourney />); await travel('mommy', 'value');
@@ -153,7 +190,7 @@ it('keeps the annual discount and offers only monthly coffee pricing after closi
   const done = vi.fn(); render(<OnboardingJourney onComplete={done} />);
   expect(document.querySelector('[data-plan="yearly"] del')).toHaveTextContent('$29.99');
   expect(document.querySelector('[data-plan="yearly"]')).toHaveTextContent('$19.99');
-  expect(screen.getByText(onboardingText('az', 'remove_ads_premium'))).toBeInTheDocument();
+  expect(within(screen.getByTestId('onboarding-benefits')).getByText('Reklamsız təcrübə')).toBeInTheDocument();
   await click(screen.getByRole('button', { name: onboardingText('az', 'close') }));
   expect(step()).toBe('offer'); expect(mocks.claim).toHaveBeenCalledOnce();
   expect(document.querySelector('.onb-offer strong')).toHaveTextContent('$3.99');

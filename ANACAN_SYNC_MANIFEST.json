@@ -1,8 +1,8 @@
 {
   "protocol": "anacan-lovable-application-sync-v1",
-  "at": "2026-10-01T07:07:32.701Z",
+  "at": "2026-10-01T08:34:27.148Z",
   "projectId": "e07ee1f9-3d58-48fe-a7a0-068ecf028173",
-  "baseCommit": "841f79dd966708235bf2011b5eab7d9a26525193",
+  "baseCommit": "43a6dc9bde953ab955ccd9bea4784c3223501a0b",
   "sourceOfTruth": "current-reviewed-worktree",
   "backend": "source",
   "files": [
@@ -73,8 +73,8 @@
     },
     {
       "path": "AGENTS.md",
-      "bytes": 19923,
-      "sha256": "236c3e1493e822e9d31cd72a20f5a0796bda6326b06625468d68dbc45d4b652a"
+      "bytes": 20584,
+      "sha256": "3ae82251ee0ff07f9907416bc143796947b0927ac7799d79b3cc8e8956bd2a6a"
     },
     {
       "path": "src/App.css",
@@ -2023,18 +2023,18 @@
     },
     {
       "path": "src/components/onboarding/OnboardingJourney.test.tsx",
-      "bytes": 15750,
-      "sha256": "f5b7f9166b9d49e49ddfd14a8a884256eaf1c6b5be98d43af5ae73330e3e56e7"
+      "bytes": 18959,
+      "sha256": "50b7a48588fecb35a3f0c95ba490b58315dc0a6609dfbbfc9e6840925adbb5e3"
     },
     {
       "path": "src/components/onboarding/OnboardingJourney.tsx",
-      "bytes": 22940,
-      "sha256": "c135d5b92f8bc78f9715917aa06e1fb126da05cb3b358cf9594fd8110327060c"
+      "bytes": 22968,
+      "sha256": "5ecccb1e49d8cf93f79948ce72cb17308da0a77c49944cb2d934211ad3c9f4c2"
     },
     {
       "path": "src/components/onboarding/OnboardingPaywall.tsx",
-      "bytes": 8540,
-      "sha256": "2bc0df8351863ac3cbd60c1b821adeb1891668d0dc37eabf351cf089f290d020"
+      "bytes": 8469,
+      "sha256": "71b8ff9f1c3f40953fe9483764dd255d49a7db547aa2f829d20651548459a055"
     },
     {
       "path": "src/components/onboarding/PremiumOnboarding.tsx",
@@ -4708,8 +4708,8 @@
     },
     {
       "path": "src/styles/onboarding.css",
-      "bytes": 11469,
-      "sha256": "1da85b11464e3c6fc440a9a4fab524c287b2294c1a125418e1724be664831e5d"
+      "bytes": 14450,
+      "sha256": "70691f1da43422fbb22f79731fa952a046a7a63033f65bd79e9f23050f0ad5dd"
     },
     {
       "path": "src/styles/startup.css",
@@ -9553,8 +9553,8 @@
     },
     {
       "path": "docs/APPLICATION_BASELINE.md",
-      "bytes": 27989,
-      "sha256": "cf891d89339cc1ac1afd8be732db53688bfb3f6e673e8e4067b4832ad17bc0bd"
+      "bytes": 28884,
+      "sha256": "1a9c8c26e541d066a867be6ef313602a4761bddc1c9d3f2b512eaaf8b20a2571"
     },
     {
       "path": "docs/RELEASE_43_SOURCE.md",
@@ -9590,6 +9590,26 @@
       "path": "src/integrations/supabase/database-types.ts",
       "bytes": 567,
       "sha256": "c11228669a8ea36f35996166f373d79d76570359a9cbed689847ea588160a5dd"
+    },
+    {
+      "path": "scripts/i18n/onboarding-features-copy.json",
+      "bytes": 29216,
+      "sha256": "b7ce634dd35308af4e13c77c220b1d99d37299fd0b98030860ad43c7f2cff055"
+    },
+    {
+      "path": "src/lib/onboarding-features.ts",
+      "bytes": 2159,
+      "sha256": "0ead90eec8523656bf6274da936a76c2874db3f106e96f9fe3084bf37bc4b08e"
+    },
+    {
+      "path": "src/components/onboarding/OnboardingBenefits.tsx",
+      "bytes": 688,
+      "sha256": "b6532fdd780862e9eaf72f28737ecf6df4a8fe6864664ce3a27d9ebd1586b062"
+    },
+    {
+      "path": "docs/ONBOARDING_COMPACT.md",
+      "bytes": 4973,
+      "sha256": "d8afec9bceabec15f4edfbe3cd25f155c036d2b462316deeea3d5384811c20f6"
     }
   ],
   "reviewedRemovals": [

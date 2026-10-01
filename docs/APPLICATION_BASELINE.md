@@ -15,7 +15,20 @@ və hazırkı **30.0** kod bazası üzərində davam etdirilir.
 UI, funksiyalar, bugfix və inteqrasiya işləri cari Azure-designated worktree-dən
 davam edir; release43 Source uyğunluğu eyni tətbiq kodundan hazırlanır.
 
-## Cari Source/native43 işi — 2026-09-30
+## Cari onboarding və brend web işi — 2026-10-01
+
+- Cari kod eyni Lovable layihəsi ilə reviewed delta vasitəsilə uyğunlaşdırılır;
+  Source database/Auth saxlanır. Lovable canonical ünvanı: **https://app.anacan.az**.
+- Ana, Hamilə və Period üçün Plan/Kiçik addımlar/Premium/Bir fincan səhifələrinin
+  yığcam,21-dilli siyahıları: [ONBOARDING_COMPACT.md](ONBOARDING_COMPACT.md).
+  Dəqiq gateway/Lovable yayım qəbulu həmin sənəddə göstərilən ops receipt-lərindədir.
+- Ayrı web brend paneli `/brands`, idarəetmə `/brands/manage`; native ekrana daxil
+  edilmir. [Brend müqaviləsi və qəbul](BRAND_PORTAL.md).
+- Brend runtime-dan sonra Source282 relation/18 receipt, writer open/generation0,
+  əvvəlki5 cron və accepted/pending xətti qorunur. Auth Hook binding-i hələ
+  Lovable Cloud operator/support asılılığıdır; Source IP mode off qalır.
+
+## Source/native43 təhvili — 2026-09-30
 
 İstifadəçinin son qərarı: cari tətbiq düzəldilir, Android/iOS paketləri hazırlanır,
 **database Lovable/Source-da qalır**. Source/generation0 və əvvəlki sync zənciri

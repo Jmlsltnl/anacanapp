@@ -103,8 +103,37 @@
 .onb-payment-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .onb-payment-top > button:not(.onb-icon) { font-size: 12px; min-height: 44px; text-decoration: underline; }
 .onb-payment-actions { margin-top: 20px; }
+/* Compact plan summaries keep the character beside the heading and use the same
+   readable checklist across the four stage-specific pages. Long locales scroll. */
+.onb-summary-heading { display: grid; grid-template-columns: minmax(0, 1fr) 72px; align-items: center; gap: 12px; margin: 4px 0 14px; }
+.onb-summary-heading h1 { font-size: clamp(22px, 5.8vw, 25px); margin: 0 0 7px; text-wrap: pretty; }
+.onb-summary-heading .onb-sub { font-size: 13px; line-height: 1.55; margin: 0; }
+.onb-summary-heading .onb-companion { height: 80px; width: 72px; margin: 0; justify-content: center; }
+.onb-benefits { display: flex; flex-direction: column; margin: 12px 0 16px; padding: 4px 12px; list-style: none; border: 1px solid var(--onb-line); border-radius: 16px; background: var(--onb-bg); }
+.onb-benefits li { display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 7px 0; font-size: 13px; line-height: 1.45; }
+.onb-benefits li + li { border-top: 1px solid var(--onb-line); }
+.onb-benefits li > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+.onb-benefit-check { display: grid; place-items: center; width: 24px; height: 24px; flex-shrink: 0; border-radius: 50%; background: var(--onb-surface); color: var(--onb-ok); }
+.onboarding[data-onboarding-step=results] .onb-results-chips { gap: 6px; margin: 10px 0; }
+.onboarding[data-onboarding-step=results] .onb-results-chips span { padding: 4px 9px; font-size: 11px; }
+.onb-paywall .onb-summary-heading { margin-top: 6px; }
+.onb-paywall .onb-benefits { margin-block: 12px; }
+.onb-plans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.onb-plans .onb-plan { min-width: 0; border-width: 2px; border-radius: 14px; padding: 10px 12px; margin: 0; overflow-wrap: anywhere; }
+.onb-plans .onb-plan-top { flex-direction: column; gap: 4px; line-height: 1.4; }
+.onb-plans .onb-plan-badge { padding: 3px 7px; margin-bottom: 6px; line-height: 1.4; }
+.onb-plans .onb-plan small { line-height: 1.5; }
+.onb-paywall .onb-offer { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 14px; margin: 12px 0; border-radius: 16px; }
+.onb-paywall .onb-offer > svg { flex-shrink: 0; color: var(--onb-accent); }
+.onb-paywall .onb-offer strong { font-size: clamp(26px, 7vw, 32px); }
+.onb-paywall .onb-payment-actions { margin-top: 12px; }
+.onb-paywall .onb-feedback { padding: 10px 12px; }
+.onb-payment-disclosure .onb-note { line-height: 1.5; margin-block: 6px; }
+.onboarding:is([data-onboarding-step=paywall], [data-onboarding-step=offer]) .onb-content { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
 .onb-spinner { animation: onb-spin 1s linear infinite; }
 @keyframes onb-spin { to { transform: rotate(360deg); } }
 @media(max-width:360px) { .onb-content { padding-inline: 18px; } .onb-footer { padding-inline: 18px; } .onb-counter { align-items: flex-start; flex-direction: column; } .onb-family .onb-companion { height: 145px; } }
 @media(max-height:700px) { .onb-family .onb-companion { height: 140px; } .onb-companion-hero { height: 158px; } .onb-companion-compact { height: 100px; } }
+@media(max-width:359px) { .onb-plans { grid-template-columns: 1fr; } .onb-plans .onb-plan-top { flex-direction: row; } }
+@media(max-height:700px) { .onb-summary-heading { grid-template-columns: minmax(0, 1fr) 60px; margin-bottom: 10px; } .onb-summary-heading .onb-companion { height: 64px; width: 60px; } .onb-benefits li { min-height: 34px; padding-block: 5px; } }
 @media(prefers-reduced-motion:reduce) { .onboarding *, .onboarding *::before { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
