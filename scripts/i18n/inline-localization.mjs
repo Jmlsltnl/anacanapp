@@ -35,7 +35,10 @@ export function jsxTextValue(raw) {
 export function analyzeInlineCopy(code, file) {
   const messages = {}, replacements = [];
   if (!/^src\/.*\.tsx?$/.test(file) || /(?:\.test\.|\.spec\.|^src\/test\/)/.test(file)
-    || file === 'src/components/InitialLanguageScreen.tsx' || file === 'src/main.tsx' || file === 'src/bootstrap-app.tsx') return { messages, replacements };
+    || file === 'src/components/InitialLanguageScreen.tsx' || file === 'src/main.tsx' || file === 'src/bootstrap-app.tsx'
+    // The business portal owns its 21-language copy and separate auth realm.
+    // Injecting consumer tr/i18n here would initialize the consumer SDK/session.
+    || file.startsWith('src/brand-portal/')) return { messages, replacements };
   const tree = ts.createSourceFile(file, code, ts.ScriptTarget.Latest, true, file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   const displayContext = node => {
     for (let parent = node.parent; parent; parent = parent.parent) {

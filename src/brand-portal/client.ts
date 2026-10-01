@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { quotaManagedStorage } from '@/lib/local-storage';
 
 export const BRAND_SOURCE_ORIGIN = 'https://tntbjulojatnrqmylorp.supabase.co';
 export const BRAND_AUTH_STORAGE_KEY = 'anacan-brand-portal-auth-v1:source';
@@ -24,7 +25,7 @@ export function getBrandClient() {
     const config = brandBackendConfig(import.meta.env);
     client = createClient(config.url, config.key, { auth: {
       storageKey: BRAND_AUTH_STORAGE_KEY, persistSession: true, autoRefreshToken: true,
-      detectSessionInUrl: false,
+      detectSessionInUrl: false, storage: quotaManagedStorage(window.localStorage),
     } });
   }
   return client;

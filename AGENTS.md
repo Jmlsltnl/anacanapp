@@ -16,6 +16,18 @@
   Keep the database on Source and preserve all delivered native43/Store43 assets.
   The brand portal must have its own web route/session and tenant authorization;
   do not expose it as a native application screen.
+- The brand portal implementation now uses `/brands` and `/brands/manage`, a
+  separate Source session/cache, server-enforced brand membership and admin-managed
+  email/password accounts. `source-brand-ads-v1` is installed (hash
+  `230e89e083c191f50a21afe9cf8bbc04b983efcfdd21e30d8722e8145736888b`), with282 Source
+  relations/18 runtime receipts and preserved writer/cron/accepted/pending state.
+  The Source `brand-portal-accounts` function is deployed. Lovable code-delta parity
+  and publication receipts are documented in `docs/BRAND_PORTAL.md`.
+  Keep consumer i18n/Supabase imports out of `src/brand-portal/`; its independent
+  copy must remain excluded from the automatic consumer inline-localization plugin.
+  Auth-hook binding was rechecked with the Lovable project's tools on2026-10-01;
+  it still requires Lovable Cloud support/operator configuration. Source IP mode
+  remains off until that actual binding and trusted-IP acceptance.
 - On2026-09-30 the user requested fixing the current application and producing
   Android/iOS release packages while keeping the database on Lovable/Source.
   Do not perform an Azure population cutover, change admission to Azure, freeze

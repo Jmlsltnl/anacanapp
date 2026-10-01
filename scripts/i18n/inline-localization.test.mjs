@@ -60,6 +60,13 @@ test('extracts display props and notifications, never pre-admission or test modu
     assert.equal(transformInlineCopy(source, path), null);
   }
 });
+test('independent brand portal copy never imports the consumer translation/auth runtime', () => {
+  const source = 'export default () => <label aria-label="Language">CTR<button>Continue</button></label>;';
+  for (const file of ['src/brand-portal/Portal.tsx', 'src/brand-portal/Report.tsx', 'src/brand-portal/Admin.tsx']) {
+    assert.equal(transformInlineCopy(source, file), null);
+    assert.deepEqual(analyzeInlineCopy(source, file).messages, {});
+  }
+});
 
 test('identical extraction/compiler keys and useful source maps survive code movement', () => {
   const source = 'export default () => <p>Retry &amp; continue</p>;';
