@@ -16,6 +16,7 @@ import { onboardingText, onboardingNumber, onboardingDate, type OnboardingCopyKe
 import { OnboardingCompanion, OnboardingFamily, type CompanionPose } from './OnboardingCompanion';
 import { OnboardingFrame, OnboardingButton } from './OnboardingFrame';
 import { OnboardingFields } from './OnboardingFields';
+import { OnboardingBenefits } from './OnboardingBenefits';
 import OnboardingPaywall from './OnboardingPaywall';
 import type { Profile } from '@/contexts/AuthContext';
 
@@ -56,6 +57,8 @@ export default function OnboardingJourney({ onComplete, legacyPending = false, o
     && (!profile.name?.trim() || profile.name === 'İstifadəçi');
   const current: OnboardingStep = nameOnly ? 'name' : draft.step;
   const steps = onboardingSteps(draft.stage, native);
+  const progressStep = draft.setupComplete && ['offer','free','success'].includes(current) ? steps.length
+    : Math.min(steps.length, Math.max(1, steps.indexOf(current) + 1));
   const t = useCallback((key: OnboardingCopyKey, values?: Record<string, string | number>) => onboardingText(language, key, values), [language]);
   const cancelAdvance = () => { if (advancing.current) clearTimeout(advancing.current); advancing.current = null; };
   useEffect(() => { alive.current = true; return () => { alive.current = false; cancelAdvance(); }; }, []);
@@ -267,15 +270,15 @@ export default function OnboardingJourney({ onComplete, legacyPending = false, o
           <li key={key} data-done={progress >= [50, 65, 90, 100][i]}><Check size={18} aria-hidden="true" />{t(key)}</li>)}</ul></>;
       footer = error ? <OnboardingButton onClick={() => void saveSetup()} busy={busy}>{t('retry')}</OnboardingButton> : null; break;
     case 'results': {
-      const selected = Object.entries(draft.answers).filter(([key]) => isQuestion(key)).flatMap(([, value]) => Array.isArray(value) ? value : typeof value === 'string' ? [value] : [])
-        .filter((value, index, all) => value !== 'none' && all.indexOf(value) === index).slice(0, 5);
-      content = <>{companion('results')}{title(t('results_title', { name: draft.name }), t('results_sub'))}<div className="onb-results-chips"><span>{stageTitle}</span>
+      content = <><div className="onb-summary-heading"><div>{title(t('results_title', { name: draft.name }), t('results_sub'))}</div>{companion('results', 'tiny')}</div>
+        <div className="onb-results-chips"><span>{stageTitle}</span>
         {draft.stage === 'mommy' && <span>{t('child_number', { n: onboardingNumber(language, draft.babyCount) })}</span>}
-        {draft.stage !== 'mommy' && profile?.last_period_date && <span>{onboardingDate(language, profile.last_period_date)}</span>}
-        {selected.map(value => <span key={value}>{t(value as OnboardingCopyKey)}</span>)}</div>{list(featureKeys)}</>;
+        {draft.stage !== 'mommy' && profile?.last_period_date && <span>{onboardingDate(language, profile.last_period_date)}</span>}</div>
+        <OnboardingBenefits stage={draft.stage!} page="results" language={language} /></>;
       footer = <OnboardingButton onClick={next} busy={busy}>{t('view_plan')}</OnboardingButton>; break;
     }
-    case 'features': content = <>{companion('proof')}{title(t('features_title'), t('features_sub'))}{list(['premium_ai','premium_reports','premium_household','premium_sounds','premium_noads'])}</>; break;
+    case 'features': content = <><div className="onb-summary-heading"><div>{title(t('features_title'), t('features_sub'))}</div>{companion('proof', 'tiny')}</div>
+      <OnboardingBenefits stage={draft.stage!} page="features" language={language} /></>; break;
     case 'paywall': case 'offer':
       content = <OnboardingPaywall stage={draft.stage!} language={language} mode={current} initialPlan={draft.plan}
         onPlanChange={plan => commit({ ...draftRef.current, plan })}
@@ -290,9 +293,9 @@ export default function OnboardingJourney({ onComplete, legacyPending = false, o
   if (legal) return <OnboardingFrame language={language} step={`legal-${legal}`} onBack={() => setLegal(null)}>
     <Suspense fallback={<p role="status">{t('working')}</p>}><LegalScreen initialDocument={legal} onBack={() => setLegal(null)} /></Suspense>
   </OnboardingFrame>;
-  return <OnboardingFrame language={language} step={current} current={nameOnly ? 1 : Math.min(steps.length, Math.max(1, steps.indexOf(current) + 1))}
+  return <OnboardingFrame language={language} step={current} current={nameOnly ? 1 : progressStep}
     total={nameOnly ? 1 : steps.length} onBack={canBack ? back : undefined} busy={busy}
-    footer={<>{error && <p role="alert" className="onb-error">{t(error)}</p>}{footer}</>}>
+    footer={error || footer ? <>{error && <p role="alert" className="onb-error">{t(error)}</p>}{footer}</> : null}>
     {content}
   </OnboardingFrame>;
 }
