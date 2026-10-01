@@ -10,11 +10,12 @@ import BrandReportView from './Report';
 import BrandAdmin from './Admin';
 
 export type BrandTranslate = (key: BrandText) => string;
+const languageLabel: Record<string, string> = { az: 'Dil', en: 'Language', tr: 'Dil', ru: 'Язык', de: 'Sprache', ar: 'اللغة', ka: 'ენა', kk: 'Тіл', uz: 'Til', zh: '语言', id: 'Bahasa', fr: 'Langue', es: 'Idioma', pt: 'Idioma', vi: 'Ngôn ngữ', hi: 'भाषा', ja: '言語', ko: '언어', pl: 'Język', nl: 'Taal', sv: 'Språk' };
 function Wordmark({ t }: { t: BrandTranslate }) {
   return <div className="brand-wordmark"><img src={logo} alt="Anacan" /><span>Anacan<small>{t('product')}</small></span></div>;
 }
 function Language({ language, setLanguage }: { language: string; setLanguage: (value: string) => void }) {
-  return <select className="brand-select" aria-label="Language" value={language} onChange={event => setLanguage(event.target.value)}>
+  return <select className="brand-select" aria-label={languageLabel[language]} value={language} onChange={event => setLanguage(event.target.value)}>
     {APP_LANGUAGES.map(item => <option key={item.code} value={item.code}>{item.native_name}</option>)}
   </select>;
 }
@@ -87,7 +88,10 @@ export default function BrandPortal() {
   const { session, access, loading } = useBrandAuth();
   const [language, setLanguage] = useState(() => { try { return normalizeAppLanguage(localStorage.getItem(BRAND_LANGUAGE_KEY) || 'az'); } catch { return 'az'; } });
   const t: BrandTranslate = key => brandText(key, language);
-  useEffect(() => { document.documentElement.lang = language; document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr'; localStorage.setItem(BRAND_LANGUAGE_KEY, language); }, [language]);
+  useEffect(() => {
+    document.documentElement.lang = language; document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+    try { localStorage.setItem(BRAND_LANGUAGE_KEY, language); } catch { /* The optional UI preference must not break an authenticated session. */ }
+  }, [language]);
   const updateLanguage = (value: string) => setLanguage(normalizeAppLanguage(value));
   if (loading) return <EmptyAccess t={t} loading />;
   if (!session) return <Login t={t} language={language} setLanguage={updateLanguage} />;
