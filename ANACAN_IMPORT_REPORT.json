@@ -1,15 +1,12 @@
 {
-  "zipSha256": "78a0ee49b8202c194efaa89b9d54f686c6cf7bbb5cf1a3e996848cf32036a0b1",
-  "manifestSha256": "754b28f54de02dd4862d8718a3fbe6ff7a886dcd73727546ba249df104c0b48c",
+  "zipSha256": "9b49b5b7f290bc74a68837f51001af5b02407d72022b66ff4dab35e32cc80c4e",
+  "manifestSha256": "099838fc3f589aea975ef2d9cf3d719d1f38e4e52f2312b20a59a2c09782a2f1",
   "baseCommit": "841f79dd966708235bf2011b5eab7d9a26525193",
-  "preImportCommit": "339495f809d70562c5c1954f65eed7c38a8de24b",
-  "expected": 1915,
-  "matched": 1913,
+  "preImportCommit": "eecc6c2d9a20a2a137253239857ac41d4a84034a",
+  "expected": 1917,
+  "matched": 1917,
   "missing": [],
-  "mismatched": [
-    "src/integrations/supabase/previewAuthStorage.ts",
-    "src/integrations/supabase/types.ts"
-  ],
+  "mismatched": [],
   "reviewedRemovals": {
     "src/components/WinBackCard.tsx": "removed"
   },
@@ -24,5 +21,5 @@
     "auth-provider settings",
     "edge function deployments"
   ],
-  "deltaFiles": 7
+  "deltaFiles": 10
 }

@@ -83,8 +83,10 @@ hash ilə təsdiqlənib və preview build keçib. Son sessiya-izolyasiya düzəl
 yoxlanmış delta ilə həmin manifestə əlavə edilir.
 
 Generated Source types yenilənib; shared Azure yolunun əvvəlki iki RPC type
-declaration-u saxlanıb. Lovable preview auth storage-ın yeni canonical-response
-düzəlişi yerli quota-safe storage ilə birləşdirilib. Operator credential-ləri və
+declaration-u application-owned `database-types.ts` qatındadır. Quota-safe preview
+storage və canonical-response düzəlişi application-owned `authStorage.ts`-dədir.
+Lovable öz generated `types.ts` və `previewAuthStorage.ts` fayllarını yeniləyəndə bu
+runtime düzəlişləri itmir. Operator credential-ləri və
 native imzalama/artifact faylları code arxivinə daxil edilmir.
 
 Final source-sync evidence: `azure-migration/ops/lovable-application-sync-task.json`,

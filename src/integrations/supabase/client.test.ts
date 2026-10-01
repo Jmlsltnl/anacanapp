@@ -3,7 +3,7 @@ import { LEGACY_AUTH_STORAGE_KEY as OLD, SOURCE_AUTH_REALM } from './auth-storag
 
 const mocks = vi.hoisted(() => ({ createClient: vi.fn(), brokeredPreviewStorage: vi.fn() }));
 vi.mock('@supabase/supabase-js', () => ({ createClient: mocks.createClient }));
-vi.mock('./previewAuthStorage', () => ({ brokeredPreviewStorage: mocks.brokeredPreviewStorage }));
+vi.mock('./authStorage', () => ({ brokeredPreviewStorage: mocks.brokeredPreviewStorage }));
 
 const AZURE = 'https://anacan-gateway.example.azurecontainerapps.io';
 const CURRENT = 'sb-anacan-gateway-auth-token';

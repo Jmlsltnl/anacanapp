@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({ native: vi.fn(), get: vi.fn(), set: vi.fn(), f
 vi.mock('@capacitor/core', () => ({ Capacitor: { isNativePlatform: mocks.native } }));
 vi.mock('@capacitor/preferences', () => ({ Preferences: { get: mocks.get, set: mocks.set } }));
 vi.mock('@supabase/supabase-js', () => ({ createClient: mocks.createClient }));
-vi.mock('./previewAuthStorage', () => ({ brokeredPreviewStorage: () => localStorage }));
+vi.mock('./authStorage', () => ({ brokeredPreviewStorage: () => localStorage }));
 const prefs = new Map<string, string>();
 const azure = { ...SOURCE, generation: 2, phase: 'azure' as const, handoffSha256: 'a'.repeat(64) };
 const paused = { ...SOURCE, generation: 1, phase: 'maintenance' as const };

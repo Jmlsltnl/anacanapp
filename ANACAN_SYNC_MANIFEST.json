@@ -1,6 +1,6 @@
 {
   "protocol": "anacan-lovable-application-sync-v1",
-  "at": "2026-10-01T06:53:56.802Z",
+  "at": "2026-10-01T07:07:32.701Z",
   "projectId": "e07ee1f9-3d58-48fe-a7a0-068ecf028173",
   "baseCommit": "841f79dd966708235bf2011b5eab7d9a26525193",
   "sourceOfTruth": "current-reviewed-worktree",
@@ -3768,8 +3768,8 @@
     },
     {
       "path": "src/integrations/supabase/auth-storage-quota.test.ts",
-      "bytes": 5152,
-      "sha256": "83f228cfe3ebc7397dfe0028363ce64fb0aad001160e58603950400f54912552"
+      "bytes": 5145,
+      "sha256": "0a55c402277179c8e2e1d68fc10f81a04d02b8976a3a44d14a4cabe12fae86f3"
     },
     {
       "path": "src/integrations/supabase/backend-admission.test.ts",
@@ -3783,8 +3783,8 @@
     },
     {
       "path": "src/integrations/supabase/backend-bootstrap.test.ts",
-      "bytes": 11602,
-      "sha256": "89cf06760cf0a255779aa58c2254bc9219c959ea212044ec440bcc84dc003680"
+      "bytes": 11595,
+      "sha256": "4816bb6b66cb2c560101a31abefcdf21622fe00246576e115858404cd39799ec"
     },
     {
       "path": "src/integrations/supabase/backend-bootstrap.ts",
@@ -3798,23 +3798,23 @@
     },
     {
       "path": "src/integrations/supabase/client.test.ts",
-      "bytes": 3616,
-      "sha256": "f82fbee3b2f71bd557cdfc48f3bf7afc822445123fc658d5084e9dac163c6b53"
+      "bytes": 3609,
+      "sha256": "e326a556a520eb0142eb170146dcd3774a37ea91b24df1db02adcab3888394d4"
     },
     {
       "path": "src/integrations/supabase/client.ts",
-      "bytes": 1206,
-      "sha256": "3faa28aebb69cb24721669f59deff429ef886fd70e1b6b00a365bfe27d6ee731"
+      "bytes": 1190,
+      "sha256": "27d13ec38e2719b7a983a3b31cf8cceb87448535289899831657768a9bbc3d0c"
     },
     {
       "path": "src/integrations/supabase/previewAuthStorage.ts",
-      "bytes": 4843,
-      "sha256": "b585c5fa504ce56afd5f6492fc7176ea52df5929a02958a90692cfcd5b88a296"
+      "bytes": 4565,
+      "sha256": "c11f61a80071f876a237b06f902f5e278283044e7202d28b33b8341b9fceafa2"
     },
     {
       "path": "src/integrations/supabase/types.ts",
-      "bytes": 842807,
-      "sha256": "693bef940543e93b9f173f09c08207820c294419935f9681e76a24dee558b257"
+      "bytes": 842660,
+      "sha256": "7a80f134ac1d61c21163ea1de09d46e8db7607f923447909f47183eb63326bfb"
     },
     {
       "path": "src/lib/admin-insights.ts",
@@ -9578,8 +9578,18 @@
     },
     {
       "path": "docs/BRAND_PORTAL.md",
-      "bytes": 6680,
-      "sha256": "9f156a743b95a92ffcb1775d8b56d43767ee1eba9aa68fb72a8a27554b728b6f"
+      "bytes": 6833,
+      "sha256": "4062c524ee87b6aa398aaf9c7f71290c8500c9aed770256b47f5cbcecddef15e"
+    },
+    {
+      "path": "src/integrations/supabase/authStorage.ts",
+      "bytes": 4940,
+      "sha256": "eb6ffc7301b6257e275c34d5c57b95d2ab8e0f928b87490599e59be9c5481c13"
+    },
+    {
+      "path": "src/integrations/supabase/database-types.ts",
+      "bytes": 567,
+      "sha256": "c11228669a8ea36f35996166f373d79d76570359a9cbed689847ea588160a5dd"
     }
   ],
   "reviewedRemovals": [
