@@ -28,7 +28,8 @@ export function normalizeSecurePartnerCode(value: string): string {
 export async function linkPartnerByCode(value: string): Promise<void> {
   if (!isAzurePartnerPairingEnabled()) throw new PartnerLinkError('PAIRING_UNAVAILABLE');
   const code = normalizeSecurePartnerCode(value);
-  const { data, error } = await supabase.rpc('link_partner_by_code', { p_partner_code: code });
+  // Azure-only RPC; absent from the Source-generated types.
+  const { data, error } = await (supabase.rpc as any)('link_partner_by_code', { p_partner_code: code });
   if (error) throw error;
 
   // Expected rejections are returned, not raised, so the server's attempt counter commits.
@@ -41,7 +42,7 @@ export async function linkPartnerByCode(value: string): Promise<void> {
 
 export async function getPartnerCodeForSharing(currentCode: string): Promise<string> {
   if (!isAzurePartnerPairingEnabled()) return currentCode;
-  const { data, error } = await supabase.rpc('ensure_secure_partner_code');
+  const { data, error } = await (supabase.rpc as any)('ensure_secure_partner_code');
   if (error) throw error;
   // Never share the cached invitation if rotation failed or the server is not migrated.
   if (typeof data !== 'string' || !secureCodePattern.test(data)) {
