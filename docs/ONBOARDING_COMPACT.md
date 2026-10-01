@@ -85,5 +85,12 @@ Database/Auth Source-da, admission source/generation0 qalır. Brend portalının
 ayrı sessiyası və21-dilli copy istisnası qorunur. Source Auth Hook binding-i və
 RevenueCat v2 metrics icazəsi əvvəlki operator asılılıqlarıdır.
 
+Lovable-un qayda faylı ölçü həddinə uyğun olaraq `AGENTS.md` yığcamdır; bütün
+əvvəlki davamlılıq qaydaları dəyişmədən `docs/WORKTREE_HISTORY.md`-də saxlanır.
+Sinxronlaşdırma manifesti Git tərəfindən nəzərə alınan tətbiq mənbələrini izləyir.
+Əvvəlki manifestin481 ignored log/aralıq tərcümə/IDE/generated-native və private
+operator/signing girişi təkrar ixrac edilmir; lokal fayllar yerində saxlanır.
+Tətbiq kodu, yekun21-dil lüğətləri və real native mənbələr manifestdə qalır.
+
 Bu kod/web yeniliyi `azure-migration/releases/43.0/` artifact-larını və
 finalized development43/Store43/Store39 workspace-lərini yenidən yazmır.
