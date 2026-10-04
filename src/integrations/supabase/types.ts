@@ -24216,9 +24216,18 @@ export type Database = {
         }
       }
       community_language_valid_v1: { Args: { value: string }; Returns: boolean }
+      community_language_words_v1: { Args: never; Returns: Json }
+      community_legacy_post_language_v1: {
+        Args: { p_content: string; p_preferred: string; p_submitted: string }
+        Returns: string
+      }
       community_premium_active_v2: {
         Args: { p_user: string }
         Returns: boolean
+      }
+      community_resolve_post_language_v1: {
+        Args: { p_actor: string; p_content: string; p_language: string }
+        Returns: string
       }
       confirm_referral_conversion: {
         Args: { p_referred_user_id: string }
@@ -24540,6 +24549,10 @@ export type Database = {
         }
       }
       get_community_language_contract_v1: { Args: never; Returns: Json }
+      get_community_language_inference_contract_v1: {
+        Args: never
+        Returns: Json
+      }
       get_community_profile_stats: {
         Args: { p_user_id: string }
         Returns: Json
@@ -24908,6 +24921,21 @@ export type Database = {
       submit_community_post_v1: {
         Args: {
           p_actor: string
+          p_blog_post_id?: string
+          p_content: string
+          p_group_id?: string
+          p_id: string
+          p_is_anonymous?: boolean
+          p_language: string
+          p_media_urls?: string[]
+          p_tagged_group_ids?: string[]
+        }
+        Returns: Json
+      }
+      submit_community_post_v2: {
+        Args: {
+          p_actor: string
+          p_auto_language?: boolean
           p_blog_post_id?: string
           p_content: string
           p_group_id?: string
