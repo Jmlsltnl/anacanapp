@@ -3589,6 +3589,7 @@ export type Database = {
           countries_include: string[] | null
           cover_image_url: string | null
           created_at: string
+          editorial_metadata: Json | null
           excerpt: string | null
           excerpt_ar: string | null
           excerpt_az: string | null
@@ -3678,6 +3679,7 @@ export type Database = {
           countries_include?: string[] | null
           cover_image_url?: string | null
           created_at?: string
+          editorial_metadata?: Json | null
           excerpt?: string | null
           excerpt_ar?: string | null
           excerpt_az?: string | null
@@ -3767,6 +3769,7 @@ export type Database = {
           countries_include?: string[] | null
           cover_image_url?: string | null
           created_at?: string
+          editorial_metadata?: Json | null
           excerpt?: string | null
           excerpt_ar?: string | null
           excerpt_az?: string | null
