@@ -5,5 +5,33 @@
   "mismatched": 0,
   "gitTrackedMatched": 18,
   "gitTrackedMissing": 79,
-  "manifestSha256": "358f6f342cd8c3dd0d68b47f3ec2deab0ab52bf5c86f6e5cff00c2f3eb79befa"
+  "manifestSha256": "358f6f342cd8c3dd0d68b47f3ec2deab0ab52bf5c86f6e5cff00c2f3eb79befa",
+  "zipSha256": "4b3c4a20eec2c5ce553baf7c04c0462448fbaeadd74f1d177ae1c5187219a7bd",
+  "gitTrackingNote": "79 new files are not gitignored; they become tracked when this turn is committed by the platform. Re-verify git ls-files on the resulting commit.",
+  "productionBuild": {
+    "passed": true,
+    "mode": "production",
+    "exitCode": 0,
+    "blogHtmlPages": 399,
+    "sitemapBlogUrls": 399
+  },
+  "nodeTests": {
+    "passed": 10,
+    "failed": 0
+  },
+  "vitest": {
+    "passed": 38,
+    "failed": 1,
+    "failure": "src/pages/Index.pushNav.test.tsx: DM target for woman \u2014 also fails with the pre-delta Index.tsx (pre-existing)",
+    "missingSuite": "no CommunityBlog test file exists in checkout"
+  },
+  "notChanged": [
+    ".env",
+    "secrets",
+    "functions",
+    "auth",
+    "cron",
+    "database (migration file only copied, not applied)",
+    "native artifacts"
+  ]
 }
