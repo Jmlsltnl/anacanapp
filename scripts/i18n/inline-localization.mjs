@@ -38,7 +38,7 @@ export function analyzeInlineCopy(code, file) {
     || file === 'src/components/InitialLanguageScreen.tsx' || file === 'src/main.tsx' || file === 'src/bootstrap-app.tsx'
     // The business portal owns its 21-language copy and separate auth realm.
     // Injecting consumer tr/i18n here would initialize the consumer SDK/session.
-    || file.startsWith('src/brand-portal/')) return { messages, replacements };
+    || file.startsWith('src/brand-portal/') || file.startsWith('src/public-blog/')) return { messages, replacements };
   const tree = ts.createSourceFile(file, code, ts.ScriptTarget.Latest, true, file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   const displayContext = node => {
     for (let parent = node.parent; parent; parent = parent.parent) {

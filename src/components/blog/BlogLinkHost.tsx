@@ -6,6 +6,7 @@ import { OPEN_BLOG_EVENT, clearPendingBlog, rememberBlog, validBlogSlug } from '
 import { pushBackHandler } from '@/lib/backButton';
 import { tr } from '@/lib/tr';
 import { PUSH_NAV_EVENT } from '@/lib/pushNav';
+import { BLOG_MODULE_EVENT } from '@/lib/blog-module-navigation';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
@@ -42,6 +43,7 @@ export default function BlogLinkHost({ children }: { children: (open: boolean) =
   }, [scope, user, profileLoaded, open]);
   useEffect(() => open ? pushBackHandler(() => { close(); return true; }) : undefined, [open, close]);
   useEffect(() => { const navigate = () => close(); window.addEventListener(PUSH_NAV_EVENT, navigate); return () => window.removeEventListener(PUSH_NAV_EVENT, navigate); }, [close]);
+  useEffect(() => { const navigate = () => close(); window.addEventListener(BLOG_MODULE_EVENT, navigate); return () => window.removeEventListener(BLOG_MODULE_EVENT, navigate); }, [close]);
   return <>
     <div ref={root} className="contents">{children(open)}</div>
     <Dialog open={open} onOpenChange={value => { if (!value) close(); }}>

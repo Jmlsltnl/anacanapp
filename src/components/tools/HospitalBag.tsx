@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ToolPage, ToolHeader, ToolLoading } from './anacan/ToolKit';
 import { tr } from "@/lib/tr";
 import { useUserStore } from '@/store/userStore';
+import ModuleArticles from '@/components/blog/ModuleArticles';
 
 interface HospitalBagProps {
   onBack: () => void;
@@ -293,6 +294,7 @@ const HospitalBag = forwardRef<HTMLDivElement, HospitalBagProps>(({ onBack }, re
             <p className="mt-1 text-sm" style={{ margin: '4px 0 0', color: 'var(--a-green-ink)', opacity: 0.85 }}>{tr("hospitalbag_cantaniz_hazirdir_xosbext_dogus_279a30", "Çantanız hazırdır. Xoşbəxt doğuş!")}</p>
           </motion.div>
         )}
+        <div className="a-card mt-4"><ModuleArticles module="hospitalBag" /></div>
       </ToolPage>
     </div>
   );

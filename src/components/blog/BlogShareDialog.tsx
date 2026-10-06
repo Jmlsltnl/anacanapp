@@ -14,7 +14,7 @@ import { PUSH_NAV_EVENT } from '@/lib/pushNav';
 export default function BlogShareDialog({ open, onOpenChange, slug, title, blog }: { open: boolean; onOpenChange: (value: boolean) => void; slug: string; title: string; blog?: SharedBlog }) {
   const [kind, setKind] = useState<'website' | 'app'>('app'), [busy, setBusy] = useState(false);
   const language = useUserStore(state => state.language), { toast } = useToast();
-  const links = validBlogSlug(slug) ? blogLinks(slug) : null, t = (key: Parameters<typeof followupText>[0]) => followupText(key, language);
+  const links = validBlogSlug(slug) ? blogLinks(slug, language) : null, t = (key: Parameters<typeof followupText>[0]) => followupText(key, language);
   if (!links) return null;
   const copy = async () => {
     setBusy(true);

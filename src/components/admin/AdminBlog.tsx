@@ -22,6 +22,7 @@ import AdminUsageStats from './AdminUsageStats';
 import { LocalizedInput } from './ui/LocalizedInput';
 import { LocalizedTextarea } from './ui/LocalizedTextarea';
 import { useAdminLocalize } from '@/contexts/AdminLanguageContext';
+import BlogSeoFields from './BlogSeoFields';
 
 const AdminBlog = () => {
   const { posts, categories, postCategories, loading, createPost, updatePost, deletePost, createCategory, deleteCategory, getPostCategoryIds, setPostCategoriesForPost } = useBlogAdmin();
@@ -56,7 +57,8 @@ const AdminBlog = () => {
     is_published: false,
     life_stage: 'all' as BlogLifeStage,
     countries_include: [] as string[],
-    countries_exclude: [] as string[]
+    countries_exclude: [] as string[],
+    editorial_metadata: null as unknown
   });
 
   const lifeStageOptions: {value: BlogLifeStage;label: string;emoji: string;}[] = [
@@ -239,7 +241,8 @@ const AdminBlog = () => {
       is_published: post.is_published,
       life_stage: (post.life_stage || 'all') as BlogLifeStage,
       countries_include: ((post as any).countries_include || []) as string[],
-      countries_exclude: ((post as any).countries_exclude || []) as string[]
+      countries_exclude: ((post as any).countries_exclude || []) as string[],
+      editorial_metadata: post.editorial_metadata || null
     };
     setFormData(newFormData);
     initialFormDataRef.current = JSON.stringify({ ...newFormData, categoryIds: postCatIds });
@@ -404,7 +407,8 @@ const AdminBlog = () => {
       is_published: false,
       life_stage: 'all' as BlogLifeStage,
       countries_include: [] as string[],
-      countries_exclude: [] as string[]
+      countries_exclude: [] as string[],
+      editorial_metadata: null as unknown
     };
     setFormData(emptyForm);
     setSelectedCategoryIds([]);
@@ -968,6 +972,8 @@ const AdminBlog = () => {
                     </p>
                   </div>
                 </div>
+
+                <BlogSeoFields value={formData.editorial_metadata} onChange={editorial_metadata => setFormData({ ...formData, editorial_metadata })} />
 
                 {/* Toggles */}
                 <div className="flex gap-6">

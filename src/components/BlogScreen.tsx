@@ -20,6 +20,8 @@ import BlogPostDetail from '@/components/blog/BlogPostDetail';
 import { tr } from "@/lib/tr";
 import { AdInlineAnchor, AdSurface } from '@/components/ads/AdExperienceProvider';
 import { followupText } from '@/lib/followup-i18n';
+import { blogMatchesStage } from '@/lib/blog-editorial';
+import BlogSeo from '@/components/blog/BlogSeo';
 
 interface BlogScreenProps {
   onBack: () => void;
@@ -85,8 +87,8 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
   // Sort posts: current life stage first, then others
   const sortedPosts = lifeStage ?
   [...posts].sort((a, b) => {
-    const aMatch = a.life_stage === lifeStage ? 0 : 1;
-    const bMatch = b.life_stage === lifeStage ? 0 : 1;
+    const aMatch = blogMatchesStage(a, lifeStage) ? 0 : 1;
+    const bMatch = blogMatchesStage(b, lifeStage) ? 0 : 1;
     return aMatch - bMatch;
   }) :
   posts;
@@ -146,6 +148,7 @@ const BlogScreen = ({ onBack, initialSlug, lifeStage }: BlogScreenProps) => {
 
   return (
     <div className="a-scope pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)', minHeight: '100vh' }}>
+      <BlogSeo />
       <AdSurface id="blog_list_banner" />
       <div className="a-shell">
         {/* Top bar */}

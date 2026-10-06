@@ -59,6 +59,7 @@ import DailySummaryAutoSync from '@/components/partner/DailySummaryAutoSync';
 import PartnerCareCard from '@/components/partner/v2/PartnerCareCard';
 import RedFlagBanner from '@/components/dashboard/RedFlagBanner';
 import RecentBlogPosts from '@/components/dashboard/RecentBlogPosts';
+import ModuleArticles from '@/components/blog/ModuleArticles';
 import FlowDashboard from '@/components/flow/FlowDashboard';
 import BirthOnboardingModal from '@/components/BirthOnboardingModal';
 import WaterWidget from '@/components/dashboard/WaterWidget';
@@ -1292,6 +1293,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
       >
       {/* Sleep Tracker */}
       <motion.div
+        data-blog-module-section="sleep" tabIndex={-1}
         className="a-card a-fade-in"
         style={{ marginTop: 10 }}
         initial={{ y: 20, opacity: 0 }}
@@ -1342,10 +1344,12 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
           </motion.div>
         }
         <TrackerAIInsight section="sleep" api={insightApi} />
+        <ModuleArticles module="sleep" />
       </motion.div>
 
       {/* Feeding Tracker */}
       <motion.div
+        data-blog-module-section="feeding" tabIndex={-1}
         className="a-card a-fade-in"
         style={{ marginTop: 10 }}
         initial={{ y: 20, opacity: 0 }}
@@ -1546,10 +1550,12 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
           </motion.div>
         }
         <TrackerAIInsight section="feeding" api={insightApi} />
+        <ModuleArticles module="feeding" />
       </motion.div>
 
       {/* Diaper Tracker */}
       <motion.div
+        data-blog-module-section="diaper" tabIndex={-1}
         className="a-card a-fade-in"
         style={{ marginTop: 10 }}
         initial={{ y: 20, opacity: 0 }}
@@ -1624,6 +1630,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
           )}
         </div>
         <TrackerAIInsight section="diaper" api={insightApi} />
+        <ModuleArticles module="diaper" />
       </motion.div>
 
       {/* Today's Summary */}
@@ -1797,6 +1804,7 @@ const MommyDashboard = ({ onNavigateToTool, onNavigate }: {onNavigateToTool?: (t
           subtitle={tr('premiumgate_growth_sub', 'ÜST standartları ilə müqayisəli inkişaf qrafikləri Premium-da')}
         >
           <GrowthTrackerWidget />
+          <ModuleArticles module="babyGrowth" />
         </PremiumBlurGate>
       </div>
 

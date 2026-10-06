@@ -34,6 +34,10 @@ async function bootstrap() {
       const { startBrandPortal } = await import('./brand-portal/bootstrap');
       startBrandPortal(); return;
     }
+    if (import.meta.env.VITE_NATIVE_BUILD !== 'true' && !Capacitor.isNativePlatform() && /^\/blog(?:\/|$)/.test(window.location.pathname)) {
+      const { startPublicBlog } = await import('./public-blog/bootstrap');
+      startPublicBlog(); return;
+    }
     await bootstrapBackend();
     const { startApp } = await import('./bootstrap-app');
     await startApp();
