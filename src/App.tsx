@@ -38,6 +38,7 @@ import CustomerIoSession from '@/components/CustomerIoSession';
 const AdmobAdminPage = lazy(() => import('./pages/AdmobAdminPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const ModeratorPage = lazy(() => import('./pages/ModeratorPage'));
+const PublicBlogPage = lazy(() => import('./public-blog/BlogPage'));
 
 // Offline-first: sorğu cache-i localStorage-da saxlanılır ki, şəbəkəsiz açılışda
 // son vəziyyət (dashboard datası, kontent, partner məlumatı və s.) dərhal görünsün.
@@ -142,6 +143,8 @@ const App = () => {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/blog/:slug" element={<BlogLink />} />
+                  <Route path="/blog" element={<Suspense fallback={null}><PublicBlogPage /></Suspense>} />
+                  <Route path="/blog/:language/:slug" element={<BlogLink />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/legal/:docType" element={<LegalPage />} />
                   <Route path="/payment/success" element={<PaymentSuccess />} />

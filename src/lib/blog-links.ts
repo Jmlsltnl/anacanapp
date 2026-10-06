@@ -4,10 +4,13 @@ export function validBlogSlug(value: unknown): value is string {
   return typeof value === 'string' && value.length > 0 && value.length <= 300 && value !== '.' && value !== '..'
     && !/[\s/\\\u0000-\u001f<>]/u.test(value);
 }
-export function blogLinks(slug: string) {
+export function blogLinks(slug: string, language?: string) {
   if (!validBlogSlug(slug)) throw new Error('BLOG_SLUG_INVALID');
-  const path = `/blog/${encodeURIComponent(slug)}`;
-  return { website: `https://anacan.az${path}`, app: `https://api.anacan.az${path}` };
+  const locale = language && /^(?:az|en|tr|ru|de|ar|ka|kk|uz|zh|id|fr|es|pt|vi|hi|ja|ko|pl|nl|sv)$/.test(language) ? language : '';
+  const path = `/blog${locale && locale !== 'az' ? `/${locale}` : ''}/${encodeURIComponent(slug)}${language ? '/' : ''}`;
+  // Delivered older native clients recognize only /blog/:slug. Keep the app
+  // handoff unlocalized; that reader already uses its own selected language.
+  return { website: `https://${language ? 'app.anacan.az' : 'anacan.az'}${path}`, app: `https://${language ? 'app.anacan.az' : 'api.anacan.az'}/blog/${encodeURIComponent(slug)}` };
 }
 export function appBlogSlug(value: string): string | null {
   try {
@@ -17,15 +20,16 @@ export function appBlogSlug(value: string): string | null {
     if (url.protocol === 'anacan:' && url.hostname === 'blog') path = `/blog${url.pathname}`;
     else if (url.protocol === 'https:' && ['api.anacan.az','app.anacan.az'].includes(url.hostname)) path = url.pathname;
     else return null;
-    const match = /^\/blog\/([^/]+)\/?$/.exec(path);
+    const match = /^\/blog\/(?:((?:az|en|tr|ru|de|ar|ka|kk|uz|zh|id|fr|es|pt|vi|hi|ja|ko|pl|nl|sv))\/)?([^/]+)\/?$/.exec(path);
     if (!match) return null;
-    const slug = decodeURIComponent(match[1]);
+    const slug = decodeURIComponent(match[2]);
     return validBlogSlug(slug) ? slug : null;
   } catch { return null; }
 }
 export function isWebsiteBlogLink(value: string): boolean {
-  try { const u = new URL(value); return u.protocol === 'https:' && u.hostname === 'anacan.az' && !u.username && !u.password && !u.port
-    && /^\/blog\/[^/]+\/?$/.test(u.pathname) && validBlogSlug(decodeURIComponent(u.pathname.split('/')[2])); } catch { return false; }
+  try { const u = new URL(value), match = /^\/blog\/(?:((?:az|en|tr|ru|de|ar|ka|kk|uz|zh|id|fr|es|pt|vi|hi|ja|ko|pl|nl|sv))\/)?([^/]+)\/?$/.exec(u.pathname);
+    return u.protocol === 'https:' && ['anacan.az','app.anacan.az'].includes(u.hostname) && !u.username && !u.password && !u.port
+      && !!match && validBlogSlug(decodeURIComponent(match[2])); } catch { return false; }
 }
 export function rememberBlog(slug: string) {
   if (!validBlogSlug(slug)) return;

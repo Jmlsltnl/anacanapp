@@ -1,0 +1,9 @@
+{
+  "expected": 97,
+  "matched": 97,
+  "missing": 0,
+  "mismatched": 0,
+  "gitTrackedMatched": 18,
+  "gitTrackedMissing": 79,
+  "manifestSha256": "358f6f342cd8c3dd0d68b47f3ec2deab0ab52bf5c86f6e5cff00c2f3eb79befa"
+}

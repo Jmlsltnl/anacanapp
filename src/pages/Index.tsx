@@ -32,6 +32,9 @@ import { AdSurface } from '@/components/ads/AdExperienceProvider';
 import { getBackendConfig } from '@/integrations/supabase/backend-config';
 import { hasPendingOnboarding } from '@/lib/onboarding-model';
 import { clearPendingBlog, pendingBlog, rememberBlog } from '@/lib/blog-links';
+import { BLOG_MODULE_EVENT, consumeBlogModule, isBlogModule, rememberBlogModule } from '@/lib/blog-module-navigation';
+import type { BlogModule } from '@/lib/blog-editorial';
+import { normalizeAppLanguage, isAppLanguage } from '@/lib/app-languages';
 import BlogLinkHost from '@/components/blog/BlogLinkHost';
 
 // PremiumOnboarding.PENDING_FUNNEL_KEY ilə sinxron saxlanmalıdır
@@ -126,6 +129,7 @@ const IndexContent = ({ blogOverlayOpen }: { blogOverlayOpen: boolean }) => {
   const [showMotherChat, setShowMotherChat] = useState(false);
   const [viewingUserId, setViewingUserId] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<string | null>(null);
+  const [blogSection, setBlogSection] = useState<'feeding' | 'sleep' | 'diaper' | null>(null);
   const [toolOpenedFromDashboard, setToolOpenedFromDashboard] = useState(false);
   const [toolsResetKey, setToolsResetKey] = useState(0);
   // Ölkə məcburi seçildikdən sonra gate-i dərhal gizlətmək üçün (profil
@@ -149,11 +153,51 @@ const IndexContent = ({ blogOverlayOpen }: { blogOverlayOpen: boolean }) => {
   );
   const { isAdmin, loading, profile, user, profileLoaded } = useAuth();
   useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get('blog_language');
+    if (!isAppLanguage(requested || '') || requested === language) return;
+    void import('@/lib/i18n').then(async ({ ensureLanguageReady }) => {
+      await ensureLanguageReady(requested!); useUserStore.getState().setLanguage(normalizeAppLanguage(requested));
+    }).catch(() => {});
+  }, []);
+  useEffect(() => {
     if (isAuthenticated && profileLoaded) {
       const slug = pendingBlog();
       if (slug) { setActiveScreen(`blog/${slug}`); clearPendingBlog(); }
     }
   }, [isAuthenticated, profileLoaded, setActiveScreen]);
+  useEffect(() => {
+    const show = (module: BlogModule) => {
+      if (!isAuthenticated || !profileLoaded) { rememberBlogModule(module); return; }
+      consumeBlogModule();
+      setActiveScreen(null); setShowMotherChat(false); setViewingUserId(null); setActiveTool(null);
+      if (module === 'calendar') { setActiveScreen('calendar'); return; }
+      if (module === 'hospitalBag' || module === 'babyGrowth') {
+        setActiveTab('tools'); setActiveTool(module === 'hospitalBag' ? 'hospital' : 'baby-growth');
+        setToolOpenedFromDashboard(true); setToolsResetKey(value => value + 1); return;
+      }
+      if (lifeStage !== 'mommy' || role === 'partner') { setActiveScreen('blog'); return; }
+      setActiveTab('home'); setBlogSection(module);
+    };
+    const handler = (event: Event) => { const module = (event as CustomEvent).detail?.module; if (isBlogModule(module)) show(module); };
+    window.addEventListener(BLOG_MODULE_EVENT, handler);
+    if (isAuthenticated && profileLoaded) {
+      const url = new URL(window.location.href), requested = url.searchParams.get('blog_module');
+      const module = consumeBlogModule() || (isBlogModule(requested) ? requested : null);
+      if (module) show(module);
+      if (isBlogModule(requested)) { url.searchParams.delete('blog_module'); url.searchParams.delete('blog_language'); window.history.replaceState(window.history.state, '', url); }
+    }
+    return () => window.removeEventListener(BLOG_MODULE_EVENT, handler);
+  }, [isAuthenticated, profileLoaded, lifeStage, role, setActiveScreen]);
+  useEffect(() => {
+    if (!blogSection || showSplash || loading || activeScreen || activeTab !== 'home') return;
+    let count = 0;
+    const timer = window.setInterval(() => {
+      const element = document.querySelector<HTMLElement>(`[data-blog-module-section="${blogSection}"]`);
+      if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'center' }); element.focus({ preventScroll: true }); setBlogSection(null); window.clearInterval(timer); }
+      else if (++count > 100) { setBlogSection(null); window.clearInterval(timer); }
+    }, 100);
+    return () => window.clearInterval(timer);
+  }, [blogSection, showSplash, loading, activeScreen, activeTab]);
   const appliedAdPreviewLink = useRef(false);
   useEffect(() => {
     if (!isAdmin || !profileLoaded || appliedAdPreviewLink.current) return;

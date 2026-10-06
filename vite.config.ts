@@ -4,6 +4,7 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { inlineLocalizationPlugin } from './scripts/i18n/inline-localization.mjs';
 import { publicContentAssetsPlugin } from './scripts/i18n/public-content-assets.mjs';
+import { blogPrerenderPlugin } from './scripts/blog/prerender.mjs';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -14,7 +15,7 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
   },
-  plugins: [publicContentAssetsPlugin(), inlineLocalizationPlugin(), react(), mode === "development" && componentTagger()].filter(Boolean),
+  plugins: [publicContentAssetsPlugin(), inlineLocalizationPlugin(), react(), blogPrerenderPlugin(), mode === "development" && componentTagger()].filter(Boolean),
   // Public locale catalogs are read as complete dictionaries. JSON.parse keeps
   // their thousands of entries out of Rollup's per-property AST/tree shaking.
   json: { stringify: true, namedExports: false },

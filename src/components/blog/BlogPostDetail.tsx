@@ -20,6 +20,10 @@ import HtmlContent from '@/components/ui/HtmlContent';
 import { tr } from "@/lib/tr";
 import { followupText } from '@/lib/followup-i18n';
 import { AdInlineAnchor, AdSurface, useAdExit } from '@/components/ads/AdExperienceProvider';
+import BlogSeo from './BlogSeo';
+import BlogEditorialSections, { BlogContents } from './BlogEditorialSections';
+import { blogLocale } from '@/lib/blog-editorial';
+import { useUserStore } from '@/store/userStore';
 
 interface BlogPostDetailProps {
   post: BlogPost;
@@ -34,6 +38,8 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
   useLayoutEffect(() => { cancelScrollRestoration(); }, [post.id]);
   useScrollToTop([post.id]);
   const { user } = useAuth();
+  const language = useUserStore(state => state.language);
+  const locale = blogLocale(post.editorial_metadata, language);
   const { toast } = useToast();
   const {
     isLiked,
@@ -230,6 +236,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
   return (
     <div className="a-scope min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }} data-blog-post={post.id}>
+      <BlogSeo post={post} />
       <AdSurface id="blog_article_banner" />
       {/* Hero Image */}
       <div className="relative">
@@ -237,7 +244,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         <div className="relative h-64 w-full">
             <img
             src={post.cover_image_url}
-            alt={post.title}
+            alt={locale?.coverAlt || post.title}
             className="w-full h-full object-cover" />
           
             <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, var(--a-bg), transparent 60%)' }} />
@@ -340,6 +347,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           </div>
         </motion.div>
 
+        <BlogContents post={post} />
         {/* Content */}
         <motion.div
           className="mt-3 a-card"
@@ -353,6 +361,8 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           <MarkdownContent content={post.content} variant="blog" />
           }
         </motion.div>
+
+        <BlogEditorialSections post={post} />
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 &&

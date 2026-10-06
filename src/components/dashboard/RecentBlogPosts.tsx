@@ -4,6 +4,7 @@ import { ChevronRight, Clock, Eye, BookOpen } from 'lucide-react';
 import { useBlog, BlogPost, BlogLifeStage } from '@/hooks/useBlog';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
+import { blogMatchesStage } from '@/lib/blog-editorial';
 
 interface RecentBlogPostsProps {
   onNavigate: (screen: string) => void;
@@ -74,7 +75,7 @@ const RecentBlogPosts = ({ onNavigate, lifeStage, variant = 'default' }: RecentB
 
   // Filter posts strictly by life stage - only show posts for the current stage
   const filteredByStage = lifeStage ?
-  posts.filter((p) => p.life_stage === lifeStage) :
+  posts.filter((p) => blogMatchesStage(p, lifeStage)) :
   posts;
 
   // Get only the 3 most recent filtered posts
