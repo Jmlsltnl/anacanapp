@@ -24324,6 +24324,7 @@ export type Database = {
       get_admin_console_contract_v1: { Args: never; Returns: Json }
       get_anacan_account_projection_contract_v1: { Args: never; Returns: Json }
       get_anacan_notification_contract_v1: { Args: never; Returns: Json }
+      get_anacan_notification_delivery_v2: { Args: never; Returns: Json }
       get_anacan_runtime_contract_v1: { Args: never; Returns: Json }
       get_baby_crisis: {
         Args: { baby_age_weeks: number }
@@ -24971,6 +24972,10 @@ export type Database = {
       }
       unlink_partners: { Args: never; Returns: undefined }
       update_my_referral_status: { Args: { p_state: string }; Returns: Json }
+      verify_source_notification_cron_v2: {
+        Args: { p_function: string; p_token: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "user" | "moderator"
