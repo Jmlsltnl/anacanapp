@@ -1,7 +1,22 @@
 // Shared auth helpers for edge functions.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-export async function requireUser(req: Request): Promise<
+/** The user ID is Auth-verified; route names are constants, never request fields. */
+export async function checkModerationAccess(userId: string, functionName = 'source-authenticated-function'): Promise<Response | null> {
+  const sourceRelease = Deno.env.get('SUPABASE_URL') === 'https://tntbjulojatnrqmylorp.supabase.co';
+  if (!sourceRelease && Deno.env.get('MODERATOR_ENFORCEMENT_REQUIRED') !== 'true') return null;
+  const denied = (unavailable: boolean) => new Response(JSON.stringify({ error: unavailable ? 'moderation_unavailable' : 'account_restricted' }), {
+    status: unavailable ? 503 : 403, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+  });
+  try {
+    const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const { data, error } = await admin.rpc('moderator_function_access_v1', { p_user: userId, p_function: functionName })
+      .abortSignal(AbortSignal.timeout(5000));
+    return error ? denied(true) : data === true ? null : denied(false);
+  } catch { return denied(true); }
+}
+
+export async function requireUser(req: Request, restrictedAccessPurpose?: 'delete-user-account' | 'sync-revenuecat-entitlement'): Promise<
   | { user: { id: string; email?: string | null }; error: null }
   | { user: null; error: Response }
 > {
@@ -32,6 +47,8 @@ export async function requireUser(req: Request): Promise<
       }),
     };
   }
+  const moderationError = await checkModerationAccess(data.user.id, restrictedAccessPurpose || Deno.env.get('SUPABASE_FUNCTION_SLUG'));
+  if (moderationError) return { user: null, error: moderationError };
   return { user: { id: data.user.id, email: data.user.email ?? null }, error: null };
 }
 
@@ -84,39 +101,6 @@ function parseSecretValues(raw?: string | null): string[] {
     .filter(Boolean);
 }
 
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
-  const parts = token.split('.');
-  if (parts.length !== 3) return null;
-
-  try {
-    const normalized = parts[1]
-      .replace(/-/g, '+')
-      .replace(/_/g, '/')
-      .padEnd(Math.ceil(parts[1].length / 4) * 4, '=');
-
-    return JSON.parse(atob(normalized));
-  } catch {
-    return null;
-  }
-}
-
-function isProjectRoleKey(token: string): boolean {
-  const payload = decodeJwtPayload(token);
-  const projectUrl = Deno.env.get('SUPABASE_URL');
-  if (!payload || !projectUrl) return false;
-
-  let projectRef = '';
-  try {
-    projectRef = new URL(projectUrl).hostname.split('.')[0] || '';
-  } catch {
-    return false;
-  }
-
-  return payload.iss === 'supabase'
-    && payload.ref === projectRef
-    && (payload.role === 'anon' || payload.role === 'service_role');
-}
-
 export function requireCronSecret(req: Request): Response | null {
   // Accept EITHER:
   //   1) x-cron-secret header matching CRON_SECRET env, OR
@@ -136,7 +120,9 @@ export function requireCronSecret(req: Request): Response | null {
     ...parseSecretValues(Deno.env.get('SUPABASE_SECRET_KEYS')),
   ]);
 
-  if (token && (acceptedKeys.has(token) || isProjectRoleKey(token))) return null;
+  // Decoding iss/ref/role is not signature verification. Accept only the exact
+  // configured keys used by the existing reviewed Source cron commands.
+  if (token && acceptedKeys.has(token)) return null;
 
   return new Response(JSON.stringify({ error: 'Unauthorized (cron)' }), {
     status: 401,

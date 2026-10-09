@@ -28,7 +28,7 @@ export const useCycleHistory = () => {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['cycle-history'],
+    queryKey: ['cycle-history', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
 
@@ -64,7 +64,7 @@ export const useCycleStats = () => {
     filter(c => c.cycle_length && c.cycle_length >= 15 && c.cycle_length <= 60).
     map(c => c.cycle_length!);
     const periodLengths = cycles.
-    filter(c => c.period_length && c.period_length >= 1 && c.period_length <= 15).
+    filter(c => c.end_date && c.period_length && c.period_length >= 1 && c.period_length <= 15).
     map(c => c.period_length!);
 
     if (cycleLengths.length > 0) {

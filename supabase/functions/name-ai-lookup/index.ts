@@ -7,6 +7,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { requireUser } from "../_shared/auth.ts";
 import { callGeminiSmart } from "../_shared/vertex-ai.ts";
+import { LANGUAGE_CODES, EXPANDED_LANGUAGE_NAMES, isExpandedLanguage } from '../_shared/languages.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -28,12 +29,14 @@ const LANG_FIELD: Record<string, { meaning: string; origin: string }> = {
   ka: { meaning: 'meaning_ka', origin: 'origin_ka' },
   de: { meaning: 'meaning_de', origin: 'origin_de' },
   ar: { meaning: 'meaning_ar', origin: 'origin_ar' },
+  ...Object.fromEntries(Object.keys(EXPANDED_LANGUAGE_NAMES).map(language => [language, { meaning: `meaning_${language}`, origin: `origin_${language}` }])),
 };
 
 /** Adı bazadakı standart formaya salır: "aylin" → "Aylin" */
-function properCase(s: string): string {
-  const t = s.trim().toLocaleLowerCase('az');
-  return t.charAt(0).toLocaleUpperCase('az') + t.slice(1);
+function properCase(s: string, language: string): string {
+  const locale = isExpandedLanguage(language) ? language : 'az';
+  const t = s.trim().toLocaleLowerCase(locale);
+  return t.charAt(0).toLocaleUpperCase(locale) + t.slice(1);
 }
 
 Deno.serve(async (req) => {
@@ -53,13 +56,13 @@ Deno.serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const { name: rawName, language = 'az' } = await req.json() as NameRequest;
-    const displayLang = ['az', 'en', 'ru', 'tr', 'kk', 'uz', 'ka', 'de', 'ar'].includes(language) ? language : 'az';
+    const displayLang = LANGUAGE_CODES.includes(language) ? language : 'az';
     // Siyahı seqmenti (baby_names_db.lang) — hər dilin öz seqmenti var (Duzelis2/3/4.sql
     // ilə kk/de/ar üçün real yerli ad dəstləri əlavə olundu; əvvəllər kk→az, de/ar→en
     // körpüsü ilə "yerli olmayan" adlar göstərilirdi).
     const lang = displayLang;
 
-    const name = properCase(String(rawName || ''));
+    const name = properCase(String(rawName || ''), displayLang);
     if (name.length < 2 || name.length > 30 || !/^[\p{L}\s'-]+$/u.test(name)) {
       return new Response(JSON.stringify({ success: false, error: 'invalid_name' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -85,8 +88,8 @@ Deno.serve(async (req) => {
         display: {
           name: existing.name,
           gender: existing.gender,
-          meaning: existing[f.meaning] || (displayLang === 'kk' || displayLang === 'uz' || displayLang === 'ka' ? existing.meaning_ru : null) || (displayLang === 'de' || displayLang === 'ar' ? existing.meaning_en : null) || existing.meaning_az || existing.meaning,
-          origin: existing[f.origin] || (displayLang === 'kk' || displayLang === 'uz' || displayLang === 'ka' ? existing.origin_ru : null) || (displayLang === 'de' || displayLang === 'ar' ? existing.origin_en : null) || existing.origin,
+          meaning: existing[f.meaning] || (displayLang === 'kk' || displayLang === 'uz' || displayLang === 'ka' ? existing.meaning_ru : null) || (displayLang === 'de' || displayLang === 'ar' || isExpandedLanguage(displayLang) ? existing.meaning_en : null) || existing.meaning_az || existing.meaning,
+          origin: existing[f.origin] || (displayLang === 'kk' || displayLang === 'uz' || displayLang === 'ka' ? existing.origin_ru : null) || (displayLang === 'de' || displayLang === 'ar' || isExpandedLanguage(displayLang) ? existing.origin_en : null) || existing.origin,
           popularity: existing.popularity || 0,
         },
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -104,14 +107,15 @@ QAYDALAR:
 2. gender: "boy" | "girl" | "unisex"
 3. Hər meaning_* qısa və dəqiq olsun (maksimum 120 simvol), həmin dildə yazılsın (meaning_kk qazax dilində kiril, meaning_uz özbək dilində latın yazısı, meaning_ka gürcü dilində Mxedruli yazısı, meaning_de alman, meaning_ar ərəb dilində).
 4. Ad real şəxs adı deyilsə (təsadüfi söz, əşya, təhqir və s.): {"found":false}
-5. Uydurma etimologiya vermə — əmin deyilsənsə found:false qaytar.`;
+5. Uydurma etimologiya vermə — əmin deyilsənsə found:false qaytar.
+6. Also provide meaning_zh/origin_zh in Simplified Mandarin, meaning_id/origin_id in Indonesian, meaning_fr/origin_fr in French, meaning_es/origin_es in Spanish, meaning_pt/origin_pt in European Portuguese, meaning_vi/origin_vi in Vietnamese, meaning_hi/origin_hi in Devanagari Hindi, meaning_ja/origin_ja in Japanese, meaning_ko/origin_ko in Korean, meaning_pl/origin_pl in Polish, meaning_nl/origin_nl in Dutch, and meaning_sv/origin_sv in Swedish. These are translations of the same verified etymology, not new claims. Keep the supplied name unchanged.`;
 
     const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
     let aiText = '';
     for (const model of models) {
       const resp = await callGeminiSmart(model, {
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.1, maxOutputTokens: 1024 },
+        generationConfig: { temperature: 0.1, maxOutputTokens: 8192 },
       });
       if (resp.ok) {
         const g = await resp.json();
@@ -129,6 +133,8 @@ QAYDALAR:
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    if (isExpandedLanguage(displayLang) && (!String(parsed[`meaning_${displayLang}`] || '').trim()
+      || !String(parsed[`origin_${displayLang}`] || '').trim())) throw new Error('localized_response_missing');
 
     const gender = ['boy', 'girl', 'unisex'].includes(parsed.gender) ? parsed.gender : 'unisex';
     const clip = (v: unknown, n: number) => String(v ?? '').slice(0, n);
@@ -158,6 +164,7 @@ QAYDALAR:
       meaning_ka: clip(parsed.meaning_ka, 200),
       meaning_de: clip(parsed.meaning_de, 200),
       meaning_ar: clip(parsed.meaning_ar, 200),
+      ...Object.fromEntries(Object.keys(EXPANDED_LANGUAGE_NAMES).flatMap(language => [[`origin_${language}`, clip(parsed[`origin_${language}`], 80)], [`meaning_${language}`, clip(parsed[`meaning_${language}`], 200)]])),
       popularity: 25,
       is_active: true,
     };

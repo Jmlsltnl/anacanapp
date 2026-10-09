@@ -4,7 +4,7 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
-import { requireCronSecret } from '../_shared/auth.ts';
+import { requireNotificationCron } from '../_shared/notification-auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,7 +14,7 @@ const corsHeaders = {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
-  const cronErr = requireCronSecret(req);
+  const cronErr = await requireNotificationCron(req, 'expire-partner-links');
   if (cronErr) return cronErr;
 
   const supabase = createClient(

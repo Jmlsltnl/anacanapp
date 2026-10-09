@@ -42,6 +42,8 @@
   },
   "android": {
     "includePlugins": [
+      "@anacan/customerio-data-in",
+      "@capacitor-community/admob",
       "@capacitor-firebase/analytics",
       "@capacitor-firebase/authentication",
       "@capacitor-firebase/messaging",
@@ -53,6 +55,7 @@
       "@capacitor/local-notifications",
       "@capacitor/preferences",
       "@capacitor/push-notifications",
+      "@capacitor/share",
       "@capacitor/splash-screen",
       "@capacitor/status-bar",
       "@revenuecat/purchases-capacitor",

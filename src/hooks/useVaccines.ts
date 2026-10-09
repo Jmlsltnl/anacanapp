@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useUserStore } from '@/store/userStore';
 import { mapRowsTranslation } from '@/lib/tr';
+import { localizedCountryName } from '@/lib/app-languages';
+import { getBackendConfig } from '@/integrations/supabase/backend-config';
+import { vaccineTiming } from '@/lib/vaccine-schedule';
 
 export interface VaccineCountry {
   id: string;
@@ -16,6 +19,7 @@ export interface VaccineCountry {
   is_active: boolean;
   is_default: boolean;
   sort_order: number;
+  schedule_meta?: { protocol: string; version: string; reviewed_at: string; notes: Record<string, string> } | null;
 }
 
 export interface Vaccine {
@@ -65,6 +69,7 @@ export interface VaccineSchedule {
   notes_az: string | null;
   notes?: string | null;
   sort_order: number;
+  schedule_meta?: unknown;
 }
 
 
@@ -90,7 +95,7 @@ export interface VaccineScheduleRow extends VaccineSchedule {
 export const useVaccineCountries = () => {
   const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['vaccine-countries', language],
+    queryKey: ['vaccine-countries', language, getBackendConfig().url],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('vaccine_countries' as any)
@@ -98,7 +103,9 @@ export const useVaccineCountries = () => {
         .eq('is_active', true)
         .order('sort_order');
       if (error) throw error;
-      return mapRowsTranslation(data, language, ['name']) as unknown as VaccineCountry[];
+      return mapRowsTranslation(data, language, ['name']).map((row: any) => ({ ...row,
+        name: row[`name_${language}`] || localizedCountryName(row.code, language, row.name || row.name_en || row.code),
+      })) as unknown as VaccineCountry[];
     },
   });
 };
@@ -106,14 +113,13 @@ export const useVaccineCountries = () => {
 export const useVaccineScheduleForCountry = (countryCode: string | null) => {
   const language = useUserStore((state) => state.language);
   return useQuery({
-    queryKey: ['vaccine-schedule', countryCode, language],
+    queryKey: ['vaccine-schedule', countryCode, language, getBackendConfig().url],
     enabled: !!countryCode,
     queryFn: async () => {
       const { data: vaccines, error: vErr } = await supabase
         .from('vaccines' as any)
         .select('*')
         .eq('country_code', countryCode!)
-        .eq('is_active', true)
         .order('sort_order');
       if (vErr) throw vErr;
 
@@ -143,7 +149,14 @@ export const useVaccineScheduleForCountry = (countryCode: string | null) => {
       const vMap = new Map(mappedVaccines.map(v => [v.id, v]));
       const rows: VaccineScheduleRow[] = mappedSchedules
         .filter(s => vMap.has(s.vaccine_id))
-        .map(s => ({ ...s, vaccine: vMap.get(s.vaccine_id)! }));
+        .map(s => {
+          const vaccine = vMap.get(s.vaccine_id)!;
+          const name = vaccineTiming(s)?.display_name?.[language];
+          // A reviewed MR programme must not inherit old MMR/mumps prose from a
+          // legacy catalogue label. Identifiers and personal records stay intact.
+          return { ...s, vaccine: name ? { ...vaccine, name, disease: null, short_description: null,
+            full_description: null, route: null, side_effects: null, contraindications: null } : vaccine };
+        });
       return rows;
     },
   });
@@ -152,13 +165,14 @@ export const useVaccineScheduleForCountry = (countryCode: string | null) => {
 export const useChildVaccinations = (childId: string | null) => {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ['child-vaccinations', childId],
+    queryKey: ['child-vaccinations', childId, user?.id, getBackendConfig().url],
     enabled: !!childId && !!user,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('child_vaccinations' as any)
         .select('*')
-        .eq('child_id', childId!);
+        .eq('child_id', childId!)
+        .eq('user_id', user!.id);
       if (error) throw error;
       return (data || []) as unknown as ChildVaccination[];
     },

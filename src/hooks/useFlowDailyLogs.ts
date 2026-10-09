@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
 import { useUserStore } from '@/store/userStore';
 import { mapRowsTranslation } from '@/lib/tr';
+import { completePeriodWrite, recordPeriodDays } from '@/hooks/usePeriodDayLogs';
 
 export interface FlowDailyLog {
   id: string;
@@ -13,7 +14,7 @@ export interface FlowDailyLog {
   energy_level: number | null;
   symptoms: string[];
   pain_level: number | null;
-  flow_intensity: 'none' | 'spotting' | 'light' | 'medium' | 'heavy' | null;
+  flow_intensity: 'unspecified' | 'none' | 'spotting' | 'light' | 'medium' | 'heavy' | null;
   sleep_hours: number | null;
   sleep_quality: number | null;
   temperature: number | null;
@@ -64,7 +65,7 @@ export const useFlowDailyLog = (date: string) => {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['flow-daily-log', date],
+    queryKey: ['flow-daily-log', user?.id, date],
     queryFn: async () => {
       if (!user?.id) return null;
 
@@ -88,7 +89,7 @@ export const useFlowDailyLogs = (startDate?: string, endDate?: string) => {
   const end = endDate || format(new Date(), 'yyyy-MM-dd');
 
   return useQuery({
-    queryKey: ['flow-daily-logs', start, end],
+    queryKey: ['flow-daily-logs', user?.id, start, end],
     queryFn: async () => {
       if (!user?.id) return [];
 
@@ -113,7 +114,7 @@ export const useFlowMonthLogs = (month: Date) => {
   const end = format(endOfMonth(month), 'yyyy-MM-dd');
 
   return useQuery({
-    queryKey: ['flow-month-logs', start, end],
+    queryKey: ['flow-month-logs', user?.id, start, end],
     queryFn: async () => {
       if (!user?.id) return [];
 
@@ -137,29 +138,13 @@ export const useSaveFlowDailyLog = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    scope: { id: `period-recording:${user?.id}` },
     mutationFn: async (log: Partial<FlowDailyLog> & { log_date: string }) => {
       if (!user?.id) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase
-        .from('flow_daily_logs')
-        .upsert({
-          ...log,
-          user_id: user.id,
-          updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'user_id,log_date',
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
+      const { log_date, flow_intensity, ...dailyLog } = log;
+      return recordPeriodDays(user.id, { dates: [log_date], flow: flow_intensity ?? null, dailyLog });
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['flow-daily-log', variables.log_date] });
-      queryClient.invalidateQueries({ queryKey: ['flow-daily-logs'] });
-      queryClient.invalidateQueries({ queryKey: ['flow-month-logs'] });
-    },
+    onSuccess: result => completePeriodWrite(result, user!.id, queryClient),
   });
 };
 
@@ -170,7 +155,7 @@ export const useFlowMoodChart = () => {
   const end = format(new Date(), 'yyyy-MM-dd');
 
   return useQuery({
-    queryKey: ['flow-mood-chart', start, end],
+    queryKey: ['flow-mood-chart', user?.id, start, end],
     queryFn: async () => {
       if (!user?.id) return [];
 

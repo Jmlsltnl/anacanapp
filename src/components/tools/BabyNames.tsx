@@ -7,8 +7,14 @@ import { useBabyNames } from '@/hooks/useDynamicContent';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { useScreenAnalytics, trackEvent } from '@/hooks/useScreenAnalytics';
 import { supabase } from '@/integrations/supabase/client';
-import { tr } from "@/lib/tr";
+import { tr, mapRowTranslation } from "@/lib/tr";
+import { NEW_LANGUAGE_CODES, localizedCountryName } from '@/lib/app-languages';
 import { useUserStore } from '@/store/userStore';
+import { useAuth } from '@/hooks/useAuth';
+import { regionalCountry } from '@/lib/vaccine-schedule';
+import { followupText } from '@/lib/followup-i18n';
+import { nameCollectionLanguage } from '@/lib/name-collections';
+import { AdInlineAnchor, AdSurface } from '@/components/ads/AdExperienceProvider';
 
 interface BabyNamesProps {
   onBack: () => void;
@@ -19,11 +25,16 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
   useScreenAnalytics('BabyNames', 'Tools');
 
   const language = useUserStore((state) => state.language);
+  const storedCountry = useUserStore(state => state.countryCode);
+  const { profile } = useAuth();
+  const country = regionalCountry(language, profile?.country_code, storedCountry);
+  const international = (NEW_LANGUAGE_CODES as readonly string[]).includes(language);
+  const curatedCollection = (NEW_LANGUAGE_CODES as readonly string[]).includes(nameCollectionLanguage(country, language));
   const [searchQuery, setSearchQuery] = useState('');
   const [genderFilter, setGenderFilter] = useState<'all' | 'boy' | 'girl'>('all');
   const [selectedName, setSelectedName] = useState<any | null>(null);
   const { favorites, loading: favsLoading, toggleFavorite, isFavorite } = useFavoriteNames();
-  const { data: names = [], isLoading } = useBabyNames();
+  const { data: names = [], isLoading } = useBabyNames(country);
   const queryClient = useQueryClient();
   const [aiLoading, setAiLoading] = useState(false);
   const [aiStatus, setAiStatus] = useState<'idle' | 'notfound' | 'error'>('idle');
@@ -47,12 +58,13 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
       }
       // Siyahını yenilə (ad artıq bazadadır) və detal modalını aç
       queryClient.invalidateQueries({ queryKey: ['baby_names'] });
+      const localized = international && data.item ? mapRowTranslation(data.item, language, ['meaning', 'origin']) : null;
       setSelectedName({
         id: data.item?.id || `ai-${Date.now()}`,
         name: data.display.name,
         gender: data.display.gender,
-        meaning: data.display.meaning,
-        origin: data.display.origin,
+        meaning: localized?.meaning || data.display.meaning,
+        origin: localized?.origin || data.display.origin,
         popularity: data.display.popularity
       });
     } catch (e) {
@@ -90,6 +102,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
 
   return (
     <div ref={ref} className="a-scope pb-24" style={{ background: 'var(--a-bg)', minHeight: '100vh' }}>
+      <AdSurface id="baby_names_banner" enabled={!selectedName && !aiLoading} />
       <div className="a-shell">
         {/* Top bar */}
         <header className="a-topbar">
@@ -98,7 +111,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
               <ArrowLeft className="rtl:rotate-180" size={16} strokeWidth={2} />
             </motion.button>
             <div>
-              <p className="a-eyebrow">{names.length} {tr("babynames_ad_count_3c7a2d", "ad")} · {language === 'en' ? '🇬🇧 English' : language === 'tr' ? '🇹🇷 Türkçe' : language === 'ru' ? '🇷🇺 Русские' : language === 'kk' ? '🇰🇿 Қазақша' : language === 'uz' ? '🇺🇿 Oʻzbekcha' : language === 'ka' ? '🇬🇪 ქართული' : language === 'de' ? '🇩🇪 Deutsch' : language === 'ar' ? '🇸🇦 العربية' : `🇦🇿 ${tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan")}`}</p>
+              <p className="a-eyebrow" data-name-country>{followupText('names_country', language, { country: localizedCountryName(country, language) })} · {names.length}</p>
               <p className="a-wordmark" style={{ fontSize: 16 }}>{tr("babynames_korpe_adlari_357880", "Körpə Adları")}</p>
             </div>
           </div>
@@ -128,6 +141,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
         </div>
 
         {/* Gender Filter Pills */}
+        <AdInlineAnchor id="baby_names_banner" />
         <div className="a-tabs" style={{ display: 'flex', width: '100%', marginTop: 12 }}>
           {[
             { id: 'all', label: `✨ ${tr("babynames_hamisi_c73c4d", 'Hamısı')}` },
@@ -180,6 +194,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
           </div>
 
           {/* Names List */}
+          {curatedCollection && <p className="a-list-sub mb-3">{followupText('names_catalog_source', language)}: <a href="https://github.com/faker-js/faker/tree/v9.9.0/src/locales" target="_blank" rel="noopener noreferrer">Faker v9.9.0 · MIT</a></p>}
           {filteredNames.length > 0 &&
           <div className="a-list-card">
             {filteredNames.map((name, index) =>
@@ -207,12 +222,12 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                       <Star size={12} style={{ color: 'var(--a-yellow-2)', fill: 'var(--a-yellow-2)' }} />
                     }
                   </p>
-                  <p className="a-list-sub" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name.meaning}</p>
+                  <p className="a-list-sub" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name.meaning || followupText('names_no_meaning', language)}</p>
                 </div>
 
                 {/* Popularity mini bar */}
                 <span className="a-list-trail" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ width: 44, height: 5, borderRadius: 999, background: 'var(--a-line-strong)', overflow: 'hidden', display: 'block' }}>
+                  {!!name.popularity && <span style={{ width: 44, height: 5, borderRadius: 999, background: 'var(--a-line-strong)', overflow: 'hidden', display: 'block' }}>
                     <span
                       style={{
                         display: 'block',
@@ -221,7 +236,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                         width: `${name.popularity || 0}%`,
                         background: name.gender === 'boy' ? 'var(--a-grad-blue)' : name.gender === 'girl' ? 'var(--a-grad-pink)' : 'var(--a-grad-lav)'
                       }} />
-                  </span>
+                  </span>}
 
                   {/* Favorite Button */}
                   <motion.button
@@ -327,7 +342,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                           {selectedName.gender === 'boy' ? tr("babynames_oglan_e9715e", "O\u011Flan") : selectedName.gender === 'girl' ? tr("babynames_qiz_79bf6b", "Q\u0131z") : 'Unisex'}
                         </span>
                         <span className="a-cta-badge" style={{ background: 'var(--a-chip-overlay)', color: ink, padding: '4px 10px', fontSize: 10 }}>
-                          {selectedName.origin || (language === 'en' ? 'Azerbaijan' : language === 'tr' ? 'Türkçe' : language === 'ru' ? 'Русское' : language === 'kk' ? 'Әзербайжан' : language === 'uz' ? 'Oʻzbek' : language === 'ka' ? 'ქართული' : language === 'de' ? 'International' : language === 'ar' ? 'دولي' : tr("babynames_azerbaycan_733e93", "Az\u0259rbaycan"))}
+                          {selectedName.origin || tr('baby_name_origin_unspecified', 'Mənşə qeyd edilməyib')}
                         </span>
                       </div>
                     </>);
@@ -338,11 +353,11 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                 {/* Meaning */}
                 <div className="mb-4">
                   <p className="a-today-info-eyebrow" style={{ marginBottom: 3 }}>{tr("babynames_menasi_83a157", "Mənası")}</p>
-                  <p style={{ margin: 0, fontSize: 14.5, fontWeight: 600, color: 'var(--a-ink)', lineHeight: 1.5 }}>{selectedName.meaning || tr("babynames_melumat_yoxdur_a3e271", "M\u0259lumat yoxdur")}</p>
+                  <p style={{ margin: 0, fontSize: 14.5, fontWeight: 600, color: 'var(--a-ink)', lineHeight: 1.5 }}>{selectedName.meaning || followupText('names_no_meaning', language)}</p>
                 </div>
 
                 {/* Popularity */}
-                <div className="a-stat-tile mb-5" style={{ justifyContent: 'space-between' }}>
+                {!!selectedName.popularity && <div className="a-stat-tile mb-5" style={{ justifyContent: 'space-between' }}>
                   <span className="a-stat-tile-label" style={{ fontSize: 11.5 }}>{tr("babynames_populyarliq_1501b1", "Populyarlıq")}</span>
                   <div className="flex items-center gap-2">
                     <div style={{ width: 80, height: 6, borderRadius: 999, background: 'var(--a-line-strong)', overflow: 'hidden' }}>
@@ -355,7 +370,7 @@ const BabyNames = forwardRef<HTMLDivElement, BabyNamesProps>(({ onBack }, ref) =
                     </div>
                     <span className="a-stat-tile-value" style={{ fontSize: 13 }}>{selectedName.popularity || 0}%</span>
                   </div>
-                </div>
+                </div>}
 
                 {/* Add to Favorites Button */}
                 <motion.button

@@ -2,6 +2,16 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { callGeminiSmart } from "../_shared/vertex-ai.ts";
+import { EXPANDED_LANGUAGE_NAMES, isExpandedLanguage } from '../_shared/languages.ts';
+import { serverCopy } from '../_shared/localized-copy.ts';
+
+const CRY_FALLBACK_COPY = {
+  shortExplanation: 'The recording is too short. At least 3 seconds of audio is needed for an accurate analysis.',
+  shortRecommendations: ['Record at least 3 seconds of audio', 'Hold the microphone close to the baby'],
+  noCryRecommendations: ['Try again when the baby is crying', 'Move the microphone closer to the baby', 'Minimize background noise'],
+  classificationExplanation: 'Baby crying was detected, but the exact type could not be determined.',
+  classificationRecommendations: ["Check the baby's overall condition", 'Check the diaper', 'Check if the baby is hungry'],
+};
 import { checkAndConsumeServerSide, limitExceededResponse } from "../_shared/usage-limit.ts";
 
 const corsHeaders = {
@@ -147,7 +157,7 @@ async function classifyCryType(audioBase64: string, _apiKey?: string, userContex
     }
   }
 
-  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH', uz: 'UZBEK (Latin script)', ka: 'GEORGIAN (ქართული, Mkhedruli script)', de: 'GERMAN', ar: 'ARABIC (feminine address to the mother)' };
+  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH', uz: 'UZBEK (Latin script)', ka: 'GEORGIAN (ქართული, Mkhedruli script)', de: 'GERMAN', ar: 'ARABIC (feminine address to the mother)', ...EXPANDED_LANGUAGE_NAMES };
   const outLang = OUT_LANG[language];
 
   const response = await callGeminiSmart("gemini-2.5-flash", {
@@ -226,6 +236,8 @@ JSON CAVAB:
   throw new Error('No JSON in classification response');
 }
 
+import { checkModerationAccess } from '../_shared/auth.ts';
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -256,6 +268,8 @@ Deno.serve(async (req) => {
       });
     }
 
+    const moderationError = await checkModerationAccess(user.id, 'analyze-cry');
+    if (moderationError) return moderationError;
     const usage = await checkAndConsumeServerSide(user.id, 'cry_translator');
     if (!usage.allowed) return limitExceededResponse(corsHeaders, usage.limit);
 
@@ -272,7 +286,7 @@ Deno.serve(async (req) => {
         analysis: {
           cryType: 'no_cry_detected',
           confidence: 0,
-          explanation: language === 'en'
+          explanation: isExpandedLanguage(language) ? serverCopy('cryFallback', language, CRY_FALLBACK_COPY).shortExplanation : language === 'en'
             ? 'The recording is too short. At least 3 seconds of audio is needed for an accurate analysis.'
             : language === 'ru'
             ? 'Запись слишком короткая. Для точного анализа нужно минимум 3 секунды звука.'
@@ -289,7 +303,7 @@ Deno.serve(async (req) => {
             : language === 'ar'
             ? 'التسجيل الصوتي قصير جدًا. يلزم تسجيل مدته ٣ ثوانٍ على الأقل لإجراء تحليل أدق.'
             : 'Səs çox qısadır. Daha dəqiq analiz üçün minimum 3 saniyə səs lazımdır.',
-          recommendations: language === 'en'
+          recommendations: isExpandedLanguage(language) ? serverCopy('cryFallback', language, CRY_FALLBACK_COPY).shortRecommendations : language === 'en'
             ? ['Record at least 3 seconds of audio', 'Hold the microphone close to the baby']
             : language === 'ru'
             ? ['Запишите минимум 3 секунды звука', 'Держите микрофон ближе к малышу']
@@ -440,7 +454,7 @@ Deno.serve(async (req) => {
         'baby_cooing': 'رضيعكِ يصدر أصواتًا سعيدة ولا يبكي.',
         'unknown': 'لم يُكتشف بكاء رضيع.'
       };
-      const messages = language === 'en' ? soundTypeMessagesEn
+      const messages = isExpandedLanguage(language) ? serverCopy('crySounds', language, soundTypeMessagesEn) : language === 'en' ? soundTypeMessagesEn
         : language === 'ru' ? soundTypeMessagesRu
         : language === 'tr' ? soundTypeMessagesTr
         : language === 'kk' ? soundTypeMessagesKk
@@ -457,7 +471,7 @@ Deno.serve(async (req) => {
           cryType: 'no_cry_detected',
           confidence: detection.confidence,
           explanation: explanation,
-          recommendations: language === 'en'
+          recommendations: isExpandedLanguage(language) ? serverCopy('cryFallback', language, CRY_FALLBACK_COPY).noCryRecommendations : language === 'en'
             ? ['Try again when the baby is crying', 'Move the microphone closer to the baby', 'Minimize background noise']
             : language === 'ru'
             ? ['Попробуйте ещё раз, когда малыш будет плакать', 'Поднесите микрофон ближе к малышу', 'Сведите фоновый шум к минимуму']
@@ -495,7 +509,7 @@ Deno.serve(async (req) => {
       analysisResult = {
         cryType: 'discomfort',
         confidence: 70,
-        explanation: language === 'en'
+        explanation: isExpandedLanguage(language) ? serverCopy('cryFallback', language, CRY_FALLBACK_COPY).classificationExplanation : language === 'en'
           ? 'Baby crying was detected, but the exact type could not be determined.'
           : language === 'ru'
           ? 'Плач малыша обнаружен, но его точный тип определить не удалось.'
@@ -512,7 +526,7 @@ Deno.serve(async (req) => {
           : language === 'ar'
           ? 'اكتُشف بكاء رضيع، لكن تعذّر تحديد نوعه بدقة.'
           : 'Körpə ağlaması aşkar edildi, lakin dəqiq növü müəyyən edilə bilmədi.',
-        recommendations: language === 'en'
+        recommendations: isExpandedLanguage(language) ? serverCopy('cryFallback', language, CRY_FALLBACK_COPY).classificationRecommendations : language === 'en'
           ? ["Check the baby's overall condition", 'Check the diaper', 'Check if the baby is hungry']
           : language === 'ru'
           ? ['Проверьте общее состояние малыша', 'Проверьте подгузник', 'Проверьте, не голоден ли малыш']

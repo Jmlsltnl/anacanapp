@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkModerationAccess } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -56,6 +57,8 @@ Deno.serve(async (req) => {
         });
       }
       authenticatedUserId = userData.user.id;
+      const moderationError = await checkModerationAccess(authenticatedUserId, 'epoint-payment');
+      if (moderationError) return moderationError;
 
       // Check admin role for privileged actions
       const { data: roleData } = await supabase

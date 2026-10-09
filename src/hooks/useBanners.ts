@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
 import { mapRowsTranslation } from '@/lib/tr';
+import { getBackendConfig } from '@/integrations/supabase/backend-config';
 
 export type BannerPlacement = 
   | 'home_top' 
@@ -50,6 +51,11 @@ export interface Banner {
   target_countries: string[] | null;
   /** Limitsiz üçün NULL — təyin olunubsa istifadəçi bu sayda gördükdən sonra göstərilmir */
   max_impressions_per_user: number | null;
+  branded?: boolean;
+  measurement_version?: number;
+  creative_revision?: number;
+  sponsor_name?: string;
+  sponsor_logo?: string | null;
   }
 
 /**
@@ -71,8 +77,13 @@ export const useBanners = (placement?: BannerPlacement) => {
   const countryCode = ((profile as any)?.country_code || storeCountryCode || '').toUpperCase();
 
   return useQuery({
-    queryKey: ['banners', placement, language, lifeStage, countryCode, user?.id],
-    queryFn: async () => {
+    queryKey: ['banners', getBackendConfig().url, placement, language, lifeStage, countryCode, user?.id],
+    queryFn: async ({ signal }) => {
+      if (user && placement) {
+        const { data, error } = await (supabase as any).rpc('get_banner_inventory_v2', { p_actor: user.id, p_placement: placement, p_language: language }).abortSignal(signal);
+        if (!error) return mapRowsTranslation(data || [], language, ['title', 'description', 'button_text']) as unknown as Banner[];
+        if (!['PGRST202', '42883'].includes(error.code)) throw error;
+      }
       let query = supabase
         .from('banners')
         .select('*')
@@ -161,7 +172,7 @@ export const useUpdateBanner = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Banner> & { id: string }) => {
+    mutationFn: async ({ id, click_count: _clicks, view_count: _views, ...updates }: Partial<Banner> & { id: string }) => {
       const { data, error } = await supabase
         .from('banners')
         .update({ ...updates, updated_at: new Date().toISOString() } as any)

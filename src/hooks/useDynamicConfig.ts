@@ -3,6 +3,7 @@ import { tr, mapRowsTranslation } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useUserStore } from '@/store/userStore';
+import { mapFollowupContent } from '@/lib/followup-content';
 
 // ============ EXERCISES ============
 export interface Exercise {
@@ -37,7 +38,7 @@ export const useExercises = () => {
         .order('sort_order');
       
       if (error) throw error;
-      const mapped = mapRowsTranslation(data, language, ['name', 'description', 'steps']);
+      const mapped = mapFollowupContent(data, language, ['name', 'description', 'steps']);
       return mapped.map(e => ({
         ...e,
         steps: Array.isArray(e.steps) ? e.steps : JSON.parse(e.steps as string || '[]')

@@ -3,6 +3,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { callGeminiSmart } from "../_shared/vertex-ai.ts";
 import { checkAndConsumeServerSide, limitExceededResponse } from "../_shared/usage-limit.ts";
+import { EXPANDED_LANGUAGE_NAMES } from '../_shared/languages.ts';
+import { serverCopy } from '../_shared/localized-copy.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -48,6 +50,7 @@ async function validateImage(imageBase64: string, _apiKey?: string, language: st
       'failed': 'Şəkil yoxlanıla bilmədi. Yenidən cəhd edin.',
     },
     en: {
+      'success': 'The image was analyzed successfully',
       'diaper_empty': 'This diaper is empty, no stool is visible. Take a photo of a diaper with stool.',
       'baby_photo': 'This is a baby photo. Please take a photo of the diaper.',
       'adult_content': 'This image is not a baby diaper. Please choose a proper image.',
@@ -160,7 +163,7 @@ async function validateImage(imageBase64: string, _apiKey?: string, language: st
       'failed': 'تعذّر التحقق من الصورة. حاولي مرة أخرى.',
     },
   };
-  const vmsg = VALIDATION_MESSAGES[language] ?? VALIDATION_MESSAGES.az;
+  const vmsg = serverCopy('poopValidation', language, VALIDATION_MESSAGES[language] ?? VALIDATION_MESSAGES.az);
   
   for (const model of models) {
     try {
@@ -256,8 +259,8 @@ CAVAB FORMATI (STRICT JSON, heç bir əlavə mətn yoxdur):
 // Stage 2: Analyze the poop
 async function analyzePoop(imageBase64: string, _apiKey?: string, userContext?: PoopAnalysisRequest['userContext'], language: string = 'az'): Promise<Response | null> {
   const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
-  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH', uz: 'UZBEK (Latin script)', ka: 'GEORGIAN (ქართული, Mkhedruli script)', de: 'GERMAN', ar: 'ARABIC (feminine address to the mother)' };
-  const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish', kk: 'Kazakh', uz: 'Uzbek', ka: 'Georgian', de: 'German', ar: 'Arabic' };
+  const OUT_LANG: Record<string, string> = { en: 'ENGLISH', ru: 'RUSSIAN', tr: 'TURKISH', kk: 'KAZAKH', uz: 'UZBEK (Latin script)', ka: 'GEORGIAN (ქართული, Mkhedruli script)', de: 'GERMAN', ar: 'ARABIC (feminine address to the mother)', ...EXPANDED_LANGUAGE_NAMES };
+  const OUT_LANG_NAME: Record<string, string> = { en: 'English', ru: 'Russian', tr: 'Turkish', kk: 'Kazakh', uz: 'Uzbek', ka: 'Georgian', de: 'German', ar: 'Arabic', ...EXPANDED_LANGUAGE_NAMES };
   const outLang = OUT_LANG[language];
   
   // Build age context for prompt
@@ -359,6 +362,8 @@ XƏBƏRDARLIQ: Ağ, qara və ya qırmızı rəng gördükdə "urgent" səviyyəs
   return null;
 }
 
+import { checkModerationAccess } from '../_shared/auth.ts';
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -389,6 +394,8 @@ Deno.serve(async (req) => {
       });
     }
 
+    const moderationError = await checkModerationAccess(user.id, 'analyze-poop');
+    if (moderationError) return moderationError;
     const usage = await checkAndConsumeServerSide(user.id, 'poop_scanner');
     if (!usage.allowed) return limitExceededResponse(corsHeaders, usage.limit);
 
@@ -487,7 +494,7 @@ Deno.serve(async (req) => {
           recommendations: ['راقبي الحالة العامة لرضيعكِ', 'راجعي الطبيب إذا لاحظتِ أي أمر مقلق'],
         },
       };
-      const fb = FALLBACK[language] ?? FALLBACK.az;
+      const fb = serverCopy('poopFallback', language, FALLBACK[language] ?? FALLBACK.az);
       analysisResult = {
         colorDetected: 'unknown',
         colorNameAz: fb.colorNameAz,
@@ -522,7 +529,7 @@ Deno.serve(async (req) => {
       validation: {
         imageType: validation.imageType,
         confidence: validation.confidence,
-        message: 'Şəkil uğurla analiz edildi'
+        message: serverCopy<Record<string, string>>('poopValidation', language, { success: 'Şəkil uğurla analiz edildi' }).success
       },
       analysis: analysisResult
     }), {

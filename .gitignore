@@ -14,8 +14,12 @@ dist-ssr
 
 # Local AI credentials (never commit)
 .env.azure
+.env.google
 scripts/content-i18n/.env.azure
 .env.vertex
+.env.*
+!.env.example
+!.env.*.example
 scripts/content-i18n/baby-activities/.env.vertex
 scripts/content-i18n/baby-activities/images/
 service-account*.json
@@ -47,3 +51,22 @@ scripts/i18n/uz.out/
 scripts/i18n/uz-translate.log
 scripts/i18n/ka.out/
 scripts/i18n/ka-translate.log
+
+# Private native signing material and device/account configuration
+*.jks
+*.keystore
+*.p12
+*.p8
+*.mobileprovision
+**/keystore.properties
+**/export_credentials.cfg
+**/ExportOptions.private.plist
+**/.netrc
+
+# Disposable local build and IDE state
+*.tsbuildinfo
+**/.kotlin/
+**/.swiftpm/
+**/xcshareddata/swiftpm/configuration/
+**/test-results/
+**/playwright-report/

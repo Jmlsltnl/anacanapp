@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
-import { requireCronSecret, requireAdmin } from '../_shared/auth.ts';
+import { requireAdmin } from '../_shared/auth.ts';
+import { requireNotificationCron } from '../_shared/notification-auth.ts';
 import { startRunLog, finishRunLog, logFailedSend, bumpReason } from '../_shared/notif-logging.ts';
 
 const corsHeaders = {
@@ -25,7 +26,7 @@ Deno.serve(async (req) => {
 
     // Auth: cron secret OR admin user for manual test
     let triggeredBy = 'cron';
-    const cronErr = requireCronSecret(req);
+    const cronErr = await requireNotificationCron(req, 'send-vitamin-reminders');
     if (cronErr) {
       const adminCheck = await requireAdmin(req);
       if (adminCheck.error) return adminCheck.error;

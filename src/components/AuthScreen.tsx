@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, User, ArrowRight, Users, Eye, EyeOff, Sparkles, ArrowLeft, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { isAzureBackend } from '@/integrations/supabase/backend-config';
+import logoImage from '@/assets/brand-mark.png';
 import { useAppBranding, getBrandingUrl } from '@/hooks/useAppBranding';
 import { useAppSetting } from '@/hooks/useAppSettings';
 import { tr } from "@/lib/tr";
@@ -15,6 +17,9 @@ import { useShallow } from 'zustand/react/shallow';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Globe } from 'lucide-react';
 import CountrySelect from '@/components/CountrySelect';
+import { getPartnerLinkErrorMessage, isAzurePartnerPairingEnabled, linkPartnerByCode, normalizeSecurePartnerCode, PartnerLinkError } from '@/lib/partner-link';
+import { APPLE_WEB_ORIGIN, appleWebErrorMessage, cancelAppleWebSignIn, isAppleWebCancelled, prepareAppleWebSignIn, usesAzureAppleWebFlow } from '@/lib/apple-web-auth';
+import { isModeratorSignupError, moderatorError } from '@/lib/moderator';
 
 type AuthMode = 'login' | 'register' | 'forgot-password';
 type PartnerAuthMode = 'login' | 'register';
@@ -25,8 +30,12 @@ const fieldCls = "ps-11 h-12 rounded-xl border-2 border-transparent text-base tr
 const fieldClsBlue = "ps-11 h-12 rounded-xl border-2 border-transparent text-base transition-all bg-[var(--a-surface-soft)] text-[var(--a-ink)] focus:border-[#63acdf] focus-visible:ring-0";
 
 function getSignupErrorMessage(error: any): string {
+  if (isModeratorSignupError(error)) return moderatorError(error, useUserStore.getState().language);
   const code = error?.code || '';
   const msg = (error?.message || '').toLowerCase();
+  if (msg.includes('fetch') || msg.includes('network request failed') || msg.includes('networkerror')) {
+    return tr('auth_connection_unavailable', 'Serverə qoşulmaq mümkün olmadı. Bağlantını yoxlayıb yenidən cəhd edin.');
+  }
   if (code === 'weak_password' || msg.includes('weak') || msg.includes('pwned')) {
     return tr("authscreen_sifre_cox_zeifdir_ve_ya_sizdir_e88929", "\u015Eifr\u0259 \xE7ox z\u0259ifdir v\u0259 ya s\u0131zd\u0131r\u0131lm\u0131\u015F \u015Fifr\u0259l\u0259r siyah\u0131s\u0131ndad\u0131r. Daha g\xFCcl\xFC, unikal bir \u015Fifr\u0259 se\xE7in (\u0259n az\u0131 8 simvol, b\xF6y\xFCk/ki\xE7ik h\u0259rf, r\u0259q\u0259m v\u0259 simvol).");
   }
@@ -50,7 +59,7 @@ function getLoginErrorMessage(error: any): string {
   const msg = (error?.message || '').toLowerCase();
 
   if (msg.includes('fetch') || msg.includes('network request failed') || msg.includes('networkerror')) {
-    return tr("authscreen_servere_baglanti_alinmadi_andr_4a4725", "Server\u0259 ba\u011Flant\u0131 al\u0131nmad\u0131. Android build-d\u0259 son native d\u0259yi\u015Fiklikl\u0259r h\u0259l\u0259 sync olunmay\u0131bsa, t\u0259tbiqi yenid\u0259n build edib sync edin v\u0259 sonra yenid\u0259n c\u0259hd edin.");
+    return tr('auth_connection_unavailable', 'Serverə qoşulmaq mümkün olmadı. Bağlantını yoxlayıb yenidən cəhd edin.');
   }
   if (code === 'invalid_credentials' || msg.includes('invalid login credentials')) {
     return tr("authscreen_e_mail_ve_ya_sifre_yanlisdir_1ef792", "E-mail v\u0259 ya \u015Fifr\u0259 yanl\u0131\u015Fd\u0131r.");
@@ -65,6 +74,47 @@ function getLoginErrorMessage(error: any): string {
   return error?.message || tr("authscreen_giris_zamani_xeta_bas_verdi_ye_1c654e", "Giri\u015F zaman\u0131 x\u0259ta ba\u015F verdi. Yenid\u0259n c\u0259hd edin.");
 }
 
+// The toast owns this form even if signup navigates away from AuthScreen.
+function PartnerPairingRetry({ initialCode, initialError, onRetry }: {
+  initialCode: string;
+  initialError: unknown;
+  onRetry: (code: string) => Promise<void>;
+}) {
+  const [code, setCode] = useState(initialCode);
+  const [error, setError] = useState(initialError);
+  const [busy, setBusy] = useState(false);
+  const inFlight = useRef(false);
+  return (
+    <form className="space-y-3 mt-2" onSubmit={async (event) => {
+      event.preventDefault();
+      if (inFlight.current) return;
+      inFlight.current = true;
+      setBusy(true);
+      try {
+        await onRetry(code);
+      } catch (nextError) {
+        setError(nextError);
+      } finally {
+        inFlight.current = false;
+        setBusy(false);
+      }
+    }}>
+      <p role="alert">{getPartnerLinkErrorMessage(error)}</p>
+      <Input
+        aria-label={tr('partner_pairing_invite_label', 'Partner invitation code')}
+        autoComplete="off"
+        maxLength={64}
+        value={code}
+        disabled={busy}
+        onChange={(event) => setCode(event.target.value.toUpperCase())}
+      />
+      <Button type="submit" disabled={busy}>
+        {busy ? tr('partner_pairing_connecting', 'Connecting...') : tr('partner_pairing_retry', 'Retry pairing')}
+      </Button>
+    </form>
+  );
+}
+
 const AuthScreen = () => {
   const [mainView, setMainView] = useState<MainView>('main');
   const [mode, setMode] = useState<AuthMode>('login');
@@ -76,12 +126,33 @@ const AuthScreen = () => {
   const [partnerCode, setPartnerCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const pendingPartnerRegistration = useRef<{ email: string; userId: string } | null>(null);
 
   const { signIn, signUp, signInWithGoogle, signInWithApple } = useAuth();
   const { toast } = useToast();
   const { data: branding = [] } = useAppBranding();
   const socialLoginEnabled = useAppSetting('social_login_enabled');
   const isSocialLoginEnabled = socialLoginEnabled === true || socialLoginEnabled === 'true';
+  // Explicit provider UI enablement for Azure preview / release builds.
+  // Server configuration and full-user cutover acceptance remain separate checks.
+  const googleLoginReady = !isAzureBackend() || import.meta.env.VITE_AZURE_GOOGLE_OAUTH_ENABLED === 'true';
+  const appleConfigured = !isAzureBackend() || import.meta.env.VITE_AZURE_APPLE_OAUTH_ENABLED === 'true';
+  const appleUsesJs = usesAzureAppleWebFlow() && appleConfigured;
+  const [applePreparation, setApplePreparation] = useState<'loading' | 'ready' | 'failed'>('loading');
+  const [applePreparationError, setApplePreparationError] = useState<unknown>(null);
+  const [appleRetry, setAppleRetry] = useState(0);
+  const appleLoginReady = appleConfigured && (!appleUsesJs || applePreparation === 'ready');
+  useEffect(() => {
+    if (!appleUsesJs) return;
+    let disposed = false;
+    setApplePreparation('loading');
+    prepareAppleWebSignIn().then(() => {
+      if (!disposed) { setApplePreparation('ready'); setApplePreparationError(null); }
+    }).catch(error => {
+      if (!disposed) { setApplePreparation('failed'); setApplePreparationError(error); }
+    });
+    return () => { disposed = true; cancelAppleWebSignIn(); };
+  }, [appleUsesJs, appleRetry]);
   const { countryCode, setCountryCode } = useUserStore(
     useShallow((s) => ({ countryCode: s.countryCode, setCountryCode: s.setCountryCode }))
   );
@@ -146,6 +217,64 @@ const AuthScreen = () => {
 
       // ── Validate partner code ──
       const normalizedPartnerCode = partnerCode.trim().toUpperCase();
+      if (isAzurePartnerPairingEnabled()) {
+        try {
+          normalizeSecurePartnerCode(partnerCode);
+        } catch (error) {
+          toast({ title: getPartnerLinkErrorMessage(error), variant: 'destructive' });
+          setIsLoading(false);
+          return;
+        }
+
+        // Do not enumerate profiles anonymously. The authenticated RPC validates the invitation.
+        const registrationEmail = email.trim().toLowerCase();
+        let registration = pendingPartnerRegistration.current;
+        if (registration?.email !== registrationEmail) {
+          const partnerName = nameInputRef.current?.value || name || 'Partner';
+          const { data, error } = await signUp(email, password, partnerName.trim(), countryCode);
+          if (error || !data?.user?.id) {
+            toast({ title: getSignupErrorMessage(error), variant: 'destructive' });
+            setIsLoading(false);
+            return;
+          }
+          registration = { email: registrationEmail, userId: data.user.id };
+          pendingPartnerRegistration.current = registration;
+        }
+        const registeredUserId = registration.userId;
+
+        const finishPairing = async (code: string, retry = false) => {
+          normalizeSecurePartnerCode(code);
+          let { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+          if (sessionError) throw sessionError;
+          if (!sessionData.session && retry) {
+            // Email confirmation can finish after signup. A retry signs in, never signs up again.
+            const { error } = await signIn(email, password);
+            if (error) throw error;
+            const result = await supabase.auth.getSession();
+            sessionData = result.data;
+            sessionError = result.error;
+            if (sessionError) throw sessionError;
+          }
+          if (!sessionData.session) throw new PartnerLinkError('NOT_AUTHENTICATED');
+          if (sessionData.session.user.id !== registeredUserId) throw new PartnerLinkError('PAIRING_ACCOUNT_CHANGED');
+          await linkPartnerByCode(code);
+          pendingPartnerRegistration.current = null;
+          toast({ title: tr('partner_pairing_connected', 'Partner linked successfully.') });
+          window.location.reload();
+        };
+
+        try {
+          await finishPairing(normalizedPartnerCode);
+        } catch (error) {
+          toast({
+            title: tr('partner_pairing_account_created', 'Account created, but partner linking is not complete. Do not register again.'),
+            duration: Infinity,
+            description: <PartnerPairingRetry initialCode={normalizedPartnerCode} initialError={error} onRetry={(code) => finishPairing(code, true)} />
+          });
+        }
+        setIsLoading(false);
+        return;
+      }
       if (!normalizedPartnerCode.startsWith('ANACAN-') || normalizedPartnerCode.length < 10) {
         toast({
           title: tr("authscreen_kod_yanlisdir_64b48f", 'Kod yanlışdır'),
@@ -381,7 +510,7 @@ const AuthScreen = () => {
       if (error) {
         toast({
           title: tr("authscreen_google_ile_giris_alinmadi_2d7d46", 'Google ilə giriş alınmadı'),
-          description: error.message || tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
+          description: isModeratorSignupError(error) ? moderatorError(error, useUserStore.getState().language) : error.message || tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
           variant: 'destructive'
         });
       }
@@ -397,25 +526,28 @@ const AuthScreen = () => {
   };
 
   const handleAppleLogin = async () => {
+    if (!appleLoginReady || isLoading) return;
     setIsLoading(true);
+    if (appleUsesJs) setApplePreparation('loading');
     try {
       const { error } = await signInWithApple();
-      if (error) {
+      if (error && !(appleUsesJs && isAppleWebCancelled(error))) {
         toast({
           title: tr("authscreen_apple_ile_giris_alinmadi_6f9b3a", 'Apple ilə giriş alınmadı'),
-          description: error.message || tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
+          description: isModeratorSignupError(error) ? moderatorError(error, useUserStore.getState().language) : appleUsesJs ? appleWebErrorMessage(error) : error.message || tr("authscreen_yeniden_cehd_edin_18c03c", 'Yenidən cəhd edin.'),
           variant: 'destructive'
         });
       }
     } catch (error: any) {
-      console.error('Apple auth error:', error);
+      if (!appleUsesJs) console.error('Apple auth error:', error);
       toast({
         title: tr("authscreen_apple_ile_giris_alinmadi_6f9b3a", 'Apple ilə giriş alınmadı'),
-        description: error?.message || String(error),
+        description: appleUsesJs ? appleWebErrorMessage(error) : error?.message || String(error),
         variant: 'destructive'
       });
     }
     setIsLoading(false);
+    if (appleUsesJs) setAppleRetry(value => value + 1);
   };
 
   const containerVariants = {
@@ -660,6 +792,7 @@ const AuthScreen = () => {
   return (
     <div
       className="a-scope fixed inset-0 flex flex-col overflow-x-hidden"
+      data-app-viewport
       style={{
         background: 'var(--a-bg)',
         paddingTop: 'env(safe-area-inset-top)',
@@ -684,16 +817,18 @@ const AuthScreen = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
             className="flex flex-col items-center mb-6">
-            <div className="w-14 h-14 flex items-center justify-center mb-3 overflow-hidden"
-            style={{ borderRadius: 18, background: 'var(--a-grad-peach)', boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.5)' }}>
-              {customLoginLogo ? (
-                <img src={customLoginLogo} alt="Anacan" className="w-9 h-9 object-contain" />
-              ) : (
-                <svg viewBox="0 0 60 60" className="w-8 h-8">
-                  <path d="M30 8 L48 52 L42 52 L38 42 L22 42 L18 52 L12 52 L30 8Z M30 20 L24 36 L36 36 L30 20Z" fill="var(--a-accent-ink)" />
-                  <circle cx="30" cy="18" r="4" fill="var(--a-accent-ink)" />
-                </svg>
-              )}
+            <div className="w-16 h-16 flex items-center justify-center mb-3 overflow-hidden rounded-full"
+            style={{ boxShadow: '0 14px 28px -12px rgba(217, 108, 74, 0.25)' }}>
+              <img
+                src={customLoginLogo || logoImage}
+                alt="Anacan"
+                className="w-full h-full object-contain rounded-full"
+                onError={(event) => {
+                  if (event.currentTarget.getAttribute('src') !== logoImage) {
+                    event.currentTarget.src = logoImage;
+                  }
+                }}
+              />
             </div>
             <h1 style={{ fontSize: 26, fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--a-ink)' }}>Anacan</h1>
             <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--a-on-bg-soft)', marginTop: 2 }}>
@@ -891,7 +1026,7 @@ const AuthScreen = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  disabled={isLoading}
+                  disabled={isLoading || !googleLoginReady}
                   className="w-full h-12 rounded-full transition-all gap-3"
                   style={{ background: 'var(--a-surface)', borderColor: 'var(--a-line-strong)', color: 'var(--a-ink)' }}
                   onClick={handleGoogleLogin}>
@@ -907,7 +1042,7 @@ const AuthScreen = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  disabled={isLoading}
+                  disabled={isLoading || !appleLoginReady}
                   className="w-full h-12 rounded-full transition-all gap-3"
                   style={{ background: 'var(--a-surface)', borderColor: 'var(--a-line-strong)', color: 'var(--a-ink)' }}
                   onClick={handleAppleLogin}>
@@ -918,6 +1053,23 @@ const AuthScreen = () => {
                   <span className="font-medium">{tr("authscreen_apple_ile_davam_et", "Apple ilə davam et")}</span>
                 </Button>
               </div>
+              {appleUsesJs && applePreparation !== 'ready' && !isLoading && (
+                <div className="mt-3 text-xs text-center text-muted-foreground" role="status">
+                  {applePreparation === 'loading'
+                    ? tr('auth_apple_web_loading', 'Apple girişi hazırlanır...')
+                    : appleWebErrorMessage(applePreparationError)}
+                  {applePreparation === 'failed' && (window.location.origin !== APPLE_WEB_ORIGIN
+                    ? <a className="block underline mt-1" href={APPLE_WEB_ORIGIN}>api.anacan.az</a>
+                    : <button type="button" className="block underline mt-1 mx-auto" onClick={() => setAppleRetry(value => value + 1)}>
+                      {tr('auth_apple_web_retry', 'Yenidən hazırla')}
+                    </button>)}
+                </div>
+              )}
+              {(!googleLoginReady || !appleConfigured) && (
+                <p className="mt-3 text-xs text-center text-muted-foreground" role="status">
+                  {tr('auth_social_provider_pending', 'Deaktiv giriş üsulları bu Azure önizləməsində hələ qoşulmayıb. E-mail və şifrədən istifadə edə bilərsiniz.')}
+                </p>
+              )}
             </motion.div>
 
 

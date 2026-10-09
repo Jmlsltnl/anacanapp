@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { tr } from '@/lib/tr';
-import { motion, AnimatePresence, PanInfo } from 'framer-motion';
+import { tr } from '@/lib/group-i18n';
+import { motion, AnimatePresence, PanInfo, useReducedMotion } from 'framer-motion';
 import { X, Pause, Play, Trash2, Eye, Users, ChevronUp, Heart, MessageCircle, Send, Volume2, VolumeX } from 'lucide-react';
 import { Story, UserStoryGroup } from '@/hooks/useStories';
 import { useStoryViewers } from '@/hooks/useStoryViewers';
@@ -11,6 +11,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useIsRtl } from '@/lib/rtl';
+import { parseStoryScene } from '@/lib/story-editor';
+import StoryVideoLayout from './StoryVideoLayout';
+import { AdSurface, useAdExperience } from '@/components/ads/AdExperienceProvider';
+import ModeratorActionMenu from '@/components/moderation/ModeratorActionMenu';
+import ModeratorActionDialog from '@/components/moderation/ModeratorActionDialog';
+import { useMyModerationStatus } from '@/hooks/useModerator';
+import RestrictionNote from '@/components/moderation/RestrictionNote';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +38,7 @@ interface StoryViewerProps {
   onViewed: (storyId: string) => void;
   onDelete?: (storyId: string) => void;
   onToggleLike?: (storyId: string, isLiked: boolean) => void;
+  likePending?: boolean;
 }
 
 const StoryViewer = ({
@@ -40,10 +48,23 @@ const StoryViewer = ({
   onClose,
   onViewed,
   onDelete,
-  onToggleLike
+  onToggleLike,
+  likePending = false,
 }: StoryViewerProps) => {
   const { user, profile, isAdmin } = useAuth();
+  const { data: moderationStatus } = useMyModerationStatus();
   const isRtl = useIsRtl();
+  const reducedMotion = useReducedMotion();
+  const [likeBurst, setLikeBurst] = useState<{ storyId: string; id: number } | null>(null);
+  const likeBurstTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const likeSequence = useRef(0);
+  const ads = useAdExperience();
+  const adApi = useRef(ads); adApi.current = ads;
+  const [adTransitioning, setAdTransitioning] = useState(false);
+  const advancing = useRef(false), alive = useRef(true), storyStartedAt = useRef(Date.now());
+  const countedStories = useRef(new Set<string>()), viewerSession = useRef(crypto.randomUUID());
+  const navigationKey = useRef('');
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
 
   // KRİTİK: qruplar AÇILIŞ ANINDA dondurulur. Əvvəllər canlı prop istifadə
   // olunurdu — hər baxış qeydiyyatı storyGroups-un yenidən sıralanmasına,
@@ -68,6 +89,12 @@ const StoryViewer = ({
   const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [moderationOpen, setModerationOpen] = useState(false), [moderatorRemove, setModeratorRemove] = useState(false), [warningOpen, setWarningOpen] = useState(() => !!document.querySelector('[data-testid="moderator-warning"]'));
+  useEffect(() => {
+    const change = (event: Event) => setWarningOpen(!!(event as CustomEvent).detail?.open);
+    window.addEventListener('anacan-moderation-overlay', change);
+    return () => window.removeEventListener('anacan-moderation-overlay', change);
+  }, []);
   const [showViewers, setShowViewers] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [replyText, setReplyText] = useState('');
@@ -83,7 +110,9 @@ const StoryViewer = ({
 
   const currentGroup = storyGroups[currentGroupIndex];
   const currentStory = currentGroup?.stories[currentStoryIndex];
+  const editorLayout = parseStoryScene(currentStory?.editor_layout);
   const isOwnStory = currentStory?.user_id === user?.id;
+  navigationKey.current = currentStory?.id ?? '';
 
   // Bəyənmə statusu canlı keşdən oxunur (snapshot köhnələ bilər)
   const liveCurrentStory = liveStoryGroups.
@@ -91,6 +120,11 @@ const StoryViewer = ({
   find((s) => s.id === currentStory?.id);
   const currentIsLiked = liveCurrentStory?.is_liked ?? currentStory?.is_liked ?? false;
   const currentLikesCount = liveCurrentStory?.likes_count ?? currentStory?.likes_count ?? 0;
+  useEffect(() => {
+    setLikeBurst(null);
+    if (likeBurstTimer.current) clearTimeout(likeBurstTimer.current);
+    return () => { if (likeBurstTimer.current) clearTimeout(likeBurstTimer.current); };
+  }, [currentStory?.id]);
 
   // Fetch actual viewers for own stories
   const { data: viewers = [], isLoading: viewersLoading } = useStoryViewers(
@@ -105,7 +139,7 @@ const StoryViewer = ({
   const createStoryReply = useCreateStoryReply();
   const deleteStoryReply = useDeleteStoryReply();
 
-  const goToNextStory = useCallback(() => {
+  const advanceToNextStory = useCallback(() => {
     if (!currentGroup) return;
     if (currentStoryIndex < currentGroup.stories.length - 1) {
       setCurrentStoryIndex((prev) => prev + 1);
@@ -118,8 +152,26 @@ const StoryViewer = ({
       onClose();
     }
   }, [currentGroup, currentStoryIndex, currentGroupIndex, storyGroups.length, onClose]);
+  const goToNextStory = useCallback(async () => {
+    if (advancing.current || !currentStory || !currentGroup) return;
+    advancing.current = true;
+    const key = currentStory.id;
+    try {
+      const hasNext = currentStoryIndex < currentGroup.stories.length - 1 || currentGroupIndex < storyGroups.length - 1;
+      const minimum = adApi.current.configuration?.placements.find(item => item.id === 'community_story_break')?.min_screen_seconds ?? 2;
+      if (hasNext && !isOwnStory && !countedStories.current.has(key) && Date.now() - storyStartedAt.current >= minimum * 1000) {
+        countedStories.current.add(key);
+        if (adApi.current.opportunity('community_story_break', `${viewerSession.current}:${countedStories.current.size}`)) {
+          setAdTransitioning(true); videoRef.current?.pause();
+          await adApi.current.showStory();
+        }
+      }
+      if (alive.current && navigationKey.current === key) advanceToNextStory();
+    } finally { advancing.current = false; if (alive.current) setAdTransitioning(false); }
+  }, [currentStory, currentGroup, currentStoryIndex, currentGroupIndex, storyGroups.length, isOwnStory, advanceToNextStory]);
 
   const goToPrevStory = useCallback(() => {
+    if (advancing.current) return;
     if (currentStoryIndex > 0) {
       setCurrentStoryIndex((prev) => prev - 1);
       setProgress(0);
@@ -145,6 +197,7 @@ const StoryViewer = ({
 
   // Story dəyişəndə: progress sıfırla + media növünə görə müddət
   useEffect(() => {
+    storyStartedAt.current = Date.now();
     setProgress(0);
     if (currentStory?.media_type !== 'video') {
       setStoryDuration(6000);
@@ -155,7 +208,7 @@ const StoryViewer = ({
   // Progress timer — updater içində YAN TƏSİR YOXDUR (əvvəllər goToNextStory
   // setProgress içindən çağırılırdı: StrictMode-da ikiqat işləyib story ötürürdü)
   useEffect(() => {
-    if (isPaused || !currentStory || showDeleteConfirm || showViewers || showReplies) return;
+    if (isPaused || adTransitioning || ads.busy || !currentStory || showDeleteConfirm || showViewers || showReplies || moderationOpen || moderatorRemove || warningOpen) return;
 
     progressInterval.current = setInterval(() => {
       setProgress((prev) => Math.min(prev + 100 / (storyDuration / 100), 100));
@@ -164,7 +217,7 @@ const StoryViewer = ({
     return () => {
       if (progressInterval.current) clearInterval(progressInterval.current);
     };
-  }, [isPaused, currentStory, showDeleteConfirm, showViewers, showReplies, storyDuration]);
+  }, [isPaused, adTransitioning, ads.busy, currentStory, showDeleteConfirm, showViewers, showReplies, storyDuration, moderationOpen, moderatorRemove, warningOpen]);
 
   // Progress dolanda NÖVBƏTİ story (yan təsir updater-dən kənarda)
   useEffect(() => {
@@ -178,9 +231,9 @@ const StoryViewer = ({
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    if (isPaused || showDeleteConfirm || showViewers || showReplies) v.pause();else
+    if (isPaused || adTransitioning || ads.busy || showDeleteConfirm || showViewers || showReplies || moderationOpen || moderatorRemove || warningOpen) v.pause();else
     v.play().catch(() => {});
-  }, [isPaused, showDeleteConfirm, showViewers, showReplies, currentStoryIndex, currentGroupIndex]);
+  }, [isPaused, adTransitioning, ads.busy, showDeleteConfirm, showViewers, showReplies, currentStoryIndex, currentGroupIndex, moderationOpen, moderatorRemove, warningOpen]);
 
   // Video: mute sinxronu — JSX `muted` prop-u DOM-da mount-dan sonra bəzi
   // WebView-larda etibarlı yenilənmir; imperativ təyinat bunu təmin edir.
@@ -233,12 +286,17 @@ const StoryViewer = ({
     if (currentStory && onDelete) {
       onDelete(currentStory.id);
       setShowDeleteConfirm(false);
-      goToNextStory();
+      advanceToNextStory();
     }
   };
 
   const handleToggleLike = () => {
-    if (currentStory && onToggleLike) {
+    if (currentStory && onToggleLike && !likePending && !isOwnStory) {
+      if (likeBurstTimer.current) clearTimeout(likeBurstTimer.current);
+      if (!currentIsLiked) {
+        setLikeBurst({ storyId: currentStory.id, id: ++likeSequence.current });
+        likeBurstTimer.current = setTimeout(() => setLikeBurst(null), 900);
+      } else setLikeBurst(null);
       // Snapshot köhnələ bilər — bəyənmə statusu canlı keşdən (currentIsLiked)
       onToggleLike(currentStory.id, currentIsLiked);
     }
@@ -246,7 +304,7 @@ const StoryViewer = ({
 
   const handleSendReply = () => {
     const content = replyText.trim();
-    if (!content || !currentStory) return;
+    if (!content || !currentStory || moderationStatus?.comment) return;
     createStoryReply.mutate({
       storyId: currentStory.id,
       content,
@@ -270,11 +328,16 @@ const StoryViewer = ({
 
   return createPortal(
     <>
+      <AdSurface id="community_story_break" />
+      {moderatorRemove && <ModeratorActionDialog target={{ kind: 'story', id: currentStory.id, userId: currentStory.user_id, name: currentGroup.user_name }}
+        action="remove" onClose={() => setModeratorRemove(false)} onDone={onClose} />}
       <motion.div
+        data-story-viewer={currentStory.id}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
+        className="fixed inset-0 z-[300] bg-black flex items-center justify-center" data-ad-block="true"
+        data-ad-allow={!showDeleteConfirm && !showViewers && !showReplies && !moderationOpen && !moderatorRemove && !warningOpen ? 'community_story_break' : ''}>
 
         {/* Progress bars + header — EKRANIN yuxarısında (letterbox üstündə).
             Əvvəllər 9:16 kətanın İÇİNDƏ idi — kətan şaquli mərkəzləndiyi üçün
@@ -335,8 +398,11 @@ const StoryViewer = ({
               </div>
 
               <div className="flex items-center gap-1.5 shrink-0 pointer-events-auto">
+                <ModeratorActionMenu target={{ kind: 'story', id: currentStory.id, userId: currentStory.user_id, name: currentGroup.user_name,
+                  version: currentStory.moderation_version || 0, removed: !!currentStory.moderation_removed_at }} onOpenChange={setModerationOpen} onDone={onClose} />
                 <button
                   onClick={(e) => {e.stopPropagation();setIsPaused(!isPaused);}}
+                  aria-label={isPaused ? tr('storyviewer_resume', 'Davam et') : tr('storyviewer_pause', 'Dayandır')}
                   className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
                   
                   {isPaused ? <Play className="w-4 h-4 text-white" /> : <Pause className="w-4 h-4 text-white" />}
@@ -352,7 +418,8 @@ const StoryViewer = ({
                 }
                 {(isOwnStory || isAdmin) && onDelete &&
                 <button
-                  onClick={(e) => {e.stopPropagation();setShowDeleteConfirm(true);setIsPaused(true);}}
+                  onClick={(e) => {e.stopPropagation();if (isAdmin && !isOwnStory) setModeratorRemove(true); else { setShowDeleteConfirm(true);setIsPaused(true); }}}
+                  aria-label={tr('stories_story_sil', 'Story-ni sil')}
                   className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
                   
                     <Trash2 className="w-4 h-4 text-white" />
@@ -360,6 +427,7 @@ const StoryViewer = ({
                 }
                 <button
                   onClick={(e) => {e.stopPropagation();onClose();}}
+                  aria-label={tr('common_close', 'Bağla')}
                   className="w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
                   
                   <X className="w-4 h-4 text-white" />
@@ -406,16 +474,13 @@ const StoryViewer = ({
                 style={{ backgroundColor: currentStory.background_color || '#000' }}>
                 
                 {currentStory.media_type === 'video' ?
-                <video
-                  ref={videoRef}
+                <StoryVideoLayout
+                  videoRef={videoRef}
                   src={currentStory.media_url}
-                  className="w-full h-full object-contain"
-                  autoPlay
+                  layout={editorLayout}
                   muted={isMuted}
-                  playsInline
-                  onLoadedMetadata={(e) => {
+                  onDuration={(d) => {
                     // Video story real müddəti qədər oynayır (max 30s, Instagram kimi)
-                    const d = (e.target as HTMLVideoElement).duration;
                     if (Number.isFinite(d) && d > 0) setStoryDuration(Math.min(d * 1000, 30000));
                   }}
                   onEnded={() => setProgress(100)} /> :
@@ -430,12 +495,21 @@ const StoryViewer = ({
               </motion.div>
             </AnimatePresence>
 
+          {likeBurst?.storyId === currentStory.id && <motion.div
+            key={likeBurst.id} data-story-like-animation aria-hidden="true"
+            className="absolute inset-0 z-20 grid place-items-center pointer-events-none"
+            initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.45 }}
+            animate={{ opacity: [0, 1, 1, 0], scale: reducedMotion ? 1 : [0.45, 1.12, 1, 0.94] }}
+            exit={{ opacity: 0 }} transition={{ duration: 0.85, times: [0, 0.22, 0.66, 1] }}>
+            <Heart className="h-24 w-24 fill-white text-white drop-shadow-xl" strokeWidth={1.5}/>
+          </motion.div>}
+
           {/* Gradient overlays for readability */}
           <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/60 to-transparent z-10 pointer-events-none" />
           <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent z-10 pointer-events-none" />
 
           {/* Text overlay */}
-          {currentStory.text_overlay &&
+          {!editorLayout && currentStory.text_overlay &&
           <div className="absolute bottom-24 start-4 end-4 text-center z-20 pointer-events-none">
               <p className="text-white text-lg font-medium drop-shadow-lg bg-black/30 backdrop-blur-sm rounded-2xl px-5 py-3">
                 {currentStory.text_overlay}
@@ -468,12 +542,6 @@ const StoryViewer = ({
                     <span className="text-white text-sm font-medium">{currentStory.view_count} {tr("storyviewer_baxis_d4da3e", "bax\u0131\u015F")}</span>
                   </div>
                 </motion.button>
-                {currentLikesCount > 0 &&
-              <div className="flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-3.5 py-2">
-                    <Heart className="w-3.5 h-3.5 fill-red-500 text-red-500" />
-                    <span className="text-white text-sm font-medium">{currentLikesCount}</span>
-                  </div>
-              }
               </div>
             }
 
@@ -494,10 +562,12 @@ const StoryViewer = ({
               </motion.button>
             }
 
+            <RestrictionNote scope="comment" />
             <div className="w-full flex items-end gap-2">
               <textarea
                 ref={replyTextareaRef}
                 value={replyText}
+                disabled={moderationStatus?.comment || createStoryReply.isPending}
                 onChange={(e) => setReplyText(e.target.value)}
                 onFocus={() => setIsPaused(true)}
                 onBlur={() => setIsPaused(false)}
@@ -515,7 +585,7 @@ const StoryViewer = ({
               {replyText.trim() &&
               <motion.button
                 onClick={(e) => {e.stopPropagation();handleSendReply();}}
-                disabled={createStoryReply.isPending}
+                disabled={createStoryReply.isPending || moderationStatus?.comment}
                 whileTap={{ scale: 0.9 }}
                 className="w-11 h-11 flex-shrink-0 rounded-full bg-white flex items-center justify-center disabled:opacity-50">
                 
@@ -525,12 +595,15 @@ const StoryViewer = ({
               {!isOwnStory && onToggleLike &&
               <motion.button
                 onClick={(e) => {e.stopPropagation();handleToggleLike();}}
+                aria-label={tr(currentIsLiked ? 'story_unlike' : 'story_like')}
+                aria-pressed={currentIsLiked}
+                disabled={likePending}
                 whileTap={{ scale: 1.25 }}
-                className="w-11 h-11 flex-shrink-0 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center gap-1">
+                className="w-11 h-11 flex-shrink-0 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center gap-1 disabled:opacity-60">
                 
                   <motion.span
                   key={currentIsLiked ? 'liked' : 'unliked'}
-                  initial={{ scale: 0.6 }}
+                  initial={false}
                   animate={{ scale: 1 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 15 }}>
                   

@@ -84,27 +84,31 @@ const PartnerCareCard = ({ lifeStage, onOpenSharing }: Props) => {
     };
     try {
       // thank_you tipi (migration tətbiq olunmayıbsa mətnə düş)
-      const { error } = await supabase.from('partner_messages').insert({
+      let { data: message, error } = await supabase.from('partner_messages').insert({
         sender_id: user.id,
         receiver_id: partnerProfile.user_id,
         message_type: 'thank_you',
         content: JSON.stringify(payload)
-      });
-      if (error) {
-        await supabase.from('partner_messages').insert({
+      }).select('id').single();
+      // Retry only a known schema constraint failure, never an uncertain write.
+      if (error?.code === '23514') {
+        const fallback = await supabase.from('partner_messages').insert({
           sender_id: user.id,
           receiver_id: partnerProfile.user_id,
           message_type: 'text',
           content: tr('partnerv2_thank_fallback_text', '🙏 Təşəkkür edirəm! Sən əla partnyorsan!')
-        });
+        }).select('id').single();
+        message = fallback.data;
+        error = fallback.error;
       }
+      if (error || !message?.id) throw error || new Error('message_not_saved');
       try {
         const { invokeSendPush } = await import('@/lib/push');
         await invokeSendPush({
           userId: partnerProfile.user_id,
           title: payload.title,
           body: payload.body,
-          data: { type: 'thank_you', context: 'partner' }
+          data: { type: 'thank_you', context: 'partner', interactionId: message.id, messageId: message.id }
         });
       } catch {/* push optional */}
       toast({ title: tr('partnerv2_thank_sent', 'Təşəkkür göndərildi! 💙') });

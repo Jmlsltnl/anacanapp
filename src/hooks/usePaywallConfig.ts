@@ -1,6 +1,8 @@
 import { useAppSetting, useUpdateAppSetting } from '@/hooks/useAppSettings';
 
 import { tr } from '@/lib/tr';
+import { getCachedTranslation } from '@/lib/i18n';
+import { useUserStore } from '@/store/userStore';
 export interface PaywallConfig {
   // Branding
   title: string;
@@ -111,11 +113,11 @@ export const getDefaultPaywallConfig = (): PaywallConfig => ({
   cancel_notice: tr("usepaywallconfig_i_stenilen_vaxt_legv_ede_biler_cc073d", "\u0130st\u0259nil\u0259n vaxt l\u0259\u011Fv ed\u0259 bil\u0259rsiniz \u2022 Avtomatik yenil\u0259nir"),
   native_notice: '',
   non_native_notice: tr("usepaywallconfig_app_store_google_play_den_yukl_1a75c6", "App Store / Google Play-d\u0259n y\xFCkl\u0259yin"),
-  free_trial_enabled: true,
-  free_trial_days: 3,
-  free_trial_badge: tr("usepaywallconfig_3_gun_pulsuz_9e6197", "3 G\xDCN PULSUZ"),
-  free_trial_cta: tr("usepaywallconfig_pulsuz_basla_4e3982", "Pulsuz Ba\u015Fla"),
-  free_trial_note: tr("usepaywallconfig_days_gun_pulsuz_sinayin_sonra__fa9bb5", "{days} g\xFCn pulsuz s\u0131nay\u0131n, sonra avtomatik abun\u0259lik ba\u015Flay\u0131r"),
+   free_trial_enabled: false,
+   free_trial_days: 0,
+   free_trial_badge: '',
+   free_trial_cta: '',
+   free_trial_note: '',
   purchasing_text: tr("paywall_emal_edilir", 'Emal edilir...'),
   gradient_from: '#d97706',
   gradient_via: '#ea580c',
@@ -174,10 +176,15 @@ export const defaultBillingConfig: BillingConfig = new Proxy({} as BillingConfig
 /**
  * Admin config sahələri üçün dinamik tr() sarğısı: admin nə vaxtsa config saxlasa
  * (tək dildə mətnlər), tərcümələr `paywallcfg_<sahə>` / `billingcfg_<sahə>` açarları
- * ilə AdminTranslations-dan idarə oluna bilir. Açar yoxdursa admin mətni olduğu kimi qalır.
+ * ilə AdminTranslations-dan idarə olunur. Tərcümə yoxdursa seçilmiş dilin lokal
+ * mətni işləyir; təkdilli admin dəyəri digər dillərin UI-sini əvəz etmir.
  */
-const localizeText = (prefix: string, field: string, value: unknown): string =>
-  typeof value === 'string' && value.trim() ? tr(`${prefix}_${field}`, value) : (value as string);
+const localizeText = (prefix: string, field: string, value: unknown, fallback: string, language: string): string => {
+  if (typeof value !== 'string') return fallback;
+  if (!value.trim() || language === 'az') return value;
+  const localized = getCachedTranslation(`${prefix}_${field}`, language);
+  return localized?.trim() && localized !== value ? localized : fallback;
+};
 
 const PAYWALL_TEXT_FIELDS: (keyof PaywallConfig)[] = [
   'title', 'subtitle', 'cta_new_user', 'cta_upgrade', 'cta_switch_yearly',
@@ -194,29 +201,35 @@ const BILLING_TEXT_FIELDS: (keyof BillingConfig)[] = [
 
 export const usePaywallConfig = (): PaywallConfig => {
   const raw = useAppSetting('premium_paywall_config');
+  const language = useUserStore(state => state.language);
   const defaults = getDefaultPaywallConfig();
   if (!raw || typeof raw !== 'object') return defaults;
   const merged: PaywallConfig = { ...defaults, ...raw };
   for (const f of PAYWALL_TEXT_FIELDS) {
     // Admin dəyəri defaultdan fərqlidirsə → dinamik açarla lokallaşdırıla bilər
-    if ((raw as any)[f] !== undefined) (merged as any)[f] = localizeText('paywallcfg', f as string, (merged as any)[f]);
+    if ((raw as any)[f] !== undefined) (merged as any)[f] = localizeText('paywallcfg', f as string, (raw as any)[f], String(defaults[f]), language);
   }
   if (Array.isArray((raw as any).pills)) {
-    merged.pills = merged.pills.map((p, i) => ({ ...p, text: localizeText('paywallcfg', `pill_${i + 1}`, p.text) }));
+    merged.pills = raw.pills.filter((p: unknown) => p && typeof p === 'object').map((p: PaywallConfig['pills'][number], i: number) => ({ ...p,
+      text: localizeText('paywallcfg', `pill_${i + 1}`, p.text, defaults.pills[i]?.text || '', language) })).filter((p: PaywallConfig['pills'][number]) => p.text);
   }
-  return merged;
+  // Retired presentation keys remain readable for old admin configurations.
+  // New purchases never advertise or auto-select a free trial.
+  return { ...merged, free_trial_enabled: false, free_trial_days: 0, free_trial_badge: '', free_trial_cta: '', free_trial_note: '' };
 };
 
 export const useBillingConfig = (): BillingConfig => {
   const raw = useAppSetting('billing_page_config');
+  const language = useUserStore(state => state.language);
   const defaults = getDefaultBillingConfig();
   if (!raw || typeof raw !== 'object') return defaults;
   const merged: BillingConfig = { ...defaults, ...raw };
   for (const f of BILLING_TEXT_FIELDS) {
-    if ((raw as any)[f] !== undefined) (merged as any)[f] = localizeText('billingcfg', f as string, (merged as any)[f]);
+    if ((raw as any)[f] !== undefined) (merged as any)[f] = localizeText('billingcfg', f as string, (raw as any)[f], String(defaults[f]), language);
   }
   if (Array.isArray((raw as any).features)) {
-    merged.features = merged.features.map((p, i) => ({ ...p, text: localizeText('billingcfg', `feature_${i + 1}`, p.text) }));
+    merged.features = raw.features.filter((p: unknown) => p && typeof p === 'object').map((p: BillingConfig['features'][number], i: number) => ({ ...p,
+      text: localizeText('billingcfg', `feature_${i + 1}`, p.text, defaults.features[i]?.text || '', language) })).filter((p: BillingConfig['features'][number]) => p.text);
   }
   return merged;
 };

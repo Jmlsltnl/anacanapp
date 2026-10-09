@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { callGeminiSmart } from "../_shared/vertex-ai.ts";
+import { isExpandedLanguage, outputLanguageRule } from '../_shared/languages.ts';
 import { checkAndConsumeServerSide, limitExceededResponse } from "../_shared/usage-limit.ts";
 
 const corsHeaders = {
@@ -56,6 +57,7 @@ const AGE_GUIDELINES: Record<string, { az: string; en: string; ru: string; tr: s
 };
 
 const getSystemPrompt = (language: string, childName: string, ageRange?: string) => {
+  if (isExpandedLanguage(language)) return `${getSystemPrompt('en', childName, ageRange)}\n\n${outputLanguageRule(language)}`;
   const ageGuide = ageRange && AGE_GUIDELINES[ageRange] 
     ? AGE_GUIDELINES[ageRange][language as keyof typeof AGE_GUIDELINES['0-2']] || AGE_GUIDELINES[ageRange]['az']
     : '';
@@ -376,6 +378,7 @@ Format: Birinci sətirdə başlıq, sonra nağıl mətni. Abzaslarla yaz, siyah�
 };
 
 const getUserPrompt = (language: string, childName: string, theme: string, hero: string, moralLesson: string, ageRange?: string, storyStyle?: string) => {
+  if (isExpandedLanguage(language)) return `${getUserPrompt('en', childName, theme, hero, moralLesson, ageRange, storyStyle)}\n\n${outputLanguageRule(language)}`;
   const ageText = ageRange ? ` (yaş qrupu: ${ageRange})` : '';
   const styleText = storyStyle || '';
 
@@ -602,6 +605,10 @@ serve(async (req) => {
       ka: `ზღაპარი ${actualChildName}-ზე`,
       de: `Das Märchen von ${actualChildName}`,
       ar: `حكاية ${actualChildName}`,
+      zh: `${actualChildName}的故事`, id: `Kisah ${actualChildName}`, fr: `L’histoire de ${actualChildName}`,
+      es: `El cuento de ${actualChildName}`, pt: `A história de ${actualChildName}`,
+      vi: `Câu chuyện của ${actualChildName}`, hi: `${actualChildName} की कहानी`, ja: `${actualChildName}のお話`,
+      ko: `${actualChildName}의 이야기`, pl: `Historia: ${actualChildName}`, nl: `Het verhaal van ${actualChildName}`, sv: `${actualChildName} – en berättelse`,
     };
     
     const title = rawTitle || defaultTitles[language] || defaultTitles['az'];
@@ -613,7 +620,7 @@ serve(async (req) => {
     });
     const content = (contentStartIndex > 0 ? lines.slice(contentStartIndex) : lines.slice(1)).join('\n').trim() || generatedText;
 
-    const wordCount = content.split(/\s+/).length;
+    const wordCount = ['zh', 'ja'].includes(language) ? Array.from(content.replace(/\s/g, '')).length / 2 : content.split(/\s+/).length;
     const durationMinutes = Math.max(2, Math.ceil(wordCount / 100));
 
     return new Response(

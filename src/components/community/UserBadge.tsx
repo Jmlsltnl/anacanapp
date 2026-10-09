@@ -1,5 +1,5 @@
 import { Shield, Sparkles, BadgeCheck } from 'lucide-react';
-import { tr } from '@/lib/tr';
+import { tr } from '@/lib/group-i18n';
 
 /**
  * Paylaşılan community "author badge" komponentləri — əvvəllər PostCard.tsx
@@ -16,17 +16,15 @@ const BADGE_CONFIG: Record<string, { label: string; icon: typeof Shield; classNa
   moderator: { label: 'Mod', icon: Shield, className: 'moderator' }
 };
 
-export const UserBadge = ({ type }: { type: BadgeType }) => {
-  if (!type) return null;
-  const b = BADGE_CONFIG[type];
-  if (!b) return null;
-  const Icon = b.icon;
-  return (
-    <span className={`a-post-badge ${b.className}`}>
-      <Icon size={9} />
-      {b.label}
-    </span>
-  );
+export const UserBadge = ({ type, premium }: { type: BadgeType; premium?: boolean }) => {
+  const kinds: string[] = [];
+  if (type === 'admin' || type === 'moderator') kinds.push(type);
+  if (premium === true || premium === undefined && type === 'premium') kinds.push('premium');
+  return <>{kinds.map(kind => {
+    const badge = BADGE_CONFIG[kind], Icon = badge.icon;
+    const label = kind === 'admin' ? tr('group_administrator') : kind === 'moderator' ? tr('community_moderator_label') : badge.label;
+    return <span key={kind} className={`a-post-badge ${badge.className}`}><Icon size={9} />{label}</span>;
+  })}</>;
 };
 
 /**

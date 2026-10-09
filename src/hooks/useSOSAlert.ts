@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { tr } from '@/lib/tr';
 import { supabase } from '@/integrations/supabase/client';
+import type { PushEventData } from '@/lib/push';
 import { useAuth } from './useAuth';
 import { usePrivacyPreferences } from './usePrivacyPreferences';
 import { Geolocation } from '@capacitor/geolocation';
@@ -181,10 +182,15 @@ export const useSOSAlert = () => {
       try {
         const { invokeSendPush } = await import('@/lib/push');
         await invokeSendPush({
-          userId: partnerUserId,
+          userId: data.receiver_id,
           title: pushTitle,
           body: pushBody,
-          data: { type: isBirth ? 'birth_alert' : 'sos_alert', alertId: data.id, context: 'partner' }
+          data: {
+            type: isBirth ? 'birth_alert' : 'sos_alert',
+            context: 'partner',
+            alertId: data.id,
+            interactionId: data.id
+          } satisfies PushEventData
         });
       } catch (pushErr) {
         console.warn('SOS push failed:', pushErr);

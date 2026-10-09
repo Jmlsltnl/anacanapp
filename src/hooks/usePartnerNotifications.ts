@@ -89,22 +89,23 @@ export const usePartnerNotifications = () => {
     });
 
     try {
-      await supabase.from('partner_messages').insert({
+      const { data: message, error } = await supabase.from('partner_messages').insert({
         sender_id: user.id,
         receiver_id: partnerUserId,
         message_type: type,
         content
-      });
+      }).select('id').single();
+      if (error) throw error;
 
       // Kritik hadisə (5-1-1): tətbiq bağlı olsa belə FCM push ilə çatdır
-      if (type === 'contraction_511') {
+      if (type === 'contraction_511' && message?.id) {
         try {
           const { invokeSendPush } = await import('@/lib/push');
           await invokeSendPush({
             userId: partnerUserId,
             title: notification.title,
             body: notification.getBody(data),
-            data: { type, context: 'partner' }
+            data: { type, context: 'partner', interactionId: message.id }
           });
         } catch (pushErr) {
           console.warn('511 push failed:', pushErr);

@@ -7,6 +7,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="@string/admob_app_id" />
+        <meta-data android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT" android:value="true" />
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
             android:name=".MainActivity"
@@ -14,10 +16,18 @@
             android:windowOptOutEdgeToEdgeEnforcement="true"
             android:theme="@style/AppTheme.NoActionBarLaunch"
             android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="anacan" />
+                <data android:scheme="com.atlasoon.anacan" />
             </intent-filter>
         </activity>
 
@@ -35,18 +45,18 @@
             android:value="high_importance_channel"
         />
 
-        <!-- Health Connect: icazə izahat ekranı (Android 13 və aşağı) -->
-        <activity android:name="com.fit_up.health.capacitor.PermissionsRationaleActivity" android:exported="true">
+        <!-- Health Connect permission rationale (Android 13 and below). -->
+        <activity android:name=".HealthPermissionsActivity" android:exported="true">
             <intent-filter>
                 <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
             </intent-filter>
         </activity>
 
-        <!-- Health Connect: icazə izahat ekranı (Android 14+) -->
+        <!-- Health Connect permission rationale (Android 14+). -->
         <activity-alias
             android:name="ViewPermissionUsageActivity"
             android:exported="true"
-            android:targetActivity="com.fit_up.health.capacitor.PermissionsRationaleActivity"
+            android:targetActivity=".HealthPermissionsActivity"
             android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
@@ -91,25 +101,18 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <!-- Health Connect (Google Fit alternativi)
-         GOOGLE PLAY "Minimum Scope" SİYASƏTİ (2026-08-26 rəddi):
-         YALNIZ real, görünən feature-lərin icazələri saxlanılır:
-           READ_STEPS         → Health Sync ekranı: bu günün addımı + 7 günlük qrafik
-           READ_EXERCISE      → Health Sync ekranı: son məşqlər siyahısı
-           WRITE_MENSTRUATION → Flow rejimi: period qeydlərini Health-ə yazma toggle-u
-         Kalori/Məsafə/Nəbz icazələri SİLİNDİ (yalnız dekorativ idi) və
-         capacitor-health plugin-inin öz manifest-inin merge etdiyi artıq
-         icazələr aşağıda tools:node="remove" ilə neytrallaşdırılır. -->
+    <!-- Health Connect: optional menstruation writes in Flow mode only. -->
     <queries>
         <package android:name="com.google.android.apps.healthdata" />
     </queries>
-    <uses-permission android:name="android.permission.health.READ_STEPS" />
-    <uses-permission android:name="android.permission.health.READ_EXERCISE" />
     <uses-permission android:name="android.permission.health.WRITE_MENSTRUATION" />
-    <!-- capacitor-health plugin manifest-inin əlavə etdiyi, istifadə olunmayan icazələri sil -->
+    <!-- Remove unused read permissions merged from capacitor-health. -->
+    <uses-permission android:name="android.permission.health.READ_STEPS" tools:node="remove" />
+    <uses-permission android:name="android.permission.health.READ_EXERCISE" tools:node="remove" />
     <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED" tools:node="remove" />
     <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED" tools:node="remove" />
     <uses-permission android:name="android.permission.health.READ_DISTANCE" tools:node="remove" />

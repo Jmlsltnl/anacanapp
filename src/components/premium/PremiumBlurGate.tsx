@@ -44,7 +44,7 @@ const PremiumBlurGate = ({
   const [showPaywall, setShowPaywall] = useState(false);
 
   // Admin bypass — PremiumGate ilə eyni davranış
-  if ((isPremium || isAdmin) && !forceLock) return <>{children}</>;
+  if (isPremium && !forceLock) return <>{children}</>;
 
   const open = () => {
     hapticFeedback.light();
@@ -69,7 +69,7 @@ const PremiumBlurGate = ({
             opacity: 0.9,
           }}
         >
-          {children}
+          <div className="min-h-[170px] p-5 space-y-4" aria-hidden="true"><div className="h-5 w-2/3 rounded bg-muted" /><div className="h-12 rounded bg-muted" /><div className="h-5 w-4/5 rounded bg-muted" /></div>
         </div>
 
         {/* PREMIUM nişanı — sağ üst (Flo-stil) */}

@@ -306,6 +306,8 @@ Generate ONE stunning, professional-quality baby portrait that:
 // ═══════════════════════════════════════════════════════════════════════════════
 // MAIN SERVER HANDLER
 // ═══════════════════════════════════════════════════════════════════════════════
+import { checkModerationAccess } from '../_shared/auth.ts';
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -335,6 +337,8 @@ Deno.serve(async (req) => {
       });
     }
 
+    const moderationError = await checkModerationAccess(user.id, 'generate-baby-photo');
+    if (moderationError) return moderationError;
     // Server-side ömürlük say limiti (bahalı şəkil-generasiya modeli —
     // əvvəllər YALNIZ klient-tərəfi yoxlanılırdı).
     const usage = await checkBabyPhotoshootLimit(user.id);

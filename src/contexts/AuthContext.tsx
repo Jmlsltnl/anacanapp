@@ -1,11 +1,14 @@
 import { tr } from "@/lib/tr";import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { isAzureBackend } from '@/integrations/supabase/backend-config';
 import { readCache, writeCache, clearAllCaches } from '@/lib/offlineCache';
+import { safeAppleWebError, signInWithAppleWeb, usesAzureAppleWebFlow } from '@/lib/apple-web-auth';
 const isCapacitorNative = typeof (window as any)?.Capacitor?.isNativePlatform === 'function' &&
   (window as any).Capacitor.isNativePlatform();
 import { useUserStore } from '@/store/userStore';
 import { useShallow } from 'zustand/react/shallow';
 import type { User, Session } from '@supabase/supabase-js';
+import type { Json } from '@/integrations/supabase/types';
 
 const PROFILE_CACHE_KEY = 'profile';
 const ROLE_CACHE_KEY = 'role';
@@ -41,6 +44,7 @@ export interface Profile {
   // Əvvəllər burada elan edilməmişdi (sütun DB-də var idi, HƏR YERDƏ `as any`
   // ilə oxunurdu — məs. useCommunity.ts, useBanners.ts, useBlog.ts).
   country_code: string | null;
+  onboarding_answers?: Json;
   created_at: string;
   updated_at: string;
 }
@@ -97,6 +101,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
     setPeriodLength,
     setDueDate,
     setBabyData,
+    setMultiplesData,
     setDeliveryType,
     setPartnerCode,
     setLinkedPartnerId,
@@ -112,6 +117,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       setPeriodLength: s.setPeriodLength,
       setDueDate: s.setDueDate,
       setBabyData: s.setBabyData,
+      setMultiplesData: s.setMultiplesData,
       setDeliveryType: s.setDeliveryType,
       setPartnerCode: s.setPartnerCode,
       setLinkedPartnerId: s.setLinkedPartnerId,
@@ -192,8 +198,15 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       // Sync linked partner ID
       setLinkedPartnerId(profileData.linked_partner_id);
 
+      // Pregnancy also needs these values after logout/re-login, when the local
+      // store has reset to one child. Keep the count/type pair coherent.
+      const babyCount = [1, 2, 3, 4].includes(profileData.baby_count ?? 0) ? profileData.baby_count! : 1;
+      const multipleType = (['single', 'twins', 'triplets', 'quadruplets'] as const)[babyCount - 1];
+      setMultiplesData(babyCount, multipleType);
+
       if (profileData.baby_birth_date && profileData.baby_name && profileData.baby_gender) {
-        setBabyData(new Date(profileData.baby_birth_date), profileData.baby_name, profileData.baby_gender);
+        setBabyData(new Date(profileData.baby_birth_date), profileData.baby_name, profileData.baby_gender,
+          babyCount, multipleType);
       }
 
       // Doğuş növü — Doğuşdan Sonra Sağalma məzmununu (məşqlər, bərpa cədvəli) filtrləmək üçün
@@ -243,7 +256,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
         }).catch(() => {});
       }
     },
-    [setOnboarded, setPartnerCode, setLastPeriodDate, setCycleLength, setPeriodLength, setDueDate, setBabyData, setDeliveryType, setRole, setLifeStage, setLinkedPartnerId]
+    [setOnboarded, setPartnerCode, setLastPeriodDate, setCycleLength, setPeriodLength, setDueDate, setBabyData, setMultiplesData, setDeliveryType, setRole, setLifeStage, setLinkedPartnerId]
   );
 
   // ─────────────────────────────────────────
@@ -256,7 +269,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: { name, country_code: countryCode }
+          data: { name, country_code: countryCode, language: useUserStore.getState().language }
         }
       });
       if (error) throw error;
@@ -306,6 +319,16 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
   }, []);
 
   const signInWithApple = useCallback(async () => {
+    if (usesAzureAppleWebFlow()) {
+      try {
+        const data = await signInWithAppleWeb();
+        import('@/lib/analytics').then((m) => m.analytics.logLogin('apple')).catch(() => {});
+        return { data, error: null };
+      } catch (error) {
+        // No raw Apple result/token reaches console or crash reporting.
+        return { data: null, error: safeAppleWebError(error) };
+      }
+    }
     try {
       const platform = (window as any)?.Capacitor?.getPlatform?.();
       if (isCapacitorNative && platform === 'ios') {
@@ -350,6 +373,9 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       setUserRole(null);
       storeLogout();
       clearAllCaches(); // offline "son vəziyyət" cache-ləri də getsin
+      if (isAzureBackend()) {
+        import('@/lib/revenuecat').then(({ logOutRevenueCat }) => logOutRevenueCat()).catch(() => {});
+      }
       // Reset Mixpanel on logout
       import('@/lib/mixpanel').then(({ resetMixpanel }) => resetMixpanel()).catch(() => {});
     }
@@ -394,6 +420,16 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
   const linkPartner = useCallback(async (partnerCode: string) => {
     if (!user) return { error: 'No user logged in' };
     try {
+      const { isAzurePartnerPairingEnabled, linkPartnerByCode } = await import('@/lib/partner-link');
+      if (isAzurePartnerPairingEnabled()) {
+        await linkPartnerByCode(partnerCode);
+        const newProfile = await fetchProfileStrict(user.id);
+        if (!newProfile) throw new Error('Profile could not be refreshed after pairing');
+        setProfile(newProfile);
+        syncProfileToStore(newProfile, user.id);
+        return { error: null };
+      }
+
       const { data: partnerProfile, error: findError } = await supabase.
       from('profiles').
       select('id, user_id').
@@ -422,7 +458,7 @@ export const AuthProvider: React.FC<{children: React.ReactNode;}> = ({ children 
       console.error('Link partner error:', error);
       return { error };
     }
-  }, [user, fetchProfile, syncProfileToStore]);
+  }, [user, fetchProfile, fetchProfileStrict, syncProfileToStore]);
 
   const refreshProfile = useCallback(async () => {
     if (!user) return;

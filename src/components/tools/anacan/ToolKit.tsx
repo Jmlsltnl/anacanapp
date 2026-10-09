@@ -53,7 +53,7 @@ export const ToolHeader = ({ title, eyebrow, onBack, actions }: ToolHeaderProps)
       )}
       <div style={{ minWidth: 0 }}>
         {eyebrow && <p className="a-eyebrow">{eyebrow}</p>}
-        <p className="a-wordmark" style={{ fontSize: 16, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <p className="a-wordmark" style={{ fontSize: 16 }}>
           {title}
         </p>
       </div>

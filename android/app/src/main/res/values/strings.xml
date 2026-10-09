@@ -5,6 +5,10 @@
     <string name="package_name">com.atlasoon.anacan</string>
     <string name="custom_url_scheme">com.atlasoon.anacan</string>
 
+    <string name="health_permissions_title">Anacan and Health Connect</string>
+    <string name="health_permissions_rationale">Anacan only writes period records to Health Connect after you enable cycle export in Flow. It does not read Health Connect data.\n\nTurn off cycle export to stop future writes. Manage permissions and previously exported records in Health Connect settings.\n\nHealth records you enter in Anacan are still saved to your account separately. Read our full privacy policy:</string>
+    <string name="privacy_policy_url" translatable="false">https://anacanapp.lovable.app/legal/privacy_policy</string>
+
     <!-- Facebook / Meta SDK -->
     <string name="facebook_app_id">927014948766655</string>
     <string name="facebook_client_token">67f7fdf1147431285d5ff230fa259f3a</string>

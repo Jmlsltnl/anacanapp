@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useLayoutEffect } from 'react';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { cancelScrollRestoration } from '@/lib/scrollMemory';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft, Clock, Eye, Heart, Bookmark, MessageCircle,
@@ -12,9 +14,15 @@ import { format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { useToast } from '@/hooks/use-toast';
 import RelatedPosts from './RelatedPosts';
-import MarkdownContent from '@/components/MarkdownContent';
-import HtmlContent from '@/components/ui/HtmlContent';
+import BlogShareDialog from './BlogShareDialog';
+import BlogContent from './BlogContent';
 import { tr } from "@/lib/tr";
+import { followupText } from '@/lib/followup-i18n';
+import { AdInlineAnchor, AdSurface, useAdExit } from '@/components/ads/AdExperienceProvider';
+import BlogSeo from './BlogSeo';
+import BlogEditorialSections, { BlogContents } from './BlogEditorialSections';
+import { blogLocale } from '@/lib/blog-editorial';
+import { useUserStore } from '@/store/userStore';
 
 interface BlogPostDetailProps {
   post: BlogPost;
@@ -25,7 +33,12 @@ interface BlogPostDetailProps {
 }
 
 const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: BlogPostDetailProps) => {
+  const leaveArticle = useAdExit('article_exit_interstitial', onBack);
+  useLayoutEffect(() => { cancelScrollRestoration(); }, [post.id]);
+  useScrollToTop([post.id]);
   const { user } = useAuth();
+  const language = useUserStore(state => state.language);
+  const locale = blogLocale(post.editorial_metadata, language);
   const { toast } = useToast();
   const {
     isLiked,
@@ -45,6 +58,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
   const [replyContent, setReplyContent] = useState('');
   const [expandedComments, setExpandedComments] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const handleAddComment = async () => {
     if (!user) {
@@ -89,14 +103,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
     );
   };
 
-  const handleShare = async () => {
-    const { nativeShare } = await import('@/lib/native');
-    await nativeShare({
-      title: post.title,
-      text: post.excerpt || '',
-      url: window.location.href
-    });
-  };
+  const handleShare = () => setShareOpen(true);
 
   const renderComment = (comment: BlogComment, isReply = false) =>
   <motion.div
@@ -106,16 +113,16 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
     animate={{ opacity: 1, y: 0 }}>
     
       <div className="flex gap-3">
-        <Avatar className="w-10 h-10" style={{ border: '2px solid var(--a-line)' }}>
+        <Avatar className="w-10 h-10 shrink-0" style={{ border: '2px solid var(--a-line)' }}>
           <AvatarImage src={comment.user_avatar || undefined} />
           <AvatarFallback className="text-sm" style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
             {comment.user_name?.charAt(0) || '?'}
           </AvatarFallback>
         </Avatar>
 
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="rounded-2xl rounded-ss-none p-3" style={{ background: 'var(--a-surface-soft)' }}>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
               <span className="font-bold text-sm" style={{ color: 'var(--a-ink)' }}>{comment.user_name}</span>
               {comment.user_badge &&
             <span className="text-[10px] px-1.5 py-0 rounded-full font-bold" style={{ background: 'var(--a-lav-1)', color: 'var(--a-lav-ink)' }}>
@@ -127,7 +134,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             <p className="text-sm" style={{ margin: 0, color: 'var(--a-ink)' }}>{comment.content}</p>
           </div>
 
-          <div className="flex items-center gap-4 mt-2 px-2">
+          <div className="flex flex-wrap items-center gap-2 mt-2 px-2">
             <button
             onClick={() => toggleCommentLike(comment.id)}
             className="flex items-center gap-1 text-xs font-semibold transition-colors"
@@ -173,7 +180,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
             placeholder={tr("blogpostdetail_cavabinizi_yazin_2cda33", "Cavabınızı yazın...")}
-            className="a-input flex-1 text-sm resize-none"
+            className="a-input flex-1 min-w-0 text-sm resize-none"
             style={{ minHeight: 60, height: 'auto', fontFamily: 'inherit' }} />
           
               <div className="flex flex-col gap-1">
@@ -227,14 +234,16 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
 
   return (
-    <div className="a-scope min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }}>
+    <div className="blog-article a-scope min-h-screen pb-24 overflow-y-auto" style={{ background: 'var(--a-bg)' }} data-blog-post={post.id}>
+      <BlogSeo post={post} />
+      <AdSurface id="blog_article_banner" />
       {/* Hero Image */}
       <div className="relative">
         {post.cover_image_url ?
         <div className="relative h-64 w-full">
             <img
             src={post.cover_image_url}
-            alt={post.title}
+            alt={locale?.coverAlt || post.title}
             className="w-full h-full object-cover" />
           
             <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, var(--a-bg), transparent 60%)' }} />
@@ -245,9 +254,10 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
         
         {/* Floating Back Button */}
         <motion.button
+          aria-label={tr('common_geri', 'Geri')}
           onClick={(e) => {
             e.stopPropagation();
-            onBack();
+            void leaveArticle();
           }}
           className="absolute start-4 z-50 w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center cursor-pointer"
           style={{ top: 'calc(env(safe-area-inset-top, 12px) + 12px)', border: 'none' }}
@@ -258,6 +268,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
         {/* Floating Share Button */}
         <motion.button
+          aria-label={followupText('share_blog')}
           onClick={(e) => {
             e.stopPropagation();
             handleShare();
@@ -303,10 +314,10 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2 pb-4" style={{ borderBottom: '1px solid var(--a-line)' }}>
+          <div className="blog-article-actions" style={{ borderBottom: '1px solid var(--a-line)' }}>
             <motion.button
               onClick={toggleLike}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full font-bold transition-all"
+              className="flex-1 flex items-center justify-center gap-2 px-2 py-3 rounded-full font-bold transition-all"
               style={isLiked ?
               { background: 'var(--a-pink-2)', color: '#fff', border: 'none', boxShadow: '0 8px 18px -8px rgba(255, 138, 164, 0.8)', cursor: 'pointer' } :
               { background: 'var(--a-surface-soft)', color: 'var(--a-ink)', border: 'none', cursor: 'pointer' }}
@@ -318,7 +329,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
             <motion.button
               onClick={toggleSave}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full font-bold transition-all"
+              className="flex-1 flex items-center justify-center gap-2 px-2 py-3 rounded-full font-bold transition-all"
               style={isSaved ?
               { background: 'var(--a-yellow-2)', color: '#5a3d00', border: 'none', boxShadow: '0 8px 18px -8px rgba(255, 201, 77, 0.8)', cursor: 'pointer' } :
               { background: 'var(--a-surface-soft)', color: 'var(--a-ink)', border: 'none', cursor: 'pointer' }}
@@ -335,6 +346,7 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           </div>
         </motion.div>
 
+        <BlogContents post={post} />
         {/* Content */}
         <motion.div
           className="mt-3 a-card"
@@ -342,12 +354,10 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}>
           
-          {post.content.trim().startsWith('<') || /<[a-z][\s\S]*>/i.test(post.content) ?
-          <HtmlContent content={post.content} /> :
-
-          <MarkdownContent content={post.content} variant="blog" />
-          }
+          <BlogContent content={post.content} className="prose prose-sm dark:prose-invert max-w-none" />
         </motion.div>
+
+        <BlogEditorialSections post={post} />
 
         {/* Tags */}
         {post.tags && post.tags.length > 0 &&
@@ -373,16 +383,17 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}>
           
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'var(--a-grad-peach)' }}>
+          <div className="w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center" style={{ background: 'var(--a-grad-peach)' }}>
             <User className="w-7 h-7" style={{ color: 'var(--a-accent-ink)' }} />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="font-bold" style={{ margin: 0, color: 'var(--a-accent-ink)' }}>{post.author_name}</p>
             <p className="text-sm" style={{ margin: 0, color: 'var(--a-accent-ink)', opacity: 0.75 }}>{tr("blogpostdetail_meqale_muellifi_1bf996", "Məqalə müəllifi")}</p>
           </div>
         </motion.div>
 
         {/* Comments Section */}
+        <AdInlineAnchor id="blog_article_banner" />
         <motion.div
           className="mt-3 a-card"
           initial={{ opacity: 0, y: 20 }}
@@ -398,17 +409,17 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
 
           {/* New comment */}
           <div className="flex gap-3 mb-6">
-            <Avatar className="w-10 h-10" style={{ border: '2px solid var(--a-line)' }}>
+            <Avatar className="w-10 h-10 shrink-0" style={{ border: '2px solid var(--a-line)' }}>
               <AvatarFallback style={{ background: 'var(--a-grad-peach)', color: 'var(--a-accent-ink)' }}>
                 <User className="w-4 h-4" />
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1 flex gap-2">
+            <div className="flex-1 min-w-0 flex gap-2">
               <textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder={user ? tr("blogpostdetail_serhinizi_yazin_9d6066", "\u015E\u0259rhinizi yaz\u0131n...") : tr("blogpostdetail_serh_yazmaq_ucun_giris_edin_d02910", "\u015E\u0259rh yazmaq \xFC\xE7\xFCn giri\u015F edin")}
-                className="a-input flex-1 resize-none"
+                className="a-input flex-1 min-w-0 resize-none"
                 style={{ minHeight: 50, height: 'auto', fontFamily: 'inherit', opacity: !user ? 0.6 : 1 }}
                 disabled={!user} />
               
@@ -439,7 +450,8 @@ const BlogPostDetail = ({ post, categories, allPosts, onBack, onSelectPost }: Bl
           }
         </motion.div>
 
-        {/* Related Posts */}
+      <BlogShareDialog open={shareOpen} onOpenChange={setShareOpen} slug={post.slug} title={post.title} blog={{ id:post.id,slug:post.slug,title:post.title,excerpt:post.excerpt,cover_image_url:post.cover_image_url }} />
+      {/* Related Posts */}
         <RelatedPosts
           currentPost={post}
           allPosts={allPosts}

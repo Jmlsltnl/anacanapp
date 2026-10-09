@@ -5,6 +5,8 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { callGeminiSmart } from "../_shared/vertex-ai.ts";
+import { LANGUAGE_NAMES } from '../_shared/languages.ts';
+import { checkModerationAccess } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -35,7 +37,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { name } = await req.json() as { name: string };
+    const moderationError = await checkModerationAccess(user.id, 'food-calories');
+    if (moderationError) return moderationError;
+    const { name, language = 'az' } = await req.json() as { name: string; language?: string };
     const food = String(name || '').trim().slice(0, 60);
     if (food.length < 2) throw new Error('name required');
 
@@ -45,7 +49,8 @@ QAYDALAR:
 1. YALNIZ JSON qaytar: {"found":true,"calories":250,"portion":"1 boşqab (250q)"}
 2. Qida adı deyilsə və ya əmin deyilsənsə: {"found":false}
 3. Azərbaycan, türk, rus mətbəxi daxil beynəlxalq qidaları tanı (plov, dolma, borş, mantı və s.)
-4. calories 1-2000 aralığında realistik olsun.`;
+4. calories 1-2000 aralığında realistik olsun.
+5. Write the human-readable portion in ${Object.hasOwn(LANGUAGE_NAMES, language) ? LANGUAGE_NAMES[language] : LANGUAGE_NAMES.az}. Preserve numeric values and physical units; keep JSON keys unchanged.`;
 
     let out: { found: boolean; calories?: number; portion?: string } = { found: false };
     for (const model of ['gemini-2.5-flash-lite', 'gemini-2.5-flash']) {

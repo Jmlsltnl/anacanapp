@@ -1,253 +1,49 @@
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useState, type ComponentType } from 'react';
+import { Loader2, ShieldCheck } from 'lucide-react';
 import { AdminLanguageProvider } from '@/contexts/AdminLanguageContext';
+import { useAuth } from '@/hooks/useAuth';
+import ErrorBoundary from './ErrorBoundary';
 import AdminLayout from './admin/AdminLayout';
-import AdminDashboard from './admin/AdminDashboard';
-import AdminUsers from './admin/AdminUsers';
-import AdminVerifiedBadges from './admin/AdminVerifiedBadges';
-import AdminProducts from './admin/AdminProducts';
-import AdminSettings from './admin/AdminSettings';
-import AdminData from './admin/AdminData';
-import AdminMessages from './admin/AdminMessages';
-import AdminSecurity from './admin/AdminSecurity';
-import AdminCommunity from './admin/AdminCommunity';
-import AdminContentManager from './admin/AdminContentManager';
-import AdminSubscriptions from './admin/AdminSubscriptions';
-import AdminPremiumAnalytics from './admin/AdminPremiumAnalytics';
-import AdminModeration from './admin/AdminModeration';
-import AdminPregnancyContent from './admin/AdminPregnancyContent';
-import AdminFruitImages from './admin/AdminFruitImages';
-import AdminBlog from './admin/AdminBlog';
-import AdminSupport from './admin/AdminSupport';
-import AdminVitamins from './admin/AdminVitamins';
-import AdminDynamicContent from './admin/AdminDynamicContent';
-import AdminTrimesterTips from './admin/AdminTrimesterTips';
-import AdminPhotoshoot from './admin/AdminPhotoshoot';
-import AdminOrders from './admin/AdminOrders';
-import AdminBranding from './admin/AdminBranding';
-import AdminLegal from './admin/AdminLegal';
-import AdminPushNotifications from './admin/AdminPushNotifications';
-import AdminAffiliateProducts from './admin/AdminAffiliateProducts';
-import AdminTools from './admin/AdminTools';
-import AdminFlowContent from './admin/AdminFlowContent';
-import AdminMarketplace from './admin/AdminMarketplace';
-import AdminFirstAid from './admin/AdminFirstAid';
-import AdminFairyTales from './admin/AdminFairyTales';
-import AdminPlaces from './admin/AdminPlaces';
-import AdminPlayActivities from './admin/AdminPlayActivities';
-import AdminQuickActions from './admin/AdminQuickActions';
-import AdminDevelopmentTips from './admin/AdminDevelopmentTips';
-import AdminBanners from './admin/AdminBanners';
-import AdminBabyGrowth from './admin/AdminBabyGrowth';
-import AdminRecipes from './admin/AdminRecipes';
-import AdminPartnerTips from './admin/AdminPartnerTips';
-import AdminFAQ from './admin/AdminFAQ';
-import AdminOnboarding from './admin/AdminOnboarding';
-import AdminMentalHealth from './admin/AdminMentalHealth';
-import AdminToolsConfig from './admin/AdminToolsConfig';
-import AdminPlacesConfig from './admin/AdminPlacesConfig';
-import AdminPartnerConfig from './admin/AdminPartnerConfig';
-import AdminDefaultShoppingItems from './admin/AdminDefaultShoppingItems';
-import AdminPremiumConfig from './admin/AdminPremiumConfig';
-import AdminMaternityBenefits from './admin/AdminMaternityBenefits';
-import AdminBabyIllustrations from './admin/AdminBabyIllustrations';
-import AdminFetusIllustrations from './admin/AdminFetusIllustrations';
-import AdminBabyCrisisCalendar from './admin/AdminBabyCrisisCalendar';
-import AdminPhaseTips from './admin/AdminPhaseTips';
-import AdminTeething from './admin/AdminTeething';
-import AdminHealthcareReviews from './admin/AdminHealthcareReviews';
-import AdminCakes from './admin/AdminCakes';
-import AdminBabyDailyInfo from './admin/AdminBabyDailyInfo';
-import AdminMommyDailyMessages from './admin/AdminMommyDailyMessages';
-import AdminIntroSlides from './admin/AdminIntroSlides';
-import AdminAlbumOrders from './admin/AdminAlbumOrders';
-import AdminCoupons from './admin/AdminCoupons';
-import AdminAnalytics from './admin/AdminAnalytics';
-import AdminCountryStats from './admin/AdminCountryStats';
-import AdminEpoint from './admin/AdminEpoint';
-import AdminForceUpdate from './admin/AdminForceUpdate';
-import AdminLanguages from './admin/AdminLanguages';
-import AdminTranslations from './admin/AdminTranslations';
-import AdminContentTranslations from './admin/AdminContentTranslations';
-import AdminDeeplinks from './admin/AdminDeeplinks';
-import AdminCrashReports from './admin/AdminCrashReports';
-import AdminPartnerVenues from './admin/AdminPartnerVenues';
-import AdminPartnerRedemptions from './admin/AdminPartnerRedemptions';
-import AdminVaccines from './admin/AdminVaccines';
-import RevenueCatDebug from '@/pages/RevenueCatDebug';
 
-interface AdminPanelProps {
-  onExit: () => void;
-}
-
-const AdminPanel = ({ onExit }: AdminPanelProps) => {
-  const [activeTab, setActiveTab] = useState('dashboard');
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'dashboard':
-        return <AdminDashboard />;
-      case 'users':
-        return <AdminUsers />;
-      case 'verified-badges':
-        return <AdminVerifiedBadges />;
-      case 'support':
-        return <AdminSupport />;
-      case 'blog':
-        return <AdminBlog />;
-      case 'orders':
-        return <AdminOrders />;
-      case 'products':
-        return <AdminProducts />;
-      case 'community':
-        return <AdminCommunity />;
-      case 'content':
-        return <AdminContentManager />;
-      case 'pregnancy':
-        return <AdminPregnancyContent />;
-      case 'fruit-images':
-        return <AdminFruitImages />;
-      case 'vitamins':
-        return <AdminVitamins />;
-      case 'dynamic-content':
-        return <AdminDynamicContent />;
-      case 'trimester-tips':
-        return <AdminTrimesterTips />;
-      case 'flow-symptoms':
-        return <AdminFlowContent />;
-      case 'flow-content':
-        return <AdminFlowContent />;
-      case 'photoshoot':
-        return <AdminPhotoshoot />;
-      case 'subscriptions':
-        return <AdminSubscriptions />;
-      case 'premium-analytics':
-        return <AdminPremiumAnalytics />;
-      case 'moderation':
-        return <AdminModeration />;
-      case 'data':
-        return <AdminData />;
-      case 'messages':
-        return <AdminMessages />;
-      case 'settings':
-        return <AdminSettings />;
-      case 'branding':
-        return <AdminBranding />;
-      case 'legal':
-        return <AdminLegal />;
-      case 'push-notifications':
-        return <AdminPushNotifications />;
-      case 'affiliate':
-        return <AdminAffiliateProducts />;
-      case 'tools':
-        return <AdminTools />;
-      case 'marketplace':
-        return <AdminMarketplace />;
-      case 'first-aid':
-        return <AdminFirstAid />;
-      case 'fairy-tales':
-        return <AdminFairyTales />;
-      case 'places':
-        return <AdminPlaces />;
-      case 'play-activities':
-        return <AdminPlayActivities />;
-      case 'quick-actions':
-        return <AdminQuickActions />;
-      case 'development-tips':
-        return <AdminDevelopmentTips />;
-      case 'banners':
-        return <AdminBanners />;
-      case 'baby-growth':
-        return <AdminBabyGrowth />;
-      case 'recipes':
-        return <AdminRecipes />;
-      case 'partner-tips':
-        return <AdminPartnerTips />;
-      case 'faq':
-        return <AdminFAQ />;
-      case 'onboarding':
-        return <AdminOnboarding />;
-      case 'mental-health':
-        return <AdminMentalHealth />;
-      case 'tools-config':
-        return <AdminToolsConfig />;
-      case 'places-config':
-        return <AdminPlacesConfig />;
-      case 'partner-config':
-        return <AdminPartnerConfig />;
-      case 'default-shopping':
-        return <AdminDefaultShoppingItems />;
-      case 'premium-config':
-        return <AdminPremiumConfig />;
-      case 'maternity':
-        return <AdminMaternityBenefits />;
-      case 'baby-illustrations':
-        return <AdminBabyIllustrations />;
-      case 'fetus-illustrations':
-        return <AdminFetusIllustrations />;
-      case 'crisis-calendar':
-        return <AdminBabyCrisisCalendar />;
-      case 'phase-tips':
-        return <AdminPhaseTips />;
-      case 'teething':
-        return <AdminTeething />;
-      case 'healthcare-reviews':
-        return <AdminHealthcareReviews />;
-      case 'cakes':
-        return <AdminCakes />;
-      case 'baby-daily-info':
-        return <AdminBabyDailyInfo />;
-      case 'mommy-daily-messages':
-        return <AdminMommyDailyMessages />;
-      case 'intro-slides':
-        return <AdminIntroSlides />;
-      case 'album-orders':
-        return <AdminAlbumOrders />;
-      case 'coupons':
-        return <AdminCoupons />;
-      case 'analytics':
-        return <AdminAnalytics />;
-      case 'country-stats':
-        return <AdminCountryStats />;
-      case 'epoint':
-        return <AdminEpoint />;
-      case 'force-update':
-        return <AdminForceUpdate />;
-      case 'security':
-        return <AdminSecurity />;
-      case 'languages':
-        return <AdminLanguages />;
-      case 'translations':
-        return <AdminTranslations />;
-      case 'content-i18n':
-        return <AdminContentTranslations />;
-      case 'deeplinks':
-        return <AdminDeeplinks />;
-      case 'crash-reports':
-        return <AdminCrashReports />;
-      case 'partner-venues':
-        return <AdminPartnerVenues />;
-      case 'partner-redemptions':
-        return <AdminPartnerRedemptions />;
-      case 'vaccines':
-        return <AdminVaccines />;
-      case 'revenuecat-debug':
-        return <RevenueCatDebug />;
-      default:
-        return <AdminDashboard />;
-    }
-  };
-
-  return (
-    <AdminLanguageProvider>
-      <AdminLayout
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onExit={onExit}
-      >
-        {renderContent()}
-      </AdminLayout>
-    </AdminLanguageProvider>
-  );
+const files = import.meta.glob<{ default: ComponentType<{ onNavigate?: (section: string) => void }> }>(['./admin/Admin*.tsx', '!./admin/**/*.test.tsx']);
+const panels = Object.fromEntries(Object.entries(files).map(([path, load]) => [path.split('/').pop()!.replace('.tsx', ''), lazy(load)]));
+const RevenueCatDebug = lazy(() => import('@/pages/RevenueCatDebug'));
+const sections: Record<string, string> = {
+  dashboard: 'AdminDashboard', users: 'AdminUsers', 'verified-badges': 'AdminVerifiedBadges', support: 'AdminSupport',
+  blog: 'AdminBlog', orders: 'AdminOrders', products: 'AdminProducts', community: 'AdminCommunity', content: 'AdminContentManager',
+  pregnancy: 'AdminPregnancyContent', 'fruit-images': 'AdminFruitImages', vitamins: 'AdminVitamins', 'dynamic-content': 'AdminDynamicContent',
+  'trimester-tips': 'AdminTrimesterTips', 'flow-symptoms': 'AdminFlowContent', 'flow-content': 'AdminFlowContent', photoshoot: 'AdminPhotoshoot',
+  subscriptions: 'AdminSubscriptions', 'premium-analytics': 'AdminPremiumAnalytics', premium: 'AdminPremiumAnalytics', moderation: 'AdminModeration',
+  'ad-moderation': 'AdminAdModeration',
+  data: 'AdminData', messages: 'AdminMessages', settings: 'AdminSettings', branding: 'AdminBranding', legal: 'AdminLegal',
+  'push-notifications': 'AdminPushNotifications', notifications: 'AdminPushNotifications', affiliate: 'AdminAffiliateProducts', tools: 'AdminTools',
+  marketplace: 'AdminMarketplace', 'first-aid': 'AdminFirstAid', 'fairy-tales': 'AdminFairyTales', places: 'AdminPlaces',
+  'play-activities': 'AdminPlayActivities', 'quick-actions': 'AdminQuickActions', 'development-tips': 'AdminDevelopmentTips', banners: 'AdminBanners',
+  'baby-growth': 'AdminBabyGrowth', recipes: 'AdminRecipes', 'partner-tips': 'AdminPartnerTips', faq: 'AdminFAQ', onboarding: 'AdminOnboarding',
+  'mental-health': 'AdminMentalHealth', 'tools-config': 'AdminToolsConfig', 'places-config': 'AdminPlacesConfig', 'partner-config': 'AdminPartnerConfig',
+  'default-shopping': 'AdminDefaultShoppingItems', 'premium-config': 'AdminPremiumConfig', maternity: 'AdminMaternityBenefits',
+  'baby-illustrations': 'AdminBabyIllustrations', 'fetus-illustrations': 'AdminFetusIllustrations', 'crisis-calendar': 'AdminBabyCrisisCalendar',
+  'phase-tips': 'AdminPhaseTips', teething: 'AdminTeething', 'healthcare-reviews': 'AdminHealthcareReviews', cakes: 'AdminCakes',
+  'baby-daily-info': 'AdminBabyDailyInfo', 'mommy-daily-messages': 'AdminMommyDailyMessages', 'intro-slides': 'AdminIntroSlides',
+  'album-orders': 'AdminAlbumOrders', coupons: 'AdminCoupons', analytics: 'AdminAnalytics', 'country-stats': 'AdminCountryStats',
+  epoint: 'AdminEpoint', 'force-update': 'AdminForceUpdate', security: 'AdminSecurity', languages: 'AdminLanguages', translations: 'AdminTranslations',
+  'content-i18n': 'AdminContentTranslations', deeplinks: 'AdminDeeplinks', 'crash-reports': 'AdminCrashReports',
+  'partner-venues': 'AdminPartnerVenues', 'partner-redemptions': 'AdminPartnerRedemptions', vaccines: 'AdminVaccines', admob: 'AdminAdmob', ads: 'AdminAdmob',
 };
+export const isAdminSection = (value: string) => Object.prototype.hasOwnProperty.call(sections, value) || value === 'revenuecat-debug';
+interface AdminPanelProps { onExit: () => void; initialTab?: string; onSectionChange?: (section: string) => void }
 
-export default AdminPanel;
+export default function AdminPanel({ onExit, initialTab = 'dashboard', onSectionChange }: AdminPanelProps) {
+  const { user, isAdmin, loading } = useAuth();
+  const [activeTab, setActiveTab] = useState(initialTab);
+  useEffect(() => { setActiveTab(initialTab); }, [initialTab]);
+  const navigate = (section: string) => { if (isAdminSection(section)) { setActiveTab(section); onSectionChange?.(section); } };
+  if (loading) return <div className="grid min-h-[50vh] place-items-center"><Loader2 className="animate-spin" /></div>;
+  if (!user || !isAdmin) return <div className="grid min-h-[50vh] place-content-center gap-3 p-6 text-center"><ShieldCheck className="mx-auto" />Administrator hesabı tələb olunur.<button onClick={onExit}>Tətbiqə qayıt</button></div>;
+  const Content = activeTab === 'revenuecat-debug' ? RevenueCatDebug : panels[sections[activeTab] || 'AdminDashboard'];
+  return <AdminLanguageProvider><AdminLayout activeTab={activeTab} onTabChange={navigate} onExit={onExit}>
+    <ErrorBoundary key={activeTab}><Suspense fallback={<div className="admin-page-loading" role="status"><Loader2 className="animate-spin" />Bölmə yüklənir…</div>}>
+      <Content onNavigate={navigate} />
+    </Suspense></ErrorBoundary>
+  </AdminLayout></AdminLanguageProvider>;
+}

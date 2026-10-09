@@ -1,6 +1,7 @@
 import { tr } from "@/lib/tr";import { motion } from 'framer-motion';
 import { Clock, ChevronRight } from 'lucide-react';
 import { BlogPost } from '@/hooks/useBlog';
+import { blogEditorial } from '@/lib/blog-editorial';
 
 interface RelatedPostsProps {
   currentPost: BlogPost;
@@ -15,6 +16,9 @@ const RelatedPosts = ({ currentPost, allPosts, onSelectPost }: RelatedPostsProps
     filter((post) => post.id !== currentPost.id && post.is_published).
     map((post) => {
       let score = 0;
+      const editorial = blogEditorial(currentPost.editorial_metadata), other = blogEditorial(post.editorial_metadata);
+      if (editorial?.relatedSlugs.includes(post.slug)) score += 20;
+      if (editorial && other) score += editorial.modules.filter(module => other.modules.includes(module)).length * 2;
 
       // Same category = +3 points
       if (post.category === currentPost.category) {

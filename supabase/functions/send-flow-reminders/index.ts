@@ -1,6 +1,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
-import { requireCronSecret, requireAdmin } from '../_shared/auth.ts';
+import { requireAdmin } from '../_shared/auth.ts';
+import { requireNotificationCron } from '../_shared/notification-auth.ts';
 import { startRunLog, finishRunLog, logFailedSend, bumpReason } from '../_shared/notif-logging.ts';
 import { fetchAllPaged } from '../_shared/paginate.ts';
 
@@ -177,7 +178,7 @@ Deno.serve(async (req) => {
 
   try {
     // Accept scheduled calls (cron secret / project key) OR admin user (manual trigger from admin panel)
-    const cronErr = requireCronSecret(req);
+    const cronErr = await requireNotificationCron(req, 'send-flow-reminders');
     let triggeredBy = 'cron';
     if (cronErr) {
       const adminCheck = await requireAdmin(req);

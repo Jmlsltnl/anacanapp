@@ -1,4 +1,6 @@
 import { tr } from "@/lib/tr";import { Capacitor } from '@capacitor/core';
+import { appLaunchDestination, APP_ENTRY_HOSTS } from '@/web-entry/policy.mjs';
+import { isAppLanguage } from '@/lib/app-languages';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // DEEPLINK SYSTEM — anacan:// + https://app.anacan.az Universal Links
@@ -60,18 +62,24 @@ export interface ParsedDeeplink {
 /**
  * Parse a deeplink URL (both anacan:// and https://app.anacan.az paths)
  */
-export function parseDeeplink(url: string): ParsedDeeplink | null {
+function parseDeeplinkRoute(url: string): ParsedDeeplink | null {
   let path = '';
+  let query = '';
 
   try {
-    if (url.startsWith('anacan://')) {
-      // anacan://tool/baby-names → /tool/baby-names
-      path = '/' + url.replace('anacan://', '');
-    } else if (url.includes('app.anacan.az')) {
+    if (url.startsWith('anacan://') || url.startsWith('com.atlasoon.anacan://')) {
       const parsed = new URL(url);
+      if (parsed.username || parsed.password || parsed.port) return null;
+      path = '/' + parsed.hostname + parsed.pathname;
+      query = parsed.search;
+    } else if (/^https:\/\//.test(url)) {
+      const parsed = new URL(url);
+      if (!APP_ENTRY_HOSTS.includes(parsed.hostname) || parsed.username || parsed.password || parsed.port) return null;
       path = parsed.pathname;
+      query = parsed.search;
     } else if (url.startsWith('/')) {
-      path = url;
+      const parsed = new URL(url, 'https://app.anacan.az'); if (parsed.origin !== 'https://app.anacan.az') return null;
+      path = parsed.pathname; query = parsed.search;
     } else {
       return null;
     }
@@ -81,6 +89,20 @@ export function parseDeeplink(url: string): ParsedDeeplink | null {
 
   // Remove trailing slash
   path = path.replace(/\/$/, '') || '/';
+
+  const parameters = new URLSearchParams(query), requestedModule = parameters.get('blog_module');
+  if (requestedModule && ['sleep','feeding','diaper','babyGrowth','hospitalBag','calendar'].includes(requestedModule)) {
+    const destination = appLaunchDestination('https://app.anacan.az' + path + query);
+    return { action: 'blog-module', params: { module: requestedModule, language: destination.language } };
+  }
+  const localizedBlog = /^\/blog\/(az|en|tr|ru|de|ar|ka|kk|uz|zh|id|fr|es|pt|vi|hi|ja|ko|pl|nl|sv)(?:\/([^/]+))?$/.exec(path);
+  if (localizedBlog) {
+    try {
+      const slug = localizedBlog[2] ? decodeURIComponent(localizedBlog[2]) : '';
+      if (slug && /[\s/\\\u0000-\u001f<>?#]/u.test(slug)) return null;
+      return { action: 'screen', params: { screen: slug ? `blog/${slug}` : 'blog', language: localizedBlog[1] } };
+    } catch { return null; }
+  }
 
   // Match against routes
   // /tool/{tool_id} → regex /^\/tool\/([^/]+)$/
@@ -107,7 +129,10 @@ export function parseDeeplink(url: string): ParsedDeeplink | null {
   // Blog
   if (path === '/blog') return { action: 'screen', params: { screen: 'blog' } };
   const blogMatch = path.match(/^\/blog\/([^/]+)$/);
-  if (blogMatch) return { action: 'screen', params: { screen: `blog/${blogMatch[1]}` } };
+  if (blogMatch) {
+    try { const slug = decodeURIComponent(blogMatch[1]); if (/[\s/\\\u0000-\u001f<>]/.test(slug) || slug === '.' || slug === '..') return null;
+      return { action: 'screen', params: { screen: `blog/${slug}` } }; } catch { return null; }
+  }
 
   // Messages
   if (path === '/messages') return { action: 'messages', params: {} };
@@ -129,6 +154,15 @@ export function parseDeeplink(url: string): ParsedDeeplink | null {
   return null;
 }
 
+export function parseDeeplink(url: string): ParsedDeeplink | null {
+  const parsed = parseDeeplinkRoute(url);
+  if (!parsed) return null;
+  const query = new URL(url, 'https://app.anacan.az').searchParams;
+  const language = query.get('blog_language') || query.get('language');
+  if (isAppLanguage(language)) parsed.params.language = language;
+  return parsed;
+}
+
 /**
  * Generate a deeplink URL
  */
@@ -144,7 +178,7 @@ format: 'scheme' | 'universal' = 'universal')
 
   if (format === 'scheme') {
     // anacan://tool/baby-names (strip leading /)
-    return 'anacan:/' + path;
+    return path === '/' ? 'anacan:///' : 'anacan:/' + path;
   }
   // https://app.anacan.az/tool/baby-names
   return 'https://app.anacan.az' + path;
@@ -156,14 +190,13 @@ format: 'scheme' | 'universal' = 'universal')
 export function initDeeplinkListener(handler: (parsed: ParsedDeeplink) => void) {
   if (!Capacitor.isNativePlatform()) return () => {};
 
-  let cleanup: (() => void) | undefined;
+  let cleanup: (() => void) | undefined, cancelled = false;
 
-  import('@capacitor/app').then(({ App }) => {
+  import('@capacitor/app').then(async ({ App }) => {
     // Handle app opened via URL (cold start or background)
     const listener = App.addListener('appUrlOpen', (event) => {
-      console.log('[Deeplink] URL received:', event.url);
       const parsed = parseDeeplink(event.url);
-      if (parsed) {
+      if (parsed && !cancelled) {
         handler(parsed);
       }
     });
@@ -171,9 +204,16 @@ export function initDeeplinkListener(handler: (parsed: ParsedDeeplink) => void) 
     cleanup = () => {
       listener.then((l) => l.remove());
     };
+    if (cancelled) { cleanup(); return; }
+    if (!launchLinkChecked) {
+      launchLinkChecked = true;
+      const launch = await App.getLaunchUrl().catch(() => undefined);
+      if (launch?.url && !cancelled) { const parsed = parseDeeplink(launch.url); if (parsed) handler(parsed); }
+    }
   }).catch((err) => {
     console.warn('[Deeplink] Failed to init listener:', err);
   });
 
-  return () => cleanup?.();
+  return () => { cancelled = true; cleanup?.(); };
 }
+let launchLinkChecked = false;

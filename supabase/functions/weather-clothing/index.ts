@@ -2,6 +2,9 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { callGeminiSmart } from "../_shared/vertex-ai.ts";
+import { EXPANDED_LANGUAGE_NAMES } from '../_shared/languages.ts';
+import { serverCopy } from '../_shared/localized-copy.ts';
+import { checkModerationAccess } from '../_shared/auth.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -52,6 +55,8 @@ Deno.serve(async (req) => {
       });
     }
 
+    const moderationError = await checkModerationAccess(user.id, 'weather-clothing');
+    if (moderationError) return moderationError;
     const { lat, lng, userContext, language = 'az' } = await req.json() as WeatherRequest;
 
     if (!lat || !lng) {
@@ -78,6 +83,18 @@ Deno.serve(async (req) => {
       ka: { geo: 'ka', unknown: 'უცნობი', outLang: 'GEORGIAN' },
       de: { geo: 'de', unknown: 'Unbekannt', outLang: 'GERMAN' },
       ar: { geo: 'ar', unknown: 'غير معروف', outLang: 'ARABIC (feminine address to the mother)' },
+      zh: { geo: 'zh-CN', unknown: '未知', outLang: EXPANDED_LANGUAGE_NAMES.zh },
+      id: { geo: 'id', unknown: 'Tidak diketahui', outLang: EXPANDED_LANGUAGE_NAMES.id },
+      fr: { geo: 'fr', unknown: 'Inconnu', outLang: EXPANDED_LANGUAGE_NAMES.fr },
+      es: { geo: 'es', unknown: 'Desconocido', outLang: EXPANDED_LANGUAGE_NAMES.es },
+      pt: { geo: 'pt-PT', unknown: 'Desconhecido', outLang: EXPANDED_LANGUAGE_NAMES.pt },
+      vi: { geo: 'vi', unknown: 'Không xác định', outLang: EXPANDED_LANGUAGE_NAMES.vi },
+      hi: { geo: 'hi', unknown: 'अज्ञात', outLang: EXPANDED_LANGUAGE_NAMES.hi },
+      ja: { geo: 'ja', unknown: '不明', outLang: EXPANDED_LANGUAGE_NAMES.ja },
+      ko: { geo: 'ko', unknown: '알 수 없음', outLang: EXPANDED_LANGUAGE_NAMES.ko },
+      pl: { geo: 'pl', unknown: 'Nieznane', outLang: EXPANDED_LANGUAGE_NAMES.pl },
+      nl: { geo: 'nl', unknown: 'Onbekend', outLang: EXPANDED_LANGUAGE_NAMES.nl },
+      sv: { geo: 'sv', unknown: 'Okänd', outLang: EXPANDED_LANGUAGE_NAMES.sv },
     };
     const langConf = LANG_CONF[language] ?? LANG_CONF.az;
 
@@ -392,7 +409,7 @@ CAVAB FORMATI (STRICT JSON):
           },
         },
       };
-      const fb = (FALLBACK_TEXTS[language] ?? FALLBACK_TEXTS.az)[tempBand];
+      const fb = serverCopy('weatherFallback', language, FALLBACK_TEXTS[language] ?? FALLBACK_TEXTS.az)[tempBand];
       advice = {
         temperature: current.temperature_2m,
         feelsLike: current.apparent_temperature,

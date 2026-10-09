@@ -1,6 +1,13 @@
 import { tr } from "@/lib/tr";import { format } from 'date-fns';
-import { az, enUS, ru, tr as trLocale, kk, de, ar, uz, ka } from 'date-fns/locale';
+import { az, enUS, ru, tr as trLocale, kk, de, ar, uz, ka, zhCN, id, fr, es, pt, vi, hi, ja, ko, pl, nl, sv } from 'date-fns/locale';
 import { getPersistedLanguage } from './tr';
+import { NEW_LANGUAGE_CODES, appLanguageLocale } from './app-languages';
+
+/** Sunday-first labels for weekly grids; the date stays in UTC. */
+export function weekdayLabels(language: string): string[] {
+  const formatter = new Intl.DateTimeFormat(appLanguageLocale(language), { weekday: 'short', timeZone: 'UTC' });
+  return Array.from({ length: 7 }, (_, index) => formatter.format(new Date(Date.UTC(2024, 0, 7 + index))));
+}
 
 export const getCurrentDateLocale = () => {
   const lang = getPersistedLanguage();
@@ -12,6 +19,18 @@ export const getCurrentDateLocale = () => {
   if (lang === 'ar') return ar;
   if (lang === 'uz') return uz;
   if (lang === 'ka') return ka;
+  if (lang === 'zh') return zhCN;
+  if (lang === 'id') return id;
+  if (lang === 'fr') return fr;
+  if (lang === 'es') return es;
+  if (lang === 'pt') return pt;
+  if (lang === 'vi') return vi;
+  if (lang === 'hi') return hi;
+  if (lang === 'ja') return ja;
+  if (lang === 'ko') return ko;
+  if (lang === 'pl') return pl;
+  if (lang === 'nl') return nl;
+  if (lang === 'sv') return sv;
   return az;
 };
 /**
@@ -41,6 +60,11 @@ export const getTranslatedMonth = (monthIndex: number): string => {
 export const formatDateAz = (date: Date | string, includeYear = false): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return '';
+  const language = getPersistedLanguage();
+  if ((NEW_LANGUAGE_CODES as readonly string[]).includes(language)) return new Intl.DateTimeFormat(appLanguageLocale(language), {
+    day: 'numeric', month: 'long', ...(includeYear ? { year: 'numeric' as const } : {}),
+    ...(typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date) ? { timeZone: 'UTC' } : {}),
+  }).format(d);
 
   const day = d.getDate();
   const month = getTranslatedMonth(d.getMonth());
@@ -54,6 +78,10 @@ export const formatDateAz = (date: Date | string, includeYear = false): string =
 export const formatDateTimeAz = (date: Date | string, includeYear = false): string => {
   const d = typeof date === 'string' ? new Date(date) : date;
   if (isNaN(d.getTime())) return '';
+  const language = getPersistedLanguage();
+  if ((NEW_LANGUAGE_CODES as readonly string[]).includes(language)) return new Intl.DateTimeFormat(appLanguageLocale(language), {
+    day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', hour12: false, ...(includeYear ? { year: 'numeric' as const } : {}),
+  }).format(d);
 
   const day = d.getDate();
   const month = getTranslatedMonth(d.getMonth());

@@ -11,6 +11,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { callGeminiSmart } from '../_shared/vertex-ai.ts';
 import { callClaude, isClaudeConfigured, claudeModelName } from '../_shared/claude.ts';
 import { callAzureGpt, isAzureGptConfigured, azureGptModelName } from '../_shared/azure-openai.ts';
+import { EXPANDED_LANGUAGE_NAMES, outputLanguageRule } from '../_shared/languages.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -78,7 +79,7 @@ const REGISTRY: Record<string, TableCfg> = {
   mommy_day_notifications: { text: ['title', 'body'] },
 };
 
-const LANG_NAMES: Record<string, string> = { ru: 'Russian', tr: 'Turkish', en: 'English', kk: 'Kazakh', uz: 'Uzbek', ka: 'Georgian', de: 'German', ar: 'Arabic' };
+const LANG_NAMES: Record<string, string> = { ru: 'Russian', tr: 'Turkish', en: 'English', kk: 'Kazakh', uz: 'Uzbek', ka: 'Georgian', de: 'German', ar: 'Arabic', ...EXPANDED_LANGUAGE_NAMES };
 const MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
 
 function buildSystemPrompt(lang: string): string {
@@ -107,6 +108,7 @@ function buildSystemPrompt(lang: string): string {
     `3) Preserve emojis, line breaks (\\n), HTML/Markdown formatting, numbers, units and placeholders like {x} exactly.`,
     `4) Keep brand/product names unchanged: Anacan (app name), Premium, Dr.Anacan. EXCEPTION: when "Anacan" is an affectionate address to the mother (baby speaking to mom), translate it: ru «мамочка», tr "anneciğim", kk «анашым», uz "Onajon", ka «დედიკო», de "Mami", ar «ماما», en "Mommy".`,
     `5) Medical accuracy over literal wording; natural, warm tone for mothers. ${style}`,
+    outputLanguageRule(lang),
   ].join('\n');
 }
 

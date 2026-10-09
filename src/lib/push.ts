@@ -1,4 +1,28 @@
-import { tr } from "@/lib/tr";import { supabase } from '@/integrations/supabase/client';
+import { tr } from '@/lib/tr';
+import { supabase } from '@/integrations/supabase/client';
+
+type InteractionPushData<Type extends string, Context extends string, Fields = object> = {
+  type: Type;
+  context: Context;
+  interactionId: string;
+} & Fields;
+
+export type PushEventData =
+  | { type: 'diagnostic'; context: 'self' }
+  | InteractionPushData<'direct_message', 'direct_message', { sender_id: string; messageId: string }>
+  | InteractionPushData<'group_message', 'group_message', { groupId: string; messageId: string }>
+  | InteractionPushData<'community_like', 'community_post', { postId: string; groupId?: string | null }>
+  | InteractionPushData<'community_comment', 'community_post', { postId: string }>
+  | InteractionPushData<'story_like', 'community_story', { storyId: string }>
+  | InteractionPushData<'story_reply', 'community_story', { storyId: string }>
+  | InteractionPushData<'comment_like', 'post_comment', { commentId: string; postId: string }>
+  | InteractionPushData<'community_reply', 'post_comment', { commentId: string; postId: string }>
+  | InteractionPushData<'partner_message', 'partner', { messageId: string }>
+  | InteractionPushData<'thank_you', 'partner', { messageId: string }>
+  | InteractionPushData<'contraction_511', 'partner'>
+  | InteractionPushData<'shopping_list', 'partner'>
+  | InteractionPushData<'sos_alert', 'partner', { alertId: string }>
+  | InteractionPushData<'birth_alert', 'partner', { alertId: string }>;
 
 export interface SendPushPayload {
   userId: string;
@@ -17,6 +41,79 @@ export interface SendPushResult {
   error?: unknown;
 }
 
+const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const contracts: Record<string, {
+  context: string;
+  required: string[];
+  optional?: string[];
+  interactionAlias?: string;
+}> = {
+  diagnostic: { context: 'self', required: [] },
+  direct_message: {
+    context: 'direct_message',
+    required: ['sender_id', 'messageId'],
+    interactionAlias: 'messageId'
+  },
+  group_message: { context: 'group_message', required: ['groupId', 'messageId'], interactionAlias: 'messageId' },
+  community_like: { context: 'community_post', required: ['postId'], optional: ['groupId'] },
+  community_comment: { context: 'community_post', required: ['postId'] },
+  story_like: { context: 'community_story', required: ['storyId'] },
+  story_reply: { context: 'community_story', required: ['storyId'] },
+  comment_like: { context: 'post_comment', required: ['commentId', 'postId'] },
+  community_reply: { context: 'post_comment', required: ['commentId', 'postId'] },
+  partner_message: { context: 'partner', required: ['messageId'], interactionAlias: 'messageId' },
+  thank_you: { context: 'partner', required: ['messageId'], interactionAlias: 'messageId' },
+  contraction_511: { context: 'partner', required: [] },
+  shopping_list: { context: 'partner', required: [] },
+  sos_alert: { context: 'partner', required: ['alertId'], interactionAlias: 'alertId' },
+  birth_alert: { context: 'partner', required: ['alertId'], interactionAlias: 'alertId' }
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function pushContractError(payload: SendPushPayload): string | null {
+  if (!uuid.test(payload.userId)) return 'invalid target user id';
+  if (typeof payload.title !== 'string' || typeof payload.body !== 'string'
+    || !payload.title.trim() || !payload.body.trim()) return 'empty title or body';
+  if (!isRecord(payload.data)) return 'missing event data';
+
+  const type = payload.data.type;
+  if (typeof type !== 'string' || !Object.prototype.hasOwnProperty.call(contracts, type)) {
+    return 'unsupported event type';
+  }
+  if (payload.kind && payload.kind !== type) return 'kind does not match event type';
+
+  const contract = contracts[type];
+  if (payload.data.context !== contract.context) return 'unsupported event context';
+
+  const allowed = new Set(['type', 'context', ...contract.required, ...(contract.optional || [])]);
+  if (type !== 'diagnostic') allowed.add('interactionId');
+  if (Object.keys(payload.data).some((key) => !allowed.has(key))) return 'unsupported event data field';
+
+  if (type === 'diagnostic') return null;
+  if (typeof payload.data.interactionId !== 'string' || !uuid.test(payload.data.interactionId)) {
+    return 'missing or invalid interaction id';
+  }
+
+  for (const field of contract.required) {
+    const value = payload.data[field];
+    if (typeof value !== 'string' || !uuid.test(value)) return `missing or invalid ${field}`;
+  }
+  for (const field of contract.optional || []) {
+    if (!Object.prototype.hasOwnProperty.call(payload.data, field)) continue;
+    const value = payload.data[field];
+    if (field === 'groupId' && value === null) continue;
+    if (typeof value !== 'string' || !uuid.test(value)) return `invalid ${field}`;
+  }
+  if (contract.interactionAlias && payload.data[contract.interactionAlias] !== payload.data.interactionId) {
+    return `${contract.interactionAlias} does not match interaction id`;
+  }
+  return null;
+}
+
 /**
  * Invokes send-push-notification and logs actionable failures (no tokens, FCM missing, etc.).
  */
@@ -29,11 +126,22 @@ export async function invokeSendPush(payload: SendPushPayload): Promise<SendPush
     catch(() => {});
   };
 
+  const contractError = pushContractError(payload);
+  if (contractError) {
+    const error = new Error(`Invalid push contract: ${contractError}`);
+    console.error('[Push] contract error:', contractError);
+    report(`contract error: ${contractError}`);
+    return { ok: false, sent: 0, error };
+  }
+
   try {
-    // kind server-ə getməsin (payload şərtnaməsi dəyişməz qalır)
-    const { kind: _k, ...body } = payload;
     const { data, error } = await supabase.functions.invoke('send-push-notification', {
-      body
+      body: {
+        userId: payload.userId,
+        title: payload.title,
+        body: payload.body,
+        data: payload.data
+      }
     });
 
     if (error) {

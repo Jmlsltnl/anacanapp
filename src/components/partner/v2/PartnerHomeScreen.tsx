@@ -25,6 +25,7 @@ import PartnerWeekInfoCard from './PartnerWeekInfoCard';
 import PartnerBabyCrisisCard from './PartnerBabyCrisisCard';
 import PartnerBabyTodayCard from './PartnerBabyTodayCard';
 import PartnerFlowStatusCard from '@/components/flow/PartnerFlowStatusCard';
+import { AdInlineAnchor } from '@/components/ads/AdExperienceProvider';
 
 /**
  * Partnyor "Bu gün" — v2 ana ekran.
@@ -349,6 +350,7 @@ const PartnerHomeScreen = ({ onNavigate, onOpenChat }: Props) => {
           }
 
           {/* ── Günlük tapşırıqlar ── */}
+          <AdInlineAnchor id="home_banner" />
           <DailyMissionsCard />
 
           {/* ── Növbəti randevu ── */}

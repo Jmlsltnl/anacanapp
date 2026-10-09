@@ -13,6 +13,10 @@ import { formatDistanceToNow, format } from 'date-fns';
 import { getCurrentDateLocale } from '@/lib/date-utils';
 import { getPublicProfileCards } from '@/lib/public-profile-cards';
 import BlockUserDialog from '@/components/moderation/BlockUserDialog';
+import { moderationText } from '@/lib/community-moderation-i18n';
+import ModeratorActionDialog from '@/components/moderation/ModeratorActionDialog';
+import { moderatorError, type ModeratorTarget } from '@/lib/moderator';
+import { useUserStore } from '@/store/userStore';
 
 interface Post {
   id: string;
@@ -61,7 +65,7 @@ interface Report {
   postAuthor?: {name: string;avatar_url?: string | null;};
 }
 
-const AdminModeration = () => {
+const AdminModeration = ({ onNavigate }: { onNavigate?: (section: string) => void }) => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'reports' | 'posts' | 'comments' | 'blocks'>('reports');
   const [posts, setPosts] = useState<Post[]>([]);
@@ -72,6 +76,7 @@ const AdminModeration = () => {
   const [search, setSearch] = useState('');
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [blockUserId, setBlockUserId] = useState<string>('');
+  const [removeTarget, setRemoveTarget] = useState<{ target: ModeratorTarget; reportId?: string } | null>(null);
 
   const fetchReports = async () => {
     // Use type assertion for new table not yet in generated types
@@ -175,74 +180,43 @@ const AdminModeration = () => {
   }, []);
 
   const handleReportAction = async (reportId: string, action: 'reviewed' | 'dismissed', postId?: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    // Use type assertion for new table
-    const { error } = await (supabase as any).
-    from('post_reports').
-    update({
-      status: action,
-      reviewed_by: user.id,
-      reviewed_at: new Date().toISOString()
-    }).
-    eq('id', reportId);
-
-    if (error) {
-      toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
+    if (action === 'reviewed' && postId) {
+      const report = reports.find(value => value.id === reportId);
+      if (report?.post) setRemoveTarget({ target: { kind: 'post', id: postId, userId: report.post.user_id,
+        content: report.post.content, name: report.postAuthor?.name }, reportId });
       return;
     }
-
-    // If reviewed, also delete the post
-    if (action === 'reviewed' && postId) {
-      await supabase.from('community_posts').delete().eq('id', postId);
-      toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: tr("adminmoderation_sikayet_yoxlanildi_ve_post_silindi_7319cc", "Şikayət yoxlanıldı və post silindi") });
-    } else {
-      toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: tr("adminmoderation_sikayet_redd_edildi_309b57", "Şikayət rədd edildi") });
+    const { error } = await (supabase as any).rpc('moderator_report_decide_v1', {
+      p_report: reportId, p_decision: action, p_request: crypto.randomUUID(),
+    });
+    if (error) {
+      toast({ title: moderatorError(error, useUserStore.getState().language), variant: 'destructive' });
+      return;
     }
+    toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu") });
     fetchReports();
     fetchPosts();
   };
 
   const deletePost = async (postId: string) => {
-    if (!confirm(tr("adminmoderation_bu_postu_silmek_isteyirsiniz_2fbc75", "Bu postu silm\u0259k ist\u0259yirsiniz?"))) return;
-
-    const { error } = await supabase.
-    from('community_posts').
-    delete().
-    eq('id', postId);
-
-    if (error) {
-      toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: 'Post silindi' });
-      fetchPosts();
-    }
+    const post = posts.find(value => value.id === postId);
+    if (post) setRemoveTarget({ target: { kind: 'post', id: post.id, userId: post.user_id, content: post.content, name: post.author?.name } });
   };
 
   const deleteComment = async (commentId: string) => {
-    if (!confirm(tr("adminmoderation_bu_serhi_silmek_isteyirsiniz_fc50c9", "Bu \u015F\u0259rhi silm\u0259k ist\u0259yirsiniz?"))) return;
-
-    const { error } = await supabase.
-    from('post_comments').
-    delete().
-    eq('id', commentId);
-
-    if (error) {
-      toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: tr("adminmoderation_ugurlu_7fe64c", "Uğurlu"), description: tr("adminmoderation_serh_silindi_59cfe5", "Şərh silindi") });
-      fetchComments();
-    }
+    const comment = comments.find(value => value.id === commentId);
+    if (comment) setRemoveTarget({ target: { kind: 'comment', id: comment.id, userId: comment.user_id, content: comment.content, name: comment.author?.name } });
   };
 
   const unblockUser = async (blockId: string) => {
     if (!confirm(tr("adminmoderation_bu_istifadecinin_blokunu_acmaq_b0d1f5", "Bu istifad\u0259\xE7inin blokunu a\xE7maq ist\u0259yirsiniz?"))) return;
 
-    const { error } = await supabase.
-    from('user_blocks').
-    update({ is_active: false }).
-    eq('id', blockId);
+    const block = blocks.find(value => value.id === blockId);
+    if (!block) return;
+    const { error } = await (supabase as any).rpc('moderator_user_action_v1', {
+      p_user: block.user_id, p_action: 'unrestrict', p_reason: 'other', p_detail: '',
+      p_options: { restriction_id: blockId }, p_request: crypto.randomUUID(),
+    });
 
     if (error) {
       toast({ title: tr("adminmoderation_xeta_3cdbb6", "Xəta"), description: error.message, variant: 'destructive' });
@@ -269,6 +243,11 @@ const AdminModeration = () => {
 
   return (
     <div className="p-6">
+      {removeTarget && <ModeratorActionDialog target={removeTarget.target} action="remove" onClose={() => setRemoveTarget(null)} onDone={() => {
+        const reportId = removeTarget.reportId;
+        if (reportId) void handleReportAction(reportId, 'reviewed');
+        void fetchData();
+      }} />}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <AlertTriangle className="w-6 h-6 text-amber-500" />
@@ -280,6 +259,10 @@ const AdminModeration = () => {
           </Badge>
         }
       </div>
+
+      {onNavigate && <Button variant="outline" className="mb-4 min-h-11 h-auto whitespace-normal" onClick={() => onNavigate('ad-moderation')}>
+        <AlertTriangle size={16} />{moderationText('title')}
+      </Button>}
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
         <TabsList className="grid grid-cols-4 w-full mb-6">

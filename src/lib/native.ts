@@ -264,6 +264,10 @@ export const localNotifications = {
 
 // Native Share
 export const nativeShare = async (data: {title?: string;text?: string;url?: string;}) => {
+  if (isNative) {
+    try { const { Share } = await import('@capacitor/share'); await Share.share(data); return true; }
+    catch { return false; }
+  }
   // Check if native share is available
   if (navigator.share) {
     try {
@@ -276,7 +280,7 @@ export const nativeShare = async (data: {title?: string;text?: string;url?: stri
     }
   } else {
     // Fallback: copy to clipboard
-    const textToCopy = data.text || data.url || '';
+    const textToCopy = [data.text, data.url && !data.text?.includes(data.url) ? data.url : null].filter(Boolean).join('\n\n');
     if (textToCopy) {
       await navigator.clipboard.writeText(textToCopy);
       return true;
@@ -456,28 +460,6 @@ export const saveImageToGallery = async (imageUrl: string, fileName?: string): P
   }
 };
 
-// Screenshot qadağası: cəhd/çəkilmə aşkarlananda lokallaşdırılmış xəbərdarlıq.
-// Android-də FLAG_SECURE onsuz da bloklayır (plugin load()-da tətbiq olunur);
-// iOS-da yalnız fakt-sonrası aşkarlama mümkündür — hər iki halda bu mesaj çıxır.
-const initScreenshotGuard = async () => {
-  try {
-    const { default: ScreenshotGuard } = await import('@/plugins/ScreenshotGuard');
-    const { toast } = await import('sonner');
-    await ScreenshotGuard.addListener('screenshotTaken', () => {
-      toast(tr('screenshot_guard_title', 'Screenshot-a icazə verilmir'), {
-        description: tr(
-          'screenshot_guard_body',
-          'Sensitiv məlumatların yayılmasının qarşısını almaq üçün Anacan-da screenshot-a icazə verilmir. Bütün məlumatlar təhlükəsizdir.'
-        ),
-        duration: 6000,
-      });
-    });
-  } catch (e) {
-    // Köhnə buildlərdə plugin olmaya bilər — kritik deyil
-    console.warn('ScreenshotGuard init failed:', e);
-  }
-};
-
 // Initialize native features
 export const initializeNativeFeatures = async () => {
   if (!isNative) {
@@ -487,19 +469,12 @@ export const initializeNativeFeatures = async () => {
 
   console.log('Initializing native features...');
 
-  // Screenshot qadağası xəbərdarlıq dinləyicisi
-  await initScreenshotGuard();
+  // ScreenCaptureGuard owns route-aware native protection and an opaque curtain.
 
   // Set status bar style
   await statusBar.setDark();
 
-  // Hide splash screen as soon as app is ready
-  try {
-    const { SplashScreen } = await import('@capacitor/splash-screen');
-    await SplashScreen.hide();
-  } catch (e) {
-    console.warn('SplashScreen hide failed:', e);
-  }
+  // App hides the native launch screen after React's first painted frame.
 
   // Register for push notifications
   await pushNotifications.register();

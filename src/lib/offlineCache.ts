@@ -7,6 +7,8 @@
  * Server tərəfdə RLS bütün real icazələri qoruyur.
  */
 
+import { writeStorageCache } from './local-storage';
+
 const PREFIX = 'anacan_ocache_v1:';
 
 interface CacheEnvelope<T> {
@@ -19,7 +21,7 @@ interface CacheEnvelope<T> {
 export function writeCache<T>(key: string, userId: string, data: T): void {
   try {
     const envelope: CacheEnvelope<T> = { userId, savedAt: Date.now(), data };
-    localStorage.setItem(PREFIX + key, JSON.stringify(envelope));
+    writeStorageCache(localStorage, PREFIX + key, JSON.stringify(envelope));
   } catch {
     /* dolu localStorage / private mode — sükutla keç */
   }

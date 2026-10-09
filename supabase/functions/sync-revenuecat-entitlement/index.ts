@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
     new Response(JSON.stringify(obj), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   try {
-    const auth = await requireUser(req);
+    const auth = await requireUser(req, 'sync-revenuecat-entitlement');
     if (auth.error) return auth.error;
 
     const result = await syncEntitlementForUser(auth.user.id);

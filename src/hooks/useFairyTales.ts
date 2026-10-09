@@ -1,6 +1,7 @@
 import { tr, mapRowsTranslation } from "@/lib/tr";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { getBackendConfig } from '@/integrations/supabase/backend-config';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useUserStore } from '@/store/userStore';
@@ -92,7 +93,7 @@ export const useGenerateFairyTale = () => {
       if (!session?.access_token) throw new Error(tr("usefairytales_sessiya_tapilmadi_2d6594", "Sessiya tap\u0131lmad\u0131"));
 
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-fairy-tale`,
+        `${getBackendConfig().url}/functions/v1/generate-fairy-tale`,
         {
           method: 'POST',
           headers: {

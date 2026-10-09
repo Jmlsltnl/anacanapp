@@ -105,6 +105,9 @@ const NotificationOpsCard = () => {
     try {
       const { data, error } = await supabase.rpc('get_notification_admin_status');
       if (error) throw error;
+      const status = data as Partial<StatusPayload> | null;
+      if (!status || !Array.isArray(status.cron_jobs) || !Array.isArray(status.today_runs) || !Array.isArray(status.today_sends))
+        throw new Error('Bildiriş statusu hazırda əlçatan deyil.');
       setData(data as StatusPayload);
     } catch (e: any) {
       toast.error(tr("notificationopscard_status_alinmadi_e7e7ec", "Status al\u0131nmad\u0131: ") + (e?.message ?? tr("notificationopscard_namelum_974fd5", "nam\u0259lum")));

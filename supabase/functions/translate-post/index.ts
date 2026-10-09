@@ -13,13 +13,14 @@ import { requireUser } from '../_shared/auth.ts';
 import { callGeminiSmart } from '../_shared/vertex-ai.ts';
 import { callClaude, isClaudeConfigured, claudeModelName } from '../_shared/claude.ts';
 import { callAzureGpt, isAzureGptConfigured, azureGptModelName } from '../_shared/azure-openai.ts';
+import { EXPANDED_LANGUAGE_NAMES } from '../_shared/languages.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const LANGS = ['az', 'en', 'ru', 'tr', 'kk', 'uz', 'ka', 'de', 'ar'];
+const LANGS = ['az', 'en', 'ru', 'tr', 'kk', 'uz', 'ka', 'de', 'ar', ...Object.keys(EXPANDED_LANGUAGE_NAMES)];
 const LANG_NAMES: Record<string, string> = {
   az: 'Azerbaijani',
   en: 'English',
@@ -30,6 +31,7 @@ const LANG_NAMES: Record<string, string> = {
   ka: 'Georgian',
   de: 'German',
   ar: 'Arabic',
+  ...EXPANDED_LANGUAGE_NAMES,
 };
 const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite'];
 const MAX_CONTENT_LEN = 6000;

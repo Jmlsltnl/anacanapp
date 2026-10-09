@@ -1,5 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
 import azStatic from '@/locales/az.json';
+import { writeStorageCache } from './local-storage';
+import { APP_LANGUAGE_CODES, appLanguageLocale, normalizeAppLanguage, readAppLanguage, resolveAppLanguages, type AppLanguage } from './app-languages';
+import { ensureContentLanguageReady } from './content-i18n';
+export type { AppLanguage } from './app-languages';
 
 // In-memory translation cache: { [lang]: { [key]: value } }
 const translationCache: Record<string, Record<string, string>> = {};
@@ -23,8 +27,11 @@ translationCache['az'] = { ...(azStatic as Record<string, string>) };
 //   1) localStorage keşi: son uğurlu dəst sinxron hidratasiya olunur (aşağıda, modul yüklənən an)
 //   2) Lokal seed chunk-ları: en/ru/tr/kk/de/ar seed-ləri bundle-ın hissəsidir (dynamic import, şəbəkəsiz)
 //   3) DB overlay: admin düzəlişləri arxa planda gəlir və keşə yazılır
-const SEED_LANGS = new Set(['en', 'ru', 'tr', 'kk', 'de', 'ar', 'uz', 'ka']);
+const SEED_LANGS = new Set<string>(APP_LANGUAGE_CODES.filter(language => language !== 'az'));
 const LS_CACHE_PREFIX = 'anacan_i18n_cache:';
+const seedLoads = new Map<string, Promise<void>>();
+const seedLoaders = import.meta.glob<Record<string, string>>('../../scripts/i18n/*.seed.json', { import: 'default' });
+let cacheGeneration = 0;
 
 function hydrateFromLocalStorage(lang: string): boolean {
   try {
@@ -43,7 +50,7 @@ function persistToLocalStorage(lang: string): void {
   try {
     const data = translationCache[lang];
     if (data && Object.keys(data).length > 0) {
-      localStorage.setItem(LS_CACHE_PREFIX + lang, JSON.stringify(data));
+      writeStorageCache(localStorage, LS_CACHE_PREFIX + lang, JSON.stringify(data));
     }
   } catch { /* kvota dolub — keşsiz davam (seed onsuz da lokaldır) */ }
 }
@@ -51,35 +58,29 @@ function persistToLocalStorage(lang: string): void {
 // Modul yüklənən AN (React-dan əvvəl) persist dil üçün sinxron hidratasiya —
 // ikinci açılışdan etibarən heç bir await olmadan düzgün dildə render olunur.
 try {
-  const bootLang = localStorage.getItem('language') || 'az';
+  const bootLang = normalizeAppLanguage(localStorage.getItem('language'));
   if (SEED_LANGS.has(bootLang)) hydrateFromLocalStorage(bootLang);
 } catch { /* SSR-safe */ }
 
 /** Lokal seed chunk-ını yüklə (şəbəkəsiz — bundle assets). Mövcud dəyərlər üstün qalır. */
 async function loadLocalSeed(lang: string): Promise<void> {
   if (!SEED_LANGS.has(lang)) return;
-  try {
-    const seedModule = lang === 'en'
-      ? await import('@/locales/en.json')
-      : lang === 'ru'
-        ? await import('../../scripts/i18n/ru.seed.json')
-        : lang === 'kk'
-          ? await import('../../scripts/i18n/kk.seed.json')
-          : lang === 'de'
-            ? await import('../../scripts/i18n/de.seed.json')
-            : lang === 'ar'
-              ? await import('../../scripts/i18n/ar.seed.json')
-              : lang === 'uz'
-                ? await import('../../scripts/i18n/uz.seed.json')
-                : lang === 'ka'
-                  ? await import('../../scripts/i18n/ka.seed.json')
-                  : await import('../../scripts/i18n/tr.seed.json');
-    const seed = (seedModule.default ?? seedModule) as Record<string, string>;
+  if (seedLoads.has(lang)) return seedLoads.get(lang);
+  const generation = cacheGeneration;
+  const loading = (async () => {
+    try {
+    const load = seedLoaders[`../../scripts/i18n/${lang}.seed.json`];
+    if (lang !== 'en' && !load) throw new Error('BUNDLED_UI_LANGUAGE_MISSING');
+    const seed: Record<string, string> = lang === 'en' ? (await import('@/locales/en.json')).default : await load();
     // seed ALTDA — localStorage keşi / DB overlay dəyərləri üstün qalsın
-    translationCache[lang] = { ...seed, ...(translationCache[lang] || {}) };
-  } catch (e) {
-    console.warn('[i18n] Lokal seed yüklənmədi:', e);
-  }
+    if (generation === cacheGeneration) translationCache[lang] = { ...seed, ...(translationCache[lang] || {}) };
+    } catch (error) {
+      if (generation === cacheGeneration) seedLoads.delete(lang);
+      throw error;
+    }
+  })();
+  seedLoads.set(lang, loading);
+  return loading;
 }
 
 /**
@@ -88,25 +89,27 @@ async function loadLocalSeed(lang: string): Promise<void> {
  * yoxdursa lokal seed chunk-ı gözlənilir (şəbəkəsiz, millisaniyələr).
  */
 export async function ensureLanguageReady(lang: string): Promise<void> {
+  lang = normalizeAppLanguage(lang);
   if (!SEED_LANGS.has(lang)) return;
-  const cached = translationCache[lang];
-  if (cached && Object.keys(cached).length > 100) return; // artıq hidratasiya olunub
-  await loadLocalSeed(lang);
+  // A previous release's cache can be large but still miss newly added screens.
+  // Merge this release's local seed once before the first translated render.
+  await Promise.all([loadLocalSeed(lang), ensureContentLanguageReady(lang)]);
   persistToLocalStorage(lang); // növbəti açılış sinxron olsun
 }
 
-let dbLoadedFor: string | null = null;
-let dbPromise: Promise<void> | null = null;
+const dbLoadedFor = new Set<string>();
+const dbLoads = new Map<string, Promise<void>>();
 
 /**
  * Overlay translations from the DB for a given language.
  * EN already has the static bundle preloaded; this just adds admin overrides.
  */
 export async function loadTranslations(lang: string): Promise<void> {
-  if (dbLoadedFor === lang) return;
-  if (dbPromise) return dbPromise;
-
-  dbPromise = (async () => {
+  lang = normalizeAppLanguage(lang);
+  if (dbLoadedFor.has(lang)) return;
+  if (dbLoads.has(lang)) return dbLoads.get(lang);
+  const generation = cacheGeneration;
+  const dbPromise = (async () => {
     try {
       // Lokal seed HƏMİŞƏ birinci (prod daxil) — DB yalnız admin düzəlişləri üçün overlay-dır.
       await loadLocalSeed(lang);
@@ -115,19 +118,21 @@ export async function loadTranslations(lang: string): Promise<void> {
       let from = 0;
       const batchSize = 1000;
       let hasMore = true;
+      let succeeded = true;
       while (hasMore) {
         const { data, error } = await supabase
           .from('translations')
           .select('key, value')
           .eq('lang', lang)
           .range(from, from + batchSize - 1);
-        if (error) { console.error('Failed to load translations:', error); break; }
+        if (error) { succeeded = false; break; }
         if (data) data.forEach(row => { overlay[row.key] = row.value; });
         hasMore = (data?.length ?? 0) === batchSize;
         from += batchSize;
       }
+      if (generation !== cacheGeneration) return;
       translationCache[lang] = { ...(translationCache[lang] || {}), ...overlay };
-      dbLoadedFor = lang;
+      if (succeeded) dbLoadedFor.add(lang);
       // Birləşmiş dəsti keşlə — növbəti soyuq açılış sinxron və şəbəkəsiz olsun
       persistToLocalStorage(lang);
     } catch (err) {
@@ -135,10 +140,10 @@ export async function loadTranslations(lang: string): Promise<void> {
       // DB alınmasa belə seed-i keşlə (offline-first)
       persistToLocalStorage(lang);
     } finally {
-      dbPromise = null;
+      if (generation === cacheGeneration) dbLoads.delete(lang);
     }
   })();
-
+  dbLoads.set(lang, dbPromise);
   return dbPromise;
 }
 
@@ -146,80 +151,32 @@ export function getCachedTranslation(key: string, lang: string): string | undefi
   return translationCache[lang]?.[key];
 }
 
-export interface AppLanguage {
-  code: string;
-  name: string;
-  native_name: string;
-}
-
-const FALLBACK_LANGUAGES: AppLanguage[] = [
-  { code: 'az', name: 'Azerbaijani', native_name: 'Azərbaycan' },
-  { code: 'en', name: 'English', native_name: 'English' },
-];
-
-/**
- * Aktiv dilləri app_languages cədvəlindən oxuyur (is_active=true, sort_order üzrə).
- * ru/tr istifadəçilərə açmaq üçün DB-də is_active=true etmək kifayətdir — app release lazım deyil.
- * Şəbəkə/RLS xətasında az+en fallback qaytarır.
- */
-/** ru/tr/kk bu bundle-da HƏMİŞƏ seçilə bilir (DB app_languages.is_active-dən asılı olmayaraq).
-    Köhnə buildlər köhnə bundle daşıdığı üçün onlarda görünmür — yalnız yeni web/build. */
-function withDevLanguages(list: AppLanguage[]): AppLanguage[] {
-  const have = new Set(list.map((l) => l.code));
-  const extras: AppLanguage[] = [
-    { code: 'tr', name: 'Turkish', native_name: 'Türkçe' },
-    { code: 'ru', name: 'Russian', native_name: 'Русский' },
-    { code: 'kk', name: 'Kazakh', native_name: 'Қазақша' },
-    { code: 'de', name: 'German', native_name: 'Deutsch' },
-    { code: 'ar', name: 'Arabic', native_name: 'العربية' },
-    { code: 'uz', name: 'Uzbek', native_name: "O'zbekcha" },
-    { code: 'ka', name: 'Georgian', native_name: 'ქართული' },
-  ];
-  return [...list, ...extras.filter((e) => !have.has(e.code))];
-}
-
+/** Bundled languages are available offline. Remote flags and tool restrictions
+ * are merged by code without admitting languages missing from this build. */
 export async function fetchActiveLanguages(): Promise<AppLanguage[]> {
   try {
     const { data, error } = await (supabase as any)
       .from('app_languages')
-      .select('code, name, native_name')
-      .eq('is_active', true)
+      .select('code, name, native_name, is_active, sort_order, disabled_tools')
       .order('sort_order', { ascending: true });
-    if (error || !data?.length) return withDevLanguages(FALLBACK_LANGUAGES);
-    return withDevLanguages(data as AppLanguage[]);
+    if (error || !data?.length) return resolveAppLanguages();
+    return resolveAppLanguages(data as AppLanguage[]);
   } catch {
-    return withDevLanguages(FALLBACK_LANGUAGES);
+    return resolveAppLanguages();
   }
 }
-
-/** BCP-47 locale tags per app language — Date/Number toLocale* formatlaması üçün. */
-const LOCALE_TAGS: Record<string, string> = {
-  az: 'az-AZ',
-  en: 'en-US',
-  ru: 'ru-RU',
-  tr: 'tr-TR',
-  kk: 'kk-KZ',
-  de: 'de-DE',
-  // QEYD: 'ar-SA' YOX — o, Hicri təqimə keçir; generic 'ar' = Qriqorian + ərəb-hind rəqəmləri (١٢٣)
-  ar: 'ar',
-  uz: 'uz-UZ',
-  ka: 'ka-GE',
-};
 
 /**
  * Cari seçilmiş dilin locale tag-ı (az-AZ / en-US / ru-RU / tr-TR).
  * Dil dəyişəndə tətbiq reload olunduğu üçün çağırış anında localStorage-dan oxumaq kifayətdir.
  */
 export function getLocaleTag(): string {
-  try {
-    const lang = localStorage.getItem('language') || 'az';
-    return LOCALE_TAGS[lang] || 'az-AZ';
-  } catch {
-    return 'az-AZ';
-  }
+  return appLanguageLocale(readAppLanguage());
 }
 
 export function clearTranslationCache(): void {
+  cacheGeneration++;
+  seedLoads.clear();
   Object.keys(translationCache).forEach(k => delete translationCache[k]);
   // Re-seed bundle (AZ yeganə statik idxaldır — bax yuxarı şərh). EN artıq
   // ru/tr/kk/de/ar kimi lazy seed-dir — çağıran kod (LanguageSelector.tsx/
@@ -227,6 +184,6 @@ export function clearTranslationCache(): void {
   // `code !== 'az'` olduqda `await ensureLanguageReady(code)` çağırır, bu da
   // EN daxil bütün lazy dilləri render-dən ƏVVƏL yenidən yükləyir.
   translationCache['az'] = { ...(azStatic as Record<string, string>) };
-  dbLoadedFor = null;
-  dbPromise = null;
+  dbLoadedFor.clear();
+  dbLoads.clear();
 }

@@ -1,12 +1,17 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { getFirebaseAccessToken, sendFCMv1 } from '../_shared/fcm.ts';
-import { requireCronSecret, requireAdmin } from '../_shared/auth.ts';
+import { requireAdmin } from '../_shared/auth.ts';
+import { requireNotificationCron } from '../_shared/notification-auth.ts';
 import { startRunLog, finishRunLog, logFailedSend, bumpReason } from '../_shared/notif-logging.ts';
 import { fetchAllPaged } from '../_shared/paginate.ts';
+import { getNotificationDate, getBabyDayNumber, indexMommyNotifications, selectMommyNotifications, renderMommyNotificationText } from '../_shared/mommy-calendar.mjs';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Expose-Headers': 'X-Anacan-Notification-Runtime',
+  'X-Anacan-Notification-Runtime': 'source-calendar-v1',
+  'X-Anacan-Notification-Delivery': 'source-scheduled-v2',
 };
 
 interface UserForNotification {
@@ -47,6 +52,8 @@ interface DayNotification {
   emoji: string;
   send_time: string;
   is_active: boolean;
+  calendar_months?: number | null;
+  calendar_day_offset?: number | null;
 }
 
 /** İstifadəçi dilinə uyğun sütunu qaytarır: field_{en|ru|tr|kk|uz|ka|de} → (kk/uz/ka→ru, de→en körpüsü) → base (AZ). */
@@ -77,6 +84,8 @@ interface DailyRunSlot {
   runAt: string;
   contentTimes: string[];
 }
+
+declare const EdgeRuntime: { waitUntil: (promise: Promise<unknown>) => void } | undefined;
 
 function normalizeTimeLabel(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -117,6 +126,12 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+  // Credential-free metadata only: checking the deployed compatibility version
+  // must not load user rows, request FCM credentials or send a notification.
+  if (req.method === 'GET' && new URL(req.url).searchParams.get('capabilities') === 'source-calendar-v1') {
+    return new Response(JSON.stringify({ schema: 'anacan-source-notification-runtime-v1', calendarRuleVersion: 1, sendsNotifications: false }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
+  }
 
   let runId: string | null = null;
   let runSupabase: any = null;
@@ -126,7 +141,7 @@ Deno.serve(async (req) => {
 
   try {
     // Auth: cron secret OR service-role/anon Bearer (used by pg_cron) OR admin user.
-    const cronErr = requireCronSecret(req);
+    const cronErr = await requireNotificationCron(req, 'send-daily-notifications');
     if (cronErr) {
       const authHeader = req.headers.get('Authorization') || '';
       const token = authHeader.replace(/^Bearer\s+/i, '');
@@ -159,7 +174,7 @@ Deno.serve(async (req) => {
     // İstifadəçi sayı artdıqca bir çağırışda hamısını emal etmək worker limitini
     // aşır (WORKER_RESOURCE_LIMIT). Ona görə hər çağırış yalnız bir parça emal
     // edir və qalan hissə üçün özünü yenidən çağırır.
-    const CHUNK_SIZE = 900;
+    const CHUNK_SIZE = 200;
     const chunkOffset = Number(body.offset ?? 0) || 0;
 
     const triggeredBy = body.manual ? (body.userId ? 'admin-test' : 'admin') : 'cron';
@@ -275,52 +290,44 @@ Deno.serve(async (req) => {
     const mommyNotifications = await fetchAllRows<DayNotification>('mommy_day_notifications');
     console.log(`[send-daily-notifications] Loaded ${mommyNotifications.length} mommy_day rows`);
 
-    const mommyNotifsByDay = new Map<number, DayNotification[]>();
-    mommyNotifications.forEach((n: DayNotification) => {
+    const mommyIndex = indexMommyNotifications(mommyNotifications.filter((n: DayNotification) => {
       const normalizedTime = normalizeTimeLabel(n.send_time);
-      if (activeContentTimes && (!normalizedTime || !activeContentTimes.has(normalizedTime))) return;
-      const existing = mommyNotifsByDay.get(n.day_number) || [];
-      existing.push(n);
-      mommyNotifsByDay.set(n.day_number, existing);
-    });
+      return !activeContentTimes || !!normalizedTime && activeContentTimes.has(normalizedTime);
+    }));
+    const notificationDate = getNotificationDate(now);
 
 
-    // Get users — optionally filter by single userId for debugging.
-    // KRİTİK: bu sorğular səhifələnməlidir, əks halda PostgREST yalnız ilk 1000
-    // sətri qaytarır və istifadəçilərin əksəriyyəti "no_device_token" kimi atlanır.
-    const profiles = await fetchAllPaged<any>(() => {
-      let q = supabase.from('profiles').select('user_id, life_stage, role, due_date, last_period_date').order('user_id');
-      if (body.userId) q = q.eq('user_id', body.userId);
-      return q;
-    });
+    // Page the profile population, including disabled users, so every offset is
+    // stable. Fetch only this chunk's private rows instead of the whole database
+    // and its high-volume event send log on every recursive invocation.
+    let profileQuery = supabase.from('profiles').select('user_id, life_stage, role, due_date, last_period_date').order('user_id');
+    if (body.userId) profileQuery = profileQuery.eq('user_id', body.userId);
+    const { data: profiles, error: profileError } = await profileQuery.range(chunkOffset, chunkOffset + CHUNK_SIZE - 1);
+    if (profileError) throw new Error('notification_profiles_unavailable');
+    const userIds = (profiles || []).map((profile: any) => profile.user_id);
+    if (!userIds.length) {
+      await finishRunLog(supabase, runId, { status: 'success', eligible_count: 0, sent_count: 0 });
+      return new Response(JSON.stringify({ success: true, sent: 0, eligible: 0, complete: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
 
     const children = await fetchAllPaged<any>(() => {
-      let q = supabase.from('user_children').select('user_id, birth_date').order('birth_date', { ascending: false });
-      if (body.userId) q = q.eq('user_id', body.userId);
+      let q = supabase.from('user_children').select('user_id, birth_date').eq('is_active', true)
+        .in('user_id', userIds).order('birth_date', { ascending: false });
       return q;
     });
 
     const preferences = await fetchAllPaged<any>(() => {
-      let q = supabase.from('user_preferences').select('user_id, push_enabled, daily_push_enabled, language').order('user_id');
-      if (body.userId) q = q.eq('user_id', body.userId);
+      let q = supabase.from('user_preferences').select('user_id, push_enabled, daily_push_enabled, language').in('user_id', userIds).order('user_id');
       return q;
     });
 
     const tokens = await fetchAllPaged<DeviceToken>(() => {
-      let q = supabase.from('device_tokens').select('token, user_id, platform').order('token');
-      if (body.userId) q = q.eq('user_id', body.userId);
+      let q = supabase.from('device_tokens').select('token, user_id, platform').in('user_id', userIds).order('token');
       return q;
     });
 
     console.log(`[send-daily-notifications] loaded profiles=${profiles.length} tokens=${tokens.length} prefs=${preferences.length}`);
-
-    if (!tokens?.length) {
-      await finishRunLog(supabase, runId, { status: 'success', sent_count: 0, skipped_count: 1, reasons: { no_device_token: 1 } });
-      return new Response(
-        JSON.stringify({ message: 'No device tokens', sent: 0, userId: body.userId || null }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
 
     // Get today's already sent notifications to prevent duplicates — use Baku-local day boundary.
     // bakuNow is already shifted by +4h, so its UTC midnight === Baku midnight in the original UTC clock.
@@ -334,6 +341,8 @@ Deno.serve(async (req) => {
         .from('notification_send_log')
         .select('user_id, source_type, source_notification_id')
         .gte('sent_at', todayStart.toISOString())
+        .in('user_id', userIds)
+        .in('source_type', ['scheduled', 'pregnancy_day', 'mommy_day', ...DAILY_RUN_SLOTS.map(slot => `scheduled:${slot.runAt}`)])
         .eq('status', 'sent')
         .order('sent_at');
       if (body.userId) q = q.eq('user_id', body.userId);
@@ -366,7 +375,7 @@ Deno.serve(async (req) => {
     preferences?.forEach((pref: any) => {
       const user = userMap.get(pref.user_id);
       if (user) {
-        user.daily_push_enabled = pref.daily_push_enabled ?? pref.push_enabled ?? true;
+        user.daily_push_enabled = pref.push_enabled !== false && pref.daily_push_enabled !== false;
         if (pref.language) user.language = pref.language;
       }
     });
@@ -382,8 +391,8 @@ Deno.serve(async (req) => {
     };
 
     const allEligibleUsers = Array.from(userMap.values()).filter(user => user.daily_push_enabled);
-    const eligibleUsers = allEligibleUsers.slice(chunkOffset, chunkOffset + CHUNK_SIZE);
-    const hasMoreUsers = chunkOffset + CHUNK_SIZE < allEligibleUsers.length;
+    const eligibleUsers = allEligibleUsers;
+    const hasMoreUsers = !body.userId && profiles.length === CHUNK_SIZE;
 
     console.log(`Eligible users: ${allEligibleUsers.length} | this chunk: ${eligibleUsers.length} (offset ${chunkOffset})`);
 
@@ -418,18 +427,15 @@ Deno.serve(async (req) => {
       if (user.life_stage === 'mommy') {
         const userChildren = children?.filter((c: any) => c.user_id === user.user_id) || [];
         if (userChildren.length > 0 && userChildren[0].birth_date) {
-          const birthDate = new Date(userChildren[0].birth_date);
-          const today = new Date();
-          birthDate.setHours(0, 0, 0, 0);
-          today.setHours(0, 0, 0, 0);
-          const childAgeDays = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-          if (childAgeDays >= 1 && childAgeDays <= 1460) {
-            const dayNotifications = mommyNotifsByDay.get(childAgeDays) || [];
+          const birthDate = String(userChildren[0].birth_date).slice(0, 10);
+          const childAgeDays = getBabyDayNumber(birthDate, notificationDate);
+          if (childAgeDays !== null) {
+            const dayNotifications = selectMommyNotifications(mommyIndex, birthDate, notificationDate) as DayNotification[];
             for (const dn of dayNotifications) {
               const dedupKey = `${user.user_id}:mommy_day:${dn.id}`;
               if (!alreadySent.has(dedupKey)) {
-                const localizedTitle = pickLang(dn as unknown as Record<string, unknown>, 'title', user.language);
-                const localizedBody = pickLang(dn as unknown as Record<string, unknown>, 'body', user.language);
+                const localizedTitle = renderMommyNotificationText(pickLang(dn as unknown as Record<string, unknown>, 'title', user.language), dn, birthDate);
+                const localizedBody = renderMommyNotificationText(pickLang(dn as unknown as Record<string, unknown>, 'body', user.language), dn, birthDate);
                 notificationsToSend.push({
                   id: dn.id,
                   title: `${dn.emoji || ''} ${localizedTitle}`.trim(),
@@ -551,19 +557,29 @@ Deno.serve(async (req) => {
 
     // Növbəti parçanı işə sal (fire-and-forget) — bütün istifadəçilər əhatə olunsun.
     if (hasMoreUsers) {
-      const cronSecret = Deno.env.get('CRON_SECRET') ?? '';
       const nextBody = { ...body, offset: chunkOffset + CHUNK_SIZE, manual: body.manual ?? false, slot: activeSendTime ?? body.slot };
       const nextUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-daily-notifications`;
       console.log(`[send-daily-notifications] scheduling next chunk offset=${nextBody.offset}`);
-      try {
-        fetch(nextUrl, {
+      const continueChunk = async () => {
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        for (const name of ['Authorization', 'apikey', 'x-cron-secret']) {
+          const value = req.headers.get(name); if (value) headers[name] = value;
+        }
+        const response = await fetch(nextUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-cron-secret': cronSecret },
+          headers, redirect: 'error', signal: AbortSignal.timeout(15000),
           body: JSON.stringify(nextBody),
-        }).catch((e) => console.error('[send-daily-notifications] next chunk trigger failed:', e?.message));
-      } catch (e) {
-        console.error('[send-daily-notifications] next chunk error:', e);
-      }
+        });
+        const accepted = response.ok; await response.body?.cancel();
+        if (!accepted) throw new Error('notification_continuation_rejected');
+      };
+      const continuation = continueChunk().catch(async () => {
+        await finishRunLog(supabase, runId, { status: 'error', sent_count: sentCount, failed_count: failedCount,
+          reasons: { ...reasons, continuation_failed: 1 }, error_message: 'notification_continuation_failed' });
+        console.error('[send-daily-notifications] continuation_failed');
+      });
+      if (typeof EdgeRuntime !== 'undefined') EdgeRuntime.waitUntil(continuation);
+      else await continuation;
     }
 
     await finishRunLog(supabase, runId, {
@@ -581,7 +597,7 @@ Deno.serve(async (req) => {
         failed: failedCount, skipped: skippedCount, reasons,
         currentTime: currentTimeStr, activeSlot: activeSendTime || 'manual',
         pregnancyDaysAvailable: pregnancyNotifsByDay.size,
-        mommyDaysAvailable: mommyNotifsByDay.size,
+        mommyDaysAvailable: mommyIndex.daily.size,
         results: results.slice(0, 20),
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

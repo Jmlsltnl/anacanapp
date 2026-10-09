@@ -158,6 +158,8 @@ const trackInternal = async (eventName: string, params?: AnalyticsParams) => {
  * Log an analytics event - triple tracks to Firebase + internal DB + Mixpanel
  */
 export const logEvent = async (eventName: AnalyticsEvent, params?: AnalyticsParams): Promise<void> => {
+  // Internal usage reporting is independent of optional third-party SDK errors.
+  void trackInternal(eventName, params);
   try {
     // Firebase tracking
     if (Capacitor.isNativePlatform()) {
@@ -184,7 +186,6 @@ export const logEvent = async (eventName: AnalyticsEvent, params?: AnalyticsPara
     }).catch(() => {});
 
     // Internal DB tracking (non-blocking)
-    trackInternal(eventName, params);
     
     if (import.meta.env.DEV) {
       console.log(`📊 Analytics: ${eventName}`, params);
@@ -241,6 +242,7 @@ export const setUserProperties = async (properties: Record<string, string>): Pro
  * screen_view eventi Mixpanel/internal DB üçün saxlanılır.
  */
 export const logScreenView = async (screenName: string, screenClass?: string): Promise<void> => {
+  void import('./customerio').then(({ customerIo }) => customerIo.screen(screenName, screenClass)).catch(() => {});
   if (Capacitor.isNativePlatform()) {
     try {
       const { FirebaseAnalytics } = await import('@capacitor-firebase/analytics');

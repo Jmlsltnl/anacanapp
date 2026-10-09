@@ -6,6 +6,9 @@ import { useEffect, useRef } from 'react';
 import { usePaywallConfig } from '@/hooks/usePaywallConfig';
 import PaywallCore from '@/components/paywall/PaywallCore';
 import { tr } from "@/lib/tr";
+import { useAdSafetyBlock } from '@/components/ads/AdExperienceProvider';
+import { useUserStore } from '@/store/userStore';
+import { onboardingText } from '@/lib/onboarding-i18n';
 
 /**
  * Anacan Premium Paywall — tam custom, sıfırdan.
@@ -20,7 +23,9 @@ interface PremiumModalProps {
 }
 
 export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
+  useAdSafetyBlock(isOpen);
   const cfg = usePaywallConfig();
+  const language = useUserStore(state => state.language);
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -60,6 +65,7 @@ export function PremiumModal({ isOpen, onClose, feature }: PremiumModalProps) {
 
   // Maşın feature id-ləri → lokallaşdırılmış adlar (kilid çipində xam string görünməsin)
   const FEATURE_LABELS: Record<string, string> = {
+    ad_free: onboardingText(language, 'premium_noads'),
     tool: tr('pm_feat_tool', 'Bu alət'),
     ai_chat: tr('pm_feat_ai_chat', 'Limitsiz AI söhbəti'),
     doctor_report: tr('pm_feat_doctor_report', 'Həkim PDF hesabatı'),

@@ -42,6 +42,8 @@ import { getSystemPrompt } from "./prompts.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { callVertex, isVertexConfigured } from "../_shared/vertex-ai.ts";
 import { checkAndConsumeServerSide, limitExceededResponse } from "../_shared/usage-limit.ts";
+import { EXPANDED_LANGUAGE_NAMES } from '../_shared/languages.ts';
+import { serverCopy } from '../_shared/localized-copy.ts';
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -95,7 +97,7 @@ Deno.serve(async (req) => {
       resolvedLifeStage = "bump";
     }
 
-    const LANG_NAME: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh (қазақ тілі, Cyrillic script)", uz: "Uzbek (oʻzbek tili, Latin script)", ka: "Georgian (ქართული)", de: "German", ar: "Arabic (Modern Standard, addressing the mother in the FEMININE second person)" };
+    const LANG_NAME: Record<string, string> = { en: "English", ru: "Russian", tr: "Turkish", kk: "Kazakh (қазақ тілі, Cyrillic script)", uz: "Uzbek (oʻzbek tili, Latin script)", ka: "Georgian (ქართული)", de: "German", ar: "Arabic (Modern Standard, addressing the mother in the FEMININE second person)", ...EXPANDED_LANGUAGE_NAMES };
     const replyLangName = LANG_NAME[language];
 
     // Native-script reminder — appended to the final user turn. The conversation history
@@ -111,6 +113,11 @@ Deno.serve(async (req) => {
       ka: "(უპასუხე მხოლოდ ქართულად.)",
       de: "(Antworte ausschließlich auf Deutsch.)",
       ar: "(أجيبي باللغة العربية الفصحى فقط.)",
+      zh: '(请仅使用简体中文回答。)', id: '(Jawab hanya dalam bahasa Indonesia.)',
+      fr: '(Répondez uniquement en français.)', es: '(Responde solo en español.)', pt: '(Responda apenas em português europeu.)',
+      vi: '(Chỉ trả lời bằng tiếng Việt.)', hi: '(केवल हिन्दी में, देवनागरी लिपि में उत्तर दें।)',
+      ja: '(日本語だけで、自然で丁寧に回答してください。)', ko: '(한국어로만 정중하게 답변해 주세요.)',
+      pl: '(Odpowiadaj wyłącznie po polsku.)', nl: '(Antwoord uitsluitend in het Nederlands.)', sv: '(Svara endast på svenska.)',
     };
     const nativeDirective = NATIVE_DIRECTIVE[language] ?? "";
 
@@ -158,7 +165,7 @@ Deno.serve(async (req) => {
         noAnswer: "عذرًا، تعذّر الحصول على إجابة. حاولي مرة أخرى.",
       },
     };
-    const errTexts = ERR_TEXTS[language] ?? ERR_TEXTS.az;
+    const errTexts = serverCopy('chatErrors', language, ERR_TEXTS[language] ?? ERR_TEXTS.az);
 
     const systemPrompt = (isWeightAnalysis
       ? `Sən çəki məsləhətçisisən. QAYDALAR: Salamlama yoxdur. "Canım", "əzizim", "balacam" kimi ifadələr İSTİFADƏ ETMƏ. Disclaimer/xəbərdarlıq yoxdur. Birbaşa 1-2 cümlə ilə praktik məsləhət ver. ${replyLangName ? `Reply ONLY in ${replyLangName}.` : "Yalnız Azərbaycan dilində."}`

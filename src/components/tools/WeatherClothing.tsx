@@ -6,7 +6,7 @@ import {
 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { getCurrentPosition, requestLocationPermission } from '@/lib/permissions';
+import { getCurrentPosition } from '@/lib/permissions';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useUserStore } from '@/store/userStore';
 import { useShallow } from 'zustand/react/shallow';
@@ -45,6 +45,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
   useScreenAnalytics('WeatherClothing', 'Tools');
   const [isLoading, setIsLoading] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [usingFallbackLocation, setUsingFallbackLocation] = useState(false);
   const [cityName, setCityName] = useState<string>('');
   const [advice, setAdvice] = useState<WeatherAdvice | null>(null);
 
@@ -89,26 +90,22 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
   const fetchWeather = async () => {
     setIsLoading(true);
     setLocationError(null);
+    setUsingFallbackLocation(false);
+    setAdvice(null);
 
     try {
       let latitude: number;
       let longitude: number;
 
       try {
-        const permission = await requestLocationPermission();
-        if (!permission.granted) {
-          // Fallback to Baku coordinates
-          latitude = 40.4093;
-          longitude = 49.8671;
-        } else {
-          const position = await getCurrentPosition();
-          latitude = position.coords.latitude;
-          longitude = position.coords.longitude;
-        }
+        const position = await getCurrentPosition();
+        latitude = position.coords.latitude;
+        longitude = position.coords.longitude;
       } catch {
         // Fallback to Baku if geolocation fails entirely
         latitude = 40.4093;
         longitude = 49.8671;
+        setUsingFallbackLocation(true);
       }
 
       // Get user context for AI
@@ -131,9 +128,9 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
       } else {
         throw new Error(data.error || tr("weatherclothing_hava_melumati_alinmadi_f903fd", "Hava m\u0259lumat\u0131 al\u0131nmad\u0131"));
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Weather fetch error:', error);
-      const errorMsg = error.message?.includes('permission') || error.message?.includes('denied') ? tr("weatherclothing_mekan_icazesi_redd_edildi_para_27f7d3", "M\u0259kan icaz\u0259si r\u0259dd edildi. Parametrl\u0259rd\u0259n icaz\u0259 verin.") : tr("weatherclothing_hava_melumati_alinarken_xeta_b_9b0a67", "Hava m\u0259lumat\u0131 al\u0131nark\u0259n x\u0259ta ba\u015F verdi.");
+      const errorMsg = tr("weatherclothing_hava_melumati_alinarken_xeta_b_9b0a67", "Hava m\u0259lumat\u0131 al\u0131nark\u0259n x\u0259ta ba\u015F verdi.");
 
 
       setLocationError(errorMsg);
@@ -184,6 +181,11 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
         } />
 
       <div className="space-y-3">
+        {usingFallbackLocation && advice && !isLoading && (
+          <p role="status" className="a-card text-sm" style={{ padding: '12px 14px' }}>
+            {tr('weather_location_fallback', 'Məkan təyin edilmədi. Bakı üçün hava göstərilir. Məkan xidmətlərini yoxlayıb yenidən cəhd edin.')}
+          </p>
+        )}
         {/* User Context Card */}
         {(userContext.babyAgeMonths !== undefined || userContext.pregnancyWeek) &&
         <div className="a-card" style={{ padding: '12px 14px' }}>
@@ -234,7 +236,7 @@ const WeatherClothing = ({ onBack }: WeatherClothingProps) => {
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-6 h-6 shrink-0" style={{ color: 'var(--a-alert-ink)' }} />
               <div>
-                <h3 className="font-bold" style={{ margin: 0, color: 'var(--a-alert-ink)' }}>{tr("weatherclothing_mekan_xetasi_bd9e1d", "Məkan xətası")}</h3>
+                <h3 className="font-bold" style={{ margin: 0, color: 'var(--a-alert-ink)' }}>{tr("weatherclothing_xeta_3cdbb6", 'Xəta')}</h3>
                 <p className="text-sm mt-1" style={{ margin: '4px 0 0', color: 'var(--a-alert-soft)' }}>{locationError}</p>
                 <button className="a-btn-soft mt-3" style={{ height: 38, padding: '0 16px' }} onClick={fetchWeather}>
                   {tr("weatherclothing_yeniden_cehd_et_d273ac", "Yenid\u0259n c\u0259hd et")}

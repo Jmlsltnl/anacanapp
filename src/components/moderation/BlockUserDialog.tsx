@@ -19,6 +19,8 @@ import {
 '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { moderatorError } from '@/lib/moderator';
 
 type BlockDuration = '1d' | '7d' | '30d' | 'permanent';
 
@@ -46,14 +48,15 @@ interface BlockUserDialogProps {
  */
 const BlockUserDialog = ({ open, onOpenChange, userId, userName, onDone }: BlockUserDialogProps) => {
   const { toast } = useToast();
+  const { isAdmin } = useAuth();
   const [blockType, setBlockType] = useState<'community' | 'full'>('community');
-  const [duration, setDuration] = useState<BlockDuration>('permanent');
+  const [duration, setDuration] = useState<BlockDuration>(isAdmin ? 'permanent' : '7d');
   const [reason, setReason] = useState('');
   const [saving, setSaving] = useState(false);
 
   const reset = () => {
     setBlockType('community');
-    setDuration('permanent');
+    setDuration(isAdmin ? 'permanent' : '7d');
     setReason('');
   };
 
@@ -81,13 +84,9 @@ const BlockUserDialog = ({ open, onOpenChange, userId, userName, onDone }: Block
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { error } = await supabase.from('user_blocks').insert({
-        user_id: userId,
-        blocked_by: user.id,
-        reason: reason.trim(),
-        block_type: blockType,
-        is_active: true,
-        expires_at: computeExpiresAt()
+      const { error } = await (supabase as any).rpc('moderator_user_action_v1', {
+        p_user: userId, p_action: 'restrict', p_reason: 'other', p_detail: reason.trim(),
+        p_options: { scope: blockType, seconds: duration === 'permanent' ? null : (duration === '1d' ? 1 : duration === '7d' ? 7 : 30) * 86400 }, p_request: crypto.randomUUID(),
       });
       if (error) throw error;
 
@@ -99,7 +98,7 @@ const BlockUserDialog = ({ open, onOpenChange, userId, userName, onDone }: Block
       onOpenChange(false);
       onDone?.();
     } catch (e: any) {
-      toast({ title: tr('blockdialog_xeta', 'Xəta'), description: e.message, variant: 'destructive' });
+      toast({ title: tr('blockdialog_xeta', 'Xəta'), description: moderatorError(e), variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -154,7 +153,7 @@ const BlockUserDialog = ({ open, onOpenChange, userId, userName, onDone }: Block
                 <SelectItem value="1d">{tr('blockdialog_duration_1d', '1 gün')}</SelectItem>
                 <SelectItem value="7d">{tr('blockdialog_duration_7d', '7 gün')}</SelectItem>
                 <SelectItem value="30d">{tr('blockdialog_duration_30d', '30 gün')}</SelectItem>
-                <SelectItem value="permanent">{tr('blockdialog_duration_permanent', 'Daimi')}</SelectItem>
+                {isAdmin && <SelectItem value="permanent">{tr('blockdialog_duration_permanent', 'Daimi')}</SelectItem>}
               </SelectContent>
             </Select>
           </div>

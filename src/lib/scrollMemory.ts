@@ -7,6 +7,12 @@
  */
 
 const mem = new Map<string, number>();
+let restoreGeneration = 0;
+
+/** A new reader/navigation must not receive an earlier screen's delayed restore. */
+export function cancelScrollRestoration(): void {
+  restoreGeneration++;
+}
 
 const defaultContainer = (): HTMLElement | null =>
   (document.querySelector('[data-scroll-container]') as HTMLElement | null) ||
@@ -24,7 +30,9 @@ export function saveScroll(key: string, el?: HTMLElement | null): void {
 export function restoreScroll(key: string, el?: HTMLElement | null): void {
   const top = mem.get(key);
   if (top == null || top <= 0) return;
+  const generation = ++restoreGeneration;
   const apply = () => {
+    if (generation !== restoreGeneration) return;
     try {
       const c = el ?? defaultContainer();
       if (c && Math.abs(c.scrollTop - top) > 2) c.scrollTop = top;

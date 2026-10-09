@@ -29,6 +29,7 @@ public class ScreenshotGuardPlugin extends Plugin {
 
     private Object captureCallback; // Activity.ScreenCaptureCallback (yalnız API 34+)
     private boolean callbackRegistered = false;
+    private boolean protectionEnabled = true;
 
     @Override
     public void load() {
@@ -57,20 +58,26 @@ public class ScreenshotGuardPlugin extends Plugin {
     @PluginMethod
     public void setEnabled(PluginCall call) {
         boolean enabled = Boolean.TRUE.equals(call.getBoolean("enabled", true));
+        protectionEnabled = enabled;
         applySecureFlag(enabled);
-        call.resolve();
+        JSObject result = new JSObject();
+        result.put("enabled", enabled);
+        result.put("secureSurface", true);
+        call.resolve(result);
     }
 
     @Override
     protected void handleOnResume() {
         super.handleOnResume();
+        applySecureFlag(protectionEnabled);
         if (Build.VERSION.SDK_INT < 34) return;
         Activity activity = getActivity();
         if (activity == null) return;
         try {
             if (captureCallback == null) {
-                captureCallback = (Activity.ScreenCaptureCallback) () ->
-                    notifyListeners("screenshotTaken", new JSObject());
+                captureCallback = (Activity.ScreenCaptureCallback) () -> {
+                    if (protectionEnabled) notifyListeners("screenshotTaken", new JSObject());
+                };
             }
             if (!callbackRegistered) {
                 activity.registerScreenCaptureCallback(

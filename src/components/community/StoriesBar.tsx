@@ -6,9 +6,10 @@ import { UserStoryGroup, useStories, useToggleStoryLike } from '@/hooks/useStori
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import StoryViewer from './StoryViewer';
-import StoryCropEditor from './StoryCropEditor';
-import { useToast } from '@/hooks/use-toast';
+import StoryCropEditor, { type StoryEditorResult } from './StoryCropEditor';
 import { tr } from "@/lib/tr";
+import { useMyModerationStatus } from '@/hooks/useModerator';
+import RestrictionNote from '@/components/moderation/RestrictionNote';
 
 interface StoriesBarProps {
   groupId?: string | null;
@@ -20,32 +21,48 @@ interface StoriesBarProps {
 
 const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBarProps) => {
   const { user, profile } = useAuth();
-  const { toast } = useToast();
+  const { data: moderationStatus } = useMyModerationStatus();
   const queryClient = useQueryClient();
-  const { storyGroups, isLoading, createStory, isCreating, markAsViewed, deleteStory } = useStories(groupId);
+  const { storyGroups, isLoading, isFetching, refetch, createStoryAsync, isCreating, markAsViewed, deleteStory } = useStories(groupId);
   const toggleStoryLike = useToggleStoryLike();
   const [viewerOpen, setViewerOpen] = useState(false);
   const [initialGroupIndex, setInitialGroupIndex] = useState(0);
   const [initialStoryId, setInitialStoryId] = useState<string | null>(null);
+  const refreshedStoryId = useRef<string | null>(null);
+  const consumedStoryId = useRef<string | null>(null);
 
   // Bildirişdən gələn storyId — story-lər yükləndikdən sonra hansı qrupda
   // olduğunu tapıb ORAYA açır (StoryViewer öz stack-i daxilində düz story-yə keçir).
   useEffect(() => {
-    if (!autoOpenStoryId || storyGroups.length === 0) return;
+    if (!autoOpenStoryId) { refreshedStoryId.current = null; consumedStoryId.current = null; return; }
+    if (consumedStoryId.current === autoOpenStoryId) return;
     const groupIdx = storyGroups.findIndex((g) => g.stories.some((s) => s.id === autoOpenStoryId));
     if (groupIdx >= 0) {
       setInitialGroupIndex(groupIdx);
       setInitialStoryId(autoOpenStoryId);
       setViewerOpen(true);
+    } else {
+      if (isLoading || isFetching) return;
+      if (refreshedStoryId.current !== autoOpenStoryId) {
+        refreshedStoryId.current = autoOpenStoryId;
+        void refetch();
+        return;
+      }
     }
+    consumedStoryId.current = autoOpenStoryId;
     onAutoOpenConsumed?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoOpenStoryId, storyGroups]);
+  }, [autoOpenStoryId, storyGroups, isLoading, isFetching, refetch]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [cropImageUrl, setCropImageUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const draftIdRef = useRef<string | null>(null);
+  const uploadedPaths = useRef<string[]>([]);
+  const publishingRef = useRef(false);
+  useEffect(() => () => { if (cropImageUrl) URL.revokeObjectURL(cropImageUrl); }, [cropImageUrl]);
 
   // Yükləmə overlay-i üçün qoruyucu: zəif şəbəkədə mutation asılı qalsa,
   // tam-ekran overlay bütün app-ı əbədi bloklamasın — 15 saniyədən sonra
@@ -67,39 +84,46 @@ const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBar
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user) return;
+    e.target.value = '';
+    if (!file || !user || moderationStatus?.story) return;
     setShowCreateModal(false);
-    if (file.type.startsWith('video/')) {
-      await uploadAndCreate(file, 'video');
-    } else {
-      setSelectedFile(file);
-      setCropImageUrl(URL.createObjectURL(file));
-    }
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    draftIdRef.current = crypto.randomUUID();
+    uploadedPaths.current = [];
+    setSelectedFile(file);
+    setCropImageUrl(URL.createObjectURL(file));
   };
 
-  const handleCropConfirm = async (croppedBlob: Blob) => {
-    setCropImageUrl(null);setSelectedFile(null);
-    await uploadAndCreate(new File([croppedBlob], `story_${Date.now()}.jpg`, { type: 'image/jpeg' }), 'image');
+  const handleCropConfirm = async ({ image, scene }: StoryEditorResult) => {
+    if (moderationStatus?.story) throw new Error('MODERATOR_ACTIVITY_RESTRICTED');
+    if (!selectedFile || !user || !draftIdRef.current) throw new Error('STORY_DRAFT_MISSING');
+    if (publishingRef.current) throw new Error('STORY_UPLOAD_IN_PROGRESS');
+    publishingRef.current = true;
+    const actorId = user.id;
+    const storyId = draftIdRef.current;
+    const paths = uploadedPaths.current;
+    const mediaType = image ? 'image' : 'video';
+    const file = image ? new File([image], `story_${storyId}.jpg`, { type: 'image/jpeg' }) : selectedFile;
+    setUploading(true);
+    try {
+      const extension = mediaType === 'image' ? 'jpg' : file.name.split('.').pop()?.replace(/[^a-zA-Z0-9]/g, '') || 'mp4';
+      const fileName = `${actorId}/${crypto.randomUUID()}.${extension}`;
+      const { error } = await supabase.storage.from('community-media').upload(fileName, file, { upsert: false, cacheControl: '3600' });
+      if (error) throw error;
+      paths.push(fileName);
+      const { data: urlData } = supabase.storage.from('community-media').getPublicUrl(fileName);
+      await createStoryAsync({ mediaUrl: urlData.publicUrl, mediaType, groupId: groupId || undefined, storyId,
+        backgroundColor: scene.background, editorLayout: mediaType === 'video' ? scene : null,
+        textOverlay: mediaType === 'video' ? scene.texts.map(text => text.text).join('\n') : undefined });
+      const obsolete = paths.filter(path => path !== fileName);
+      if (obsolete.length) void supabase.storage.from('community-media').remove(obsolete);
+      if (draftIdRef.current === storyId) {
+        setCropImageUrl(null); setSelectedFile(null); draftIdRef.current = null; uploadedPaths.current = [];
+      }
+    } finally { publishingRef.current = false; setUploading(false); }
   };
 
   const handleCropCancel = () => {
-    if (cropImageUrl) URL.revokeObjectURL(cropImageUrl);
     setCropImageUrl(null);setSelectedFile(null);
-  };
-
-  const uploadAndCreate = async (file: File, mediaType: 'image' | 'video') => {
-    if (!user) return;
-    setUploading(true);
-    try {
-      const fileName = `${user.id}/${Date.now()}.${file.name.split('.').pop()}`;
-      const { error: uploadError } = await supabase.storage.from('community-media').upload(fileName, file);
-      if (uploadError) throw uploadError;
-      const { data: urlData } = supabase.storage.from('community-media').getPublicUrl(fileName);
-      createStory({ mediaUrl: urlData.publicUrl, mediaType, groupId: groupId || undefined });
-    } catch (error: any) {
-      toast({ title: tr("storiesbar_yukleme_xetasi_eebca5", 'Yükləmə xətası'), description: error.message, variant: 'destructive' });
-    } finally {setUploading(false);}
   };
 
   const userStoryGroup = storyGroups.find((g) => g.user_id === user?.id);
@@ -107,10 +131,11 @@ const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBar
 
   return (
     <>
+      <RestrictionNote scope="story" />
       <div className="flex gap-3.5 overflow-x-auto hide-scrollbar py-1">
         {/* Own Story */}
         <motion.button
-          onClick={() => hasOwnStory ? handleStoryClick(0) : setShowCreateModal(true)}
+          onClick={() => hasOwnStory ? handleStoryClick(0) : !moderationStatus?.story && setShowCreateModal(true)}
           className="flex-shrink-0 flex flex-col items-center gap-1.5"
           whileTap={{ scale: 0.92 }}>
           
@@ -139,7 +164,7 @@ const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBar
             <div
               className="absolute -bottom-0.5 -end-0.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm cursor-pointer"
               style={{ background: 'var(--a-peach-2)', border: '2px solid var(--a-surface)' }}
-              onClick={(e) => {e.stopPropagation();setShowCreateModal(true);}}>
+              onClick={(e) => {e.stopPropagation();if (!moderationStatus?.story) setShowCreateModal(true);}}>
               
               <Plus className="w-2.5 h-2.5 text-white" strokeWidth={3} />
             </div>
@@ -194,10 +219,10 @@ const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBar
           // markAsViewed artıq refetch ETMİR (açıq viewer altında sıra
           // dəyişməsin deyə) — halqaların "baxılıb" vəziyyəti viewer
           // bağlananda BİR DƏFƏ yenilənir
-          queryClient.invalidateQueries({ queryKey: ['stories'] });}} onViewed={markAsViewed} onDelete={deleteStory} onToggleLike={(storyId, isLiked) => toggleStoryLike.mutate({ storyId, isLiked })} />}
+          queryClient.invalidateQueries({ queryKey: ['stories'] });}} onViewed={markAsViewed} onDelete={deleteStory} likePending={toggleStoryLike.isPending} onToggleLike={(storyId, isLiked) => toggleStoryLike.mutate({ storyId, isLiked })} />}
       </AnimatePresence>
       <AnimatePresence>
-        {cropImageUrl && <StoryCropEditor imageUrl={cropImageUrl} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />}
+        {cropImageUrl && <StoryCropEditor key={cropImageUrl} imageUrl={cropImageUrl} mediaType={selectedFile?.type.startsWith('video/') ? 'video' : 'image'} onConfirm={handleCropConfirm} onCancel={handleCropCancel} />}
       </AnimatePresence>
 
       {/* Create Modal */}
@@ -236,7 +261,7 @@ const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBar
                     <span className="font-bold text-[12px] text-foreground">{tr("untranslated_qalereyadan_w37f0m", "Qalereyadan")}</span>
                   </motion.button>
                   <motion.button
-                  onClick={() => toast({ title: tr("storiesbar_kamera_tezlikle_elave_olunacaq_0a3aad", 'Kamera tezliklə əlavə olunacaq') })}
+                  onClick={() => cameraInputRef.current?.click()}
                   className="flex flex-col items-center gap-3 p-6 bg-gradient-to-br from-blue-500/5 to-cyan-500/3 rounded-2xl border border-blue-500/8 active:border-blue-500/20 transition-all"
                   whileTap={{ scale: 0.96 }}>
                   
@@ -252,7 +277,7 @@ const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBar
         }
       </AnimatePresence>
 
-      {overlayVisible && !overlayDismissed &&
+      {overlayVisible && !cropImageUrl && !overlayDismissed &&
       <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center">
           <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="bg-card rounded-2xl p-6 flex flex-col items-center gap-3 shadow-xl">
             <div className="w-10 h-10 border-[2.5px] border-primary/25 border-t-primary rounded-full animate-spin" />
@@ -269,6 +294,7 @@ const StoriesBar = ({ groupId, autoOpenStoryId, onAutoOpenConsumed }: StoriesBar
       }
 
       <input ref={fileInputRef} type="file" accept="image/*,video/*" className="hidden" onChange={handleFileSelect} />
+      <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileSelect} />
     </>);
 
 };

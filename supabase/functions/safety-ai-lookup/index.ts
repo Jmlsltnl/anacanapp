@@ -3,6 +3,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { requireUser } from "../_shared/auth.ts";
 import { callGeminiSmart } from "../_shared/vertex-ai.ts";
+import { EXPANDED_LANGUAGE_NAMES, isExpandedLanguage } from '../_shared/languages.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -107,7 +108,9 @@ QAYDALAR:
    - medicine: dərmanlar, vitaminlər
    - beauty: kosmetika, gözəllik prosedurları (epilyasiya, manikür, saç boyası və s.)
 
-4. Ad və izahatı 9 dildə ver (eyni məzmun, hər dildə təbii tərcümə). Rus dilində "вы" formasında, türk dilində "siz" formasında, qazax dilində «Сіз» formasında (kiril), özbək dilində "siz" formasında (LATIN yazısı), gürcü dilində «თქვენ» formasında (Mxedruli yazısı), alman dilində "du" formasında, ərəb dilində anaya QADIN cinsində müraciətlə (أنتِ) yaz.
+4. Ad və izahatı 21 dildə ver (eyni məzmun, hər dildə təbii tərcümə). Rus dilində "вы" formasında, türk dilində "siz" formasında, qazax dilində «Сіз» formasında (kiril), özbək dilində "siz" formasında (LATIN yazısı), gürcü dilində «თქვენ» formasında (Mxedruli yazısı), alman dilində "du" formasında, ərəb dilində anaya QADIN cinsində müraciətlə (أنتِ) yaz.
+Also include name_zh/description_zh in Simplified Mandarin, name_id/description_id in Indonesian, name_fr/description_fr in French, name_es/description_es in Spanish and name_pt/description_pt in European Portuguese. Preserve the same assessment, numbers and physical units in every translation. Keep category and safety_level codes unchanged.
+Also include name_vi/description_vi in Vietnamese, name_hi/description_hi in Devanagari Hindi, name_ja/description_ja in Japanese, name_ko/description_ko in Korean, name_pl/description_pl in Polish, name_nl/description_nl in Dutch and name_sv/description_sv in Swedish, preserving exactly the same assessment.
 
 JSON formatı:
 {
@@ -149,7 +152,7 @@ NÜMUNƏLƏR:
       },
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 12288,
       },
     });
 
@@ -180,6 +183,8 @@ NÜMUNƏLƏR:
     if (!safetyData.name_az || !safetyData.safety_level) {
       throw new Error('Invalid AI response format');
     }
+    if (isExpandedLanguage(language) && (!String((safetyData as any)[`name_${language}`] || '').trim()
+      || !String((safetyData as any)[`description_${language}`] || '').trim())) throw new Error('localized_response_missing');
 
     // Ensure safety_level is valid
     if (!['safe', 'warning', 'danger'].includes(safetyData.safety_level)) {
@@ -234,6 +239,7 @@ NÜMUNƏLƏR:
         description_ka: (safetyData as any).description_ka || null,
         description_de: (safetyData as any).description_de || null,
         description_ar: (safetyData as any).description_ar || null,
+        ...Object.fromEntries(Object.keys(EXPANDED_LANGUAGE_NAMES).flatMap(language => [[`name_${language}`, (safetyData as any)[`name_${language}`] || null], [`description_${language}`, (safetyData as any)[`description_${language}`] || null]])),
         is_active: true,
       })
       .select()

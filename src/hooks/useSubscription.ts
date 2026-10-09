@@ -1,8 +1,10 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useAppSetting } from './useAppSettings';
 import { readCache, writeCache } from '@/lib/offlineCache';
+import { usePremiumEntitlement } from './usePremiumEntitlement';
 
 const SUBSCRIPTION_CACHE = 'subscription';
 const HOUSEHOLD_PREMIUM_CACHE = 'household_premium';
@@ -56,11 +58,13 @@ const DAILY_LIMIT_KEYS: Record<DailyFeature, keyof typeof DEFAULT_FREE_LIMITS> =
 };
 
 export function useSubscription() {
-  const { user, profile } = useAuth();
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [usage, setUsage] = useState<UsageTracking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [householdPremium, setHouseholdPremium] = useState(false);
+  const access = usePremiumEntitlement();
+  const { user, profile: authProfile } = useAuth();
+  const userId = user?.id ?? null;
+  const profile = authProfile?.user_id === userId ? authProfile : null;
+  const linkedPartnerId = profile?.linked_partner_id ?? null;
+  const today = new Date().toISOString().split('T')[0];
+  const householdCacheKey = `${HOUSEHOLD_PREMIUM_CACHE}:${linkedPartnerId}`;
 
   // Read free limits from DB (app_settings -> free_limits)
   const dbFreeLimits = useAppSetting('free_limits');
@@ -72,94 +76,86 @@ export function useSubscription() {
     return DEFAULT_FREE_LIMITS;
   }, [dbFreeLimits]);
 
-  const fetchSubscription = useCallback(async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { data: subData } = await supabase
+  const subscriptionQuery = useQuery({
+    queryKey: ['subscription', userId],
+    enabled: !!userId,
+    staleTime: 30_000,
+    retry: false,
+    networkMode: 'always',
+    queryFn: async () => {
+      if (!userId) return null;
+      const { data, error } = await supabase
         .from('subscriptions')
         .select('*')
-        .eq('user_id', user.id)
-        .single();
+        .eq('user_id', userId)
+        .maybeSingle();
 
-      if (subData) {
-        setSubscription(subData as Subscription);
-        writeCache(SUBSCRIPTION_CACHE, user.id, subData);
-      }
-      // QEYD: əvvəllər burada sətir yoxdursa klient özü INSERT edirdi.
-      // subscriptions cədvəli artıq yalnız admin/service-role tərəfindən
-      // yazıla bilir (Duzelis33.sql — özünə sonsuz Premium yazma bug-ı
-      // düzəldilib) — default 'free' sətri artıq profil yaranan kimi
-      // avtomatik trigger ilə yaranır (ensure_default_subscription). Sətir
-      // hələ də tapılmasa (məs. miqrasiya işlədilməyibsə), subscription
-      // null qalır — ownPremium hesablaması bunu təhlükəsiz "free" sayır.
+      if (error) throw error;
+      const subscription = data as Subscription | null;
+      // A confirmed missing row must also clear the previous offline entitlement.
+      writeCache(SUBSCRIPTION_CACHE, userId, subscription);
+      return subscription;
+    },
+  });
 
-      const today = new Date().toISOString().split('T')[0];
-      const { data: usageData } = await supabase
+  const usageQuery = useQuery({
+    queryKey: ['subscription-usage', userId, today],
+    enabled: !!userId,
+    staleTime: 30_000,
+    retry: false,
+    networkMode: 'always',
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
         .from('usage_tracking')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .eq('usage_date', today);
 
-      if (usageData) {
-        setUsage(usageData as UsageTracking[]);
-      }
-    } catch (error) {
-      console.error('Error fetching subscription:', error);
-      // Offline → son bilinən abunə vəziyyəti (expires_at yoxlaması ownPremium-da qalır)
-      const cached = readCache<Subscription>(SUBSCRIPTION_CACHE, user.id);
-      if (cached) setSubscription(cached);
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
+      if (error) throw error;
+      return (data ?? []) as UsageTracking[];
+    },
+  });
 
-  useEffect(() => {
-    fetchSubscription();
-  }, [fetchSubscription]);
+  const householdQuery = useQuery({
+    queryKey: ['household-premium', userId, linkedPartnerId],
+    enabled: !!userId && !!linkedPartnerId,
+    staleTime: 30_000,
+    retry: false,
+    networkMode: 'always',
+    queryFn: async () => {
+      if (!userId || !linkedPartnerId) return false;
+      const { data, error } = await (supabase.rpc as any)('get_linked_partner_premium');
+      if (error) throw error;
+      writeCache(householdCacheKey, userId, data === true);
+      return data === true;
+    },
+  });
 
-  // Household premium: linked partnyorun abunəsi hər iki tərəfi açır.
-  // RPC mövcud deyilsə (migration tətbiq olunmayıbsa) səssizcə false qalır.
-  useEffect(() => {
-    let cancelled = false;
-    const checkHousehold = async () => {
-      if (!user || !profile?.linked_partner_id) {
-        setHouseholdPremium(false);
-        return;
-      }
-      try {
-        const { data, error } = await (supabase.rpc as any)('get_linked_partner_premium');
-        if (!cancelled) {
-          if (error) {
-            // RPC xətası (offline/migration yoxdur) → son bilinən dəyər
-            setHouseholdPremium(readCache<boolean>(HOUSEHOLD_PREMIUM_CACHE, user.id) === true);
-          } else {
-            setHouseholdPremium(data === true);
-            writeCache(HOUSEHOLD_PREMIUM_CACHE, user.id, data === true);
-          }
-        }
-      } catch {
-        // Şəbəkə xətası → son bilinən dəyər (yoxdursa false)
-        if (!cancelled) setHouseholdPremium(readCache<boolean>(HOUSEHOLD_PREMIUM_CACHE, user.id) === true);
-      }
-    };
-    checkHousehold();
-    return () => {cancelled = true;};
-  }, [user, profile?.linked_partner_id]);
+  // Keep query errors visible; reading offline data must not renew its cache lifetime.
+  const subscription = subscriptionQuery.isError && userId
+    ? readCache<Subscription>(SUBSCRIPTION_CACHE, userId)
+    : subscriptionQuery.data ?? null;
+  const usage = usageQuery.data;
+  const householdPremium = access.householdPremium;
+  const loading = !!userId && (subscriptionQuery.isLoading || usageQuery.isLoading || householdQuery.isLoading);
 
-  // Müddət yoxlaması: expires_at/premium_until KEÇMİŞDƏDİRSƏ premium sayılmır.
-  // (Əvvəllər 'active' status və is_premium flag-ı tarixsiz yoxlanılırdı →
-  // heç bir cron/webhook olmadığı üçün premium praktikada HEÇ VAXT bitmirdi.)
-  const notExpired = (until?: string | null) => !until || new Date(until) > new Date();
+  const { refetch: refetchSubscription } = subscriptionQuery;
+  const { refetch: refetchUsage } = usageQuery;
+  const { refetch: refetchHousehold } = householdQuery;
+  const refreshAccess = access.refresh;
+  const fetchSubscription = useCallback(async (): Promise<void> => {
+    if (!userId) return;
+    await Promise.all([
+      refetchSubscription({ cancelRefetch: false }),
+      refetchUsage({ cancelRefetch: false }),
+      refreshAccess({ cancelRefetch: false }),
+      ...(linkedPartnerId ? [refetchHousehold({ cancelRefetch: false })] : []),
+    ]);
+  }, [userId, linkedPartnerId, refetchSubscription, refetchUsage, refetchHousehold, refreshAccess]);
 
-  const ownPremium =
-  (subscription?.plan_type === 'premium' || subscription?.plan_type === 'premium_plus') &&
-  (subscription?.status === 'active' || subscription?.status === 'cancelled') &&
-  notExpired(subscription?.expires_at) ||
-  profile?.is_premium === true && notExpired((profile as any)?.premium_until);
+  // Only the bounded, current server grant authorizes paid access.
+  const ownPremium = access.ownPremium;
 
   // Household: linked partnyorun premiumu da sayılır
   const isPremium = ownPremium || householdPremium;
@@ -169,7 +165,7 @@ export function useSubscription() {
 
   const getUsageForFeature = useCallback(
     (featureType: UsageFeatureType): UsageTracking | undefined => {
-      return usage.find(u => u.feature_type === featureType);
+      return usage?.find(u => u.feature_type === featureType);
     },
     [usage]
   );
@@ -184,14 +180,14 @@ export function useSubscription() {
   ): Promise<{ allowed: boolean; remaining: number; limit: number }> => {
     const limit = Number(freeLimits[DAILY_LIMIT_KEYS[feature]] ?? 0);
     if (isPremium) return { allowed: true, remaining: Infinity, limit };
-    if (!user) return { allowed: false, remaining: 0, limit };
+    if (!userId) return { allowed: false, remaining: 0, limit };
 
     const today = new Date().toISOString().split('T')[0];
     try {
       const { data: row } = await supabase
         .from('usage_tracking')
         .select('id, usage_count')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .eq('feature_type', feature)
         .eq('usage_date', today)
         .maybeSingle();
@@ -203,7 +199,7 @@ export function useSubscription() {
         await supabase.from('usage_tracking').update({ usage_count: used + 1 }).eq('id', row.id);
       } else {
         await supabase.from('usage_tracking').upsert({
-          user_id: user.id,
+          user_id: userId,
           feature_type: feature,
           usage_date: today,
           usage_count: 1,
@@ -215,7 +211,7 @@ export function useSubscription() {
       console.error('checkAndConsume failed:', e);
       return { allowed: true, remaining: 0, limit };
     }
-  }, [isPremium, user, freeLimits]);
+  }, [isPremium, userId, freeLimits]);
 
   /** Gündəlik limitdən nə qədər qalıb — YALNIZ oxuyur (UI sayğacları üçün). */
   const peekRemainingDaily = useCallback(async (
@@ -223,13 +219,13 @@ export function useSubscription() {
   ): Promise<{ remaining: number; limit: number }> => {
     const limit = Number(freeLimits[DAILY_LIMIT_KEYS[feature]] ?? 0);
     if (isPremium) return { remaining: Infinity, limit };
-    if (!user) return { remaining: 0, limit };
+    if (!userId) return { remaining: 0, limit };
     const today = new Date().toISOString().split('T')[0];
     try {
       const { data: row } = await supabase
         .from('usage_tracking')
         .select('usage_count')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .eq('feature_type', feature)
         .eq('usage_date', today)
         .maybeSingle();
@@ -237,7 +233,7 @@ export function useSubscription() {
     } catch {
       return { remaining: limit, limit };
     }
-  }, [isPremium, user, freeLimits]);
+  }, [isPremium, userId, freeLimits]);
 
   const canUseWhiteNoise = useCallback((): { allowed: boolean; remainingSeconds: number } => {
     if (isPremium) {
@@ -259,14 +255,14 @@ export function useSubscription() {
       return { allowed: true, remainingCount: Infinity };
     }
 
-    if (!user) {
+    if (!userId) {
       return { allowed: false, remainingCount: 0 };
     }
 
     const { count } = await supabase
       .from('baby_photos')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id);
+      .eq('user_id', userId);
 
     const totalPhotos = count || 0;
     const remaining = freeLimits.baby_photoshoot_count - totalPhotos;
@@ -275,10 +271,10 @@ export function useSubscription() {
       allowed: remaining > 0,
       remainingCount: Math.max(0, remaining),
     };
-  }, [isPremium, user, freeLimits]);
+  }, [isPremium, userId, freeLimits]);
 
   const trackWhiteNoiseUsage = useCallback(async (seconds: number) => {
-    if (!user || isPremium) return;
+    if (!userId || isPremium) return;
 
     const today = new Date().toISOString().split('T')[0];
     const existingUsage = getUsageForFeature('white_noise');
@@ -292,15 +288,15 @@ export function useSubscription() {
       await supabase
         .from('usage_tracking')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           feature_type: 'white_noise',
           usage_date: today,
           usage_seconds: seconds,
         });
     }
 
-    fetchSubscription();
-  }, [fetchSubscription, getUsageForFeature, isPremium, user]);
+    await refetchUsage({ cancelRefetch: false });
+  }, [refetchUsage, getUsageForFeature, isPremium, userId]);
 
   // !!! DEPRECATED (Duzelis33 təhlükəsizlik düzəlişi) !!!
   // Əvvəllər bu 2 funksiya subscriptions.status-u BİRBAŞA DB-də dəyişirdi —
@@ -337,9 +333,10 @@ export function useSubscription() {
     isPremium,
     ownPremium,
     householdPremium,
+    entitlementReady: access.ready,
     isCancelled,
     cancelledButActive,
-    loading,
+    loading: loading || access.loading,
     canUseWhiteNoise,
     canUseBabyPhotoshoot,
     trackWhiteNoiseUsage,

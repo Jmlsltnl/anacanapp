@@ -1,11 +1,13 @@
 /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 // baby-insight: Yuxu / Qidalanma / Bez göstəricilərinin körpənin yaşına görə
-// AI norma analizi — qısa, effektiv, 4 dildə. Diaqnoz yox, məlumat + istiqamət.
+// Independently requested care sections in all21 languages; no diagnosis.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { callGeminiSmart } from "../_shared/vertex-ai.ts";
 import { checkAndConsumeServerSide, limitExceededResponse } from "../_shared/usage-limit.ts";
+import { EXPANDED_LANGUAGE_NAMES } from '../_shared/languages.ts';
+import { serverCopy } from '../_shared/localized-copy.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,6 +16,7 @@ const corsHeaders = {
 
 interface InsightRequest {
   language?: string;
+  section?: 'sleep' | 'feeding' | 'diaper';
   child: {
     ageMonths: number;
     ageDays: number;
@@ -88,6 +91,7 @@ const FALLBACK: Record<string, Insight> = {
 };
 
 const LANG_CONF: Record<string, { outLang: string }> = {
+  ...Object.fromEntries(Object.entries(EXPANDED_LANGUAGE_NAMES).map(([language, outLang]) => [language, { outLang }])),
   az: { outLang: '' },
   en: { outLang: 'ENGLISH' },
   ru: { outLang: 'RUSSIAN' },
@@ -98,6 +102,8 @@ const LANG_CONF: Record<string, { outLang: string }> = {
   de: { outLang: 'GERMAN' },
   ar: { outLang: 'ARABIC (feminine address to the mother)' },
 };
+
+import { checkModerationAccess } from '../_shared/auth.ts';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -127,11 +133,23 @@ Deno.serve(async (req) => {
       });
     }
 
+    const moderationError = await checkModerationAccess(user.id, 'baby-insight');
+    if (moderationError) return moderationError;
+    let body: InsightRequest;
+    try { body = await req.json(); } catch { body = {} as InsightRequest; }
+    const { language = 'az', child, stats, section } = body || {};
+    if (!child || !stats) return new Response(JSON.stringify({ success: false, error: 'INVALID_INSIGHT_DATA' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    if (!Object.hasOwn(LANG_CONF, language) || section !== undefined && !['sleep','feeding','diaper'].includes(section)) {
+      return new Response(JSON.stringify({ success: false, error: 'INVALID_INSIGHT_SCOPE' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const sections = section ? [section] : ['sleep','feeding','diaper'];
+    const fields = { sleep: ['sleepMinutes','sleepCount'], feeding: ['feedingCount','breastCount','formulaCount','formulaMl','solidCount'], diaper: ['diaperCount','wetCount','dirtyCount','mixedCount'] };
+    const numbers = [child.ageMonths,child.ageDays,stats.localHour,...sections.flatMap(key => fields[key as keyof typeof fields].map(field => (stats as any)[field]))];
+    if (numbers.some(value => typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 10000) || stats.localHour > 23) {
+      return new Response(JSON.stringify({ success: false, error: 'INVALID_INSIGHT_DATA' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
     const usage = await checkAndConsumeServerSide(user.id, 'baby_insight');
     if (!usage.allowed) return limitExceededResponse(corsHeaders, usage.limit);
-
-    const { language = 'az', child, stats } = await req.json() as InsightRequest;
-    if (!child || !stats) throw new Error('child and stats required');
 
     const langConf = LANG_CONF[language] ?? LANG_CONF.az;
 
@@ -143,6 +161,12 @@ Deno.serve(async (req) => {
 
     const sleepH = Math.floor(stats.sleepMinutes / 60);
     const sleepM = stats.sleepMinutes % 60;
+    const entries = [
+      sections.includes('sleep') ? `- Yuxu: ${sleepH} saat ${sleepM} dəq (${stats.sleepCount} seans)` : '',
+      sections.includes('feeding') ? `- Qidalanma: cəmi ${stats.feedingCount} dəfə (ana südü: ${stats.breastCount}, süd əvəzedicisi: ${stats.formulaCount}, cəmi ${stats.formulaMl} ml, əlavə qida: ${stats.solidCount})` : '',
+      sections.includes('diaper') ? `- Bez: cəmi ${stats.diaperCount} (nəm: ${stats.wetCount}, çirkli: ${stats.dirtyCount}, qarışıq: ${stats.mixedCount})` : '',
+    ].filter(Boolean).join('\n');
+    const outputShape = JSON.stringify(Object.fromEntries(sections.map(key => [key, { status: 'normal', note: '...' }])));
 
     const prompt = `${langConf.outLang ? `OUTPUT LANGUAGE: ${langConf.outLang}. Every "note" value MUST be written in natural, fluent ${langConf.outLang} — NEVER in Azerbaijani, even though the instructions below are written in Azerbaijani.
 
@@ -153,9 +177,7 @@ KÖRPƏ: ${ageDesc}${child.gender ? ` (${child.gender === 'girl' ? 'qız' : 'oğ
 VAXT KONTEKSTİ: hazırda saat təxminən ${stats.localHour}:00 — gün hələ bitməyib, göstəriciləri günün bu hissəsinə görə qiymətləndir (məsələn, səhər saatlarında az qeyd normaldır).
 
 BUGÜNKÜ QEYDLƏR:
-- Yuxu: ${sleepH} saat ${sleepM} dəq (${stats.sleepCount} seans)
-- Qidalanma: cəmi ${stats.feedingCount} dəfə (ana südü: ${stats.breastCount}, süd əvəzedicisi: ${stats.formulaCount}${stats.formulaMl > 0 ? ` / ${stats.formulaMl} ml` : ''}, əlavə qida: ${stats.solidCount})
-- Bez: cəmi ${stats.diaperCount} (nəm: ${stats.wetCount}, çirkli: ${stats.dirtyCount}, qarışıq: ${stats.mixedCount})
+${entries}
 
 YAŞ NORMALARI (istinad üçün, 24 saatlıq):
 - 0-3 ay: yuxu 14-17s; qidalanma 8-12 dəfə; nəm bez 6+; nəcis 3-4+ (yaş artdıqca seyrəkləşə bilər)
@@ -171,7 +193,8 @@ QAYDALAR:
 4. Qeyd azdırsa bunu nəzərə al — valideyn hər şeyi qeyd etməyə bilər.
 
 YALNIZ bu JSON formatında cavab ver (başqa heç nə yazma):
-{"sleep":{"status":"normal","note":"..."},"feeding":{"status":"normal","note":"..."},"diaper":{"status":"normal","note":"..."}}${langConf.outLang ? `
+${outputShape}
+Analyze ONLY these sections: ${sections.join(', ')}. Do not infer or discuss measurements from an unrequested section.${langConf.outLang ? `
 
 IMPORTANT: Write ALL "note" text values ONLY in ${langConf.outLang} (correct spelling and grammar — not a transliteration of Azerbaijani). Keep JSON keys and status enum values exactly as shown.` : ''}`;
 
@@ -185,7 +208,7 @@ IMPORTANT: Write ALL "note" text values ONLY in ${langConf.outLang} (correct spe
       if (geminiResponse.ok) break;
     }
 
-    let insight: Insight | null = null;
+    let insight: Partial<Insight> | null = null;
     if (geminiResponse && geminiResponse.ok) {
       const g = await geminiResponse.json();
       const textContent = g?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
@@ -194,28 +217,25 @@ IMPORTANT: Write ALL "note" text values ONLY in ${langConf.outLang} (correct spe
         try {
           const parsed = JSON.parse(m[0]);
           const ok = (s: any): s is SectionInsight =>
-            s && typeof s.note === 'string' && ['normal', 'low', 'high', 'watch'].includes(s.status);
-          if (ok(parsed.sleep) && ok(parsed.feeding) && ok(parsed.diaper)) {
-            insight = {
-              sleep: { status: parsed.sleep.status, note: String(parsed.sleep.note).slice(0, 200) },
-              feeding: { status: parsed.feeding.status, note: String(parsed.feeding.note).slice(0, 200) },
-              diaper: { status: parsed.diaper.status, note: String(parsed.diaper.note).slice(0, 200) },
-            };
+            s && typeof s.note === 'string' && !!s.note.trim() && ['normal', 'low', 'high', 'watch'].includes(s.status);
+          if (sections.every(key => ok(parsed[key]))) {
+            insight = Object.fromEntries(sections.map(key => [key, { status: parsed[key].status, note: String(parsed[key].note).slice(0, 200) }]));
           }
         } catch { /* fallback aşağıda */ }
       }
     }
 
     if (!insight) {
-      insight = FALLBACK[language] ?? FALLBACK.az;
+      if (section) return new Response(JSON.stringify({ success: false, error: 'AI_INSIGHT_UNAVAILABLE' }), { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      insight = serverCopy('babyFallback', language, FALLBACK[language] ?? FALLBACK.az);
     }
 
     return new Response(JSON.stringify({ success: true, insight }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('baby-insight error:', error);
-    return new Response(JSON.stringify({ success: false, error: String((error as Error)?.message ?? error) }), {
+    console.error('baby-insight request failed');
+    return new Response(JSON.stringify({ success: false, error: 'AI_INSIGHT_UNAVAILABLE' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

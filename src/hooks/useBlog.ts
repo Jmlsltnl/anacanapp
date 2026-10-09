@@ -5,6 +5,10 @@ import { tr, mapRowsTranslation, mapRowTranslation } from '@/lib/tr';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useUserStore } from '@/store/userStore';
 import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
+import type { Json } from '@/integrations/supabase/types';
+import { getBackendConfig } from '@/integrations/supabase/backend-config';
+import { blogLocale, blogCoverUrl } from '@/lib/blog-editorial';
 
 export type BlogLifeStage = 'flow' | 'bump' | 'mommy' | 'all';
 
@@ -43,6 +47,8 @@ export interface BlogPost {
   updated_at: string;
   category_ids?: string[]; // For multi-category support
   life_stage: BlogLifeStage;
+  editorial_metadata?: unknown;
+  category_slugs?: string[];
 }
 
 export interface BlogCategory {
@@ -74,18 +80,23 @@ const passesCountryFilter = (post: any, country: string | null): boolean => {
   return true;
 };
 
+export function localizeBlogPost(post: BlogPost, language: string): BlogPost {
+  const localized = mapRowTranslation(post, language, ['title', 'content', 'excerpt'])!;
+  const locale = blogLocale(post.editorial_metadata, language);
+  return { ...localized, tags: locale?.tags || post.tags || [],
+    author_name: post.author_name || 'Anacan', reading_time: post.reading_time || 5,
+    view_count: post.view_count || 0, cover_image_url: blogCoverUrl(post.cover_image_url) || null };
+}
+
 export const useBlog = () => {
   const { language } = useLanguage();
   const countryCode = useUserStore((s) => s.countryCode);
   const { profile } = useAuth();
   const userCountry = (profile as any)?.country_code || countryCode || null;
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [categories, setCategories] = useState<BlogCategory[]>([]);
-  const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchPosts = useCallback(async () => {
-    try {
+  const backend = getBackendConfig().url;
+  const postQuery = useQuery({
+    queryKey: ['blog-posts-v2', backend, language, userCountry], staleTime: 60_000,
+    queryFn: async () => {
       // Sərhədsiz idi (bütün nəşr olunmuş məqalələr) — təhlükəsizlik həddi
       // əlavə olunub; ölkə/kateqoriya/axtarış filtri hələ də client-side-dır
       // (bu cədvəl admin-idarəli məzmundur, community_posts kimi istifadəçi
@@ -93,7 +104,7 @@ export const useBlog = () => {
       // filtrinə keçid bu keçiddə prioritet deyil).
       const { data, error } = await supabase
         .from('blog_posts')
-        .select('*')
+        .select('*, blog_post_categories(category_id, blog_categories(slug))')
         .eq('is_published', true)
         .order('created_at', { ascending: false })
         .limit(200);
@@ -107,16 +118,13 @@ export const useBlog = () => {
       // REGISTRY-də tərcümə üçün qeydiyyatdan keçməyib (yalnız title/content/excerpt var);
       // əvvəllər 'category' burda verildikdə mövcud olan stray category_en sütunu post-un
       // slug-ını əvəz edirdi (yalnız EN istifadəçiləri üçün) və kateqoriya filtri/uyğunlaşması sınırdı.
-      typedPosts = mapRowsTranslation(typedPosts, language, ['title', 'content', 'excerpt']);
-      setPosts(typedPosts);
-      setFeaturedPosts(typedPosts.filter(p => p.is_featured));
-    } catch (error) {
-      console.error('Error fetching blog posts:', error);
-    }
-  }, [language, userCountry]);
-
-  const fetchCategories = useCallback(async () => {
-    try {
+      return typedPosts.map(post => ({ ...localizeBlogPost(post, language),
+        category_slugs: [...new Set([post.category, ...((post as any).blog_post_categories || []).map((item: any) => item.blog_categories?.slug).filter(Boolean)])] }));
+    },
+  });
+  const categoryQuery = useQuery({
+    queryKey: ['blog-categories-v2', backend, language], staleTime: 300_000,
+    queryFn: async () => {
       const data = await fetchAllRows((from, to) =>
         supabase
           .from('blog_categories')
@@ -127,13 +135,14 @@ export const useBlog = () => {
       );
       let typedCategories = (data || []) as BlogCategory[];
       typedCategories = mapRowsTranslation(typedCategories, language, ['name', 'description']);
-      setCategories(typedCategories);
-    } catch (error) {
-      console.error('Error fetching blog categories:', error);
-    }
-  }, [language]);
+      return typedCategories;
+    },
+  });
+  const posts = postQuery.data || [], categories = categoryQuery.data || [];
+  const featuredPosts = posts.filter(post => post.is_featured);
+  const loading = postQuery.isLoading || categoryQuery.isLoading;
 
-  const getPostBySlug = async (slug: string): Promise<BlogPost | null> => {
+  const getPostBySlug = useCallback(async (slug: string): Promise<BlogPost | null> => {
     try {
       const { data, error } = await supabase
         .from('blog_posts')
@@ -144,20 +153,16 @@ export const useBlog = () => {
 
       if (error) throw error;
       
-      // Increment view count using RPC function (bypasses RLS)
-      if (data) {
-        await supabase.rpc('increment_blog_view_count', { post_id: data.id });
-      }
-      
-      return data ? mapRowTranslation(data as BlogPost, language, ['title', 'content', 'excerpt']) : null;
+      if (data && !passesCountryFilter(data, userCountry)) return null;
+      return data ? localizeBlogPost(data as BlogPost, language) : null;
     } catch (error) {
       console.error('Error fetching post:', error);
       return null;
     }
-  };
+  }, [language, userCountry]);
 
   const getPostsByCategory = useCallback((categorySlug: string) => {
-    return posts.filter(p => p.category === categorySlug);
+    return posts.filter(p => p.category === categorySlug || p.category_slugs?.includes(categorySlug));
   }, [posts]);
 
   const searchPosts = useCallback((query: string) => {
@@ -165,18 +170,9 @@ export const useBlog = () => {
     return posts.filter(p => 
       p.title.toLowerCase().includes(lowerQuery) ||
       (p.excerpt && p.excerpt.toLowerCase().includes(lowerQuery)) ||
-      p.tags.some(t => t.toLowerCase().includes(lowerQuery))
+      (p.tags || []).some(t => t.toLowerCase().includes(lowerQuery))
     );
   }, [posts]);
-
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await Promise.all([fetchPosts(), fetchCategories()]);
-      setLoading(false);
-    };
-    loadData();
-  }, [fetchPosts, fetchCategories]);
 
   return {
     posts,
@@ -186,7 +182,8 @@ export const useBlog = () => {
     getPostBySlug,
     getPostsByCategory,
     searchPosts,
-    refetch: () => Promise.all([fetchPosts(), fetchCategories()])
+    error: postQuery.error || categoryQuery.error,
+    refetch: () => Promise.all([postQuery.refetch(), categoryQuery.refetch()])
   };
 };
 
@@ -206,6 +203,7 @@ export const useBlogAdmin = () => {
         supabase
           .from('blog_posts')
           .select('*')
+          .setHeader('X-Anacan-Blog-Format', 'source-v1')
           .order('created_at', { ascending: false })
           .range(from, to)
       );
@@ -294,7 +292,7 @@ export const useBlogAdmin = () => {
     try {
       const { data, error } = await supabase
         .from('blog_posts')
-        .insert(post)
+        .insert({ ...post, editorial_metadata: post.editorial_metadata as Json | undefined })
         .select()
         .single();
 
@@ -317,7 +315,7 @@ export const useBlogAdmin = () => {
     try {
       const { data, error } = await supabase
         .from('blog_posts')
-        .update(updates)
+        .update({ ...updates, editorial_metadata: updates.editorial_metadata as Json | undefined })
         .eq('id', id)
         .select()
         .single();
